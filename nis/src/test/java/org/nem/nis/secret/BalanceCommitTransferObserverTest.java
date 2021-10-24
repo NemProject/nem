@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,8 +26,8 @@ public class BalanceCommitTransferObserverTest {
 		NotificationUtils.notifyTransfer(context.observer, sender, recipient, Amount.fromNem(20));
 
 		// Assert:
-		Assert.assertThat(senderAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
-		Assert.assertThat(recipientAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
+		MatcherAssert.assertThat(senderAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
+		MatcherAssert.assertThat(recipientAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class BalanceCommitTransferObserverTest {
 		NotificationUtils.notifyCredit(context.observer, account, Amount.fromNem(20));
 
 		// Assert:
-		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
+		MatcherAssert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class BalanceCommitTransferObserverTest {
 		NotificationUtils.notifyDebit(context.observer, account, Amount.fromNem(20));
 
 		// Assert:
-		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
+		MatcherAssert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class BalanceCommitTransferObserverTest {
 		context.observer.notify(new AccountNotification(account));
 
 		// Assert:
-		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	private static class TestContext {

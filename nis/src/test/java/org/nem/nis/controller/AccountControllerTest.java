@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -108,7 +109,7 @@ public class AccountControllerTest {
 		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo("ok"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo("ok"));
 	}
 
 	@Test
@@ -132,7 +133,7 @@ public class AccountControllerTest {
 		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo("nope"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo("nope"));
 	}
 
 	private static class AccountIsUnlockedTestContext {
@@ -169,9 +170,9 @@ public class AccountControllerTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(entity);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		Assert.assertThat(jsonObject.get("num-unlocked"), IsEqual.equalTo(3));
-		Assert.assertThat(jsonObject.get("max-unlocked"), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.get("num-unlocked"), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(jsonObject.get("max-unlocked"), IsEqual.equalTo(8));
 	}
 
 	//endregion
@@ -198,7 +199,7 @@ public class AccountControllerTest {
 		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getEntity())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
@@ -230,8 +231,8 @@ public class AccountControllerTest {
 
 		// Assert:
 		final Collection<Hash> innerHashes = pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList());
-		Assert.assertThat(innerHashes.stream().filter(h -> null != h).count(), IsEqual.equalTo(3L));
-		Assert.assertThat(innerHashes, IsEqual.equalTo(expectedHashes));
+		MatcherAssert.assertThat(innerHashes.stream().filter(h -> null != h).count(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(innerHashes, IsEqual.equalTo(expectedHashes));
 	}
 
 	//endregion
@@ -258,7 +259,7 @@ public class AccountControllerTest {
 		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(idBuilder, pageBuilder);
 
 		// Assert:
-		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		MatcherAssert.assertThat(resultList, IsSame.sameInstance(expectedList));
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L, 12);
 	}
 
@@ -285,7 +286,7 @@ public class AccountControllerTest {
 				createAccountImportanceViewModel("alpha", 12, 45),
 				createAccountImportanceViewModel("gamma", 0, 0),
 				createAccountImportanceViewModel("sigma", 4, 88));
-		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
+		MatcherAssert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
 	private static AccountState createAccountState(
@@ -325,8 +326,8 @@ public class AccountControllerTest {
 		final KeyPairViewModel viewModel = context.controller.generateAccount();
 
 		// Assert:
-		Assert.assertThat(viewModel.getKeyPair(), IsNull.notNullValue());
-		Assert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
+		MatcherAssert.assertThat(viewModel.getKeyPair(), IsNull.notNullValue());
+		MatcherAssert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
 	}
 
 	//endregion

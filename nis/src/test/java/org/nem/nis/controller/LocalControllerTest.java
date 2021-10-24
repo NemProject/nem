@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -41,9 +42,9 @@ public class LocalControllerTest {
 		final NemRequestResult result = context.controller.heartbeat();
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(NemRequestResult.CODE_SUCCESS));
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_HEARTBEAT));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("ok"));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(NemRequestResult.CODE_SUCCESS));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_HEARTBEAT));
+		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("ok"));
 	}
 
 	//endregion
@@ -135,9 +136,9 @@ public class LocalControllerTest {
 
 	private static void assertStatus(final NemRequestResult result, final NemStatus expectedStatus) {
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(expectedStatus.getValue()));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(expectedStatus.getValue()));
+		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
 	}
 
 	//endregion

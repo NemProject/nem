@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -24,10 +25,10 @@ public class NamespaceModelToDbModelMappingTest {
 		final DbNamespace dbNamespace = context.mapping.map(namespace);
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner(), IsEqual.equalTo(context.dbOwner));
-		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("foo.bar"));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbNamespace.getLevel(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbNamespace.getOwner(), IsEqual.equalTo(context.dbOwner));
+		MatcherAssert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("foo.bar"));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbNamespace.getLevel(), IsEqual.equalTo(1));
 	}
 
 	private static class TestContext {

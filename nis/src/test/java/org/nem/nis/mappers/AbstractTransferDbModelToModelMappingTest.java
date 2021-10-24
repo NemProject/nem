@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -47,11 +48,11 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		final Transaction model = this.createMapping(mapper).map(dbModel);
 
 		// Assert:
-		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
-		Assert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
-		Assert.assertThat(model.getSignature(), IsEqual.equalTo(signature));
-		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
-		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
+		MatcherAssert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
+		MatcherAssert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(model.getSignature(), IsEqual.equalTo(signature));
+		MatcherAssert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
+		MatcherAssert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
 	}
 
 	@Test
@@ -73,11 +74,11 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		final Transaction model = this.createMapping(mapper).map(dbModel);
 
 		// Assert:
-		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
-		Assert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
-		Assert.assertThat(model.getSignature(), IsNull.nullValue());
-		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
-		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
+		MatcherAssert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
+		MatcherAssert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(model.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
+		MatcherAssert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
 	}
 
 	private static void addAccountMapping(final IMapper mapper) {

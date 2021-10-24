@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,7 +26,7 @@ public class NisDbModelToModelMapperTest {
 		final Block result = context.nisMapper.map(context.dbBlock);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(context.block));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(context.block));
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbBlock, Block.class);
 	}
 
@@ -41,7 +42,7 @@ public class NisDbModelToModelMapperTest {
 		final Transaction result = context.nisMapper.map(dbTransferTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(transfer));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(transfer));
 		Mockito.verify(context.mapper, Mockito.only()).map(dbTransferTransaction, Transaction.class);
 	}
 
@@ -81,7 +82,7 @@ public class NisDbModelToModelMapperTest {
 		final Namespace result = context.nisMapper.map(context.dbNamespace, Namespace.class);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(context.namespace));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(context.namespace));
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbNamespace, Namespace.class);
 	}
 
@@ -160,8 +161,8 @@ public class NisDbModelToModelMapperTest {
 			final Collection<Transaction> expectedTransfers = expectedTransferIndexes.stream().map(this.transfers::get).collect(Collectors.toList());
 			final List<AbstractTransfer> expectedDbTransfers = expectedTransferIndexes.stream().map(this.dbTransfers::get).collect(Collectors.toList());
 
-			Assert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
-			Assert.assertThat(transfers, IsEquivalent.equivalentTo(expectedTransfers));
+			MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
+			MatcherAssert.assertThat(transfers, IsEquivalent.equivalentTo(expectedTransfers));
 
 			for (int i = 0; i < numExpectedTransfers; ++i) {
 				Mockito.verify(this.mapper, Mockito.times(1)).map(Mockito.eq(expectedDbTransfers.get(i)), Mockito.any());

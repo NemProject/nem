@@ -1,5 +1,6 @@
 package org.nem.specific.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.deploy.CommonConfiguration;
@@ -15,7 +16,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Assert:
-		Assert.assertThat(policy.getAppConfigClass(), IsEqual.equalTo(NisAppConfig.class));
+		MatcherAssert.assertThat(policy.getAppConfigClass(), IsEqual.equalTo(NisAppConfig.class));
 	}
 
 	@Test
@@ -24,7 +25,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Assert:
-		Assert.assertThat(policy.getWebAppInitializerClass(), IsEqual.equalTo(NisWebAppInitializer.class));
+		MatcherAssert.assertThat(policy.getWebAppInitializerClass(), IsEqual.equalTo(NisWebAppInitializer.class));
 	}
 
 	@Test
@@ -33,7 +34,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Assert:
-		Assert.assertThat(policy.getWebAppWebsockInitializerClass(), IsEqual.equalTo(NisWebAppWebsocketInitializer.class));
+		MatcherAssert.assertThat(policy.getWebAppWebsockInitializerClass(), IsEqual.equalTo(NisWebAppWebsocketInitializer.class));
 	}
 
 	//endregion
@@ -69,6 +70,6 @@ public class NisConfigurationPolicyTest {
 		final CommonConfiguration configuration = policy.loadConfig(new String[] {});
 
 		// Assert:
-		Assert.assertThat(configuration, IsNull.notNullValue());
+		MatcherAssert.assertThat(configuration, IsNull.notNullValue());
 	}
 }

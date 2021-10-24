@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -19,7 +20,7 @@ public class MosaicEntryTest {
 		final MosaicEntry entry = new MosaicEntry(mosaicDefinition);
 
 		// Assert:
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(entry, 0, new Supply(123456));
 	}
 
@@ -29,7 +30,7 @@ public class MosaicEntryTest {
 		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(entry, new Supply(474));
 	}
 
@@ -60,7 +61,7 @@ public class MosaicEntryTest {
 		// Assert: only the entry's supply was updated
 		assertSupply(entry, new Supply(585));
 
-		Assert.assertThat(copy.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
+		MatcherAssert.assertThat(copy.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(copy, new Supply(474));
 	}
 
@@ -77,11 +78,11 @@ public class MosaicEntryTest {
 
 		// Assert:
 		final Quantity expectedCreatorBalance = MosaicUtils.toQuantity(new Supply(474), DEFAULT_DIVISIBILITY);
-		Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(4));
-		Assert.assertThat(getCreatorBalance(entry), IsEqual.equalTo(expectedCreatorBalance));
-		Assert.assertThat(entry.getBalances().getBalance(address1), IsEqual.equalTo(new Quantity(11)));
-		Assert.assertThat(entry.getBalances().getBalance(address2), IsEqual.equalTo(new Quantity(22)));
-		Assert.assertThat(entry.getBalances().getBalance(address3), IsEqual.equalTo(new Quantity(33)));
+		MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(getCreatorBalance(entry), IsEqual.equalTo(expectedCreatorBalance));
+		MatcherAssert.assertThat(entry.getBalances().getBalance(address1), IsEqual.equalTo(new Quantity(11)));
+		MatcherAssert.assertThat(entry.getBalances().getBalance(address2), IsEqual.equalTo(new Quantity(22)));
+		MatcherAssert.assertThat(entry.getBalances().getBalance(address3), IsEqual.equalTo(new Quantity(33)));
 	}
 
 	//endregion
@@ -151,9 +152,9 @@ public class MosaicEntryTest {
 
 	private static void assertSupply(final MosaicEntry entry, final int divisibility, final Supply expectedSupply) {
 		// supply increases / decreases should affect the mosaic creator's balance
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(expectedSupply));
-		Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
-		Assert.assertThat(getCreatorBalance(entry), IsEqual.equalTo(MosaicUtils.toQuantity(expectedSupply, divisibility)));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(expectedSupply));
+		MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getCreatorBalance(entry), IsEqual.equalTo(MosaicUtils.toQuantity(expectedSupply, divisibility)));
 	}
 
 	private static Quantity getCreatorBalance(final MosaicEntry entry) {

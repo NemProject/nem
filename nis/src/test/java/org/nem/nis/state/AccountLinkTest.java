@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,9 +19,9 @@ public class AccountLinkTest {
 		final AccountLink link = new AccountLink(height, amount, address);
 
 		// Assert:
-		Assert.assertThat(link.getHeight(), IsSame.sameInstance(height));
-		Assert.assertThat(link.getAmount(), IsSame.sameInstance(amount));
-		Assert.assertThat(link.getOtherAccountAddress(), IsSame.sameInstance(address));
+		MatcherAssert.assertThat(link.getHeight(), IsSame.sameInstance(height));
+		MatcherAssert.assertThat(link.getAmount(), IsSame.sameInstance(amount));
+		MatcherAssert.assertThat(link.getOtherAccountAddress(), IsSame.sameInstance(address));
 	}
 
 	@Test
@@ -30,8 +31,8 @@ public class AccountLinkTest {
 		final AccountLink link2 = NisUtils.createLink(7, 12, "AAA");
 
 		// Assert:
-		Assert.assertThat(link1.compareTo(link2), IsEqual.equalTo(0));
-		Assert.assertThat(link2.compareTo(link1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(link1.compareTo(link2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(link2.compareTo(link1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -41,8 +42,8 @@ public class AccountLinkTest {
 		final AccountLink link2 = NisUtils.createLink(7, 12, "ZZZ");
 
 		// Assert:
-		Assert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
-		Assert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -52,8 +53,8 @@ public class AccountLinkTest {
 		final AccountLink link2 = NisUtils.createLink(8, 1, "ZZZ");
 
 		// Assert:
-		Assert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
-		Assert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -63,8 +64,8 @@ public class AccountLinkTest {
 		final AccountLink link2 = NisUtils.createLink(8, 1, "AAA");
 
 		// Assert:
-		Assert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
-		Assert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link1.compareTo(link2) >= 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
 	}
 
 	//region equals / hashCode
@@ -75,12 +76,12 @@ public class AccountLinkTest {
 		final AccountLink link = NisUtils.createLink(8, 1, "ZZZ");
 
 		// Assert:
-		Assert.assertThat(NisUtils.createLink(8, 1, "ZZZ"), IsEqual.equalTo(link));
-		Assert.assertThat(NisUtils.createLink(9, 1, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(NisUtils.createLink(8, 2, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(NisUtils.createLink(8, 1, "ZZA"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(8, IsNot.not(IsEqual.equalTo((Object)link)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZZ"), IsEqual.equalTo(link));
+		MatcherAssert.assertThat(NisUtils.createLink(9, 1, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 2, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZA"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object)link)));
 	}
 
 	@Test
@@ -90,10 +91,10 @@ public class AccountLinkTest {
 		final int hashCode = link.hashCode();
 
 		// Assert:
-		Assert.assertThat(NisUtils.createLink(8, 1, "ZZZ").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(NisUtils.createLink(9, 1, "ZZZ").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(NisUtils.createLink(8, 2, "ZZZ").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(NisUtils.createLink(8, 1, "ZZA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZZ").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(NisUtils.createLink(9, 1, "ZZZ").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 2, "ZZZ").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -106,7 +107,7 @@ public class AccountLinkTest {
 		final AccountLink link = NisUtils.createLink(8, 1, "ZZZ");
 
 		// Assert:
-		Assert.assertThat(link.toString(), IsEqual.equalTo("1000000 -> ZZZ @ 8"));
+		MatcherAssert.assertThat(link.toString(), IsEqual.equalTo("1000000 -> ZZZ @ 8"));
 	}
 
 	//endregion

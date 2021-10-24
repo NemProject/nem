@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
@@ -15,7 +16,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 1, Amount.ZERO, Amount.ZERO);
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -25,7 +26,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.ZERO, Amount.fromNem(1_000_000));
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -35,7 +36,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.ZERO);
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.fromNem(2_000_000));
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(3_000_000)));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(3_000_000)));
 	}
 
 	//endregion ctor
@@ -62,7 +63,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(1_100_000));
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -77,7 +78,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 14401, Amount.fromMicroNem(586_189_403_910L), Amount.fromMicroNem(413_810_596_090L));
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -90,7 +91,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.fromNem(1_000_000), Amount.fromNem(100_000));
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -124,7 +125,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -137,7 +138,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
-		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -150,7 +151,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 50 * 1440 + 1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -162,9 +163,9 @@ public class WeightedBalanceTest {
 			balance = balance.next();
 
 			// Assert:
-			Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440 * i + 1)));
+			MatcherAssert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(1440 * i + 1)));
 			final Amount sum = balance.getVestedBalance().add(balance.getUnvestedBalance());
-			Assert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
+			MatcherAssert.assertThat(sum, IsEqual.equalTo(Amount.fromMicroNem(75)));
 		}
 	}
 
@@ -182,7 +183,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(900_000));
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -196,7 +197,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 14401, Amount.fromMicroNem(586_189_403_910L), Amount.fromMicroNem(313_810_596_090L));
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -209,7 +210,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.fromNem(900_000), Amount.ZERO);
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -223,7 +224,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -237,7 +238,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
-		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(3_000_000)));
+		MatcherAssert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(3_000_000)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -287,9 +288,9 @@ public class WeightedBalanceTest {
 		final WeightedBalance weightedBalance2 = WeightedBalance.createUnvested(new BlockHeight(20), Amount.fromMicroNem(1000));
 
 		// Assert:
-		Assert.assertThat(weightedBalance1.compareTo(weightedBalance1), IsEqual.equalTo(0));
-		Assert.assertThat(weightedBalance1.compareTo(weightedBalance2), IsEqual.equalTo(-1));
-		Assert.assertThat(weightedBalance2.compareTo(weightedBalance1), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(weightedBalance1.compareTo(weightedBalance1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(weightedBalance1.compareTo(weightedBalance2), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(weightedBalance2.compareTo(weightedBalance1), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -302,7 +303,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(copiedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
-		Assert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -315,7 +316,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(copiedBalance, 3, Amount.fromNem(17), Amount.fromNem(12));
-		Assert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(29)));
+		MatcherAssert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(29)));
 	}
 
 	//endregion
@@ -335,10 +336,10 @@ public class WeightedBalanceTest {
 			final Amount vestedAmount,
 			final Amount unvestedAmount) {
 		// Assert
-		Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
-		Assert.assertThat(balance.getVestedBalance(), IsEqual.equalTo(vestedAmount));
-		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(unvestedAmount));
+		MatcherAssert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
+		MatcherAssert.assertThat(balance.getVestedBalance(), IsEqual.equalTo(vestedAmount));
+		MatcherAssert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(unvestedAmount));
 		final Amount expectedBalance = vestedAmount.add(unvestedAmount);
-		Assert.assertThat(balance.getBalance(), IsEqual.equalTo(expectedBalance));
+		MatcherAssert.assertThat(balance.getBalance(), IsEqual.equalTo(expectedBalance));
 	}
 }

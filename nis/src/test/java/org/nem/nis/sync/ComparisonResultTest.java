@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -17,14 +18,14 @@ public class ComparisonResultTest {
 		final ComparisonResult.Code code = ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE;
 
 		// Assert:
-		Assert.assertThat(code.getValue(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(code.getValue(), IsEqual.equalTo(5));
 	}
 
 	@Test
 	public void isEvilOnlyReturnsTrueForEvilCodes() {
 		for (final ComparisonResult.Code code : ComparisonResult.Code.values()) {
 			// Assert: (check negative as an alternative to high bit check)
-			Assert.assertThat(code.isEvil(), IsEqual.equalTo(code.getValue() < 0));
+			MatcherAssert.assertThat(code.isEvil(), IsEqual.equalTo(code.getValue() < 0));
 		}
 	}
 
@@ -40,10 +41,10 @@ public class ComparisonResultTest {
 				new BlockHeight(66));
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(33L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(66)));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(33L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(66)));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -94,7 +95,7 @@ public class ComparisonResultTest {
 			final NodeInteractionResult expectedResult = neutralCodes.contains(code)
 					? NodeInteractionResult.NEUTRAL
 					: NodeInteractionResult.FAILURE;
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
 }

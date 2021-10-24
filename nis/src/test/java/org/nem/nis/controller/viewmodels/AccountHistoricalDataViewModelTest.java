@@ -1,6 +1,7 @@
 package org.nem.nis.controller.viewmodels;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -24,13 +25,13 @@ public class AccountHistoricalDataViewModelTest {
 				0.678);
 
 		// Assert:
-		Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(123L)));
-		Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234)));
-		Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
-		Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(456)));
-		Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.567));
-		Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.678));
+		MatcherAssert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(123L)));
+		MatcherAssert.assertThat(viewModel.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234)));
+		MatcherAssert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
+		MatcherAssert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(456)));
+		MatcherAssert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.567));
+		MatcherAssert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.678));
 	}
 
 	@Test
@@ -50,13 +51,13 @@ public class AccountHistoricalDataViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(7));
-		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(123L));
-		Assert.assertThat(jsonObject.get("address"), IsEqual.equalTo(address.toString()));
-		Assert.assertThat(jsonObject.get("balance"), IsEqual.equalTo(234000000L));
-		Assert.assertThat(jsonObject.get("vestedBalance"), IsEqual.equalTo(345000000L));
-		Assert.assertThat(jsonObject.get("unvestedBalance"), IsEqual.equalTo(456000000L));
-		Assert.assertThat(jsonObject.get("importance"), IsEqual.equalTo(0.567));
-		Assert.assertThat(jsonObject.get("pageRank"), IsEqual.equalTo(0.678));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(jsonObject.get("height"), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(jsonObject.get("address"), IsEqual.equalTo(address.toString()));
+		MatcherAssert.assertThat(jsonObject.get("balance"), IsEqual.equalTo(234000000L));
+		MatcherAssert.assertThat(jsonObject.get("vestedBalance"), IsEqual.equalTo(345000000L));
+		MatcherAssert.assertThat(jsonObject.get("unvestedBalance"), IsEqual.equalTo(456000000L));
+		MatcherAssert.assertThat(jsonObject.get("importance"), IsEqual.equalTo(0.567));
+		MatcherAssert.assertThat(jsonObject.get("pageRank"), IsEqual.equalTo(0.678));
 	}
 }

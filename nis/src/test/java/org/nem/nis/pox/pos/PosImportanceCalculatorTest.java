@@ -1,5 +1,6 @@
 package org.nem.nis.pox.pos;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
@@ -30,7 +31,7 @@ public class PosImportanceCalculatorTest {
 		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
-		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
+		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> MatcherAssert.assertThat(
 				accountImportance.getHeight(),
 				IsEqual.equalTo(HEIGHT)));
 	}
@@ -41,7 +42,7 @@ public class PosImportanceCalculatorTest {
 		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
-		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
+		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> MatcherAssert.assertThat(
 				accountImportance.getLastPageRank(),
 				IsEqual.equalTo(0.0)));
 	}
@@ -55,7 +56,7 @@ public class PosImportanceCalculatorTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class PosImportanceCalculatorTest {
 				.reduce(0.0, Double::sum);
 
 		// Assert:
-		Assert.assertThat(sum, IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(sum, IsEqual.equalTo(1.0));
 	}
 
 	@Test
@@ -81,7 +82,7 @@ public class PosImportanceCalculatorTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
 	}
 
 	private static Collection<AccountState> recalculate(final long... balances) {

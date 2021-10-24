@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -28,8 +29,8 @@ public class MosaicControllerTest {
 		final MosaicIdSupplyPair pair = context.controller.getMosaicSupply(context.getMosaicIdBuilder("id3:name3"));
 
 		// Assert:
-		Assert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
-		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(300)));
+		MatcherAssert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
+		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(300)));
 		context.assertNamespaceCacheGetDelegation("id3", true);
 	}
 
@@ -74,8 +75,8 @@ public class MosaicControllerTest {
 				.collect(Collectors.toSet());
 
 		// Assert:
-		Assert.assertThat(pairs.size(), IsEqual.equalTo(4));
-		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		Arrays.stream(requestIds).forEach(id -> context.assertNamespaceCacheGetDelegation(String.format("id%d", id), true));
 		context.assertNamespaceCacheNumGetDelegations(4);
 	}

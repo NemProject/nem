@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -72,11 +73,11 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 				final DbImportanceTransferTransaction dbModel,
 				final Integer expectedMode,
 				final ImportanceTransferTransaction model) {
-			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
-			Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(expectedMode));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
+			MatcherAssert.assertThat(dbModel.getMode(), IsEqual.equalTo(expectedMode));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
+			MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
 	}
 }

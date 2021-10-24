@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ public class AuditInterceptorTest {
 		final boolean result = context.interceptor.preHandle(context.request, context.response, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(1)).add("127.0.0.10", "/foo/bar");
 	}
 
@@ -45,7 +46,7 @@ public class AuditInterceptorTest {
 		final boolean result = context.interceptor.preHandle(context.request, context.response, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(0)).add(Mockito.any(), Mockito.any());
 	}
 

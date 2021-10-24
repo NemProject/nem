@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -41,9 +42,9 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
-		Assert.assertThat(dbModel.getMessageType(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getMessagePayload(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dbModel.getMessageType(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getMessagePayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -58,9 +59,9 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
-		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -75,9 +76,9 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
-		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(2));
-		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(dbModel.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -92,13 +93,13 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
-		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(dbModel.getMosaics().size(), IsEqual.equalTo(5));
-		Assert.assertThat(dbModel.getMosaics(), IsEquivalent.equivalentTo(context.dbMosaics));
+		MatcherAssert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(dbModel.getMosaics().size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(dbModel.getMosaics(), IsEquivalent.equivalentTo(context.dbMosaics));
 
 		context.mosaics.forEach(mosaic -> Mockito.verify(context.mapper, Mockito.times(1)).map(mosaic, DbMosaic.class));
-		dbModel.getMosaics().forEach(dbMosaic -> Assert.assertThat(dbMosaic.getTransferTransaction(), IsEqual.equalTo(dbModel)));
+		dbModel.getMosaics().forEach(dbMosaic -> MatcherAssert.assertThat(dbMosaic.getTransferTransaction(), IsEqual.equalTo(dbModel)));
 	}
 
 	@Override
@@ -153,11 +154,11 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		}
 
 		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {
-			Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
-			Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(111111L));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
+			MatcherAssert.assertThat(dbModel.getAmount(), IsEqual.equalTo(111111L));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
+			MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
 	}
 }

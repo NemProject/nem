@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -63,8 +64,8 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		final PoxFacade copyFacade = facade.copy();
 
 		// Assert:
-		Assert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
-		Assert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		MatcherAssert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
@@ -102,8 +103,8 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.shallowCopyTo(copyFacade);
 
 		// Assert:
-		Assert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
-		Assert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		MatcherAssert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
@@ -141,7 +142,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		// Assert: the generator was called once and passed a collection with three accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_70.prev()), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
+		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_20.prev()), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2)));
+		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2)));
 	}
 
 	@Test
@@ -176,7 +177,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_70.prev()), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
+		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
@@ -210,7 +211,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		// Assert: the generator was called twice and passed a collection with three accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(2)).recalculate(Mockito.any(), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
+		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
@@ -226,7 +227,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
-		Assert.assertThat(facade.getLastVectorSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(facade.getLastVectorSize(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -242,7 +243,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
-		Assert.assertThat(facade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		MatcherAssert.assertThat(facade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	private static List<AccountState> createAccountStatesForRecalculateTests(final int numAccounts) {

@@ -1,6 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -19,9 +20,9 @@ public class DbAccountTest {
 		final DbAccount account = new DbAccount();
 
 		// Assert:
-		Assert.assertThat(account.getId(), IsNull.nullValue());
-		Assert.assertThat(account.getPrintableKey(), IsNull.nullValue());
-		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPrintableKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPublicKey(), IsNull.nullValue());
 	}
 
 	@Test
@@ -30,9 +31,9 @@ public class DbAccountTest {
 		final DbAccount account = new DbAccount(7);
 
 		// Assert:
-		Assert.assertThat(account.getId(), IsEqual.equalTo(7L));
-		Assert.assertThat(account.getPrintableKey(), IsNull.nullValue());
-		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getId(), IsEqual.equalTo(7L));
+		MatcherAssert.assertThat(account.getPrintableKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPublicKey(), IsNull.nullValue());
 	}
 
 	@Test
@@ -41,9 +42,9 @@ public class DbAccountTest {
 		final DbAccount account = new DbAccount("TALICE", null);
 
 		// Assert:
-		Assert.assertThat(account.getId(), IsNull.nullValue());
-		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
-		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
+		MatcherAssert.assertThat(account.getPublicKey(), IsNull.nullValue());
 	}
 
 	@Test
@@ -53,9 +54,9 @@ public class DbAccountTest {
 		final DbAccount account = new DbAccount("TALICE", publicKey);
 
 		// Assert:
-		Assert.assertThat(account.getId(), IsNull.nullValue());
-		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
-		Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(account.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
+		MatcherAssert.assertThat(account.getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
 	@Test
@@ -65,9 +66,9 @@ public class DbAccountTest {
 		final DbAccount account = new DbAccount(address);
 
 		// Assert:
-		Assert.assertThat(account.getId(), IsNull.nullValue());
-		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
-		Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		MatcherAssert.assertThat(account.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
+		MatcherAssert.assertThat(account.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	//endregion
@@ -98,7 +99,7 @@ public class DbAccountTest {
 					? IsNot.not(IsEqual.equalTo(dbAccount))
 					: IsEqual.equalTo(dbAccount);
 
-			Assert.assertThat(entry.getValue(), matcher);
+			MatcherAssert.assertThat(entry.getValue(), matcher);
 		}
 	}
 
@@ -114,7 +115,7 @@ public class DbAccountTest {
 					? IsNot.not(IsEqual.equalTo(hashCode))
 					: IsEqual.equalTo(hashCode);
 
-			Assert.assertThat(entry.getValue().hashCode(), matcher);
+			MatcherAssert.assertThat(entry.getValue().hashCode(), matcher);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -71,9 +72,9 @@ public class MultisigTransactionRawToDbModelMappingTest {
 
 				final AbstractBlockTransfer dbTransferFromMappedModel = entry.getFromMultisig.apply(dbModel);
 				if (type == this.entry.type) {
-					Assert.assertThat(dbTransferFromMappedModel, IsEqual.equalTo(dbTransfer));
+					MatcherAssert.assertThat(dbTransferFromMappedModel, IsEqual.equalTo(dbTransfer));
 				} else {
-					Assert.assertThat(dbTransferFromMappedModel, IsNull.nullValue());
+					MatcherAssert.assertThat(dbTransferFromMappedModel, IsNull.nullValue());
 				}
 			}
 		}
@@ -93,11 +94,11 @@ public class MultisigTransactionRawToDbModelMappingTest {
 
 		private static void assertDbModelFields(final DbMultisigTransaction dbModel) {
 			// Assert:
-			Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-			Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+			MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+			MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 	}
 

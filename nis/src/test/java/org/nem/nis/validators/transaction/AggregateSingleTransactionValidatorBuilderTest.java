@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -72,7 +73,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		final ValidationResult result = aggregate.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(validator, Mockito.only()).validate(transaction, validationContext);
 	}
 
@@ -94,14 +95,14 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		final ValidationResult result = aggregate.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
 		Mockito.verify(validator, Mockito.only()).validate(pairsCaptor.capture());
 
 		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-		Assert.assertThat(pair.getContext(), IsSame.sameInstance(validationContext));
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
+		MatcherAssert.assertThat(pair.getContext(), IsSame.sameInstance(validationContext));
+		MatcherAssert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@SuppressWarnings("unchecked")

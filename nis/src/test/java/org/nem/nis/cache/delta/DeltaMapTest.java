@@ -1,5 +1,6 @@
 package org.nem.nis.cache.delta;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -35,7 +36,7 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 		final DeltaMap<?, ?> map = this.createMapWithCapacity(11);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -78,11 +79,11 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 	private static void assertContents(
 			final DeltaMap<Integer, String> map,
 			final Collection<Map.Entry<Integer, String>> entries) {
-		Assert.assertThat(map.size(), IsEqual.equalTo(entries.size()));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(entries.size()));
 		entries.stream()
 				.forEach(e -> {
-					Assert.assertThat(map.containsKey(e.getKey()), IsEqual.equalTo(true));
-					Assert.assertThat(map.get(e.getKey()), IsEqual.equalTo(e.getValue()));
+					MatcherAssert.assertThat(map.containsKey(e.getKey()), IsEqual.equalTo(true));
+					MatcherAssert.assertThat(map.get(e.getKey()), IsEqual.equalTo(e.getValue()));
 				});
 	}
 }

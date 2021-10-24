@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,7 +20,7 @@ public class PeerNetworkSchedulerTest {
 		// Act:
 		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Assert:
-			Assert.assertThat(scheduler.getVisitors().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(scheduler.getVisitors().size(), IsEqual.equalTo(0));
 		}
 	}
 
@@ -44,7 +45,7 @@ public class PeerNetworkSchedulerTest {
 					"BROADCAST BUFFERED ENTITIES",
 					"UPDATE NODE EXPERIENCES",
 					"PRUNE NODE EXPERIENCES");
-			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
+			MatcherAssert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
 
@@ -57,7 +58,7 @@ public class PeerNetworkSchedulerTest {
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
-			Assert.assertThat(!taskNames.contains("TIME SYNCHRONIZATION"), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(!taskNames.contains("TIME SYNCHRONIZATION"), IsEqual.equalTo(true));
 		}
 	}
 
@@ -70,7 +71,7 @@ public class PeerNetworkSchedulerTest {
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
-			Assert.assertThat(!taskNames.contains("AUTO IP DETECTION"), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(!taskNames.contains("AUTO IP DETECTION"), IsEqual.equalTo(true));
 		}
 	}
 
@@ -93,7 +94,7 @@ public class PeerNetworkSchedulerTest {
 					"BROADCAST BUFFERED ENTITIES",
 					"UPDATE NODE EXPERIENCES",
 					"PRUNE NODE EXPERIENCES");
-			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
+			MatcherAssert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
 

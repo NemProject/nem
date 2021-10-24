@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
@@ -30,7 +31,7 @@ public class TransferTransactionValidatorTest {
 		final ValidationResult result = validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static TransferTransaction createTransaction(final int amount, final int fee) {
@@ -136,7 +137,7 @@ public class TransferTransactionValidatorTest {
 	private static void assertMessageSizesValidation(final int[] messageSizes, final Long height, final ValidationResult expectedResult) {
 		// Assert:
 		for (final int messageSize : messageSizes) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					String.format("message size: %d, height: %d", messageSize, height),
 					isMessageSizeValid(messageSize, height),
 					IsEqual.equalTo(expectedResult));

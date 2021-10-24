@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -190,10 +191,10 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 
 		public void assertModel(final MultisigTransaction model, final int numExpectedSignatures) {
-			Assert.assertThat(model.getOtherTransaction(), IsEqual.equalTo(this.expectedOtherTransaction));
-			Assert.assertThat(model.getCosignerSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
+			MatcherAssert.assertThat(model.getOtherTransaction(), IsEqual.equalTo(this.expectedOtherTransaction));
+			MatcherAssert.assertThat(model.getCosignerSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
 
-			Assert.assertThat(model.getCosignerSignatures(), IsEqual.equalTo(this.expectedSignatures));
+			MatcherAssert.assertThat(model.getCosignerSignatures(), IsEqual.equalTo(this.expectedSignatures));
 		}
 	}
 }

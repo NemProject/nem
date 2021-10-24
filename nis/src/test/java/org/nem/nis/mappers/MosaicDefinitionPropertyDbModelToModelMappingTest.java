@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.NemProperty;
@@ -19,7 +20,7 @@ public class MosaicDefinitionPropertyDbModelToModelMappingTest {
 		final NemProperty property = mapping.map(dbMosaicProperty);
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
-		Assert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
+		MatcherAssert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
 	}
 }

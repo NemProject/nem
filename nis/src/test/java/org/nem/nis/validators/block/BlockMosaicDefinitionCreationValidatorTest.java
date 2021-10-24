@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -230,7 +231,7 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 			final ValidationResult result = this.validator.validate(this.block);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
 }

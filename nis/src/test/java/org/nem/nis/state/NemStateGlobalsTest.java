@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,7 +17,7 @@ public class NemStateGlobalsTest {
 	@Test
 	public void canCreateWeightedBalancesUsingDefaultSupplier() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				NemStateGlobals.createWeightedBalances(),
 				IsInstanceOf.instanceOf(TimeBasedVestingWeightedBalances.class));
 	}
@@ -30,7 +31,7 @@ public class NemStateGlobalsTest {
 		NemStateGlobals.setWeightedBalancesSupplier(() -> balances);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				NemStateGlobals.createWeightedBalances(),
 				IsEqual.equalTo(balances));
 	}

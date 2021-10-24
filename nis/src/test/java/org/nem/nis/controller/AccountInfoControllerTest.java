@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -147,8 +148,8 @@ public class AccountInfoControllerTest {
 			final AccountMetaData accountMetaData = this.getAccountInfo(context);
 
 			// Assert:
-			Assert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(0));
-			Assert.assertThat(accountMetaData.getCosignatories().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(accountMetaData.getCosignatories().size(), IsEqual.equalTo(0));
 		}
 
 		@Test
@@ -190,8 +191,8 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			// - each account info was queried and returned
-			Assert.assertThat(getAccountInfos.apply(accountMetaData).size(), IsEqual.equalTo(3));
-			Assert.assertThat(getAccountInfos.apply(accountMetaData), IsEquivalent.equivalentTo(accountInfos));
+			MatcherAssert.assertThat(getAccountInfos.apply(accountMetaData).size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(getAccountInfos.apply(accountMetaData), IsEquivalent.equivalentTo(accountInfos));
 			for (final Address address : addresses) {
 				Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
 			}
@@ -215,7 +216,7 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
+			MatcherAssert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
@@ -264,7 +265,7 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
+			MatcherAssert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
 		}
@@ -299,7 +300,7 @@ public class AccountInfoControllerTest {
 		@Override
 		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
 			final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
-			Assert.assertThat(pairs.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(1));
 			return pairs.get(0);
 		}
 
@@ -323,8 +324,8 @@ public class AccountInfoControllerTest {
 			final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(deserializer);
 
 			// Assert:
-			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
-			Assert.assertThat(
+			MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(
 					pairs.asCollection().stream().map(AbstractMetaDataPair::getEntity).collect(Collectors.toList()),
 					IsEquivalent.equivalentTo(accountInfos));
 			Mockito.verify(context.accountInfoFactory, Mockito.times(3)).createInfo(Mockito.any());
@@ -357,15 +358,15 @@ public class AccountInfoControllerTest {
 			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
 
 			// Assert:
-			Assert.assertThat(viewModels.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(viewModels.size(), IsEqual.equalTo(1));
 			final AccountHistoricalDataViewModel viewModel = viewModels.get(0);
-			Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(625)));
-			Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
-			Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234 + 345)));
-			Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(234)));
-			Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
-			Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.456));
-			Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.567));
+			MatcherAssert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(625)));
+			MatcherAssert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+			MatcherAssert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234 + 345)));
+			MatcherAssert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(234)));
+			MatcherAssert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
+			MatcherAssert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.456));
+			MatcherAssert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.567));
 		}
 
 		@Test
@@ -396,16 +397,16 @@ public class AccountInfoControllerTest {
 			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
 
 			// Assert:
-			Assert.assertThat(viewModels.size(), IsEqual.equalTo(heights.length));
+			MatcherAssert.assertThat(viewModels.size(), IsEqual.equalTo(heights.length));
 			for (int i = 0; i < heights.length; i++) {
 				final AccountHistoricalDataViewModel viewModel = viewModels.get(i);
-				Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[i]));
-				Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
-				Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(vestedBalances[i].add(unvestedBalances[i])));
-				Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(vestedBalances[i]));
-				Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(unvestedBalances[i]));
-				Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(importances[i]));
-				Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(pageRanks[i]));
+				MatcherAssert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[i]));
+				MatcherAssert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+				MatcherAssert.assertThat(viewModel.getBalance(), IsEqual.equalTo(vestedBalances[i].add(unvestedBalances[i])));
+				MatcherAssert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(vestedBalances[i]));
+				MatcherAssert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(unvestedBalances[i]));
+				MatcherAssert.assertThat(viewModel.getImportance(), IsEqual.equalTo(importances[i]));
+				MatcherAssert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(pageRanks[i]));
 			}
 		}
 
@@ -459,19 +460,19 @@ public class AccountInfoControllerTest {
 				final List<SerializableAccountId> accountIds,
 				final BlockHeight[] heights) {
 			// Assert:
-			Assert.assertThat(viewModelsList.size(), IsEqual.equalTo(accountIds.size()));
+			MatcherAssert.assertThat(viewModelsList.size(), IsEqual.equalTo(accountIds.size()));
 			for (int i = 0; i < accountIds.size(); ++i) {
 				final SerializableList<AccountHistoricalDataViewModel> viewModels = viewModelsList.get(i);
 				for (int j = 0; j < heights.length; ++j) {
 					final int index = i * heights.length + j;
 					final AccountHistoricalDataViewModel viewModel = viewModels.get(j);
-					Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[j]));
-					Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(accountIds.get(i).getAddress()));
-					Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(5 * index)));
-					Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(2 * index)));
-					Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(3 * index)));
-					Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(4.0 * index));
-					Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(5.0 * index));
+					MatcherAssert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[j]));
+					MatcherAssert.assertThat(viewModel.getAddress(), IsEqual.equalTo(accountIds.get(i).getAddress()));
+					MatcherAssert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(5 * index)));
+					MatcherAssert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(2 * index)));
+					MatcherAssert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(3 * index)));
+					MatcherAssert.assertThat(viewModel.getImportance(), IsEqual.equalTo(4.0 * index));
+					MatcherAssert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(5.0 * index));
 				}
 			}
 		}
@@ -491,7 +492,7 @@ public class AccountInfoControllerTest {
 					= context.controller.accountHistoricalDataGetBatch(deserializer);
 
 			// Assert:
-			Assert.assertThat(viewModelsList.size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(viewModelsList.size(), IsEqual.equalTo(0));
 		}
 		@Test
 		public void accountHistoricalDataGetBatchCanReturnHistoricalDataForSingleAccount_SingleHeight() {
@@ -710,7 +711,7 @@ public class AccountInfoControllerTest {
 				final AccountMetaData accountMetaData,
 				final AccountRemoteStatus remoteStatus,
 				final long blockHeight) {
-			Assert.assertThat(accountMetaData.getRemoteStatus(), IsEqual.equalTo(remoteStatus));
+			MatcherAssert.assertThat(accountMetaData.getRemoteStatus(), IsEqual.equalTo(remoteStatus));
 			Mockito.verify(this.accountStateCache, Mockito.only()).findStateByAddress(this.address);
 			final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(this.address).getRemoteLinks();
 			Mockito.verify(remoteLinks, Mockito.only()).getRemoteStatus(new BlockHeight(blockHeight));
@@ -720,7 +721,7 @@ public class AccountInfoControllerTest {
 		private void assertUnlocked(
 				final AccountMetaData accountMetaData,
 				final AccountStatus status) {
-			Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(status));
+			MatcherAssert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(status));
 			Mockito.verify(this.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(this.address);
 		}
 

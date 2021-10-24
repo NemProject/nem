@@ -1,5 +1,6 @@
 package org.nem.nis.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -76,7 +77,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		final NodeSelector selector = createSelector.apply(factory);
 
 		// Assert:
-		Assert.assertThat(selector, IsNull.notNullValue());
+		MatcherAssert.assertThat(selector, IsNull.notNullValue());
 	}
 
 	private static void assertNumSelectedNodes(final Function<PeerNetworkNodeSelectorFactory, NodeSelector> createSelector, final int expectedNumNodes) {
@@ -88,7 +89,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		final Collection<Node> nodes = selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(expectedNumNodes));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(expectedNumNodes));
 	}
 
 	private static PeerNetworkNodeSelectorFactory createFactory() {

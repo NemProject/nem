@@ -1,6 +1,7 @@
 package org.nem.nis.validators.integration;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -38,10 +39,10 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
 		// - C 200 - 0 (No Change) = 200
 		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
-		Assert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	@Test
@@ -65,12 +66,12 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// - C2 202 - 0 (No Change) = 202
 		// - C3 203 - 0 (No Change) = 203
 		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
-		Assert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		final ValidationResult result = this.validateTransactions(chainHeight, nisCache.copy(), all);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);

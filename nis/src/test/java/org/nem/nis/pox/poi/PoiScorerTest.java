@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
@@ -53,7 +54,7 @@ public class PoiScorerTest {
 				1.0 * (weightedOutlinks.getAt(5) + weightedImportance.getAt(5)));
 		expectedFinalScoresVector.normalize();
 
-		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
+		MatcherAssert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}
 
 	@Test
@@ -99,7 +100,7 @@ public class PoiScorerTest {
 				1.0 * (weightedOutlinks.getAt(5) + weightedImportance.getAt(5)));
 		expectedFinalScoresVector.normalize();
 
-		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
+		MatcherAssert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}
 
 	//endregion
@@ -180,6 +181,6 @@ public class PoiScorerTest {
 	}
 
 	private static void assertRoundedEquality(final ColumnVector actual, final ColumnVector expected) {
-		Assert.assertThat(actual.roundTo(10), IsEqual.equalTo(expected.roundTo(10)));
+		MatcherAssert.assertThat(actual.roundTo(10), IsEqual.equalTo(expected.roundTo(10)));
 	}
 }

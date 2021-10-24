@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -22,10 +23,10 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		final DbMosaicDefinitionCreationTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-		Assert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
-		Assert.assertThat(dbModel.getCreationFeeSink(), IsEqual.equalTo(context.dbCreationFeeSink));
-		Assert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
+		MatcherAssert.assertThat(dbModel.getCreationFeeSink(), IsEqual.equalTo(context.dbCreationFeeSink));
+		MatcherAssert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaicDefinition, DbMosaicDefinition.class);
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creationFeeSink, DbAccount.class);
 	}

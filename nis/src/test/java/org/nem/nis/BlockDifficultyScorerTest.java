@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockDifficulty;
@@ -26,8 +27,8 @@ public class BlockDifficultyScorerTest {
 		final BlockDifficulty blockDifficulty2 = blockDifficultyScorer.calculateDifficulty(blockDifficulties2, null);
 
 		// Assert:
-		Assert.assertThat(blockDifficulty1, IsEqual.equalTo(BASE_DIFF));
-		Assert.assertThat(blockDifficulty2, IsEqual.equalTo(BASE_DIFF));
+		MatcherAssert.assertThat(blockDifficulty1, IsEqual.equalTo(BASE_DIFF));
+		MatcherAssert.assertThat(blockDifficulty2, IsEqual.equalTo(BASE_DIFF));
 	}
 
 	@Test
@@ -36,7 +37,7 @@ public class BlockDifficultyScorerTest {
 		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(TARGET_TIME);
 
 		// Assert:
-		Assert.assertThat(blockDifficulty, IsEqual.equalTo(BASE_DIFF));
+		MatcherAssert.assertThat(blockDifficulty, IsEqual.equalTo(BASE_DIFF));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class BlockDifficultyScorerTest {
 		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(TARGET_TIME + 1);
 
 		// Assert:
-		Assert.assertThat(blockDifficulty.compareTo(BASE_DIFF), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(blockDifficulty.compareTo(BASE_DIFF), IsEqual.equalTo(-1));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class BlockDifficultyScorerTest {
 		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime((TARGET_TIME - 1));
 
 		// Assert:
-		Assert.assertThat(blockDifficulty.compareTo(BASE_DIFF), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(blockDifficulty.compareTo(BASE_DIFF), IsEqual.equalTo(1));
 	}
 
 	private BlockDifficulty getBlockDifficultyVariableTime(final int time) {
@@ -105,7 +106,7 @@ public class BlockDifficultyScorerTest {
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 
 			// Assert: the difficulty changed in the expected direction
-			Assert.assertThat(diff.compareTo(prevDifficulty), IsEqual.equalTo(comparisonResult));
+			MatcherAssert.assertThat(diff.compareTo(prevDifficulty), IsEqual.equalTo(comparisonResult));
 
 			// Arrange: update
 			// - the difficulties (add current difficulty)
@@ -149,13 +150,13 @@ public class BlockDifficultyScorerTest {
 
 			if (isClamped(diff)) {
 				LOGGER.info(String.format("difficulty is clamped after %d iterations", i));
-				Assert.assertThat(String.format("breaking after %d iterations", i), i > 40, IsEqual.equalTo(true));
+				MatcherAssert.assertThat(String.format("breaking after %d iterations", i), i > 40, IsEqual.equalTo(true));
 				break;
 			}
 
 			// Assert: the percentage change matches the expected change
 			LOGGER.info(String.format("%d %s %s vs %s", i, percentageChange, diff, BASE_DIFF.getRaw() / 10));
-			Assert.assertThat(percentageChange, IsEqual.equalTo(expectedChange));
+			MatcherAssert.assertThat(percentageChange, IsEqual.equalTo(expectedChange));
 
 			// Arrange: update
 			// - the difficulties (add current difficulty)
@@ -188,7 +189,7 @@ public class BlockDifficultyScorerTest {
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 
 			// Assert: the difficulty does not change (it is clamped at max difficulty)
-			Assert.assertThat(diff, IsEqual.equalTo(maxDifficulty));
+			MatcherAssert.assertThat(diff, IsEqual.equalTo(maxDifficulty));
 
 			// Arrange: update
 			// - the difficulties (add current difficulty)

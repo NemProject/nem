@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.*;
@@ -97,7 +98,7 @@ public class HarvestAwareNetworkHostBootstrapperTest {
 		// Assert:
 		final ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
 		Mockito.verify(context.unlockedAccounts, Mockito.times(3)).addUnlockedAccount(accountCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				accountCaptor.getAllValues(),
 				IsEquivalent.equivalentTo(
 						bootNodeToAccount(bootNode),
@@ -125,7 +126,7 @@ public class HarvestAwareNetworkHostBootstrapperTest {
 		// Assert:
 		final ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
 		Mockito.verify(context.unlockedAccounts, Mockito.times(3)).addUnlockedAccount(accountCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				accountCaptor.getAllValues(),
 				IsEquivalent.equivalentTo(
 						bootNodeToAccount(bootNode),

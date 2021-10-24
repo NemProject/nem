@@ -1,6 +1,7 @@
 package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
@@ -28,8 +29,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown transaction type: 123456"));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown transaction type: 123456"));
 	}
 
 	@Test
@@ -44,8 +45,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address 'BAD RECIPIENT' (org.nem.core.model.Address)"));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(404));
+		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address 'BAD RECIPIENT' (org.nem.core.model.Address)"));
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("amount (-13) must be non-negative"));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("amount (-13) must be non-negative"));
 	}
 
 	@Test
@@ -79,8 +80,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown message type: 66"));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown message type: 66"));
 	}
 
 	@Test
@@ -98,8 +99,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(
 				result.getError().getMessage(),
 				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character G at index 11"));
 	}
@@ -116,8 +117,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(
 				result.getError().getMessage(),
 				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character   at index 3"));
 	}
@@ -132,8 +133,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
-		Assert.assertThat(result.hasBody(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		MatcherAssert.assertThat(result.hasBody(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -147,8 +148,8 @@ public class TransferControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("FAILURE_PAST_DEADLINE"));
 	}
 
 	private static JSONObject createValidTransaction() {

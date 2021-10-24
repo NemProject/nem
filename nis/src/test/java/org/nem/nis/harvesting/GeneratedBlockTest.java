@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Block;
@@ -17,7 +18,7 @@ public class GeneratedBlockTest {
 		final GeneratedBlock generatedBlock = new GeneratedBlock(block, score);
 
 		// Assert:
-		Assert.assertThat(generatedBlock.getBlock(), IsEqual.equalTo(block));
-		Assert.assertThat(generatedBlock.getScore(), IsEqual.equalTo(score));
+		MatcherAssert.assertThat(generatedBlock.getBlock(), IsEqual.equalTo(block));
+		MatcherAssert.assertThat(generatedBlock.getScore(), IsEqual.equalTo(score));
 	}
 }

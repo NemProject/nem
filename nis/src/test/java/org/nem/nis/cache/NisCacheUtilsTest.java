@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -32,9 +33,9 @@ public class NisCacheUtilsTest {
 		final ValidationState validationState = NisCacheUtils.createValidationState(nisCache);
 
 		// Assert:
-		Assert.assertThat(validationState.canDebit(account, Amount.fromNem(443)), IsEqual.equalTo(true));
-		Assert.assertThat(validationState.canDebit(account, Amount.fromNem(444)), IsEqual.equalTo(true));
-		Assert.assertThat(validationState.canDebit(account, Amount.fromNem(445)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(validationState.canDebit(account, Amount.fromNem(443)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(validationState.canDebit(account, Amount.fromNem(444)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(validationState.canDebit(account, Amount.fromNem(445)), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -60,9 +61,9 @@ public class NisCacheUtilsTest {
 		final ValidationState validationState = NisCacheUtils.createValidationState(nisCache);
 
 		// Assert:
-		Assert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(443))), IsEqual.equalTo(true));
-		Assert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(444))), IsEqual.equalTo(true));
-		Assert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(445))), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(443))), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(444))), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(445))), IsEqual.equalTo(false));
 	}
 
 
@@ -115,8 +116,8 @@ public class NisCacheUtilsTest {
 		final Mosaic mosaicWithoutLevy = new Mosaic(new MosaicId(namespaceId, "coupons"), Quantity.fromValue(123));
 		final MosaicTransferFeeCalculator calculator = state.getMosaicTransferFeeCalculator();
 
-		Assert.assertThat(calculator.calculateAbsoluteLevy(mosaicWithLevy), IsEqual.equalTo(mosaicLevy));
-		Assert.assertThat(calculator.calculateAbsoluteLevy(mosaicWithoutLevy), IsEqual.equalTo(null));
+		MatcherAssert.assertThat(calculator.calculateAbsoluteLevy(mosaicWithLevy), IsEqual.equalTo(mosaicLevy));
+		MatcherAssert.assertThat(calculator.calculateAbsoluteLevy(mosaicWithoutLevy), IsEqual.equalTo(null));
 	}
 
 	// endregion

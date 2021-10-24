@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -81,7 +82,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, new NodeAge(0));
-		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_START / 100.0))));
+		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_START / 100.0))));
 	}
 
 	@Test
@@ -97,7 +98,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)(100.0 * 500.0 * strategy.getCoupling(age) / 100.0))));
+		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)(100.0 * 500.0 * strategy.getCoupling(age) / 100.0))));
 	}
 
 	@Test
@@ -113,7 +114,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				offset,
 				IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_MINIMUM / 100.0))));
 	}
@@ -134,7 +135,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
 
 		// Second sample has offset < 1000 and is dominant.
-		Assert.assertThat(offset.getRaw() < 1000, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(offset.getRaw() < 1000, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		Assert.assertThat(offset, IsEqual.equalTo(new TimeOffset(100L)));
+		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset(100L)));
 	}
 
 	@Test
@@ -160,9 +161,9 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final DefaultTimeSynchronizationStrategy strategy = this.createDefaultStrategy();
 
 		// Assert:
-		Assert.assertThat(strategy.getCoupling(new NodeAge(0)),
+		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(0)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_START));
-		Assert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND)),
+		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_START));
 	}
 
@@ -183,7 +184,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// coupling = exp(-2.1) = 0.12245642825298191021864737607263
 		Assert.assertEquals(0.12245642825298, strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 7)), epsilon);
 		// exp(-2.4) = 0.09071795328941250337517222007969 < COUPLING_MINIMUM
-		Assert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 8)),
+		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 8)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_MINIMUM));
 	}
 

@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -36,7 +37,7 @@ public class BalanceValidatorTest {
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 	}
 
@@ -243,7 +244,7 @@ public class BalanceValidatorTest {
 			final ValidationResult result = validator.validate(transaction, createValidationContext(debitPredicate));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
 		private static ValidationContext createValidationContext(final DebitPredicate<Amount> debitPredicate) {

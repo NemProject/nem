@@ -1,5 +1,6 @@
 package org.nem.nis.chain.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -63,22 +64,22 @@ public class BlockChainHarvesterTest {
 
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// Assert:
 		// - the process (remote) block was accepted
 		// - the harvest (local) block with higher score was also accepted
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
 
 		// - the harvested block contains only the second transactions because the first was already present in the block
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
 
 		// Sanity:
 		// - the process block has height H and the harvest block has height H+1
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(-1L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(-1L));
 	}
 
 	@Test
@@ -111,9 +112,9 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the process (remote) block was accepted
 		// - the harvest block was not accepted
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(harvestedBlock, IsNull.nullValue());
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(harvestedBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
 	}
 
 	//endregion
@@ -144,7 +145,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -153,15 +154,15 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block was not accepted (because it had a lower score)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -194,7 +195,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -203,16 +204,16 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block was not accepted (because it had a lower score)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
-		Assert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(new Quantity(40 - 32)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
+		MatcherAssert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(new Quantity(40 - 32)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -239,7 +240,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -248,12 +249,12 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block with higher score was accepted (and the harvest block was reverted)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 8 - 2)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 8 - 2)));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
 	//endregion
@@ -295,9 +296,9 @@ public class BlockChainHarvesterTest {
 		final ValidationResult processResult = context.processBlock(block);
 
 		// Assert:
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(block.getLessor(), IsNull.notNullValue());
-		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
 	//endregion
@@ -345,7 +346,7 @@ public class BlockChainHarvesterTest {
 		// T(2): harvester is unblocked creates a valid block (it is working off the modified cache)
 		//       containing only t1 and rolls back the processed block
 		//       BALANCE: 26 (30 + 10 - 14) NEM
-		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 14)));
+		MatcherAssert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 14)));
 	}
 
 	@Test
@@ -386,7 +387,7 @@ public class BlockChainHarvesterTest {
 		//       t1 is subsequently rolled back) and rolls back the processed block
 		//       REMOTE: none
 		// TODO 20151207 J-B,G: not sure if this behavior is ok (rejecting transactions due to other transactions that are rolled back)
-		Assert.assertThat(getRemoteAccount.get(), IsNull.nullValue());
+		MatcherAssert.assertThat(getRemoteAccount.get(), IsNull.nullValue());
 	}
 
 	private void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
@@ -451,7 +452,7 @@ public class BlockChainHarvesterTest {
 			}
 
 			// - the processed block was accepted
-			Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 			this.logWithThread("end (main)");
 		}
 

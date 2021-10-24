@@ -1,5 +1,6 @@
 package org.nem.nis.validators.unconfirmed;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -33,7 +34,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	//endregion
@@ -47,7 +48,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(Collections.emptyList());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static class TestContext {

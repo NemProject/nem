@@ -1,5 +1,6 @@
 package org.nem.nis.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -28,7 +29,7 @@ public class DefaultChainServicesTest {
 		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(isSynchronized, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isSynchronized, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class DefaultChainServicesTest {
 		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(isSynchronized, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isSynchronized, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class DefaultChainServicesTest {
 		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(isSynchronized, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isSynchronized, IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -77,7 +78,7 @@ public class DefaultChainServicesTest {
 		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+		MatcherAssert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
 
 		context.verifyNumChainHeightRequests(3);
 		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);
@@ -101,7 +102,7 @@ public class DefaultChainServicesTest {
 		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+		MatcherAssert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
 
 		context.verifyNumChainHeightRequests(3);
 		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);
@@ -125,7 +126,7 @@ public class DefaultChainServicesTest {
 		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(maxBlockHeight, IsEqual.equalTo(BlockHeight.ONE));
 
 		context.verifyNumChainHeightRequests(3);
 		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);

@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,8 +26,8 @@ public class PoiAccountInfoTest {
 		final PoiAccountInfo info = new PoiAccountInfo(17, state, height);
 
 		// Assert:
-		Assert.assertThat(info.getIndex(), IsEqual.equalTo(17));
-		Assert.assertThat(info.getState(), IsSame.sameInstance(state));
+		MatcherAssert.assertThat(info.getIndex(), IsEqual.equalTo(17));
+		MatcherAssert.assertThat(info.getState(), IsSame.sameInstance(state));
 	}
 
 	//region getOutlinks
@@ -40,7 +41,7 @@ public class PoiAccountInfoTest {
 		final List<WeightedLink> actualLinks = info.getOutlinks();
 
 		// Assert:
-		Assert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
+		MatcherAssert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class PoiAccountInfoTest {
 				new WeightedLink(Address.fromEncoded("acc 2"), 1.0e06),
 				new WeightedLink(Address.fromEncoded("acc 3"), 5.0e06),
 				new WeightedLink(Address.fromEncoded("acc 4"), 9.0e06));
-		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class PoiAccountInfoTest {
 				new WeightedLink(Address.fromEncoded("acc 4"), 5.0e06 * ONE_DAY_DECAY),
 				new WeightedLink(Address.fromEncoded("acc 5"), 8.0e06),
 				new WeightedLink(Address.fromEncoded("acc 6"), 9.0e06));
-		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
 
 	@Test
@@ -94,7 +95,7 @@ public class PoiAccountInfoTest {
 		final List<WeightedLink> actualLinks = info.getOutlinks();
 
 		// Assert:
-		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(actualLinks.size(), IsEqual.equalTo(5));
 	}
 
 	private static PoiAccountInfo createAccountInfoForOldOutlinkBlockHistoryTests(final long accountInfoHeight) {
@@ -121,7 +122,7 @@ public class PoiAccountInfoTest {
 		final List<WeightedLink> actualLinks = info.getNetOutlinks();
 
 		// Assert:
-		Assert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
+		MatcherAssert.assertThat(actualLinks, IsEqual.equalTo(new ArrayList<>()));
 	}
 
 	@Test
@@ -142,7 +143,7 @@ public class PoiAccountInfoTest {
 				new WeightedLink(Address.fromEncoded("acc 2"), -1.0e06), // 1 - 2
 				new WeightedLink(Address.fromEncoded("acc 3"), 5.0e06),  // 5
 				new WeightedLink(Address.fromEncoded("acc 4"), 7.0e06)); // 9 -2
-		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
 
 	@Test
@@ -170,7 +171,7 @@ public class PoiAccountInfoTest {
 				new WeightedLink(Address.fromEncoded("acc 4"), 5.0e06 * ONE_DAY_DECAY),  // 5
 				new WeightedLink(Address.fromEncoded("acc 5"), 5.5e06),                  // 8 - 2.5
 				new WeightedLink(Address.fromEncoded("acc 6"), 9.0e06));                 // 9
-		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
 	}
 
 	//endregion
@@ -183,7 +184,7 @@ public class PoiAccountInfoTest {
 		final PoiAccountInfo info = createAccountInfoWithNullOutlinks();
 
 		// Assert:
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -195,7 +196,7 @@ public class PoiAccountInfoTest {
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
 
 		// Assert: sum(2, 3, 1, 5, 9) - sum(2, 2, 2)
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(1.4e07));
+		MatcherAssert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(1.4e07));
 	}
 
 	@Test
@@ -207,7 +208,7 @@ public class PoiAccountInfoTest {
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
 
 		// Assert: (sum(2, 3, 1, 5, 9) - sum(20, 2, 2))
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(-0.4e07));
+		MatcherAssert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(-0.4e07));
 	}
 
 	@Test
@@ -232,7 +233,7 @@ public class PoiAccountInfoTest {
 						+ 5.0e06 * ONE_DAY_DECAY // 5
 						+ 5.5e06                 // 8 - 2.5
 						+ 9.0e06;                // 9
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(expectedScore));
+		MatcherAssert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(expectedScore));
 	}
 
 	//endregion

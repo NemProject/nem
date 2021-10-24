@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -22,8 +23,8 @@ public class NamespaceCacheUtilsTest {
 		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(mosaicDefinition, IsNull.notNullValue());
-		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(Utils.createMosaicDefinition("foo", "tokens").getId()));
+		MatcherAssert.assertThat(mosaicDefinition, IsNull.notNullValue());
+		MatcherAssert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(Utils.createMosaicDefinition("foo", "tokens").getId()));
 	}
 
 	@Test
@@ -33,7 +34,7 @@ public class NamespaceCacheUtilsTest {
 		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, createMosaicId("bar", "tokens"));
 
 		// Assert:
-		Assert.assertThat(mosaicDefinition, IsNull.nullValue());
+		MatcherAssert.assertThat(mosaicDefinition, IsNull.nullValue());
 	}
 
 	@Test
@@ -43,7 +44,7 @@ public class NamespaceCacheUtilsTest {
 		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(mosaicDefinition, IsNull.nullValue());
+		MatcherAssert.assertThat(mosaicDefinition, IsNull.nullValue());
 	}
 
 	//endregion
@@ -57,8 +58,8 @@ public class NamespaceCacheUtilsTest {
 		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(entry, IsNull.notNullValue());
-		Assert.assertThat(entry.getMosaicDefinition().getId(), IsEqual.equalTo(createMosaicId("foo", "tokens")));
+		MatcherAssert.assertThat(entry, IsNull.notNullValue());
+		MatcherAssert.assertThat(entry.getMosaicDefinition().getId(), IsEqual.equalTo(createMosaicId("foo", "tokens")));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class NamespaceCacheUtilsTest {
 		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, createMosaicId("bar", "tokens"));
 
 		// Assert:
-		Assert.assertThat(entry, IsNull.nullValue());
+		MatcherAssert.assertThat(entry, IsNull.nullValue());
 	}
 
 	@Test
@@ -78,7 +79,7 @@ public class NamespaceCacheUtilsTest {
 		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(entry, IsNull.nullValue());
+		MatcherAssert.assertThat(entry, IsNull.nullValue());
 	}
 
 	//endregion
@@ -92,7 +93,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<Address> addresses = NamespaceCacheUtils.getMosaicOwners(cache, createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -102,7 +103,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<Address> addresses = NamespaceCacheUtils.getMosaicOwners(cache, createMosaicId("bar", "tokens"));
 
 		// Assert:
-		Assert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<Address> addresses = NamespaceCacheUtils.getMosaicOwners(cache, createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addresses.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -126,7 +127,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<Address> addresses = NamespaceCacheUtils.getMosaicOwners(cache, createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(addresses, IsEquivalent.equivalentTo(owners));
+		MatcherAssert.assertThat(addresses, IsEquivalent.equivalentTo(owners));
 	}
 
 	@Test
@@ -140,7 +141,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<Address> addresses = NamespaceCacheUtils.getMosaicOwners(cache, createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(addresses, IsEquivalent.equivalentTo(owners));
+		MatcherAssert.assertThat(addresses, IsEquivalent.equivalentTo(owners));
 	}
 
 	//endregion
@@ -154,7 +155,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<MosaicId> mosaicIds = NamespaceCacheUtils.getMosaicIds(cache, new NamespaceId("bar"));
 
 		// Assert:
-		Assert.assertThat(mosaicIds.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaicIds.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -164,7 +165,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<MosaicId> mosaicIds = NamespaceCacheUtils.getMosaicIds(cache, new NamespaceId("foo"));
 
 		// Assert:
-		Assert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo", "tokens"))));
+		MatcherAssert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo", "tokens"))));
 	}
 
 	@Test
@@ -178,7 +179,7 @@ public class NamespaceCacheUtilsTest {
 		final Collection<MosaicId> mosaicIds = NamespaceCacheUtils.getMosaicIds(cache, new NamespaceId("foo"));
 
 		// Assert:
-		Assert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Arrays.asList(
+		MatcherAssert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Arrays.asList(
 				createMosaicId("foo", "tokens"),
 				createMosaicId("foo", "coins"),
 				createMosaicId("foo", "paddles"))));

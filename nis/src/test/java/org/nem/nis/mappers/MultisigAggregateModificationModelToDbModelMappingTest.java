@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -144,24 +145,24 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 				final DbMultisigAggregateModificationTransaction dbModel,
 				final int numExpectedModifications,
 				final int expectedRelativeChange) {
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
+			MatcherAssert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<DbAccount, Integer> actualModifications = new HashMap<>();
 			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType());
 			}
 
-			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
+			MatcherAssert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
 			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
-				Assert.assertThat(modification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
+				MatcherAssert.assertThat(modification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
 			}
 
 			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = dbModel.getMultisigMinCosignatoriesModification();
 			if (0 != expectedRelativeChange) {
-				Assert.assertThat(dbMinCosignatoriesModification.getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
+				MatcherAssert.assertThat(dbMinCosignatoriesModification.getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
 			} else {
-				Assert.assertThat(dbMinCosignatoriesModification, IsNull.nullValue());
+				MatcherAssert.assertThat(dbMinCosignatoriesModification, IsNull.nullValue());
 			}
 		}
 	}

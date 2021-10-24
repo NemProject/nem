@@ -1,6 +1,7 @@
 package org.nem.nis.controller.viewmodels;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -48,11 +49,11 @@ public class ExplorerBlockViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
-		Assert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(blockHash));
-		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(blockHash.toString()));
-		Assert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(difficulty.getRaw()));
-		Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(blockHash));
+		MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(blockHash.toString()));
+		MatcherAssert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(difficulty.getRaw()));
+		MatcherAssert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));
 	}
 
 	private static ExplorerTransferViewModel createTransferViewModel() {

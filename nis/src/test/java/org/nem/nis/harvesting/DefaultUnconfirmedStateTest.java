@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -41,8 +42,8 @@ public class DefaultUnconfirmedStateTest {
 			final Account account2 = context.addAccount(Amount.fromNem(100));
 
 			// Assert:
-			Assert.assertThat(context.state.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(5)));
-			Assert.assertThat(context.state.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(100)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(5)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(100)));
 		}
 
 		@Test
@@ -57,8 +58,8 @@ public class DefaultUnconfirmedStateTest {
 			context.addAll(transactions);
 
 			// Assert:
-			Assert.assertThat(context.state.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(12)));
-			Assert.assertThat(context.state.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(107)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(12)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(107)));
 		}
 
 		@Test
@@ -71,7 +72,7 @@ public class DefaultUnconfirmedStateTest {
 			context.add(t1);
 
 			// Assert:
-			Assert.assertThat(context.state.getUnconfirmedBalance(sender), IsEqual.equalTo(Amount.fromNem(499990)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedBalance(sender), IsEqual.equalTo(Amount.fromNem(499990)));
 		}
 	}
 
@@ -93,10 +94,10 @@ public class DefaultUnconfirmedStateTest {
 			context.addMosaic(account2, mosaicId2, Supply.fromValue(21));
 
 			// Assert:
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(12_000)));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.ZERO));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.ZERO));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(21_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(12_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.ZERO));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.ZERO));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(21_000)));
 		}
 
 		@Test
@@ -116,10 +117,10 @@ public class DefaultUnconfirmedStateTest {
 			context.addAll(transactions);
 
 			// Assert:
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(9_000)));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.fromValue(5_000)));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(16_000)));
-			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.fromValue(3_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(9_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.fromValue(5_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(16_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.fromValue(3_000)));
 		}
 	}
 
@@ -141,7 +142,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			context.assertTransactionAdded(transaction);
 		}
 
@@ -156,10 +157,10 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert: the notification context should use the current (not creation) information
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any(), Mockito.anyObject());
 			Mockito.verify(context.blockTransferObserver, Mockito.only()).notify(Mockito.any(), Mockito.any());
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 			context.assertNotificationContext(CONFIRMED_BLOCK_HEIGHT + 10, CURRENT_TIME + 7);
 		}
 
@@ -173,7 +174,7 @@ public class DefaultUnconfirmedStateTest {
 			final Collection<ValidationResult> results = transactions.stream().map(t -> this.add(context.state, t)).collect(Collectors.toList());
 
 			// Assert:
-			results.forEach(result -> Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS)));
+			results.forEach(result -> MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS)));
 			context.assertTransactionsAdded(transactions);
 		}
 
@@ -192,7 +193,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 			context.assertTransactionAdded(transaction);
 		}
 
@@ -207,10 +208,10 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 			Mockito.verify(transaction, Mockito.never()).execute(Mockito.any(), Mockito.anyObject());
 			Mockito.verify(context.blockTransferObserver, Mockito.never()).notify(Mockito.any(), Mockito.any());
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}
 
 		//endregion
@@ -228,7 +229,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
 			context.assertNoTransactionsAdded();
 		}
 
@@ -254,7 +255,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(validationResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 			context.assertNoTransactionsAdded();
 		}
 
@@ -272,8 +273,8 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result2 = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
-			Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
+			MatcherAssert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
 			context.assertTransactionAdded(transaction);
 		}
 
@@ -296,7 +297,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transactions.get(1));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 			context.assertTransactionAdded(transactions.get(0));
 		}
 
@@ -320,7 +321,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transactions.get(1));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 			context.assertTransactionAdded(transactions.get(0));
 		}
 
@@ -340,7 +341,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 			context.assertNoTransactionsAdded();
 		}
 
@@ -358,7 +359,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
 			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), validationContextCaptor.capture());
 			assertCapturedValidationContext(validationContextCaptor.getValue());
@@ -366,8 +367,8 @@ public class DefaultUnconfirmedStateTest {
 
 		protected static void assertCapturedValidationContext(final ValidationContext context) {
 			// Assert:
-			Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT + 1)));
-			Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
+			MatcherAssert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT + 1)));
+			MatcherAssert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
 		}
 
 		//endregion
@@ -382,7 +383,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			assertTransactionAddition(context, expectedResult, transaction);
 		}
 
@@ -396,7 +397,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			assertTransactionAddition(context, expectedResult, transaction);
 		}
 
@@ -410,7 +411,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			assertTransactionAddition(context, expectedResult, transaction);
 
 			if (expectedResult.isSuccess()) {
@@ -483,12 +484,12 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
 			Mockito.verify(context.batchValidator, Mockito.only()).validate(pairsCaptor.capture());
 
 			final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-			Assert.assertThat(pair.getTransactions(), IsEqual.equalTo(Collections.singletonList(transaction)));
+			MatcherAssert.assertThat(pair.getTransactions(), IsEqual.equalTo(Collections.singletonList(transaction)));
 			assertCapturedValidationContext(pair.getContext());
 		}
 
@@ -537,7 +538,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = context.state.addNewBatch(transactions);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			Mockito.verify(context.spamFilter, Mockito.only()).filter(transactions);
 			context.assertTransactionsAdded(transactions);
 		}
@@ -557,7 +558,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = context.state.addNewBatch(transactions);
 
 			// Assert: all successfully validated state were added and the first failure was returned
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 			context.assertTransactionsAdded(transactions);
 		}
 
@@ -572,7 +573,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = context.state.addNewBatch(transactions);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
 			context.assertNoTransactionsAdded();
 		}
 
@@ -588,7 +589,7 @@ public class DefaultUnconfirmedStateTest {
 			final ValidationResult result = context.state.addNewBatch(transactions);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			context.assertTransactionsAdded(filteredTransactions);
 		}
 	}
@@ -713,10 +714,10 @@ public class DefaultUnconfirmedStateTest {
 		}
 
 		public void assertNotificationContext(final long blockHeight, final int time) {
-			Assert.assertThat(this.lastNotificationContext, IsNull.notNullValue());
-			Assert.assertThat(this.lastNotificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
-			Assert.assertThat(this.lastNotificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(time)));
-			Assert.assertThat(this.lastNotificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
+			MatcherAssert.assertThat(this.lastNotificationContext, IsNull.notNullValue());
+			MatcherAssert.assertThat(this.lastNotificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
+			MatcherAssert.assertThat(this.lastNotificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(time)));
+			MatcherAssert.assertThat(this.lastNotificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
 		}
 	}
 }

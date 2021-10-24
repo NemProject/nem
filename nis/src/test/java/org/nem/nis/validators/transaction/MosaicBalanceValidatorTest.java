@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -35,7 +36,7 @@ public class MosaicBalanceValidatorTest {
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 	}
 
@@ -109,7 +110,7 @@ public class MosaicBalanceValidatorTest {
 					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 
 		@Test
@@ -130,7 +131,7 @@ public class MosaicBalanceValidatorTest {
 					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		}
 
 		@Test
@@ -160,7 +161,7 @@ public class MosaicBalanceValidatorTest {
 					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 
 		@Test
@@ -190,7 +191,7 @@ public class MosaicBalanceValidatorTest {
 					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		}
 	}
 
@@ -230,7 +231,7 @@ public class MosaicBalanceValidatorTest {
 					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
 		protected Account createAccount(final Mosaic mosaic) {

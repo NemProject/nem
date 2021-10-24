@@ -1,6 +1,7 @@
 package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
@@ -41,6 +42,6 @@ public class PushControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(PUSH_TRANSACTION_PATH, obj);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
 	}
 }

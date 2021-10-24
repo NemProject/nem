@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -21,8 +22,8 @@ public class InterLevelProximityMatrixTest {
 		final SparseMatrix r = new SparseMatrix(1, 1, 1);
 		r.setAt(0, 0, 1.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(0, 0, 1.0);
 		r.setAt(1, 1, 1.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -56,8 +57,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(1, 0, 1.0 / 2.0);
 		r.setAt(1, 1, 1.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -87,8 +88,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(4, 3, 1.0 / 2.0);
 		r.setAt(4, 4, 1.0 / 1.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -118,8 +119,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(4, 3, 1.0 / 2.0);
 		r.setAt(4, 4, 1.0 / 2.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -141,8 +142,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(0, 2, 1.0 / 4.0);
 		r.setAt(0, 3, 1.0 / 4.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -166,8 +167,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(1, 1, 1.0 / 2.0);
 		r.setAt(1, 4, 1.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -199,8 +200,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(1, 6, 1.0 / 4.0);
 		r.setAt(1, 7, 1.0 / 4.0);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -235,8 +236,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(1, 7, 1.0 / 4.0);
 		r.setAt(2, 8, 0.5);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -271,8 +272,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(2, 4, 0.5);
 		r.setAt(2, 8, 0.5);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -319,8 +320,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(4, 10, 0.5);
 		r.setAt(5, 11, 0.5);
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	@Test
@@ -385,8 +386,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(6, 17, 1.0); // N(17): 1; |A(6)|: 1
 		r.setAt(7, 19, 1.0); // N(19): 1; |A(7)|: 1
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
@@ -441,8 +442,8 @@ public class InterLevelProximityMatrixTest {
 		r.setAt(3, 0, 1.0 / 3.0); // N(0): 3
 		r.setAt(3, 3, 1.0 / 1.0); // N(3): 1
 
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	//region test infrastructure

@@ -1,5 +1,6 @@
 package org.nem.nis.validators.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -50,7 +51,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE));
 	}
 
 	@Test
@@ -72,7 +73,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
 	}
 
 	@Test
@@ -125,7 +126,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static Block createFutureBlock(final Block parentBlock) {

@@ -1,6 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -16,7 +17,7 @@ public class DbMosaicIdTest {
 		final DbMosaicId dbMosaicId = new DbMosaicId(123L);
 
 		// Assert:
-		Assert.assertThat(dbMosaicId.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbMosaicId.getId(), IsEqual.equalTo(123L));
 	}
 
 	// endregion
@@ -43,7 +44,7 @@ public class DbMosaicIdTest {
 					? IsNot.not(IsEqual.equalTo(dbMosaicId))
 					: IsEqual.equalTo(dbMosaicId);
 
-			Assert.assertThat(entry.getValue(), matcher);
+			MatcherAssert.assertThat(entry.getValue(), matcher);
 		}
 	}
 
@@ -59,7 +60,7 @@ public class DbMosaicIdTest {
 					? IsNot.not(IsEqual.equalTo(hashCode))
 					: IsEqual.equalTo(hashCode);
 
-			Assert.assertThat(entry.getValue().hashCode(), matcher);
+			MatcherAssert.assertThat(entry.getValue().hashCode(), matcher);
 		}
 	}
 

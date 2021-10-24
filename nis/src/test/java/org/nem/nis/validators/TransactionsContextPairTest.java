@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,8 +21,8 @@ public class TransactionsContextPairTest {
 		final TransactionsContextPair pair = new TransactionsContextPair(transaction, context);
 
 		// Assert:
-		Assert.assertThat(pair.getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
+		MatcherAssert.assertThat(pair.getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class TransactionsContextPairTest {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, context);
 
 		// Assert:
-		Assert.assertThat(pair.getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(pair.getTransactions(), IsSame.sameInstance(transactions));
+		MatcherAssert.assertThat(pair.getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(pair.getTransactions(), IsSame.sameInstance(transactions));
 	}
 }

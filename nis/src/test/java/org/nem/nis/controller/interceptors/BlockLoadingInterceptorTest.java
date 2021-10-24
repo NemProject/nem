@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -88,7 +89,7 @@ public class BlockLoadingInterceptorTest {
 		final boolean result = preHandle(interceptor, requestUri);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	private static void assertAccessDenied(final BlockLoadingInterceptor interceptor, final String requestUri) {

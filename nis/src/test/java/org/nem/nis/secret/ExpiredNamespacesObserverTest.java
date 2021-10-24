@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -83,7 +84,7 @@ public class ExpiredNamespacesObserverTest {
 	// endregion
 
 	private static void assertAccountOwnsMosaics(final AccountInfo accountInfo, final Collection<MosaicId> mosaicIds) {
-		Assert.assertThat(accountInfo.getMosaicIds(), IsEquivalent.equivalentTo(mosaicIds));
+		MatcherAssert.assertThat(accountInfo.getMosaicIds(), IsEquivalent.equivalentTo(mosaicIds));
 	}
 
 	private static void assertNoAction(final BlockHeight height, final NotificationTrigger notificationTrigger) {

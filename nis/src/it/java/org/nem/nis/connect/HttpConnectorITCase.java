@@ -1,6 +1,7 @@
 package org.nem.nis.connect;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.*;
@@ -41,7 +42,7 @@ public class HttpConnectorITCase {
 		final Node remoteNode = this.connector.getInfo(node).join();
 
 		// Assert:
-		Assert.assertThat(remoteNode.getIdentity().getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(remoteNode.getIdentity().getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
 	@Test
@@ -77,7 +78,7 @@ public class HttpConnectorITCase {
 		final boolean result = this.analyzeNodes(config.getPreTrustedNodes().getNodes());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	private enum NodeStatus {

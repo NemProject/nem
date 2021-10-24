@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,12 +22,12 @@ public class ImportanceTransferRawToDbModelMappingTest extends AbstractTransferR
 		final DbImportanceTransferTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(context.dbRemote));
-		Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(321));
-		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
+		MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getRemote(), IsEqual.equalTo(context.dbRemote));
+		MatcherAssert.assertThat(dbModel.getMode(), IsEqual.equalTo(321));
+		MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
 	}
 
 	@Override

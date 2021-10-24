@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -34,7 +35,7 @@ public class BlockExplorerControllerTest {
 
 		// Assert:
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksAfter(height, BLOCKS_LIMIT);
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -49,7 +50,7 @@ public class BlockExplorerControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(ExplorerBlockViewModel.class));
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -63,8 +64,8 @@ public class BlockExplorerControllerTest {
 		final SerializableList<ExplorerBlockViewModel> blocks = context.controller.localBlocksAfter(height);
 
 		// Assert:
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
-		Assert.assertThat(
+		MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(
 				blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
@@ -87,8 +88,8 @@ public class BlockExplorerControllerTest {
 		// Assert:
 		Mockito.verify(context.blockDao, Mockito.only()).findByHeight(height);
 		Mockito.verify(context.mapper, Mockito.only()).map(dbBlock, ExplorerBlockViewModel.class);
-		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(getHeight(block), IsEqual.equalTo(16L));
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(getHeight(block), IsEqual.equalTo(16L));
 	}
 
 	//endregion

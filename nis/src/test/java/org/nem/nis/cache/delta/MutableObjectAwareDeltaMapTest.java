@@ -1,5 +1,6 @@
 package org.nem.nis.cache.delta;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -16,7 +17,7 @@ public class MutableObjectAwareDeltaMapTest {
 		final MutableObjectAwareDeltaMap<Address, AccountState> deltaMap = new MutableObjectAwareDeltaMap<>(1234);
 
 		// Assert:
-		Assert.assertThat(deltaMap.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(deltaMap.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -37,7 +38,7 @@ public class MutableObjectAwareDeltaMapTest {
 		final AccountState foundState = deltaMap.getOrDefault(address, null);
 
 		// Assert:
-		Assert.assertThat(foundState, IsSame.sameInstance(state));
+		MatcherAssert.assertThat(foundState, IsSame.sameInstance(state));
 	}
 
 	@Test
@@ -51,7 +52,7 @@ public class MutableObjectAwareDeltaMapTest {
 		final AccountState foundState = deltaMap.getOrDefault(address, defaultState);
 
 		// Assert:
-		Assert.assertThat(foundState, IsSame.sameInstance(defaultState));
+		MatcherAssert.assertThat(foundState, IsSame.sameInstance(defaultState));
 	}
 
 	// endregion

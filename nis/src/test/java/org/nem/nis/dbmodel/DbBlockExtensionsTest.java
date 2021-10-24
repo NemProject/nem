@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.nis.test.*;
@@ -22,6 +23,6 @@ public class DbBlockExtensionsTest {
 		final int numTransaction = DbBlockExtensions.countTransactions(block);
 
 		// Assert:
-		Assert.assertThat(numTransaction, IsEqual.equalTo(5 + 2 * 3));
+		MatcherAssert.assertThat(numTransaction, IsEqual.equalTo(5 + 2 * 3));
 	}
 }

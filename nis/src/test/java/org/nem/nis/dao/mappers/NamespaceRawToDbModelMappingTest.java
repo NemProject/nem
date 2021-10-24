@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,12 +21,12 @@ public class NamespaceRawToDbModelMappingTest {
 		final DbNamespace dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getFullName(), IsEqual.equalTo("foo.bar"));
-		Assert.assertThat(dbModel.getOwner(), IsEqual.equalTo(context.dbOwner));
-		Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(321L));
-		Assert.assertThat(dbModel.getLevel(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getFullName(), IsEqual.equalTo("foo.bar"));
+		MatcherAssert.assertThat(dbModel.getOwner(), IsEqual.equalTo(context.dbOwner));
+		MatcherAssert.assertThat(dbModel.getHeight(), IsEqual.equalTo(321L));
+		MatcherAssert.assertThat(dbModel.getLevel(), IsEqual.equalTo(2));
 	}
 
 	private IMapping<Object[], DbNamespace> createMapping(final IMapper mapper) {

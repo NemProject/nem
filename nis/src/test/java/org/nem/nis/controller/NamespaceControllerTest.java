@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -46,10 +47,10 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getRootNamespaces(11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				projectNamespaces(pairs, p -> p.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				projectNamespaces(pairs, p -> p.getEntity().getId().toString()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
@@ -78,10 +79,10 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getRootNamespaces(11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				projectNamespaces(pairs, p -> p.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 11L));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				projectNamespaces(pairs, p -> p.getEntity().getId().toString()),
 				IsEquivalent.equivalentTo("a", "c"));
 	}
@@ -104,7 +105,7 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespace(id);
 		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(id));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(id));
 	}
 
 	@Test
@@ -159,7 +160,7 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
@@ -190,7 +191,7 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("a", "c"));
 	}

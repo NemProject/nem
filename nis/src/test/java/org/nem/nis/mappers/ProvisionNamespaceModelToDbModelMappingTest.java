@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -23,18 +24,18 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 
 		// Assert:
 		// - the transaction properties
-		Assert.assertThat(dbModel.getRentalFeeSink(), IsEqual.equalTo(context.dbRentalFeeSink));
-		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(25_000_000L));
-		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(dbModel.getRentalFeeSink(), IsEqual.equalTo(context.dbRentalFeeSink));
+		MatcherAssert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(25_000_000L));
+		MatcherAssert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 		// - the namespace properties (passed to the sub-mapper)
 		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
 		Mockito.verify(context.mapper, Mockito.times(1)).map(namespaceCaptor.capture(), Mockito.eq(DbNamespace.class));
 		final Namespace namespace = namespaceCaptor.getValue();
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	@Test
@@ -48,7 +49,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final DbProvisionNamespaceTransaction dbModel = context.mapping.map(transaction);
 
 		// Assert:
-		Assert.assertThat(dbModel.getNamespace().getHeight(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getNamespace().getHeight(), IsNull.nullValue());
 	}
 
 	@Test
@@ -65,9 +66,9 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
 		Mockito.verify(context.mapper, Mockito.times(1)).map(namespaceCaptor.capture(), Mockito.eq(DbNamespace.class));
 		final Namespace namespace = namespaceCaptor.getValue();
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	@Override

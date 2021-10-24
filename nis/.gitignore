@@ -22,3 +22,6 @@ poiAnalysisData
 nickel/dist/
 nickel/build/
 node_modules/
+.classpath
+.project
+.settings

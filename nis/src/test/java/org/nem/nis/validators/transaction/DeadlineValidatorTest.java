@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.ValidationResult;
@@ -54,6 +55,6 @@ public class DeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

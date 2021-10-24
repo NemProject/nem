@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -18,7 +19,7 @@ public class OutlierScanClusteringStrategyTest {
 		final ClusteringResult result = strategy.cluster(neighborhood);
 
 		// Assert:
-		Assert.assertThat(result.numClusters(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(result.numClusters(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -32,12 +33,12 @@ public class OutlierScanClusteringStrategyTest {
 		final ClusteringResult result = strategy.cluster(neighborhood);
 
 		// Assert:
-		Assert.assertThat(result.numClusters(), IsEqual.equalTo(5));
-		Assert.assertThat(result.getOutliers().size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(result.numClusters(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(result.getOutliers().size(), IsEqual.equalTo(5));
 
 		int i = 0;
 		for (final Cluster outlier : result.getOutliers()) {
-			Assert.assertThat(outlier, IsEqual.equalTo(new Cluster(new NodeId(i))));
+			MatcherAssert.assertThat(outlier, IsEqual.equalTo(new Cluster(new NodeId(i))));
 			++i;
 		}
 	}

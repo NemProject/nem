@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hibernate.*;
 import org.junit.*;
@@ -47,7 +48,7 @@ public class DaoUtilsTest {
 			final long accountId = DaoUtils.getAccountId(this.session, ACCOUNTS.get((int)i).getAddress());
 
 			// Assert:
-			Assert.assertThat(accountId, IsEqual.equalTo(i + 1));
+			MatcherAssert.assertThat(accountId, IsEqual.equalTo(i + 1));
 		});
 	}
 
@@ -61,7 +62,7 @@ public class DaoUtilsTest {
 
 		// Assert:
 		final List<Long> expectedIds = Arrays.asList(2L, 4L, 6L, 8L);
-		Assert.assertThat(accountIds, IsEquivalent.equivalentTo(expectedIds));
+		MatcherAssert.assertThat(accountIds, IsEquivalent.equivalentTo(expectedIds));
 	}
 
 	private void createAccounts(final int count) {

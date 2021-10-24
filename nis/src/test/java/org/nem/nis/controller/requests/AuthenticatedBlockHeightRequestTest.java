@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -19,8 +20,8 @@ public class AuthenticatedBlockHeightRequestTest {
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(height, challenge);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
-		Assert.assertThat(request.getEntity(), IsEqual.equalTo(height));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getEntity(), IsEqual.equalTo(height));
 	}
 
 	@Test
@@ -36,7 +37,7 @@ public class AuthenticatedBlockHeightRequestTest {
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
-		Assert.assertThat(request.getEntity(), IsEqual.equalTo(height));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getEntity(), IsEqual.equalTo(height));
 	}
 }

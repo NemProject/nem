@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -205,7 +206,7 @@ public class VersionTransactionValidatorTest {
 		final ValidationResult result = validator.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static Transaction changeTransactionVersion(final Transaction transaction, final int version) {

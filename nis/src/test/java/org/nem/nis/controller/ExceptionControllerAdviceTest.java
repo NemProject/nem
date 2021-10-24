@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -72,10 +73,10 @@ public class ExceptionControllerAdviceTest {
 
 	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode, final String expectedMessage) {
 		// Assert:
-		Assert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
-		Assert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
-		Assert.assertThat(entity.getBody().getStatus(), IsEqual.equalTo(expectedCode.value()));
-		Assert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo(expectedMessage));
+		MatcherAssert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
+		MatcherAssert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
+		MatcherAssert.assertThat(entity.getBody().getStatus(), IsEqual.equalTo(expectedCode.value()));
+		MatcherAssert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo(expectedMessage));
 	}
 
 	private static ExceptionControllerAdvice createAdvice() {

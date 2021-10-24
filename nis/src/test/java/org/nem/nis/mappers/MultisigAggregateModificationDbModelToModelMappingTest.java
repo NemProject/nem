@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -152,17 +153,17 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 				final MultisigAggregateModificationTransaction model,
 				final int numExpectedModifications,
 				final int expectedRelativeChange) {
-			Assert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
+			MatcherAssert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.core.model.Account, Integer> actualModifications = new HashMap<>();
 			for (final MultisigCosignatoryModification modification : model.getCosignatoryModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType().value());
 			}
 
-			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
+			MatcherAssert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
 			if (0 != expectedRelativeChange) {
-				Assert.assertThat(model.getMinCosignatoriesModification().getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
+				MatcherAssert.assertThat(model.getMinCosignatoriesModification().getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
 			} else {
-				Assert.assertThat(model.getMinCosignatoriesModification(), IsNull.nullValue());
+				MatcherAssert.assertThat(model.getMinCosignatoriesModification(), IsNull.nullValue());
 			}
 		}
 	}

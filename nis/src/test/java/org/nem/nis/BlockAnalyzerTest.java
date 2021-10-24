@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -42,9 +43,9 @@ public class BlockAnalyzerTest {
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 
 		// Assert:
-		Assert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
-		Assert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
-		Assert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(162));
+		MatcherAssert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
+		MatcherAssert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
+		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(162));
 	}
 
 	@Test
@@ -58,9 +59,9 @@ public class BlockAnalyzerTest {
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 
 		// Assert:
-		Assert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
-		Assert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
-		Assert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(1353));
+		MatcherAssert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
+		MatcherAssert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
+		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(1353));
 	}
 
 	//endregion
@@ -77,8 +78,8 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(346)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(346)));
 	}
 
 	@Test
@@ -93,8 +94,8 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS, 234L);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(234)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(234)));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(BlockHeight.ONE);
 		Mockito.verify(context.blockDao, Mockito.times(6 + 1)).getBlocksAfterAndUpdateCache(Mockito.any(), Mockito.eq(100));
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(568)).analyzeLastBlock(Mockito.any());
@@ -132,7 +133,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, options);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
 		Mockito.verify(context.importanceCalculator, Mockito.times(3)).recalculate(Mockito.any(), Mockito.any());
 	}
 
@@ -152,13 +153,13 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(copy.getAccountCache().isKnownAddress(nemesisBlockInfo.getAddress()), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.getAccountCache().isKnownAddress(nemesisBlockInfo.getAddress()), IsEqual.equalTo(true));
 		final AccountState nemesisState = copy.getAccountStateCache().findStateByAddress(nemesisBlockInfo.getAddress());
-		Assert.assertThat(nemesisState.getAccountInfo().getBalance(), IsEqual.equalTo(nemesisFees));
-		Assert.assertThat(nemesisState.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(nemesisState.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(nemesisFees));
-		Assert.assertThat(nemesisState.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(nemesisState.getAccountInfo().getBalance(), IsEqual.equalTo(nemesisFees));
+		MatcherAssert.assertThat(nemesisState.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(nemesisState.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(nemesisFees));
+		MatcherAssert.assertThat(nemesisState.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 	}
 
 	@Test
@@ -174,9 +175,9 @@ public class BlockAnalyzerTest {
 
 		// Assert:
 		// - just test the balances of two prototype accounts
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50000000L)));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50000000L)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50000000L)));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50000000L)));
 	}
 
 	@Test
@@ -203,9 +204,9 @@ public class BlockAnalyzerTest {
 
 		// Assert:
 		// - just test the balances of two prototype accounts
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
 	}
 
 	@Test
@@ -221,7 +222,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(false));
 	}
 
 	private static Amount getBalance(final ReadOnlyNisCache cache, final Address address) {

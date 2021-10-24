@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -53,8 +54,8 @@ public class MosaicDefinitionRetrieverTest {
 		final DbMosaicDefinition dbMosaicDefinition = retriever.getMosaicDefinition(this.session, mosaicId);
 
 		// Assert:
-		Assert.assertThat(dbMosaicDefinition, IsNull.notNullValue());
-		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("sugary"));
+		MatcherAssert.assertThat(dbMosaicDefinition, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("sugary"));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class MosaicDefinitionRetrieverTest {
 		final DbMosaicDefinition dbMosaicDefinition = retriever.getMosaicDefinition(this.session, mosaicId);
 
 		// Assert:
-		Assert.assertThat(dbMosaicDefinition, IsNull.nullValue());
+		MatcherAssert.assertThat(dbMosaicDefinition, IsNull.nullValue());
 	}
 
 	@Test
@@ -97,8 +98,8 @@ public class MosaicDefinitionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(names.size(), IsEqual.equalTo(5));
-		Assert.assertThat(
+		MatcherAssert.assertThat(names.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(
 				names,
 				IsEquivalent.equivalentTo("orange", "butter", "honey", "cola", "beer"));
 	}
@@ -119,8 +120,8 @@ public class MosaicDefinitionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(names.size(), IsEqual.equalTo(2));
-		Assert.assertThat(
+		MatcherAssert.assertThat(names.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(
 				names,
 				IsEquivalent.equivalentTo("cola", "beer"));
 	}
@@ -154,8 +155,8 @@ public class MosaicDefinitionRetrieverTest {
 		final Collection<String> names = dbMosaicDefinitions.stream().map(DbMosaicDefinition::getName).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(names.size(), IsEqual.equalTo(3));
-		Assert.assertThat(
+		MatcherAssert.assertThat(names.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(
 				names,
 				IsEquivalent.equivalentTo("silver", "gold", "platinum"));
 	}
@@ -185,8 +186,8 @@ public class MosaicDefinitionRetrieverTest {
 		final Collection<Long> ids = dbMosaicDefinitions.stream().map(DbMosaicDefinition::getId).collect(Collectors.toList());
 
 		// Assert (database id 11 points to the old mosaic with description "alcoholic"):
-		Assert.assertThat(dbMosaicDefinitions.size(), IsEqual.equalTo(11));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L)));
+		MatcherAssert.assertThat(dbMosaicDefinitions.size(), IsEqual.equalTo(11));
+		MatcherAssert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L)));
 	}
 
 	@Test
@@ -200,8 +201,8 @@ public class MosaicDefinitionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert (database id 11 points to the old mosaic with description "alcoholic"):
-		Assert.assertThat(ids.size(), IsEqual.equalTo(5));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L)));
+		MatcherAssert.assertThat(ids.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L)));
 	}
 
 	@Test
@@ -215,8 +216,8 @@ public class MosaicDefinitionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(ids.size(), IsEqual.equalTo(4));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L, 3L)));
+		MatcherAssert.assertThat(ids.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(ids, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L, 3L)));
 	}
 
 	//endregion

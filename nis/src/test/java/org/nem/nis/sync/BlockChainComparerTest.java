@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -16,7 +17,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsLessThanLocalChainScore() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareDifferentChainScores(10, 9),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE));
 	}
@@ -24,7 +25,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsEqualToLocalChainScore() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareDifferentChainScores(10, 10),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE));
 	}
@@ -32,7 +33,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void chainScoreCheckPassesIfRemoteChainScoreIsGreaterThanLocalChainScore() {
 		// Assert:
-		Assert.assertThat(compareDifferentChainScores(10, 11), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+		MatcherAssert.assertThat(compareDifferentChainScores(10, 11), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
 	}
 
 	private static ComparisonResult.Code compareDifferentChainScores(final int localChainScore, final int remoteChainScore) {
@@ -72,7 +73,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(account, 11), new BlockChainScore(10))).getRemoteHeight();
 
 		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
 	}
 
 	@Test
@@ -86,7 +87,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(null, new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
 	}
 
 	@Test
@@ -100,7 +101,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createNonVerifiableBlock(7), new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
 	}
 
 	@Test
@@ -115,13 +116,13 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(account, 7), new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_SYNCED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_SYNCED));
 	}
 
 	@Test
 	public void remoteIsTooFarBehindIfRemoteIsMoreThanMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareBlocksWithHeight(18, 7),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND));
 	}
@@ -129,7 +130,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void remoteIsNotTooFarBehindIfRemoteIsMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareBlocksWithHeight(17, 7),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND)));
 	}
@@ -137,7 +138,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void localCanBeMoreThanMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareBlocksWithHeight(7, 18),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND)));
 	}
@@ -160,7 +161,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksToAnalyze() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareBlocksWithNumRemoteHashes(21),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES));
 	}
@@ -168,7 +169,7 @@ public class BlockChainComparerTest {
 	@Test
 	public void remoteDidNotReturnTooManyHashesIfItReturnedExactlyMaxBlocksToAnalyze() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				compareBlocksWithNumRemoteHashes(20),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES)));
 	}
@@ -195,7 +196,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(account, 7), 1),
 				new MockBlockLookup(createVerifiableBlock(account, 8), new BlockChainScore(10), 2)).getCode();
 
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES));
 	}
 
 	@Test
@@ -214,7 +215,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain)).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
 	}
 
 	@Test
@@ -232,7 +233,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain)).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
 	}
 
 	@Test
@@ -250,10 +251,10 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain));
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
 	}
 
 	@Test
@@ -277,7 +278,7 @@ public class BlockChainComparerTest {
 				remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
 	}
 
 	@Test
@@ -301,9 +302,9 @@ public class BlockChainComparerTest {
 				remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -328,9 +329,9 @@ public class BlockChainComparerTest {
 				remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
 	}
 
 	//endregion

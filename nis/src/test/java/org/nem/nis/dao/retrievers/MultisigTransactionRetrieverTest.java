@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -83,7 +84,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 					transferType);
 
 			// Assert:
-			pairs.stream().forEach(p -> Assert.assertThat(
+			pairs.stream().forEach(p -> MatcherAssert.assertThat(
 					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
 					IsNull.nullValue()));
 		}
@@ -119,7 +120,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
+		MatcherAssert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
 	}
 
 	// endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,6 +26,6 @@ public class UnconfirmedStateFactoryTest {
 		final UnconfirmedState state = factory.create(Mockito.mock(NisCache.class), Mockito.mock(UnconfirmedTransactionsCache.class));
 
 		// Assert:
-		Assert.assertThat(state, IsNull.notNullValue());
+		MatcherAssert.assertThat(state, IsNull.notNullValue());
 	}
 }

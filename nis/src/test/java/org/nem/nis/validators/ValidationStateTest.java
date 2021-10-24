@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -22,7 +23,7 @@ public class ValidationStateTest {
 		final boolean result = validationState.canDebit(account, Amount.fromNem(1234));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 		Mockito.verify(xemDebitPredicate, Mockito.only()).canDebit(account, Amount.fromNem(1234));
 	}
 
@@ -37,7 +38,7 @@ public class ValidationStateTest {
 		final boolean result = validationState.canDebit(account, Utils.createMosaic(4, 1234));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(mosaicDebitPredicate, Mockito.only()).canDebit(account, Utils.createMosaic(4, 1234));
 	}
 
@@ -55,7 +56,7 @@ public class ValidationStateTest {
 		final TransactionExecutionState transactionExecutionState = validationState.transactionExecutionState();
 
 		// Assert:
-		Assert.assertThat(transactionExecutionState, IsEqual.equalTo(originalTransactionExecutionState));
+		MatcherAssert.assertThat(transactionExecutionState, IsEqual.equalTo(originalTransactionExecutionState));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -46,7 +47,7 @@ public class DbModelUtilsTest {
 		final AbstractTransfer dbInnerTransfer = DbModelUtils.getInnerTransaction(dbMultisig);
 
 		// Assert:
-		Assert.assertThat(dbInnerTransfer, IsSame.sameInstance(dbTransfer));
+		MatcherAssert.assertThat(dbInnerTransfer, IsSame.sameInstance(dbTransfer));
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class DbModelUtilsTest {
 		final boolean isInnerTransaction = DbModelUtils.isInnerTransaction(dbTransfer);
 
 		// Assert:
-		Assert.assertThat(isInnerTransaction, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isInnerTransaction, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -86,7 +87,7 @@ public class DbModelUtilsTest {
 		final boolean isInnerTransaction = DbModelUtils.isInnerTransaction(dbTransfer);
 
 		// Assert:
-		Assert.assertThat(isInnerTransaction, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isInnerTransaction, IsEqual.equalTo(false));
 	}
 
 	//endregion

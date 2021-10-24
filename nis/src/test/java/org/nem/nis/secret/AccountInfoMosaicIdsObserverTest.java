@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -231,9 +232,9 @@ public class AccountInfoMosaicIdsObserverTest {
 		private void assertMosaicIds(final Account account, final boolean hasMosaicSubscription) {
 			// Assert:
 			final AccountInfo info = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
-			Assert.assertThat(info.getMosaicIds().size(), IsEqual.equalTo(hasMosaicSubscription ? 1 : 0));
+			MatcherAssert.assertThat(info.getMosaicIds().size(), IsEqual.equalTo(hasMosaicSubscription ? 1 : 0));
 			if (hasMosaicSubscription) {
-				Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(Collections.singletonList(this.mosaicDefinition.getId())));
+				MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(Collections.singletonList(this.mosaicDefinition.getId())));
 			}
 		}
 

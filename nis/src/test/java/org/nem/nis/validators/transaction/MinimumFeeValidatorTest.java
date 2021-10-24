@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
@@ -43,7 +44,7 @@ public class MinimumFeeValidatorTest {
 		final ValidationResult result = validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class MinimumFeeValidatorTest {
 		transactions.add(transaction);
 
 		// Assert:
-		transactions.forEach(t -> Assert.assertThat(
+		transactions.forEach(t -> MatcherAssert.assertThat(
 				validator.validate(t, new ValidationContext(ValidationStates.Throw)),
 				IsEqual.equalTo(ValidationResult.SUCCESS)));
 	}
@@ -119,7 +120,7 @@ public class MinimumFeeValidatorTest {
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {

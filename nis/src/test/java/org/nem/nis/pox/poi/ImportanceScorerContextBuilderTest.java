@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
@@ -17,9 +18,9 @@ public class ImportanceScorerContextBuilderTest {
 		final ImportanceScorerContext context = builder.create();
 
 		// Assert:
-		Assert.assertThat(context.getImportanceVector(), IsEqual.equalTo(new ColumnVector(1, 1, 1)));
-		Assert.assertThat(context.getOutlinkVector(), IsEqual.equalTo(new ColumnVector(2, 2, 2)));
-		Assert.assertThat(context.getVestedBalanceVector(), IsEqual.equalTo(new ColumnVector(3, 3, 3)));
-		Assert.assertThat(context.getGraphWeightVector(), IsEqual.equalTo(new ColumnVector(4, 4, 4)));
+		MatcherAssert.assertThat(context.getImportanceVector(), IsEqual.equalTo(new ColumnVector(1, 1, 1)));
+		MatcherAssert.assertThat(context.getOutlinkVector(), IsEqual.equalTo(new ColumnVector(2, 2, 2)));
+		MatcherAssert.assertThat(context.getVestedBalanceVector(), IsEqual.equalTo(new ColumnVector(3, 3, 3)));
+		MatcherAssert.assertThat(context.getGraphWeightVector(), IsEqual.equalTo(new ColumnVector(4, 4, 4)));
 	}
 }

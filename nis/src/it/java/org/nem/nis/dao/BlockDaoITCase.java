@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -30,7 +31,7 @@ public class BlockDaoITCase {
 		LOGGER.warning(String.format("getBlocksAfter needed %dms", elapsedTime));
 
 		// Assert:
-		Assert.assertThat(elapsedTime < 7500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(elapsedTime < 7500, IsEqual.equalTo(true));
 	}
 
 	private static long measureTime(final BiConsumer<BlockHeight, Integer> getBlocks) {

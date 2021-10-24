@@ -1,5 +1,6 @@
 package org.nem.nis.test;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.mockito.Mockito;
@@ -94,14 +95,14 @@ public class MosaicTestContext {
 	}
 
 	public void assertMosaicDefinitionsOwned(final Collection<MosaicDefinition> returnedMosaicDefinitions, final List<MosaicId> expected) {
-		Assert.assertThat(returnedMosaicDefinitions.size(), IsEqual.equalTo(expected.size()));
+		MatcherAssert.assertThat(returnedMosaicDefinitions.size(), IsEqual.equalTo(expected.size()));
 
 		final Set<MosaicDefinition> definitions = expected.stream().map(this.mosaicDefinitions::get).collect(Collectors.toSet());
-		Assert.assertThat(returnedMosaicDefinitions, IsEquivalent.equivalentTo(definitions));
+		MatcherAssert.assertThat(returnedMosaicDefinitions, IsEquivalent.equivalentTo(definitions));
 	}
 
 	public void assertMosaicsOwned(final Collection<Mosaic> returnedMosaics, final List<Mosaic> expectedMosaics) {
-		Assert.assertThat(returnedMosaics.size(), IsEqual.equalTo(expectedMosaics.size()));
-		Assert.assertThat(returnedMosaics, IsEquivalent.equivalentTo(expectedMosaics));
+		MatcherAssert.assertThat(returnedMosaics.size(), IsEqual.equalTo(expectedMosaics.size()));
+		MatcherAssert.assertThat(returnedMosaics, IsEquivalent.equivalentTo(expectedMosaics));
 	}
 }

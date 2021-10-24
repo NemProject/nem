@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -29,9 +30,9 @@ public class MosaicSupplyChangeDbModelToModelMappingTest extends AbstractTransfe
 		final MosaicSupplyChangeTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
-		Assert.assertThat(model.getMosaicId(), IsEqual.equalTo(context.mosaicId));
-		Assert.assertThat(model.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
-		Assert.assertThat(model.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(model.getMosaicId(), IsEqual.equalTo(context.mosaicId));
+		MatcherAssert.assertThat(model.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
+		MatcherAssert.assertThat(model.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
 
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 	}

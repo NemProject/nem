@@ -1,5 +1,6 @@
 package org.nem.nis.validators.unconfirmed;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -42,7 +43,7 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -83,7 +84,7 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -124,7 +125,7 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion

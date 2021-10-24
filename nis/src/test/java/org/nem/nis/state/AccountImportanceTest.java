@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -19,8 +20,8 @@ public class AccountImportanceTest {
 		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
-		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(ai.getHeight(), IsNull.nullValue());
 	}
 
 	@Test
@@ -30,10 +31,10 @@ public class AccountImportanceTest {
 		final ReadOnlyAccountImportance ai = new AccountImportance(height, 0.234, 0.345);
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(ai.getImportance(height), IsEqual.equalTo(0.234));
-		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.345));
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(ai.getImportance(height), IsEqual.equalTo(0.234));
+		MatcherAssert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.345));
 	}
 
 	//endregion
@@ -49,8 +50,8 @@ public class AccountImportanceTest {
 		final ReadOnlyAccountImportance ai = roundtripImportance(original);
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
-		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(ai.getHeight(), IsNull.nullValue());
 	}
 
 	@Test
@@ -65,10 +66,10 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(17.0));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
-		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importance, IsEqual.equalTo(17.0));
+		MatcherAssert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		MatcherAssert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
 	private static ReadOnlyAccountImportance roundtripImportance(final ReadOnlyAccountImportance original) {
@@ -96,8 +97,8 @@ public class AccountImportanceTest {
 				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(9)));
-		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
-		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -117,8 +118,8 @@ public class AccountImportanceTest {
 				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(9)));
-		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
-		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -137,8 +138,8 @@ public class AccountImportanceTest {
 				NisUtils.createLink(8, 35, "CCC"));
 
 		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(8)));
-		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
-		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(8)), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(ai.getOutlinksSize(new BlockHeight(8)), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -158,8 +159,8 @@ public class AccountImportanceTest {
 				NisUtils.createLink(9, 18, "AAA"),
 				NisUtils.createLink(10, 22, "ZZZ"));
 		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(10)));
-		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
-		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(10)), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(ai.getOutlinksSize(new BlockHeight(10)), IsEqual.equalTo(2));
 	}
 
 	//endregion
@@ -172,7 +173,7 @@ public class AccountImportanceTest {
 		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Act:
-		Assert.assertThat(ai.getImportance(new BlockHeight(7)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(ai.getImportance(new BlockHeight(7)), IsEqual.equalTo(0.0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -195,9 +196,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(17.0));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importance, IsEqual.equalTo(17.0));
+		MatcherAssert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
@@ -211,9 +212,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(11.0));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importance, IsEqual.equalTo(11.0));
+		MatcherAssert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
@@ -227,9 +228,9 @@ public class AccountImportanceTest {
 		final double importance = ai.getImportance(new BlockHeight(6));
 
 		// Assert:
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(12.0));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(6)));
+		MatcherAssert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importance, IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(6)));
 	}
 
 	//endregion
@@ -242,7 +243,7 @@ public class AccountImportanceTest {
 		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Assert:
-		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -254,7 +255,7 @@ public class AccountImportanceTest {
 		ai.setLastPageRank(12);
 
 		// Assert:
-		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
 	//endregion
@@ -273,10 +274,10 @@ public class AccountImportanceTest {
 		final double importance = copy.getImportance(new BlockHeight(5));
 
 		// Assert:
-		Assert.assertThat(copy.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(17.0));
-		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
-		Assert.assertThat(copy.getLastPageRank(), IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(copy.isSet(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importance, IsEqual.equalTo(17.0));
+		MatcherAssert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		MatcherAssert.assertThat(copy.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
 	@Test
@@ -297,8 +298,8 @@ public class AccountImportanceTest {
 				NisUtils.createLink(9, 18, "AAA"));
 
 		final List<AccountLink> links = this.toList(getOutlinksIterator(copy, new BlockHeight(9)));
-		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
-		Assert.assertThat(copy.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		MatcherAssert.assertThat(copy.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -314,8 +315,8 @@ public class AccountImportanceTest {
 		copy.addOutlink(NisUtils.createLink(11, 14, "DDD"));
 
 		// Assert:
-		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(3));
-		Assert.assertThat(copy.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(ai.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(copy.getOutlinksSize(new BlockHeight(15)), IsEqual.equalTo(4));
 	}
 
 	//endregion
@@ -329,7 +330,7 @@ public class AccountImportanceTest {
 		ai.setImportance(new BlockHeight(5), 17);
 
 		// Assert:
-		Assert.assertThat(ai.toString(), IsEqual.equalTo("(5 : 17.000000)"));
+		MatcherAssert.assertThat(ai.toString(), IsEqual.equalTo("(5 : 17.000000)"));
 	}
 
 	//endregion

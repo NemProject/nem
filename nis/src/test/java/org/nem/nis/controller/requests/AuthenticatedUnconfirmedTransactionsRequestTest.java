@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -23,7 +24,7 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 		final AuthenticatedUnconfirmedTransactionsRequest authenticatedRequest = new AuthenticatedUnconfirmedTransactionsRequest(request, challenge);
 
 		// Assert:
-		Assert.assertThat(authenticatedRequest.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(authenticatedRequest.getChallenge(), IsEqual.equalTo(challenge));
 		assertEquivalent(authenticatedRequest.getEntity(), request);
 	}
 
@@ -36,7 +37,7 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 		final AuthenticatedUnconfirmedTransactionsRequest authenticatedRequest = new AuthenticatedUnconfirmedTransactionsRequest(challenge);
 
 		// Assert:
-		Assert.assertThat(authenticatedRequest.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(authenticatedRequest.getChallenge(), IsEqual.equalTo(challenge));
 		assertEquivalent(authenticatedRequest.getEntity(), new UnconfirmedTransactionsRequest());
 	}
 
@@ -57,13 +58,13 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 		final AuthenticatedUnconfirmedTransactionsRequest request = new AuthenticatedUnconfirmedTransactionsRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		assertEquivalent(request.getEntity(), original);
 	}
 
 	// endregion
 
 	private static void assertEquivalent(final UnconfirmedTransactionsRequest lhs, final UnconfirmedTransactionsRequest rhs) {
-		Assert.assertThat(lhs.getHashShortIds(), IsEquivalent.equivalentTo(rhs.getHashShortIds()));
+		MatcherAssert.assertThat(lhs.getHashShortIds(), IsEquivalent.equivalentTo(rhs.getHashShortIds()));
 	}
 }

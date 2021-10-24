@@ -1,5 +1,6 @@
 package org.nem.nis.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -112,7 +113,7 @@ public class AuditedCommunicatorTest {
 
 			// Assert:
 			Mockito.verify(this.collection, Mockito.times(1)).remove("localhost", "/my/path");
-			Assert.assertThat(deserializer, IsSame.sameInstance(this.deserializer));
+			MatcherAssert.assertThat(deserializer, IsSame.sameInstance(this.deserializer));
 		}
 
 		public void assertPostExceptionalCompletionRemovesFromAuditCollection() throws MalformedURLException {

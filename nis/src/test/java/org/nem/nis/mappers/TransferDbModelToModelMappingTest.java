@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -24,8 +25,8 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 
 		// Assert:
 		context.assertModel(model);
-		Assert.assertThat(model.getMessage(), IsNull.nullValue());
-		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(model.getMessage(), IsNull.nullValue());
+		MatcherAssert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -42,10 +43,10 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 
 		// Assert:
 		context.assertModel(model);
-		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
-		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
-		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(model.getMessage(), IsNull.notNullValue());
+		MatcherAssert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -62,10 +63,10 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 
 		// Assert:
 		context.assertModel(model);
-		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
-		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(2));
-		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(model.getMessage(), IsNull.notNullValue());
+		MatcherAssert.assertThat(model.getMessage().getType(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -96,10 +97,10 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 
 		// Assert:
 		context.assertModel(model);
-		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
-		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
-		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaics(), IsEquivalent.equivalentTo(context.mosaics));
+		MatcherAssert.assertThat(model.getMessage(), IsNull.notNullValue());
+		MatcherAssert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
+		MatcherAssert.assertThat(model.getAttachment().getMosaics(), IsEquivalent.equivalentTo(context.mosaics));
 
 		context.dbMosaics.forEach(dbMosaic ->
 				Mockito.verify(context.mapper, Mockito.times(1)).map(dbMosaic, Mosaic.class));
@@ -152,8 +153,8 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		}
 
 		public void assertModel(final TransferTransaction model) {
-			Assert.assertThat(model.getRecipient(), IsEqual.equalTo(this.recipient));
-			Assert.assertThat(model.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(111111)));
+			MatcherAssert.assertThat(model.getRecipient(), IsEqual.equalTo(this.recipient));
+			MatcherAssert.assertThat(model.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(111111)));
 		}
 	}
 }

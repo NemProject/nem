@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -60,7 +61,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) only harvesting-eligible accounts (0, 2, 3, 4) are represented
 		// (2) vested balances are not normalized
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getVestedBalanceVector(),
 				IsEqual.equalTo(new ColumnVector(29999999999L, 50000000000L, 10000000000L, 10000000000L)));
 	}
@@ -73,7 +74,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) only harvesting-eligible accounts (0, 2, 3, 4) are represented
 		// (2) calculation delegates to PoiAccountInfo
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
 				IsEqual.equalTo(new ColumnVector(0, 3e06, 0, 10e06)));
 	}
@@ -90,7 +91,7 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		// (3) negative outflows are scaled
 		// (4) net outflows are used instead of total outflows
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
 				IsEqual.equalTo(new ColumnVector(9 * MIN_OUTLINK_WEIGHT, 0, 0.6 * -15 * MIN_OUTLINK_WEIGHT, 8 * MIN_OUTLINK_WEIGHT)));
 	}
@@ -103,7 +104,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) start vector is uniform
 		// (2) start vector is normalized
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getPoiStartVector(),
 				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
@@ -120,7 +121,7 @@ public class PoiContextTest {
 		expectedOutlierVector.setAt(13, 1);
 		expectedOutlierVector.setAt(17, 1);
 		expectedOutlierVector.setAt(19, 1);
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getOutlierVector(),
 				IsEqual.equalTo(expectedOutlierVector));
 	}
@@ -140,7 +141,7 @@ public class PoiContextTest {
 		expectedGraphWeightVector.setAt(13, 0.75);
 		expectedGraphWeightVector.setAt(17, 0.75);
 		expectedGraphWeightVector.setAt(19, 0.75);
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getGraphWeightVector(),
 				IsEqual.equalTo(expectedGraphWeightVector));
 	}
@@ -156,7 +157,7 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) accounts without outlinks are dangling (2 has inlinks but no outlinks)
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getDangleIndexes(),
 				IsEquivalent.equivalentTo(2));
 	}
@@ -183,7 +184,7 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getOutlinkMatrix().roundTo(5),
 				IsEqual.equalTo(expectedAccountLinks));
 	}
@@ -208,7 +209,7 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(2, 3, 1.0);
 
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				context.getOutlinkMatrix().roundTo(5),
 				IsEqual.equalTo(expectedAccountLinks));
 	}
@@ -235,9 +236,9 @@ public class PoiContextTest {
 
 		// Assert:
 		final ClusteringResult expectedResult = IdealizedClusterFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
+		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
+		MatcherAssert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
+		MatcherAssert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
 	//endregion
@@ -259,7 +260,7 @@ public class PoiContextTest {
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getLastPageRank())
 				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
 	}
 
 	@Test
@@ -280,7 +281,7 @@ public class PoiContextTest {
 					return ai.isSet() ? ai.getImportance(height) : 0.0;
 				})
 				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
 	}
 
 	@Test
@@ -333,8 +334,8 @@ public class PoiContextTest {
 		final List<Double> lastPageRanks = accountStates.stream()
 				.map(a -> a.getHistoricalImportances().getHistoricalPageRank(height))
 				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
-		Assert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		MatcherAssert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
 	}
 
 	@Test
@@ -351,7 +352,7 @@ public class PoiContextTest {
 		final int numHistoricalEntries = accountStates.stream()
 				.map(a -> a.getHistoricalImportances().size())
 				.reduce(0, Integer::sum);
-		Assert.assertThat(numHistoricalEntries, IsEqual.equalTo(4));
+		MatcherAssert.assertThat(numHistoricalEntries, IsEqual.equalTo(4));
 	}
 
 	//endregion

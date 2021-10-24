@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -43,19 +44,19 @@ public class PoiImportanceCalculatorTest {
 
 		// Act:
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(DEFAULT_IMPORTANCE_SCORER, getPoiOptions);
-		Assert.assertThat(heights.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(0));
 
 		for (int i = 0; i < numIterations; ++i) {
 			// Act:
 			importanceCalculator.recalculate(new BlockHeight(100 + i), accountStates);
 
 			// Assert:
-			Assert.assertThat(heights.size(), IsEqual.equalTo(1 + i));
+			MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(1 + i));
 		}
 
 		// Assert:
-		Assert.assertThat(heights.size(), IsEqual.equalTo(numIterations));
-		Assert.assertThat(
+		MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(numIterations));
+		MatcherAssert.assertThat(
 				heights,
 				IsEqual.equalTo(Arrays.asList(new BlockHeight(100), new BlockHeight(101), new BlockHeight(102))));
 	}
@@ -112,8 +113,8 @@ public class PoiImportanceCalculatorTest {
 		}
 
 		// Assert: max index and next max index are 2 and 4
-		Assert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(6));
-		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(6));
+		MatcherAssert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(2));
 	}
 
 	private static double calculateDistanceBetweenFastScanAndOtherImportances(final GraphClusteringStrategy clusteringStrategy) {
@@ -189,15 +190,15 @@ public class PoiImportanceCalculatorTest {
 		final double hubImportance = importances.getAt(0);
 		final double spokeImportance = importances.getAt(1);
 		for (int i = 2; i < importances.size(); ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
 		}
 
 		// - the hub importance is greater than the spoke importance
 		// - the higher the negative outlink weight and the lower the teleportation probability the more the ratio approaches 1.0
 		final double ratio = hubImportance / spokeImportance;
 		LOGGER.info(String.format("hub: %f; spoke %f; ratio: %f", hubImportance, spokeImportance, ratio));
-		Assert.assertThat(ratio > 1.10, IsEqual.equalTo(true));
-		Assert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio > 1.10, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -241,14 +242,14 @@ public class PoiImportanceCalculatorTest {
 		final double hubImportance = importances.getAt(0);
 		final double spokeImportance = importances.getAt(1);
 		for (int i = 2; i < importances.size(); ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
 		}
 
 		// - the hub importance is greater than the spoke importance
 		final double ratio = hubImportance / spokeImportance;
 		LOGGER.info(String.format("hub: %f; spoke %f; ratio: %f", hubImportance, spokeImportance, ratio));
-		Assert.assertThat(ratio > 1.20, IsEqual.equalTo(true));
-		Assert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio > 1.20, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -313,12 +314,12 @@ public class PoiImportanceCalculatorTest {
 		// - all importances should be within a small range
 		for (int i = 0; i < importances.size(); ++i) {
 			final double importance = importances.getAt(i);
-			Assert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
 		}
 
 		// - the ring importances should be the same for the corresponding position
 		for (int i = 1; i <= 5; ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
 		}
 	}
 
@@ -376,8 +377,8 @@ public class PoiImportanceCalculatorTest {
 		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Ideally the ratio should be within a small range.
-		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
-		Assert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -498,8 +499,8 @@ public class PoiImportanceCalculatorTest {
 
 		// Assert:
 		// There should have been some importance transferred from the right ring to the left one.
-		Assert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
-		Assert.assertThat(ratio2 > 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio2 > 1, IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -590,10 +591,10 @@ public class PoiImportanceCalculatorTest {
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.
-		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
-		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
-		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
-		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
 	}
 
 	private class StandardContext {
@@ -644,8 +645,8 @@ public class PoiImportanceCalculatorTest {
 		assertEqualBalances(height, accountStates, 100000);
 
 		// - outlink > inlink > outlier
-		Assert.assertThat(importances.getAt(1) > importances.getAt(0), IsEqual.equalTo(true));
-		Assert.assertThat(importances.getAt(0) > importances.getAt(2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importances.getAt(1) > importances.getAt(0), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importances.getAt(0) > importances.getAt(2), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -752,7 +753,7 @@ public class PoiImportanceCalculatorTest {
 		// Assert:
 		final double adjustedAmount = Amount.fromMicroNem((long)(amount * MIN_OUTLINK_WEIGHT)).getNumNem();
 		for (int i = 0; i < balances.size(); ++i) {
-			Assert.assertThat(balances.getAt(i), IsEqual.equalTo(adjustedAmount));
+			MatcherAssert.assertThat(balances.getAt(i), IsEqual.equalTo(adjustedAmount));
 		}
 	}
 
@@ -770,7 +771,7 @@ public class PoiImportanceCalculatorTest {
 
 		for (int i = 0; i < balances.size(); ++i) {
 			final double balance = balances.getAt(i);
-			Assert.assertThat(balance >= adjustedLowAmount && balance < adjustedHighAmount, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(balance >= adjustedLowAmount && balance < adjustedHighAmount, IsEqual.equalTo(true));
 		}
 	}
 

@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -14,7 +15,7 @@ public class NamedValidatorTest {
 		final String name = validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("CrazyNameValidator"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("CrazyNameValidator"));
 	}
 
 	private static class CrazyNameValidator implements NamedValidator {

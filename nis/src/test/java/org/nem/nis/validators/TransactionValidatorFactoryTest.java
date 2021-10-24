@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.IsEquivalent;
@@ -110,7 +111,7 @@ public class TransactionValidatorFactoryTest {
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
+		MatcherAssert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
 	}
 
 	private static TransactionValidatorFactory createFactory() {

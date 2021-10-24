@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -29,7 +30,7 @@ public class EligibleSignerBlockValidatorTest {
 		final ValidationResult result = validator.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT));
 	}
 
 	@Test
@@ -109,6 +110,6 @@ public class EligibleSignerBlockValidatorTest {
 		final ValidationResult result = validator.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

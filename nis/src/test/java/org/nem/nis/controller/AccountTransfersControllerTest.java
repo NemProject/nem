@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -74,7 +75,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
-			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+			MatcherAssert.assertThat(resultList, IsSame.sameInstance(expectedList));
 			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, 1L, this.getTransferType(), 30);
 		}
 
@@ -104,7 +105,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
-			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+			MatcherAssert.assertThat(resultList, IsSame.sameInstance(expectedList));
 			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType(), 35);
 			Mockito.verify(context.transactionHashCache, Mockito.times(1)).get(hash);
 		}
@@ -128,7 +129,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
-			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+			MatcherAssert.assertThat(resultList, IsSame.sameInstance(expectedList));
 			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, null, this.getTransferType(), 40);
 		}
 
@@ -214,9 +215,9 @@ public class AccountTransfersControllerTest {
 
 			// Assert:
 			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
-			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
-			Assert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
-			Assert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
+			MatcherAssert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
+			MatcherAssert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
+			MatcherAssert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
 		}
 
 		@Test
@@ -240,7 +241,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
-			Assert.assertThat(resultList.get(0).getEntity(), IsSame.sameInstance(pair.getEntity()));
+			MatcherAssert.assertThat(resultList.get(0).getEntity(), IsSame.sameInstance(pair.getEntity()));
 		}
 
 		@Test
@@ -270,8 +271,8 @@ public class AccountTransfersControllerTest {
 			// Assert:
 			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
 			final Collection<Mosaic> mosaics = tx.getAttachment().getMosaics();
-			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
-			Assert.assertThat(mosaics, IsEqual.equalTo(Collections.singletonList(new Mosaic(Utils.createMosaicId(5), Quantity.fromValue(123)))));
+			MatcherAssert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
+			MatcherAssert.assertThat(mosaics, IsEqual.equalTo(Collections.singletonList(new Mosaic(Utils.createMosaicId(5), Quantity.fromValue(123)))));
 		}
 
 		@Test

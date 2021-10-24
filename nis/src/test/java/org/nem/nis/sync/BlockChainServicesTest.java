@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -51,7 +52,7 @@ public class BlockChainServicesTest {
 				blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class BlockChainServicesTest {
 				blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
 	}
 
 	@Test
@@ -84,7 +85,7 @@ public class BlockChainServicesTest {
 		final Collection<BlockDifficulty> difficulties = blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(difficulties, IsEqual.equalTo(expectedDifficulties));
+		MatcherAssert.assertThat(difficulties, IsEqual.equalTo(expectedDifficulties));
 	}
 
 	//endregion
@@ -104,13 +105,13 @@ public class BlockChainServicesTest {
 		final BlockChainScore peerScore = context.getBlockChainScore();
 
 		// sanity check
-		Assert.assertThat(peerScore, IsNot.not(IsEqual.equalTo(initialScore)));
+		MatcherAssert.assertThat(peerScore, IsNot.not(IsEqual.equalTo(initialScore)));
 
 		// Act:
 		final BlockChainScore score = context.getBlockChainServices().undoAndGetScore(context.getNisCacheCopy(), context.createBlockLookup(), height);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(peerScore.subtract(initialScore)));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(peerScore.subtract(initialScore)));
 	}
 
 	@Test
@@ -130,7 +131,7 @@ public class BlockChainServicesTest {
 		// sanity check
 		copy.getAccountStateCache().contents().stream()
 				.filter(a -> !context.getNemesisAccount().getAddress().equals(a.getAddress()))
-				.forEach(a -> Assert.assertThat(
+				.forEach(a -> MatcherAssert.assertThat(
 						a.getWeightedBalances().size(),
 						IsNot.not(IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress())))));
 
@@ -140,7 +141,7 @@ public class BlockChainServicesTest {
 
 		// Assert:
 		copy.getAccountStateCache().contents().stream()
-				.forEach(a -> Assert.assertThat(a.getWeightedBalances().size(), IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress()))));
+				.forEach(a -> MatcherAssert.assertThat(a.getWeightedBalances().size(), IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress()))));
 	}
 
 	@Test
@@ -170,12 +171,12 @@ public class BlockChainServicesTest {
 		final NisCache copy = context.getNisCacheCopy();
 
 		// sanity check: the balances should all be adjusted
-		Assert.assertThat(cache.addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
+		MatcherAssert.assertThat(cache.addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
 		cache.addressToBalanceMap.entrySet().stream()
 				.forEach(e -> {
 					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
 					final Amount expected = e.getValue();
-					Assert.assertThat(balance, IsEqual.equalTo(expected));
+					MatcherAssert.assertThat(balance, IsEqual.equalTo(expected));
 				});
 
 		// Act: undo and revert changes
@@ -187,7 +188,7 @@ public class BlockChainServicesTest {
 				.forEach(e -> {
 					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
 					final Amount expected = cache.getInitialBalance(e.getKey());
-					Assert.assertThat(balance, IsEqual.equalTo(expected));
+					MatcherAssert.assertThat(balance, IsEqual.equalTo(expected));
 				});
 	}
 

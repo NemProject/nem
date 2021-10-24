@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.DbAccount;
@@ -13,8 +14,8 @@ public class AccountRawToDbModelMappingTest {
 		final DbAccount dbAccount = mapping.map(123L);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsNull.notNullValue());
-		Assert.assertThat(dbAccount.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbAccount, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbAccount.getId(), IsEqual.equalTo(123L));
 	}
 
 	@Test
@@ -24,6 +25,6 @@ public class AccountRawToDbModelMappingTest {
 		final DbAccount dbAccount = mapping.map(null);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsNull.nullValue());
+		MatcherAssert.assertThat(dbAccount, IsNull.nullValue());
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -40,7 +41,7 @@ public class BlockScorerTest {
 		final BigInteger hit = scorer.calculateHit(previousBlock);
 
 		// Assert:
-		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
+		MatcherAssert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
 	}
 
 	//endregion
@@ -60,7 +61,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -92,7 +93,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -119,7 +120,7 @@ public class BlockScorerTest {
 				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64)
 				.divide(BigInteger.valueOf((long)60E12));
 
-		Assert.assertThat(target, IsEqual.equalTo(expectedTarget));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(expectedTarget));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public class BlockScorerTest {
 		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
+		MatcherAssert.assertThat(score, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
 	}
 
 	@Test
@@ -187,7 +188,7 @@ public class BlockScorerTest {
 		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
-		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
+		MatcherAssert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
 		Mockito.verify(context.accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
@@ -208,7 +209,7 @@ public class BlockScorerTest {
 
 		// Assert:
 		final long expectedScore = 44_888_000_000_000L - (5568532 - 5567320);
-		Assert.assertThat(score, IsEqual.equalTo(expectedScore));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(expectedScore));
 	}
 
 	//endregion

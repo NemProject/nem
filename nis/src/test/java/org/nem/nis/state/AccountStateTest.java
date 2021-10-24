@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,14 +19,14 @@ public class AccountStateTest {
 		final AccountState state = new AccountState(address);
 
 		// Assert:
-		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
-		Assert.assertThat(state.getHistoricalImportances(), IsNull.notNullValue());
-		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
-		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
-		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
-		Assert.assertThat(state.getMultisigLinks(), IsNull.notNullValue());
-		Assert.assertThat(state.getHeight(), IsNull.nullValue());
+		MatcherAssert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getHistoricalImportances(), IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getMultisigLinks(), IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -42,7 +43,7 @@ public class AccountStateTest {
 		final AccountState copy = state.copy();
 
 		// Assert:
-		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(copy.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -60,11 +61,11 @@ public class AccountStateTest {
 		copy.getImportanceInfo().setImportance(new BlockHeight(234), 0.0234375);
 
 		// Assert:
-		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
-		Assert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));
-		Assert.assertThat(copyImportance.getOutlinksSize(height), IsEqual.equalTo(1));
-		Assert.assertThat(
+		MatcherAssert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
+		MatcherAssert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
+		MatcherAssert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));
+		MatcherAssert.assertThat(copyImportance.getOutlinksSize(height), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(
 				copyImportance.getOutlinksIterator(height, height).next(),
 				IsEqual.equalTo(importance.getOutlinksIterator(height, height).next()));
 	}
@@ -81,8 +82,8 @@ public class AccountStateTest {
 		final ReadOnlyWeightedBalances copyBalances = copy.getWeightedBalances();
 
 		// Assert:
-		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
-		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
+		MatcherAssert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
+		MatcherAssert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
 	}
 
 	@Test
@@ -97,9 +98,9 @@ public class AccountStateTest {
 		final ReadOnlyHistoricalImportances copyImportances = copy.getHistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(copyImportances, IsNot.not(IsSame.sameInstance(importances)));
-		Assert.assertThat(copyImportances.getHistoricalImportance(new BlockHeight(17)), IsEqual.equalTo(0.3));
-		Assert.assertThat(copyImportances.getHistoricalPageRank(new BlockHeight(17)), IsEqual.equalTo(0.6));
+		MatcherAssert.assertThat(copyImportances, IsNot.not(IsSame.sameInstance(importances)));
+		MatcherAssert.assertThat(copyImportances.getHistoricalImportance(new BlockHeight(17)), IsEqual.equalTo(0.3));
+		MatcherAssert.assertThat(copyImportances.getHistoricalPageRank(new BlockHeight(17)), IsEqual.equalTo(0.6));
 	}
 
 	@Test
@@ -123,9 +124,9 @@ public class AccountStateTest {
 		copyLinks.removeLink(link2);
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
-		Assert.assertThat(copyLinks.isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(copyLinks.getCurrent(), IsNull.nullValue());
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(copyLinks.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copyLinks.getCurrent(), IsNull.nullValue());
 	}
 
 	@Test
@@ -139,8 +140,8 @@ public class AccountStateTest {
 		copy.getAccountInfo().decrementBalance(Amount.fromNem(234));
 
 		// Assert:
-		Assert.assertThat(state.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(copy.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
+		MatcherAssert.assertThat(state.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		MatcherAssert.assertThat(copy.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
 	}
 
 	@Test
@@ -158,11 +159,11 @@ public class AccountStateTest {
 		copyLinks.addCosignatoryOf(multisig2);
 
 		// Assert:
-		Assert.assertThat(stateLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
-		Assert.assertThat(stateLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(stateLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(stateLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(false));
 
-		Assert.assertThat(copyLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
-		Assert.assertThat(copyLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copyLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copyLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -175,7 +176,7 @@ public class AccountStateTest {
 		final AccountState copy = state.copy();
 
 		// Assert:
-		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
+		MatcherAssert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
 	//endregion
@@ -191,7 +192,7 @@ public class AccountStateTest {
 		state.setHeight(new BlockHeight(17));
 
 		// Assert:
-		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
+		MatcherAssert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
 	@Test
@@ -204,7 +205,7 @@ public class AccountStateTest {
 		state.setHeight(new BlockHeight(32));
 
 		// Assert:
-		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
+		MatcherAssert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.visitors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Block;
@@ -21,10 +22,10 @@ public class AggregateBlockVisitorTest {
 		context.visitor.visit(parentBlock, block);
 
 		// Assert:
-		Assert.assertThat(context.visitor1.lastBlock, IsEqual.equalTo(block));
-		Assert.assertThat(context.visitor1.lastParentBlock, IsEqual.equalTo(parentBlock));
-		Assert.assertThat(context.visitor2.lastBlock, IsEqual.equalTo(block));
-		Assert.assertThat(context.visitor2.lastParentBlock, IsEqual.equalTo(parentBlock));
+		MatcherAssert.assertThat(context.visitor1.lastBlock, IsEqual.equalTo(block));
+		MatcherAssert.assertThat(context.visitor1.lastParentBlock, IsEqual.equalTo(parentBlock));
+		MatcherAssert.assertThat(context.visitor2.lastBlock, IsEqual.equalTo(block));
+		MatcherAssert.assertThat(context.visitor2.lastParentBlock, IsEqual.equalTo(parentBlock));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class AggregateBlockVisitorTest {
 		context.visitor.visit(null, block);
 
 		// Assert:
-		Assert.assertThat(context.visitList, IsEquivalent.equivalentTo(1, 2));
+		MatcherAssert.assertThat(context.visitList, IsEquivalent.equivalentTo(1, 2));
 	}
 
 	private static class TestContext {

@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -21,7 +22,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("bar", "coins"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.nullValue());
+		MatcherAssert.assertThat(information, IsNull.nullValue());
 	}
 
 	@Test
@@ -33,7 +34,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.nullValue());
+		MatcherAssert.assertThat(information, IsNull.nullValue());
 	}
 
 	@Test
@@ -45,9 +46,9 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.notNullValue());
-		Assert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(1133)));
-		Assert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(information, IsNull.notNullValue());
+		MatcherAssert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(1133)));
+		MatcherAssert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
 	}
 
 	//endregion
@@ -63,7 +64,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("bar", "coins"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -87,8 +88,8 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.notNullValue());
-		Assert.assertThat(levy, IsEqual.equalTo(context.levy));
+		MatcherAssert.assertThat(levy, IsNull.notNullValue());
+		MatcherAssert.assertThat(levy, IsEqual.equalTo(context.levy));
 	}
 
 	//endregion

@@ -1,6 +1,7 @@
 package org.nem.nis.controller.requests;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -21,10 +22,10 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey());
 
 		// Assert:
-		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
-		Assert.assertThat(page.getHash(), IsNull.nullValue());
-		Assert.assertThat(page.getId(), IsNull.nullValue());
-		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(page.getHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	@Test
@@ -41,10 +42,10 @@ public class AccountPrivateKeyTransactionsPageTest {
 				"56");
 
 		// Assert:
-		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
-		Assert.assertThat(page.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
-		Assert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
+		MatcherAssert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(page.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(page.getId(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
 	}
 
 	@Test
@@ -67,10 +68,10 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), null, null, null);
 
 		// Assert:
-		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
-		Assert.assertThat(page.getHash(), IsNull.nullValue());
-		Assert.assertThat(page.getId(), IsNull.nullValue());
-		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(page.getHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	// endregion
@@ -88,10 +89,10 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(deserializer);
 
 		// Assert:
-		Assert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-		Assert.assertThat(page.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
-		Assert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
+		MatcherAssert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(page.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(page.getId(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
 	}
 
 	@Test
@@ -116,10 +117,10 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(deserializer);
 
 		// Assert:
-		Assert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-		Assert.assertThat(page.getHash(), IsNull.nullValue());
-		Assert.assertThat(page.getId(), IsNull.nullValue());
-		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(page.getHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	// endregion
@@ -142,8 +143,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
-		Assert.assertThat(id.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		MatcherAssert.assertThat(id.getHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
@@ -161,8 +162,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
-		Assert.assertThat(id.getHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		MatcherAssert.assertThat(id.getHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -179,8 +180,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final DefaultPage defaultPage = builder.build();
 
 		// Assert:
-		Assert.assertThat(defaultPage.getId(), IsEqual.equalTo(1234L));
-		Assert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(56));
+		MatcherAssert.assertThat(defaultPage.getId(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(56));
 	}
 
 	@Test
@@ -197,8 +198,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final DefaultPage defaultPage = builder.build();
 
 		// Assert:
-		Assert.assertThat(defaultPage.getId(), IsNull.nullValue());
-		Assert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(defaultPage.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(25));
 	}
 
 	// endregion

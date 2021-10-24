@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -81,7 +82,7 @@ public class MosaicSupplyChangeObserverTest {
 		notifyMosaicSupplyChange(context, new Supply(900), MosaicSupplyType.Delete, NotificationTrigger.Execute);
 
 		// Assert: mosaic id must have been removed
-		Assert.assertThat(context.accountState.getAccountInfo().getMosaicIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.accountState.getAccountInfo().getMosaicIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -138,20 +139,20 @@ public class MosaicSupplyChangeObserverTest {
 
 		private void assertSupply(final Supply supply) {
 			// - single namespace
-			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
 			// - single mosaic
 			final Mosaics mosaics = this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics();
-			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 
 			// - correct supply
 			final MosaicEntry entry = mosaics.get(this.mosaicDefinition.getId());
-			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(supply));
+			MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(supply));
 
 			// - correct balance
 			final Quantity expectedBalance = MosaicUtils.toQuantity(supply, 4);
-			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
-			Assert.assertThat(entry.getBalances().getBalance(this.supplier.getAddress()), IsEqual.equalTo(expectedBalance));
+			MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(entry.getBalances().getBalance(this.supplier.getAddress()), IsEqual.equalTo(expectedBalance));
 		}
 
 		private static MosaicProperties createMosaicProperties() {

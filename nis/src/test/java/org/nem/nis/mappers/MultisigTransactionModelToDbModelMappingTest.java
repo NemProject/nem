@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -182,36 +183,36 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 
 		public void assertDbModel(final DbMultisigTransaction dbModel, final int numExpectedSignatures) {
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
+			MatcherAssert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				Assert.assertThat(
+				MatcherAssert.assertThat(
 						entry.getFromMultisig.apply(dbModel),
 						TransactionTypes.TRANSFER == entry.type
 								? IsEqual.equalTo(this.expectedTransfer)
 								: IsNull.nullValue());
 			}
 
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
 
 			for (final DbMultisigSignatureTransaction signature : dbModel.getMultisigSignatureTransactions()) {
-				Assert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
+				MatcherAssert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
 			}
 		}
 
 		public void assertDbModelWithInner(final DbMultisigTransaction dbModel, final AbstractBlockTransfer dbInner) {
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				Assert.assertThat(
+				MatcherAssert.assertThat(
 						entry.getFromMultisig.apply(dbModel),
 						dbInner.getClass().equals(entry.dbModelClass)
 								? IsEqual.equalTo(dbInner)
 								: IsNull.nullValue());
 			}
 
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(0));
 		}
 	}
 }

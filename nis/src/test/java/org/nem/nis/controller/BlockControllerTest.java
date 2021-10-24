@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -47,7 +48,7 @@ public class BlockControllerTest {
 				h -> new AuthenticatedBlockHeightRequest(h, challenge),
 				(c, r) -> c.controller.blockAt(r),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <TRequest, TResponse> TResponse runBlockAtTests(
@@ -67,7 +68,7 @@ public class BlockControllerTest {
 		final Block block = getBlock.apply(response);
 
 		// Assert:
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(27)));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(27)));
 		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(height);
 		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(Mockito.any());
 		return response;

@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,9 +22,9 @@ public class BlockChainLastBlockLayerTest {
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -36,9 +37,9 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -50,9 +51,9 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.setLoaded();
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -66,9 +67,9 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -103,9 +104,9 @@ public class BlockChainLastBlockLayerTest {
 		context.lastBlockLayer.addBlockToDb(block);
 
 		// Assert:
-		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
-		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -140,9 +141,9 @@ public class BlockChainLastBlockLayerTest {
 		context.lastBlockLayer.dropDbBlocksAfter(height);
 
 		// Assert:
-		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
-		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
 	//endregion

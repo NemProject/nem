@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -39,7 +40,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -108,7 +109,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -124,7 +125,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -164,7 +165,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -182,7 +183,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
 	}
 
 	@Test
@@ -196,7 +197,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
 	}
 
 	@Test
@@ -259,7 +260,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
 	}
 
 	@Test
@@ -273,7 +274,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
 	}
 
 	@Test
@@ -286,7 +287,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
 	}
 
 	@Test
@@ -308,7 +309,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
 	}
 
 	@Test
@@ -327,7 +328,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
 	}
 
 	@Test
@@ -346,7 +347,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
 	}
 
 	@Test
@@ -359,7 +360,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK));
 	}
 
 	@Test
@@ -372,7 +373,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE));
 	}
 
 	//endregion
@@ -547,7 +548,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, height);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion

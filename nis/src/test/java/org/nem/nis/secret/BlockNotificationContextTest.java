@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -16,8 +17,8 @@ public class BlockNotificationContextTest {
 				NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.getHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(context.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(context.getTrigger(), IsEqual.equalTo(NotificationTrigger.Undo));
+		MatcherAssert.assertThat(context.getHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(context.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(context.getTrigger(), IsEqual.equalTo(NotificationTrigger.Undo));
 	}
 }

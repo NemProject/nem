@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -88,8 +89,8 @@ public class NisMainTest {
 
 		// Assert:
 		assertBlockAnalyzerUsed(context);
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
 		context.assertNoErrors();
 	}
 
@@ -116,8 +117,8 @@ public class NisMainTest {
 
 		// Assert:
 		assertBlockAnalyzerUsed(context);
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
 		context.assertNoErrors();
 	}
 
@@ -146,17 +147,17 @@ public class NisMainTest {
 
 		final NodeIdentity identity = nodeCaptor.getValue().getIdentity();
 		if (0 != (flags & SUPPLY_BOOT_KEY)) {
-			Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(bootKey));
+			MatcherAssert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(bootKey));
 		}
 
 		if (0 != (flags & SUPPLY_BOOT_NAME)) {
-			Assert.assertThat(identity.getName(), IsEqual.equalTo(bootName));
+			MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo(bootName));
 		} else {
-			Assert.assertThat(identity.getName(), IsEqual.equalTo(identity.getAddress().toString()));
+			MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo(identity.getAddress().toString()));
 		}
 
 		final NodeEndpoint endpoint = nodeCaptor.getValue().getEndpoint();
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
+		MatcherAssert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
 		context.assertNoErrors();
 	}
 
@@ -207,7 +208,7 @@ public class NisMainTest {
 		final TestContext context = this.createTestContext();
 
 		// sanity check
-		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
+		MatcherAssert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
 
 		// Act:
 		context.nisMain.init();
@@ -216,7 +217,7 @@ public class NisMainTest {
 		// Assert:
 		// - if nemesis block would have been saved during init, it would have been mapped to a dbBlock.
 		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any());
-		Assert.assertThat(dbBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbBlock, IsNull.notNullValue());
 		context.assertNoErrors();
 	}
 
@@ -227,7 +228,7 @@ public class NisMainTest {
 		context.saveNemesisBlock();
 
 		// sanity check
-		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.notNullValue());
+		MatcherAssert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.notNullValue());
 
 		// Act:
 		context.nisMain.init();
@@ -301,7 +302,7 @@ public class NisMainTest {
 		context.nisMain.init();
 
 		// Assert:
-		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
 		context.assertNoErrors();
 	}
 
@@ -314,7 +315,7 @@ public class NisMainTest {
 		context.nisMain.init();
 
 		// Assert:
-		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
 		context.assertNoErrors();
 	}
 
@@ -511,11 +512,11 @@ public class NisMainTest {
 		}
 
 		public void assertNoErrors() {
-			Assert.assertThat(this.exitReason[0], IsNull.nullValue());
+			MatcherAssert.assertThat(this.exitReason[0], IsNull.nullValue());
 		}
 
 		public void assertError(final int expectedReason) {
-			Assert.assertThat(this.exitReason[0], IsEqual.equalTo(expectedReason));
+			MatcherAssert.assertThat(this.exitReason[0], IsEqual.equalTo(expectedReason));
 		}
 	}
 }

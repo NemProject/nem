@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -25,7 +26,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -59,7 +60,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
@@ -78,7 +79,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion

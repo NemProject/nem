@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -122,7 +123,7 @@ public class LocalHostDetectorTest {
 		final boolean result = detector.isLocal(request);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(isLocal));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(isLocal));
 	}
 
 	private static void assertInvalidAddress(final String address) {

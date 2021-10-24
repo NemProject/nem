@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,8 +17,8 @@ public class TransferBlockPairTest {
 		final TransferBlockPair pair = new TransferBlockPair(transfer, block);
 
 		// Assert:
-		Assert.assertThat(pair.getTransfer(), IsSame.sameInstance(transfer));
-		Assert.assertThat(pair.getDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(pair.getTransfer(), IsSame.sameInstance(transfer));
+		MatcherAssert.assertThat(pair.getDbBlock(), IsSame.sameInstance(block));
 	}
 
 	@Test
@@ -27,8 +28,8 @@ public class TransferBlockPairTest {
 		final TransferBlockPair pair2 = createTransferWithId(8);
 
 		// Assert:
-		Assert.assertThat(pair1.compareTo(pair2), IsEqual.equalTo(0));
-		Assert.assertThat(pair2.compareTo(pair1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(pair1.compareTo(pair2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(pair2.compareTo(pair1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class TransferBlockPairTest {
 		final TransferBlockPair pair2 = createTransferWithId(8);
 
 		// Assert:
-		Assert.assertThat(pair1.compareTo(pair2), IsEqual.equalTo(1));
-		Assert.assertThat(pair2.compareTo(pair1), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(pair1.compareTo(pair2), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(pair2.compareTo(pair1), IsEqual.equalTo(-1));
 	}
 
 	private static TransferBlockPair createTransferWithId(final long id) {

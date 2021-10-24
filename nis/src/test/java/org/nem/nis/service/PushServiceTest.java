@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -50,8 +51,8 @@ public class PushServiceTest {
 				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
+		MatcherAssert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	private static TestContext assertPushTransactionExperienceChange(final ValidationResult result) {
@@ -159,8 +160,8 @@ public class PushServiceTest {
 				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_BLOCK), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((Block)secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
+		MatcherAssert.assertThat(((Block)secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
 	}
 
 	private static TestContext assertPushBlockExperienceChange(
@@ -221,8 +222,8 @@ public class PushServiceTest {
 				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
+		MatcherAssert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	@Test
@@ -263,7 +264,7 @@ public class PushServiceTest {
 		// Assert:
 		// transaction validation should have only occurred the expected number of times
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(expectedNumberOfInvocations)).addNew(Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	@Test
@@ -402,7 +403,7 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushTransaction(transaction, context.remoteNodeIdentity);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
@@ -438,7 +439,7 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushBlock(block, context.remoteNodeIdentity);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion

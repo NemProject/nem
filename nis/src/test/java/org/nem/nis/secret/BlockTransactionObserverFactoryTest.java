@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -57,7 +58,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
 
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
+		MatcherAssert.assertThat(observer, IsNull.notNullValue());
 		assertAreEquivalent(observer.getName(), expectedNames);
 	}
 
@@ -97,7 +98,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
 
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
+		MatcherAssert.assertThat(observer, IsNull.notNullValue());
 		assertAreEquivalent(observer.getName(), expectedNames);
 	}
 
@@ -152,7 +153,7 @@ public class BlockTransactionObserverFactoryTest {
 		final List<String> subObserverNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
+		MatcherAssert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
 	}
 
 	//endregion
@@ -364,7 +365,7 @@ public class BlockTransactionObserverFactoryTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
+		MatcherAssert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
 	}
 
 	@Test
@@ -388,7 +389,7 @@ public class BlockTransactionObserverFactoryTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
-		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
+		MatcherAssert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
 	}
 
 	//endregion

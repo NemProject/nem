@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ public class MultisigSignatureRawToDbModelMappingTest extends AbstractTransferRa
 		final DbMultisigSignatureTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
 	}
 
 	@Override

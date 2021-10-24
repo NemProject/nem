@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -66,7 +67,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		final AccountState state = context.accountStateCache.findStateByAddress(account1.getAddress());
-		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
+		MatcherAssert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		final ReadOnlyAccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
-		Assert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
+		MatcherAssert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
 	//endregion
@@ -151,13 +152,13 @@ public class AccountsHeightObserverTest {
 		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
-		Assert.assertThat(accountCache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(accountCache.size(), IsEqual.equalTo(1));
 
 		// Act:
 		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
-		Assert.assertThat(accountCache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(accountCache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

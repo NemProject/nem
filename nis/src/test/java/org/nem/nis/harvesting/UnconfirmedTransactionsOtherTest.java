@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -34,7 +35,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		}
 
 		// Assert:
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
+		MatcherAssert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
 	}
 
 	//endregion
@@ -56,7 +57,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result = context.add(prepare(inner));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result = context.add(outer);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	//endregion
@@ -115,9 +116,9 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result2 = context.add(prepare(transactions.get(1)));
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(expectedResult));
-		Assert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
 	}
 
 	//endregion
@@ -136,7 +137,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
 	}
 
 	@Test
@@ -171,8 +172,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (50) < 80 + 2
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 50, 0, 10);
 	}
 
@@ -203,8 +204,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (18) < 80 + 2
 		// - second transaction can be added - account2 balance (100) >= 50 + 2
 		// - third transaction can be added - account2 balance (48) >= 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 18, 36, 60);
 	}
 
@@ -225,8 +226,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (50) < 80 + 2
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 50, 0, 10);
 	}
 
@@ -253,7 +254,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(5, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(5, 7)));
 	}
 
 	@Test
@@ -272,8 +273,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction was dropped because it expired
 		// - second was dropped because it was dependent on the first - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 100, 0, 10);
 	}
 
@@ -313,9 +314,9 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 			final int amount1,
 			final int amount2,
 			final int amount3) {
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(0).getSigner()), IsEqual.equalTo(Amount.fromNem(amount1)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getSigner()), IsEqual.equalTo(Amount.fromNem(amount2)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getRecipient()), IsEqual.equalTo(Amount.fromNem(amount3)));
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(0).getSigner()), IsEqual.equalTo(Amount.fromNem(amount1)));
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getSigner()), IsEqual.equalTo(Amount.fromNem(amount2)));
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getRecipient()), IsEqual.equalTo(Amount.fromNem(amount3)));
 	}
 
 	//endregion

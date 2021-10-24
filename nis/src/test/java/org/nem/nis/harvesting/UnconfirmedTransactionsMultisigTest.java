@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -32,8 +33,8 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		final ValidationResult signatureResult = context.addSignatureTransaction(signature);
 
 		// Assert:
-		Assert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(signatureResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(signatureResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -47,8 +48,8 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		final ValidationResult signatureResult = context.addSignatureTransaction(signature);
 
 		// Assert:
-		Assert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(signatureResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+		MatcherAssert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(signatureResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
 	@Test
@@ -61,7 +62,7 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		final ValidationResult multisigResult = context.addMultisigTransactionWithSignature(signature);
 
 		// Assert:
-		Assert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		final ValidationResult multisigResult = context.addMultisigTransactionWithSignature(signature);
 
 		// Assert:
-		Assert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+		MatcherAssert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
 	//endregion
@@ -100,13 +101,13 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		signature.setDeadline(signatureDeadline);
 		signature.sign();
 		multisigTransaction.addSignature(signature);
-		Assert.assertThat(context.add(multisigTransaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(context.add(multisigTransaction), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		context.getTransactions().dropExpiredTransactions(CURRENT_TIME.addMinutes(5));
 
 		// Assert:
-		Assert.assertThat(context.getTransactions().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -72,15 +73,15 @@ public class DefaultMapperFactoryTest {
 		final MappingRepository mapper = factory.createModelToDbModelMapper(Mockito.mock(AccountDaoLookup.class));
 
 		// Assert:
-		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size()));
+		MatcherAssert.assertThat(mapper, IsNull.notNullValue());
+		MatcherAssert.assertThat(mapper.size(), IsEqual.equalTo(1 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size()));
 
 		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
-			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
 
 		for (final TransactionEntry<?, ?> entry : TRANSACTION_ENTRIES) {
-			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
 	}
 
@@ -91,19 +92,19 @@ public class DefaultMapperFactoryTest {
 		final MappingRepository mapper = factory.createDbModelToModelMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:
-		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(2 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size() * 2));
+		MatcherAssert.assertThat(mapper, IsNull.notNullValue());
+		MatcherAssert.assertThat(mapper.size(), IsEqual.equalTo(2 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size() * 2));
 
 		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
-			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
 		}
 
 		for (final TransactionEntry<?, ?> entry : TRANSACTION_ENTRIES) {
-			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
-			Assert.assertThat(mapper.isSupported(entry.dbModelClass, Transaction.class), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mapper.isSupported(entry.dbModelClass, Transaction.class), IsEqual.equalTo(true));
 		}
 
-		Assert.assertThat(mapper.isSupported(DbBlock.class, ExplorerBlockViewModel.class), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mapper.isSupported(DbBlock.class, ExplorerBlockViewModel.class), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -122,8 +123,8 @@ public class DefaultMapperFactoryTest {
 		// Assert:
 		// (this test is ok because the model -> dbmodel mapping only happens before a dbmodel is saved,
 		// which requires the latest db mosaic ids)
-		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
-		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+		MatcherAssert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+		MatcherAssert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 	}
 
 	@Test
@@ -136,8 +137,8 @@ public class DefaultMapperFactoryTest {
 		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
 
 		// sanity check
-		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
-		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+		MatcherAssert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		MatcherAssert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 
 		// Act:
 		final Block block = MapperUtils.toModel(dbBlock, accountLookup, mosaicIdCache);
@@ -145,8 +146,8 @@ public class DefaultMapperFactoryTest {
 		final TransferTransaction transaction2 = (TransferTransaction)block.getTransactions().get(1);
 
 		// Assert:
-		Assert.assertThat(getFirst(transaction1.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
-		Assert.assertThat(getFirst(transaction2.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		MatcherAssert.assertThat(getFirst(transaction1.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		MatcherAssert.assertThat(getFirst(transaction2.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
 	}
 
 	private static DbBlock mapBlockWithMosaicTransferTransactions() {
@@ -230,7 +231,7 @@ public class DefaultMapperFactoryTest {
 		final DbMosaicSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockMosaicSupplyChangeTransactions().get(0);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				dbMosaicDefinitionCreationTransaction.getSender(),
 				IsSame.sameInstance(dbSupplyChangeTransaction.getSender()));
 	}

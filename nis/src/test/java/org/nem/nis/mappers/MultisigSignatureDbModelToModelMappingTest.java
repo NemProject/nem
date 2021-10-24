@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -86,8 +87,8 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		}
 
 		public void assertModel(final MultisigSignatureTransaction model) {
-			Assert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
-			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
+			MatcherAssert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
+			MatcherAssert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
 		}
 	}
 }

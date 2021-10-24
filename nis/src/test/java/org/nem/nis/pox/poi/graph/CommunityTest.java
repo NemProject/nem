@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.NodeId;
@@ -105,10 +106,10 @@ public class CommunityTest {
 			final List<NodeId> similarNeighborIds,
 			final List<NodeId> dissimilarNeighborIds,
 			final boolean isIsolated) {
-		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(pivotId)));
-		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(similarNeighborIds));
-		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(dissimilarNeighborIds));
-		Assert.assertThat(community.isIsolated(), IsEqual.equalTo(isIsolated));
+		MatcherAssert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(pivotId)));
+		MatcherAssert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(similarNeighborIds));
+		MatcherAssert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(dissimilarNeighborIds));
+		MatcherAssert.assertThat(community.isIsolated(), IsEqual.equalTo(isIsolated));
 	}
 
 	//endregion
@@ -125,7 +126,7 @@ public class CommunityTest {
 				MU);
 
 		// Assert:
-		Assert.assertThat(community.size(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(community.size(), IsEqual.equalTo(7));
 	}
 
 	//endregion
@@ -148,14 +149,14 @@ public class CommunityTest {
 	@Test
 	public void coreCommunitiesAreCorrectlyDetected() {
 		// Assert:
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU+1_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU-1_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(false));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("1_SIMILAR_NEIGHBOR").isCore(), IsEqual.equalTo(false));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("1_DISSIMILAR_NEIGHBOR").isCore(), IsEqual.equalTo(false));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_DISSIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(false));
-		Assert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_TOTAL_NEIGHBORS").isCore(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU+1_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("MU-1_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("1_SIMILAR_NEIGHBOR").isCore(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("1_DISSIMILAR_NEIGHBOR").isCore(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_SIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_DISSIMILAR_NEIGHBORS").isCore(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(NAME_TO_COMMUNITY_MAP.get("2_TOTAL_NEIGHBORS").isCore(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -184,17 +185,17 @@ public class CommunityTest {
 		final Community community = new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7), NisUtils.createNeighbors(0, 3), MU);
 
 		// Assert:
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("default"), IsEqual.equalTo(community));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-pivot-id"), IsEqual.equalTo(community));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-id-classifications"), IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(community)));
-		Assert.assertThat(NisUtils.createNeighbors(2, 5, 7), IsNot.not(IsEqual.equalTo((Object)community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("default"), IsEqual.equalTo(community));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-pivot-id"), IsEqual.equalTo(community));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-similar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-id-classifications"), IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(community)));
+		MatcherAssert.assertThat(NisUtils.createNeighbors(2, 5, 7), IsNot.not(IsEqual.equalTo((Object)community)));
 	}
 
 	@Test
@@ -204,15 +205,15 @@ public class CommunityTest {
 		final int hashCode = community.hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-pivot-id").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-similar-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-similar-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-similar-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-id-classifications").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-pivot-id").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-similar-ids").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-similar-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-similar-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-id-classifications").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -231,7 +232,7 @@ public class CommunityTest {
 		// Assert:
 		final String expectedString =
 				"Pivot Id: 5; Similar Neighbor Ids: {1,4,5}; Dissimilar Neighbor Ids: {3,7,8}";
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				community.toString(),
 				IsEqual.equalTo(expectedString));
 	}

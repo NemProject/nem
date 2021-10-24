@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,12 +22,12 @@ public class MultisigAggregateModificationRawToDbModelMappingTest extends Abstra
 		final DbMultisigAggregateModificationTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
-		Assert.assertThat(dbModel.getMultisigModifications(), IsNull.notNullValue());
-		Assert.assertThat(dbModel.getMultisigMinCosignatoriesModification(), IsNull.nullValue()); // the mapper does not set this field
+		MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
+		MatcherAssert.assertThat(dbModel.getMultisigModifications(), IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getMultisigMinCosignatoriesModification(), IsNull.nullValue()); // the mapper does not set this field
 	}
 
 	@Override

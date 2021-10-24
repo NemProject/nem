@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -30,7 +31,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).isLoading();
 	}
 
@@ -44,7 +45,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).size();
 	}
 
@@ -59,7 +60,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).prune(new BlockHeight(124));
 	}
@@ -81,7 +82,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
@@ -100,7 +101,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
+		MatcherAssert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
 		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
@@ -137,7 +138,7 @@ public class HarvesterTest {
 		Mockito.verify(context.mapper, Mockito.only()).map(dbLastBlock);
 		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
+		MatcherAssert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
 	}
 
 	//endregion
@@ -168,7 +169,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsEqual.equalTo(generatedBlocks.get(3).getBlock()));
+		MatcherAssert.assertThat(block, IsEqual.equalTo(generatedBlocks.get(3).getBlock()));
 		Mockito.verify(context.generator, Mockito.times(5))
 				.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any());
 	}

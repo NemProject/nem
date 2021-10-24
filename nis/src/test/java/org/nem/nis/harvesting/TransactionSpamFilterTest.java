@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -36,7 +37,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 			// Assert:
-			Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
+			MatcherAssert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 		}
 
 		@Test
@@ -50,7 +51,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 			// Assert:
-			Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.emptyList()));
+			MatcherAssert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.emptyList()));
 		}
 
 		@Test
@@ -65,7 +66,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 			// Assert:
-			Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
+			MatcherAssert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 		}
 
 		@Test
@@ -79,7 +80,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 			// Assert:
-			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(5));
+			MatcherAssert.assertThat(filteredTransactions.size(), IsEqual.equalTo(5));
 		}
 
 		@Test
@@ -180,7 +181,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 			// Assert:
-			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(expectedFilteredTransactionsSize));
+			MatcherAssert.assertThat(filteredTransactions.size(), IsEqual.equalTo(expectedFilteredTransactionsSize));
 		}
 
 		private void assertFilterResult(
@@ -200,7 +201,7 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 			// Assert:
-			Assert.assertThat(filteredTransactions.isEmpty(), IsEqual.equalTo(isFiltered));
+			MatcherAssert.assertThat(filteredTransactions.isEmpty(), IsEqual.equalTo(isFiltered));
 		}
 
 		protected abstract Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count);
@@ -243,8 +244,8 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 			// Assert:
-			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
-			Assert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
+			MatcherAssert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
+			MatcherAssert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
 		}
 
 		@Test
@@ -257,8 +258,8 @@ public class TransactionSpamFilterTest {
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 			// Assert:
-			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
-			Assert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
+			MatcherAssert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
+			MatcherAssert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
 		}
 
 		// endregion

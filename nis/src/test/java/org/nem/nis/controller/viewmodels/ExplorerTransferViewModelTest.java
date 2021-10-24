@@ -1,6 +1,7 @@
 package org.nem.nis.controller.viewmodels;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -26,9 +27,9 @@ public class ExplorerTransferViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		Assert.assertThat(getDeserializedTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
-		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(getDeserializedTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
+		MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
 	}
 
 	@Test
@@ -46,10 +47,10 @@ public class ExplorerTransferViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
-		Assert.assertThat(getDeserializedMultisigTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
-		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
-		Assert.assertThat(jsonObject.get("innerHash"), IsEqual.equalTo(innerTxHash.toString()));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(getDeserializedMultisigTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
+		MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
+		MatcherAssert.assertThat(jsonObject.get("innerHash"), IsEqual.equalTo(innerTxHash.toString()));
 	}
 
 	private static Hash getDeserializedTxHash(final JSONObject jsonObject) {

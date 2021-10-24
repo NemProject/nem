@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.hibernate.*;
 import org.junit.*;
@@ -158,7 +159,7 @@ public abstract class TransactionRetrieverTest {
 				accountIndex,
 				topMostId,
 				LIMIT);
-		Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
+		MatcherAssert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
 	}
 
 	private void assertCanRetrieveOutgoingTransactions(final int accountIndex, final long topMostId) {
@@ -182,7 +183,7 @@ public abstract class TransactionRetrieverTest {
 				accountIndex,
 				topMostId,
 				LIMIT);
-		Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
+		MatcherAssert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
 	}
 
 	private List<Integer> getExpectedIdsForTransactions(
@@ -231,7 +232,7 @@ public abstract class TransactionRetrieverTest {
 					transferType);
 
 			// Assert:
-			pairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
+			pairs.stream().forEach(p -> MatcherAssert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
 		}
 	}
 

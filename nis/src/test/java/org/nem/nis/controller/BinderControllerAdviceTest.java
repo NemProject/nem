@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
@@ -26,7 +27,7 @@ public class BinderControllerAdviceTest {
 				InsecurePrivateKeyValidator.class,
 				ConfiguredPrivateKeyValidator.class
 		};
-		Assert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
+		MatcherAssert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
 	}
 
 	@Test
@@ -36,7 +37,7 @@ public class BinderControllerAdviceTest {
 
 		// Assert:
 		final Class<?>[] expectedValidatorClasses = new Class<?>[] {};
-		Assert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
+		MatcherAssert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
 	}
 
 	private static Collection<Class<?>> getValidatorClassesForTarget(final Object target) {

@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -42,7 +43,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Collections.singletonList(1)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Collections.singletonList(1)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.only()).getTransactionsBefore(currentTime);
 	}
 
@@ -64,7 +65,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
 	}
 
 	@Test
@@ -115,7 +116,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(2), new TimeInstant(3))));
+		MatcherAssert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(2), new TimeInstant(3))));
 	}
 
 	//endregion
@@ -156,7 +157,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -175,8 +176,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), validationContextCaptor.capture());
 
 		for (final ValidationContext validationContext : validationContextCaptor.getAllValues()) {
-			Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
-			Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
+			MatcherAssert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
+			MatcherAssert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
 		}
 	}
 
@@ -216,7 +217,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any());
 	}
 
@@ -236,9 +237,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		Mockito.verify(validator, Mockito.times(3)).validate(blockCaptor.capture());
 
 		for (final Block block : blockCaptor.getAllValues()) {
-			Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(harvester.getAddress()));
-			Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
-			Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
+			MatcherAssert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(harvester.getAddress()));
+			MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
+			MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
 		}
 	}
 
@@ -314,9 +315,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		Mockito.verify(observer, Mockito.times(3)).notify(Mockito.any(), notificationContextCaptor.capture());
 
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
-			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
-			Assert.assertThat(notificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
-			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
+			MatcherAssert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
+			MatcherAssert.assertThat(notificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
+			MatcherAssert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
 		}
 	}
 
@@ -370,8 +371,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(createIntRange(6, 6 + numFilteredTransactions)));
+		MatcherAssert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(createIntRange(6, 6 + numFilteredTransactions)));
 	}
 
 	//endregion
@@ -403,11 +404,11 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(createIntRange(6, 6 + numFilteredTransactions)));
+		MatcherAssert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(createIntRange(6, 6 + numFilteredTransactions)));
 
 		final int numTotalTransactions = filteredTransactions.stream().mapToInt(t -> 1 + t.getChildTransactions().size()).sum();
-		Assert.assertThat(numTotalTransactions, IsEqual.equalTo((numChildTransactions + 1) * numFilteredTransactions));
+		MatcherAssert.assertThat(numTotalTransactions, IsEqual.equalTo((numChildTransactions + 1) * numFilteredTransactions));
 	}
 
 	//endregion

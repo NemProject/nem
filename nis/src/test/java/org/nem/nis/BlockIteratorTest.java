@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Block;
@@ -21,7 +22,7 @@ public class BlockIteratorTest {
 		BlockIterator.unwindUntil(lookup, new BlockHeight(7), visitor);
 
 		// Assert:
-		Assert.assertThat(visitor.visitedBlockHeights.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.visitedBlockHeights.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class BlockIteratorTest {
 		BlockIterator.unwindUntil(lookup, new BlockHeight(4), visitor);
 
 		// Assert:
-		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 6L, 5L)));
-		Assert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L)));
+		MatcherAssert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 6L, 5L)));
+		MatcherAssert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L)));
 	}
 
 	@Test
@@ -56,8 +57,8 @@ public class BlockIteratorTest {
 		BlockIterator.all(NisUtils.createRandomBlockWithHeight(12), blocks, visitor);
 
 		// Assert:
-		Assert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 11L, 8L)));
-		Assert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(12L, 7L, 11L)));
+		MatcherAssert.assertThat(visitor.visitedBlockHeights, IsEqual.equalTo(Arrays.asList(7L, 11L, 8L)));
+		MatcherAssert.assertThat(visitor.visitedParentBlockHeights, IsEqual.equalTo(Arrays.asList(12L, 7L, 11L)));
 	}
 
 	private class MockBlockVisitor implements BlockVisitor {

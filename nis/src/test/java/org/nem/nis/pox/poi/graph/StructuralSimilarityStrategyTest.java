@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -17,8 +18,8 @@ public class StructuralSimilarityStrategyTest {
 		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(neighborMap);
 
 		// Assert:
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(0.0));
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -30,8 +31,8 @@ public class StructuralSimilarityStrategyTest {
 		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(neighborMap);
 
 		// Assert:
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(0.0));
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -44,8 +45,8 @@ public class StructuralSimilarityStrategyTest {
 
 		// Assert:
 		final double expected = 2 / Math.sqrt(20);
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(expected));
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(expected));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(expected));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(expected));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class StructuralSimilarityStrategyTest {
 
 		// Assert:
 		final double expected = 4 / Math.sqrt(25);
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(expected));
-		Assert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(expected));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(5), new NodeId(2)), IsEqual.equalTo(expected));
+		MatcherAssert.assertThat(strategy.calculateSimilarity(new NodeId(2), new NodeId(5)), IsEqual.equalTo(expected));
 	}
 }

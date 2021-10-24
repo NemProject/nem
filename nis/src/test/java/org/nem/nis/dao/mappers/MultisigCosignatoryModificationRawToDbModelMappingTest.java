@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,9 +21,9 @@ public class MultisigCosignatoryModificationRawToDbModelMappingTest {
 		final DbMultisigModification dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getCosignatory(), IsEqual.equalTo(context.dbCosignatory));
-		Assert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(234));
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getCosignatory(), IsEqual.equalTo(context.dbCosignatory));
+		MatcherAssert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(234));
 	}
 
 	private IMapping<Object[], DbMultisigModification> createMapping(final IMapper mapper) {

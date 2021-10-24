@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -29,9 +30,9 @@ public class DbTransferIoAdapterTest {
 		final TransactionMetaDataPair pair = context.transactionIo.getTransactionUsingHash(hash, height);
 
 		// Assert:
-		Assert.assertThat(pair.getEntity().getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(pair.getMetaData().getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
-		Assert.assertThat(pair.getMetaData().getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(pair.getEntity().getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(pair.getMetaData().getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
+		MatcherAssert.assertThat(pair.getMetaData().getHash(), IsEqual.equalTo(hash));
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionUsingHash(hash, height);
 	}
 

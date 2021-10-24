@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -76,7 +77,7 @@ public class TimeSynchronizationControllerTest {
 		final CommunicationTimeStamps timeStamps = context.controller.getNetworkTime();
 
 		// Assert:
-		Assert.assertThat(timeStamps, IsEqual.equalTo(context.timeStamps));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(context.timeStamps));
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class TimeSynchronizationControllerTest {
 				context,
 				c -> c.controller.getNetworkTime(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	// endregion
@@ -105,7 +106,7 @@ public class TimeSynchronizationControllerTest {
 		final CommunicationTimeStamps timeStamps = getCommunicationTimeStamps.apply(response);
 
 		// Assert:
-		Assert.assertThat(timeStamps, IsEqual.equalTo(context.timeStamps));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(context.timeStamps));
 		return response;
 	}
 

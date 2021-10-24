@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -39,7 +40,7 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertNemesisModel(model);
-			Assert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		//endregion
@@ -57,7 +58,7 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model);
-			Assert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -71,7 +72,7 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model, 111L, null);
-			Assert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -85,7 +86,7 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model, 0L, context.lessor);
-			Assert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		//endregion
@@ -124,14 +125,14 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model);
-			Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
-			Assert.assertThat(model.getTransactions(), IsEqual.equalTo(orderedTransactions));
+			MatcherAssert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
+			MatcherAssert.assertThat(model.getTransactions(), IsEqual.equalTo(orderedTransactions));
 			Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 
 			// Sanity:
-			Assert.assertThat(transactions, IsNot.not(IsEqual.equalTo(orderedTransactions)));
+			MatcherAssert.assertThat(transactions, IsNot.not(IsEqual.equalTo(orderedTransactions)));
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				Assert.assertThat(
+				MatcherAssert.assertThat(
 						"not all transaction types are represented",
 						entry.getFromBlock.apply(dbBlock).isEmpty(),
 						IsEqual.equalTo(false));
@@ -162,12 +163,12 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model);
-			Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
+			MatcherAssert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
 			Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final int numExpectedTransactions = TransactionTypes.MULTISIG == entry.type ? numTransactionsPerType + 2 : numTransactionsPerType;
-				Assert.assertThat(
+				MatcherAssert.assertThat(
 						String.format("transaction type %d should have %d transactions in block", entry.type, numExpectedTransactions),
 						entry.getFromBlock.apply(dbBlock).size(),
 						IsEqual.equalTo(numExpectedTransactions));
@@ -207,8 +208,8 @@ public class BlockDbModelToModelMappingTest {
 
 			// Assert:
 			context.assertModel(model);
-			Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(3));
-			Assert.assertThat(model.getTransactions(), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
+			MatcherAssert.assertThat(model.getTransactions().size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(model.getTransactions(), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
 			Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transaction.class));
 		}
 	}
@@ -260,25 +261,25 @@ public class BlockDbModelToModelMappingTest {
 
 		public void assertNemesisModel(final Block model) {
 			this.assertModelInternal(model, 0L, null);
-			Assert.assertThat(model.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
-			Assert.assertThat(model.getType(), IsEqual.equalTo(-1));
+			MatcherAssert.assertThat(model.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+			MatcherAssert.assertThat(model.getType(), IsEqual.equalTo(-1));
 		}
 
 		public void assertModel(final Block model, final long expectedDifficulty, final Account expectedLessor) {
 			this.assertModelInternal(model, expectedDifficulty, expectedLessor);
-			Assert.assertThat(model.getHeight(), IsEqual.equalTo(new BlockHeight(7)));
-			Assert.assertThat(model.getType(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(model.getHeight(), IsEqual.equalTo(new BlockHeight(7)));
+			MatcherAssert.assertThat(model.getType(), IsEqual.equalTo(1));
 		}
 
 		private void assertModelInternal(final Block model, final long expectedDifficulty, final Account expectedLessor) {
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.harvester));
-			Assert.assertThat(model.getPreviousBlockHash(), IsEqual.equalTo(this.prevBlockHash));
-			Assert.assertThat(model.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
+			MatcherAssert.assertThat(model.getSigner(), IsEqual.equalTo(this.harvester));
+			MatcherAssert.assertThat(model.getPreviousBlockHash(), IsEqual.equalTo(this.prevBlockHash));
+			MatcherAssert.assertThat(model.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
+			MatcherAssert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
 
-			Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(expectedDifficulty)));
-			Assert.assertThat(model.getLessor(), IsEqual.equalTo(expectedLessor));
-			Assert.assertThat(model.getSignature(), IsEqual.equalTo(this.signature));
+			MatcherAssert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(expectedDifficulty)));
+			MatcherAssert.assertThat(model.getLessor(), IsEqual.equalTo(expectedLessor));
+			MatcherAssert.assertThat(model.getSignature(), IsEqual.equalTo(this.signature));
 		}
 
 		//region add*

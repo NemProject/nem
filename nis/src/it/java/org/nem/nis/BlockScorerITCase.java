@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -231,7 +232,7 @@ public class BlockScorerITCase {
 					i,
 					actualWins,
 					maxWins);
-			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
 		}
 	}
 
@@ -346,7 +347,7 @@ public class BlockScorerITCase {
 					i,
 					actualWins,
 					maxWins);
-			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
 		}
 	}
 
@@ -384,7 +385,7 @@ public class BlockScorerITCase {
 		final long scoreB = this.calculateScore(blocks, scorer);
 
 		LOGGER.info("a: " + scoreA + " b: " + scoreB);
-		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
+		MatcherAssert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 
 	private int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {

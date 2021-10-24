@@ -1,5 +1,6 @@
 package org.nem.nis.validators.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
@@ -28,8 +29,8 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 		final List<Transaction> blockTransactions = context.getBlockTransactions();
 
 		// Assert:
-		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(expectedFiltered.size()));
-		Assert.assertThat(blockTransactions, IsEquivalent.equivalentTo(expectedFiltered));
+		MatcherAssert.assertThat(blockTransactions.size(), IsEqual.equalTo(expectedFiltered.size()));
+		MatcherAssert.assertThat(blockTransactions, IsEquivalent.equivalentTo(expectedFiltered));
 	}
 
 	private static class TestContext {

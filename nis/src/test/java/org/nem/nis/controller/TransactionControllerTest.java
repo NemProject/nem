@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -60,7 +61,7 @@ public class TransactionControllerTest {
 		final RequestPrepare requestPrepare = context.controller.transactionPrepare(deserializer);
 
 		// Assert:
-		Assert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+		MatcherAssert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -82,9 +83,9 @@ public class TransactionControllerTest {
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), validationContextCaptor.capture());
 
 		final ValidationContext validationContext = validationContextCaptor.getValue();
-		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
-		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
-		Assert.assertThat(validationContext.getState(), IsEqual.equalTo(context.validationState));
+		MatcherAssert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
+		MatcherAssert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
+		MatcherAssert.assertThat(validationContext.getState(), IsEqual.equalTo(context.validationState));
 	}
 
 	//endregion
@@ -152,17 +153,17 @@ public class TransactionControllerTest {
 		final NemAnnounceResult result = context.controller.transactionPrepareAnnounce(request);
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
-		Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(expectedTransactionHash));
-		Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+		MatcherAssert.assertThat(result.getTransactionHash(), IsEqual.equalTo(expectedTransactionHash));
+		MatcherAssert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
 
 		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
 		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
 
 		final Transaction pushedTransaction = transactionCaptor.getValue();
-		Assert.assertThat(pushedTransaction.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(pushedTransaction.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(pushedTransaction.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(pushedTransaction.verify(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -229,13 +230,13 @@ public class TransactionControllerTest {
 		final NemAnnounceResult result = context.controller.transactionAnnounce(requestAnnounce);
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
-		Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+		MatcherAssert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
 
 		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
 		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
-		Assert.assertThat(transactionCaptor.getValue().getSignature(), IsEqual.equalTo(signature));
+		MatcherAssert.assertThat(transactionCaptor.getValue().getSignature(), IsEqual.equalTo(signature));
 	}
 
 	//endregion
@@ -254,7 +255,7 @@ public class TransactionControllerTest {
 				context,
 				c -> c.controller.transactionsUnconfirmed(new AuthenticatedUnconfirmedTransactionsRequest(challenge)),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runTransactionsUnconfirmedTest(
@@ -269,8 +270,8 @@ public class TransactionControllerTest {
 		final SerializableList<Transaction> transactions = getUnconfirmedTransactions.apply(result);
 
 		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(321)));
+		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transactions.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(321)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getUnknownTransactions(Mockito.any());
 		return result;
 	}
@@ -324,7 +325,7 @@ public class TransactionControllerTest {
 		final TransactionMetaDataPair pair = context.controller.getTransaction(hashBuilder);
 
 		// Assert:
-		Assert.assertThat(pair, IsSame.sameInstance(originalPair));
+		MatcherAssert.assertThat(pair, IsSame.sameInstance(originalPair));
 		Mockito.verify(context.nisConfiguration, Mockito.only()).isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP);
 		Mockito.verify(context.hashCache, Mockito.only()).get(hash);
 		Mockito.verify(context.transactionIo, Mockito.only()).getTransactionUsingHash(hash, new BlockHeight(123));

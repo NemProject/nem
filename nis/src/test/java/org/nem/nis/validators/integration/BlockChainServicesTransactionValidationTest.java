@@ -1,5 +1,6 @@
 package org.nem.nis.validators.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.mockito.Mockito;
@@ -52,7 +53,7 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 			}
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			break;
 		}
 	}

@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -24,7 +25,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
 	}
 
 	@Test
@@ -36,7 +37,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	//endregion
@@ -52,7 +53,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	@Test
@@ -64,7 +65,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 	//endregion
 
@@ -81,8 +82,8 @@ public class HarvestRewardCommitObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 	}
 
 	//endregion

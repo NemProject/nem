@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,7 +26,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -55,7 +56,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(true));
 	}
 
 	private static class TestContext {

@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,15 +22,15 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		final DbProvisionNamespaceTransaction dbModel = context.createMapping().map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
-		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
-		Assert.assertThat(dbModel.getRentalFeeSink(), IsEqual.equalTo(context.dbRentalFeeSink));
-		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(654L));
-		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
+		MatcherAssert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
+		MatcherAssert.assertThat(dbModel.getRentalFeeSink(), IsEqual.equalTo(context.dbRentalFeeSink));
+		MatcherAssert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(654L));
+		MatcherAssert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
 	}
 
 	@Override

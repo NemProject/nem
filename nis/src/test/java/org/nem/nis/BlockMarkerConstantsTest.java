@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.NetworkInfos;
@@ -40,7 +41,7 @@ public class BlockMarkerConstantsTest {
 		final long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
 
 		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
 	//region MOSAICS_FORK
@@ -74,7 +75,7 @@ public class BlockMarkerConstantsTest {
 		final long marker = BlockMarkerConstants.MOSAICS_FORK(version << 24);
 
 		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
 	//endregion
@@ -110,7 +111,7 @@ public class BlockMarkerConstantsTest {
 		final long marker = BlockMarkerConstants.FEE_FORK(version << 24);
 
 		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
 	//endregion
@@ -146,7 +147,7 @@ public class BlockMarkerConstantsTest {
 		final long marker = BlockMarkerConstants.SECOND_FEE_FORK(version << 24);
 
 		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -28,7 +29,7 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(new DenseMatrix(7, 7));
 
 		// Assert:
-		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -55,11 +56,11 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
 
 		// Assert: even though the matrix is zero, all nodes include themselves as neighbors
-		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
+		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
 	}
 
 	@Test
@@ -77,11 +78,11 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
 
 		// Assert:
-		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2, 3)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
+		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2, 3)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
 	}
 
 	@Test
@@ -101,11 +102,11 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
 
 		// Assert:
-		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 2)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
+		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 2)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
 	}
 
 	@Test
@@ -124,14 +125,14 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
 
 		// Assert: the node id is based on the column
-		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4, 6)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(4)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(5)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5, 6)));
-		Assert.assertThat(neighborMap.getNeighbors(new NodeId(6)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 6)));
+		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4, 6)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(4)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(5)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5, 6)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(6)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 6)));
 	}
 
 	//endregion

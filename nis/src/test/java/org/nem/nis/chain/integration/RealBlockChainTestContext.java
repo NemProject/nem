@@ -1,5 +1,6 @@
 package org.nem.nis.chain.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
@@ -332,7 +333,7 @@ public class RealBlockChainTestContext {
 		final ValidationResult result = this.unconfirmedTransactions.addNew(transaction);
 
 		// Assert: that the add was successful (if this fails, a test is probably wrong)
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	/**

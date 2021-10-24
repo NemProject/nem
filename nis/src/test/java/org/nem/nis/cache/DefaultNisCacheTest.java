@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -27,11 +28,11 @@ public class DefaultNisCacheTest {
 				namespaceCache);
 
 		// Assert:
-		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
-		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
-		Assert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
-		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
-		Assert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
+		MatcherAssert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
+		MatcherAssert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
+		MatcherAssert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
+		MatcherAssert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
+		MatcherAssert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
 	}
 
 	@Test
@@ -72,11 +73,11 @@ public class DefaultNisCacheTest {
 			Mockito.verify(context.namespaceCache, Mockito.only()).deepCopy();
 		}
 
-		Assert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
-		Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
-		Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
-		Assert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
-		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
+		MatcherAssert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
+		MatcherAssert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
+		MatcherAssert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
+		MatcherAssert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
+		MatcherAssert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
 	}
 
 	@Test

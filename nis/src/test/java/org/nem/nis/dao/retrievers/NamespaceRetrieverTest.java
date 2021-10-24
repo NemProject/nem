@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -54,7 +55,7 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getNamespacesForAccount(this.session, 1, null, 300);
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(222));
+		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(222));
 	}
 
 	@Test
@@ -66,10 +67,10 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("aa"), 300);
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(110));
+		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(110));
 		dbNamespaces.stream()
 				.map(n -> new NamespaceId(n.getFullName()).getRoot())
-				.forEach(root -> Assert.assertThat(root, IsEqual.equalTo(new NamespaceId("aa"))));
+				.forEach(root -> MatcherAssert.assertThat(root, IsEqual.equalTo(new NamespaceId("aa"))));
 	}
 
 	@Test
@@ -81,7 +82,7 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getNamespacesForAccount(this.session, 2, new NamespaceId("aa"), 300);
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -95,9 +96,9 @@ public class NamespaceRetrieverTest {
 		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 3, new NamespaceId("aaa"), 300));
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
-		Assert.assertThat(dbNamespaces.get(0).getOwner().getId(), IsEqual.equalTo(3L));
-		Assert.assertThat(dbNamespaces.get(0).getHeight(), IsEqual.equalTo(2000L));
+		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbNamespaces.get(0).getOwner().getId(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(dbNamespaces.get(0).getHeight(), IsEqual.equalTo(2000L));
 	}
 
 	@Test
@@ -111,8 +112,8 @@ public class NamespaceRetrieverTest {
 
 		// Assert:
 		dbNamespaces.stream().forEach(n -> {
-			Assert.assertThat(n.getOwner().getId(), IsEqual.equalTo(1L));
-			Assert.assertThat(n.getHeight(), IsEqual.equalTo(5000L));
+			MatcherAssert.assertThat(n.getOwner().getId(), IsEqual.equalTo(1L));
+			MatcherAssert.assertThat(n.getHeight(), IsEqual.equalTo(5000L));
 		});
 	}
 
@@ -129,7 +130,7 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aa.bbb.cccc"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
+		MatcherAssert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
 	}
 
 	@Test
@@ -141,7 +142,7 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aa.bbb.abcd"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace, IsNull.nullValue());
+		MatcherAssert.assertThat(dbNamespace, IsNull.nullValue());
 	}
 
 	@Test
@@ -153,7 +154,7 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("zz.bbb.cccc"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace, IsNull.nullValue());
+		MatcherAssert.assertThat(dbNamespace, IsNull.nullValue());
 	}
 
 	@Test
@@ -166,8 +167,8 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaa"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
 	}
 
 	@Test
@@ -180,8 +181,8 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaa.bbb.ccc"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
 	}
 
 	@Test
@@ -194,8 +195,8 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaaaaaa"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
 	@Test
@@ -208,8 +209,8 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaaaaaa.b.c"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
 	//endregion
@@ -236,8 +237,8 @@ public class NamespaceRetrieverTest {
 				"aaaaaaaaaa");
 
 		// Assert:
-		Assert.assertThat(dbFullNames.size(), IsEqual.equalTo(10));
-		Assert.assertThat(dbFullNames, IsEquivalent.equivalentTo(expectedFullNames));
+		MatcherAssert.assertThat(dbFullNames.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(dbFullNames, IsEquivalent.equivalentTo(expectedFullNames));
 	}
 
 	@Test
@@ -260,9 +261,9 @@ public class NamespaceRetrieverTest {
 		final Collection<String> expectedFullNamesPage2 = Arrays.asList("aaaaaaaa", "aaaaaa", "aaaaa", "aaaa");
 		final Collection<String> expectedFullNamesPage3 = Arrays.asList("aa", "a");
 
-		Assert.assertThat(dbFullNamesPage1, IsEquivalent.equivalentTo(expectedFullNamesPage1));
-		Assert.assertThat(dbFullNamesPage2, IsEquivalent.equivalentTo(expectedFullNamesPage2));
-		Assert.assertThat(dbFullNamesPage3, IsEquivalent.equivalentTo(expectedFullNamesPage3));
+		MatcherAssert.assertThat(dbFullNamesPage1, IsEquivalent.equivalentTo(expectedFullNamesPage1));
+		MatcherAssert.assertThat(dbFullNamesPage2, IsEquivalent.equivalentTo(expectedFullNamesPage2));
+		MatcherAssert.assertThat(dbFullNamesPage3, IsEquivalent.equivalentTo(expectedFullNamesPage3));
 	}
 
 	private static Long getLastId(final Collection<DbNamespace> dbNamespaces) {
@@ -292,9 +293,9 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = filter(dbNamespaces, "aaaaaaa");
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aaaaaaa"));
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
+		MatcherAssert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aaaaaaa"));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
 	@Test
@@ -309,8 +310,8 @@ public class NamespaceRetrieverTest {
 		final DbNamespace dbNamespace = filter(dbNamespaces, "aaa");
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
+		MatcherAssert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
 	}
 
 	private static DbNamespace filter(final Collection<DbNamespace> dbNamespaces, final String name) {

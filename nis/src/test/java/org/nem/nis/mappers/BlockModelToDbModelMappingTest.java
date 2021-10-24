@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -97,14 +98,14 @@ public class BlockModelToDbModelMappingTest {
 			// Assert:
 			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
 
-			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(numTransactions));
+			MatcherAssert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(numTransactions));
 
 			k = 0;
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final Collection<? extends AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbModel);
-				Assert.assertThat(transfers.size(), IsEqual.equalTo(numTransactionsPerType));
-				Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(blockTransfers.get(k), blockTransfers.get(k + numBlockEmbeddableTypes))));
-				Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(k, k + numBlockEmbeddableTypes)));
+				MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(numTransactionsPerType));
+				MatcherAssert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(blockTransfers.get(k), blockTransfers.get(k + numBlockEmbeddableTypes))));
+				MatcherAssert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(k, k + numBlockEmbeddableTypes)));
 
 				Mockito.verify(context.mapper, Mockito.times(numTransactionsPerType)).map(Mockito.any(), Mockito.eq(entry.dbModelClass));
 				++k;
@@ -114,7 +115,7 @@ public class BlockModelToDbModelMappingTest {
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
 
-				Assert.assertThat(
+				MatcherAssert.assertThat(
 						"not all transaction types are represented",
 						entry.getFromBlock.apply(dbModel).isEmpty(),
 						IsEqual.equalTo(false));
@@ -145,17 +146,17 @@ public class BlockModelToDbModelMappingTest {
 			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
 
 			// Assert: db model transactions
-			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(TransactionRegistry.size() + 2));
+			MatcherAssert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(TransactionRegistry.size() + 2));
 
 			int k = 0;
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final Collection<? extends AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbModel);
 				if (TransactionTypes.MULTISIG == entry.type) {
-					Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
-					Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, k + 1, TransactionRegistry.size() + 1)));
+					MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(3));
+					MatcherAssert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, k + 1, TransactionRegistry.size() + 1)));
 				} else {
-					Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
-					Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(k + 1)));
+					MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(1));
+					MatcherAssert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(k + 1)));
 				}
 
 				++k;
@@ -167,11 +168,11 @@ public class BlockModelToDbModelMappingTest {
 
 			// Assert: multisig inner transactions
 			// - inner transaction does not belong to a block, so it won't have order id
-			Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(0));
-			Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
+			MatcherAssert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
 
-			Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(TransactionRegistry.size() + 1));
-			Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
+			MatcherAssert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(TransactionRegistry.size() + 1));
+			MatcherAssert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
 		}
 
 		//endregion
@@ -211,11 +212,11 @@ public class BlockModelToDbModelMappingTest {
 			// Assert:
 			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
 
-			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(3));
-			Assert.assertThat(dbTransfers.size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(dbTransfers.size(), IsEqual.equalTo(3));
 
-			Assert.assertThat(this.entry.getFromBlock.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
-			Assert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
+			MatcherAssert.assertThat(this.entry.getFromBlock.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
+			MatcherAssert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 			assertTransfersHaveBlockSetCorrectly(dbTransfers, dbModel);
 
 			Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(this.entry.dbModelClass));
@@ -238,7 +239,7 @@ public class BlockModelToDbModelMappingTest {
 			final Collection<? extends AbstractBlockTransfer> dbTransfers,
 			final DbBlock expectedBlock) {
 		for (final AbstractBlockTransfer dbTransfer : dbTransfers) {
-			Assert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
+			MatcherAssert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
 		}
 	}
 
@@ -278,21 +279,21 @@ public class BlockModelToDbModelMappingTest {
 		}
 
 		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
-			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForger));
-			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
-			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
-			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
-			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(7L));
+			MatcherAssert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForger));
+			MatcherAssert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
+			MatcherAssert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
+			MatcherAssert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
+			MatcherAssert.assertThat(dbModel.getHeight(), IsEqual.equalTo(7L));
 
-			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(this.difficulty.getRaw()));
-			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(expectedLessor));
-			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.signature.getBytes()));
+			MatcherAssert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(this.difficulty.getRaw()));
+			MatcherAssert.assertThat(dbModel.getLessor(), IsEqual.equalTo(expectedLessor));
+			MatcherAssert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.signature.getBytes()));
 
-			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(expectedHash));
+			MatcherAssert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(expectedHash));
 		}
 
 		public void assertNoTransactions(final DbBlock dbModel) {
-			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(0));
 		}
 
 		//region add*

@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -20,7 +21,7 @@ public class AuthenticatedChainRequestTest {
 		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(chainRequest, challenge);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		assertEqual(request.getEntity(), chainRequest);
 	}
 
@@ -37,13 +38,13 @@ public class AuthenticatedChainRequestTest {
 		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		assertEqual(request.getEntity(), chainRequest);
 	}
 
 	private static void assertEqual(final ChainRequest lhs, final ChainRequest rhs) {
-		Assert.assertThat(lhs.getHeight(), IsEqual.equalTo(rhs.getHeight()));
-		Assert.assertThat(lhs.getMinBlocks(), IsEqual.equalTo(rhs.getMinBlocks()));
-		Assert.assertThat(lhs.getMaxTransactions(), IsEqual.equalTo(rhs.getMaxTransactions()));
+		MatcherAssert.assertThat(lhs.getHeight(), IsEqual.equalTo(rhs.getHeight()));
+		MatcherAssert.assertThat(lhs.getMinBlocks(), IsEqual.equalTo(rhs.getMinBlocks()));
+		MatcherAssert.assertThat(lhs.getMaxTransactions(), IsEqual.equalTo(rhs.getMaxTransactions()));
 	}
 }

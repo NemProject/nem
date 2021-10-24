@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -23,9 +24,9 @@ public class DefaultMosaicDebitPredicateTest {
 		final DebitPredicate<Mosaic> debitPredicate = new DefaultMosaicDebitPredicate(namespaceCache);
 
 		// Assert:
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 122)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 123)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 124)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 122)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 123)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 124)), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class DefaultMosaicDebitPredicateTest {
 		final DebitPredicate<Mosaic> debitPredicate = new DefaultMosaicDebitPredicate(namespaceCache);
 
 		// Assert:
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(4, 0)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(4, 1)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(4, 0)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(4, 1)), IsEqual.equalTo(false));
 	}
 
 	private static Account addAccountWithMosaicBalance(final NamespaceCache namespaceCache, final MosaicId mosaicId, final Quantity balance) {

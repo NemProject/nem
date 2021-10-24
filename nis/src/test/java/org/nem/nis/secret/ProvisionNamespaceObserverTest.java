@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -32,9 +33,9 @@ public class ProvisionNamespaceObserverTest {
 		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
 		Mockito.verify(context.namespaceCache, Mockito.times(1)).add(namespaceCaptor.capture());
 		final Namespace namespace = namespaceCaptor.getValue();
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(context.namespaceId));
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.owner));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(NOTIFY_BLOCK_HEIGHT)));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(context.namespaceId));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.owner));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(NOTIFY_BLOCK_HEIGHT)));
 	}
 
 	@Test
@@ -80,15 +81,15 @@ public class ProvisionNamespaceObserverTest {
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				accountStateCache.findStateByAddress(namespaceOwner.getAddress()).getAccountInfo().getMosaicIds(),
 				IsEquivalent.equivalentTo(Arrays.asList(
 						createMosaicId("foo", "tokens"),
 						createMosaicId("foo.bar", "coins"))));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				accountStateCache.findStateByAddress(tokensOwners.get(0)).getAccountInfo().getMosaicIds(),
 				IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo", "tokens"))));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				accountStateCache.findStateByAddress(coinsOwners.get(0)).getAccountInfo().getMosaicIds(),
 				IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo.bar", "coins"))));
 	}

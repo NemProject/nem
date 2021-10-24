@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -29,7 +30,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	//endregion
@@ -58,7 +59,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -114,11 +115,11 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Sanity:
-		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners(), IsEquivalent.equivalentTo(context.dummy));
+		MatcherAssert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getSigners(), IsEquivalent.equivalentTo(context.dummy));
 	}
 
 	@Test
@@ -138,10 +139,10 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Sanity:
-		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -162,7 +163,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	@Test
@@ -184,7 +185,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	//endregion
@@ -218,7 +219,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert: this is allowable (even though the account is 2-of-2, the removed account is not required, so only one signature is needed)
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -236,7 +237,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(context.getCosignatories(context.multisig).size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(context.getCosignatories(context.multisig).size(), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -255,7 +256,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert: this is allowable
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -289,7 +290,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	@Test
@@ -306,7 +307,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -336,7 +337,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -374,7 +375,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -409,7 +410,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Assert:
 		// - validation fails because the removed account signature does not count
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	@Test
@@ -445,7 +446,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	//endregion

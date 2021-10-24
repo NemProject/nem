@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,7 +21,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		final String name = context.validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("inner"));
 		Mockito.verify(context.innerValidator, Mockito.only()).getName();
 	}
 
@@ -34,7 +35,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		Mockito.verify(context.innerValidator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -48,7 +49,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(context.innerValidator, Mockito.never()).validate(Mockito.any(), Mockito.any());
 	}
 

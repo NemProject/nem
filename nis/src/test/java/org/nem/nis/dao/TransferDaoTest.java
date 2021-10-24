@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hibernate.*;
 import org.junit.*;
@@ -67,12 +68,12 @@ public class TransferDaoTest {
 		// Act:
 		for (int i = 0; i < context.hashes.size(); ++i) {
 			final TransferBlockPair pair = this.transferDao.getTransactionUsingHash(context.hashes.get(i), BlockHeight.ONE);
-			Assert.assertThat(2 * i, IsEqual.equalTo(pair.getTransfer().getTimeStamp()));
-			Assert.assertThat(context.hashes.get(i), IsEqual.equalTo(pair.getTransfer().getTransferHash()));
-			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getTransfer().getSender().getPrintableKey()));
-			Assert.assertThat(123, IsEqual.equalTo(pair.getDbBlock().getTimeStamp()));
-			Assert.assertThat(1L, IsEqual.equalTo(pair.getDbBlock().getHeight()));
-			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getDbBlock().getHarvester().getPrintableKey()));
+			MatcherAssert.assertThat(2 * i, IsEqual.equalTo(pair.getTransfer().getTimeStamp()));
+			MatcherAssert.assertThat(context.hashes.get(i), IsEqual.equalTo(pair.getTransfer().getTransferHash()));
+			MatcherAssert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getTransfer().getSender().getPrintableKey()));
+			MatcherAssert.assertThat(123, IsEqual.equalTo(pair.getDbBlock().getTimeStamp()));
+			MatcherAssert.assertThat(1L, IsEqual.equalTo(pair.getDbBlock().getHeight()));
+			MatcherAssert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getDbBlock().getHarvester().getPrintableKey()));
 		}
 	}
 
@@ -91,9 +92,9 @@ public class TransferDaoTest {
 		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
-		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -207,9 +208,9 @@ public class TransferDaoTest {
 		final Collection<?> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
-		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -221,7 +222,7 @@ public class TransferDaoTest {
 		final Collection<?> entities = this.getTransfersFromDbUsingAttribute(context, null, 1234L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(25));
 	}
 
 	@Test
@@ -506,7 +507,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
+		MatcherAssert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	private class MultisigTestContext {
@@ -688,8 +689,8 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
-		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(0, 25)));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(0, 25)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
@@ -708,8 +709,8 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
-		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(25, 50)));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(25, 50)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
@@ -728,7 +729,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(0));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
@@ -773,8 +774,8 @@ public class TransferDaoTest {
 		final List<Long> resultIds = entities1.stream().map(pair -> pair.getTransfer().getId()).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(9));
-		Assert.assertThat(resultIds, IsEqual.equalTo(expectedIds));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(resultIds, IsEqual.equalTo(expectedIds));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
@@ -793,7 +794,7 @@ public class TransferDaoTest {
 				type);
 
 		// Assert:
-		Assert.assertThat(entities.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(1));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
@@ -814,7 +815,7 @@ public class TransferDaoTest {
 				type);
 
 		// Assert:
-		Assert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(

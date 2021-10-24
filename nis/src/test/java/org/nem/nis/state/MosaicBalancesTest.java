@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,7 +19,7 @@ public class MosaicBalancesTest {
 		final MosaicBalances balances = new MosaicBalances();
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -36,7 +37,7 @@ public class MosaicBalancesTest {
 		final Quantity quantity = balances.getBalance(Utils.generateRandomAddress());
 
 		// Assert:
-		Assert.assertThat(quantity, IsEqual.equalTo(Quantity.ZERO));
+		MatcherAssert.assertThat(quantity, IsEqual.equalTo(Quantity.ZERO));
 	}
 
 	@Test
@@ -50,7 +51,7 @@ public class MosaicBalancesTest {
 		final Quantity quantity = balances.getBalance(address);
 
 		// Assert:
-		Assert.assertThat(quantity, IsEqual.equalTo(new Quantity(221)));
+		MatcherAssert.assertThat(quantity, IsEqual.equalTo(new Quantity(221)));
 	}
 
 	//endregion
@@ -66,7 +67,7 @@ public class MosaicBalancesTest {
 		final Collection<Address> owners = balances.getOwners();
 
 		// Assert:
-		Assert.assertThat(owners.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(owners.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -84,7 +85,7 @@ public class MosaicBalancesTest {
 		final Collection<Address> owners = balances.getOwners();
 
 		// Assert:
-		Assert.assertThat(owners, IsEquivalent.equivalentTo(expectedOwners));
+		MatcherAssert.assertThat(owners, IsEquivalent.equivalentTo(expectedOwners));
 	}
 
 	//endregion
@@ -101,8 +102,8 @@ public class MosaicBalancesTest {
 		balances.incrementBalance(address, new Quantity(221));
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(221)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(221)));
 	}
 
 	@Test
@@ -116,8 +117,8 @@ public class MosaicBalancesTest {
 		balances.incrementBalance(address, new Quantity(373));
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(594)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(594)));
 	}
 
 	@Test
@@ -134,9 +135,9 @@ public class MosaicBalancesTest {
 		final Quantity quantity2 = balances.getBalance(address2);
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(2));
-		Assert.assertThat(quantity1, IsEqual.equalTo(new Quantity(221)));
-		Assert.assertThat(quantity2, IsEqual.equalTo(new Quantity(373)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(quantity1, IsEqual.equalTo(new Quantity(221)));
+		MatcherAssert.assertThat(quantity2, IsEqual.equalTo(new Quantity(373)));
 	}
 
 	@Test
@@ -151,9 +152,9 @@ public class MosaicBalancesTest {
 		balances.incrementBalance(address2, new Quantity(373));
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address1), IsEqual.equalTo(Quantity.ZERO));
-		Assert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address1), IsEqual.equalTo(Quantity.ZERO));
+		MatcherAssert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
 	}
 
 	//endregion
@@ -171,8 +172,8 @@ public class MosaicBalancesTest {
 		balances.decrementBalance(address, new Quantity(21));
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(200)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(200)));
 	}
 
 	@Test
@@ -188,9 +189,9 @@ public class MosaicBalancesTest {
 		balances.decrementBalance(address1, new Quantity(221));
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address1), IsEqual.equalTo(Quantity.ZERO));
-		Assert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address1), IsEqual.equalTo(Quantity.ZERO));
+		MatcherAssert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
 	}
 
 	@Test
@@ -206,8 +207,8 @@ public class MosaicBalancesTest {
 				IllegalArgumentException.class);
 
 		// Assert:
-		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
-		Assert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(221)));
+		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(221)));
 	}
 
 	//endregion
@@ -228,11 +229,11 @@ public class MosaicBalancesTest {
 		balances.incrementBalance(address2, new Quantity(27));
 
 		// Assert: only the quantity in the original was updated
-		Assert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(400)));
+		MatcherAssert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(400)));
 
-		Assert.assertThat(copy.size(), IsEqual.equalTo(2));
-		Assert.assertThat(copy.getBalance(address1), IsEqual.equalTo(new Quantity(221)));
-		Assert.assertThat(copy.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(copy.getBalance(address1), IsEqual.equalTo(new Quantity(221)));
+		MatcherAssert.assertThat(copy.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
 	}
 
 	//endregion

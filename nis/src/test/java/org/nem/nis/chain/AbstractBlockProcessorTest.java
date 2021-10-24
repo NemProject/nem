@@ -1,5 +1,6 @@
 package org.nem.nis.chain;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -118,8 +119,8 @@ public abstract class AbstractBlockProcessorTest {
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
-			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
-			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
+			MatcherAssert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			MatcherAssert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
 		}
 	}
 
@@ -136,8 +137,8 @@ public abstract class AbstractBlockProcessorTest {
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
-			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
-			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
+			MatcherAssert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			MatcherAssert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
 		}
 	}
 
@@ -276,7 +277,7 @@ public abstract class AbstractBlockProcessorTest {
 
 		// check notification
 		final TransactionHashesNotification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(), expectedNotifications);
-		Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
 		NotificationUtils.assertTransactionHashesNotification(notification, transactionHashPairs);
 	}
 

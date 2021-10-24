@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -48,7 +49,7 @@ public class NodeControllerTest {
 				context,
 				c -> c.controller.getInfo(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runInfoTest(
@@ -60,7 +61,7 @@ public class NodeControllerTest {
 		final Node node = getNode.apply(response);
 
 		// Assert:
-		Assert.assertThat(node, IsEqual.equalTo(context.network.getLocalNode()));
+		MatcherAssert.assertThat(node, IsEqual.equalTo(context.network.getLocalNode()));
 		return response;
 	}
 
@@ -73,7 +74,7 @@ public class NodeControllerTest {
 		final Node node = context.controller.getExtendedInfo().getNode();
 
 		// Assert:
-		Assert.assertThat(node, IsSame.sameInstance(context.network.getLocalNode()));
+		MatcherAssert.assertThat(node, IsSame.sameInstance(context.network.getLocalNode()));
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class NodeControllerTest {
 		final ApplicationMetaData appMetaData = context.controller.getExtendedInfo().getAppMetaData();
 
 		// Assert:
-		Assert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
+		MatcherAssert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
 	}
 
 	//endregion
@@ -101,7 +102,7 @@ public class NodeControllerTest {
 		final NodeCollection nodes = context.controller.getPeerList();
 
 		// Assert:
-		Assert.assertThat(nodes, IsSame.sameInstance(context.network.getNodes()));
+		MatcherAssert.assertThat(nodes, IsSame.sameInstance(context.network.getNodes()));
 	}
 
 	@Test
@@ -123,7 +124,7 @@ public class NodeControllerTest {
 		final List<Node> expectedNodes = Arrays.asList(
 				NodeUtils.createNodeWithHost("10.0.0.4"),
 				NodeUtils.createNodeWithHost("10.0.0.7"));
-		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
 	@Test
@@ -147,7 +148,7 @@ public class NodeControllerTest {
 				context,
 				c -> c.controller.getActivePeerList(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runActivePeerListTest(
@@ -165,7 +166,7 @@ public class NodeControllerTest {
 		final SerializableList<Node> nodes = getActivePeerList.apply(response);
 
 		// Assert:
-		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(selectedNodes));
+		MatcherAssert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(selectedNodes));
 		return response;
 	}
 
@@ -198,7 +199,7 @@ public class NodeControllerTest {
 				new ExtendedNodeExperiencePair(NodeUtils.createNodeWithName("n"), new NodeExperience(0, 1), 7),
 				new ExtendedNodeExperiencePair(NodeUtils.createNodeWithName("e"), new NodeExperience(1, 0), 0),
 				new ExtendedNodeExperiencePair(NodeUtils.createNodeWithName("m"), new NodeExperience(1, 0), 2));
-		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	//endregion
@@ -246,9 +247,9 @@ public class NodeControllerTest {
 				.getEntity(context.localNode.getIdentity(), challenge);
 
 		// Assert:
-		Assert.assertThat(actualPair.getNode(), IsEqual.equalTo(context.localNode));
-		Assert.assertThat(actualPair.getExperiences().size(), IsEqual.equalTo(numExpectedExperiencePairs));
-		actualPair.getExperiences().forEach(p -> Assert.assertThat(experiencePairs.contains(p), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(actualPair.getNode(), IsEqual.equalTo(context.localNode));
+		MatcherAssert.assertThat(actualPair.getExperiences().size(), IsEqual.equalTo(numExpectedExperiencePairs));
+		actualPair.getExperiences().forEach(p -> MatcherAssert.assertThat(experiencePairs.contains(p), IsEqual.equalTo(true)));
 	}
 
 	static private NodeExperiencePair createPair(final int successfulCalls) {
@@ -277,7 +278,7 @@ public class NodeControllerTest {
 		context.controller.signOfLife(node, request);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.ACTIVE));
+		MatcherAssert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
@@ -296,7 +297,7 @@ public class NodeControllerTest {
 		context.controller.signOfLife(node, request);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.INACTIVE));
+		MatcherAssert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.INACTIVE));
 	}
 
 	@Test
@@ -314,7 +315,7 @@ public class NodeControllerTest {
 		context.controller.signOfLife(remoteNode, request);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
 		Mockito.verify(context.compatibilityChecker, Mockito.only())
 				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
 		Mockito.verify(context.host, Mockito.never())
@@ -336,7 +337,7 @@ public class NodeControllerTest {
 		context.controller.signOfLife(remoteNode, request);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
 		Mockito.verify(context.compatibilityChecker, Mockito.only())
 				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
 		Mockito.verify(context.host, Mockito.never())
@@ -360,7 +361,7 @@ public class NodeControllerTest {
 		context.controller.signOfLife(remoteNode, request);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
 		Mockito.verify(context.compatibilityChecker, Mockito.only())
 				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
 		Mockito.verify(context.host, Mockito.times(1))
@@ -386,7 +387,7 @@ public class NodeControllerTest {
 		// Assert:
 		// (1) address comes from the servlet request
 		// (2) scheme and port comes from the original local node endpoint
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.123", 123)));
+		MatcherAssert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.123", 123)));
 	}
 
 	@Test
@@ -404,7 +405,7 @@ public class NodeControllerTest {
 
 		// Assert:
 		Mockito.verify(context.hostBootstrapper, Mockito.only()).boot(Mockito.any(Node.class));
-		Assert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
 	}
 
 	@Test
@@ -419,7 +420,7 @@ public class NodeControllerTest {
 
 		// Assert:
 		Mockito.verify(context.services, Mockito.only()).getMaxChainHeightAsync(selectedNodes);
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	private static JsonDeserializer createLocalNodeDeserializer(final NodeIdentity identity) {

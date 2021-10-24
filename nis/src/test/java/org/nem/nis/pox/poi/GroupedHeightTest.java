@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -33,6 +34,6 @@ public class GroupedHeightTest {
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(new BlockHeight(height));
 
 		// Assert:
-		Assert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
+		MatcherAssert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.model.TransferTransaction;
 import org.nem.core.model.primitive.BlockHeight;
@@ -84,7 +85,7 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
+		MatcherAssert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
 	}
 
 	// endregion

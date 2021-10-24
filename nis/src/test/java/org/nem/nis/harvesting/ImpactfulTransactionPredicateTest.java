@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -41,7 +42,7 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.test(getAccount.apply(context));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -65,7 +66,7 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.predicate.test(cosigner.getAddress(), transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.predicate.test(nonCosigner.getAddress(), transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	//endregion

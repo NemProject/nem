@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -58,7 +59,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_UNKNOWN));
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 40);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
 	}
 
 	//endregion
@@ -220,7 +221,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR - 1);
 
 		// Assert: the non-root part is not renewable
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
 	}
 
 	//endregion
@@ -317,7 +318,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertInvalidRentalFeeSink(final String parent, final String part) {
@@ -330,7 +331,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK));
 	}
 
 	private static void assertRentalFee(final String parent, final String part, final Amount rentalFee, final ValidationResult expectedResult) {
@@ -343,7 +344,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertRenewalOfRootWithExpiration(
@@ -367,7 +368,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -743,7 +744,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, height.getRaw());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion

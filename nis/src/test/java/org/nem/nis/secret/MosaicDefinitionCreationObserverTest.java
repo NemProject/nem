@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -37,9 +38,9 @@ public class MosaicDefinitionCreationObserverTest {
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(1));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -52,9 +53,9 @@ public class MosaicDefinitionCreationObserverTest {
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -141,8 +142,8 @@ public class MosaicDefinitionCreationObserverTest {
 
 	private static void assertMosaicEntry(final TestContext context, final Long supply, final int numBalances) {
 		MosaicEntry entry = context.getMosaicEntry();
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(supply)));
-		Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numBalances));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(supply)));
+		MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numBalances));
 	}
 
 	//endregion
@@ -164,9 +165,9 @@ public class MosaicDefinitionCreationObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
 	}
 
 	//endregion

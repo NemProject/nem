@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -26,7 +27,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final String name = validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("inner"));
 		Mockito.verify(innerValidator, Mockito.only()).getName();
 	}
 
@@ -59,7 +60,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = validator.validate(transaction, context);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		Mockito.verify(innerValidator, Mockito.only()).validate(transaction, context);
 	}
 
@@ -78,7 +79,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		context.verifyValidation(true, true, true, true);
 	}
 
@@ -93,7 +94,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 
@@ -108,7 +109,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on first inner transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		context.verifyValidation(true, true, true, false);
 	}
 
@@ -123,7 +124,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 

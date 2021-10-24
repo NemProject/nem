@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -68,9 +69,9 @@ public class DbBlockTest {
 			setInBlock.accept(dbBlock, dbTransactions);
 
 			// Assert:
-			Assert.assertThat(getFromBlock.apply(dbBlock).size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(getFromBlock.apply(dbBlock).size(), IsEqual.equalTo(10));
 			getFromBlock.apply(dbBlock).stream()
-					.forEach(t -> Assert.assertThat(t.getSenderProof(), IsNull.notNullValue()));
+					.forEach(t -> MatcherAssert.assertThat(t.getSenderProof(), IsNull.notNullValue()));
 		}
 
 		private static <T extends AbstractBlockTransfer> List<T> createTransactions(final Supplier<T> activator) {

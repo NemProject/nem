@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -36,8 +37,8 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("Adding %d entries to the hash cache needed %dms", count, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(context.cache.size(), IsEqual.equalTo(count));
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.cache.size(), IsEqual.equalTo(count));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -57,8 +58,8 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("Add all %d entries to the hash cache needed %dms", count, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(context.cache.size(), IsEqual.equalTo(count));
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.cache.size(), IsEqual.equalTo(count));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -75,8 +76,8 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("shallow copy with %d entries needed %dms", count, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(copy.size(), IsEqual.equalTo(count));
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(count));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -94,8 +95,8 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("shallow copy to with %d entries needed %dms", count, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(copy.size(), IsEqual.equalTo(count));
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(count));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -130,7 +131,7 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("search for existent hash %d times needed %dms", count, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -154,7 +155,7 @@ public class DefaultHashCachePerformanceITCase {
 		LOGGER.info(String.format("%d batch searches for %d non existent hashes needed %dms", 1000, 120, (stop - start)));
 
 		// Assert:
-		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
 	private static class TestContext {

@@ -1,5 +1,6 @@
 package org.nem.nis.test;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.crypto.Hash;
@@ -418,7 +419,7 @@ public class NisUtils {
 		ExceptionAssert.assertThrows(
 				consumer,
 				NisIllegalStateException.class,
-				ex -> Assert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
+				ex -> MatcherAssert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
 	}
 
 	//endregion

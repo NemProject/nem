@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,13 +32,13 @@ public class MosaicInfoFactoryTest {
 		final List<Mosaic> mosaics = context.factory.getAccountOwnedMosaics(context.address);
 
 		// Assert: two mosaics were returned (nem.xem, foo.bar), mosaic baz.qux was filtered
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(2));
 		final Mosaic xemMosaic = mosaics.get(0);
-		Assert.assertThat(xemMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("nem"), "xem")));
-		Assert.assertThat(xemMosaic.getQuantity(), IsEqual.equalTo(Quantity.ZERO));
+		MatcherAssert.assertThat(xemMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("nem"), "xem")));
+		MatcherAssert.assertThat(xemMosaic.getQuantity(), IsEqual.equalTo(Quantity.ZERO));
 		final Mosaic barMosaic = mosaics.get(1);
-		Assert.assertThat(barMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("foo"), "bar")));
-		Assert.assertThat(barMosaic.getQuantity(), IsEqual.equalTo(new Quantity(1234)));
+		MatcherAssert.assertThat(barMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("foo"), "bar")));
+		MatcherAssert.assertThat(barMosaic.getQuantity(), IsEqual.equalTo(new Quantity(1234)));
 	}
 
 	private static class TestContext {

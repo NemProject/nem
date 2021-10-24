@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -43,7 +44,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 
 		// Assert:
 		context.assertViewModel(viewModel, blockHash, 3);
-		Assert.assertThat(getTransactionHashes(viewModel), IsEqual.equalTo(transactionHashes));
+		MatcherAssert.assertThat(getTransactionHashes(viewModel), IsEqual.equalTo(transactionHashes));
 	}
 
 	private static Hash getDeserializedBlockHash(final JSONObject jsonObject) {
@@ -96,11 +97,11 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 			// Assert:
-			Assert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
-			Assert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
-			Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(this.dbBlockHash.toString()));
-			Assert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(this.blockDifficulty.getRaw()));
-			Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
+			MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
+			MatcherAssert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
+			MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(this.dbBlockHash.toString()));
+			MatcherAssert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(this.blockDifficulty.getRaw()));
+			MatcherAssert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
 		}
 	}
 }

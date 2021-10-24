@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -15,6 +16,6 @@ public class NisMapperFactoryTest {
 		final NisDbModelToModelMapper mapper = factory.createDbModelToModelNisMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:
-		Assert.assertThat(mapper, IsNull.notNullValue());
+		MatcherAssert.assertThat(mapper, IsNull.notNullValue());
 	}
 }

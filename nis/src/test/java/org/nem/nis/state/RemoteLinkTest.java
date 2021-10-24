@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -19,10 +20,10 @@ public class RemoteLinkTest {
 		final RemoteLink link = new RemoteLink(address, new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester);
 
 		// Assert:
-		Assert.assertThat(link.getLinkedAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(link.getEffectiveHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(link.getMode(), IsEqual.equalTo(DEACTIVATE));
-		Assert.assertThat(link.getOwner(), IsEqual.equalTo(RemoteLink.Owner.RemoteHarvester));
+		MatcherAssert.assertThat(link.getLinkedAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(link.getEffectiveHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(link.getMode(), IsEqual.equalTo(DEACTIVATE));
+		MatcherAssert.assertThat(link.getOwner(), IsEqual.equalTo(RemoteLink.Owner.RemoteHarvester));
 	}
 
 	//region equals / hashCode
@@ -43,13 +44,13 @@ public class RemoteLinkTest {
 		final RemoteLink link = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester);
 
 		// Assert:
-		Assert.assertThat(DESC_TO_LINK_MAP.get("default"), IsEqual.equalTo(link));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-mode"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-owner"), IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
-		Assert.assertThat(Address.fromEncoded("a"), IsNot.not(IsEqual.equalTo((Object)link)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("default"), IsEqual.equalTo(link));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-mode"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-owner"), IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
+		MatcherAssert.assertThat(Address.fromEncoded("a"), IsNot.not(IsEqual.equalTo((Object)link)));
 	}
 
 	@Test
@@ -59,11 +60,11 @@ public class RemoteLinkTest {
 		final int hashCode = link.hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_LINK_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-mode").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_LINK_MAP.get("diff-owner").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-mode").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-owner").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion

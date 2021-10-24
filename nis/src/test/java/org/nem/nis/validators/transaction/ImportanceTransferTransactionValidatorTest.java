@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
 	}
 
 	//endregion
@@ -171,7 +172,7 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ValidationResult result = context.validate(transaction, new BlockHeight(height));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
 
@@ -211,7 +212,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -251,7 +252,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	//endregion
@@ -288,7 +289,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	//endregion
@@ -415,7 +416,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	private static void assertRemoteIsOccupiedTest(
@@ -438,7 +439,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	//endregion

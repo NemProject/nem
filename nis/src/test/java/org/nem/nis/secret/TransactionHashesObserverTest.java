@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -24,9 +25,9 @@ public class TransactionHashesObserverTest {
 		notifyTransactionHashes(context.observer, context.pairs, NotificationTrigger.Execute);
 
 		// Assert:
-		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
 		for (final HashMetaDataPair pair : context.pairs) {
-			Assert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
+			MatcherAssert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
 		}
 	}
 
@@ -44,7 +45,7 @@ public class TransactionHashesObserverTest {
 		notifyTransactionHashes(context.observer, context.pairs, NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
 	}
 
 	//endregion

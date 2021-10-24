@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -42,7 +43,7 @@ public class NisPeerNetworkHostTest {
 			final CompletableFuture future = host.boot(createLocalNode());
 
 			// Assert:
-			Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 
 			// Cleanup:
 			future.join();
@@ -92,7 +93,7 @@ public class NisPeerNetworkHostTest {
 			host.boot(createLocalNode()).join();
 
 			// Assert:
-			Assert.assertThat(getSubObject.apply(host), IsNull.notNullValue());
+			MatcherAssert.assertThat(getSubObject.apply(host), IsNull.notNullValue());
 		}
 	}
 
@@ -106,7 +107,7 @@ public class NisPeerNetworkHostTest {
 		final NisPeerNetworkHost host = createNetwork();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -118,7 +119,7 @@ public class NisPeerNetworkHostTest {
 		host.boot(createLocalNode()).join();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -131,7 +132,7 @@ public class NisPeerNetworkHostTest {
 		final NisPeerNetworkHost host = createNetwork();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -143,7 +144,7 @@ public class NisPeerNetworkHostTest {
 		final CompletableFuture<?> future = host.boot(createLocalNode());
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(true));
 
 		// Cleanup:
 		future.join();
@@ -158,7 +159,7 @@ public class NisPeerNetworkHostTest {
 		host.boot(createLocalNode()).join();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -189,7 +190,7 @@ public class NisPeerNetworkHostTest {
 		final CompletableFuture<Node> future = host.getNodeInfo(node);
 
 		// Assert:
-		Assert.assertThat(future.join(), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(future.join(), IsEqual.equalTo(node));
 	}
 
 	//endregion
@@ -203,7 +204,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(11));
+			MatcherAssert.assertThat(visitors.size(), IsEqual.equalTo(11));
 		}
 	}
 

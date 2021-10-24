@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -59,7 +60,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(node, IsNull.nullValue());
+		MatcherAssert.assertThat(node, IsNull.nullValue());
 	}
 
 	@Test
@@ -78,7 +79,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(node, IsNull.nullValue());
+		MatcherAssert.assertThat(node, IsNull.nullValue());
 	}
 
 	@Test
@@ -97,7 +98,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final Node node = context.selector.selectNode();
 
 		// Assert:
-		Assert.assertThat(node, IsEqual.equalTo(context.nodes[1]));
+		MatcherAssert.assertThat(node, IsEqual.equalTo(context.nodes[1]));
 	}
 
 	//endregion
@@ -120,7 +121,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -139,7 +140,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
@@ -179,7 +180,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes)));
 
@@ -204,7 +205,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 		// Assert:
 		// the old algorithm would have returned no nodes because 0.2 + 0.2 + 0.2 < 0.9 and thus it would have skipped all good candidates.
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[2], context.nodes[1])));
 	}
@@ -226,7 +227,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				nodes,
 				IsEqual.equalTo(Arrays.asList(context.nodes[1], context.nodes[2])));
 	}

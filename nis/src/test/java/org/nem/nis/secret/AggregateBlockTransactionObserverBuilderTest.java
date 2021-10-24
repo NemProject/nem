@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -97,7 +98,7 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		aggregate.notify(NOTIFICATION, NOTIFICATION_CONTEXT);
 
 		// Assert:
-		Assert.assertThat(context.visitIds, IsEqual.equalTo(Arrays.asList(1, 2, 3, 4)));
+		MatcherAssert.assertThat(context.visitIds, IsEqual.equalTo(Arrays.asList(1, 2, 3, 4)));
 	}
 
 	@Test
@@ -110,7 +111,7 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		aggregate.notify(NOTIFICATION, NOTIFICATION_CONTEXT);
 
 		// Assert:
-		Assert.assertThat(context.visitIds, IsEqual.equalTo(Arrays.asList(4, 3, 2, 1)));
+		MatcherAssert.assertThat(context.visitIds, IsEqual.equalTo(Arrays.asList(4, 3, 2, 1)));
 	}
 
 	private static class AddMultipleTestContext {
@@ -158,7 +159,7 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		final String name = observer.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
 	}
 
 	private static BlockTransactionObserver createObserverWithName(final String name) {

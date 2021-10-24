@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -49,7 +50,7 @@ public class ChainControllerTest {
 				context,
 				c -> c.controller.blockLast(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runBlockLastTest(
@@ -65,7 +66,7 @@ public class ChainControllerTest {
 		final Block block = getBlock.apply(result);
 
 		// Assert:
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(443)));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(443)));
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastDbBlock();
 		return result;
 	}
@@ -93,8 +94,8 @@ public class ChainControllerTest {
 		final HashChain chain = response.getEntity(localNode.getIdentity(), challenge);
 
 		// Assert:
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(chain, IsEqual.equalTo(originalHashes));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(height, defaultLimit);
 	}
 
@@ -123,7 +124,7 @@ public class ChainControllerTest {
 				context,
 				c -> c.controller.chainScore(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runChainScoreTest(
@@ -138,7 +139,7 @@ public class ChainControllerTest {
 		final BlockChainScore score = getChainScore.apply(result);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(21)));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(new BlockChainScore(21)));
 		Mockito.verify(context.blockChainScoreManager, Mockito.times(1)).getScore();
 		return result;
 	}
@@ -168,7 +169,7 @@ public class ChainControllerTest {
 				context,
 				c -> c.controller.chainHeight(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	private static <T> T runChainHeightTest(
@@ -183,7 +184,7 @@ public class ChainControllerTest {
 		final BlockHeight height = getChainHeight.apply(result);
 
 		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(1234L)));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(new BlockHeight(1234L)));
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
 		return result;
 	}
@@ -206,7 +207,7 @@ public class ChainControllerTest {
 				c -> c.controller.blocksAfter(request),
 				r -> r.getEntity(localNode.getIdentity(), challenge),
 				createDbBlockList(11, 2));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -245,10 +246,10 @@ public class ChainControllerTest {
 				c -> c.controller.blocksAfter(request),
 				r -> r.getEntity(localNode.getIdentity(), challenge),
 				createDbBlockList(11, 150));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 
 		// (1 transfer + 1 multisig transaction containing 1 transfer  per block)
-		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130 / 3));
+		MatcherAssert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130 / 3));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -273,8 +274,8 @@ public class ChainControllerTest {
 		blocks.stream()
 				.sorted((b1, b2) -> b1.getHeight().compareTo(b2.getHeight()))
 				.forEach(b -> {
-					Assert.assertThat(b.getHeight(), IsEqual.equalTo(new BlockHeight(heights[0]++)));
-					Assert.assertThat(b.getTimeStamp(), IsEqual.equalTo(new TimeInstant(timeInstants[0]++)));
+					MatcherAssert.assertThat(b.getHeight(), IsEqual.equalTo(new BlockHeight(heights[0]++)));
+					MatcherAssert.assertThat(b.getTimeStamp(), IsEqual.equalTo(new TimeInstant(timeInstants[0]++)));
 				});
 
 		// (the second parameter should be min blocks (10) + 100)

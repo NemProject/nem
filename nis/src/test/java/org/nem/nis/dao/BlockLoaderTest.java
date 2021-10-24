@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -56,7 +57,7 @@ public class BlockLoaderTest {
 		final DbBlock dbBlock = this.createLoader().getBlockById(101L);
 
 		// Assert:
-		Assert.assertThat(dbBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(dbBlock, IsNull.nullValue());
 	}
 
 	@Test
@@ -73,8 +74,8 @@ public class BlockLoaderTest {
 		final DbBlock dbBlock = this.createLoader().getBlockById(original.getId());
 
 		// Assert:
-		Assert.assertThat(dbBlock.getId(), IsEqual.equalTo(original.getId()));
-		Assert.assertThat(dbBlock.getHeight(), IsEqual.equalTo(original.getHeight()));
+		MatcherAssert.assertThat(dbBlock.getId(), IsEqual.equalTo(original.getId()));
+		MatcherAssert.assertThat(dbBlock.getHeight(), IsEqual.equalTo(original.getHeight()));
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class BlockLoaderTest {
 		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
 
 		// Assert:
-		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getNamespace().getOwner()));
+		MatcherAssert.assertThat(t.getSender(), IsSame.sameInstance(t.getNamespace().getOwner()));
 	}
 
 	@Test
@@ -92,7 +93,7 @@ public class BlockLoaderTest {
 		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
 
 		// Assert:
-		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
 	}
 
 	@Test
@@ -101,7 +102,7 @@ public class BlockLoaderTest {
 		final DbMosaicDefinitionCreationTransaction t = this.createRoundTrippedDbMosaicDefinitionCreationTransaction();
 
 		// Assert:
-		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaicDefinition().getCreator()));
+		MatcherAssert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaicDefinition().getCreator()));
 	}
 
 	private BlockLoader createLoader() {

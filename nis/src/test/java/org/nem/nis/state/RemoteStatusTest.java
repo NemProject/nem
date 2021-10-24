@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.AccountRemoteStatus;
@@ -11,7 +12,7 @@ public class RemoteStatusTest {
 	@Test
 	public void remoteStatusCanBeConvertedIntoAccountRemoteStatus() {
 		// Assert:
-		Assert.assertThat(RemoteStatus.values().length, IsEqual.equalTo(9));
+		MatcherAssert.assertThat(RemoteStatus.values().length, IsEqual.equalTo(9));
 		assertMapping(RemoteStatus.NOT_SET, AccountRemoteStatus.INACTIVE);
 		assertMapping(RemoteStatus.OWNER_INACTIVE, AccountRemoteStatus.INACTIVE);
 		assertMapping(RemoteStatus.OWNER_ACTIVATING, AccountRemoteStatus.ACTIVATING);
@@ -25,7 +26,7 @@ public class RemoteStatusTest {
 
 	private static void assertMapping(final RemoteStatus remoteStatus, final AccountRemoteStatus accountRemoteStatus) {
 		// Assert:
-		Assert.assertThat(remoteStatus.toAccountRemoteStatus(), IsEqual.equalTo(accountRemoteStatus));
+		MatcherAssert.assertThat(remoteStatus.toAccountRemoteStatus(), IsEqual.equalTo(accountRemoteStatus));
 	}
 
 	//endregion

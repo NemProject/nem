@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -13,8 +14,8 @@ public class PowerIteratorTest {
 		final ColumnVector result = iterator.getResult();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(null));
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(null));
+		MatcherAssert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -27,8 +28,8 @@ public class PowerIteratorTest {
 		final ColumnVector result = iterator.getResult();
 
 		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
-		Assert.assertThat(result.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(iterator.hasConverged(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.1);
 		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.1);
 	}
@@ -43,8 +44,8 @@ public class PowerIteratorTest {
 		final ColumnVector result = iterator.getResult();
 
 		// Assert:
-		Assert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(iterator.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(3.00, result.getAt(0) / result.getAt(1), 0.001);
 	}

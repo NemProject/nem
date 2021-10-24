@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -27,7 +28,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
 	}
 
 	//endregion
@@ -59,7 +60,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(context.transactions));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(context.transactions));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				unknownTransactions,
 				IsEquivalent.equivalentTo(Arrays.asList(0, 3, 5).stream().map(context.transactions::get).collect(Collectors.toList())));
 	}
@@ -95,7 +96,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	// endregion
@@ -147,7 +148,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), numRequested);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(numExpected));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(numExpected));
 	}
 
 	@Test
@@ -161,7 +162,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
 	}
 
 	@Test
@@ -176,8 +177,8 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
-		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
 	}
 
 	@Test
@@ -191,8 +192,8 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
-		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
 	}
 
 	@Test
@@ -208,7 +209,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
 		for (final Transaction tx : mostRecentTransactions) {
-			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
 			curTimeStamp = tx.getTimeStamp();
 		}
 	}
@@ -227,7 +228,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
 	@Test
@@ -241,7 +242,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
 	}
 
 	@Test
@@ -255,7 +256,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
 	//endregion

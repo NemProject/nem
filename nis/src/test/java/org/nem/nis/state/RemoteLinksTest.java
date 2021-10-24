@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -17,10 +18,10 @@ public class RemoteLinksTest {
 		final ReadOnlyRemoteLinks links = new RemoteLinks();
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(false));
-		Assert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(false));
-		Assert.assertThat(links.getCurrent(), IsNull.nullValue());
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -37,10 +38,10 @@ public class RemoteLinksTest {
 		links.addLink(link);
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
-		Assert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(true));
-		Assert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(false));
-		Assert.assertThat(links.getCurrent(), IsEqual.equalTo(link));
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.getCurrent(), IsEqual.equalTo(link));
 	}
 
 	@Test
@@ -53,10 +54,10 @@ public class RemoteLinksTest {
 		links.addLink(link);
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
-		Assert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(false));
-		Assert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(true));
-		Assert.assertThat(links.getCurrent(), IsEqual.equalTo(link));
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isHarvestingRemotely(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isRemoteHarvester(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.getCurrent(), IsEqual.equalTo(link));
 	}
 
 	//endregion
@@ -96,8 +97,8 @@ public class RemoteLinksTest {
 		links.removeLink(link2);
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(links.getCurrent(), IsNull.nullValue());
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -121,8 +122,8 @@ public class RemoteLinksTest {
 		links.removeLink(link2);
 
 		// Assert:
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(links.getCurrent(), IsNull.nullValue());
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -135,10 +136,10 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 
 		// Assert:
-		Assert.assertThat(links.getRemoteStatus(BlockHeight.ONE), IsEqual.equalTo(RemoteStatus.NOT_SET));
-		Assert.assertThat(links.getRemoteStatus(new BlockHeight(100L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
-		Assert.assertThat(links.getRemoteStatus(new BlockHeight(1000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
-		Assert.assertThat(links.getRemoteStatus(new BlockHeight(10000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		MatcherAssert.assertThat(links.getRemoteStatus(BlockHeight.ONE), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(100L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(1000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(10000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
 	}
 
 	@Test
@@ -266,7 +267,7 @@ public class RemoteLinksTest {
 		final RemoteStatus status = links.getRemoteStatus(height);
 
 		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(expectedStatus));
+		MatcherAssert.assertThat(status, IsEqual.equalTo(expectedStatus));
 	}
 
 	// endregion
@@ -292,9 +293,9 @@ public class RemoteLinksTest {
 		copy.removeLink(link3);
 		copy.removeLink(link2);
 
-		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
-		Assert.assertThat(copy.isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(copy.getCurrent(), IsNull.nullValue());
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(copy.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.getCurrent(), IsNull.nullValue());
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -36,17 +37,17 @@ public class PoiOptionsBuilderTest {
 
 	private static void assertPostForkOptions(final PoiOptions options) {
 		// Assert:
-		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(10000)));
-		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(1000)));
-		Assert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.60));
-		Assert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.90));
-		Assert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
-		Assert.assertThat(options.getClusteringStrategy(), IsInstanceOf.instanceOf(FastScanClusteringStrategy.class));
-		Assert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(4));
-		Assert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.30));
-		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.70));
-		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.10));
-		Assert.assertThat(options.getInverseTeleportationProbability(), IsEqual.equalTo(1.00 - 0.70 - 0.10));
+		MatcherAssert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(10000)));
+		MatcherAssert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(1000)));
+		MatcherAssert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.60));
+		MatcherAssert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.90));
+		MatcherAssert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(options.getClusteringStrategy(), IsInstanceOf.instanceOf(FastScanClusteringStrategy.class));
+		MatcherAssert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.30));
+		MatcherAssert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.70));
+		MatcherAssert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.10));
+		MatcherAssert.assertThat(options.getInverseTeleportationProbability(), IsEqual.equalTo(1.00 - 0.70 - 0.10));
 	}
 
 	@Test
@@ -59,8 +60,8 @@ public class PoiOptionsBuilderTest {
 
 		// Assert:
 		assertCommonCustomOptionValues(options);
-		Assert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
-		Assert.assertThat(options.getClusteringStrategy(), IsSame.sameInstance(strategy));
+		MatcherAssert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(options.getClusteringStrategy(), IsSame.sameInstance(strategy));
 	}
 
 	@Test
@@ -72,8 +73,8 @@ public class PoiOptionsBuilderTest {
 
 		// Assert:
 		assertCommonCustomOptionValues(options);
-		Assert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(false));
-		Assert.assertThat(options.getClusteringStrategy(), IsNull.nullValue());
+		MatcherAssert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(options.getClusteringStrategy(), IsNull.nullValue());
 	}
 
 	private static PoiOptionsBuilder createBuilderWithCustomOptions() {
@@ -92,14 +93,14 @@ public class PoiOptionsBuilderTest {
 
 	private static void assertCommonCustomOptionValues(final PoiOptions options) {
 		// Assert:
-		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(123)));
-		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(777)));
-		Assert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.76));
-		Assert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.82));
-		Assert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(5));
-		Assert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.42));
-		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.65));
-		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.32));
-		Assert.assertThat(options.getInverseTeleportationProbability(), IsRoundedEqual.equalTo(0.03));
+		MatcherAssert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(123)));
+		MatcherAssert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(777)));
+		MatcherAssert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.76));
+		MatcherAssert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.82));
+		MatcherAssert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.42));
+		MatcherAssert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.65));
+		MatcherAssert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.32));
+		MatcherAssert.assertThat(options.getInverseTeleportationProbability(), IsRoundedEqual.equalTo(0.03));
 	}
 }

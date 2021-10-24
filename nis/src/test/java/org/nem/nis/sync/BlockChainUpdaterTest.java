@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ public class BlockChainUpdaterTest {
 		nodeContext.getBlockChainUpdater().updateScore(parent, child);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				nodeContext.getBlockChainUpdater().getScore(),
 				IsEqual.equalTo(oldScore.add(new BlockChainScore(child.getDifficulty().getRaw() - timeDiff))));
 	}
@@ -78,7 +79,7 @@ public class BlockChainUpdaterTest {
 		nodeContext.processBlock(child, blockDao, nisCache);
 
 		// Act:
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Assert:
 		BlockChainUtils.assertMockBlockDaosAreEquivalent(blockDao, nodeContext.getMockBlockDao());
@@ -94,7 +95,7 @@ public class BlockChainUpdaterTest {
 		nodeContext.processBlock(child, nodeContext.getMockBlockDao().shallowCopy(), nisCache);
 
 		// Act:
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Assert:
 		BlockChainUtils.assertNisCachesAreEquivalent(nisCache.copy(), nodeContext.getNisCache().copy());
@@ -111,7 +112,7 @@ public class BlockChainUpdaterTest {
 		final ValidationResult result = nodeContext.getBlockChainUpdater().updateBlock(child);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -122,13 +123,13 @@ public class BlockChainUpdaterTest {
 		final List<Block> chain = nodeContext.getChain();
 		final Block child = context.createChild(chain, 0);
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), 0);
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		final ValidationResult result = nodeContext.getBlockChainUpdater().updateBlock(sibling);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
@@ -139,13 +140,13 @@ public class BlockChainUpdaterTest {
 		final List<Block> chain = nodeContext.getChain();
 		final Block child = context.createChild(chain, 0);
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), 10);
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		final ValidationResult result = nodeContext.getBlockChainUpdater().updateBlock(sibling);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
@@ -156,13 +157,13 @@ public class BlockChainUpdaterTest {
 		final List<Block> chain = nodeContext.getChain();
 		final Block child = context.createChild(chain, 0);
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), -5);
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		final ValidationResult result = nodeContext.getBlockChainUpdater().updateBlock(sibling);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -176,10 +177,10 @@ public class BlockChainUpdaterTest {
 		final MockBlockDao blockDao = nodeContext.getMockBlockDao().shallowCopy();
 		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		nodeContext.processBlock(sibling, blockDao, nisCache);
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(sibling), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(sibling), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Assert:
 		BlockChainUtils.assertMockBlockDaosAreEquivalent(blockDao, nodeContext.getMockBlockDao());
@@ -195,10 +196,10 @@ public class BlockChainUpdaterTest {
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), -5);
 		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		nodeContext.processBlock(sibling, nodeContext.getMockBlockDao().shallowCopy(), nisCache);
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
-		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(sibling), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(sibling), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Assert:
 		BlockChainUtils.assertNisCachesAreEquivalent(nisCache.copy(), nodeContext.getNisCache().copy());
@@ -224,7 +225,7 @@ public class BlockChainUpdaterTest {
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
 	}
 
 	@Test
@@ -240,13 +241,13 @@ public class BlockChainUpdaterTest {
 
 		// extra block for local to make his chain superior
 		final Block child = context.createChild(nodeContext1.getChain(), 0);
-		Assert.assertThat(nodeContext1.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext1.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.NEUTRAL));
 	}
 
 	// sub-region remote has chain with higher score
@@ -258,7 +259,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 		final Block child = context.createChild(nodeContext2.getChain(), 0);
-		Assert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
@@ -278,7 +279,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 		final Block child = context.createChild(nodeContext2.getChain(), 0);
-		Assert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// make the remote's last block null
 		nodeContext2.getChain().add(null);
@@ -291,7 +292,7 @@ public class BlockChainUpdaterTest {
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
 	}
 
 	@Test
@@ -312,7 +313,7 @@ public class BlockChainUpdaterTest {
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
 	}
 
 	@Test
@@ -322,7 +323,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 		final Block child = context.createChild(nodeContext2.getChain(), 0);
-		Assert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 		nodeContext2.getChain().add(child);
 
 		// remote supplies more hashes than allowed
@@ -342,7 +343,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 		final Block child = context.createChild(nodeContext2.getChain(), 0);
-		Assert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 		nodeContext2.getChain().add(child);
 
 		// remote supplies some random hashes
@@ -408,7 +409,7 @@ public class BlockChainUpdaterTest {
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(nodeContext2.getConnectorPool(), nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 		BlockChainUtils.assertNisCachesAreEquivalent(nodeContext1.getNisCache(), nodeContext2.getNisCache());
 		BlockChainUtils.assertMockBlockDaosAreEquivalent(nodeContext1.getMockBlockDao(), nodeContext2.getMockBlockDao());
 	}
@@ -429,7 +430,7 @@ public class BlockChainUpdaterTest {
 		final NodeInteractionResult result = nodeContext1.getBlockChainUpdater().updateChain(nodeContext2.getConnectorPool(), nodeContext2.getNode());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 		BlockChainUtils.assertNisCachesAreEquivalent(nodeContext1.getNisCache(), nodeContext2.getNisCache());
 		BlockChainUtils.assertMockBlockDaosAreEquivalent(nodeContext1.getMockBlockDao(), nodeContext2.getMockBlockDao());
 	}
@@ -474,7 +475,7 @@ public class BlockChainUpdaterTest {
 						nodeContext.getNode().getIdentity(),
 						partner.getNode().getIdentity(),
 						result.toString()));
-				Assert.assertThat(result, IsNot.not(NodeInteractionResult.FAILURE));
+				MatcherAssert.assertThat(result, IsNot.not(NodeInteractionResult.FAILURE));
 			}
 			if (this.allBlockChainsHaveEqualScore(context.getNodeContexts())) {
 				break;
@@ -483,8 +484,8 @@ public class BlockChainUpdaterTest {
 
 		// Assert:
 		LOGGER.info(String.format("synchronization ended after %d rounds", round));
-		Assert.assertThat(round <= numRounds, IsEqual.equalTo(true));
-		Assert.assertThat(bestScore, IsEqual.equalTo(context.getNodeContexts().get(0).getBlockChainUpdater().getScore()));
+		MatcherAssert.assertThat(round <= numRounds, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(bestScore, IsEqual.equalTo(context.getNodeContexts().get(0).getBlockChainUpdater().getScore()));
 		for (int i = 0; i < context.getNodeContexts().size() - 1; i++) {
 			final NodeContext nodeContext1 = context.getNodeContexts().get(i);
 			final NodeContext nodeContext2 = context.getNodeContexts().get(i + 1);

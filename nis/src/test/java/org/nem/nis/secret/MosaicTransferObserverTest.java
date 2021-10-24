@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -96,18 +97,18 @@ public class MosaicTransferObserverTest {
 		private void assertBalances(final Quantity senderBalance, final Quantity recipientBalance) {
 			// Assert:
 			// - single namespace
-			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
 			// - single mosaic mosaic
 			final Mosaics mosaics = this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics();
-			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 
 			// - correct balances
 			final int numExpectedBalances = isNonZero(senderBalance) + isNonZero(recipientBalance);
 			final MosaicEntry entry = mosaics.get(this.mosaicDefinition.getId());
-			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numExpectedBalances));
-			Assert.assertThat(entry.getBalances().getBalance(this.sender.getAddress()), IsEqual.equalTo(senderBalance));
-			Assert.assertThat(entry.getBalances().getBalance(this.recipient.getAddress()), IsEqual.equalTo(recipientBalance));
+			MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numExpectedBalances));
+			MatcherAssert.assertThat(entry.getBalances().getBalance(this.sender.getAddress()), IsEqual.equalTo(senderBalance));
+			MatcherAssert.assertThat(entry.getBalances().getBalance(this.recipient.getAddress()), IsEqual.equalTo(recipientBalance));
 		}
 
 		private static int isNonZero(final Quantity quantity) {

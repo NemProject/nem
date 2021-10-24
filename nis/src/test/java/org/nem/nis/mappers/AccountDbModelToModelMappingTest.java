@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -46,8 +47,8 @@ public class AccountDbModelToModelMappingTest {
 
 		// Assert:
 		// - note that the isValid calculation is bypassed so the invalid address is marked as valid
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(account.getAddress().isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(account.getAddress().isValid(), IsEqual.equalTo(true));
 	}
 
 	private static void canMapDbAccountToAccount(final String encodedAddress, final PublicKey publicKey) {
@@ -63,12 +64,12 @@ public class AccountDbModelToModelMappingTest {
 		final Account account = mapping.map(dbAccount);
 
 		// Assert:
-		Assert.assertThat(account, IsEqual.equalTo(accountReturnedByAccountLookup));
+		MatcherAssert.assertThat(account, IsEqual.equalTo(accountReturnedByAccountLookup));
 
 		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
 		Mockito.verify(accountLookup, Mockito.only()).findByAddress(addressCaptor.capture(), Mockito.any());
-		Assert.assertThat(addressCaptor.getValue().getEncoded(), IsEqual.equalTo(encodedAddress));
-		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(addressCaptor.getValue().isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addressCaptor.getValue().getEncoded(), IsEqual.equalTo(encodedAddress));
+		MatcherAssert.assertThat(addressCaptor.getValue().getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(addressCaptor.getValue().isValid(), IsEqual.equalTo(true));
 	}
 }

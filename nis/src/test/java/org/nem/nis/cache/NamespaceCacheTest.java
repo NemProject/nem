@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -42,8 +43,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final NamespaceCache cache = this.createCache();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
 	}
 
 	// endregion
@@ -62,7 +63,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Namespace namespace = cache.get(new NamespaceId("foo")).getNamespace();
 
 		// Assert:
-		Assert.assertThat(namespace, IsEqual.equalTo(original));
+		MatcherAssert.assertThat(namespace, IsEqual.equalTo(original));
 	}
 
 	@Test
@@ -77,8 +78,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final NamespaceEntry entry = cache.get(new NamespaceId("foo"));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(getSupply(cache, "foo", 1), IsEqual.equalTo(new Supply(7)));
+		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getSupply(cache, "foo", 1), IsEqual.equalTo(new Supply(7)));
 	}
 
 	@Test
@@ -94,8 +95,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final NamespaceEntry entry = cache.get(new NamespaceId("foo.bar"));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(getSupply(cache, "foo.bar", 2), IsEqual.equalTo(new Supply(9)));
+		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getSupply(cache, "foo.bar", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -111,9 +112,9 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
-		Assert.assertThat(rootIds.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(rootIds.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -132,10 +133,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(11));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
-		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
-		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(11));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
+		MatcherAssert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
 	}
 
 	@Test
@@ -154,10 +155,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(11));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
-		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
-		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(11));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
+		MatcherAssert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
 	}
 
 	@Test
@@ -180,10 +181,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(11 + 5));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11 + 5));
-		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
-		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(11 + 5));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(11 + 5));
+		MatcherAssert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
 	}
 
 	// endregion
@@ -202,10 +203,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> subNamespaceIds = cache.getSubNamespaceIds(root.getId());
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(subNamespaceIds.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(subNamespaceIds.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -236,12 +237,12 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Collection<NamespaceId> subNamespaceIds = cache.getSubNamespaceIds(root1.getId());
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 2 + 10 + 5));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 2 + 10 + 5));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("qux")), IsEqual.equalTo(true));
-		Assert.assertThat(subNamespaceIds.size(), IsEqual.equalTo(15));
-		Assert.assertThat(subNamespaceIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 2 + 10 + 5));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 2 + 10 + 5));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("qux")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(subNamespaceIds.size(), IsEqual.equalTo(15));
+		MatcherAssert.assertThat(subNamespaceIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
 	}
 
 	// endregion
@@ -255,9 +256,9 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		this.addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
 
 		// Assert:
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -267,9 +268,9 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		this.addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
 
 		// Assert:
-		Assert.assertThat(cache.contains(new NamespaceId("fo0o")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("bar.foo")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("fo0o")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("bar.foo")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -314,7 +315,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final boolean isActive = cache.isActive(new NamespaceId(testName), height);
 
 		// Assert:
-		Assert.assertThat(isActive, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(isActive, IsEqual.equalTo(expectedResult));
 	}
 
 	// endregion
@@ -358,7 +359,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final boolean isActive = cache.isActive(new NamespaceId(testName), testHeight);
 
 		// Assert:
-		Assert.assertThat(isActive, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(isActive, IsEqual.equalTo(expectedResult));
 	}
 
 	// endregion
@@ -375,12 +376,12 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 		// Assert:
 		// - at HEIGHTS[0] both have the same owner
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
 
 		// - at 1000000 both have the same owner
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -393,12 +394,12 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 		// Assert:
 		// - at HEIGHTS[0] both have the same owner
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
 
 		// - at 1000000 root and sub have different owners
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -419,12 +420,12 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.add(createNamespace("bar"));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 4));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 4));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -452,11 +453,11 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1]));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[1]), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[1]), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -490,11 +491,11 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 		// Assert:
 		final NamespaceId id = new NamespaceId("foo");
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 2));
-		Assert.assertThat(cache.contains(id), IsEqual.equalTo(true));
-		Assert.assertThat(cache.get(id).getNamespace().getOwner(), IsEqual.equalTo(OWNERS[1]));
-		Assert.assertThat(cache.get(id).getNamespace().getHeight(), IsEqual.equalTo(HEIGHTS[1]));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 2));
+		MatcherAssert.assertThat(cache.contains(id), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.get(id).getNamespace().getOwner(), IsEqual.equalTo(OWNERS[1]));
+		MatcherAssert.assertThat(cache.get(id).getNamespace().getHeight(), IsEqual.equalTo(HEIGHTS[1]));
 	}
 
 	@Test
@@ -508,8 +509,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Namespace namespace = cache.get(new NamespaceId("foo.bar")).getNamespace();
 
 		// Assert:
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[0]));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[0]));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[0]));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[0]));
 	}
 
 	@Test
@@ -561,11 +562,11 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		IntStream.range(0, ids.length).forEach(i -> {
 			final NamespaceEntry entry = cache.get(new NamespaceId(ids[i]));
 			if (-1 == expectedOwnerIndices[i]) {
-				Assert.assertThat(entry, IsNull.nullValue());
+				MatcherAssert.assertThat(entry, IsNull.nullValue());
 			} else {
 				final Namespace namespace = entry.getNamespace();
-				Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
-				Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+				MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
+				MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 			}
 		});
 	}
@@ -581,11 +582,11 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.remove(new NamespaceId("bar.baz.qux"));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 4));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 4));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 4));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -598,10 +599,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.remove(new NamespaceId("foo"));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -659,20 +660,20 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// - the root namespace (foo) was not removed because it existed previously
 		// - in the case of a -1 owner index, the corresponding namespace is considered inactive (because there was an owner change)
 		final int adjustment = Long.valueOf(Arrays.stream(expectedOwnerIndices).filter(i -> -1 == i).count()).intValue();
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 5 - adjustment));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 8 - adjustment));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 5 - adjustment));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 8 - adjustment));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 
 		// - all foo descendants have reverted to their original owners and heights
 		IntStream.range(0, ids.length)
 				.forEach(i -> {
 					final NamespaceEntry entry = cache.get(new NamespaceId(ids[i]));
 					if (-1 == expectedOwnerIndices[i]) {
-						Assert.assertThat(entry, IsNull.nullValue());
+						MatcherAssert.assertThat(entry, IsNull.nullValue());
 					} else {
 						final Namespace namespace = entry.getNamespace();
-						Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
-						Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+						MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
+						MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 					}
 				});
 	}
@@ -717,8 +718,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.add(createNamespace("bar", OWNERS[0], HEIGHTS[1]));
 
 		// Assert:
-		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
-		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
+		MatcherAssert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		MatcherAssert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	@Test
@@ -734,8 +735,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.add(createNamespace("bar.qux", OWNERS[1], HEIGHTS[1]));
 
 		// Assert:
-		Assert.assertThat(getMosaicEntry(cache, "bar", 1), IsNull.nullValue());
-		Assert.assertThat(getMosaicEntry(cache, "bar.qux", 2), IsNull.nullValue());
+		MatcherAssert.assertThat(getMosaicEntry(cache, "bar", 1), IsNull.nullValue());
+		MatcherAssert.assertThat(getMosaicEntry(cache, "bar.qux", 2), IsNull.nullValue());
 	}
 
 	@Test
@@ -751,8 +752,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.remove(new NamespaceId("bar"));
 
 		// Assert:
-		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
-		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
+		MatcherAssert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		MatcherAssert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -772,19 +773,19 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		}
 
 		// Sanity: precondition 12 items were added to the cache
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 12));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 12));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 12));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 12));
 
 		// Act: prune at height 1002
 		cache.prune(new BlockHeight(1002L));
 
 		// Assert: only the items no less than the prune height (2, 3) remain
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 6));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 6));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 6));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 6));
 		for (final String rootName : Arrays.asList("2", "3")) {
-			Assert.assertThat(cache.contains(new NamespaceId(rootName)), IsEqual.equalTo(true));
-			Assert.assertThat(cache.contains(new NamespaceId(rootName + ".a")), IsEqual.equalTo(true));
-			Assert.assertThat(cache.contains(new NamespaceId(rootName + ".a.a")), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cache.contains(new NamespaceId(rootName)), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cache.contains(new NamespaceId(rootName + ".a")), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cache.contains(new NamespaceId(rootName + ".a.a")), IsEqual.equalTo(true));
 		}
 	}
 
@@ -800,15 +801,15 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.add(new Namespace(new NamespaceId("0.a"), account, BlockHeight.ONE));
 
 		// Sanity: precondition 2 items were added to the cache
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 5));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 5));
 
 		// Act: prune at height 1002
 		cache.prune(new BlockHeight(1002L));
 
 		// Assert: no items were removed
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 3));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1 + 2));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 3));
 
 		// Act: remove all items
 		cache.remove(new NamespaceId("0.a"));
@@ -816,8 +817,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.remove(new NamespaceId("0"));
 
 		// Assert: all items were removed (the root required two removals because it had two links)
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -847,8 +848,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		cache.remove(new NamespaceId("foo"));
 
 		// Assert: the namespace should be removed from the original and the shallow copy
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -865,10 +866,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 11);
 
 		// Assert: the supplies are updated in both the original and shallow copy
-		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
-		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
-		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
-		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
+		MatcherAssert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		MatcherAssert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		MatcherAssert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
+		MatcherAssert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
 	}
 
 	@Test
@@ -891,8 +892,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// Assert: the namespace should be removed from the copy but not the original
 		//         (the first but not the second 'foo' namespace has a 'bar' subnamespace, so when the second
 		//         is removed (in the copy), the 'foo.bar' namespace is present)
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -908,10 +909,10 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		addMosaic(copy, new NamespaceId("bar.qux"), 2, 11);
 
 		// Assert: the supplies are only updated in the copy cache
-		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
-		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
-		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
-		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
+		MatcherAssert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		MatcherAssert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		MatcherAssert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
+		MatcherAssert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
 	}
 
 	private T createCacheForCopyTests() {
@@ -934,13 +935,13 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(copy.size(), IsEqual.equalTo(1 + 3));
-		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(1 + 7));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(1 + 3));
+		MatcherAssert.assertThat(copy.deepSize(), IsEqual.equalTo(1 + 7));
 		Arrays.asList("foo", "bar", "bar.qux").stream()
 				.map(NamespaceId::new)
-				.forEach(id -> Assert.assertThat(id.toString(), copy.contains(id), IsEqual.equalTo(true)));
-		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(7)));
-		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
+				.forEach(id -> MatcherAssert.assertThat(id.toString(), copy.contains(id), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		MatcherAssert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -956,8 +957,8 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final NamespaceEntry namespaceEntry = cache.get(new NamespaceId("nem"));
 
 		// Assert:
-		Assert.assertThat(namespaceEntry, IsNull.notNullValue());
-		Assert.assertThat(namespaceEntry, IsSame.sameInstance(NamespaceConstants.NAMESPACE_ENTRY_NEM));
+		MatcherAssert.assertThat(namespaceEntry, IsNull.notNullValue());
+		MatcherAssert.assertThat(namespaceEntry, IsSame.sameInstance(NamespaceConstants.NAMESPACE_ENTRY_NEM));
 	}
 
 	@Test
@@ -966,7 +967,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final T cache = this.createCache();
 
 		// Assert:
-		Assert.assertThat(cache.contains(new NamespaceId("nem")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(new NamespaceId("nem")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -981,7 +982,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 					final boolean isActive = cache.isActive(id, height);
 
 					// Assert:
-					Assert.assertThat(height.toString(), isActive, IsEqual.equalTo(true));
+					MatcherAssert.assertThat(height.toString(), isActive, IsEqual.equalTo(true));
 				});
 	}
 

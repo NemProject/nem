@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
@@ -15,7 +16,7 @@ public class NamespaceConstantsTest {
 	@Test
 	public void namespaceEntryNemHasExpectedNamespace() {
 		// Assert:
-		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getNamespace(), IsEqual.equalTo(MosaicConstants.NAMESPACE_NEM));
+		MatcherAssert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getNamespace(), IsEqual.equalTo(MosaicConstants.NAMESPACE_NEM));
 	}
 
 	@Test
@@ -24,9 +25,9 @@ public class NamespaceConstantsTest {
 		final MosaicEntry mosaicEntry = getMosaicXemEntry();
 
 		// Assert:
-		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaicEntry.getMosaicDefinition(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
-		Assert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
+		MatcherAssert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getMosaics().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mosaicEntry.getMosaicDefinition(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
+		MatcherAssert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class NamespaceConstantsTest {
 				UnsupportedOperationException.class);
 
 		// Assert:
-		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class NamespaceConstantsTest {
 				UnsupportedOperationException.class);
 
 		// Assert:
-		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
 	}
 
 	// endregion
@@ -72,7 +73,7 @@ public class NamespaceConstantsTest {
 				UnsupportedOperationException.class);
 
 		// Assert:
-		Assert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
+		MatcherAssert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
 	}
 
 	@Test
@@ -86,7 +87,7 @@ public class NamespaceConstantsTest {
 				UnsupportedOperationException.class);
 
 		// Assert:
-		Assert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
+		MatcherAssert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
 	}
 
 	// endregion

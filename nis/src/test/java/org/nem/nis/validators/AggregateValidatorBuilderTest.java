@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -86,7 +87,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		this.verifyValidate(validator, param, Mockito.only());
 	}
 
@@ -103,7 +104,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		context.assertAllValidatorsCalledOnce();
 	}
 
@@ -120,7 +121,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
 		context.assertOnlyFirstTwoValidatorsCalledOnce();
 	}
 
@@ -137,7 +138,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		context.assertAllValidatorsCalledOnce();
 	}
 
@@ -154,7 +155,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
 		context.assertAllValidatorsCalledOnce();
 	}
 
@@ -209,7 +210,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final String name = validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
 	}
 
 	private TValidator createValidatorWithName(final String name) {

@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -36,7 +37,7 @@ public class AccountIoAdapterTest {
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
-			Assert.assertThat(accountIoAdapter.findByAddress(accounts.get(i).getAddress()), IsEqual.equalTo(accounts.get(i)));
+			MatcherAssert.assertThat(accountIoAdapter.findByAddress(accounts.get(i).getAddress()), IsEqual.equalTo(accounts.get(i)));
 		}
 	}
 
@@ -59,7 +60,7 @@ public class AccountIoAdapterTest {
 		final Account account = context.accountIoAdapter.findByAddress(context.address);
 
 		// Assert:
-		Assert.assertThat(account, IsEqual.equalTo(context.account));
+		MatcherAssert.assertThat(account, IsEqual.equalTo(context.account));
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
 	}
 
@@ -210,32 +211,32 @@ public class AccountIoAdapterTest {
 		//region assertDefaultTransactions
 
 		public void assertDefaultTransactions(final SerializableList<TransactionMetaDataPair> pairs) {
-			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(3));
 			Mockito.verify(this.mapper, Mockito.times(3)).map(Mockito.any(AbstractBlockTransfer.class));
 
 			// heights
 			final Collection<Long> heights = pairs.asCollection().stream()
 					.map(p -> p.getMetaData().getHeight().getRaw())
 					.collect(Collectors.toList());
-			Assert.assertThat(heights, IsEquivalent.equivalentTo(12L, 12L, 15L));
+			MatcherAssert.assertThat(heights, IsEquivalent.equivalentTo(12L, 12L, 15L));
 
 			// ids
 			final Collection<Long> ids = pairs.asCollection().stream()
 					.map(p -> p.getMetaData().getId())
 					.collect(Collectors.toList());
-			Assert.assertThat(ids, IsEquivalent.equivalentTo(7L, 8L, 9L));
+			MatcherAssert.assertThat(ids, IsEquivalent.equivalentTo(7L, 8L, 9L));
 
 			// amounts
 			final Collection<Long> amounts = pairs.asCollection().stream()
 					.map(p -> ((TransferTransaction)p.getEntity()).getAmount().getNumNem())
 					.collect(Collectors.toList());
-			Assert.assertThat(amounts, IsEquivalent.equivalentTo(111L, 222L, 333L));
+			MatcherAssert.assertThat(amounts, IsEquivalent.equivalentTo(111L, 222L, 333L));
 
 			// hashes
 			final Collection<Hash> hashes = pairs.asCollection().stream()
 					.map(p -> p.getMetaData().getHash())
 					.collect(Collectors.toList());
-			Assert.assertThat(hashes, IsEquivalent.equivalentTo(this.transactionHashes));
+			MatcherAssert.assertThat(hashes, IsEquivalent.equivalentTo(this.transactionHashes));
 		}
 
 		//endregion
@@ -262,27 +263,27 @@ public class AccountIoAdapterTest {
 			final Collection<Long> heights = harvestInfos.asCollection().stream()
 					.map(p -> p.getBlockHeight().getRaw())
 					.collect(Collectors.toList());
-			Assert.assertThat(heights, IsEquivalent.equivalentTo(444L, 777L, 222L));
+			MatcherAssert.assertThat(heights, IsEquivalent.equivalentTo(444L, 777L, 222L));
 
 			final Collection<Integer> timeStamps = harvestInfos.asCollection().stream()
 					.map(p -> p.getTimeStamp().getRawTime())
 					.collect(Collectors.toList());
-			Assert.assertThat(timeStamps, IsEquivalent.equivalentTo(897, 123, 345));
+			MatcherAssert.assertThat(timeStamps, IsEquivalent.equivalentTo(897, 123, 345));
 
 			final Collection<Long> fees = harvestInfos.asCollection().stream()
 					.map(p -> p.getTotalFee().getNumMicroNem())
 					.collect(Collectors.toList());
-			Assert.assertThat(fees, IsEquivalent.equivalentTo(8L, 9L, 7L));
+			MatcherAssert.assertThat(fees, IsEquivalent.equivalentTo(8L, 9L, 7L));
 
 			final Collection<Long> ids = harvestInfos.asCollection().stream()
 					.map(HarvestInfo::getId)
 					.collect(Collectors.toList());
-			Assert.assertThat(ids, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getId).collect(Collectors.toList())));
+			MatcherAssert.assertThat(ids, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getId).collect(Collectors.toList())));
 
 			final Collection<Long> difficulties = harvestInfos.asCollection().stream()
 					.map(HarvestInfo::getDifficulty)
 					.collect(Collectors.toList());
-			Assert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
+			MatcherAssert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
 		}
 
 		//endregion

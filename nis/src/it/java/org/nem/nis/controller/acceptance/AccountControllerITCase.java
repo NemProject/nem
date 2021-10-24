@@ -1,6 +1,7 @@
 package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
@@ -24,8 +25,8 @@ public class AccountControllerITCase {
 		final ErrorResponseDeserializerUnion result = unlock();
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
-		Assert.assertThat(result.hasBody(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		MatcherAssert.assertThat(result.hasBody(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -35,8 +36,8 @@ public class AccountControllerITCase {
 		final ErrorResponseDeserializerUnion result = lock();
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
-		Assert.assertThat(result.hasBody(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		MatcherAssert.assertThat(result.hasBody(), IsEqual.equalTo(false));
 	}
 
 	private static ErrorResponseDeserializerUnion lock() {

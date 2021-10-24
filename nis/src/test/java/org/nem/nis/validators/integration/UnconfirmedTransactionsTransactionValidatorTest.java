@@ -1,5 +1,6 @@
 package org.nem.nis.validators.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
@@ -36,10 +37,10 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 
 			// Assert:
 			if (expectedFiltered.contains(t)) {
-				Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+				MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 				expectedFiltered.remove(t);
 			} else {
-				Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+				MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			}
 		}
 	}

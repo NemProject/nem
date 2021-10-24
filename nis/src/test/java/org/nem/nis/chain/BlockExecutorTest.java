@@ -1,5 +1,6 @@
 package org.nem.nis.chain;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -83,7 +84,7 @@ public class BlockExecutorTest {
 			context.execute();
 
 			// Assert:
-			Assert.assertThat(context.executeList, IsEqual.equalTo(Arrays.asList(1, 2, 3)));
+			MatcherAssert.assertThat(context.executeList, IsEqual.equalTo(Arrays.asList(1, 2, 3)));
 		}
 
 		@Test
@@ -96,7 +97,7 @@ public class BlockExecutorTest {
 			context.undo();
 
 			// Assert:
-			Assert.assertThat(context.undoList, IsEqual.equalTo(Arrays.asList(3, 2, 1)));
+			MatcherAssert.assertThat(context.undoList, IsEqual.equalTo(Arrays.asList(3, 2, 1)));
 		}
 
 		private final class UndoExecuteTransactionOrderTestContext {

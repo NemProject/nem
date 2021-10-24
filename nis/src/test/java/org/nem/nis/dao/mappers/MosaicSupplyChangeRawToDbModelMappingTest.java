@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,15 +22,15 @@ public class MosaicSupplyChangeRawToDbModelMappingTest extends AbstractTransferR
 		final DbMosaicSupplyChangeTransaction dbModel = context.createMapping().map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
-		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
-		Assert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(654L));
-		Assert.assertThat(dbModel.getSupplyType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(789L));
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
+		MatcherAssert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
+		MatcherAssert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(654L));
+		MatcherAssert.assertThat(dbModel.getSupplyType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(789L));
 	}
 
 	@Override

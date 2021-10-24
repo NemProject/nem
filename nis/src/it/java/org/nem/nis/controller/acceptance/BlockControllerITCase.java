@@ -1,6 +1,7 @@
 package org.nem.nis.controller.acceptance;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.ErrorResponseDeserializerUnion;
@@ -27,7 +28,7 @@ public class BlockControllerITCase {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(result.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(1)));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(1)));
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class BlockControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(expectedStatus));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(expectedStatus));
 	}
 
 	@Test
@@ -65,7 +66,7 @@ public class BlockControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(BLOCK_AT_PATH, input);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(500));
 	}
 
 	@Test
@@ -78,6 +79,6 @@ public class BlockControllerITCase {
 		final ErrorResponseDeserializerUnion result = connector.post(INVALID_PATH, input);
 
 		// Assert:
-		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
+		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(404));
 	}
 }

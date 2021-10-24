@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
@@ -28,7 +29,7 @@ public class MosaicDefinitionDaoImplTest {
 		final DbMosaicDefinition result = context.mosaicDefinitionDao.getMosaicDefinition(Utils.createMosaicId(2));
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinition(context.session, Utils.createMosaicId(2));
 	}
 
@@ -51,7 +52,7 @@ public class MosaicDefinitionDaoImplTest {
 				25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only())
 				.getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"), Long.MAX_VALUE, 25);
 	}
@@ -71,7 +72,7 @@ public class MosaicDefinitionDaoImplTest {
 				25);
 
 		// Assert:
-		Assert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
 		Mockito.verify(context.retriever, Mockito.never()).getMosaicDefinitionsForAccount(
 				Mockito.any(),
 				Mockito.anyLong(),
@@ -106,7 +107,7 @@ public class MosaicDefinitionDaoImplTest {
 				25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only())
 				.getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"), retrieverId, 25);
 	}
@@ -130,7 +131,7 @@ public class MosaicDefinitionDaoImplTest {
 				25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only())
 				.getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"), Long.MAX_VALUE, 25);
 	}
@@ -160,7 +161,7 @@ public class MosaicDefinitionDaoImplTest {
 				25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only())
 				.getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"), retrieverId, 25);
 	}
@@ -191,7 +192,7 @@ public class MosaicDefinitionDaoImplTest {
 		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitions(requestId, 25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only())
 				.getMosaicDefinitions(context.session, retrieverId, 25);
 	}

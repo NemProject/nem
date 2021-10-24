@@ -1,5 +1,6 @@
 package org.nem.nis.cache.delta;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -20,7 +21,7 @@ public class DefaultSkipListMapTest {
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>();
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -33,7 +34,7 @@ public class DefaultSkipListMapTest {
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(1));
 	}
 
 	// endregion
@@ -56,13 +57,13 @@ public class DefaultSkipListMapTest {
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// sanity check
-		Assert.assertThat(map.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(5));
 
 		// Act:
 		map.clear();
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -81,7 +82,7 @@ public class DefaultSkipListMapTest {
 		final boolean isContained = map.contains(TimeInstant.ZERO, hash);
 
 		// Assert:
-		Assert.assertThat(isContained, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isContained, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -97,8 +98,8 @@ public class DefaultSkipListMapTest {
 		final boolean isContained2 = map.contains(new TimeInstant(1), hash);
 
 		// Assert:
-		Assert.assertThat(isContained1, IsEqual.equalTo(false));
-		Assert.assertThat(isContained2, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isContained1, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isContained2, IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -116,8 +117,8 @@ public class DefaultSkipListMapTest {
 		map.put(TimeInstant.ZERO, hash);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(1));
-		Assert.assertThat(map.contains(TimeInstant.ZERO, hash), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, hash), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -132,8 +133,8 @@ public class DefaultSkipListMapTest {
 		map.put(TimeInstant.ZERO, hash);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(2));
-		Assert.assertThat(map.contains(TimeInstant.ZERO, hash), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, hash), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -150,8 +151,8 @@ public class DefaultSkipListMapTest {
 		map.put(TimeInstant.ZERO, hashes);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(3));
-		hashes.stream().forEach(h -> Assert.assertThat(map.contains(TimeInstant.ZERO, h), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(3));
+		hashes.stream().forEach(h -> MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, h), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -169,8 +170,8 @@ public class DefaultSkipListMapTest {
 		map.put(TimeInstant.ZERO, hashes);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(4));
-		hashes.stream().forEach(h -> Assert.assertThat(map.contains(TimeInstant.ZERO, h), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(4));
+		hashes.stream().forEach(h -> MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, h), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -184,9 +185,9 @@ public class DefaultSkipListMapTest {
 		original.putAll(map);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(6));
 		map.entrySet().forEach(e -> e.getValue().stream()
-				.forEach(h -> Assert.assertThat(original.contains(e.getKey(), h), IsEqual.equalTo(true))));
+				.forEach(h -> MatcherAssert.assertThat(original.contains(e.getKey(), h), IsEqual.equalTo(true))));
 	}
 
 	// endregion
@@ -209,8 +210,8 @@ public class DefaultSkipListMapTest {
 		map.remove(TimeInstant.ZERO, hashes.get(2));
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(1));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(map.contains(TimeInstant.ZERO, hashes.get(i)), IsEqual.equalTo(1 == i % 2)));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(1));
+		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, hashes.get(i)), IsEqual.equalTo(1 == i % 2)));
 	}
 
 	@Test
@@ -238,9 +239,9 @@ public class DefaultSkipListMapTest {
 		original.removeAll(map);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(original.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(1 == i % 2)));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(original.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(0 == i % 2)));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(3));
+		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(original.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(1 == i % 2)));
+		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(original.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(0 == i % 2)));
 	}
 
 	// endregion
@@ -271,8 +272,8 @@ public class DefaultSkipListMapTest {
 		final Collection<Hash> foundHashes2 = original.getValuesBefore(new TimeInstant(6));
 
 		// Assert:
-		Assert.assertThat(foundHashes1, IsEqual.equalTo(Collections.singletonList(hash)));
-		Assert.assertThat(foundHashes2, IsEquivalent.equivalentTo(hashes3));
+		MatcherAssert.assertThat(foundHashes1, IsEqual.equalTo(Collections.singletonList(hash)));
+		MatcherAssert.assertThat(foundHashes2, IsEquivalent.equivalentTo(hashes3));
 	}
 
 	// endregion
@@ -298,11 +299,11 @@ public class DefaultSkipListMapTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(entrySet.size(), IsEqual.equalTo(2));
-		Assert.assertThat(sortedEntries.get(0).getKey(), IsEqual.equalTo(TimeInstant.ZERO));
-		Assert.assertThat(sortedEntries.get(0).getValue(), IsEqual.equalTo(Collections.singleton(hash)));
-		Assert.assertThat(sortedEntries.get(1).getKey(), IsEqual.equalTo(new TimeInstant(1)));
-		Assert.assertThat(sortedEntries.get(1).getValue(), IsEquivalent.equivalentTo(hashes));
+		MatcherAssert.assertThat(entrySet.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sortedEntries.get(0).getKey(), IsEqual.equalTo(TimeInstant.ZERO));
+		MatcherAssert.assertThat(sortedEntries.get(0).getValue(), IsEqual.equalTo(Collections.singleton(hash)));
+		MatcherAssert.assertThat(sortedEntries.get(1).getKey(), IsEqual.equalTo(new TimeInstant(1)));
+		MatcherAssert.assertThat(sortedEntries.get(1).getValue(), IsEquivalent.equivalentTo(hashes));
 	}
 
 	//endregion

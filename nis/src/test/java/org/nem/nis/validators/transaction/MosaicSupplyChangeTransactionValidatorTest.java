@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -66,7 +67,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -95,7 +96,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
 	}
 
 	//endregion
@@ -114,7 +115,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
 	}
 
 	//endregion
@@ -133,7 +134,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
 	}
 
 	//endregion
@@ -163,7 +164,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE));
 	}
 
 	//endregion
@@ -182,7 +183,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED));
 	}
 
 	@Test
@@ -217,7 +218,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE));
 	}
 
 	//endregion
