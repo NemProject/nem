@@ -39,6 +39,7 @@ public class BlockValidatorFactory {
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());
 		builder.add(new VersionBlockValidator());
+		builder.add(new TreasuryReissuanceForkTransactionBlockValidator(this.forkConfiguration));
 		builder.add(this.createTransactionOnly());
 		return builder.build();
 	}
