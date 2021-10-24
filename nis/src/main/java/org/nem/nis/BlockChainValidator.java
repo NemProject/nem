@@ -75,12 +75,12 @@ public class BlockChainValidator {
 			final BlockProcessor processor = this.processorFactory.apply(block);
 			block.setPrevious(parentBlock);
 			if (!expectedHeight.equals(block.getHeight())) {
-				LOGGER.info("received block with unexpected height");
+				LOGGER.info(String.format("received block at %s with unexpected height (expected %s)", block.getHeight(), expectedHeight));
 				return ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT;
 			}
 
 			if (!block.verify()) {
-				LOGGER.info("received unverifiable block");
+				LOGGER.info(String.format("received unverifiable block at %s", block.getHeight()));
 				return ValidationResult.FAILURE_BLOCK_UNVERIFIABLE;
 			}
 
@@ -125,8 +125,11 @@ public class BlockChainValidator {
 		return ValidationResult.SUCCESS;
 	}
 
-	private static boolean verifyTransactions(final Collection<Block> blocks) {
-		return blocks.parallelStream().flatMap(b -> b.getTransactions().stream()).allMatch(VerifiableEntity::verify);
+	private boolean verifyTransactions(final Collection<Block> blocks) {
+		return blocks.parallelStream()
+				// TreasuryReissuanceForkTransactionBlockValidator ensures fork block contains expected transactions
+				.filter(b -> !b.getHeight().equals(this.forkConfiguration.getTreasuryReissuanceForkHeight()))
+				.flatMap(b -> b.getTransactions().stream()).allMatch(VerifiableEntity::verify);
 	}
 
 	private static List<Hash> getHashes(final Transaction transaction) {

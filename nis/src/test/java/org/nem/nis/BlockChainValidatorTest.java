@@ -236,11 +236,40 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 
+		// - repair the chain after changes to the middle block
+		blocks.set(2, new Block(Utils.generateRandomAccount(), middleBlock, TimeInstant.ZERO));
+		blocks.get(2).sign();
+
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
+	}
+
+	@Test
+	public void transactionsAtTreasuryReissuanceForkHeightDoNotNeedToVerify() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator(new ForkConfiguration(new BlockHeight(100), new ArrayList<Hash>()));
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 98);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidNonVerifiableTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// - repair the chain after changes to the middle block
+		blocks.set(2, new Block(Utils.generateRandomAccount(), middleBlock, TimeInstant.ZERO));
+		blocks.get(2).sign();
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -619,12 +648,20 @@ public class BlockChainValidatorTest {
 		}
 
 		public BlockChainValidator create() {
+			return create(new ForkConfiguration());
+		}
+
+		public BlockChainValidator create(final ForkConfiguration forkConfiguration) {
 			return new BlockChainValidator(this.processorFactory, this.scorer, this.maxChainSize, this.blockValidator,
-					this.transactionValidator, this.validationState, new ForkConfiguration());
+					this.transactionValidator, this.validationState, forkConfiguration);
 		}
 	}
 
 	private static BlockChainValidator createValidator() {
-		return new BlockChainValidatorFactory().create();
+		return createValidator(new ForkConfiguration());
+	}
+
+	private static BlockChainValidator createValidator(final ForkConfiguration forkConfiguration) {
+		return new BlockChainValidatorFactory().create(forkConfiguration);
 	}
 }
