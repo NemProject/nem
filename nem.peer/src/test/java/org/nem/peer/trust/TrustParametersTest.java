@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -14,8 +15,8 @@ public class TrustParametersTest {
 		params.set("s", "foobar");
 
 		// Assert:
-		Assert.assertThat(params.get("s"), IsEqual.equalTo("foobar"));
-		Assert.assertThat(params.get("s", "default"), IsEqual.equalTo("foobar"));
+		MatcherAssert.assertThat(params.get("s"), IsEqual.equalTo("foobar"));
+		MatcherAssert.assertThat(params.get("s", "default"), IsEqual.equalTo("foobar"));
 	}
 
 	@Test
@@ -27,8 +28,8 @@ public class TrustParametersTest {
 		params.set("i", "123");
 
 		// Assert:
-		Assert.assertThat(params.getAsInteger("i"), IsEqual.equalTo(123));
-		Assert.assertThat(params.getAsInteger("i", 7), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(params.getAsInteger("i"), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(params.getAsInteger("i", 7), IsEqual.equalTo(123));
 	}
 
 	@Test
@@ -40,8 +41,8 @@ public class TrustParametersTest {
 		params.set("d", "123.45");
 
 		// Assert:
-		Assert.assertThat(params.getAsDouble("d"), IsEqual.equalTo(123.45));
-		Assert.assertThat(params.getAsDouble("d", 3.14), IsEqual.equalTo(123.45));
+		MatcherAssert.assertThat(params.getAsDouble("d"), IsEqual.equalTo(123.45));
+		MatcherAssert.assertThat(params.getAsDouble("d", 3.14), IsEqual.equalTo(123.45));
 	}
 
 	@Test
@@ -50,7 +51,7 @@ public class TrustParametersTest {
 		final TrustParameters params = new TrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.get("s", "default"), IsEqual.equalTo("default"));
+		MatcherAssert.assertThat(params.get("s", "default"), IsEqual.equalTo("default"));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class TrustParametersTest {
 		final TrustParameters params = new TrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.getAsInteger("i", 7), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(params.getAsInteger("i", 7), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class TrustParametersTest {
 		final TrustParameters params = new TrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.getAsDouble("d", 3.14), IsEqual.equalTo(3.14));
+		MatcherAssert.assertThat(params.getAsDouble("d", 3.14), IsEqual.equalTo(3.14));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

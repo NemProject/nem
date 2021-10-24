@@ -1,5 +1,6 @@
 package org.nem.peer.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -21,7 +22,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest();
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -30,7 +31,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final TestContext context = new TestContext(10);
 
 		// Assert:
-		Assert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+		MatcherAssert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
 	}
 
 	// endregion
@@ -56,7 +57,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(transactions);
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
+		MatcherAssert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
 	}
 
 	private static MultisigTransaction createMultisigTransactionWithSignatures(final List<HashShortId> hashShortIds) {
@@ -99,7 +100,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+		MatcherAssert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
 	}
 
 	// endregion

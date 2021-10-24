@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -11,7 +12,7 @@ public class RealDoubleTest {
 		final RealDouble value = new RealDouble(1.2);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(1.2));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(1.2));
 	}
 
 	@Test
@@ -20,7 +21,7 @@ public class RealDoubleTest {
 		final RealDouble value = new RealDouble(Double.NaN);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class RealDoubleTest {
 		value.set(-3.4);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(-3.4));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(-3.4));
 	}
 
 	@Test
@@ -61,6 +62,6 @@ public class RealDoubleTest {
 		value.set(invalidValue);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(0.0));
 	}
 }

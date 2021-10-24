@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -160,7 +161,7 @@ public class NodeRefresherTest {
 
 		// Assert:
 		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
-		Assert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
+		MatcherAssert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -182,7 +183,7 @@ public class NodeRefresherTest {
 		final NodeMetaData metaData = updatedNode.getMetaData();
 
 		// Assert:
-		Assert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
+		MatcherAssert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -203,7 +204,7 @@ public class NodeRefresherTest {
 		final NodeIdentity identity = updatedNode.getIdentity();
 
 		// Assert:
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("b-new-name"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("b-new-name"));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -292,7 +293,7 @@ public class NodeRefresherTest {
 
 		// Assert:
 		// - since 'b' was communicated with directly, the evil peer cannot update the name
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("b"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("b"));
 	}
 
 	@Test
@@ -311,7 +312,7 @@ public class NodeRefresherTest {
 
 		// Assert:
 		// - since 'b' was not communicated with directly, the evil peer can provide the name
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("bad bob"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bad bob"));
 	}
 
 	//endregion
@@ -346,7 +347,7 @@ public class NodeRefresherTest {
 				context.nodes,
 				new String[] { "c", "d", "e", "f", "g" },
 				new String[] { "a", "b" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -379,7 +380,7 @@ public class NodeRefresherTest {
 				new String[] { "a", "b", "d" },
 				new String[] { "g" },
 				new String[] { "f" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -406,7 +407,7 @@ public class NodeRefresherTest {
 				context.nodes,
 				new String[] { "a", "c", "e" },
 				new String[] { "b" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -446,11 +447,11 @@ public class NodeRefresherTest {
 				context.nodes,
 				new String[] { "a", "b", "d" },
 				new String[] { "c" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 
 		// Assert: the endpoints of good nodes were not changed
 		for (final Node node : context.nodes.getAllNodes()) {
-			Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+			MatcherAssert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 		}
 	}
 
@@ -477,7 +478,7 @@ public class NodeRefresherTest {
 				context.nodes,
 				new String[] { "a", "b", "d" },
 				new String[] { "c" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -569,7 +570,7 @@ public class NodeRefresherTest {
 		final CompletableFuture future = context.refresher.refresh(context.refreshNodes);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
 	//endregion

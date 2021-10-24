@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -13,8 +14,8 @@ public class EigenTrustConvergencePolicyTest {
 		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(result, IsNull.nullValue());
-		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsNull.nullValue());
+		MatcherAssert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -27,8 +28,8 @@ public class EigenTrustConvergencePolicyTest {
 		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
-		Assert.assertThat(result.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(policy.hasConverged(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.1);
 		Assert.assertEquals(1.20, result.getAt(0) / result.getAt(1), 0.1);
 	}
@@ -43,8 +44,8 @@ public class EigenTrustConvergencePolicyTest {
 		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(1.405, result.getAt(0) / result.getAt(1), 0.001);
 	}
@@ -59,8 +60,8 @@ public class EigenTrustConvergencePolicyTest {
 		final ColumnVector result = policy.getResult();
 
 		// Assert:
-		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(result.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
 		Assert.assertEquals(0.967, result.getAt(0) / result.getAt(1), 0.001);
 	}

@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -17,8 +18,8 @@ public class AuthenticatedRequestTest {
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
-		Assert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
 	}
 
 	@Test
@@ -34,7 +35,7 @@ public class AuthenticatedRequestTest {
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
-		Assert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(request.getEntity(), IsEqual.equalTo(entity));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -26,7 +27,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsSame.sameInstance(node));
+		MatcherAssert.assertThat(selectedNode, IsSame.sameInstance(node));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("r")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("r")));
 	}
 
 	@Test
@@ -55,7 +56,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
 	}
 
 	//endregion
@@ -90,7 +91,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				selectedNodes,
 				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("p", "q", "r", "a", "c")));
 	}
@@ -109,7 +110,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				selectedNodes,
 				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a", "s-a")));
 	}
@@ -126,7 +127,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				selectedNodes,
 				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a")));
 	}
@@ -143,7 +144,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				selectedNodes,
 				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "q-a")));
 	}

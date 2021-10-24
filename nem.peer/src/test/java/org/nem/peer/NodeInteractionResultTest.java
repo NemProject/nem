@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.ValidationResult;
@@ -28,7 +29,7 @@ public class NodeInteractionResultTest {
 			final NodeInteractionResult expectedResult = expectedMappings.getOrDefault(
 					validationResult,
 					NodeInteractionResult.FAILURE);
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
 }

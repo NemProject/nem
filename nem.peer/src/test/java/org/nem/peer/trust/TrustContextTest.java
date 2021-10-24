@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.nem.core.node.Node;
@@ -28,10 +29,10 @@ public class TrustContextTest {
 				params);
 
 		// Assert:
-		Assert.assertThat(context.getNodes(), IsSame.sameInstance(nodes));
-		Assert.assertThat(context.getLocalNode(), IsSame.sameInstance(localNode));
-		Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(nodeExperiences));
-		Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
-		Assert.assertThat(context.getParams(), IsSame.sameInstance(params));
+		MatcherAssert.assertThat(context.getNodes(), IsSame.sameInstance(nodes));
+		MatcherAssert.assertThat(context.getLocalNode(), IsSame.sameInstance(localNode));
+		MatcherAssert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(nodeExperiences));
+		MatcherAssert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
+		MatcherAssert.assertThat(context.getParams(), IsSame.sameInstance(params));
 	}
 }

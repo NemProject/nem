@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -38,8 +39,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(1)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
 	@Test
@@ -67,8 +68,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(1)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
 	@Test
@@ -83,8 +84,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(1)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.101"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.101"));
 	}
 
 	//endregion
@@ -104,8 +105,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
 	}
 
 	@Test
@@ -121,8 +122,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.20"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.20"));
 	}
 
 	@Test
@@ -138,8 +139,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
 	//endregion
@@ -159,8 +160,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.30"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.30"));
 	}
 
 	@Test
@@ -180,8 +181,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(7)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
 	}
 
 	@Test
@@ -200,8 +201,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(6)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.10"));
 	}
 
 	@Test
@@ -217,8 +218,8 @@ public class LocalNodeEndpointUpdaterTest {
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
 	//endregion

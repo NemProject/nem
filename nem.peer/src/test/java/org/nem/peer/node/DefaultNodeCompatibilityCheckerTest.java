@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.*;
@@ -22,8 +23,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(ZERO_VERSION, crossNetworkMetaData);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(false));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -37,8 +38,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(crossNetworkMetaData, ZERO_VERSION);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(false));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -52,8 +53,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(DEFAULT_VERSION, crossNetworkMetaData);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(false));
-		Assert.assertThat(result2, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -70,8 +71,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(ZERO_VERSION, DEFAULT_VERSION);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -84,8 +85,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(DEFAULT_VERSION, ZERO_VERSION);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(true));
-		Assert.assertThat(result2, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -131,8 +132,8 @@ public class DefaultNodeCompatibilityCheckerTest {
 		final boolean result2 = checker.check(createMetaDataForNetwork(version2, 4), createMetaDataForNetwork(version1, 4));
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(expectedIsCompatible));
-		Assert.assertThat(result2, IsEqual.equalTo(expectedIsCompatible));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(expectedIsCompatible));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(expectedIsCompatible));
 	}
 
 	private static NodeMetaData createMetaDataForNetwork(final NodeVersion nodeVersion, final int networkId) {

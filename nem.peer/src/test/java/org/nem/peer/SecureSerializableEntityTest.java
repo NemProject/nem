@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -21,9 +22,9 @@ public class SecureSerializableEntityTest {
 		final SecureSerializableEntity<?> secureEntity = new SecureSerializableEntity<>(entity, identity);
 
 		// Assert:
-		Assert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
-		Assert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
+		MatcherAssert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
 	}
 
 	@Test
@@ -39,9 +40,9 @@ public class SecureSerializableEntityTest {
 		final SecureSerializableEntity<?> secureEntity = new SecureSerializableEntity<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
-		Assert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
+		MatcherAssert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
 	}
 
 	@Test(expected = ImpersonatingPeerException.class)

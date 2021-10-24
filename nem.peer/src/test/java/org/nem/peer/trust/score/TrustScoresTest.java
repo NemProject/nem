@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.node.Node;
@@ -19,7 +20,7 @@ public class TrustScoresTest {
 		final RealDouble weight = scores.getScoreWeight(node);
 
 		// Assert:
-		Assert.assertThat(weight.get(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(weight.get(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -33,6 +34,6 @@ public class TrustScoresTest {
 		final RealDouble weight2 = scores.getScoreWeight(node);
 
 		// Assert:
-		Assert.assertThat(weight2, IsSame.sameInstance(weight1));
+		MatcherAssert.assertThat(weight2, IsSame.sameInstance(weight1));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -38,7 +39,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		Assert.assertThat(state.getConfiguration(), IsSame.sameInstance(config));
+		MatcherAssert.assertThat(state.getConfiguration(), IsSame.sameInstance(config));
 	}
 
 	@Test
@@ -48,7 +49,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), nodes);
 
 		// Assert:
-		Assert.assertThat(state.getNodes(), IsSame.sameInstance(nodes));
+		MatcherAssert.assertThat(state.getNodes(), IsSame.sameInstance(nodes));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		Assert.assertThat(state.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
+		MatcherAssert.assertThat(state.getLocalNode(), IsEqual.equalTo(config.getLocalNode()));
 	}
 
 	@Test
@@ -92,11 +93,11 @@ public class PeerNetworkStateTest {
 				NodeUtils.createNodeWithName("b1"),
 				NodeUtils.createNodeWithName("l"),
 		};
-		Assert.assertThat(context.getNodes(), IsEqual.equalTo(expectedNodes));
-		Assert.assertThat(context.getLocalNode(), IsSame.sameInstance(state.getLocalNode()));
-		Assert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(experiences));
-		Assert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
-		Assert.assertThat(context.getParams(), IsSame.sameInstance(params));
+		MatcherAssert.assertThat(context.getNodes(), IsEqual.equalTo(expectedNodes));
+		MatcherAssert.assertThat(context.getLocalNode(), IsSame.sameInstance(state.getLocalNode()));
+		MatcherAssert.assertThat(context.getNodeExperiences(), IsSame.sameInstance(experiences));
+		MatcherAssert.assertThat(context.getPreTrustedNodes(), IsSame.sameInstance(preTrustedNodes));
+		MatcherAssert.assertThat(context.getParams(), IsSame.sameInstance(params));
 	}
 
 	@Test
@@ -106,7 +107,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -122,7 +123,7 @@ public class PeerNetworkStateTest {
 		state.setChainSynchronized(false);
 
 		// Assert:
-		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -139,7 +140,7 @@ public class PeerNetworkStateTest {
 		state.setChainSynchronized(false);
 
 		// Assert:
-		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -152,9 +153,9 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience = updateExperienceThrice("p", NodeInteractionResult.SUCCESS);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(3L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
 	}
 
 	@Test
@@ -163,9 +164,9 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience = updateExperienceThrice("p", NodeInteractionResult.FAILURE);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(3L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
 	}
 
 	@Test
@@ -174,9 +175,9 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience = updateExperienceThrice("p", NodeInteractionResult.NEUTRAL);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -185,9 +186,9 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience = updateExperienceThrice("z", NodeInteractionResult.SUCCESS);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(3L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(3L));
 	}
 
 	@Test
@@ -196,9 +197,9 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience = updateExperienceThrice("l", NodeInteractionResult.SUCCESS);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
 	}
 
 	private static NodeExperience updateExperienceThrice(final String name, final NodeInteractionResult result) {
@@ -230,7 +231,7 @@ public class PeerNetworkStateTest {
 		final NodeExperiencesPair pair = state.getLocalNodeAndExperiences();
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsSame.sameInstance(state.getLocalNode()));
+		MatcherAssert.assertThat(pair.getNode(), IsSame.sameInstance(state.getLocalNode()));
 	}
 
 	@Test
@@ -258,10 +259,10 @@ public class PeerNetworkStateTest {
 		}
 
 		// Assert:
-		Assert.assertThat(pair1.getNode(), IsEqual.equalTo(otherNode1));
-		Assert.assertThat(pair1.getExperience().successfulCalls().get(), IsEqual.equalTo(14L));
-		Assert.assertThat(pair2.getNode(), IsEqual.equalTo(otherNode2));
-		Assert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
+		MatcherAssert.assertThat(pair1.getNode(), IsEqual.equalTo(otherNode1));
+		MatcherAssert.assertThat(pair1.getExperience().successfulCalls().get(), IsEqual.equalTo(14L));
+		MatcherAssert.assertThat(pair2.getNode(), IsEqual.equalTo(otherNode2));
+		MatcherAssert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -298,10 +299,10 @@ public class PeerNetworkStateTest {
 		final NodeExperience experience2 = experiences.getNodeExperience(remoteNode, otherNode2);
 
 		// Assert:
-		Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
-		Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
-		Assert.assertThat(experience1.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(experience2.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
+		MatcherAssert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
+		MatcherAssert.assertThat(experience1.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(experience2.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	//endregion
@@ -334,7 +335,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(0)));
+		MatcherAssert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(0)));
 	}
 
 	//endregion
@@ -352,7 +353,7 @@ public class PeerNetworkStateTest {
 		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
 
 		// Assert:
-		Assert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(3)));
+		MatcherAssert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(3)));
 	}
 
 	@Test
@@ -366,7 +367,7 @@ public class PeerNetworkStateTest {
 		state.updateTimeSynchronizationResults(new TimeSynchronizationResult(new TimeInstant(25), new TimeOffset(30), new TimeOffset(40)));
 
 		// Assert:
-		Assert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
 	}
 
 	//endregion

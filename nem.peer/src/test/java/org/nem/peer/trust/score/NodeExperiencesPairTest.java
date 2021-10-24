@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -20,8 +21,8 @@ public class NodeExperiencesPairTest {
 		final NodeExperiencesPair pair = new NodeExperiencesPair(node, experiences);
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsSame.sameInstance(node));
-		Assert.assertThat(pair.getExperiences(), IsSame.sameInstance(experiences));
+		MatcherAssert.assertThat(pair.getNode(), IsSame.sameInstance(node));
+		MatcherAssert.assertThat(pair.getExperiences(), IsSame.sameInstance(experiences));
 	}
 
 	@Test
@@ -38,7 +39,7 @@ public class NodeExperiencesPairTest {
 		final NodeExperiencesPair pair = new NodeExperiencesPair(org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsEqual.equalTo(node));
-		Assert.assertThat(pair.getExperiences().size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(pair.getNode(), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(pair.getExperiences().size(), IsEqual.equalTo(2));
 	}
 }

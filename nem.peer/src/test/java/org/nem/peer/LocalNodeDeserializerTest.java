@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -24,10 +25,10 @@ public class LocalNodeDeserializerTest {
 		final Node node = new LocalNodeDeserializer().deserialize(builder.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
-		Assert.assertThat(node.getIdentity().getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-		Assert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("trudy"));
-		Assert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(node.getIdentity().getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("trudy"));
+		MatcherAssert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -44,7 +45,7 @@ public class LocalNodeDeserializerTest {
 		final Node node = new LocalNodeDeserializer().deserialize(builder.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
+		MatcherAssert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
 	}
 
 	@Test
@@ -70,7 +71,7 @@ public class LocalNodeDeserializerTest {
 		final Node node = new LocalNodeDeserializer().deserialize(builder.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, application)));
+		MatcherAssert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, application)));
 	}
 
 	private static class TestDeserializerBuilder {

@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -44,7 +45,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.only()).getLocalNode();
-		Assert.assertThat(networkLocalNode, IsSame.sameInstance(localNode));
+		MatcherAssert.assertThat(networkLocalNode, IsSame.sameInstance(localNode));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.only()).getNodes();
-		Assert.assertThat(networkNodes, IsSame.sameInstance(nodes));
+		MatcherAssert.assertThat(networkNodes, IsSame.sameInstance(nodes));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.updateSelector, Mockito.only()).selectNodes();
-		Assert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
+		MatcherAssert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.only()).getLocalNodeAndExperiences();
-		Assert.assertThat(networkPair, IsSame.sameInstance(pair));
+		MatcherAssert.assertThat(networkPair, IsSame.sameInstance(pair));
 	}
 
 	@Test
@@ -171,7 +172,7 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.selectorFactory, Mockito.times(2)).createUpdateNodeSelector(); // called once in construction and once in refresh
 		Mockito.verify(updateSelector, Mockito.only()).selectNodes(); // called in getPartnerNodes
-		Assert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
+		MatcherAssert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
 
 	@Test

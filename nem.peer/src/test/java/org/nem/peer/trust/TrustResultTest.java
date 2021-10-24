@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,8 +22,8 @@ public class TrustResultTest {
 		final TrustResult result = new TrustResult(trustContext, trustValues);
 
 		// Assert:
-		Assert.assertThat(result.getTrustValues(), IsEqual.equalTo(trustValues));
-		Assert.assertThat(result.getTrustContext(), IsEqual.equalTo(trustContext));
+		MatcherAssert.assertThat(result.getTrustValues(), IsEqual.equalTo(trustValues));
+		MatcherAssert.assertThat(result.getTrustContext(), IsEqual.equalTo(trustContext));
 	}
 
 	@Test

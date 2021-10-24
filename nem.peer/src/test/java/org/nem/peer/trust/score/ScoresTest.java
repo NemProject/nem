@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -20,7 +21,7 @@ public class ScoresTest {
 		final MockScore score = context.scores.getScore(context.nodes[0], context.nodes[1]);
 
 		// Assert:
-		Assert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
+		MatcherAssert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
 	}
 
 	@Test
@@ -33,7 +34,7 @@ public class ScoresTest {
 		final MockScore score2 = context.scores.getScore(context.nodes[0], context.nodes[1]);
 
 		// Assert:
-		Assert.assertThat(score2, IsSame.sameInstance(score1));
+		MatcherAssert.assertThat(score2, IsSame.sameInstance(score1));
 	}
 
 	@Test
@@ -46,7 +47,7 @@ public class ScoresTest {
 		final MockScore score2 = context.scores.getScore(context.nodes[1], context.nodes[0]);
 
 		// Assert:
-		Assert.assertThat(score2, IsNot.not(IsSame.sameInstance(score1)));
+		MatcherAssert.assertThat(score2, IsNot.not(IsSame.sameInstance(score1)));
 	}
 
 	//endregion
@@ -65,10 +66,10 @@ public class ScoresTest {
 		final ColumnVector vector = context.scores.getScoreVector(context.nodes[0], context.nodes);
 
 		// Assert:
-		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(MockScore.INITIAL_SCORE));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(2.0));
+		MatcherAssert.assertThat(vector.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(vector.getAt(0), IsEqual.equalTo(MockScore.INITIAL_SCORE));
+		MatcherAssert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
+		MatcherAssert.assertThat(vector.getAt(2), IsEqual.equalTo(2.0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -108,10 +109,10 @@ public class ScoresTest {
 		final ColumnVector vector = context.scores.getScoreVector(context.nodes[1], context.nodes);
 
 		// Assert:
-		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(3.0));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
+		MatcherAssert.assertThat(vector.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(vector.getAt(0), IsEqual.equalTo(3.0));
+		MatcherAssert.assertThat(vector.getAt(1), IsEqual.equalTo(7.0));
+		MatcherAssert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
 	}
 
 	//endregion
@@ -134,17 +135,17 @@ public class ScoresTest {
 		final Matrix matrix = context.scores.getScoreMatrix(context.nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0));
-		Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
 	}
 
 	//endregion
@@ -168,17 +169,17 @@ public class ScoresTest {
 		final Matrix matrix = context.scores.getScoreMatrix(context.nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0 / 9));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0 / 17));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0 / 9));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0 / 17));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0 / 9));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0 / 9));
-		Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(5.0 / 9));
+		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(11.0 / 17));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(7.0 / 9));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(6.0 / 17));
+		MatcherAssert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(2.0 / 9));
+		MatcherAssert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(4.0 / 9));
+		MatcherAssert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
 	}
 
 	//endregion

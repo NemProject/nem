@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -32,7 +33,7 @@ public class NodeSynchronizerTest {
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class NodeSynchronizerTest {
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.blockSynchronizer, Mockito.times(1)).synchronizeNode(context.syncConnectorPool, remoteNode);
 	}
 
@@ -68,7 +69,7 @@ public class NodeSynchronizerTest {
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.state, Mockito.times(1)).updateExperience(remoteNode, interactionResult);
 	}
 

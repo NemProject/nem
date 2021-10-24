@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -14,7 +15,7 @@ public class NodeChallengeFactoryTest {
 		final NodeChallenge challenge = factory.next();
 
 		// Assert:
-		Assert.assertThat(challenge.getRaw().length, IsEqual.equalTo(64));
+		MatcherAssert.assertThat(challenge.getRaw().length, IsEqual.equalTo(64));
 	}
 
 	@Test
@@ -27,6 +28,6 @@ public class NodeChallengeFactoryTest {
 		final NodeChallenge challenge2 = factory.next();
 
 		// Assert:
-		Assert.assertThat(challenge2, IsNot.not(IsEqual.equalTo(challenge1)));
+		MatcherAssert.assertThat(challenge2, IsNot.not(IsEqual.equalTo(challenge1)));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -20,8 +21,8 @@ public class AuthenticatedResponseTest {
 		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity, challenge);
 
 		// Assert:
-		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
-		Assert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
+		MatcherAssert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class AuthenticatedResponseTest {
 		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
-		Assert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(response.getSignature(), IsEqual.equalTo(identity.sign(challenge.getRaw())));
+		MatcherAssert.assertThat(response.getEntity(identity, challenge), IsEqual.equalTo(entity));
 	}
 
 	@Test(expected = ImpersonatingPeerException.class)
@@ -54,6 +55,6 @@ public class AuthenticatedResponseTest {
 		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(entity, identity1, challenge);
 
 		// Assert:
-		Assert.assertThat(response.getEntity(identity2, challenge), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(response.getEntity(identity2, challenge), IsEqual.equalTo(entity));
 	}
 }

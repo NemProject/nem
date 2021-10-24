@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -18,7 +19,7 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = new NodeChallenge(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(challenge.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		MatcherAssert.assertThat(challenge.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
 	//endregion
@@ -31,7 +32,7 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = createRoundTrippedChallenge(new NodeChallenge(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(challenge, IsEqual.equalTo(new NodeChallenge(TEST_BYTES)));
+		MatcherAssert.assertThat(challenge, IsEqual.equalTo(new NodeChallenge(TEST_BYTES)));
 	}
 
 	private static NodeChallenge createRoundTrippedChallenge(final NodeChallenge originalChallenge) {
@@ -50,10 +51,10 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = new NodeChallenge(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES), IsEqual.equalTo(challenge));
-		Assert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(challenge)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(challenge)));
-		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)challenge)));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(challenge)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(challenge)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)challenge)));
 	}
 
 	@Test
@@ -63,8 +64,8 @@ public class NodeChallengeTest {
 		final int hashCode = challenge.hashCode();
 
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -74,7 +75,7 @@ public class NodeChallengeTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion

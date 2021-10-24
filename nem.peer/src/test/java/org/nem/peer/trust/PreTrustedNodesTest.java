@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
@@ -18,7 +19,7 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class PreTrustedNodesTest {
 				NodeUtils.createNodeWithName("e"),
 				NodeUtils.createNodeWithName("m")
 		};
-		Assert.assertThat(preTrustedNodes.getNodes(), IsEquivalent.equivalentTo(expectedPreTrustedNodes));
+		MatcherAssert.assertThat(preTrustedNodes.getNodes(), IsEquivalent.equivalentTo(expectedPreTrustedNodes));
 	}
 
 	@Test
@@ -41,9 +42,9 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("n")), IsEqual.equalTo(true));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("e")), IsEqual.equalTo(true));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("m")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("n")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("e")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("m")), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -52,9 +53,9 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("a")), IsEqual.equalTo(false));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("p")), IsEqual.equalTo(false));
-		Assert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("z")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("a")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("p")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("z")), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -76,11 +77,11 @@ public class PreTrustedNodesTest {
 		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert:
-		Assert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
-		Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.25));
-		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.25));
-		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.25));
-		Assert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.25));
+		MatcherAssert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.25));
+		MatcherAssert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.25));
+		MatcherAssert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.25));
+		MatcherAssert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.25));
 	}
 
 	@Test
@@ -98,11 +99,11 @@ public class PreTrustedNodesTest {
 		final ColumnVector preTrustVector = preTrustedNodes.getPreTrustVector(nodes);
 
 		// Assert: (the vector should be normalized)
-		Assert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
-		Assert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.00));
-		Assert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.50));
-		Assert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.50));
-		Assert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.00));
+		MatcherAssert.assertThat(preTrustVector.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(preTrustVector.getAt(0), IsEqual.equalTo(0.00));
+		MatcherAssert.assertThat(preTrustVector.getAt(1), IsEqual.equalTo(0.50));
+		MatcherAssert.assertThat(preTrustVector.getAt(2), IsEqual.equalTo(0.50));
+		MatcherAssert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.00));
 	}
 
 	//endregion

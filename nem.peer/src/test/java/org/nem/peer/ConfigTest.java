@@ -1,6 +1,7 @@
 package org.nem.peer;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.*;
@@ -20,7 +21,7 @@ public class ConfigTest {
 		final Config config = createTestConfig();
 
 		// Assert:
-		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("Default Network"));
+		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("Default Network"));
 	}
 
 	@Test
@@ -68,14 +69,14 @@ public class ConfigTest {
 
 	private static void assertLocalNodeProperties(final Node node, final String expectedPlatform, final String expectedApplication) {
 		final NodeMetaData metaData = node.getMetaData();
-		Assert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("local larry"));
-		Assert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
-		Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo(DEFAULT_LOCAL_NODE_HOST));
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 0, 0)));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo(expectedApplication));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("local larry"));
+		MatcherAssert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo(DEFAULT_LOCAL_NODE_HOST));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 0, 0)));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo(expectedApplication));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(6));
 	}
 
 	@Test
@@ -93,9 +94,9 @@ public class ConfigTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
-		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(3));
-		Assert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
+		MatcherAssert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
 	}
 
 	@Test
@@ -131,7 +132,7 @@ public class ConfigTest {
 		final Config config = createConfig(localNode, peersConfig, "2.0.0-DEVELOPER BUILD");
 
 		// Assert:
-		Assert.assertThat(config.getPreTrustedNodes().getSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(config.getPreTrustedNodes().getSize(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -149,9 +150,9 @@ public class ConfigTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(1));
-		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(1));
-		Assert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
+		MatcherAssert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
 	}
 
 	@Test
@@ -163,9 +164,9 @@ public class ConfigTest {
 		final TrustParameters params = config.getTrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(20));
-		Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.1));
-		Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.01));
+		MatcherAssert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(20));
+		MatcherAssert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.1));
+		MatcherAssert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.01));
 	}
 
 	//region Factories

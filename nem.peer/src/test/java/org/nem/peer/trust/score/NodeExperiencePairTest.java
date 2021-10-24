@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -20,8 +21,8 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = new NodeExperiencePair(node, experience);
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsSame.sameInstance(node));
-		Assert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
+		MatcherAssert.assertThat(pair.getNode(), IsSame.sameInstance(node));
+		MatcherAssert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
 	}
 
 	@Test
@@ -37,8 +38,8 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = new NodeExperiencePair(org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsEqual.equalTo(node));
-		Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
+		MatcherAssert.assertThat(pair.getNode(), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
 	}
 
 	//endregion
@@ -51,12 +52,12 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1);
 
 		// Assert:
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1), IsEqual.equalTo(pair));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1), IsEqual.equalTo(pair));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)pair)));
 	}
 
 	@Test
@@ -66,10 +67,10 @@ public class NodeExperiencePairTest {
 		final int hashCode = pair.hashCode();
 
 		// Assert:
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -82,7 +83,7 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				pair.toString(),
 				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) 10.0.0.1] @ [10.0.0.1]]"));
 	}

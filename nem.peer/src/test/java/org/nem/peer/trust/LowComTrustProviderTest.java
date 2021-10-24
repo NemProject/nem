@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
@@ -14,7 +15,7 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(0, 0, 0);
 
 		// Assert:
-		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
+		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	@Test
@@ -29,7 +30,7 @@ public class LowComTrustProviderTest {
 				0.2 / 1.4,
 				0.4 / 1.4, // this node should be boosted by 0.4/2
 				0.2 / 1.4);
-		Assert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
+		MatcherAssert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 
 	@Test
@@ -44,7 +45,7 @@ public class LowComTrustProviderTest {
 				0.2 / 1.1,
 				0.2 / 1.1,
 				0.2 / 1.1);
-		Assert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
+		MatcherAssert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(10, 100, 10);
 
 		// Assert:
-		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
+		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	@Test
@@ -62,7 +63,7 @@ public class LowComTrustProviderTest {
 		final ColumnVector vector = getAdjustedTrustVector(11, 100, 10);
 
 		// Assert:
-		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
+		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
 	@Test
@@ -81,8 +82,8 @@ public class LowComTrustProviderTest {
 		final TrustResult result = provider.computeTrust(context);
 
 		// Assert:
-		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
-		Assert.assertThat(result.getTrustContext(), IsSame.sameInstance(innerContext));
+		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
+		MatcherAssert.assertThat(result.getTrustContext(), IsSame.sameInstance(innerContext));
 	}
 
 	private static ColumnVector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {

@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ public class NodeExperiencesUpdaterTest {
 		final boolean result = context.updater.update(context.selector).join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class NodeExperiencesUpdaterTest {
 		final CompletableFuture<Boolean> future = context.updater.update(context.selector);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class NodeExperiencesUpdaterTest {
 		final boolean result = context.updater.update(context.selector).join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	private NodeExperiencesPair createPairWithTooManyExperiences() {

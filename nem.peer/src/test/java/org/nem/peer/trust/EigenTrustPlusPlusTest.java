@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -18,10 +19,10 @@ public class EigenTrustPlusPlusTest {
 		final ScoreProviderTestContext context = new ScoreProviderTestContext(provider);
 
 		// Assert:
-		Assert.assertThat(context.calculateTrustScore(1000, 1), IsEqual.equalTo(1000.0));
-		Assert.assertThat(context.calculateTrustScore(1, 1000), IsEqual.equalTo(1.0));
-		Assert.assertThat(context.calculateTrustScore(1000, 980), IsEqual.equalTo(1000.0));
-		Assert.assertThat(context.calculateTrustScore(21, 1), IsEqual.equalTo(21.0));
+		MatcherAssert.assertThat(context.calculateTrustScore(1000, 1), IsEqual.equalTo(1000.0));
+		MatcherAssert.assertThat(context.calculateTrustScore(1, 1000), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(context.calculateTrustScore(1000, 980), IsEqual.equalTo(1000.0));
+		MatcherAssert.assertThat(context.calculateTrustScore(21, 1), IsEqual.equalTo(21.0));
 	}
 
 	@Test
@@ -33,10 +34,10 @@ public class EigenTrustPlusPlusTest {
 		final ScoreProviderTestContext context = new ScoreProviderTestContext(provider, scores);
 
 		// Assert:
-		Assert.assertThat(context.calculateCredibilityScore(1, 2, 4, 5), IsEqual.equalTo(-18.0));
-		Assert.assertThat(context.calculateCredibilityScore(4, 5, 2, 1), IsEqual.equalTo(18.0));
-		Assert.assertThat(context.calculateCredibilityScore(1, 1, 1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(context.calculateCredibilityScore(1, 2, 1, 1), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(context.calculateCredibilityScore(1, 2, 4, 5), IsEqual.equalTo(-18.0));
+		MatcherAssert.assertThat(context.calculateCredibilityScore(4, 5, 2, 1), IsEqual.equalTo(18.0));
+		MatcherAssert.assertThat(context.calculateCredibilityScore(1, 1, 1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(context.calculateCredibilityScore(1, 2, 1, 1), IsEqual.equalTo(1.0));
 	}
 
 	//endregion
@@ -55,8 +56,8 @@ public class EigenTrustPlusPlusTest {
 		final ColumnVector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
-		Assert.assertThat(vector.getAt(1), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(vector.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(vector.getAt(1), IsEqual.equalTo(1.0));
 	}
 
 	@Test
@@ -71,9 +72,9 @@ public class EigenTrustPlusPlusTest {
 		final ColumnVector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(vector.size(), IsEqual.equalTo(3));
-		Assert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
-		Assert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(vector.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(vector.getAt(0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(vector.getAt(2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class EigenTrustPlusPlusTest {
 		final ColumnVector vector = trust.getCredibilityScores().getScoreVector(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(vector.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(vector.size(), IsEqual.equalTo(4));
 		Assert.assertEquals(21002.73, vector.getAt(3), 0.1);
 	}
 
@@ -120,11 +121,11 @@ public class EigenTrustPlusPlusTest {
 		final Matrix matrix = trust.getTrustMatrix(nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(5));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(5));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.8));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(0.2));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.8));
+		MatcherAssert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(0.2));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
 	}
 
 	//endregion
