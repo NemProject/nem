@@ -1,6 +1,7 @@
 package org.nem.core.model.ncc;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.Supply;
@@ -19,8 +20,8 @@ public class MosaicDefinitionSupplyPairTest {
 		final MosaicDefinitionSupplyPair pair = new MosaicDefinitionSupplyPair(Utils.createMosaicDefinition(5), Supply.fromValue(12345));
 
 		// Assert:
-		Assert.assertThat(pair.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(5)));
-		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
+		MatcherAssert.assertThat(pair.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(5)));
+		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
 	}
 
 	@Test
@@ -45,9 +46,9 @@ public class MosaicDefinitionSupplyPairTest {
 		// Assert:
 		final JSONObject mosaicDefinitionJsonObject = (JSONObject)jsonObject.get("mosaicDefinition");
 		final JSONObject mosaicIdJsonObject = (JSONObject)mosaicDefinitionJsonObject.get("id");
-		Assert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
-		Assert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
-		Assert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
+		MatcherAssert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
+		MatcherAssert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
+		MatcherAssert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class MosaicDefinitionSupplyPairTest {
 		final MosaicDefinitionSupplyPair pair = new MosaicDefinitionSupplyPair(deserializer);
 
 		// Assert:
-		Assert.assertThat(pair.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(5)));
-		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
+		MatcherAssert.assertThat(pair.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(5)));
+		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
 	}
 
 	@Test
@@ -102,13 +103,13 @@ public class MosaicDefinitionSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinitionSupplyPair> entry : createMosaicDefinitionSupplyPairsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
 	}
 
 	@Test
@@ -118,7 +119,7 @@ public class MosaicDefinitionSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinitionSupplyPair> entry : createMosaicDefinitionSupplyPairsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

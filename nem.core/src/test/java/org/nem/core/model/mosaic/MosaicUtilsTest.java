@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -68,7 +69,7 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
+			MatcherAssert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
 		}
 	}
 
@@ -80,7 +81,7 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.tryAdd(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsNull.nullValue());
+			MatcherAssert.assertThat(sum, IsNull.nullValue());
 		}
 
 		@Override
@@ -89,7 +90,7 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.tryAdd(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
+			MatcherAssert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
 		}
 	}
 
@@ -127,7 +128,7 @@ public class MosaicUtilsTest {
 			final Supply supply = MosaicUtils.toSupply(quantity, divisibility);
 
 			// Assert:
-			Assert.assertThat(supply, IsEqual.equalTo(expectedSupply));
+			MatcherAssert.assertThat(supply, IsEqual.equalTo(expectedSupply));
 		}
 
 		//endregion
@@ -153,7 +154,7 @@ public class MosaicUtilsTest {
 			final Quantity quantity = MosaicUtils.toQuantity(supply, divisibility);
 
 			// Assert:
-			Assert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
+			MatcherAssert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
 		}
 
 		//endregion

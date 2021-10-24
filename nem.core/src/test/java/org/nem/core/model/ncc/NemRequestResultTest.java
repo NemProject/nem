@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.ValidationResult;
@@ -14,9 +15,9 @@ public class NemRequestResultTest {
 		final NemRequestResult result = new NemRequestResult(42, 1337, "Neutral result");
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(42));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(1337));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("Neutral result"));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(42));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(1337));
+		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("Neutral result"));
 	}
 
 	@Test
@@ -25,9 +26,9 @@ public class NemRequestResultTest {
 		final NemRequestResult result = new NemRequestResult(ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID.getValue()));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("FAILURE_CHAIN_INVALID"));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID.getValue()));
+		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("FAILURE_CHAIN_INVALID"));
 	}
 
 	@Test
@@ -43,8 +44,8 @@ public class NemRequestResultTest {
 				"Neutral result");
 
 		// Assert:
-		Assert.assertThat(result.isError(), IsEqual.equalTo(false));
-		Assert.assertThat(result2.isError(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.isError(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result2.isError(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class NemRequestResultTest {
 				"Neutral result");
 
 		// Assert:
-		Assert.assertThat(result.isError(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.isError(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -68,8 +69,8 @@ public class NemRequestResultTest {
 		final NemRequestResult result = new NemRequestResult(deserializer);
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(42));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(1337));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("Neutral result"));
+		MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(42));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(1337));
+		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("Neutral result"));
 	}
 }

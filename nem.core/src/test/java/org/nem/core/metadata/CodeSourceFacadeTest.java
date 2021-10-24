@@ -1,5 +1,6 @@
 package org.nem.core.metadata;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -17,8 +18,8 @@ public class CodeSourceFacadeTest {
 		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, (Certificate[])null));
 
 		// Assert:
-		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
-		Assert.assertThat(facade.getFirstCertificate(), IsNull.nullValue());
+		MatcherAssert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
+		MatcherAssert.assertThat(facade.getFirstCertificate(), IsNull.nullValue());
 	}
 
 	@Test
@@ -28,8 +29,8 @@ public class CodeSourceFacadeTest {
 		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, new Certificate[] {}));
 
 		// Assert:
-		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
-		Assert.assertThat(facade.getFirstCertificate(), IsNull.nullValue());
+		MatcherAssert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
+		MatcherAssert.assertThat(facade.getFirstCertificate(), IsNull.nullValue());
 	}
 
 	@Test
@@ -40,8 +41,8 @@ public class CodeSourceFacadeTest {
 		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, new Certificate[] { c1 }));
 
 		// Assert:
-		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
-		Assert.assertThat(facade.getFirstCertificate(), IsSame.sameInstance(c1));
+		MatcherAssert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
+		MatcherAssert.assertThat(facade.getFirstCertificate(), IsSame.sameInstance(c1));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class CodeSourceFacadeTest {
 		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, new Certificate[] { c1, c2, c3 }));
 
 		// Assert:
-		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
-		Assert.assertThat(facade.getFirstCertificate(), IsSame.sameInstance(c1));
+		MatcherAssert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
+		MatcherAssert.assertThat(facade.getFirstCertificate(), IsSame.sameInstance(c1));
 	}
 }

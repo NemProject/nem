@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -36,11 +37,11 @@ public class ImportanceTransferTransactionTest {
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Assert:
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		MatcherAssert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -120,13 +121,13 @@ public class ImportanceTransferTransactionTest {
 		// Act:
 		final ImportanceTransferTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(EXPECTED_FEE));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		MatcherAssert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(EXPECTED_FEE));
 	}
 
 	private ImportanceTransferTransaction createRoundTrippedTransaction(
@@ -154,7 +155,7 @@ public class ImportanceTransferTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, remote));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, remote));
 	}
 
 	//endregion

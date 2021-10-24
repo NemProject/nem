@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -17,8 +18,8 @@ public class AccountStatusTest {
 		final AccountStatus statusLocked = AccountStatus.fromString("LOCKED");
 
 		// Assert:
-		Assert.assertThat(statusUnlocked, IsEqual.equalTo(AccountStatus.UNLOCKED));
-		Assert.assertThat(statusLocked, IsEqual.equalTo(AccountStatus.LOCKED));
+		MatcherAssert.assertThat(statusUnlocked, IsEqual.equalTo(AccountStatus.UNLOCKED));
+		MatcherAssert.assertThat(statusLocked, IsEqual.equalTo(AccountStatus.LOCKED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -42,8 +43,8 @@ public class AccountStatusTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("status"), IsEqual.equalTo("UNLOCKED"));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("status"), IsEqual.equalTo("UNLOCKED"));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class AccountStatusTest {
 		final AccountStatus status = AccountStatus.readFrom(deserializer, "status");
 
 		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(originalStatus));
+		MatcherAssert.assertThat(status, IsEqual.equalTo(originalStatus));
 	}
 
 	//endregion

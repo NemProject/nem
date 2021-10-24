@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.NemProperty;
@@ -53,17 +54,17 @@ public class DefaultMosaicPropertiesTest {
 	}
 
 	private static void assertDefaultProperties(final MosaicProperties properties) {
-		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(0));
-		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(1_000L));
-		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
-		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(properties.getDivisibility(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(1_000L));
+		MatcherAssert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 	}
 
 	private static void assertCustomProperties(final MosaicProperties properties) {
-		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(2));
-		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(123456L));
-		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(properties.getDivisibility(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(123456L));
+		MatcherAssert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(properties.isTransferable(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -78,7 +79,7 @@ public class DefaultMosaicPropertiesTest {
 			final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 
 			// Assert:
-			Assert.assertThat(mosaicProperties.getInitialSupply(), IsEqual.equalTo(quantity));
+			MatcherAssert.assertThat(mosaicProperties.getInitialSupply(), IsEqual.equalTo(quantity));
 		}
 	}
 
@@ -153,7 +154,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "1000"),
 				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
-		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
+		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
 	@Test
@@ -171,7 +172,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "123456"),
 				new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"));
-		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
+		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
 	@Test
@@ -191,7 +192,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "1000"),
 				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
-		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
+		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
 	//endregion
@@ -225,13 +226,13 @@ public class DefaultMosaicPropertiesTest {
 
 		// Assert:
 		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(properties)) : IsEqual.equalTo(properties));
 		}
 
-		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo("foo")));
-		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo(null)));
+		MatcherAssert.assertThat(properties, IsNot.not(IsEqual.equalTo("foo")));
+		MatcherAssert.assertThat(properties, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
@@ -242,7 +243,7 @@ public class DefaultMosaicPropertiesTest {
 
 		// Assert:
 		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -29,12 +30,12 @@ public class MultisigSignatureTransactionTest {
 				hash);
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
-		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
@@ -51,12 +52,12 @@ public class MultisigSignatureTransactionTest {
 
 		// Assert:
 		final Hash hash = HashUtils.calculateHash(otherTransaction);
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
-		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
@@ -75,12 +76,12 @@ public class MultisigSignatureTransactionTest {
 		final MultisigSignatureTransaction transaction = createRoundTrippedTransaction(originalTransaction);
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
-		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	private static MultisigSignatureTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
@@ -108,7 +109,7 @@ public class MultisigSignatureTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
 	}
 
 	//endregion

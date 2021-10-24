@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -14,7 +15,7 @@ public class NamedObserverTest {
 		final String name = observer.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("CrazyNameObserver"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("CrazyNameObserver"));
 	}
 
 	private static class CrazyNameObserver implements NamedObserver {

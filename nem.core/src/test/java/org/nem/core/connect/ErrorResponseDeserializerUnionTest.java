@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -17,14 +18,14 @@ public class ErrorResponseDeserializerUnionTest {
 				null);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(true));
-		Assert.assertThat(union.hasError(), IsEqual.equalTo(true));
-		Assert.assertThat(500, IsEqual.equalTo(union.getStatus()));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(union.hasError(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(500, IsEqual.equalTo(union.getStatus()));
 		ExceptionAssert.assertThrows(v -> union.getDeserializer(), IllegalStateException.class);
 
 		final ErrorResponse response = union.getError();
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(700));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(700));
 	}
 
 	@Test
@@ -37,15 +38,15 @@ public class ErrorResponseDeserializerUnionTest {
 				context);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(true));
-		Assert.assertThat(union.hasError(), IsEqual.equalTo(false));
-		Assert.assertThat(200, IsEqual.equalTo(union.getStatus()));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(union.hasError(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(200, IsEqual.equalTo(union.getStatus()));
 		ExceptionAssert.assertThrows(v -> union.getError(), IllegalStateException.class);
 
 		final Deserializer deserializer = union.getDeserializer();
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
-		Assert.assertThat(deserializer.getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, "foo", 12)));
+		MatcherAssert.assertThat(deserializer.getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, "foo", 12)));
 	}
 
 	@Test
@@ -54,9 +55,9 @@ public class ErrorResponseDeserializerUnionTest {
 		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(500, "", null);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(false));
-		Assert.assertThat(union.hasError(), IsEqual.equalTo(true));
-		Assert.assertThat(500, IsEqual.equalTo(union.getStatus()));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(union.hasError(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(500, IsEqual.equalTo(union.getStatus()));
 		ExceptionAssert.assertThrows(v -> union.getDeserializer(), IllegalStateException.class);
 		ExceptionAssert.assertThrows(v -> union.getError(), IllegalStateException.class);
 	}
@@ -67,9 +68,9 @@ public class ErrorResponseDeserializerUnionTest {
 		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(200, "", null);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(false));
-		Assert.assertThat(union.hasError(), IsEqual.equalTo(false));
-		Assert.assertThat(200, IsEqual.equalTo(union.getStatus()));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(union.hasError(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(200, IsEqual.equalTo(union.getStatus()));
 		ExceptionAssert.assertThrows(v -> union.getDeserializer(), IllegalStateException.class);
 		ExceptionAssert.assertThrows(v -> union.getError(), IllegalStateException.class);
 	}
@@ -80,9 +81,9 @@ public class ErrorResponseDeserializerUnionTest {
 		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(200, "foo", null);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(true));
-		Assert.assertThat(union.hasError(), IsEqual.equalTo(false));
-		Assert.assertThat(200, IsEqual.equalTo(union.getStatus()));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(union.hasError(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(200, IsEqual.equalTo(union.getStatus()));
 		ExceptionAssert.assertThrows(v -> union.getDeserializer(), IllegalStateException.class);
 		ExceptionAssert.assertThrows(v -> union.getError(), IllegalStateException.class);
 	}

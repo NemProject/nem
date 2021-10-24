@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -89,9 +90,9 @@ public class HttpMethodClientTest {
 			final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get();
 
 			// Assert:
-			Assert.assertThat(deserializer, IsNull.notNullValue());
-			Assert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
-			Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
+			MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
+			MatcherAssert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
+			MatcherAssert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 		}
 
 		@Test
@@ -117,9 +118,9 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
 
 			// Assert:
-			Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
-			Assert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
-			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
+			MatcherAssert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
+			MatcherAssert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
+			MatcherAssert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
 		@Test(expected = InactivePeerException.class)

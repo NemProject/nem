@@ -1,5 +1,6 @@
 package org.nem.core.serialization.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -22,7 +23,7 @@ public abstract class AbstractObjectArraySerializationTest<TSerializer extends S
 		this.assertCanRoundtrip(objects);
 
 		// Sanity:
-		Assert.assertThat(objects.get(1), IsNull.nullValue());
+		MatcherAssert.assertThat(objects.get(1), IsNull.nullValue());
 	}
 
 	@Test

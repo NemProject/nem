@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -14,15 +15,15 @@ public class MosaicConstantsTest {
 	@Test
 	public void namespaceOwnerNemHasExpectedPublicKey() {
 		// Assert:
-		Assert.assertThat(MosaicConstants.NAMESPACE_OWNER_NEM.getAddress().getPublicKey(), IsEqual.equalTo(NAMESPACE_OWNER_NEM_KEY));
+		MatcherAssert.assertThat(MosaicConstants.NAMESPACE_OWNER_NEM.getAddress().getPublicKey(), IsEqual.equalTo(NAMESPACE_OWNER_NEM_KEY));
 	}
 
 	@Test
 	public void namespaceNemHasExpectedProperties() {
 		// Assert:
-		Assert.assertThat(MosaicConstants.NAMESPACE_NEM.getId(), IsSame.sameInstance(MosaicConstants.NAMESPACE_ID_NEM));
-		Assert.assertThat(MosaicConstants.NAMESPACE_NEM.getOwner(), IsSame.sameInstance(MosaicConstants.NAMESPACE_OWNER_NEM));
-		Assert.assertThat(MosaicConstants.NAMESPACE_NEM.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		MatcherAssert.assertThat(MosaicConstants.NAMESPACE_NEM.getId(), IsSame.sameInstance(MosaicConstants.NAMESPACE_ID_NEM));
+		MatcherAssert.assertThat(MosaicConstants.NAMESPACE_NEM.getOwner(), IsSame.sameInstance(MosaicConstants.NAMESPACE_OWNER_NEM));
+		MatcherAssert.assertThat(MosaicConstants.NAMESPACE_NEM.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	// endregion
@@ -32,25 +33,25 @@ public class MosaicConstantsTest {
 	@Test
 	public void mosaicIdXemHasExpectedProperties() {
 		// Assert:
-		Assert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getNamespaceId(), IsEqual.equalTo(MosaicConstants.NAMESPACE_ID_NEM));
-		Assert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getName(), IsEqual.equalTo("xem"));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getNamespaceId(), IsEqual.equalTo(MosaicConstants.NAMESPACE_ID_NEM));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getName(), IsEqual.equalTo("xem"));
 	}
 
 	@Test
 	public void mosaicDefinitionXemHasExpectedProperties() {
 		// Assert:
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.isMosaicLevyPresent(), IsEqual.equalTo(false));
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getMosaicLevy(), IsNull.nullValue());
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.isMosaicLevyPresent(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getMosaicLevy(), IsNull.nullValue());
 
 		final MosaicProperties properties = MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties();
-		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));
-		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
-		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
-		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
+		MatcherAssert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
 	}
 
 	// endregion

@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -10,8 +11,8 @@ public class MosaicTransferFeeTypeTest {
 
 	@Test
 	public void valueReturnsExpectedValue() {
-		Assert.assertThat(MosaicTransferFeeType.Absolute.value(), IsEqual.equalTo(1));
-		Assert.assertThat(MosaicTransferFeeType.Percentile.value(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(MosaicTransferFeeType.Absolute.value(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(MosaicTransferFeeType.Percentile.value(), IsEqual.equalTo(2));
 	}
 
 	// endregion
@@ -21,8 +22,8 @@ public class MosaicTransferFeeTypeTest {
 	@Test
 	public void fromValueReturnsCorrespondingEnumValueForKnownValue() {
 		// Assert:
-		Assert.assertThat(MosaicTransferFeeType.fromValue(1), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(MosaicTransferFeeType.fromValue(2), IsEqual.equalTo(MosaicTransferFeeType.Percentile));
+		MatcherAssert.assertThat(MosaicTransferFeeType.fromValue(1), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(MosaicTransferFeeType.fromValue(2), IsEqual.equalTo(MosaicTransferFeeType.Percentile));
 	}
 
 	@Test

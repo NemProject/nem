@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicDefinition;
@@ -14,7 +15,7 @@ public class MosaicDefinitionCreationNotificationTest {
 		final MosaicDefinitionCreationNotification notification = new MosaicDefinitionCreationNotification(mosaicDefinition);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicDefinitionCreation));
-		Assert.assertThat(notification.getMosaicDefinition(), IsSame.sameInstance(mosaicDefinition));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicDefinitionCreation));
+		MatcherAssert.assertThat(notification.getMosaicDefinition(), IsSame.sameInstance(mosaicDefinition));
 	}
 }

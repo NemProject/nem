@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
@@ -20,7 +21,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDirectTransactions(block));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 100, 150));
 	}
@@ -34,7 +35,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDirectAndFirstChildTransactions(block));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
 	}
@@ -48,7 +49,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDefault(block));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
 	}
@@ -62,7 +63,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamAllTransactions(block));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(
 						50, 60, 61, 62, 70, 80, 81, 82,

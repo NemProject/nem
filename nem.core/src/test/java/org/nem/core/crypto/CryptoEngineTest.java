@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.*;
 
@@ -11,7 +12,7 @@ public abstract class CryptoEngineTest {
 		final Curve curve = this.getCryptoEngine().getCurve();
 
 		// Assert:
-		Assert.assertThat(curve, IsInstanceOf.instanceOf(Curve.class));
+		MatcherAssert.assertThat(curve, IsInstanceOf.instanceOf(Curve.class));
 	}
 
 	@Test
@@ -21,7 +22,7 @@ public abstract class CryptoEngineTest {
 		final DsaSigner signer = engine.createDsaSigner(KeyPair.random(engine));
 
 		// Assert:
-		Assert.assertThat(signer, IsInstanceOf.instanceOf(DsaSigner.class));
+		MatcherAssert.assertThat(signer, IsInstanceOf.instanceOf(DsaSigner.class));
 	}
 
 	@Test
@@ -30,7 +31,7 @@ public abstract class CryptoEngineTest {
 		final KeyGenerator keyGenerator = this.getCryptoEngine().createKeyGenerator();
 
 		// Assert:
-		Assert.assertThat(keyGenerator, IsInstanceOf.instanceOf(KeyGenerator.class));
+		MatcherAssert.assertThat(keyGenerator, IsInstanceOf.instanceOf(KeyGenerator.class));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public abstract class CryptoEngineTest {
 		final KeyAnalyzer keyAnalyzer = this.getCryptoEngine().createKeyAnalyzer();
 
 		// Assert:
-		Assert.assertThat(keyAnalyzer, IsInstanceOf.instanceOf(KeyAnalyzer.class));
+		MatcherAssert.assertThat(keyAnalyzer, IsInstanceOf.instanceOf(KeyAnalyzer.class));
 	}
 
 	@Test
@@ -49,7 +50,7 @@ public abstract class CryptoEngineTest {
 		final BlockCipher blockCipher = engine.createBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
 
 		// Assert:
-		Assert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
+		MatcherAssert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
 	}
 
 	protected abstract CryptoEngine getCryptoEngine();

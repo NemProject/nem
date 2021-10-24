@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -22,14 +23,14 @@ public class BlockedHarvesterPublicKeysTest {
 	@Test
 	public void setSizesMatchExpectedValue() {
 		// Assert:
-		Assert.assertThat(BlockedHarvesterPublicKeys.getAll().size(), IsEqual.equalTo(EXPECTED_SET_SIZE));
+		MatcherAssert.assertThat(BlockedHarvesterPublicKeys.getAll().size(), IsEqual.equalTo(EXPECTED_SET_SIZE));
 	}
 
 	@Test
 	public void existingFundsAtLaunchAreBlockedFromHarvesting() {
 		// Assert:
 		for (final PublicKey coreFundPublicKey : CORE_FUNDS) {
-			Assert.assertThat(BlockedHarvesterPublicKeys.contains(coreFundPublicKey), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(BlockedHarvesterPublicKeys.contains(coreFundPublicKey), IsEqual.equalTo(true));
 		}
 	}
 
@@ -52,8 +53,8 @@ public class BlockedHarvesterPublicKeysTest {
 				.collect(Collectors.toSet());
 
 		// Assert:
-		Assert.assertThat(addressPrefixes.size(), IsEqual.equalTo(expectedPrefixes.size()));
-		Assert.assertThat(addressPrefixes, IsEquivalent.equivalentTo(expectedPrefixes));
+		MatcherAssert.assertThat(addressPrefixes.size(), IsEqual.equalTo(expectedPrefixes.size()));
+		MatcherAssert.assertThat(addressPrefixes, IsEquivalent.equivalentTo(expectedPrefixes));
 	}
 
 	@Test
@@ -62,6 +63,6 @@ public class BlockedHarvesterPublicKeysTest {
 		final boolean isContained = BlockedHarvesterPublicKeys.contains(new KeyPair().getPublicKey());
 
 		// Assert:
-		Assert.assertThat(isContained, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isContained, IsEqual.equalTo(false));
 	}
 }

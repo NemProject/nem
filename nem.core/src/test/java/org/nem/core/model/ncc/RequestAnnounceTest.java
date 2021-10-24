@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -14,8 +15,8 @@ public class RequestAnnounceTest {
 				new byte[] { 4, 5, 7, 2, 3 });
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
-		Assert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
 	}
 
 	@Test
@@ -29,8 +30,8 @@ public class RequestAnnounceTest {
 		final RequestAnnounce request = createRoundTrippedRequest(originalRequest);
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
-		Assert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
 	}
 
 	private static RequestAnnounce createRoundTrippedRequest(final RequestAnnounce originalRequest) {

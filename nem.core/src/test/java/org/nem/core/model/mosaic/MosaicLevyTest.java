@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -103,13 +104,13 @@ public class MosaicLevyTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicLevy> entry : createLeviesForEqualityTests(recipient).entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(levy)) : IsEqual.equalTo(levy));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(levy)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(levy)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(levy)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(levy)));
 	}
 
 	@Test
@@ -120,7 +121,7 @@ public class MosaicLevyTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicLevy> entry : createLeviesForEqualityTests(recipient).entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
@@ -134,10 +135,10 @@ public class MosaicLevyTest {
 
 	private static void assertMosaicLevy(final MosaicLevy levy, final Account recipient) {
 		// Assert:
-		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
-		Assert.assertThat(levy.getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
+		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(recipient));
+		MatcherAssert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		MatcherAssert.assertThat(levy.getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	private static MosaicLevy createMosaicLevy(final Account recipient) {

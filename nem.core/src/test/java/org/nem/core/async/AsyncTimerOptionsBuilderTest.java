@@ -1,5 +1,6 @@
 package org.nem.core.async;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -28,10 +29,10 @@ public class AsyncTimerOptionsBuilderTest {
 				.create();
 
 		// Assert:
-		Assert.assertThat(options.getRecurringFutureSupplier(), IsSame.sameInstance(recurringFutureSupplier));
-		Assert.assertThat(options.getInitialTrigger(), IsSame.sameInstance(trigger));
-		Assert.assertThat(options.getDelayStrategy(), IsSame.sameInstance(delayStrategy));
-		Assert.assertThat(options.getVisitor(), IsSame.sameInstance(visitor));
+		MatcherAssert.assertThat(options.getRecurringFutureSupplier(), IsSame.sameInstance(recurringFutureSupplier));
+		MatcherAssert.assertThat(options.getInitialTrigger(), IsSame.sameInstance(trigger));
+		MatcherAssert.assertThat(options.getDelayStrategy(), IsSame.sameInstance(delayStrategy));
+		MatcherAssert.assertThat(options.getVisitor(), IsSame.sameInstance(visitor));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class AsyncTimerOptionsBuilderTest {
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().create();
 
 		// Assert:
-		Assert.assertThat(options.getVisitor(), IsNull.notNullValue());
+		MatcherAssert.assertThat(options.getVisitor(), IsNull.notNullValue());
 	}
 
 	//region getInitialTrigger
@@ -51,7 +52,7 @@ public class AsyncTimerOptionsBuilderTest {
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().create();
 
 		// Assert: 0 - trigger should be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -80,19 +81,19 @@ public class AsyncTimerOptionsBuilderTest {
 			final AsyncTimerOptions options,
 			final int time) throws InterruptedException {
 		// Assert: 0 - trigger should not be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
 		Thread.sleep(time - TIME_HALF_UNIT);
 
 		// Assert: time - 0.5 - trigger should not be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
 		Thread.sleep(time + TIME_HALF_UNIT);
 
 		// Assert: time + 0.5 - trigger should be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -105,20 +106,20 @@ public class AsyncTimerOptionsBuilderTest {
 				.create();
 
 		// Assert: 0 - trigger should not be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
 		Thread.sleep(2 * TIME_UNIT);
 		triggerFuture.complete(null);
 
 		// Assert: 2.0 - trigger is completed but sleep is not, so the initial trigger should not be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
 		Thread.sleep(TIME_UNIT);
 
 		// Act: 3.0 - the sleep is completed, so the initial trigger should be done
-		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
 	}
 
 	//region visitors

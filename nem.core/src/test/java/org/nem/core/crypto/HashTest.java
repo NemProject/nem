@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -15,7 +16,7 @@ public class HashTest {
 	@Test
 	public void zeroHashIsInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(Hash.ZERO, IsEqual.equalTo(new Hash(new byte[32])));
+		MatcherAssert.assertThat(Hash.ZERO, IsEqual.equalTo(new Hash(new byte[32])));
 	}
 
 	//endregion
@@ -28,7 +29,7 @@ public class HashTest {
 		final Hash hash = new Hash(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		MatcherAssert.assertThat(hash.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class HashTest {
 		final Hash hash = Hash.fromHexString("227F");
 
 		// Assert:
-		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
+		MatcherAssert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -56,7 +57,7 @@ public class HashTest {
 		final Hash hash = createRoundTrippedHash(new Hash(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(hash, IsEqual.equalTo(new Hash(TEST_BYTES)));
+		MatcherAssert.assertThat(hash, IsEqual.equalTo(new Hash(TEST_BYTES)));
 	}
 
 	private static Hash createRoundTrippedHash(final Hash originalKey) {
@@ -75,10 +76,10 @@ public class HashTest {
 		final Hash hash = new Hash(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new Hash(TEST_BYTES), IsEqual.equalTo(hash));
-		Assert.assertThat(new Hash(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(hash)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(hash)));
-		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)hash)));
+		MatcherAssert.assertThat(new Hash(TEST_BYTES), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(new Hash(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(hash)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(hash)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)hash)));
 	}
 
 	@Test
@@ -88,8 +89,8 @@ public class HashTest {
 		final int hashCode = hash.hashCode();
 
 		// Assert:
-		Assert.assertThat(new Hash(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new Hash(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new Hash(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new Hash(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -102,7 +103,7 @@ public class HashTest {
 		final Hash hash = new Hash(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 });
 
 		// Assert:
-		Assert.assertThat(hash.getShortId(), IsEqual.equalTo(0x0001020304050607L));
+		MatcherAssert.assertThat(hash.getShortId(), IsEqual.equalTo(0x0001020304050607L));
 	}
 
 	//endregion
@@ -112,7 +113,7 @@ public class HashTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new Hash(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		MatcherAssert.assertThat(new Hash(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion

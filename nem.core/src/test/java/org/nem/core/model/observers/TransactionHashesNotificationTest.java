@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -20,8 +21,8 @@ public class TransactionHashesNotificationTest {
 		final TransactionHashesNotification notification = new TransactionHashesNotification(pairs);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
-		Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(5));
-		Assert.assertThat(notification.getPairs(), IsEqual.equalTo(pairs));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
+		MatcherAssert.assertThat(notification.getPairs().size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(notification.getPairs(), IsEqual.equalTo(pairs));
 	}
 }

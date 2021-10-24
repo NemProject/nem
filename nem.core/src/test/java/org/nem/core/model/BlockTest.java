@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -24,19 +25,19 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlock(signer);
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(BlockUtils.DUMMY_GENERATION_HASH));
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(BlockUtils.DUMMY_GENERATION_HASH));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
@@ -45,9 +46,9 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlockWithHeight(BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 	}
 
 	@Test
@@ -56,9 +57,9 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlockWithHeight(new BlockHeight(2));
 
 		// Assert:
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(2)));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(2)));
 	}
 
 	@Test
@@ -71,22 +72,22 @@ public class BlockTest {
 		final Block block = new Block(signer, previousBlock, new TimeInstant(11));
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11)));
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11)));
 
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(4)));
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(4)));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousBlock.getGenerationHash(),
 				signer.getAddress().getPublicKey());
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -103,11 +104,11 @@ public class BlockTest {
 		block.setPrevious(previousBlock);
 
 		// Assert:
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousBlock.getGenerationHash(),
 				block.getSigner().getAddress().getPublicKey());
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 
 	@Test
@@ -123,7 +124,7 @@ public class BlockTest {
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousGenerationHash,
 				block.getSigner().getAddress().getPublicKey());
-		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 
 	@Test
@@ -136,7 +137,7 @@ public class BlockTest {
 		block.setDifficulty(blockDifficulty);
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(blockDifficulty));
 	}
 
 	@Test
@@ -149,7 +150,7 @@ public class BlockTest {
 		block.setLessor(account);
 
 		// Assert:
-		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
 	@Test
@@ -161,7 +162,7 @@ public class BlockTest {
 		block.setLessor(block.getSigner());
 
 		// Assert:
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 	//endregion
 
@@ -176,24 +177,24 @@ public class BlockTest {
 		final Block block = this.createBlockForRoundTripTests(true, signer);
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
 		// (t1 has a fee of 2 and t2 has a fee of 140)
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 + 140)));
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
+		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 + 140)));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
 		final List<Transaction> transactions = block.getTransactions();
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
 		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
-		Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(Amount.fromNem(17)));
+		MatcherAssert.assertThat(transaction1.getAmount(), IsEqual.equalTo(Amount.fromNem(17)));
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+		MatcherAssert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -202,7 +203,7 @@ public class BlockTest {
 		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 	}
 
 	@Test
@@ -211,7 +212,7 @@ public class BlockTest {
 		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Assert:
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
@@ -224,9 +225,9 @@ public class BlockTest {
 		block.setDifficulty(new BlockDifficulty(55_444_333_222_111L));
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(55_444_333_222_111L)));
-		Assert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
-		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(55_444_333_222_111L)));
+		MatcherAssert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -240,9 +241,9 @@ public class BlockTest {
 		block.setPrevious(previousBlock);
 
 		// Assert:
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
-		Assert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
-		Assert.assertThat(block.verify(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
+		MatcherAssert.assertThat(originalVerifyResult, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(block.verify(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -251,16 +252,16 @@ public class BlockTest {
 		final Block block = this.createBlockForRoundTripTests(true, null);
 
 		// Assert:
-		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(block.verify(), IsEqual.equalTo(true));
 
 		final List<Transaction> transactions = block.getTransactions();
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
 		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
-		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -269,16 +270,16 @@ public class BlockTest {
 		final Block block = this.createBlockForRoundTripTests(false, null);
 
 		// Assert:
-		Assert.assertThat(block.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getSignature(), IsNull.nullValue());
 
 		final List<Transaction> transactions = block.getTransactions();
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
 		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
-		Assert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-		Assert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
 	}
 
 	private Block createBlockForRoundTripTests(final boolean verifiable, final Account signer) {
@@ -334,8 +335,8 @@ public class BlockTest {
 		block.addTransaction(transaction);
 
 		// Assert:
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transaction));
 	}
 
 	@Test
@@ -350,9 +351,9 @@ public class BlockTest {
 		block.addTransactions(transactions);
 
 		// Assert:
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(2));
-		Assert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transactions.get(0)));
-		Assert.assertThat((block.getTransactions().get(1)), IsEqual.equalTo(transactions.get(1)));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat((block.getTransactions().get(0)), IsEqual.equalTo(transactions.get(0)));
+		MatcherAssert.assertThat((block.getTransactions().get(1)), IsEqual.equalTo(transactions.get(1)));
 	}
 
 	//endregion
@@ -371,7 +372,7 @@ public class BlockTest {
 		block.addTransaction(BlockUtils.createTransactionWithFee(22));
 
 		// Assert:
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
+		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
 	}
 
 	@Test
@@ -394,7 +395,7 @@ public class BlockTest {
 		block.addTransaction(transaction);
 
 		// Assert:
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
+		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
 	}
 
 	//endregion
@@ -433,13 +434,13 @@ public class BlockTest {
 		block.sign();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("default"), IsEqual.equalTo(block));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature"), IsNot.not(IsEqual.equalTo(block)));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(block)));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash"), IsNot.not(IsEqual.equalTo(block)));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature"), IsNot.not(IsEqual.equalTo(block)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(block)));
-		Assert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object)block)));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("default"), IsEqual.equalTo(block));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature"), IsNot.not(IsEqual.equalTo(block)));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(block)));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash"), IsNot.not(IsEqual.equalTo(block)));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature"), IsNot.not(IsEqual.equalTo(block)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(block)));
+		MatcherAssert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object)block)));
 	}
 
 	@Test
@@ -450,11 +451,11 @@ public class BlockTest {
 		final int hashCode = block.hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
@@ -469,7 +470,7 @@ public class BlockTest {
 		block.addTransaction(BlockUtils.createTransactionWithFee(7));
 
 		// Assert:
-		Assert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
+		MatcherAssert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
 	}
 
 	//endregion

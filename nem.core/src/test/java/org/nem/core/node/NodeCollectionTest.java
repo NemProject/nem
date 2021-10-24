@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -18,12 +19,12 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = new NodeCollection();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
 		for (final NodeStatus status : NodeStatus.values()) {
-			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
 		}
 	}
 
@@ -66,12 +67,12 @@ public class NodeCollectionTest {
 
 		// Assert:
 		final boolean isActiveOrBusy = NodeStatus.ACTIVE == expectedStatus || NodeStatus.BUSY == expectedStatus;
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(NodeStatus.ACTIVE == expectedStatus ? 1 : 0));
-		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(NodeStatus.BUSY == expectedStatus ? 1 : 0));
-		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(isActiveOrBusy ? 1 : 0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(NodeStatus.ACTIVE == expectedStatus ? 1 : 0));
+		MatcherAssert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(NodeStatus.BUSY == expectedStatus ? 1 : 0));
+		MatcherAssert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(isActiveOrBusy ? 1 : 0));
 		for (final NodeStatus status : NodeStatus.values()) {
-			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(status == expectedStatus ? 1 : 0));
+			MatcherAssert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(status == expectedStatus ? 1 : 0));
 		}
 	}
 
@@ -84,12 +85,12 @@ public class NodeCollectionTest {
 		nodes.update(NodeUtils.createNodeWithName("X"), NodeStatus.UNKNOWN);
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
 		for (final NodeStatus status : NodeStatus.values()) {
-			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
 		}
 	}
 
@@ -108,9 +109,9 @@ public class NodeCollectionTest {
 
 		// Assert:
 		final Collection<Node> expectedNodes = Collections.singletonList(node);
-		Assert.assertThat(nodes.getActiveNodes(), IsEquivalent.equivalentTo(expectedNodes));
-		Assert.assertThat(nodes.getAllNodes(), IsEquivalent.equivalentTo(expectedNodes));
-		Assert.assertThat(nodes.getNodes(NodeStatus.ACTIVE), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getActiveNodes(), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getAllNodes(), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.ACTIVE), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
 	@Test
@@ -124,9 +125,9 @@ public class NodeCollectionTest {
 
 		// Assert:
 		final Collection<Node> expectedNodes = Collections.singletonList(node);
-		Assert.assertThat(nodes.getBusyNodes(), IsEquivalent.equivalentTo(expectedNodes));
-		Assert.assertThat(nodes.getAllNodes(), IsEquivalent.equivalentTo(expectedNodes));
-		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getBusyNodes(), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getAllNodes(), IsEquivalent.equivalentTo(expectedNodes));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.BUSY), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
 	@Test
@@ -150,7 +151,7 @@ public class NodeCollectionTest {
 		nodes.update(node, status);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodes(status), IsEquivalent.equivalentTo(Collections.singletonList(node)));
+		MatcherAssert.assertThat(nodes.getNodes(status), IsEquivalent.equivalentTo(Collections.singletonList(node)));
 	}
 
 	//endregion
@@ -190,7 +191,7 @@ public class NodeCollectionTest {
 		nodes.update(node, status);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(status));
+		MatcherAssert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(status));
 	}
 
 	@Test
@@ -200,7 +201,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = new NodeCollection();
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		MatcherAssert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.UNKNOWN));
 	}
 
 	//endregion
@@ -229,7 +230,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByEndpoint(NodeEndpoint.fromHost("10.0.0.1"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsEqual.equalTo(node));
+		MatcherAssert.assertThat(resultNode, IsEqual.equalTo(node));
 	}
 
 	@Test
@@ -254,7 +255,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByEndpoint(NodeEndpoint.fromHost("10.0.0.1"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsNull.nullValue());
+		MatcherAssert.assertThat(resultNode, IsNull.nullValue());
 	}
 
 	@Test
@@ -266,7 +267,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByEndpoint(NodeEndpoint.fromHost("10.0.0.1"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsNull.nullValue());
+		MatcherAssert.assertThat(resultNode, IsNull.nullValue());
 	}
 
 	//endregion
@@ -295,7 +296,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByIdentity(new WeakNodeIdentity("X"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsEqual.equalTo(node));
+		MatcherAssert.assertThat(resultNode, IsEqual.equalTo(node));
 	}
 
 	@Test
@@ -320,7 +321,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByIdentity(new WeakNodeIdentity("X"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsNull.nullValue());
+		MatcherAssert.assertThat(resultNode, IsNull.nullValue());
 	}
 
 	@Test
@@ -332,7 +333,7 @@ public class NodeCollectionTest {
 		final Node resultNode = nodes.findNodeByIdentity(new WeakNodeIdentity("X"));
 
 		// Assert:
-		Assert.assertThat(resultNode, IsNull.nullValue());
+		MatcherAssert.assertThat(resultNode, IsNull.nullValue());
 	}
 
 	//endregion
@@ -370,7 +371,7 @@ public class NodeCollectionTest {
 		nodes.update(node, status);
 
 		// Assert:
-		Assert.assertThat(nodes.isNodeBlacklisted(node), IsEqual.equalTo(isBlacklisted));
+		MatcherAssert.assertThat(nodes.isNodeBlacklisted(node), IsEqual.equalTo(isBlacklisted));
 	}
 
 	@Test
@@ -380,7 +381,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = new NodeCollection();
 
 		// Assert:
-		Assert.assertThat(nodes.isNodeBlacklisted(node), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(nodes.isNodeBlacklisted(node), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -395,7 +396,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(8));
 	}
 
 	@Test
@@ -443,7 +444,7 @@ public class NodeCollectionTest {
 		nodes.update(node, NodeStatus.UNKNOWN);
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -469,12 +470,12 @@ public class NodeCollectionTest {
 		nodes.update(node2, endingStatus);
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(nodes.getNodes(endingStatus).size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes.getNodes(endingStatus).size(), IsEqual.equalTo(1));
 
 		final Node collectionNode = nodes.getNodes(endingStatus).iterator().next();
-		Assert.assertThat(collectionNode.getIdentity().getName(), IsEqual.equalTo("X"));
-		Assert.assertThat(collectionNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.2")));
+		MatcherAssert.assertThat(collectionNode.getIdentity().getName(), IsEqual.equalTo("X"));
+		MatcherAssert.assertThat(collectionNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.2")));
 	}
 
 	@Test
@@ -507,12 +508,12 @@ public class NodeCollectionTest {
 		nodes.update(node2, endingStatus);
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(nodes.getNodes(endingStatus).size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes.getNodes(endingStatus).size(), IsEqual.equalTo(1));
 
 		final Node collectionNode = nodes.getNodes(endingStatus).iterator().next();
-		Assert.assertThat(collectionNode.getIdentity(), IsEqual.equalTo(identity));
-		Assert.assertThat(collectionNode.getMetaData(), IsEqual.equalTo(node2.getMetaData()));
+		MatcherAssert.assertThat(collectionNode.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(collectionNode.getMetaData(), IsEqual.equalTo(node2.getMetaData()));
 	}
 
 	@Test
@@ -525,12 +526,12 @@ public class NodeCollectionTest {
 		nodes.update(node, NodeStatus.BUSY);
 
 		// Assert: A2 moved from active to busy
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(8));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2", "A2")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("F1", "F2")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A3")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2", "A2")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("F1", "F2")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -606,12 +607,12 @@ public class NodeCollectionTest {
 		nodes.prune(); // removed: { B1, I1, F2 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(5));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3", "B2", "F1")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3", "B2", "F1")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -674,12 +675,12 @@ public class NodeCollectionTest {
 		nodes.prune(); // removed: { B1, F2 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("F1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Collections.singletonList("B2")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("F1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Collections.singletonList("B2")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -699,12 +700,12 @@ public class NodeCollectionTest {
 		nodes.prune(); // candidate: { B1, I1, F2 }, pruned: { B2, F1 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Collections.singletonList("B1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Collections.singletonList("F2")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Collections.singletonList("B1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Collections.singletonList("F2")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -730,13 +731,13 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" });
 
 		// Assert:
-		Assert.assertThat(DESC_TO_NODES_MAP.get("default"), IsEqual.equalTo(nodes));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-active"), IsNot.not(IsEqual.equalTo(nodes)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive"), IsNot.not(IsEqual.equalTo(nodes)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-status"), IsNot.not(IsEqual.equalTo(nodes)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-other"), IsNot.not(IsEqual.equalTo(nodes)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(nodes)));
-		Assert.assertThat(new String[] { "A", "F", "Y" }, IsNot.not(IsEqual.equalTo((Object)nodes)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("default"), IsEqual.equalTo(nodes));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-active"), IsNot.not(IsEqual.equalTo(nodes)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive"), IsNot.not(IsEqual.equalTo(nodes)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-status"), IsNot.not(IsEqual.equalTo(nodes)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-other"), IsNot.not(IsEqual.equalTo(nodes)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(nodes)));
+		MatcherAssert.assertThat(new String[] { "A", "F", "Y" }, IsNot.not(IsEqual.equalTo((Object)nodes)));
 	}
 
 	@Test
@@ -746,11 +747,11 @@ public class NodeCollectionTest {
 		final int hashCode = nodes.hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_NODES_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-active").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-status").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_NODES_MAP.get("diff-other").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-active").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-inactive").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-status").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_NODES_MAP.get("diff-other").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	private static NodeCollection createNodeCollection(
@@ -788,22 +789,22 @@ public class NodeCollectionTest {
 
 	private static void assertMultipleNodesCollection(final NodeCollection nodes) {
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(8));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("F1", "F2")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Collections.singletonList("I1")));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("F1", "F2")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	private static void assertMultipleNodesCollectionAfterPruning(final NodeCollection nodes) {
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(3));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	private static List<String> getNames(final Collection<Node> nodes) {

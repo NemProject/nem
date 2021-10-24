@@ -1,6 +1,7 @@
 package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.JsonSerializer;
@@ -19,7 +20,7 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(entity);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				request.getPayload(),
 				IsEqual.equalTo(JsonSerializer.serializeToBytes(entity)));
 	}
@@ -35,7 +36,7 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(jsonEntity);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				request.getPayload(),
 				IsEqual.equalTo(jsonEntity.toString().getBytes("UTF-8")));
 	}
@@ -49,7 +50,7 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(entity);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				request.getContentType(),
 				IsEqual.equalTo("application/json"));
 	}

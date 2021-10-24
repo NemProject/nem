@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,7 +16,7 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
+		MatcherAssert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
 	}
 
 	@Test(expected = FatalPeerException.class)

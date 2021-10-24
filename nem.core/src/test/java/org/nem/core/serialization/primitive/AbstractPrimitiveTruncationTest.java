@@ -1,5 +1,6 @@
 package org.nem.core.serialization.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -28,8 +29,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 		// Assert:
 		final T expectedValue = this.getTruncatedValue(originalValue, 5);
-		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(5));
 	}
 
 	@Test
@@ -46,8 +47,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 		// Assert:
 		final T expectedValue = this.getTruncatedValue(originalValue, 5);
-		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(5));
 	}
 
 	@Test
@@ -65,8 +66,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 		// Assert:
 		final T expectedValue = this.getTruncatedValue(originalValue, this.getDefaultLimit());
-		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(this.getDefaultLimit()));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(this.getDefaultLimit()));
 	}
 
 	@Test
@@ -84,8 +85,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 		// Assert:
 		final T expectedValue = this.getTruncatedValue(originalValue, this.getDefaultLimit());
-		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(this.getDefaultLimit()));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(this.getDefaultLimit()));
 	}
 
 	@Test
@@ -102,8 +103,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		final T value = this.readValue(deserializer, "val");
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(originalValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(originalValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
 	}
 
 	@Test
@@ -120,8 +121,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		final T value = this.readValue(deserializer, "val", limit);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(originalValue));
-		Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(originalValue));
+		MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
 	}
 
 	@Test
@@ -155,8 +156,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		// Assert: nothing was truncated
 		for (int i = 0; i < numFields; ++i) {
 			final T value = values.get(i);
-			Assert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
-			Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
+			MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
 		}
 	}
 
@@ -184,8 +185,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		// Assert: nothing was truncated
 		for (int i = 0; i < numFields; ++i) {
 			final T value = values.get(i);
-			Assert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
-			Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
+			MatcherAssert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
 		}
 	}
 

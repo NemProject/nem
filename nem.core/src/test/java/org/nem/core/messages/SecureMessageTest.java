@@ -1,5 +1,6 @@
 package org.nem.core.messages;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -20,10 +21,10 @@ public class SecureMessageTest {
 		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -35,11 +36,11 @@ public class SecureMessageTest {
 		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
-		Assert.assertThat(message.getEncodedPayload().length, IsEqual.equalTo(64));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getEncodedPayload().length, IsEqual.equalTo(64));
 	}
 
 	@Test
@@ -57,10 +58,10 @@ public class SecureMessageTest {
 				encodedBytes);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -87,7 +88,7 @@ public class SecureMessageTest {
 		final Message message = SecureMessage.fromEncodedPayload(senderPublicKeyOnly, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
 	}
 
 	//endregion
@@ -106,10 +107,10 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipient);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -128,7 +129,7 @@ public class SecureMessageTest {
 		final byte[] payload = deserializer.readBytes("payload");
 
 		// Assert:
-		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	//endregion
@@ -142,8 +143,8 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(input, false, true);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
@@ -153,8 +154,8 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(input, true, false);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
@@ -164,9 +165,9 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(input, false, false);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -182,9 +183,9 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, senderWithoutKeyPair, recipient);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -200,9 +201,9 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientWithoutKeyPair);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	private static SecureMessage createRoundTrippedMessage(
@@ -236,20 +237,20 @@ public class SecureMessageTest {
 		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 });
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }),
 				IsEqual.equalTo(message));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }),
 				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }),
 				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }),
 				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsNot.not((Object)IsEqual.equalTo(message)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsNot.not((Object)IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
 	}
 
 	@Test
@@ -262,16 +263,16 @@ public class SecureMessageTest {
 		final int hashCode = message.hashCode();
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }).hashCode(),
 				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }).hashCode(),
 				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }).hashCode(),
 				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }).hashCode(),
 				IsNot.not(IsEqual.equalTo(hashCode)));
 	}

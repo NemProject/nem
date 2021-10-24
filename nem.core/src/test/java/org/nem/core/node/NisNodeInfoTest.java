@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,8 +22,8 @@ public class NisNodeInfoTest {
 		final NisNodeInfo nodeInfo = new NisNodeInfo(node, appMetaData);
 
 		// Assert:
-		Assert.assertThat(nodeInfo.getNode(), IsSame.sameInstance(node));
-		Assert.assertThat(nodeInfo.getAppMetaData(), IsSame.sameInstance(appMetaData));
+		MatcherAssert.assertThat(nodeInfo.getNode(), IsSame.sameInstance(node));
+		MatcherAssert.assertThat(nodeInfo.getAppMetaData(), IsSame.sameInstance(appMetaData));
 	}
 
 	@Test
@@ -35,8 +36,8 @@ public class NisNodeInfoTest {
 		final NisNodeInfo nodeInfo = roundtripNodeInfo(new NisNodeInfo(node, appMetaData));
 
 		// Assert:
-		Assert.assertThat(nodeInfo.getNode(), IsEqual.equalTo(node));
-		Assert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
+		MatcherAssert.assertThat(nodeInfo.getNode(), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(nodeInfo.getAppMetaData().getAppName(), IsEqual.equalTo("nem"));
 	}
 
 	//region equals / hashCode
@@ -62,11 +63,11 @@ public class NisNodeInfoTest {
 		final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(info));
-		Assert.assertThat(infoMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(infoMap.get("diff-metaData"), IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
+		MatcherAssert.assertThat(infoMap.get("default"), IsEqual.equalTo(info));
+		MatcherAssert.assertThat(infoMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(info)));
+		MatcherAssert.assertThat(infoMap.get("diff-metaData"), IsNot.not(IsEqual.equalTo(info)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
+		MatcherAssert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)info)));
 	}
 
 	@Test
@@ -80,9 +81,9 @@ public class NisNodeInfoTest {
 		final Map<String, NisNodeInfo> infoMap = createNisNodeInfosForEqualityTests(keyPair);
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-metaData").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(infoMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("diff-metaData").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion

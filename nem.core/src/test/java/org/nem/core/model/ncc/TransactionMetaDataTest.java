@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
@@ -17,10 +18,10 @@ public class TransactionMetaDataTest {
 		final TransactionMetaData metaData = createMetaData(1234, 321, hash);
 
 		// Assert:
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(1234)));
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
-		Assert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(metaData.getInnerHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(1234)));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
+		MatcherAssert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -31,10 +32,10 @@ public class TransactionMetaDataTest {
 		final TransactionMetaData metaData = createMetaData(1234, 321, hash, innerHash);
 
 		// Assert:
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(1234)));
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
-		Assert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(metaData.getInnerHash(), IsEqual.equalTo(innerHash));
+		MatcherAssert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(1234)));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
+		MatcherAssert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerHash(), IsEqual.equalTo(innerHash));
 	}
 
 	@Test
@@ -44,10 +45,10 @@ public class TransactionMetaDataTest {
 		final TransactionMetaData metaData = createRoundTrippedMetaData(7546, 456, hash);
 
 		// Assert:
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
-		Assert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(metaData.getInnerHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
+		MatcherAssert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -58,10 +59,10 @@ public class TransactionMetaDataTest {
 		final TransactionMetaData metaData = createRoundTrippedMetaData(7546, 456, hash, innerHash);
 
 		// Assert:
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
-		Assert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(metaData.getInnerHash(), IsEqual.equalTo(innerHash));
+		MatcherAssert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
+		MatcherAssert.assertThat(metaData.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerHash(), IsEqual.equalTo(innerHash));
 	}
 
 	private static TransactionMetaData createMetaData(final long height, final long id, final Hash hash) {

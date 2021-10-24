@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -15,8 +16,8 @@ public class HashMetaDataTest {
 		final HashMetaData meta = new HashMetaData(new BlockHeight(10), new TimeInstant(123));
 
 		// Assert:
-		Assert.assertThat(meta.getHeight(), IsEqual.equalTo(new BlockHeight(10)));
-		Assert.assertThat(meta.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(meta.getHeight(), IsEqual.equalTo(new BlockHeight(10)));
+		MatcherAssert.assertThat(meta.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	//region equals / hashCode
@@ -27,9 +28,9 @@ public class HashMetaDataTest {
 		final HashMap<String, HashMetaData> map = createTestObjects();
 
 		// Assert:
-		Assert.assertThat(map.get("copy"), IsEqual.equalTo(map.get("original")));
-		Assert.assertThat(map.get("differentHeight"), IsNot.not(IsEqual.equalTo(map.get("original"))));
-		Assert.assertThat(map.get("differentTimeStamp"), IsNot.not(IsEqual.equalTo(map.get("original"))));
+		MatcherAssert.assertThat(map.get("copy"), IsEqual.equalTo(map.get("original")));
+		MatcherAssert.assertThat(map.get("differentHeight"), IsNot.not(IsEqual.equalTo(map.get("original"))));
+		MatcherAssert.assertThat(map.get("differentTimeStamp"), IsNot.not(IsEqual.equalTo(map.get("original"))));
 	}
 
 	@Test
@@ -38,9 +39,9 @@ public class HashMetaDataTest {
 		final HashMap<String, HashMetaData> map = createTestObjects();
 
 		// Assert:
-		Assert.assertThat(map.get("copy").hashCode(), IsEqual.equalTo(map.get("original").hashCode()));
-		Assert.assertThat(map.get("differentHeight").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
-		Assert.assertThat(map.get("differentTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
+		MatcherAssert.assertThat(map.get("copy").hashCode(), IsEqual.equalTo(map.get("original").hashCode()));
+		MatcherAssert.assertThat(map.get("differentHeight").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
+		MatcherAssert.assertThat(map.get("differentTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
 	private static HashMap<String, HashMetaData> createTestObjects() {

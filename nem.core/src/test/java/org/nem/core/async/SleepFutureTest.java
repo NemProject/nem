@@ -1,5 +1,6 @@
 package org.nem.core.async;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -16,7 +17,7 @@ public class SleepFutureTest {
 		final CompletableFuture<?> future = SleepFuture.create(TIME_UNIT);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -27,7 +28,7 @@ public class SleepFutureTest {
 		Thread.sleep(TIME_UNIT + DELTA);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -42,7 +43,7 @@ public class SleepFutureTest {
 
 		// Assert:
 		for (final CompletableFuture<?> future : futures) {
-			Assert.assertThat(future.isDone(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -55,12 +56,12 @@ public class SleepFutureTest {
 		Thread.sleep(TIME_UNIT + DELTA);
 
 		// Assert:
-		Assert.assertThat(future1.isDone(), IsEqual.equalTo(true));
-		Assert.assertThat(future5.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future1.isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(future5.isDone(), IsEqual.equalTo(false));
 
 		Thread.sleep(TIME_UNIT * 4);
 
-		Assert.assertThat(future1.isDone(), IsEqual.equalTo(true));
-		Assert.assertThat(future5.isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(future1.isDone(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(future5.isDone(), IsEqual.equalTo(true));
 	}
 }

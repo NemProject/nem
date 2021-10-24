@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.Supply;
@@ -12,7 +13,7 @@ public class MosaicFeeInformationTest {
 		final MosaicFeeInformation information = new MosaicFeeInformation(new Supply(575), 3);
 
 		// Assert:
-		Assert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(575)));
-		Assert.assertThat(information.getDivisibility(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(575)));
+		MatcherAssert.assertThat(information.getDivisibility(), IsEqual.equalTo(3));
 	}
 }

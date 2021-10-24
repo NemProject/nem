@@ -1,6 +1,7 @@
 package org.nem.core.crypto.secp256k1;
 
 import org.bouncycastle.crypto.params.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -17,7 +18,7 @@ public class SecP256K1UtilsTest {
 		final ECPrivateKeyParameters parameters = SecP256K1Utils.getPrivateKeyParameters(keyPair.getPrivateKey());
 
 		// Assert:
-		Assert.assertThat(parameters.getD(), IsEqual.equalTo(keyPair.getPrivateKey().getRaw()));
+		MatcherAssert.assertThat(parameters.getD(), IsEqual.equalTo(keyPair.getPrivateKey().getRaw()));
 	}
 
 	@Test
@@ -30,6 +31,6 @@ public class SecP256K1UtilsTest {
 		final ECPublicKeyParameters parameters = SecP256K1Utils.getPublicKeyParameters(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(parameters.getQ().getEncoded(true), IsEqual.equalTo(keyPair.getPublicKey().getRaw()));
+		MatcherAssert.assertThat(parameters.getQ().getEncoded(true), IsEqual.equalTo(keyPair.getPublicKey().getRaw()));
 	}
 }

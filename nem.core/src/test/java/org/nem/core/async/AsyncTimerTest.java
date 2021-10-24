@@ -1,5 +1,6 @@
 package org.nem.core.async;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -24,14 +25,14 @@ public class AsyncTimerTest {
 			Thread.sleep(TIME_HALF_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
 
 			// Arrange:
 			Thread.sleep(3 * TIME_HALF_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -46,8 +47,8 @@ public class AsyncTimerTest {
 			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -60,8 +61,8 @@ public class AsyncTimerTest {
 			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -75,9 +76,9 @@ public class AsyncTimerTest {
 			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(4));
-			Assert.assertThat(strategy.getNumNextCalls(), IsEqual.equalTo(4));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(4));
+			MatcherAssert.assertThat(strategy.getNumNextCalls(), IsEqual.equalTo(4));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -99,8 +100,8 @@ public class AsyncTimerTest {
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -122,8 +123,8 @@ public class AsyncTimerTest {
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -141,8 +142,8 @@ public class AsyncTimerTest {
 			Thread.sleep(TIME_HALF_UNIT);
 
 			// Assert:
-			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -160,15 +161,15 @@ public class AsyncTimerTest {
 
 				// Assert:
 				Mockito.verify(visitor, Mockito.times(0)).notifyOperationStart();
-				Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
+				MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
 
 				// Arrange:
 				Thread.sleep(4 * TIME_UNIT);
 
 				// Assert:
 				Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
-				Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
-				Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+				MatcherAssert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
+				MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 			}
 		}
 	}
@@ -182,8 +183,8 @@ public class AsyncTimerTest {
 			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
-			Assert.assertThat(f.getNumCalls(), IsEqual.equalTo(3));
-			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(f.getNumCalls(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -212,19 +213,19 @@ public class AsyncTimerTest {
 	private static void assertFirstFireFutureIsSet(final CountableFuture cf) throws InterruptedException {
 		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT)) {
 			// Assert: initially unset
-			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(false));
 
 			// Arrange: (should fire at 1)
 			Thread.sleep(2 * TIME_UNIT);
 
 			// Assert: the future should be set after the initial fire
-			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
 
 			// Arrange: (should fire at 3)
 			Thread.sleep(2 * TIME_UNIT);
 
 			// Assert: the future should be set after subsequent fires
-			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -297,7 +298,7 @@ public class AsyncTimerTest {
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(4)).notifyDelay(delayCaptor.capture());
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					delayCaptor.getAllValues(),
 					IsEqual.equalTo(Arrays.asList(TIME_HALF_UNIT, 2 * TIME_UNIT, 3 * TIME_HALF_UNIT, TIME_UNIT)));
 		}

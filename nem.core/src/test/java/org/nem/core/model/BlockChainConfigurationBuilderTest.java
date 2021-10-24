@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -12,11 +13,11 @@ public class BlockChainConfigurationBuilderTest {
 		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder().build();
 
 		// Assert:
-		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(10000));
-		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
-		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
-		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
-		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(10000));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
+		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
+		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
 	}
 
 	@Test
@@ -30,11 +31,11 @@ public class BlockChainConfigurationBuilderTest {
 				.build();
 
 		// Assert:
-		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
-		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
-		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
-		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
+		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
 	}
 
 	@Test
@@ -49,11 +50,11 @@ public class BlockChainConfigurationBuilderTest {
 				.build();
 
 		// Assert:
-		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
-		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
-		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
-		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
+		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
+		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
 	}
 
 	@Test

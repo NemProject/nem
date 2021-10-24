@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -18,7 +19,7 @@ public class PublicKeyTest {
 		final PublicKey key = new PublicKey(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
 	@Test
@@ -27,7 +28,7 @@ public class PublicKeyTest {
 		final PublicKey key = PublicKey.fromHexString("227F");
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
+		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -46,7 +47,7 @@ public class PublicKeyTest {
 		final PublicKey key = createRoundTrippedKey(new PublicKey(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(TEST_BYTES)));
+		MatcherAssert.assertThat(key, IsEqual.equalTo(new PublicKey(TEST_BYTES)));
 	}
 
 	private static PublicKey createRoundTrippedKey(final PublicKey originalKey) {
@@ -65,10 +66,10 @@ public class PublicKeyTest {
 		final PublicKey key = new PublicKey(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
-		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
+		MatcherAssert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
+		MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
 	}
 
 	@Test
@@ -78,8 +79,8 @@ public class PublicKeyTest {
 		final int hashCode = key.hashCode();
 
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new PublicKey(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -89,7 +90,7 @@ public class PublicKeyTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new PublicKey(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		MatcherAssert.assertThat(new PublicKey(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion

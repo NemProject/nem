@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -45,9 +46,9 @@ public class BlockCipherStressITCase {
 		final byte[] encryptedBytes2 = blockCipher2.encrypt(input);
 
 		// Assert:
-		Assert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-		Assert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
-		Assert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
-		Assert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
 	}
 }

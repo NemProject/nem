@@ -1,5 +1,6 @@
 package org.nem.core.test;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.serialization.MissingRequiredPropertyException;
@@ -109,6 +110,6 @@ public class ExceptionAssert {
 		ExceptionAssert.assertThrows(
 				v -> consumer.get(),
 				MissingRequiredPropertyException.class,
-				ex -> Assert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
+				ex -> MatcherAssert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
 	}
 }

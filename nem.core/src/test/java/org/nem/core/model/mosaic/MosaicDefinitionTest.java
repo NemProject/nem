@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -92,7 +93,7 @@ public class MosaicDefinitionTest {
 				levy);
 
 		// Assert:
-		Assert.assertThat(mosaicDefinition.isMosaicLevyPresent(), IsEqual.equalTo(expected));
+		MatcherAssert.assertThat(mosaicDefinition.isMosaicLevyPresent(), IsEqual.equalTo(expected));
 	}
 
 	// endregion
@@ -163,7 +164,7 @@ public class MosaicDefinitionTest {
 		final String uniqueId = mosaicDefinition.toString();
 
 		// Assert:
-		Assert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers:alice's vouchers"));
+		MatcherAssert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers:alice's vouchers"));
 	}
 
 	// endregion
@@ -177,13 +178,13 @@ public class MosaicDefinitionTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaicDefinition)) : IsEqual.equalTo(mosaicDefinition));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(mosaicDefinition)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(mosaicDefinition)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(mosaicDefinition)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(mosaicDefinition)));
 	}
 
 	@Test
@@ -193,7 +194,7 @@ public class MosaicDefinitionTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
@@ -246,11 +247,11 @@ public class MosaicDefinitionTest {
 			final MosaicProperties properties,
 			final MosaicLevy levy) {
 		// Assert:
-		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
-		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers")));
-		Assert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
-		Assert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
-		Assert.assertThat(mosaicDefinition.getMosaicLevy(), null == levy ? IsNull.nullValue() : IsEqual.equalTo(levy));
+		MatcherAssert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
+		MatcherAssert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers")));
+		MatcherAssert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
+		MatcherAssert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
+		MatcherAssert.assertThat(mosaicDefinition.getMosaicLevy(), null == levy ? IsNull.nullValue() : IsEqual.equalTo(levy));
 	}
 
 	private static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {

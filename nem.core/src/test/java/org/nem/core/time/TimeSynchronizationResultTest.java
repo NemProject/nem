@@ -1,5 +1,6 @@
 package org.nem.core.time;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.TimeOffset;
@@ -15,9 +16,9 @@ public class TimeSynchronizationResultTest {
 		final TimeSynchronizationResult result = new TimeSynchronizationResult(new TimeInstant(50), new TimeOffset(17), new TimeOffset(7));
 
 		// Assert:
-		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
-		Assert.assertThat(result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(17)));
-		Assert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
+		MatcherAssert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
+		MatcherAssert.assertThat(result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(17)));
+		MatcherAssert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
 	}
 
 	//endregion
@@ -33,9 +34,9 @@ public class TimeSynchronizationResultTest {
 		final TimeSynchronizationResult result = new TimeSynchronizationResult(Utils.roundtripSerializableEntity(originalResult, null));
 
 		// Assert:
-		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
-		Assert.assertThat(result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(17)));
-		Assert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
+		MatcherAssert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
+		MatcherAssert.assertThat(result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(17)));
+		MatcherAssert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
 	}
 
 	//endregion

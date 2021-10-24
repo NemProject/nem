@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -52,7 +53,7 @@ public class NetworkInfosTest {
 		@Test
 		public void defaultNetworkIsTestNetworkByDefault() {
 			// Assert:
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					NetworkInfos.getDefault(),
 					IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
 		}
@@ -63,7 +64,7 @@ public class NetworkInfosTest {
 			NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
 
 			// Assert:
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					NetworkInfos.getDefault(),
 					IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
 		}
@@ -77,7 +78,7 @@ public class NetworkInfosTest {
 			NetworkInfos.setDefault(null);
 
 			// Assert:
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					NetworkInfos.getDefault(),
 					IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
 		}
@@ -158,7 +159,7 @@ public class NetworkInfosTest {
 			final NetworkInfo networkInfo = NetworkInfos.fromAddress(address);
 
 			// Assert:
-			Assert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
+			MatcherAssert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
 		}
 
 		@Test
@@ -170,7 +171,7 @@ public class NetworkInfosTest {
 			final NetworkInfo networkInfo = NetworkInfos.fromVersion(version);
 
 			// Assert:
-			Assert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
+			MatcherAssert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
 		}
 
 		@Test
@@ -182,7 +183,7 @@ public class NetworkInfosTest {
 			final NetworkInfo networkInfo = NetworkInfos.fromFriendlyName(friendlyName);
 
 			// Assert:
-			Assert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
+			MatcherAssert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
 		}
 
 		@Test
@@ -193,7 +194,7 @@ public class NetworkInfosTest {
 				final boolean isCompatible = this.networkInfo.isCompatible(entry.getValue());
 
 				// Assert:
-				Assert.assertThat(isCompatible, IsEqual.equalTo(this.identifier.equals(entry.getKey())));
+				MatcherAssert.assertThat(isCompatible, IsEqual.equalTo(this.identifier.equals(entry.getKey())));
 			}
 		}
 
@@ -216,12 +217,12 @@ public class NetworkInfosTest {
 			// Assert:
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("8d07f90fb4bbe7715fa327c926770166a11be2e494a970605f2e12557f66c9b9");
-			Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
-			Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
-			Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
-			Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
-			Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(9000000240L)));
-			Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis.bin"));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
+			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(9000000240L)));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis.bin"));
 		}
 	}
 
@@ -235,12 +236,12 @@ public class NetworkInfosTest {
 		protected void assertNetworkInfo(final NetworkInfo info) {
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
-			Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x98));
-			Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('T'));
-			Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
-			Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
-			Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
-			Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-testnet.bin"));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x98));
+			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('T'));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-testnet.bin"));
 		}
 	}
 
@@ -254,12 +255,12 @@ public class NetworkInfosTest {
 		protected void assertNetworkInfo(final NetworkInfo info) {
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("57b4832d9232ee410e93d595207cffc2b9e9c5002472c4b0bb3bb10a4ce152e3");
-			Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x60));
-			Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('M'));
-			Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
-			Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
-			Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(9000000000L)));
-			Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-mijinnet.bin"));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x60));
+			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('M'));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(9000000000L)));
+			MatcherAssert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-mijinnet.bin"));
 		}
 	}
 }

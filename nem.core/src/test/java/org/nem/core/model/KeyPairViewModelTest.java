@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -18,8 +19,8 @@ public class KeyPairViewModelTest {
 		final KeyPairViewModel viewModel = new KeyPairViewModel(keyPair, (byte)17);
 
 		// Assert:
-		Assert.assertThat(viewModel.getKeyPair(), IsEqual.equalTo(keyPair));
-		Assert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo((byte)17));
+		MatcherAssert.assertThat(viewModel.getKeyPair(), IsEqual.equalTo(keyPair));
+		MatcherAssert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo((byte)17));
 	}
 
 	@Test
@@ -72,9 +73,9 @@ public class KeyPairViewModelTest {
 		final KeyPairViewModel viewModel = new KeyPairViewModel(Utils.roundtripSerializableEntity(originalViewModel, null));
 
 		// Assert:
-		Assert.assertThat(viewModel.getKeyPair().getPrivateKey(), IsEqual.equalTo(originalViewModel.getKeyPair().getPrivateKey()));
-		Assert.assertThat(viewModel.getKeyPair().getPublicKey(), IsEqual.equalTo(originalViewModel.getKeyPair().getPublicKey()));
-		Assert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(originalViewModel.getNetworkVersion()));
+		MatcherAssert.assertThat(viewModel.getKeyPair().getPrivateKey(), IsEqual.equalTo(originalViewModel.getKeyPair().getPrivateKey()));
+		MatcherAssert.assertThat(viewModel.getKeyPair().getPublicKey(), IsEqual.equalTo(originalViewModel.getKeyPair().getPublicKey()));
+		MatcherAssert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(originalViewModel.getNetworkVersion()));
 	}
 
 	@Test
@@ -87,9 +88,9 @@ public class KeyPairViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
-		Assert.assertThat(jsonObject.get("privateKey"), IsEqual.equalTo(keyPair.getPrivateKey().toString()));
-		Assert.assertThat(jsonObject.get("publicKey"), IsEqual.equalTo(keyPair.getPublicKey().toString()));
-		Assert.assertThat(jsonObject.get("address"), IsEqual.equalTo(Address.fromPublicKey((byte)17, keyPair.getPublicKey()).toString()));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(jsonObject.get("privateKey"), IsEqual.equalTo(keyPair.getPrivateKey().toString()));
+		MatcherAssert.assertThat(jsonObject.get("publicKey"), IsEqual.equalTo(keyPair.getPublicKey().toString()));
+		MatcherAssert.assertThat(jsonObject.get("address"), IsEqual.equalTo(Address.fromPublicKey((byte)17, keyPair.getPublicKey()).toString()));
 	}
 }

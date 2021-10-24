@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ public abstract class DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, signature), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner.verify(input, signature), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -39,10 +40,10 @@ public abstract class DsaSignerTest {
 		final Signature signature2 = dsaSigner2.sign(input);
 
 		// Assert:
-		Assert.assertThat(dsaSigner1.verify(input, signature1), IsEqual.equalTo(true));
-		Assert.assertThat(dsaSigner1.verify(input, signature2), IsEqual.equalTo(false));
-		Assert.assertThat(dsaSigner2.verify(input, signature1), IsEqual.equalTo(false));
-		Assert.assertThat(dsaSigner2.verify(input, signature2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner1.verify(input, signature1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner1.verify(input, signature2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner2.verify(input, signature1), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner2.verify(input, signature2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public abstract class DsaSignerTest {
 		final Signature signature2 = dsaSigner.sign(input);
 
 		// Assert:
-		Assert.assertThat(signature1, IsEqual.equalTo(signature2));
+		MatcherAssert.assertThat(signature1, IsEqual.equalTo(signature2));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -85,7 +86,7 @@ public abstract class DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.isCanonicalSignature(signature), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(signature), IsEqual.equalTo(true));
 	}
 
 	@Test

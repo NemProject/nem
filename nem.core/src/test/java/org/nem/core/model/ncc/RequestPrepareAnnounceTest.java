@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -18,8 +19,8 @@ public class RequestPrepareAnnounceTest {
 		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(transaction, privateKey);
 
 		// Assert:
-		Assert.assertThat(request.getTransaction(), IsEqual.equalTo(transaction));
-		Assert.assertThat(request.getPrivateKey(), IsEqual.equalTo(privateKey));
+		MatcherAssert.assertThat(request.getTransaction(), IsEqual.equalTo(transaction));
+		MatcherAssert.assertThat(request.getPrivateKey(), IsEqual.equalTo(privateKey));
 	}
 
 	@Test
@@ -34,8 +35,8 @@ public class RequestPrepareAnnounceTest {
 		final RequestPrepareAnnounce request = createRoundTrippedRequest(originalRequest);
 
 		// Assert:
-		Assert.assertThat(HashUtils.calculateHash(request.getTransaction().asNonVerifiable()), IsEqual.equalTo(transactionHash));
-		Assert.assertThat(request.getPrivateKey(), IsEqual.equalTo(privateKey));
+		MatcherAssert.assertThat(HashUtils.calculateHash(request.getTransaction().asNonVerifiable()), IsEqual.equalTo(transactionHash));
+		MatcherAssert.assertThat(request.getPrivateKey(), IsEqual.equalTo(privateKey));
 	}
 
 	private static RequestPrepareAnnounce createRoundTrippedRequest(final RequestPrepareAnnounce originalRequest) {

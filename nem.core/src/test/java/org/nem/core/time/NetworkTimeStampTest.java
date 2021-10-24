@@ -1,6 +1,7 @@
 package org.nem.core.time;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -16,7 +17,7 @@ public class NetworkTimeStampTest {
 		final NetworkTimeStamp networkTimeStamp = new NetworkTimeStamp(1234);
 
 		// Assert:
-		Assert.assertThat(networkTimeStamp.getRaw(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(networkTimeStamp.getRaw(), IsEqual.equalTo(1234L));
 	}
 
 	//endregion
@@ -30,8 +31,8 @@ public class NetworkTimeStampTest {
 		final NetworkTimeStamp networkTimeStamp2 = new NetworkTimeStamp(576);
 
 		// Act + Assert:
-		Assert.assertThat(networkTimeStamp1.subtract(networkTimeStamp2), IsEqual.equalTo(658L));
-		Assert.assertThat(networkTimeStamp2.subtract(networkTimeStamp1), IsEqual.equalTo(-658L));
+		MatcherAssert.assertThat(networkTimeStamp1.subtract(networkTimeStamp2), IsEqual.equalTo(658L));
+		MatcherAssert.assertThat(networkTimeStamp2.subtract(networkTimeStamp1), IsEqual.equalTo(-658L));
 	}
 
 	//endregion
@@ -49,8 +50,8 @@ public class NetworkTimeStampTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("timeStamp"), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("timeStamp"), IsEqual.equalTo(1234L));
 	}
 
 	@Test
@@ -66,7 +67,7 @@ public class NetworkTimeStampTest {
 		final NetworkTimeStamp networkTimeStamp = NetworkTimeStamp.readFrom(deserializer, "timeStamp");
 
 		// Assert:
-		Assert.assertThat(networkTimeStamp, IsEqual.equalTo(originalNetworkTimeStamp));
+		MatcherAssert.assertThat(networkTimeStamp, IsEqual.equalTo(originalNetworkTimeStamp));
 	}
 
 	//endregion

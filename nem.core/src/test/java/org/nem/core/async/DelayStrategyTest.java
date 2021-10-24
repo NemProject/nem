@@ -1,5 +1,6 @@
 package org.nem.core.async;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -17,7 +18,7 @@ public class DelayStrategyTest {
 		strategy.next();
 
 		// Assert:
-		Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(strategy.shouldStop(), IsEqual.equalTo(true));
 
 		// Act:
 		strategy.next();
@@ -35,8 +36,8 @@ public class DelayStrategyTest {
 		// Assert:
 		for (int i = 0; i < 100; ++i) {
 			final String message = "Iteration: " + i;
-			Assert.assertThat(message, strategy.shouldStop(), IsEqual.equalTo(false));
-			Assert.assertThat(message, strategy.next(), IsEqual.equalTo(41));
+			MatcherAssert.assertThat(message, strategy.shouldStop(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(message, strategy.next(), IsEqual.equalTo(41));
 		}
 	}
 
@@ -92,8 +93,8 @@ public class DelayStrategyTest {
 
 		// Assert:
 		for (int i = 0; i < 100; ++i) {
-			Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
-			Assert.assertThat(strategy.next(), IsEqual.equalTo(delays[i % delays.length]));
+			MatcherAssert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(strategy.next(), IsEqual.equalTo(delays[i % delays.length]));
 		}
 	}
 
@@ -130,10 +131,10 @@ public class DelayStrategyTest {
 
 	private static void assertStrategy(final AbstractDelayStrategy strategy, final int[] expectedDelays) {
 		for (final int expectedDelay : expectedDelays) {
-			Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
-			Assert.assertThat(strategy.next(), IsEqual.equalTo(expectedDelay));
+			MatcherAssert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(strategy.next(), IsEqual.equalTo(expectedDelay));
 		}
 
-		Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(strategy.shouldStop(), IsEqual.equalTo(true));
 	}
 }

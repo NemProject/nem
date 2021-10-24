@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -16,14 +17,14 @@ public class StringEncoderTest {
 	@Test
 	public void stringCanBeConvertedToByteArray() {
 		// Assert:
-		Assert.assertThat(StringEncoder.getBytes("Sigma"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
-		Assert.assertThat(StringEncoder.getBytes("$¢€"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
+		MatcherAssert.assertThat(StringEncoder.getBytes("Sigma"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+		MatcherAssert.assertThat(StringEncoder.getBytes("$¢€"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
 	}
 
 	@Test
 	public void byteArrayCanBeConvertedToString() {
 		// Assert:
-		Assert.assertThat(StringEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("Sigma"));
-		Assert.assertThat(StringEncoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("$¢€"));
+		MatcherAssert.assertThat(StringEncoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("Sigma"));
+		MatcherAssert.assertThat(StringEncoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("$¢€"));
 	}
 }

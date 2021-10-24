@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -48,6 +49,6 @@ public class BlockMultisigTest {
 		final Hash hash2 = HashUtils.calculateHash(block2);
 
 		// Assert:
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		MatcherAssert.assertThat(hash2, IsEqual.equalTo(hash1));
 	}
 }

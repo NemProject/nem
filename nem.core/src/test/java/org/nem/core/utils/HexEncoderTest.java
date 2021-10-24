@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -43,7 +44,7 @@ public class HexEncoderTest {
 		final byte[] output = HexEncoder.getBytes(input);
 
 		// Assert:
-		Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
+		MatcherAssert.assertThat(output, IsEqual.equalTo(expectedOutput));
 	}
 
 	//endregion
@@ -87,7 +88,7 @@ public class HexEncoderTest {
 		final byte[] output = HexEncoder.tryGetBytes(input);
 
 		// Assert:
-		Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
+		MatcherAssert.assertThat(output, IsEqual.equalTo(expectedOutput));
 	}
 
 	//endregion
@@ -115,7 +116,7 @@ public class HexEncoderTest {
 		final String output = HexEncoder.getString(input);
 
 		// Assert:
-		Assert.assertThat(output, IsEqual.equalTo(expectedOutput));
+		MatcherAssert.assertThat(output, IsEqual.equalTo(expectedOutput));
 	}
 
 	//endregion

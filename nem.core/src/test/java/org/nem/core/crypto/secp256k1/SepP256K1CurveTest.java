@@ -1,5 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.CryptoEngines;
@@ -13,13 +14,13 @@ public class SepP256K1CurveTest {
 	@Test
 	public void getNameReturnsCorrectName() {
 		// Assert:
-		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getName(), IsEqual.equalTo("secp256k1"));
+		MatcherAssert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getName(), IsEqual.equalTo("secp256k1"));
 	}
 
 	@Test
 	public void getNameReturnsCorrectGroupOrder() {
 		// Assert:
-		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
+		MatcherAssert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
 	}
 
 	@Test
@@ -28,6 +29,6 @@ public class SepP256K1CurveTest {
 		final BigInteger halfGroupOrder = GROUP_ORDER.shiftRight(1);
 
 		// Assert:
-		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getHalfGroupOrder(), IsEqual.equalTo(halfGroupOrder));
+		MatcherAssert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getHalfGroupOrder(), IsEqual.equalTo(halfGroupOrder));
 	}
 }

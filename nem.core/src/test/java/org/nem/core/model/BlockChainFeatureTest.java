@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -28,11 +29,11 @@ public class BlockChainFeatureTest {
 			final BlockChainFeature feature = BlockChainFeature.fromString(entry.getKey());
 
 			// Assert:
-			Assert.assertThat(feature, IsEqual.equalTo(entry.getValue()));
+			MatcherAssert.assertThat(feature, IsEqual.equalTo(entry.getValue()));
 		}
 
 		// Assert:
-		Assert.assertThat(expectedMappings.size(), IsEqual.equalTo(BlockChainFeature.values().length));
+		MatcherAssert.assertThat(expectedMappings.size(), IsEqual.equalTo(BlockChainFeature.values().length));
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature feature = BlockChainFeature.PROOF_OF_IMPORTANCE;
 
 		// Assert:
-		Assert.assertThat(feature.value(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(feature.value(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -62,7 +63,7 @@ public class BlockChainFeatureTest {
 		final int value = BlockChainFeature.or();
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -71,7 +72,7 @@ public class BlockChainFeatureTest {
 		final int value = BlockChainFeature.or(BlockChainFeature.PROOF_OF_IMPORTANCE);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(1));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -80,7 +81,7 @@ public class BlockChainFeatureTest {
 		final int value = BlockChainFeature.or(BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(17));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(17));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(0);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] {}));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] {}));
 	}
 
 	@Test
@@ -98,7 +99,7 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(2);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
 	}
 
 	@Test
@@ -107,7 +108,7 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(17);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				features,
 				IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES }));
 	}

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -20,7 +21,7 @@ public class TransactionExtensionsTest {
 		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(transaction).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(signatures.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(signatures.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -32,8 +33,8 @@ public class TransactionExtensionsTest {
 		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(multisigTransaction).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(signatures.size(), IsEqual.equalTo(3));
-		Assert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
+		MatcherAssert.assertThat(signatures.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
 	}
 
 	//endregion
@@ -47,7 +48,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndFirstChildTransactions(transaction));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}
@@ -61,7 +62,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndAllTransactions(transaction));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82));
 	}
@@ -75,7 +76,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamDefault(transaction));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}

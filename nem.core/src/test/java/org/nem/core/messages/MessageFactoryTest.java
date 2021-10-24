@@ -1,6 +1,7 @@
 package org.nem.core.messages;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -30,9 +31,9 @@ public class MessageFactoryTest {
 		final Message message = deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(message, IsInstanceOf.instanceOf(PlainMessage.class));
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
+		MatcherAssert.assertThat(message, IsInstanceOf.instanceOf(PlainMessage.class));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
 	}
 
 	@Test
@@ -52,9 +53,9 @@ public class MessageFactoryTest {
 		final Message message = MessageFactory.deserialize(deserializer, sender, recipient);
 
 		// Assert:
-		Assert.assertThat(message, IsInstanceOf.instanceOf(SecureMessage.class));
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
+		MatcherAssert.assertThat(message, IsInstanceOf.instanceOf(SecureMessage.class));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
 	}
 
 	private static Message deserialize(final Deserializer deserializer) {

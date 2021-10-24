@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -22,7 +23,7 @@ public class ParallelVerifyPerfITCase {
 		// Warm up
 		for (int i = 0; i < 5; i++) {
 			LOGGER.info("Warm up round " + (i + 1));
-			Assert.assertThat(transactions.parallelStream().allMatch(VerifiableEntity::verify), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(transactions.parallelStream().allMatch(VerifiableEntity::verify), IsEqual.equalTo(true));
 		}
 
 		// Act:
@@ -39,9 +40,9 @@ public class ParallelVerifyPerfITCase {
 		LOGGER.info(String.format("Sequential verify: %d ns/tx", (stopSequential - startSequential) / count));
 
 		// Assert:
-		Assert.assertThat(resultParallel, IsEqual.equalTo(true));
-		Assert.assertThat(resultSequential, IsEqual.equalTo(true));
-		Assert.assertThat((stopSequential - startSequential) / (stopParallel - startParallel) > 2, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(resultParallel, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(resultSequential, IsEqual.equalTo(true));
+		MatcherAssert.assertThat((stopSequential - startSequential) / (stopParallel - startParallel) > 2, IsEqual.equalTo(true));
 	}
 
 	private static Collection<Transaction> createTransactions(final int count) {

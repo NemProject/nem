@@ -1,5 +1,6 @@
 package org.nem.core.serialization.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -34,7 +35,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final T value = this.readValue(deserializer, "val");
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValue));
 	}
 
 	@Test
@@ -47,7 +48,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final T value = this.readOptionalValue(deserializer, "value");
 
 		// Assert:
-		Assert.assertThat(value, IsNull.nullValue());
+		MatcherAssert.assertThat(value, IsNull.nullValue());
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final T value = this.readOptionalValue(deserializer, "value");
 
 		// Assert:
-		Assert.assertThat(value, IsNull.nullValue());
+		MatcherAssert.assertThat(value, IsNull.nullValue());
 	}
 
 	@Test

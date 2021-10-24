@@ -1,5 +1,6 @@
 package org.nem.core.serialization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.primitive.*;
@@ -27,7 +28,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			// Assert:
 			final byte[] expectedBytes = new byte[] { 0x10, 0x35, 0x51, 0x09 };
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -43,7 +44,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x50, 0x13, (byte)0x95, (byte)0xCE,
 					0x33, (byte)0xA0, 0x39, (byte)0xF2
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -57,7 +58,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			// Assert:
 			final byte[] expectedBytes = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putDouble(d).array();
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -74,7 +75,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x07, 0x00, 0x00, 0x00,
 					0x00, (byte)0x95, (byte)0x8A, 0x75, 0x61, (byte)0xF0, 0x14
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -91,7 +92,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x03, 0x00, 0x00, 0x00,
 					0x00, (byte)0x90, 0x12
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -108,7 +109,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x05, 0x00, 0x00, 0x00,
 					0x50, (byte)0xFF, 0x00, 0x7C, 0x21
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -121,7 +122,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			// Assert:
 			final byte[] expectedBytes = new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF };
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -135,7 +136,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			// Assert:
 			final byte[] expectedBytes = new byte[] { 0x00, 0x00, 0x00, 0x00 };
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -151,7 +152,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x04, 0x00, 0x00, 0x00,
 					0x42, 0x45, 0x74, 0x61
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -170,7 +171,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x03, 0x00, 0x00, 0x00, 0x66, 0x6F, 0x6F,
 					0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -202,7 +203,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 					0x05, 0x00, 0x00, 0x00, 0x61, 0x6C, 0x70, 0x68, 0x61,
 					0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			};
-			Assert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
+			MatcherAssert.assertThat(serializer.getBytes(), IsEqual.equalTo(expectedBytes));
 		}
 	}
 
@@ -219,7 +220,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			try (BinaryDeserializer deserializer = this.createBinaryDeserializer(serializer.getBytes())) {
 				// Assert:
-				Assert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(true));
+				MatcherAssert.assertThat(deserializer.hasMoreData(), IsEqual.equalTo(true));
 			}
 		}
 	}
@@ -238,11 +239,11 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 			try (BinaryDeserializer deserializer = this.createBinaryDeserializer(serializer.getBytes())) {
 				// Assert:
-				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(12));
+				MatcherAssert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(12));
 				deserializer.readInt("int");
-				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(8));
+				MatcherAssert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(8));
 				deserializer.readLong("long");
-				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(0));
+				MatcherAssert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(0));
 			}
 		}
 	}
@@ -288,7 +289,7 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 			final byte[] writeObjectBytes = serializer.getBytes();
 
 			// Assert:
-			Assert.assertThat(BinarySerializer.serializeToBytes(entity), IsEqual.equalTo(writeObjectBytes));
+			MatcherAssert.assertThat(BinarySerializer.serializeToBytes(entity), IsEqual.equalTo(writeObjectBytes));
 		}
 	}
 

@@ -1,5 +1,6 @@
 package org.nem.core.metadata;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -37,11 +38,11 @@ public class MetaDataFactoryTest {
 			final ApplicationMetaData metaData = MetaDataFactory.loadApplicationMetaData(codeSource, timeProvider);
 
 			// Assert:
-			Assert.assertThat(metaData.getAppName(), IsEqual.equalTo("test-title"));
-			Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("test-version"));
-			Assert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
-			Assert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(11)));
-			Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(14)));
+			MatcherAssert.assertThat(metaData.getAppName(), IsEqual.equalTo("test-title"));
+			MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo("test-version"));
+			MatcherAssert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
+			MatcherAssert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(11)));
+			MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(14)));
 		}
 	}
 }

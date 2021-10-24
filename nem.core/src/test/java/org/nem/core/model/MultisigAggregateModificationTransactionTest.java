@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -136,12 +137,12 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Assert:
 			for (int i = 0; i < 3; i++) {
-				Assert.assertThat(modifications.get(i).getModificationType(), IsEqual.equalTo(MultisigModificationType.AddCosignatory));
-				Assert.assertThat(
+				MatcherAssert.assertThat(modifications.get(i).getModificationType(), IsEqual.equalTo(MultisigModificationType.AddCosignatory));
+				MatcherAssert.assertThat(
 						modifications.get(i).getCosignatory().getAddress().getEncoded(),
 						IsEqual.equalTo(Character.toString((char)(i + (int)'A'))));
-				Assert.assertThat(modifications.get(i + 3).getModificationType(), IsEqual.equalTo(MultisigModificationType.DelCosignatory));
-				Assert.assertThat(
+				MatcherAssert.assertThat(modifications.get(i + 3).getModificationType(), IsEqual.equalTo(MultisigModificationType.DelCosignatory));
+				MatcherAssert.assertThat(
 						modifications.get(i + 3).getCosignatory().getAddress().getEncoded(),
 						IsEqual.equalTo(Character.toString((char)(i + (int)'D'))));
 			}
@@ -194,13 +195,13 @@ public class MultisigAggregateModificationTransactionTest {
 			final MultisigAggregateModificationTransaction transaction = this.createTransaction(signer, cosignatoryModifications);
 
 			// Assert:
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
-			Assert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
-			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+			MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
+			MatcherAssert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 		}
 
 		//endregion
@@ -232,22 +233,22 @@ public class MultisigAggregateModificationTransactionTest {
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 			// Assert:
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+			MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
 
 			final List<MultisigCosignatoryModification> originalModifications = new ArrayList<>(originalTransaction.getCosignatoryModifications());
 			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getCosignatoryModifications());
 			for (int i = 0; i < numModifications; ++i) {
 				final MultisigCosignatoryModification originalModification = originalModifications.get(i);
 				final MultisigCosignatoryModification modification = modifications.get(i);
-				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
-				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
+				MatcherAssert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
+				MatcherAssert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
 			}
 
-			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
+			MatcherAssert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 		}
 
 		private MultisigAggregateModificationTransaction createRoundTrippedTransaction(
@@ -292,7 +293,7 @@ public class MultisigAggregateModificationTransactionTest {
 			final Collection<Account> accounts = context.transactionWithTwoCosignatoryModifications.getAccounts();
 
 			// Assert:
-			Assert.assertThat(accounts, IsEquivalent.equivalentTo(context.signer, context.cosignatory1, context.cosignatory2));
+			MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(context.signer, context.cosignatory1, context.cosignatory2));
 		}
 
 		//endregion
@@ -556,8 +557,8 @@ public class MultisigAggregateModificationTransactionTest {
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 			// Assert:
-			Assert.assertThat(originalTransaction.getMinCosignatoriesModification(), IsNull.notNullValue());
-			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
+			MatcherAssert.assertThat(originalTransaction.getMinCosignatoriesModification(), IsNull.notNullValue());
+			MatcherAssert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 		}
 
 		private MultisigAggregateModificationTransaction createRoundTrippedTransaction(
@@ -643,13 +644,13 @@ public class MultisigAggregateModificationTransactionTest {
 					: this.createTransaction(signer, cosignatoryModifications);
 
 			// Assert:
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
-			Assert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
-			Assert.assertThat(
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+			MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
+			MatcherAssert.assertThat(
 					transaction.getMinCosignatoriesModification(),
 					hasMinCosignatoriesModification ? IsEqual.equalTo(minCosignatoriesModification) : IsNull.nullValue());
 		}
@@ -689,23 +690,23 @@ public class MultisigAggregateModificationTransactionTest {
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 			// Assert:
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+			MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
 
 			final List<MultisigCosignatoryModification> originalModifications = new ArrayList<>(originalTransaction.getCosignatoryModifications());
 			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getCosignatoryModifications());
 			for (int i = 0; i < numModifications; ++i) {
 				final MultisigCosignatoryModification originalModification = originalModifications.get(i);
 				final MultisigCosignatoryModification modification = modifications.get(i);
-				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
-				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
+				MatcherAssert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
+				MatcherAssert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
 			}
 
-			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.notNullValue());
-			Assert.assertThat(
+			MatcherAssert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.notNullValue());
+			MatcherAssert.assertThat(
 					transaction.getMinCosignatoriesModification().getRelativeChange(),
 					IsEqual.equalTo(minCosignatoriesModification.getRelativeChange()));
 		}

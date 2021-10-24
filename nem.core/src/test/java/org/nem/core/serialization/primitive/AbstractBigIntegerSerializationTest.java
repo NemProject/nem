@@ -1,5 +1,6 @@
 package org.nem.core.serialization.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -20,7 +21,7 @@ public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Se
 		this.assertCanRoundtrip(i);
 
 		// Sanity:
-		Assert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
+		MatcherAssert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Se
 		this.assertCanRoundtrip(i, new BigInteger(1, new byte[] { (byte)0x90, 0x12 }));
 
 		// Sanity:
-		Assert.assertThat(2, IsEqual.equalTo(i.toByteArray().length));
+		MatcherAssert.assertThat(2, IsEqual.equalTo(i.toByteArray().length));
 	}
 
 	@Override

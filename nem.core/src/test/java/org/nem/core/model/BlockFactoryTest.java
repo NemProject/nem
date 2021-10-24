@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -54,9 +55,9 @@ public class BlockFactoryTest {
 		final Block block = BlockFactory.VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
-		Assert.assertThat(block.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
+		MatcherAssert.assertThat(block.getSignature(), IsNull.notNullValue());
 	}
 
 	private static void canDeserializeNonVerifiableBlock(final Block originalBlock, final int expectedType) {
@@ -69,9 +70,9 @@ public class BlockFactoryTest {
 		final Block block = BlockFactory.NON_VERIFIABLE.deserialize(deserializer);
 
 		// Assert:
-		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
-		Assert.assertThat(block.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
+		MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
+		MatcherAssert.assertThat(block.getSignature(), IsNull.nullValue());
 	}
 
 	private static Block createNemesisBlock() {

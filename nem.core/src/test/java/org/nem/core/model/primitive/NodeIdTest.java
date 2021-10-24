@@ -1,5 +1,6 @@
 package org.nem.core.model.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -19,7 +20,7 @@ public class NodeIdTest {
 		final NodeId id = new NodeId(0);
 
 		// Assert:
-		Assert.assertThat(id.getValue(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -28,7 +29,7 @@ public class NodeIdTest {
 		final NodeId id = new NodeId(1);
 
 		// Assert:
-		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -14,7 +15,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getMinTransactionsPerSyncAttempt(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(configuration.getMinTransactionsPerSyncAttempt(), IsEqual.equalTo(100));
 	}
 
 	@Test
@@ -23,7 +24,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getDefaultTransactionsPerSyncAttempt(), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(configuration.getDefaultTransactionsPerSyncAttempt(), IsEqual.equalTo(500));
 	}
 
 	// endregion
@@ -36,7 +37,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getDefaultBlocksPerSyncAttempt(), IsEqual.equalTo(70 / 4));
+		MatcherAssert.assertThat(configuration.getDefaultBlocksPerSyncAttempt(), IsEqual.equalTo(70 / 4));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getMaxBlocksPerSyncAttempt(), IsEqual.equalTo(30 + 40));
+		MatcherAssert.assertThat(configuration.getMaxBlocksPerSyncAttempt(), IsEqual.equalTo(30 + 40));
 	}
 
 	// endregion
@@ -58,7 +59,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getEstimatedBlocksPerDay(), IsEqual.equalTo(1920));
+		MatcherAssert.assertThat(configuration.getEstimatedBlocksPerDay(), IsEqual.equalTo(1920));
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getEstimatedBlocksPerMonth(), IsEqual.equalTo(1920 * 30));
+		MatcherAssert.assertThat(configuration.getEstimatedBlocksPerMonth(), IsEqual.equalTo(1920 * 30));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getEstimatedBlocksPerYear(), IsEqual.equalTo(1920 * 365));
+		MatcherAssert.assertThat(configuration.getEstimatedBlocksPerYear(), IsEqual.equalTo(1920 * 365));
 	}
 
 	// endregion
@@ -89,7 +90,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
 
 		// Assert:
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -98,7 +99,7 @@ public class BlockChainConfigurationTest {
 		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
 
 		// Assert:
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
 	}
 
 	// endregion

@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,7 +16,7 @@ public class AmountTest {
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(Amount.ZERO, IsEqual.equalTo(new Amount(0)));
+		MatcherAssert.assertThat(Amount.ZERO, IsEqual.equalTo(new Amount(0)));
 	}
 
 	//endregion
@@ -28,8 +29,8 @@ public class AmountTest {
 		final Amount amount = Amount.fromNem(11);
 
 		// Assert:
-		Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11000000L));
-		Assert.assertThat(amount.getNumNem(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11000000L));
+		MatcherAssert.assertThat(amount.getNumNem(), IsEqual.equalTo(11L));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class AmountTest {
 		final Amount amount = Amount.fromMicroNem(11);
 
 		// Assert:
-		Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11L));
-		Assert.assertThat(amount.getNumNem(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(amount.getNumNem(), IsEqual.equalTo(0L));
 	}
 
 	//endregion
@@ -58,7 +59,7 @@ public class AmountTest {
 		final Amount amount = new Amount(0);
 
 		// Assert:
-		Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class AmountTest {
 		final Amount amount = new Amount(1);
 
 		// Assert:
-		Assert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(1L));
+		MatcherAssert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(1L));
 	}
 
 	//endregion
@@ -77,9 +78,9 @@ public class AmountTest {
 	@Test
 	public void getNumNemRoundsDownToTheNearestWholeNem() {
 		// Assert:
-		Assert.assertThat(Amount.fromMicroNem(11000000L).getNumNem(), IsEqual.equalTo(11L));
-		Assert.assertThat(Amount.fromMicroNem(11000001L).getNumNem(), IsEqual.equalTo(11L));
-		Assert.assertThat(Amount.fromMicroNem(11999999L).getNumNem(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(Amount.fromMicroNem(11000000L).getNumNem(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(Amount.fromMicroNem(11000001L).getNumNem(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(Amount.fromMicroNem(11999999L).getNumNem(), IsEqual.equalTo(11L));
 	}
 
 	//endregion
@@ -97,8 +98,8 @@ public class AmountTest {
 		final Amount result2 = amount2.add(amount1);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(new Amount(176)));
-		Assert.assertThat(result2, IsEqual.equalTo(new Amount(176)));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(new Amount(176)));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(new Amount(176)));
 	}
 
 	@Test
@@ -111,7 +112,7 @@ public class AmountTest {
 		final Amount result = amount2.subtract(amount1);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new Amount(46)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new Amount(46)));
 	}
 
 	@Test(expected = NegativeBalanceException.class)
@@ -137,7 +138,7 @@ public class AmountTest {
 		final Amount result = amount.multiply(3);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new Amount(195)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new Amount(195)));
 	}
 
 	//endregion
@@ -155,8 +156,8 @@ public class AmountTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Amount"), IsEqual.equalTo(0x7712411223456L));
 	}
 
 	@Test
@@ -183,7 +184,7 @@ public class AmountTest {
 		final Amount amount = readFrom.apply(deserializer, "Amount");
 
 		// Assert:
-		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
+		MatcherAssert.assertThat(amount, IsEqual.equalTo(originalAmount));
 	}
 
 	@Test
@@ -196,7 +197,7 @@ public class AmountTest {
 		final Amount amount = Amount.readFromOptional(deserializer, "Amount");
 
 		// Assert:
-		Assert.assertThat(amount, IsNull.nullValue());
+		MatcherAssert.assertThat(amount, IsNull.nullValue());
 	}
 
 	//endregion

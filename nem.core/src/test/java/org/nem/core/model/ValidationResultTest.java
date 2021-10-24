@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -15,7 +16,7 @@ public class ValidationResultTest {
 		final ValidationResult result = ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 
 		// Assert:
-		Assert.assertThat(result.getValue(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(result.getValue(), IsEqual.equalTo(8));
 	}
 
 	@Test
@@ -24,7 +25,7 @@ public class ValidationResultTest {
 		final ValidationResult result = ValidationResult.fromValue(8);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -46,7 +47,7 @@ public class ValidationResultTest {
 
 		// Assert:
 		for (final ValidationResult result : ValidationResult.values()) {
-			Assert.assertThat(result.isSuccess(), IsEqual.equalTo(successValues.contains(result)));
+			MatcherAssert.assertThat(result.isSuccess(), IsEqual.equalTo(successValues.contains(result)));
 		}
 	}
 
@@ -61,7 +62,7 @@ public class ValidationResultTest {
 
 		// Assert:
 		for (final ValidationResult result : ValidationResult.values()) {
-			Assert.assertThat(result.isFailure(), IsEqual.equalTo(!nonFailureValues.contains(result)));
+			MatcherAssert.assertThat(result.isFailure(), IsEqual.equalTo(!nonFailureValues.contains(result)));
 		}
 	}
 
@@ -144,8 +145,8 @@ public class ValidationResultTest {
 		final ValidationResult result = ValidationResult.aggregate(resultIterator);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-		Assert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(isShortCircuited));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(isShortCircuited));
 	}
 
 	//endregion
@@ -226,8 +227,8 @@ public class ValidationResultTest {
 		final ValidationResult result = ValidationResult.aggregateNoShortCircuit(resultIterator);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-		Assert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(false));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -18,8 +19,8 @@ public class ProvisionNamespaceNotificationTest {
 		final ProvisionNamespaceNotification notification = new ProvisionNamespaceNotification(owner, namespaceId);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ProvisionNamespace));
-		Assert.assertThat(notification.getOwner(), IsEqual.equalTo(owner));
-		Assert.assertThat(notification.getNamespaceId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ProvisionNamespace));
+		MatcherAssert.assertThat(notification.getOwner(), IsEqual.equalTo(owner));
+		MatcherAssert.assertThat(notification.getNamespaceId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -16,15 +17,15 @@ public class Base64EncoderTest {
 	@Test
 	public void stringCanBeConvertedToByteArray() {
 		// Assert:
-		Assert.assertThat(Base64Encoder.getBytes("U2lnbWE="), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
-		Assert.assertThat(Base64Encoder.getBytes("JMKi4oKs"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
+		MatcherAssert.assertThat(Base64Encoder.getBytes("U2lnbWE="), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+		MatcherAssert.assertThat(Base64Encoder.getBytes("JMKi4oKs"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
 	}
 
 	@Test
 	public void byteArrayCanBeConvertedToString() {
 		// Assert:
-		Assert.assertThat(Base64Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("U2lnbWE="));
-		Assert.assertThat(Base64Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("JMKi4oKs"));
+		MatcherAssert.assertThat(Base64Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("U2lnbWE="));
+		MatcherAssert.assertThat(Base64Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("JMKi4oKs"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -36,6 +37,6 @@ public class Base64EncoderTest {
 	@Test
 	public void stringCanContainPaddingAndWhitespace() {
 		// Assert:
-		Assert.assertThat(Base64Encoder.getBytes("  U2lnbWE=  "), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+		MatcherAssert.assertThat(Base64Encoder.getBytes("  U2lnbWE=  "), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
 	}
 }

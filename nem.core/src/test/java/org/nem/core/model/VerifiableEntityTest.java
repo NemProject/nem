@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -22,13 +23,13 @@ public class VerifiableEntityTest {
 		final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 6);
 
 		// Assert:
-		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
-		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
-		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+		MatcherAssert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
+		MatcherAssert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test
@@ -70,13 +71,13 @@ public class VerifiableEntityTest {
 		final MockVerifiableEntity entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
 
 		// Assert:
-		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
-		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+		MatcherAssert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
+		MatcherAssert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -88,13 +89,13 @@ public class VerifiableEntityTest {
 		final MockVerifiableEntity entity = createNonVerifiableRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
 
 		// Assert:
-		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
-		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
-		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+		MatcherAssert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		MatcherAssert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
+		MatcherAssert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test(expected = SerializationException.class)
@@ -130,7 +131,7 @@ public class VerifiableEntityTest {
 		final JSONObject object = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(object.containsKey("signature"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("signature"), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -146,7 +147,7 @@ public class VerifiableEntityTest {
 		final JSONObject object = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(object.containsKey("signature"), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(object.containsKey("signature"), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -163,8 +164,8 @@ public class VerifiableEntityTest {
 		entity.sign();
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -178,8 +179,8 @@ public class VerifiableEntityTest {
 		entity.signBy(signer);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -193,8 +194,8 @@ public class VerifiableEntityTest {
 		entity.setVerifiableField1(5);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -208,8 +209,8 @@ public class VerifiableEntityTest {
 		entity.setNonVerifiableField1(5);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -241,7 +242,7 @@ public class VerifiableEntityTest {
 		final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, signerPublicKeyOnly);
 
 		// Assert:
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -252,7 +253,7 @@ public class VerifiableEntityTest {
 		final MockVerifiableEntity entity = createRoundTrippedEntity(signer, 7, accountLookup);
 
 		// Assert:
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -282,7 +283,7 @@ public class VerifiableEntityTest {
 		entity.setSignature(signature);
 
 		// Assert:
-		Assert.assertThat(entity.getSignature(), IsEqual.equalTo(signature));
+		MatcherAssert.assertThat(entity.getSignature(), IsEqual.equalTo(signature));
 	}
 
 	@Test
@@ -295,7 +296,7 @@ public class VerifiableEntityTest {
 		entity.setSignature(new Signature(Utils.generateRandomBytes(64)));
 
 		// Assert:
-		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(entity.verify(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -310,7 +311,7 @@ public class VerifiableEntityTest {
 		entity2.setSignature(entity1.getSignature());
 
 		// Assert:
-		Assert.assertThat(entity2.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entity2.verify(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -328,10 +329,10 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		assertVerifiableEntityProperties(entity, signer);
-		Assert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
-		Assert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(4));
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -345,10 +346,10 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		assertVerifiableEntityProperties(entity, signer);
-		Assert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
-		Assert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(-1));
-		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test
@@ -362,13 +363,13 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		assertVerifiableEntityProperties(entity, signer);
-		Assert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
-		Assert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(4));
-		Assert.assertThat(entity.getVerifiableField3(), IsEqual.equalTo(5));
-		Assert.assertThat(entity.getVerifiableField4(), IsEqual.equalTo(8));
-		Assert.assertThat(entity.getNonVerifiableField2(), IsEqual.equalTo(2));
-		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(entity.getVerifiableField3(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entity.getVerifiableField4(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(entity.getNonVerifiableField2(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -382,13 +383,13 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		assertVerifiableEntityProperties(entity, signer);
-		Assert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
-		Assert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
-		Assert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(-1));
-		Assert.assertThat(entity.getVerifiableField3(), IsEqual.equalTo(5));
-		Assert.assertThat(entity.getVerifiableField4(), IsEqual.equalTo(8));
-		Assert.assertThat(entity.getNonVerifiableField2(), IsEqual.equalTo(-1));
-		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(entity.getVerifiableField1(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(entity.getVerifiableField2(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(entity.getNonVerifiableField1(), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(entity.getVerifiableField3(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entity.getVerifiableField4(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(entity.getNonVerifiableField2(), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(entity.getSignature(), IsNull.nullValue());
 	}
 
 	@Test
@@ -402,9 +403,9 @@ public class VerifiableEntityTest {
 		final JSONObject object = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(object.containsKey("verifiableField1"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("verifiableField2"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("nonVerifiableField1"), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(object.containsKey("verifiableField1"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("verifiableField2"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("nonVerifiableField1"), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -418,12 +419,12 @@ public class VerifiableEntityTest {
 		final JSONObject object = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(object.containsKey("verifiableField1"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("verifiableField2"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("verifiableField3"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("verifiableField4"), IsEqual.equalTo(true));
-		Assert.assertThat(object.containsKey("nonVerifiableField1"), IsEqual.equalTo(false));
-		Assert.assertThat(object.containsKey("nonVerifiableField2"), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(object.containsKey("verifiableField1"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("verifiableField2"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("verifiableField3"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("verifiableField4"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(object.containsKey("nonVerifiableField1"), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(object.containsKey("nonVerifiableField2"), IsEqual.equalTo(false));
 	}
 
 	private static MockVerifiableEntityWithNonVerifiableData create(
@@ -456,11 +457,11 @@ public class VerifiableEntityTest {
 			final MockVerifiableEntityWithNonVerifiableData entity,
 			final Account signer) {
 		// Assert:
-		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntityWithNonVerifiableData.VERSION));
-		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.VERSION));
-		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TIMESTAMP));
-		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TYPE));
+		MatcherAssert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntityWithNonVerifiableData.VERSION));
+		MatcherAssert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.VERSION));
+		MatcherAssert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TIMESTAMP));
+		MatcherAssert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 	}
 
 	//endregion

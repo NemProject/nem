@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -23,7 +24,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -38,7 +39,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -51,7 +52,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -64,7 +65,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
+		MatcherAssert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
 	}
 
 	@Test
@@ -94,7 +95,7 @@ public class MultisigSignatureTransactionComparatorTest {
 		final int result = compare(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
+		MatcherAssert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
 	}
 
 	private static int compare(final MultisigSignatureTransaction lhs, final MultisigSignatureTransaction rhs) {

@@ -1,5 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -22,7 +23,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 
 		// Assert:
 		final String expectedSignature = "01485191de9fa79887300a2543e2ae5860c744863c380e9ccd2b0c62d768e61b68e3c1f8e8fe4206a4b598f512b5944a43cf8dac03fc871c2ed7d2b927643852";
-		Assert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
+		MatcherAssert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, nonCanonicalSignature), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.verify(input, nonCanonicalSignature), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -71,11 +72,11 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 		final BigInteger nonCanonicalS = engine.getCurve().getGroupOrder().subtract(signature.getS());
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
-		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
 		final Signature canonicalSignature = dsaSigner.makeSignatureCanonical(nonCanonicalSignature);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 				signature.getS());
 
 		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
 	@Override

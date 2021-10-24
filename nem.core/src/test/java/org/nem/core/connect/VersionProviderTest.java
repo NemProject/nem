@@ -1,6 +1,7 @@
 package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ public class VersionProviderTest {
 		final NodeVersion version = context.provider.getLocalVersion();
 
 		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(new NodeVersion(0, 6, 0, "DEVELOPER BUILD")));
+		MatcherAssert.assertThat(version, IsEqual.equalTo(new NodeVersion(0, 6, 0, "DEVELOPER BUILD")));
 	}
 
 	@Test
@@ -36,7 +37,7 @@ public class VersionProviderTest {
 		final NodeVersion version = context.provider.getLatestVersion();
 
 		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(new NodeVersion(1, 2, 3)));
+		MatcherAssert.assertThat(version, IsEqual.equalTo(new NodeVersion(1, 2, 3)));
 		context.assertDelegationToVersionProvider();
 	}
 
@@ -69,7 +70,7 @@ public class VersionProviderTest {
 		final NodeVersion version = context.provider.getLatestVersion();
 
 		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(NodeVersion.ZERO));
+		MatcherAssert.assertThat(version, IsEqual.equalTo(NodeVersion.ZERO));
 		context.assertDelegationToVersionProvider();
 	}
 
@@ -82,7 +83,7 @@ public class VersionProviderTest {
 		final NodeVersion version = context.provider.getLatestVersion();
 
 		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(NodeVersion.ZERO));
+		MatcherAssert.assertThat(version, IsEqual.equalTo(NodeVersion.ZERO));
 		context.assertDelegationToVersionProvider();
 	}
 

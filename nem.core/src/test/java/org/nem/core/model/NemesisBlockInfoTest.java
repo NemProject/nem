@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -22,9 +23,9 @@ public class NemesisBlockInfoTest {
 				"awesome-nemesis.bin");
 
 		// Assert:
-		Assert.assertThat(info.getGenerationHash(), IsEqual.equalTo(generationHash));
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getAmount(), IsEqual.equalTo(Amount.fromNem(44221122)));
-		Assert.assertThat(info.getDataFileName(), IsEqual.equalTo("awesome-nemesis.bin"));
+		MatcherAssert.assertThat(info.getGenerationHash(), IsEqual.equalTo(generationHash));
+		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(info.getAmount(), IsEqual.equalTo(Amount.fromNem(44221122)));
+		MatcherAssert.assertThat(info.getDataFileName(), IsEqual.equalTo("awesome-nemesis.bin"));
 	}
 }

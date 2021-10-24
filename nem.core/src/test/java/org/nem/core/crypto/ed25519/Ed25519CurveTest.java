@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.CryptoEngines;
@@ -13,13 +14,13 @@ public class Ed25519CurveTest {
 	@Test
 	public void getNameReturnsCorrectName() {
 		// Assert:
-		Assert.assertThat(CryptoEngines.ed25519Engine().getCurve().getName(), IsEqual.equalTo("ed25519"));
+		MatcherAssert.assertThat(CryptoEngines.ed25519Engine().getCurve().getName(), IsEqual.equalTo("ed25519"));
 	}
 
 	@Test
 	public void getNameReturnsCorrectGroupOrder() {
 		// Assert:
-		Assert.assertThat(CryptoEngines.ed25519Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
+		MatcherAssert.assertThat(CryptoEngines.ed25519Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
 	}
 
 	@Test
@@ -28,6 +29,6 @@ public class Ed25519CurveTest {
 		final BigInteger halfGroupOrder = GROUP_ORDER.shiftRight(1);
 
 		// Assert:
-		Assert.assertThat(CryptoEngines.ed25519Engine().getCurve().getHalfGroupOrder(), IsEqual.equalTo(halfGroupOrder));
+		MatcherAssert.assertThat(CryptoEngines.ed25519Engine().getCurve().getHalfGroupOrder(), IsEqual.equalTo(halfGroupOrder));
 	}
 }

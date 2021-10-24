@@ -1,6 +1,7 @@
 package org.nem.core.model.namespace;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -22,9 +23,9 @@ public class NamespaceTest {
 		final Namespace namespace = new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123));
 
 		// Assert:
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	// endregion
@@ -47,7 +48,7 @@ public class NamespaceTest {
 
 		// Assert:
 		for (final Long delta : Arrays.asList(0L, BLOCKS_PER_YEAR - 10000, BLOCKS_PER_YEAR - 1)) {
-			Assert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(true));
 		}
 	}
 
@@ -58,7 +59,7 @@ public class NamespaceTest {
 
 		// Assert:
 		for (final Long delta : Arrays.asList(-1L, BLOCKS_PER_YEAR, BLOCKS_PER_YEAR + 10000)) {
-			Assert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(false));
 		}
 	}
 
@@ -75,14 +76,14 @@ public class NamespaceTest {
 		// Assert:
 		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
 			final String key = entry.getKey();
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					key,
 					infoMap.get(key),
 					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(namespace)) : IsEqual.equalTo(namespace));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(namespace)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(namespace)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(namespace)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(namespace)));
 	}
 
 	@Test
@@ -94,7 +95,7 @@ public class NamespaceTest {
 		// Assert:
 		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
 			final String key = entry.getKey();
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					key,
 					infoMap.get(key).hashCode(),
 					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
@@ -128,9 +129,9 @@ public class NamespaceTest {
 		final Namespace namespace = new Namespace(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("abc.def")));
-		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(737)));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("abc.def")));
+		MatcherAssert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
+		MatcherAssert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(737)));
 	}
 
 	@Test
@@ -145,10 +146,10 @@ public class NamespaceTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(namespace);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
-		Assert.assertThat(jsonObject.get("fqn"), IsEqual.equalTo("abc.def"));
-		Assert.assertThat(jsonObject.get("owner"), IsEqual.equalTo("XYZ"));
-		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(737L));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(jsonObject.get("fqn"), IsEqual.equalTo("abc.def"));
+		MatcherAssert.assertThat(jsonObject.get("owner"), IsEqual.equalTo("XYZ"));
+		MatcherAssert.assertThat(jsonObject.get("height"), IsEqual.equalTo(737L));
 	}
 
 	//endregion

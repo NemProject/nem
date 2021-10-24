@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -24,7 +25,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -39,11 +40,11 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 		final BigInteger nonCanonicalS = engine.getCurve().getGroupOrder().add(signature.getS());
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
-		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
 		final Signature canonicalSignature = dsaSigner.makeSignatureCanonical(nonCanonicalSignature);
 
 		// Assert:
-		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final Signature signature2 = new Signature(groupOrder.add(signature.getR()), signature.getS());
 
 		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -84,7 +85,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 			final Signature signature2 = MathUtils.sign(keyPair, input);
 
 			// Assert:
-			Assert.assertThat(signature1, IsEqual.equalTo(signature2));
+			MatcherAssert.assertThat(signature1, IsEqual.equalTo(signature2));
 		}
 	}
 
@@ -101,7 +102,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 			final Signature signature1 = dsaSigner.sign(input);
 
 			// Assert:
-			Assert.assertThat(dsaSigner.verify(input, signature1), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(dsaSigner.verify(input, signature1), IsEqual.equalTo(true));
 		}
 	}
 
@@ -141,7 +142,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final boolean result = dsaSignerWithZeroArrayPublicKey.verify(input, signature);
 
 		// Assert (getKeyPair() would be called more than once if it got beyond the second check):
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 		Mockito.verify(dsaSignerWithZeroArrayPublicKey, Mockito.times(1)).isCanonicalSignature(signature);
 		Mockito.verify(dsaSignerWithZeroArrayPublicKey, Mockito.times(1)).getKeyPair();
 	}

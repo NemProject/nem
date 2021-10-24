@@ -1,5 +1,6 @@
 package org.nem.core.metadata;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,11 +22,11 @@ public class ApplicationMetaDataTest {
 		final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", null, timeProvider);
 
 		// Assert:
-		Assert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
-		Assert.assertThat(metaData.getCertificateSigner(), IsNull.nullValue());
-		Assert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
-		Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
+		MatcherAssert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
+		MatcherAssert.assertThat(metaData.getCertificateSigner(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
+		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
 	}
 
 	@Test
@@ -39,11 +40,11 @@ public class ApplicationMetaDataTest {
 		final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", certificate, timeProvider);
 
 		// Assert:
-		Assert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
-		Assert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
-		Assert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
-		Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
+		MatcherAssert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
+		MatcherAssert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
+		MatcherAssert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
+		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
 	}
 
 	@Test
@@ -58,11 +59,11 @@ public class ApplicationMetaDataTest {
 		final ApplicationMetaData metaData = roundtripMetaData(originalMetaData);
 
 		// Assert:
-		Assert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
-		Assert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
-		Assert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
-		Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
+		MatcherAssert.assertThat(metaData.getAppName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo("12.0"));
+		MatcherAssert.assertThat(metaData.getCertificateSigner(), IsEqual.equalTo("CN=Someone,O=NemSoft"));
+		MatcherAssert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
+		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
 	}
 
 	@Test
@@ -78,9 +79,9 @@ public class ApplicationMetaDataTest {
 		final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", null, timeProvider);
 
 		// Assert:
-		Assert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
-		Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
-		Assert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(136)));
+		MatcherAssert.assertThat(metaData.getStartTime(), IsEqual.equalTo(new TimeInstant(100)));
+		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(125)));
+		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(136)));
 	}
 
 	//region equals / hashCode
@@ -113,14 +114,14 @@ public class ApplicationMetaDataTest {
 		final Map<String, ApplicationMetaData> infoMap = createApplicationMetaDataForEqualityTests(certificate);
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(metaData));
-		Assert.assertThat(infoMap.get("diff-name"), IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat(infoMap.get("diff-version"), IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat(infoMap.get("diff-cert"), IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat(infoMap.get("diff-null-cert"), IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat(infoMap.get("diff-time"), IsEqual.equalTo(metaData));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)metaData)));
+		MatcherAssert.assertThat(infoMap.get("default"), IsEqual.equalTo(metaData));
+		MatcherAssert.assertThat(infoMap.get("diff-name"), IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat(infoMap.get("diff-version"), IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat(infoMap.get("diff-cert"), IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat(infoMap.get("diff-null-cert"), IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat(infoMap.get("diff-time"), IsEqual.equalTo(metaData));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)metaData)));
 	}
 
 	@Test
@@ -132,12 +133,12 @@ public class ApplicationMetaDataTest {
 		final Map<String, ApplicationMetaData> infoMap = createApplicationMetaDataForEqualityTests(certificate);
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("diff-name").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-version").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-null-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-time").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(infoMap.get("diff-name").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("diff-version").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("diff-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("diff-null-cert").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(infoMap.get("diff-time").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion

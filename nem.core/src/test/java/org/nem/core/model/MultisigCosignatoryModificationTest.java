@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -35,8 +36,8 @@ public class MultisigCosignatoryModificationTest {
 		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(type, account);
 
 		// Assert:
-		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(account));
-		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(type));
+		MatcherAssert.assertThat(modification.getCosignatory(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(modification.getModificationType(), IsEqual.equalTo(type));
 	}
 
 	@Test
@@ -83,9 +84,9 @@ public class MultisigCosignatoryModificationTest {
 		// Assert:
 		for (int i = 0; i < modifications.size(); i++) {
 			for (int j = 0; j < modifications.size(); j++) {
-				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) > 0, IsEqual.equalTo(i > j));
-				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) == 0, IsEqual.equalTo(i == j));
-				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) < 0, IsEqual.equalTo(i < j));
+				MatcherAssert.assertThat(modifications.get(i).compareTo(modifications.get(j)) > 0, IsEqual.equalTo(i > j));
+				MatcherAssert.assertThat(modifications.get(i).compareTo(modifications.get(j)) == 0, IsEqual.equalTo(i == j));
+				MatcherAssert.assertThat(modifications.get(i).compareTo(modifications.get(j)) < 0, IsEqual.equalTo(i < j));
 			}
 		}
 	}
@@ -109,8 +110,8 @@ public class MultisigCosignatoryModificationTest {
 		final MultisigCosignatoryModification entity = this.createRoundTrippedEntity(originalEntity, accountLookup);
 
 		// Assert:
-		Assert.assertThat(entity.getCosignatory(), IsEqual.equalTo(cosignatory));
-		Assert.assertThat(entity.getModificationType(), IsEqual.equalTo(modificationType));
+		MatcherAssert.assertThat(entity.getCosignatory(), IsEqual.equalTo(cosignatory));
+		MatcherAssert.assertThat(entity.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
 	private MultisigCosignatoryModification createRoundTrippedEntity(

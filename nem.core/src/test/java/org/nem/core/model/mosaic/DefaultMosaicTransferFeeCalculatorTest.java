@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -22,7 +23,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -48,7 +49,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	// region percentile xem fees
@@ -125,10 +126,10 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 	private static void assertMosaicXemLevy(final MosaicLevy levy, final Amount expectedFee) {
 		// Assert:
-		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(RECIPIENT));
-		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
-		Assert.assertThat(Amount.fromMicroNem(levy.getFee().getRaw()), IsEqual.equalTo(expectedFee));
+		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(RECIPIENT));
+		MatcherAssert.assertThat(levy.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
+		MatcherAssert.assertThat(Amount.fromMicroNem(levy.getFee().getRaw()), IsEqual.equalTo(expectedFee));
 	}
 
 	// endregion
@@ -142,10 +143,10 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId, final int expectedFee) {
 		// Assert:
-		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));
-		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(expectedMosaicId)));
-		Assert.assertThat(levy.getFee(), IsEqual.equalTo(new Quantity(expectedFee)));
+		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));
+		MatcherAssert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(expectedMosaicId)));
+		MatcherAssert.assertThat(levy.getFee(), IsEqual.equalTo(new Quantity(expectedFee)));
 	}
 
 	private static MosaicTransferFeeCalculator createCalculator() {

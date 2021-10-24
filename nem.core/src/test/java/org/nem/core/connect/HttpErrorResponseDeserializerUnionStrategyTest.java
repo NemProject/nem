@@ -2,6 +2,7 @@ package org.nem.core.connect;
 
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,8 +26,8 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(union.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(union.getDeserializer().getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, s, 12)));
+		MatcherAssert.assertThat(union.getDeserializer().getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, s, 12)));
 	}
 
 	@Test
@@ -51,8 +52,8 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		final ErrorResponse response = union.getError();
 
 		// Assert:
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(700));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(700));
 	}
 
 	@Test
@@ -64,7 +65,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 				null);
 
 		// Assert:
-		Assert.assertThat(union.hasBody(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(false));
 	}
 
 	@Test(expected = FatalPeerException.class)

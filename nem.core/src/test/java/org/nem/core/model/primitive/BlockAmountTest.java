@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,7 +14,7 @@ public class BlockAmountTest {
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(BlockAmount.ZERO, IsEqual.equalTo(new BlockAmount(0)));
+		MatcherAssert.assertThat(BlockAmount.ZERO, IsEqual.equalTo(new BlockAmount(0)));
 	}
 
 	//endregion
@@ -32,7 +33,7 @@ public class BlockAmountTest {
 		final BlockAmount amount = new BlockAmount(0);
 
 		// Assert:
-		Assert.assertThat(amount.getRaw(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(amount.getRaw(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class BlockAmountTest {
 		final BlockAmount amount = new BlockAmount(1);
 
 		// Assert:
-		Assert.assertThat(amount.getRaw(), IsEqual.equalTo(1L));
+		MatcherAssert.assertThat(amount.getRaw(), IsEqual.equalTo(1L));
 	}
 
 	//endregion
@@ -57,8 +58,8 @@ public class BlockAmountTest {
 		final BlockAmount result = amount.increment();
 
 		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
-		Assert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
+		MatcherAssert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
 	}
 
 	@Test
@@ -70,8 +71,8 @@ public class BlockAmountTest {
 		final BlockAmount result = amount.decrement();
 
 		// Assert:
-		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
-		Assert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
+		MatcherAssert.assertThat(result, IsNot.not(IsEqual.equalTo(amount)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new BlockAmount(0x1234L)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -98,8 +99,8 @@ public class BlockAmountTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("xyzAmount"), IsEqual.equalTo(0x8712411223456L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("xyzAmount"), IsEqual.equalTo(0x8712411223456L));
 	}
 
 	@Test
@@ -115,7 +116,7 @@ public class BlockAmountTest {
 		final BlockAmount amount = BlockAmount.readFrom(deserializer, "xyzAmount");
 
 		// Assert:
-		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
+		MatcherAssert.assertThat(amount, IsEqual.equalTo(originalAmount));
 	}
 
 	//endregion

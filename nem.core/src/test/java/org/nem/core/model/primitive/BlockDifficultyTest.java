@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,7 +16,7 @@ public class BlockDifficultyTest {
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				BlockDifficulty.INITIAL_DIFFICULTY,
 				IsEqual.equalTo(new BlockDifficulty(100_000_000_000_000L)));
 	}
@@ -30,7 +31,7 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(79_876_543_211_237L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(79_876_543_211_237L));
+		MatcherAssert.assertThat(difficulty.getRaw(), IsEqual.equalTo(79_876_543_211_237L));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(1_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(10_000_000_000_000L));
+		MatcherAssert.assertThat(difficulty.getRaw(), IsEqual.equalTo(10_000_000_000_000L));
 	}
 
 	@Test
@@ -48,7 +49,7 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(1_987_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(1_000_000_000_000_000L));
+		MatcherAssert.assertThat(difficulty.getRaw(), IsEqual.equalTo(1_000_000_000_000_000L));
 	}
 
 	//endregion
@@ -61,7 +62,7 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(79_876_543_211_237L);
 
 		// Assert:
-		Assert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("79876543211237")));
+		MatcherAssert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("79876543211237")));
 	}
 
 	//endregion
@@ -79,8 +80,8 @@ public class BlockDifficultyTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("difficulty"), IsEqual.equalTo(79_876_543_211_237L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("difficulty"), IsEqual.equalTo(79_876_543_211_237L));
 	}
 
 	@Test
@@ -96,7 +97,7 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
 
 		// Assert:
-		Assert.assertThat(difficulty, IsEqual.equalTo(originalDifficulty));
+		MatcherAssert.assertThat(difficulty, IsEqual.equalTo(originalDifficulty));
 	}
 
 	//endregion

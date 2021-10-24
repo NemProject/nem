@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,8 +14,8 @@ public class BlockHeightTest {
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(BlockHeight.ONE, IsEqual.equalTo(new BlockHeight(1)));
-		Assert.assertThat(BlockHeight.MAX, IsEqual.equalTo(new BlockHeight(Long.MAX_VALUE)));
+		MatcherAssert.assertThat(BlockHeight.ONE, IsEqual.equalTo(new BlockHeight(1)));
+		MatcherAssert.assertThat(BlockHeight.MAX, IsEqual.equalTo(new BlockHeight(Long.MAX_VALUE)));
 	}
 
 	//endregion
@@ -39,7 +40,7 @@ public class BlockHeightTest {
 		final BlockHeight height = new BlockHeight(1);
 
 		// Assert:
-		Assert.assertThat(height.getRaw(), IsEqual.equalTo(1L));
+		MatcherAssert.assertThat(height.getRaw(), IsEqual.equalTo(1L));
 	}
 
 	//endregion
@@ -55,8 +56,8 @@ public class BlockHeightTest {
 		final BlockHeight nextHeight = height.next();
 
 		// Assert:
-		Assert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
-		Assert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(46)));
+		MatcherAssert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
+		MatcherAssert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(46)));
 	}
 
 	@Test
@@ -68,8 +69,8 @@ public class BlockHeightTest {
 		final BlockHeight nextHeight = height.prev();
 
 		// Assert:
-		Assert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
-		Assert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(44)));
+		MatcherAssert.assertThat(nextHeight, IsNot.not(IsEqual.equalTo(height)));
+		MatcherAssert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(44)));
 	}
 
 	//endregion
@@ -83,8 +84,8 @@ public class BlockHeightTest {
 		final BlockHeight height2 = new BlockHeight(3);
 
 		// Assert:
-		Assert.assertThat(14L, IsEqual.equalTo(height1.subtract(height2)));
-		Assert.assertThat(-14L, IsEqual.equalTo(height2.subtract(height1)));
+		MatcherAssert.assertThat(14L, IsEqual.equalTo(height1.subtract(height2)));
+		MatcherAssert.assertThat(-14L, IsEqual.equalTo(height2.subtract(height1)));
 	}
 
 	//endregion
@@ -102,7 +103,7 @@ public class BlockHeightTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(142L));
+		MatcherAssert.assertThat(jsonObject.get("height"), IsEqual.equalTo(142L));
 	}
 
 	@Test
@@ -111,7 +112,7 @@ public class BlockHeightTest {
 		final BlockHeight height = createRoundTrippedHeight(new BlockHeight(142));
 
 		// Assert:
-		Assert.assertThat(height.getRaw(), IsEqual.equalTo(142L));
+		MatcherAssert.assertThat(height.getRaw(), IsEqual.equalTo(142L));
 	}
 
 	private static BlockHeight createRoundTrippedHeight(final BlockHeight originalHeight) {
@@ -135,8 +136,8 @@ public class BlockHeightTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Height"), IsEqual.equalTo(0x8712411223456L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Height"), IsEqual.equalTo(0x8712411223456L));
 	}
 
 	@Test
@@ -152,7 +153,7 @@ public class BlockHeightTest {
 		final BlockHeight height = BlockHeight.readFrom(deserializer, "Height");
 
 		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(originalHeight));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(originalHeight));
 	}
 
 	//endregion

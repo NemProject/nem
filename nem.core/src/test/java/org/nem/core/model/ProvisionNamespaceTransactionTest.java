@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -64,15 +65,15 @@ public class ProvisionNamespaceTransactionTest {
 			final Amount expectedRentalFee,
 			final NamespaceIdPart expectedNewPart,
 			final NamespaceId expectedParent) {
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(expectedRentalFeeSink));
-		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(expectedRentalFee));
-		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
-		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(expectedRentalFeeSink));
+		MatcherAssert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(expectedRentalFee));
+		MatcherAssert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
+		MatcherAssert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
 	}
 
 	// endregion
@@ -88,7 +89,7 @@ public class ProvisionNamespaceTransactionTest {
 		final NamespaceId result = transaction.getResultingNamespaceId();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
 	@Test
@@ -100,7 +101,7 @@ public class ProvisionNamespaceTransactionTest {
 		final NamespaceId result = transaction.getResultingNamespaceId();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new NamespaceId("bar")));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new NamespaceId("bar")));
 	}
 
 	// endregion
@@ -116,7 +117,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(RENTAL_FEE_SINK)));
+		MatcherAssert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(RENTAL_FEE_SINK)));
 	}
 
 	// endregion
@@ -132,7 +133,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, RENTAL_FEE_SINK)));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, RENTAL_FEE_SINK)));
 	}
 
 	// endregion
@@ -200,14 +201,14 @@ public class ProvisionNamespaceTransactionTest {
 		final ProvisionNamespaceTransaction transaction = createRoundTrippedTransaction(createTransaction(newPart, parent));
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(RENTAL_FEE_SINK));
-		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
-		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
-		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(RENTAL_FEE_SINK));
+		MatcherAssert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
+		MatcherAssert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
+		MatcherAssert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
 
 	@Test

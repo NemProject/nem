@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
@@ -20,7 +21,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		matrix.forEach((row, col, value) -> values.add(value));
 
 		// Assert: zero-values are excluded
-		Assert.assertThat(values, IsEquivalent.equivalentTo(2.0, 1.0, -5.0, 8.0));
+		MatcherAssert.assertThat(values, IsEquivalent.equivalentTo(2.0, 1.0, -5.0, 8.0));
 	}
 
 	//endregion
@@ -41,7 +42,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 						+ "(0, 1) -> 11.123" + System.lineSeparator()
 						+ "(1, 1) -> 1.000" + System.lineSeparator()
 						+ "(2, 0) -> 5012.013";
-		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedString));
+		MatcherAssert.assertThat(matrix.toString(), IsEqual.equalTo(expectedString));
 	}
 
 	//endregion
@@ -54,14 +55,14 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
 
 		// Act:
 		sparseMatrix.setAt(0, 1, 0.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
-		Assert.assertThat(
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(
 				sparseMatrix,
 				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
 	}
@@ -82,14 +83,14 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		}
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
 
 		// Act:
 		sparseMatrix.setAt(0, 1, 0.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
-		Assert.assertThat(
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(
 				sparseMatrix,
 				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
 	}
@@ -100,15 +101,15 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
 
 		// Act:
 		sparseMatrix.setAt(0, 1, 0.0);
 		sparseMatrix.setAt(0, 0, 0.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(0));
-		Assert.assertThat(
+		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(
 				sparseMatrix,
 				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 5, 11, 1, 8 })));
 	}
@@ -122,7 +123,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.removeLessThan(0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -132,15 +133,15 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(0, 0, 5.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(1));
 
 		// Act:
 		sparseMatrix.setAt(0, 1, 3.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(5.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
+		MatcherAssert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(5.0));
+		MatcherAssert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
 	}
 
 	@Test
@@ -150,15 +151,15 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(0, 1, 5.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(1));
 
 		// Act:
 		sparseMatrix.setAt(0, 0, 3.0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
-		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(5.0));
-		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(3.0));
+		MatcherAssert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(5.0));
+		MatcherAssert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(3.0));
 	}
 
 	//endregion
@@ -177,7 +178,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(3, 3, -5.0);
 
 		// Act and Assert:
-		Assert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(5));
 	}
 
 	//endregion
@@ -229,7 +230,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		int col = -1;
 		while (iterator.hasNext()) {
 			final MatrixElement entry = iterator.next();
-			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
 			col = entry.getColumn();
 		}
 	}

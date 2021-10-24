@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -27,12 +28,12 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
-		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
+		MatcherAssert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
+		MatcherAssert.assertThat(transaction.getCustomField(), IsEqual.equalTo(6));
 	}
 
 	@Test
@@ -45,12 +46,12 @@ public class TransactionTest {
 		final MockTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signerPublicKeyOnly));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(new Amount(130L)));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
-		Assert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signerPublicKeyOnly));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(new Amount(130L)));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
+		MatcherAssert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
+		MatcherAssert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
 	}
 
 	//endregion
@@ -64,7 +65,7 @@ public class TransactionTest {
 		transaction.setDeadline(new TimeInstant(726));
 
 		// Assert:
-		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
+		MatcherAssert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
 	}
 
 	//endregion
@@ -78,8 +79,8 @@ public class TransactionTest {
 		final MockTransaction transaction2 = new MockTransaction(7, 12, new TimeInstant(124), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -89,8 +90,8 @@ public class TransactionTest {
 		final MockTransaction transaction2 = new MockTransaction(11, 12, new TimeInstant(124), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -100,8 +101,8 @@ public class TransactionTest {
 		final MockTransaction transaction2 = new MockTransaction(11, 20, new TimeInstant(124), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -111,8 +112,8 @@ public class TransactionTest {
 		final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 70);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(1));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(-1));
 	}
 
 	@Test
@@ -122,8 +123,8 @@ public class TransactionTest {
 		final MockTransaction transaction2 = new MockTransaction(11, 14, new TimeInstant(200), 90);
 
 		// Assert:
-		Assert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
-		Assert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction1.compareTo(transaction2), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -138,7 +139,7 @@ public class TransactionTest {
 		transaction.setFee(Amount.fromNem(200));
 
 		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -147,7 +148,7 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
 	}
 
 	@Test
@@ -159,7 +160,7 @@ public class TransactionTest {
 		transaction.setFee(Amount.fromNem(1000));
 
 		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1000)));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1000)));
 	}
 
 	@Test
@@ -171,7 +172,7 @@ public class TransactionTest {
 		transaction.setFee(Amount.fromNem(1));
 
 		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 	@Test
@@ -184,7 +185,7 @@ public class TransactionTest {
 		transaction.setFee(null);
 
 		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
 	}
 
 	//endregion
@@ -201,7 +202,7 @@ public class TransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
 	}
 
 	@Test
@@ -218,7 +219,7 @@ public class TransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2, other3));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2, other3));
 	}
 
 	@Test
@@ -234,7 +235,7 @@ public class TransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2));
 	}
 
 	//endregion
@@ -250,7 +251,7 @@ public class TransactionTest {
 		final Collection<Transaction> childTransactions = transaction.getChildTransactions();
 
 		// Assert:
-		Assert.assertThat(childTransactions.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(childTransactions.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -266,7 +267,7 @@ public class TransactionTest {
 		transaction.execute(Mockito.mock(TransactionObserver.class), null);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -278,7 +279,7 @@ public class TransactionTest {
 		transaction.undo(Mockito.mock(TransactionObserver.class), null);
 
 		// Assert:
-		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -302,7 +303,7 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceTransfer, NotificationType.ImportanceTransfer, NotificationType.BalanceDebit)));
 	}
@@ -331,7 +332,7 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
 	}
@@ -354,7 +355,7 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				notificationCaptor.getAllValues().stream()
 						.filter(n -> NotificationType.Account != n.getType())
 						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())
@@ -380,7 +381,7 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				notificationCaptor.getAllValues().stream()
 						.filter(n -> NotificationType.Account != n.getType())
 						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())

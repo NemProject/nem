@@ -1,5 +1,6 @@
 package org.nem.core.time;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.TimeOffset;
@@ -31,13 +32,13 @@ public class SystemTimeProviderTest {
 		final TimeProvider provider = new SystemTimeProvider();
 
 		// Assert:
-		Assert.assertThat(provider.getEpochTime(), IsEqual.equalTo(TimeInstant.ZERO));
+		MatcherAssert.assertThat(provider.getEpochTime(), IsEqual.equalTo(TimeInstant.ZERO));
 	}
 
 	@Test
 	public void getEpochTimeMillisReturnsEpochInMilliseconds() {
 		// Assert:
-		Assert.assertThat(SystemTimeProvider.getEpochTimeMillis(), IsEqual.equalTo(EPOCH_TIME));
+		MatcherAssert.assertThat(SystemTimeProvider.getEpochTimeMillis(), IsEqual.equalTo(EPOCH_TIME));
 	}
 
 	//endregion
@@ -50,7 +51,7 @@ public class SystemTimeProviderTest {
 		final TimeProvider provider = new SystemTimeProvider();
 
 		// Assert:
-		Assert.assertThat(provider.getCurrentTime().compareTo(TimeInstant.ZERO), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(provider.getCurrentTime().compareTo(TimeInstant.ZERO), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class SystemTimeProviderTest {
 		final CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
 
 		// Assert:
-		Assert.assertThat(ctInfo.currentTime, IsEqual.equalTo(convertSystemTimeToCurrentTime(ctInfo.systemTime, 0)));
+		MatcherAssert.assertThat(ctInfo.currentTime, IsEqual.equalTo(convertSystemTimeToCurrentTime(ctInfo.systemTime, 0)));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class SystemTimeProviderTest {
 		final CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
 
 		// Assert:
-		Assert.assertThat(ctInfo.currentTime, IsEqual.equalTo(ctInfo.currentTimeFromSystemTime));
+		MatcherAssert.assertThat(ctInfo.currentTime, IsEqual.equalTo(ctInfo.currentTimeFromSystemTime));
 	}
 
 	//endregion
@@ -81,7 +82,7 @@ public class SystemTimeProviderTest {
 		final CurrentTimeInfo ctInfo = getDeterministicCurrentTime();
 
 		// Assert:
-		Assert.assertThat(ctInfo.networkTime, IsEqual.equalTo(convertSystemTimeToNetworkTime(ctInfo.systemTime, 0)));
+		MatcherAssert.assertThat(ctInfo.networkTime, IsEqual.equalTo(convertSystemTimeToNetworkTime(ctInfo.systemTime, 0)));
 	}
 
 	//endregion
@@ -91,12 +92,12 @@ public class SystemTimeProviderTest {
 	@Test
 	public void getTimeRoundsTimeToNearestSecond() {
 		// Assert:
-		Assert.assertThat(getTimeRelativeToEpoch(1000), IsEqual.equalTo(1));
-		Assert.assertThat(getTimeRelativeToEpoch(1001), IsEqual.equalTo(1));
-		Assert.assertThat(getTimeRelativeToEpoch(1499), IsEqual.equalTo(1));
-		Assert.assertThat(getTimeRelativeToEpoch(1500), IsEqual.equalTo(2));
-		Assert.assertThat(getTimeRelativeToEpoch(1999), IsEqual.equalTo(2));
-		Assert.assertThat(getTimeRelativeToEpoch(2000), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(1000), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(1001), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(1499), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(1500), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(1999), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(getTimeRelativeToEpoch(2000), IsEqual.equalTo(2));
 	}
 
 	private static int getTimeRelativeToEpoch(final int millis) {
@@ -158,12 +159,12 @@ public class SystemTimeProviderTest {
 		public int rounds = 0;
 
 		private void assertSystemTimeOffset(final long systemTime, final int offset, final int cumulativeOffset) {
-			Assert.assertThat(this.result.getChange(), IsEqual.equalTo(new TimeOffset(offset)));
-			Assert.assertThat(this.result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(cumulativeOffset)));
-			Assert.assertThat(this.result.getTimeStamp(), IsEqual.equalTo(convertSystemTimeToCurrentTime(systemTime, cumulativeOffset)));
+			MatcherAssert.assertThat(this.result.getChange(), IsEqual.equalTo(new TimeOffset(offset)));
+			MatcherAssert.assertThat(this.result.getCurrentTimeOffset(), IsEqual.equalTo(new TimeOffset(cumulativeOffset)));
+			MatcherAssert.assertThat(this.result.getTimeStamp(), IsEqual.equalTo(convertSystemTimeToCurrentTime(systemTime, cumulativeOffset)));
 
-			Assert.assertThat(this.currentTime, IsEqual.equalTo(convertSystemTimeToCurrentTime(systemTime, cumulativeOffset)));
-			Assert.assertThat(this.networkTime, IsEqual.equalTo(convertSystemTimeToNetworkTime(systemTime, cumulativeOffset)));
+			MatcherAssert.assertThat(this.currentTime, IsEqual.equalTo(convertSystemTimeToCurrentTime(systemTime, cumulativeOffset)));
+			MatcherAssert.assertThat(this.networkTime, IsEqual.equalTo(convertSystemTimeToNetworkTime(systemTime, cumulativeOffset)));
 		}
 	}
 
@@ -188,8 +189,8 @@ public class SystemTimeProviderTest {
 		});
 
 		// Assert:
-		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[1]));
-		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[2]));
+		MatcherAssert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[1]));
+		MatcherAssert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[2]));
 	}
 
 	//endregion

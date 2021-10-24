@@ -1,5 +1,6 @@
 package org.nem.core.serialization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.primitive.SerializationPolicy;
@@ -79,28 +80,28 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final Deserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		Assert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
-		Assert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
-		Assert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
+		MatcherAssert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
+		MatcherAssert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
+		MatcherAssert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
 
 		final MockSerializableEntity entity = deserializer.readObject(
 				"object",
 				new MockSerializableEntity.Activator());
-		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
 
-		Assert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
-		Assert.assertThat(deserializer.readDouble("omega"), IsEqual.equalTo(Double.MIN_NORMAL));
-		Assert.assertThat(deserializer.readDouble("psi"), IsEqual.equalTo(Double.MIN_VALUE));
-		Assert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
+		MatcherAssert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(deserializer.readDouble("omega"), IsEqual.equalTo(Double.MIN_NORMAL));
+		MatcherAssert.assertThat(deserializer.readDouble("psi"), IsEqual.equalTo(Double.MIN_VALUE));
+		MatcherAssert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
 
 		final List<MockSerializableEntity> entities = deserializer.readObjectArray(
 				"entities",
 				new MockSerializableEntity.Activator());
-		Assert.assertThat(entities.get(0), IsEqual.equalTo(new MockSerializableEntity(5, "ooo", 62)));
-		Assert.assertThat(entities.get(1), IsEqual.equalTo(new MockSerializableEntity(8, "ala", 15)));
+		MatcherAssert.assertThat(entities.get(0), IsEqual.equalTo(new MockSerializableEntity(5, "ooo", 62)));
+		MatcherAssert.assertThat(entities.get(1), IsEqual.equalTo(new MockSerializableEntity(8, "ala", 15)));
 
-		Assert.assertThat(deserializer.readBigInteger("bi"), IsEqual.equalTo(new BigInteger("14")));
-		Assert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
+		MatcherAssert.assertThat(deserializer.readBigInteger("bi"), IsEqual.equalTo(new BigInteger("14")));
+		MatcherAssert.assertThat(deserializer.readLong("sigma"), IsEqual.equalTo(8L));
 	}
 
 	@Test
@@ -115,9 +116,9 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final Deserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		Assert.assertThat(deserializer.readInt("height"), IsEqual.equalTo(111));
-		Assert.assertThat(deserializer.readOptionalInt("minBlocks"), IsNull.nullValue());
-		Assert.assertThat(deserializer.readOptionalInt("maxTransactions"), IsNull.nullValue());
+		MatcherAssert.assertThat(deserializer.readInt("height"), IsEqual.equalTo(111));
+		MatcherAssert.assertThat(deserializer.readOptionalInt("minBlocks"), IsNull.nullValue());
+		MatcherAssert.assertThat(deserializer.readOptionalInt("maxTransactions"), IsNull.nullValue());
 	}
 
 	//endregion
@@ -132,7 +133,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TSerializer serializer = this.createSerializer(null);
 
 		// Assert:
-		Assert.assertThat(serializer.getContext(), IsNull.notNullValue());
+		MatcherAssert.assertThat(serializer.getContext(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -144,7 +145,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TSerializer serializer = this.createSerializer(context);
 
 		// Assert:
-		Assert.assertThat(serializer.getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(serializer.getContext(), IsSame.sameInstance(context));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObject("test", s -> childContext[0] = s.getContext());
 
 		// Assert:
-		Assert.assertThat(childContext[0], IsSame.sameInstance(context));
+		MatcherAssert.assertThat(childContext[0], IsSame.sameInstance(context));
 	}
 
 	@Test
@@ -174,7 +175,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		serializer.writeObjectArray("test", entities);
 
 		// Assert:
-		Assert.assertThat(childContext[0], IsSame.sameInstance(context));
+		MatcherAssert.assertThat(childContext[0], IsSame.sameInstance(context));
 	}
 
 	//endregion
@@ -187,7 +188,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TDeserializer deserializer = this.createDeserializer(this.createSerializer(), null);
 
 		// Assert:
-		Assert.assertThat(deserializer.getContext(), IsNull.notNullValue());
+		MatcherAssert.assertThat(deserializer.getContext(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -199,7 +200,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		final TDeserializer deserializer = this.createDeserializer(this.createSerializer(), context);
 
 		// Assert:
-		Assert.assertThat(deserializer.getContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(deserializer.getContext(), IsSame.sameInstance(context));
 	}
 
 	@Test
@@ -215,7 +216,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		deserializer.readObject("test", objectDeserializer);
 
 		// Assert:
-		Assert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
 	}
 
 	@Test
@@ -231,7 +232,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		deserializer.readObjectArray("test", objectDeserializer);
 
 		// Assert:
-		Assert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
+		MatcherAssert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
 	}
 
 	//endregion

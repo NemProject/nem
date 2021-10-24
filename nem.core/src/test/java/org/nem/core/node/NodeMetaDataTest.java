@@ -1,6 +1,7 @@
 package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -18,11 +19,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = new NodeMetaData("plat", "app", new NodeVersion(3, 0, 0), 4, 7);
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -31,11 +32,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = new NodeMetaData("plat", "app");
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -48,11 +49,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = createMetaDataFromJson("plat", "app", "3.0.0", 4, 7);
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -61,11 +62,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = createMetaDataFromJson("plat", "app", "3.0.0", null, null);
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -74,11 +75,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = createMetaDataFromJson(null, null, "3.0.0", null, null);
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsNull.nullValue());
-		Assert.assertThat(metaData.getApplication(), IsNull.nullValue());
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getApplication(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = MissingRequiredPropertyException.class)
@@ -111,11 +112,11 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = new NodeMetaData(deserializer);
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
-		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
-		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(metaData.getPlatform(), IsEqual.equalTo("plat"));
+		MatcherAssert.assertThat(metaData.getApplication(), IsEqual.equalTo("app"));
+		MatcherAssert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(3, 0, 0)));
+		MatcherAssert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
 	}
 
 	//endregion
@@ -146,17 +147,17 @@ public class NodeMetaDataTest {
 		final NodeMetaData metaData = new NodeMetaData("plat", "app", new NodeVersion(1, 0, 0), 4, 7);
 
 		// Assert:
-		Assert.assertThat(DESC_TO_META_DATA_MAP.get("default"), IsEqual.equalTo(metaData));
+		MatcherAssert.assertThat(DESC_TO_META_DATA_MAP.get("default"), IsEqual.equalTo(metaData));
 		for (final Map.Entry<String, NodeMetaData> entry : DESC_TO_META_DATA_MAP.entrySet()) {
 			if ("default".equals(entry.getKey())) {
 				continue;
 			}
 
-			Assert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(metaData)));
+			MatcherAssert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(metaData)));
 		}
 
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
-		Assert.assertThat("plat", IsNot.not(IsEqual.equalTo((Object)metaData)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
+		MatcherAssert.assertThat("plat", IsNot.not(IsEqual.equalTo((Object)metaData)));
 	}
 
 	@Test
@@ -165,13 +166,13 @@ public class NodeMetaDataTest {
 		final int hashCode = new NodeMetaData("plat", "app", new NodeVersion(1, 0, 0), 4, 7).hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_META_DATA_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_META_DATA_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
 		for (final Map.Entry<String, NodeMetaData> entry : DESC_TO_META_DATA_MAP.entrySet()) {
 			if ("default".equals(entry.getKey())) {
 				continue;
 			}
 
-			Assert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+			MatcherAssert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		}
 	}
 

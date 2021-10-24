@@ -1,6 +1,7 @@
 package org.nem.core.async;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -29,15 +30,15 @@ public class NemAsyncTimerVisitorTest {
 		visitor.notifyOperationStart();
 
 		// Assert:
-		Assert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
-		Assert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
-		Assert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
-		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.isExecuting(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
+		MatcherAssert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
+		MatcherAssert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.isExecuting(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -51,15 +52,15 @@ public class NemAsyncTimerVisitorTest {
 		visitor.notifyOperationComplete();
 
 		// Assert:
-		Assert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
-		Assert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
-		Assert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(1));
-		Assert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
-		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(30));
-		Assert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(30));
-		Assert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
+		MatcherAssert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
+		MatcherAssert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -73,15 +74,15 @@ public class NemAsyncTimerVisitorTest {
 		visitor.notifyOperationCompleteExceptionally(new RuntimeException("test exception"));
 
 		// Assert:
-		Assert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
-		Assert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
-		Assert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(1));
-		Assert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
-		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(30));
-		Assert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(30));
-		Assert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
+		MatcherAssert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(new TimeInstant(71)));
+		MatcherAssert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -99,8 +100,8 @@ public class NemAsyncTimerVisitorTest {
 		visitor.notifyOperationComplete();
 
 		// Assert:
-		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(10));
-		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(20));
+		MatcherAssert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(20));
 	}
 
 	@Test
@@ -162,30 +163,30 @@ public class NemAsyncTimerVisitorTest {
 
 		// Assert:
 		final int executingAdjustment = isExecuting ? 1 : 0;
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(9));
-		Assert.assertThat(jsonObject.get("name"), IsEqual.equalTo("timer a"));
-		Assert.assertThat(jsonObject.get("executions"), IsEqual.equalTo(3 + executingAdjustment));
-		Assert.assertThat(jsonObject.get("successes"), IsEqual.equalTo(2));
-		Assert.assertThat(jsonObject.get("failures"), IsEqual.equalTo(1));
-		Assert.assertThat(jsonObject.get("last-delay-time"), IsEqual.equalTo(42));
-		Assert.assertThat(jsonObject.get("last-operation-start-time"), IsEqual.equalTo(isExecuting ? 142 : 121));
-		Assert.assertThat(jsonObject.get("last-operation-time"), IsEqual.equalTo(10));
-		Assert.assertThat(jsonObject.get("average-operation-time"), IsEqual.equalTo(20));
-		Assert.assertThat(jsonObject.get("is-executing"), IsEqual.equalTo(executingAdjustment));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(jsonObject.get("name"), IsEqual.equalTo("timer a"));
+		MatcherAssert.assertThat(jsonObject.get("executions"), IsEqual.equalTo(3 + executingAdjustment));
+		MatcherAssert.assertThat(jsonObject.get("successes"), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.get("failures"), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(jsonObject.get("last-delay-time"), IsEqual.equalTo(42));
+		MatcherAssert.assertThat(jsonObject.get("last-operation-start-time"), IsEqual.equalTo(isExecuting ? 142 : 121));
+		MatcherAssert.assertThat(jsonObject.get("last-operation-time"), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(jsonObject.get("average-operation-time"), IsEqual.equalTo(20));
+		MatcherAssert.assertThat(jsonObject.get("is-executing"), IsEqual.equalTo(executingAdjustment));
 	}
 
 	private static void assertDefaultValuesWithLastDelayTime(
 			final NemAsyncTimerVisitor visitor,
 			final int expectedLastDelayTime) {
 		// Assert:
-		Assert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
-		Assert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(TimeInstant.ZERO));
-		Assert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(expectedLastDelayTime));
-		Assert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(0));
-		Assert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
+		MatcherAssert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getNumSuccesses(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getNumFailures(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getLastOperationStartTime(), IsEqual.equalTo(TimeInstant.ZERO));
+		MatcherAssert.assertThat(visitor.getLastOperationTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.getLastDelayTime(), IsEqual.equalTo(expectedLastDelayTime));
+		MatcherAssert.assertThat(visitor.getAverageOperationTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(visitor.isExecuting(), IsEqual.equalTo(false));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -16,15 +17,15 @@ public class Base32EncoderTest {
 	@Test
 	public void stringCanBeConvertedToByteArray() {
 		// Assert:
-		Assert.assertThat(Base32Encoder.getBytes("KNUWO3LB"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
-		Assert.assertThat(Base32Encoder.getBytes("ETBKFYUCVQ======"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
+		MatcherAssert.assertThat(Base32Encoder.getBytes("KNUWO3LB"), IsEqual.equalTo(ENCODED_SIGMA_BYTES));
+		MatcherAssert.assertThat(Base32Encoder.getBytes("ETBKFYUCVQ======"), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
 	}
 
 	@Test
 	public void byteArrayCanBeConvertedToString() {
 		// Assert:
-		Assert.assertThat(Base32Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("KNUWO3LB"));
-		Assert.assertThat(Base32Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("ETBKFYUCVQ======"));
+		MatcherAssert.assertThat(Base32Encoder.getString(ENCODED_SIGMA_BYTES), IsEqual.equalTo("KNUWO3LB"));
+		MatcherAssert.assertThat(Base32Encoder.getString(ENCODED_CURRENCY_SYMBOLS_BYTES), IsEqual.equalTo("ETBKFYUCVQ======"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -36,6 +37,6 @@ public class Base32EncoderTest {
 	@Test
 	public void stringCanContainPaddingAndWhitespace() {
 		// Assert:
-		Assert.assertThat(Base32Encoder.getBytes("  ETBKFYUCVQ======  "), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
+		MatcherAssert.assertThat(Base32Encoder.getBytes("  ETBKFYUCVQ======  "), IsEqual.equalTo(ENCODED_CURRENCY_SYMBOLS_BYTES));
 	}
 }

@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -25,7 +26,7 @@ public class AccountRemoteStatusTest {
 		final AccountRemoteStatus status = AccountRemoteStatus.fromString(statusString);
 
 		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(accountRemoteStatus));
+		MatcherAssert.assertThat(status, IsEqual.equalTo(accountRemoteStatus));
 	}
 
 	@Test
@@ -57,8 +58,8 @@ public class AccountRemoteStatusTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("status"), IsEqual.equalTo(statusString));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("status"), IsEqual.equalTo(statusString));
 	}
 
 	@Test
@@ -80,7 +81,7 @@ public class AccountRemoteStatusTest {
 		final AccountRemoteStatus status = AccountRemoteStatus.readFrom(deserializer, "status");
 
 		// Assert:
-		Assert.assertThat(status, IsEqual.equalTo(originalStatus));
+		MatcherAssert.assertThat(status, IsEqual.equalTo(originalStatus));
 	}
 	//endregion
 }

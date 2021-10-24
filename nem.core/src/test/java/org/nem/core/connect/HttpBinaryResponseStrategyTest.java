@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,7 +16,7 @@ public class HttpBinaryResponseStrategyTest extends HttpDeserializerResponseStra
 		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(null);
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
+		MatcherAssert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
 	}
 
 	@Override

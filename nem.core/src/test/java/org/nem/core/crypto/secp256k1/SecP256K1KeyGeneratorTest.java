@@ -1,5 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -74,7 +75,7 @@ public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 			final PublicKey publicKey = generator.derivePublicKey(PrivateKey.fromHexString(privateKey));
 
 			// Assert:
-			Assert.assertThat(publicKey, IsEqual.equalTo(PublicKey.fromHexString(entry.getValue())));
+			MatcherAssert.assertThat(publicKey, IsEqual.equalTo(PublicKey.fromHexString(entry.getValue())));
 		}
 	}
 

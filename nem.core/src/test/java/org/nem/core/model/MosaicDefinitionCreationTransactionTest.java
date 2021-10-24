@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -50,14 +51,14 @@ public class MosaicDefinitionCreationTransactionTest {
 			final MosaicDefinition expectedMosaicDefinition,
 			final Account expectedCreationFeeSink,
 			final Amount expectedCreationFee) {
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_DEFINITION_CREATION));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getMosaicDefinition(), IsEqual.equalTo(expectedMosaicDefinition));
-		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(expectedCreationFeeSink));
-		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(expectedCreationFee));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_DEFINITION_CREATION));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getMosaicDefinition(), IsEqual.equalTo(expectedMosaicDefinition));
+		MatcherAssert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(expectedCreationFeeSink));
+		MatcherAssert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(expectedCreationFee));
 	}
 
 	@Test
@@ -97,7 +98,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
+		MatcherAssert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
 	}
 
 	@Test
@@ -109,7 +110,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
+		MatcherAssert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
 	}
 
 	@Test
@@ -122,7 +123,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(CREATION_FEE_SINK, feeRecipient)));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(CREATION_FEE_SINK, feeRecipient)));
 	}
 
 	// endregion
@@ -138,7 +139,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, CREATION_FEE_SINK)));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, CREATION_FEE_SINK)));
 	}
 
 	// endregion

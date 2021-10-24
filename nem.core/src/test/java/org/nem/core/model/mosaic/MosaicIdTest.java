@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -54,8 +55,8 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = createMosaicId("alice.vouchers", "foo");
 
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
-		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+		MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
 	}
 
 	@Test
@@ -102,8 +103,8 @@ public class MosaicIdTest {
 			final MosaicId mosaicId = new MosaicId(namespaceId, name);
 
 			// Assert:
-			Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(namespaceId));
-			Assert.assertThat(mosaicId.getName(), IsEqual.equalTo(name));
+			MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(namespaceId));
+			MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo(name));
 		});
 	}
 
@@ -118,8 +119,8 @@ public class MosaicIdTest {
 			final MosaicId mosaicId = MosaicId.parse("alice.vouchers:" + name);
 
 			// Assert:
-			Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
-			Assert.assertThat(mosaicId.getName(), IsEqual.equalTo(name));
+			MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+			MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo(name));
 		});
 	}
 
@@ -165,9 +166,9 @@ public class MosaicIdTest {
 		final JSONObject object = JsonSerializer.serializeToJson(mosaicId);
 
 		// Assert:
-		Assert.assertThat(object.size(), IsEqual.equalTo(2));
-		Assert.assertThat(object.get("namespaceId"), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(object.get("name"), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(object.get("namespaceId"), IsEqual.equalTo("alice.vouchers"));
+		MatcherAssert.assertThat(object.get("name"), IsEqual.equalTo("foo"));
 	}
 
 	@Test
@@ -176,8 +177,8 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = deserialize("alice.vouchers", "foo");
 
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
-		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+		MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
 	}
 
 	@Test
@@ -190,8 +191,8 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = new MosaicId(deserializer);
 
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
-		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+		MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
 	}
 
 	@Test
@@ -244,7 +245,7 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = createMosaicId("bob.silver", "bar");
 
 		// Assert:
-		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver:bar"));
+		MatcherAssert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver:bar"));
 	}
 
 	//endregion
@@ -268,13 +269,13 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaicId)) : IsEqual.equalTo(mosaicId));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(mosaicId)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(mosaicId)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(mosaicId)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(mosaicId)));
 	}
 
 	@Test
@@ -284,7 +285,7 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

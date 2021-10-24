@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -20,10 +21,10 @@ public class MosaicTransferNotificationTest {
 				new Quantity(467));
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
-		Assert.assertThat(notification.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
-		Assert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(467)));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
+		MatcherAssert.assertThat(notification.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(notification.getRecipient(), IsEqual.equalTo(recipient));
+		MatcherAssert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
+		MatcherAssert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(467)));
 	}
 }

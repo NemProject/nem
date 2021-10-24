@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -19,7 +20,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.duplicate(src);
 
 		// Assert:
-		Assert.assertThat(result, IsNot.not(IsSame.sameInstance(src)));
+		MatcherAssert.assertThat(result, IsNot.not(IsSame.sameInstance(src)));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.duplicate(bytes);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(bytes));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(bytes));
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -62,7 +63,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] {}));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 12, 4, 6 }));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new byte[] { 12, 4, 6 }));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13 }));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13 }));
 	}
 
 	@Test
@@ -101,7 +102,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6 }));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6 }));
 	}
 
 	@Test
@@ -110,7 +111,7 @@ public class ArrayUtilsTest {
 		final byte[] result = ArrayUtils.concat(new byte[] { 7, 13 }, new byte[] { 12, 4, 6 }, new byte[] { 11, 9 });
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6, 11, 9 }));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new byte[] { 7, 13, 12, 4, 6, 11, 9 }));
 	}
 
 	//endregion
@@ -144,9 +145,9 @@ public class ArrayUtilsTest {
 		final byte[][] parts = ArrayUtils.split(bytes, 0);
 
 		// Assert:
-		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
+		MatcherAssert.assertThat(parts.length, IsEqual.equalTo(2));
+		MatcherAssert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
+		MatcherAssert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
@@ -158,9 +159,9 @@ public class ArrayUtilsTest {
 		final byte[][] parts = ArrayUtils.split(bytes, 0);
 
 		// Assert:
-		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] { 12, 4, 6 }));
+		MatcherAssert.assertThat(parts.length, IsEqual.equalTo(2));
+		MatcherAssert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
+		MatcherAssert.assertThat(parts[1], IsEqual.equalTo(new byte[] { 12, 4, 6 }));
 	}
 
 	@Test
@@ -172,9 +173,9 @@ public class ArrayUtilsTest {
 		final byte[][] parts = ArrayUtils.split(bytes, 2);
 
 		// Assert:
-		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] { 7, 13 }));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
+		MatcherAssert.assertThat(parts.length, IsEqual.equalTo(2));
+		MatcherAssert.assertThat(parts[0], IsEqual.equalTo(new byte[] { 7, 13 }));
+		MatcherAssert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
@@ -186,9 +187,9 @@ public class ArrayUtilsTest {
 		final byte[][] parts = ArrayUtils.split(bytes, 2);
 
 		// Assert:
-		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] { 7, 13 }));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] { 12, 4, 6 }));
+		MatcherAssert.assertThat(parts.length, IsEqual.equalTo(2));
+		MatcherAssert.assertThat(parts[0], IsEqual.equalTo(new byte[] { 7, 13 }));
+		MatcherAssert.assertThat(parts[1], IsEqual.equalTo(new byte[] { 12, 4, 6 }));
 	}
 
 	//endregion
@@ -201,7 +202,7 @@ public class ArrayUtilsTest {
 		final byte[] bytes = ArrayUtils.toByteArray(new BigInteger("321495", 16), 3);
 
 		// Assert:
-		Assert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, 0x32 }));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, 0x32 }));
 	}
 
 	@Test
@@ -210,7 +211,7 @@ public class ArrayUtilsTest {
 		final byte[] bytes = ArrayUtils.toByteArray(new BigInteger("F21495", 16), 3);
 
 		// Assert:
-		Assert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, (byte)0xF2 }));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, (byte)0xF2 }));
 	}
 
 	@Test
@@ -219,7 +220,7 @@ public class ArrayUtilsTest {
 		final byte[] bytes = ArrayUtils.toByteArray(new BigInteger("0000A5", 16), 3);
 
 		// Assert:
-		Assert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0xA5, 0x00, 0x00 }));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0xA5, 0x00, 0x00 }));
 	}
 
 	@Test
@@ -228,7 +229,7 @@ public class ArrayUtilsTest {
 		final byte[] bytes = ArrayUtils.toByteArray(new BigInteger("F122321495", 16), 3);
 
 		// Assert:
-		Assert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, 0x32 }));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(new byte[] { (byte)0x95, 0x14, 0x32 }));
 	}
 
 	//endregion
@@ -241,7 +242,7 @@ public class ArrayUtilsTest {
 		final BigInteger result = ArrayUtils.toBigInteger(new byte[] { (byte)0x95, 0x14, 0x32 });
 
 		// Assert:
-		Assert.assertThat(new BigInteger("321495", 16), IsEqual.equalTo(result));
+		MatcherAssert.assertThat(new BigInteger("321495", 16), IsEqual.equalTo(result));
 	}
 
 	@Test
@@ -250,7 +251,7 @@ public class ArrayUtilsTest {
 		final BigInteger result = ArrayUtils.toBigInteger(new byte[] { (byte)0x95, 0x14, (byte)0xF2 });
 
 		// Assert:
-		Assert.assertThat(new BigInteger("F21495", 16), IsEqual.equalTo(result));
+		MatcherAssert.assertThat(new BigInteger("F21495", 16), IsEqual.equalTo(result));
 	}
 
 	@Test
@@ -259,7 +260,7 @@ public class ArrayUtilsTest {
 		final BigInteger result = ArrayUtils.toBigInteger(new byte[] { (byte)0xA5, 0x00, 0x00 });
 
 		// Assert:
-		Assert.assertThat(new BigInteger("0000A5", 16), IsEqual.equalTo(result));
+		MatcherAssert.assertThat(new BigInteger("0000A5", 16), IsEqual.equalTo(result));
 	}
 
 	//endregion
@@ -280,7 +281,7 @@ public class ArrayUtilsTest {
 			final int result = ArrayUtils.isEqualConstantTime(bytes1, bytes2);
 
 			// Assert:
-			Assert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(1));
+			MatcherAssert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(1));
 		}
 	}
 
@@ -299,7 +300,7 @@ public class ArrayUtilsTest {
 			final int result = ArrayUtils.isEqualConstantTime(bytes1, bytes2);
 
 			// Assert:
-			Assert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(0));
+			MatcherAssert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(0));
 		}
 	}
 
@@ -365,14 +366,14 @@ public class ArrayUtilsTest {
 
 	private static void assertCompareZero(final byte[] a, final byte[] b) {
 		// Assert:
-		Assert.assertThat(ArrayUtils.compare(a, b), IsEqual.equalTo(0));
-		Assert.assertThat(ArrayUtils.compare(b, a), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(ArrayUtils.compare(a, b), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(ArrayUtils.compare(b, a), IsEqual.equalTo(0));
 	}
 
 	private static void assertCompareNonZero(final byte[] smaller, final byte[] larger) {
 		// Assert:
-		Assert.assertThat(ArrayUtils.compare(smaller, larger), IsEqual.equalTo(-1));
-		Assert.assertThat(ArrayUtils.compare(larger, smaller), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(ArrayUtils.compare(smaller, larger), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(ArrayUtils.compare(larger, smaller), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -381,16 +382,16 @@ public class ArrayUtilsTest {
 
 	@Test
 	public void getBitReturnZeroIfBitIsNotSet() {
-		Assert.assertThat(ArrayUtils.getBit(new byte[] { 0 }, 0), IsEqual.equalTo(0));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 15), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(ArrayUtils.getBit(new byte[] { 0 }, 0), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 15), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void getBitReturnOneIfBitIsSet() {
 		// Assert:
-		Assert.assertThat(ArrayUtils.getBit(new byte[] { 8 }, 3), IsEqual.equalTo(1));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 9), IsEqual.equalTo(1));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 16), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(ArrayUtils.getBit(new byte[] { 8 }, 3), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 9), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 16), IsEqual.equalTo(1));
 	}
 
 	//endregion

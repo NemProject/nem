@@ -1,5 +1,6 @@
 package org.nem.core.messages;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.MessageTypes;
@@ -15,10 +16,10 @@ public class PlainMessageTest {
 		final PlainMessage message = new PlainMessage(input);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
@@ -31,10 +32,10 @@ public class PlainMessageTest {
 		final PlainMessage message = createRoundTrippedMessage(originalMessage);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
 	}
 
 	//region equals / hashCode
@@ -45,10 +46,10 @@ public class PlainMessageTest {
 		final PlainMessage message = new PlainMessage(new byte[] { 12, 77, 56 });
 
 		// Assert:
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsEqual.equalTo(message));
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77 }), IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(new byte[] { 12, 77, 56 }, IsNot.not((Object)IsEqual.equalTo(message)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(new PlainMessage(new byte[] { 12, 77 }), IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(new byte[] { 12, 77, 56 }, IsNot.not((Object)IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
 	}
 
 	@Test
@@ -58,8 +59,8 @@ public class PlainMessageTest {
 		final int hashCode = message.hashCode();
 
 		// Assert:
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77 }).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new PlainMessage(new byte[] { 12, 77 }).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion

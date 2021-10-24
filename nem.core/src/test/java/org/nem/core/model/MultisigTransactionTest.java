@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -33,13 +34,13 @@ public class MultisigTransactionTest {
 				innerTransaction);
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
-		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
-		Assert.assertThat(transaction.getOtherTransaction(), IsEqual.equalTo(innerTransaction));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
+		MatcherAssert.assertThat(transaction.getOtherTransaction(), IsEqual.equalTo(innerTransaction));
 	}
 
 	//endregion
@@ -53,7 +54,7 @@ public class MultisigTransactionTest {
 		// Assert:
 		final MultisigTransaction transaction = assertCanRoundtripNonVerifiableTransaction(
 				MultisigTransactionTest::createRoundTrippedTransaction);
-		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+		MatcherAssert.assertThat(transaction.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -85,9 +86,9 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = new MultisigTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
 		// Assert:
-		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
+		MatcherAssert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
 	}
 
 	@Test
@@ -123,7 +124,7 @@ public class MultisigTransactionTest {
 		// Assert:
 		final MultisigTransaction transaction = assertCanRoundtripNonVerifiableTransaction(
 				MultisigTransactionTest::createNonVerifiableRoundTrippedTransaction);
-		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(transaction.getSignature(), IsNull.nullValue());
 	}
 
 	@Test
@@ -141,8 +142,8 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = createNonVerifiableRoundTrippedTransaction(originalTransaction);
 
 		// Assert: signatures are non included in the non-verifiable payload
-		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -165,16 +166,16 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = roundTripEntity.apply(originalTransaction);
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
-		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
 
 		// - the other transaction excluding is preserved, excluding its signature
-		Assert.assertThat(HashUtils.calculateHash(transaction.getOtherTransaction()), IsEqual.equalTo(innerTransactionHash));
-		Assert.assertThat(transaction.getOtherTransaction().getSignature(), IsNull.nullValue());
+		MatcherAssert.assertThat(HashUtils.calculateHash(transaction.getOtherTransaction()), IsEqual.equalTo(innerTransactionHash));
+		MatcherAssert.assertThat(transaction.getOtherTransaction().getSignature(), IsNull.nullValue());
 		return transaction;
 	}
 
@@ -224,7 +225,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		final Hash actualHash = HashUtils.calculateHash(originalTransaction);
-		Assert.assertThat(actualHash, IsEqual.equalTo(expectedHash));
+		MatcherAssert.assertThat(actualHash, IsEqual.equalTo(expectedHash));
 	}
 
 	//endregion
@@ -329,7 +330,7 @@ public class MultisigTransactionTest {
 			this.transaction.execute(observer, null);
 
 			// Assert: the inner transaction notifications were bubbled
-			Assert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(expectedNotifications)).notify(notificationCaptor.capture());
@@ -342,7 +343,7 @@ public class MultisigTransactionTest {
 			this.transaction.undo(observer, null);
 
 			// Assert: the inner transaction notifications were bubbled
-			Assert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(expectedNotifications)).notify(notificationCaptor.capture());
@@ -381,7 +382,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		final Collection<Account> expectedAccounts = Arrays.asList(innerTransactionSigner, cosigner, transaction.getSigner());
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(expectedAccounts));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(expectedAccounts));
 	}
 
 	@Test
@@ -402,7 +403,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		final Collection<Transaction> expectedTransactions = Arrays.asList(innerTransaction, signatureTransaction);
-		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
+		MatcherAssert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	//endregion
@@ -448,8 +449,8 @@ public class MultisigTransactionTest {
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 
 		// Assert:
-		Assert.assertThat(signers.size(), IsEqual.equalTo(0));
-		Assert.assertThat(signatures.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(signers.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(signatures.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -466,8 +467,8 @@ public class MultisigTransactionTest {
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 
 		// Assert:
-		Assert.assertThat(signers, IsEquivalent.equivalentTo(sigTransaction.getSigner()));
-		Assert.assertThat(signatures, IsEquivalent.equivalentTo(sigTransaction));
+		MatcherAssert.assertThat(signers, IsEquivalent.equivalentTo(sigTransaction.getSigner()));
+		MatcherAssert.assertThat(signatures, IsEquivalent.equivalentTo(sigTransaction));
 	}
 
 	@Test
@@ -486,8 +487,8 @@ public class MultisigTransactionTest {
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 
 		// Assert:
-		Assert.assertThat(signers, IsEquivalent.equivalentTo(sigTransaction1.getSigner(), sigTransaction2.getSigner()));
-		Assert.assertThat(signatures, IsEquivalent.equivalentTo(sigTransaction1, sigTransaction2));
+		MatcherAssert.assertThat(signers, IsEquivalent.equivalentTo(sigTransaction1.getSigner(), sigTransaction2.getSigner()));
+		MatcherAssert.assertThat(signatures, IsEquivalent.equivalentTo(sigTransaction1, sigTransaction2));
 	}
 
 	@Test
@@ -508,7 +509,7 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction result = msTransaction.getCosignerSignatures().iterator().next();
 
 		// Assert:
-		Assert.assertThat(result.getFee(), IsEqual.equalTo(Amount.fromNem(6)));
+		MatcherAssert.assertThat(result.getFee(), IsEqual.equalTo(Amount.fromNem(6)));
 	}
 
 	@Test
@@ -525,8 +526,8 @@ public class MultisigTransactionTest {
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 
 		// Assert:
-		Assert.assertThat(signers.size(), IsEqual.equalTo(0));
-		Assert.assertThat(signatures.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(signers.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(signatures.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -580,7 +581,7 @@ public class MultisigTransactionTest {
 		final boolean isVerified = multisigTransaction.verify();
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -613,7 +614,7 @@ public class MultisigTransactionTest {
 		final boolean isVerified = multisigTransaction.verify();
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -636,7 +637,7 @@ public class MultisigTransactionTest {
 		final boolean isVerified = multisigTransaction.verify();
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(false));
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -14,9 +15,9 @@ public class KeyPairTest {
 		final KeyPair kp = new KeyPair();
 
 		// Assert:
-		Assert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
-		Assert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
-		Assert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
+		MatcherAssert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
+		MatcherAssert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -28,9 +29,9 @@ public class KeyPairTest {
 		final KeyPair kp2 = new KeyPair(kp1.getPrivateKey());
 
 		// Assert:
-		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
-		Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
-		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+		MatcherAssert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
+		MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
 	@Test
@@ -42,9 +43,9 @@ public class KeyPairTest {
 		final KeyPair kp2 = new KeyPair(kp1.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(kp2.getPrivateKey(), IsNull.nullValue());
-		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+		MatcherAssert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(kp2.getPrivateKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
 	//endregion
@@ -56,8 +57,8 @@ public class KeyPairTest {
 		final KeyPair kp2 = new KeyPair();
 
 		// Assert:
-		Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
-		Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+		MatcherAssert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+		MatcherAssert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
@@ -20,8 +21,8 @@ public class TransferTransactionAttachmentTest {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsNull.nullValue());
-		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(attachment.getMessage(), IsNull.nullValue());
+		MatcherAssert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -31,8 +32,8 @@ public class TransferTransactionAttachmentTest {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
-		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -49,7 +50,7 @@ public class TransferTransactionAttachmentTest {
 		attachment.setMessage(message);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
 	}
 
 	@Test
@@ -66,7 +67,7 @@ public class TransferTransactionAttachmentTest {
 				IllegalStateException.class);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message1));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message1));
 	}
 
 	//endregion
@@ -88,7 +89,7 @@ public class TransferTransactionAttachmentTest {
 				new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
 				new Mosaic(Utils.createMosaicId(2), new Quantity(77)),
 				new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
-		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public class TransferTransactionAttachmentTest {
 		// Assert:
 		final Collection<Mosaic> expectedPairs = Collections.singletonList(
 				new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
-		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -124,7 +125,7 @@ public class TransferTransactionAttachmentTest {
 				Utils.createMosaicId("aa", "a"),
 				Utils.createMosaicId("b", "a"),
 				Utils.createMosaicId("b", "c"));
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				attachment.getMosaics().stream().map(Mosaic::getMosaicId).collect(Collectors.toList()),
 				IsEqual.equalTo(expectedMosaicIds));
 	}

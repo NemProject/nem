@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -19,8 +20,8 @@ public class HashMetaDataPairTest {
 		final HashMetaDataPair pair = new HashMetaDataPair(hash, metaData);
 
 		// Assert:
-		Assert.assertThat(pair.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(pair.getMetaData(), IsEqual.equalTo(metaData));
+		MatcherAssert.assertThat(pair.getHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(pair.getMetaData(), IsEqual.equalTo(metaData));
 	}
 
 	//region equals / hashCode
@@ -31,9 +32,9 @@ public class HashMetaDataPairTest {
 		final HashMap<String, HashMetaDataPair> map = createTestObjects();
 
 		// Assert:
-		Assert.assertThat(map.get("copy"), IsEqual.equalTo(map.get("original")));
-		Assert.assertThat(map.get("differentHash"), IsNot.not(IsEqual.equalTo(map.get("original"))));
-		Assert.assertThat(map.get("differentMetaData"), IsNot.not(IsEqual.equalTo(map.get("original"))));
+		MatcherAssert.assertThat(map.get("copy"), IsEqual.equalTo(map.get("original")));
+		MatcherAssert.assertThat(map.get("differentHash"), IsNot.not(IsEqual.equalTo(map.get("original"))));
+		MatcherAssert.assertThat(map.get("differentMetaData"), IsNot.not(IsEqual.equalTo(map.get("original"))));
 	}
 
 	@Test
@@ -42,9 +43,9 @@ public class HashMetaDataPairTest {
 		final HashMap<String, HashMetaDataPair> map = createTestObjects();
 
 		// Assert:
-		Assert.assertThat(map.get("copy").hashCode(), IsEqual.equalTo(map.get("original").hashCode()));
-		Assert.assertThat(map.get("differentHash").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
-		Assert.assertThat(map.get("differentMetaData").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
+		MatcherAssert.assertThat(map.get("copy").hashCode(), IsEqual.equalTo(map.get("original").hashCode()));
+		MatcherAssert.assertThat(map.get("differentHash").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
+		MatcherAssert.assertThat(map.get("differentMetaData").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
 	private static HashMap<String, HashMetaDataPair> createTestObjects() {

@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -18,7 +19,7 @@ public class NodeEndpointTest {
 
 		// Assert:
 		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
-		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
 	@Test
@@ -28,7 +29,7 @@ public class NodeEndpointTest {
 
 		// Assert:
 		final URL expectedUrl = new URL("http", "10.8.8.2", 7890, "/");
-		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class NodeEndpointTest {
 
 		// Assert:
 		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
-		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
+		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
 	//region invalid parameters
@@ -75,7 +76,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", hostName, 12);
 
 		// Assert:
-		Assert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo(expectedHostName));
+		MatcherAssert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo(expectedHostName));
 	}
 
 	//endregion
@@ -118,7 +119,7 @@ public class NodeEndpointTest {
 		final boolean result = endpoint.isLocal();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(isHostLocal));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(isHostLocal));
 	}
 
 	//endregion
@@ -131,12 +132,12 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
 		// Assert:
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12), IsEqual.equalTo(endpoint));
-		Assert.assertThat(new NodeEndpoint("http", "10.8.8.2", 12), IsNot.not(IsEqual.equalTo(endpoint)));
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12), IsNot.not(IsEqual.equalTo(endpoint)));
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13), IsNot.not(IsEqual.equalTo(endpoint)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(endpoint)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)endpoint)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12), IsEqual.equalTo(endpoint));
+		MatcherAssert.assertThat(new NodeEndpoint("http", "10.8.8.2", 12), IsNot.not(IsEqual.equalTo(endpoint)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12), IsNot.not(IsEqual.equalTo(endpoint)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13), IsNot.not(IsEqual.equalTo(endpoint)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(endpoint)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)endpoint)));
 	}
 
 	@Test
@@ -146,8 +147,8 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpointWithHostName = new NodeEndpoint("http", "localhost", 12);
 
 		// Assert:
-		Assert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
-		Assert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
+		MatcherAssert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
+		MatcherAssert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
 	}
 
 	@Test
@@ -159,8 +160,8 @@ public class NodeEndpointTest {
 				new NodeEndpoint(Utils.roundtripSerializableEntity(new NodeEndpoint("http", "localhost", 12), null));
 
 		// Assert:
-		Assert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
-		Assert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
+		MatcherAssert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
+		MatcherAssert.assertThat(endpointWithHostIp.hashCode(), IsEqual.equalTo(endpointWithHostName.hashCode()));
 	}
 
 	@Test
@@ -170,10 +171,10 @@ public class NodeEndpointTest {
 		final int hashCode = endpoint.hashCode();
 
 		// Assert:
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeEndpoint("http", "10.8.8.2", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 12).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeEndpoint("http", "10.8.8.2", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	@Test
@@ -183,7 +184,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint2 = new NodeEndpoint("ftp", "127.0.0.1", 12);
 
 		// Assert:
-		Assert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));
+		MatcherAssert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));
 	}
 
 	//endregion
@@ -196,7 +197,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "127.0.0.1", 12);
 
 		// Assert:
-		Assert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://127.0.0.1:12/"));
+		MatcherAssert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://127.0.0.1:12/"));
 	}
 
 	@Test
@@ -205,7 +206,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "localhost", 12);
 
 		// Assert:
-		Assert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://localhost:12/"));
+		MatcherAssert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://localhost:12/"));
 	}
 
 	//endregion

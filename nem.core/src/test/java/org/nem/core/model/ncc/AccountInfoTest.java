@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -28,14 +29,14 @@ public class AccountInfoTest {
 				2.3);
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
-		Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(1222)));
-		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
-		Assert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
+		MatcherAssert.assertThat(info.getKeyPair(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		MatcherAssert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(1222)));
+		MatcherAssert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
+		MatcherAssert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
 	}
 
 	@Test
@@ -53,14 +54,14 @@ public class AccountInfoTest {
 				2.3);
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(1222)));
-		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
-		Assert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		MatcherAssert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(1222)));
+		MatcherAssert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
+		MatcherAssert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class AccountInfoTest {
 				multisigInfo);
 
 		// Assert:
-		Assert.assertThat(info.getMultisigInfo(), IsEqual.equalTo(multisigInfo));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsEqual.equalTo(multisigInfo));
 	}
 
 	//endregion
@@ -139,9 +140,9 @@ public class AccountInfoTest {
 		final AccountInfo info = new AccountInfo(Utils.roundtripSerializableEntity(originalInfo, null));
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getMultisigInfo(), IsNull.notNullValue());
-		Assert.assertThat(info.getMultisigInfo().getCosignatoriesCount(), IsEqual.equalTo(8));
+		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.notNullValue());
+		MatcherAssert.assertThat(info.getMultisigInfo().getCosignatoriesCount(), IsEqual.equalTo(8));
 	}
 
 	private static void assertAccountRoundTrip(final Address address, final PublicKey expectedPublicKey) {
@@ -160,23 +161,23 @@ public class AccountInfoTest {
 		final AccountInfo info = infoDeserializer.apply(Utils.roundtripSerializableEntity(originalInfo, null));
 
 		// Assert:
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 
 		if (null == expectedPublicKey) {
-			Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
+			MatcherAssert.assertThat(info.getKeyPair(), IsNull.nullValue());
 		} else {
-			Assert.assertThat(info.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-			Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			MatcherAssert.assertThat(info.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 		}
 
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
-		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(727L)));
-		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
+		MatcherAssert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(727L)));
+		MatcherAssert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
+		MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
-		Assert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
 	}
 
 	private static void assertAccountSerialization(final Address address, final byte[] expectedPublicKey) {
@@ -189,18 +190,18 @@ public class AccountInfoTest {
 		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 
 		// Assert:
-		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalInfo.getAddress().getEncoded()));
-		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
-		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
-		Assert.assertThat(deserializer.readLong("vestedBalance"), IsEqual.equalTo(727000000L));
-		Assert.assertThat(deserializer.readLong("harvestedBlocks"), IsEqual.equalTo(3L));
-		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
-		Assert.assertThat(deserializer.readOptionalObject("multisigInfo", MultisigInfo::new), IsNull.nullValue());
+		MatcherAssert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalInfo.getAddress().getEncoded()));
+		MatcherAssert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
+		MatcherAssert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
+		MatcherAssert.assertThat(deserializer.readLong("vestedBalance"), IsEqual.equalTo(727000000L));
+		MatcherAssert.assertThat(deserializer.readLong("harvestedBlocks"), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
+		MatcherAssert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
+		MatcherAssert.assertThat(deserializer.readOptionalObject("multisigInfo", MultisigInfo::new), IsNull.nullValue());
 
 		// 8 "real" properties and 1 "hidden" (ordering) property
 		final int expectedProperties = 8 + 1;
-		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
+		MatcherAssert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
 	private static AccountInfo createAccountInfoForSerializationTests(final Address address) {
@@ -249,12 +250,12 @@ public class AccountInfoTest {
 				continue;
 			}
 
-			Assert.assertThat(entry.getValue(), IsEqual.equalTo(info));
+			MatcherAssert.assertThat(entry.getValue(), IsEqual.equalTo(info));
 		}
 
-		Assert.assertThat(DESC_TO_INFO_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
+		MatcherAssert.assertThat(DESC_TO_INFO_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(info)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
 	}
 
 	@Test
@@ -268,10 +269,10 @@ public class AccountInfoTest {
 				continue;
 			}
 
-			Assert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
+			MatcherAssert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
 		}
 
-		Assert.assertThat(DESC_TO_INFO_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_INFO_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	private static AccountInfo createAccountInfo(

@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -36,7 +37,7 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = createTransferTransaction(signer, recipient, 123);
 
 			// Assert:
-			Assert.assertThat(transaction.getEntityVersion(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(transaction.getEntityVersion(), IsEqual.equalTo(2));
 		}
 
 		@Test
@@ -50,8 +51,8 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction2 = createTransferTransaction(123, signer, recipient, 123);
 
 			// Assert:
-			Assert.assertThat(transaction1.getEntityVersion(), IsEqual.equalTo(1));
-			Assert.assertThat(transaction2.getEntityVersion(), IsEqual.equalTo(123));
+			MatcherAssert.assertThat(transaction1.getEntityVersion(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(transaction2.getEntityVersion(), IsEqual.equalTo(123));
 		}
 
 		private static TransferTransaction createTransferTransaction(
@@ -183,9 +184,9 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
-			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
-			Assert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -199,9 +200,9 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
-			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(0));
-			Assert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(transaction.getMessage(), IsNull.nullValue());
+			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		//endregion
@@ -217,7 +218,7 @@ public class TransferTransactionTest {
 			final Amount amount = transaction.getXemTransferAmount();
 
 			// Act:
-			Assert.assertThat(amount, IsEqual.equalTo(ONE_POINT_TWO_XEM));
+			MatcherAssert.assertThat(amount, IsEqual.equalTo(ONE_POINT_TWO_XEM));
 		}
 
 		@Test
@@ -229,7 +230,7 @@ public class TransferTransactionTest {
 			final Collection<Mosaic> mosaics = transaction.getMosaics();
 
 			// Act:
-			Assert.assertThat(mosaics.isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(mosaics.isEmpty(), IsEqual.equalTo(true));
 		}
 
 		private TransferTransaction createTransferWithoutMosaics(final Amount amount) {
@@ -268,10 +269,10 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					null == message ? transaction.getMessage() : transaction.getMessage().getDecodedPayload(),
 					IsEqual.equalTo(null == message ? null : messageBytes));
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					transaction.getAttachment().getMosaics(),
 					IsEquivalent.equivalentTo(null == mosaics ? Collections.emptyList() : mosaics));
 		}
@@ -281,10 +282,10 @@ public class TransferTransactionTest {
 				final Account signer,
 				final Account recipient,
 				final Amount amount) {
-			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-			Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(amount));
+			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			MatcherAssert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
+			MatcherAssert.assertThat(transaction.getAmount(), IsEqual.equalTo(amount));
 		}
 
 		//endregion
@@ -297,7 +298,7 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = this.createTransactionWithMockMessage(100, 44);
 
 			// Assert:
-			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(100));
+			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(100));
 		}
 
 		private TransferTransaction createTransactionWithMockMessage(final int encodedMessageSize, final int decodedMessageSize) {
@@ -370,7 +371,7 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
 			// Assert:
-			Assert.assertThat(transaction.getMessage(), isNullMessageExpected ? IsNull.nullValue() : IsEqual.equalTo(message));
+			MatcherAssert.assertThat(transaction.getMessage(), isNullMessageExpected ? IsNull.nullValue() : IsEqual.equalTo(message));
 		}
 
 		//endregion
@@ -388,7 +389,7 @@ public class TransferTransactionTest {
 			final Collection<Account> accounts = transaction.getAccounts();
 
 			// Assert:
-			Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, recipient));
+			MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, recipient));
 		}
 
 		//endregion
@@ -461,8 +462,8 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 			// Assert:
-			Assert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(true));
-			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+			MatcherAssert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
 		}
 
 		@Test
@@ -481,8 +482,8 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 			// Assert:
-			Assert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(false));
-			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
+			MatcherAssert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
 		}
 
 		//endregion
@@ -594,8 +595,8 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup, 1);
 
 			// Assert: the mosaic transfers are not persisted in v1 transactions
-			Assert.assertThat(originalTransaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(false));
-			Assert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(originalTransaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
 		//endregion
@@ -635,7 +636,7 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
 		}
 
 		@Test
@@ -651,9 +652,9 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
-			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
-			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
 		}
 
 		@Test
@@ -667,7 +668,7 @@ public class TransferTransactionTest {
 			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 1, null, mosaics);
 
 			// Assert
-			Assert.assertThat(transaction.getXemTransferAmount(), IsEqual.equalTo(Amount.fromMicroNem(8_999_999_999_000_000L)));
+			MatcherAssert.assertThat(transaction.getXemTransferAmount(), IsEqual.equalTo(Amount.fromMicroNem(8_999_999_999_000_000L)));
 		}
 		//endregion
 
@@ -878,7 +879,7 @@ public class TransferTransactionTest {
 			final Amount amount = transaction.getXemTransferAmount();
 
 			// Act:
-			Assert.assertThat(amount, IsNull.nullValue());
+			MatcherAssert.assertThat(amount, IsNull.nullValue());
 		}
 
 		@Test
@@ -890,7 +891,7 @@ public class TransferTransactionTest {
 			final Amount amount = transaction.getXemTransferAmount();
 
 			// Act:
-			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(6))); // 5 * 1.2
+			MatcherAssert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(6))); // 5 * 1.2
 		}
 
 		@Test
@@ -906,7 +907,7 @@ public class TransferTransactionTest {
 					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
 					Utils.createMosaic(11, 6),    //  5 * 1.2 =  6.0
 					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
-			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
+			MatcherAssert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
 		}
 
 		@Test
@@ -921,7 +922,7 @@ public class TransferTransactionTest {
 			final Collection<Mosaic> expectedMosaics = Arrays.asList(
 					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
 					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
-			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
+			MatcherAssert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
 		}
 
 		private TransferTransaction createTransferWithMosaics(final Amount amount, final boolean transferXem) {

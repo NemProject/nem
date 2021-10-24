@@ -1,5 +1,6 @@
 package org.nem.core.model.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -47,7 +48,7 @@ public abstract class AbstractPrimitiveTest<
 		final TFoo foo = this.createFoo(-127);
 
 		// Assert:
-		Assert.assertThat(foo.getValue(), IsEqual.equalTo(this.longToValue(-127L)));
+		MatcherAssert.assertThat(foo.getValue(), IsEqual.equalTo(this.longToValue(-127L)));
 	}
 
 	//endregion
@@ -61,8 +62,8 @@ public abstract class AbstractPrimitiveTest<
 		final TFoo foo2 = this.createFoo(7);
 
 		// Assert:
-		Assert.assertThat(foo1.compareTo(foo2), IsEqual.equalTo(0));
-		Assert.assertThat(foo2.compareTo(foo1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(foo1.compareTo(foo2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(foo2.compareTo(foo1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -72,8 +73,8 @@ public abstract class AbstractPrimitiveTest<
 		final TFoo foo2 = this.createFoo(8);
 
 		// Assert:
-		Assert.assertThat(foo1.compareTo(foo2), IsEqual.equalTo(-1));
-		Assert.assertThat(foo2.compareTo(foo1), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(foo1.compareTo(foo2), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(foo2.compareTo(foo1), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -86,12 +87,12 @@ public abstract class AbstractPrimitiveTest<
 		final TFoo foo = this.createFoo(7);
 
 		// Assert:
-		Assert.assertThat(this.createFoo(7), IsEqual.equalTo(foo));
-		Assert.assertThat(this.createBar(7), IsNot.not((Object)IsEqual.equalTo(foo)));
-		Assert.assertThat(this.createFoo(6), IsNot.not(IsEqual.equalTo(foo)));
-		Assert.assertThat(this.createFoo(8), IsNot.not(IsEqual.equalTo(foo)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(foo)));
-		Assert.assertThat(7, IsNot.not(IsEqual.equalTo((Object)foo)));
+		MatcherAssert.assertThat(this.createFoo(7), IsEqual.equalTo(foo));
+		MatcherAssert.assertThat(this.createBar(7), IsNot.not((Object)IsEqual.equalTo(foo)));
+		MatcherAssert.assertThat(this.createFoo(6), IsNot.not(IsEqual.equalTo(foo)));
+		MatcherAssert.assertThat(this.createFoo(8), IsNot.not(IsEqual.equalTo(foo)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(foo)));
+		MatcherAssert.assertThat(7, IsNot.not(IsEqual.equalTo((Object)foo)));
 	}
 
 	@Test
@@ -101,10 +102,10 @@ public abstract class AbstractPrimitiveTest<
 		final int hashCode = foo.hashCode();
 
 		// Assert:
-		Assert.assertThat(this.createFoo(7).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(this.createBar(7).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(this.createFoo(6).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(this.createFoo(8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(this.createFoo(7).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(this.createBar(7).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(this.createFoo(6).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(this.createFoo(8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -117,7 +118,7 @@ public abstract class AbstractPrimitiveTest<
 		final TFoo foo = this.createFoo(22561);
 
 		// Assert:
-		Assert.assertThat(foo.toString(), IsEqual.equalTo("22561"));
+		MatcherAssert.assertThat(foo.toString(), IsEqual.equalTo("22561"));
 	}
 
 	//endregion

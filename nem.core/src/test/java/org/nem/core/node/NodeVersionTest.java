@@ -1,6 +1,7 @@
 package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,7 +14,7 @@ public class NodeVersionTest {
 	@Test
 	public void zeroConstantIsCorrect() {
 		// Assert:
-		Assert.assertThat(NodeVersion.ZERO, IsEqual.equalTo(new NodeVersion(0, 0, 0)));
+		MatcherAssert.assertThat(NodeVersion.ZERO, IsEqual.equalTo(new NodeVersion(0, 0, 0)));
 	}
 
 	//endregion
@@ -24,10 +25,10 @@ public class NodeVersionTest {
 		final NodeVersion version = new NodeVersion(2, 1, 12, "BETA");
 
 		// Assert:
-		Assert.assertThat(version.getMajorVersion(), IsEqual.equalTo(2));
-		Assert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(version.getBuildVersion(), IsEqual.equalTo(12));
-		Assert.assertThat(version.getTag(), IsEqual.equalTo("BETA"));
+		MatcherAssert.assertThat(version.getMajorVersion(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(version.getBuildVersion(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(version.getTag(), IsEqual.equalTo("BETA"));
 	}
 
 	@Test
@@ -36,10 +37,10 @@ public class NodeVersionTest {
 		final NodeVersion version = new NodeVersion(2, 1, 12);
 
 		// Assert:
-		Assert.assertThat(version.getMajorVersion(), IsEqual.equalTo(2));
-		Assert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(version.getBuildVersion(), IsEqual.equalTo(12));
-		Assert.assertThat(version.getTag(), IsNull.nullValue());
+		MatcherAssert.assertThat(version.getMajorVersion(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(version.getBuildVersion(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(version.getTag(), IsNull.nullValue());
 	}
 
 	@Test
@@ -48,10 +49,10 @@ public class NodeVersionTest {
 		final NodeVersion version = NodeVersion.parse("22.1.123-BETA");
 
 		// Assert:
-		Assert.assertThat(version.getMajorVersion(), IsEqual.equalTo(22));
-		Assert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(version.getBuildVersion(), IsEqual.equalTo(123));
-		Assert.assertThat(version.getTag(), IsEqual.equalTo("BETA"));
+		MatcherAssert.assertThat(version.getMajorVersion(), IsEqual.equalTo(22));
+		MatcherAssert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(version.getBuildVersion(), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(version.getTag(), IsEqual.equalTo("BETA"));
 	}
 
 	@Test
@@ -60,10 +61,10 @@ public class NodeVersionTest {
 		final NodeVersion version = NodeVersion.parse("22.1.123");
 
 		// Assert:
-		Assert.assertThat(version.getMajorVersion(), IsEqual.equalTo(22));
-		Assert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(version.getBuildVersion(), IsEqual.equalTo(123));
-		Assert.assertThat(version.getTag(), IsNull.nullValue());
+		MatcherAssert.assertThat(version.getMajorVersion(), IsEqual.equalTo(22));
+		MatcherAssert.assertThat(version.getMinorVersion(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(version.getBuildVersion(), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(version.getTag(), IsNull.nullValue());
 	}
 
 	@Test
@@ -81,14 +82,14 @@ public class NodeVersionTest {
 		final NodeVersion version = new NodeVersion(2, 1, 12, "ZETA");
 
 		// Assert:
-		Assert.assertThat(new NodeVersion(2, 1, 12, "ZETA"), IsEqual.equalTo(version));
-		Assert.assertThat(new NodeVersion(3, 1, 12, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(new NodeVersion(2, 0, 12, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(new NodeVersion(2, 1, 123, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(new NodeVersion(2, 1, 12, "BETA"), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(new NodeVersion(2, 1, 12), IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(version)));
-		Assert.assertThat("ZETA", IsNot.not(IsEqual.equalTo((Object)version)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12, "ZETA"), IsEqual.equalTo(version));
+		MatcherAssert.assertThat(new NodeVersion(3, 1, 12, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat(new NodeVersion(2, 0, 12, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 123, "ZETA"), IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12, "BETA"), IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12), IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(version)));
+		MatcherAssert.assertThat("ZETA", IsNot.not(IsEqual.equalTo((Object)version)));
 	}
 
 	@Test
@@ -98,12 +99,12 @@ public class NodeVersionTest {
 		final int hashCode = version.hashCode();
 
 		// Assert:
-		Assert.assertThat(new NodeVersion(2, 1, 12, "ZETA").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeVersion(3, 1, 12, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new NodeVersion(2, 0, 12, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new NodeVersion(2, 1, 123, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new NodeVersion(2, 1, 12, "BETA").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeVersion(2, 1, 12).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12, "ZETA").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeVersion(3, 1, 12, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeVersion(2, 0, 12, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 123, "ZETA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12, "BETA").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeVersion(2, 1, 12).hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
@@ -121,8 +122,8 @@ public class NodeVersionTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Version"), IsEqual.equalTo("2.1.12-BETA"));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Version"), IsEqual.equalTo("2.1.12-BETA"));
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class NodeVersionTest {
 		final NodeVersion version = NodeVersion.readFrom(deserializer, "Version");
 
 		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(originalVersion));
+		MatcherAssert.assertThat(version, IsEqual.equalTo(originalVersion));
 	}
 
 	//endregion
@@ -151,7 +152,7 @@ public class NodeVersionTest {
 		final NodeVersion version = new NodeVersion(2, 1, 12, "BETA");
 
 		// Assert:
-		Assert.assertThat(version.toString(), IsEqual.equalTo("2.1.12-BETA"));
+		MatcherAssert.assertThat(version.toString(), IsEqual.equalTo("2.1.12-BETA"));
 	}
 
 	@Test
@@ -160,7 +161,7 @@ public class NodeVersionTest {
 		final NodeVersion version = new NodeVersion(2, 1, 12);
 
 		// Assert:
-		Assert.assertThat(version.toString(), IsEqual.equalTo("2.1.12"));
+		MatcherAssert.assertThat(version.toString(), IsEqual.equalTo("2.1.12"));
 	}
 
 	//endregion

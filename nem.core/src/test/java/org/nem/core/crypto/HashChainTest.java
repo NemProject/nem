@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -25,9 +26,9 @@ public class HashChainTest {
 		final HashChain hashChain2 = new HashChain(hashes);
 
 		// Assert:
-		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(3));
-		Assert.assertThat(hashChain2.size(), IsEqual.equalTo(3));
-		Assert.assertThat(hashChain1, IsEqual.equalTo(hashChain2));
+		MatcherAssert.assertThat(hashChain1.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(hashChain2.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(hashChain1, IsEqual.equalTo(hashChain2));
 	}
 
 	@Test
@@ -44,9 +45,9 @@ public class HashChainTest {
 		final HashChain hashChain2 = this.createRoundTrippedHashChain(hashChain1);
 
 		// Assert:
-		Assert.assertThat(hashChain1.size(), IsEqual.equalTo(3));
-		Assert.assertThat(hashChain2.size(), IsEqual.equalTo(3));
-		Assert.assertThat(hashChain1, IsEqual.equalTo(hashChain2));
+		MatcherAssert.assertThat(hashChain1.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(hashChain2.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(hashChain1, IsEqual.equalTo(hashChain2));
 	}
 
 	private HashChain createRoundTrippedHashChain(final HashChain originalTransaction) {

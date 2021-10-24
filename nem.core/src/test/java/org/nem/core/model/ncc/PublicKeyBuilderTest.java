@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -18,6 +19,6 @@ public class PublicKeyBuilderTest {
 		final PublicKey publicKey = builder.build();
 
 		// Assert:
-		Assert.assertThat(publicKey, IsEqual.equalTo(original));
+		MatcherAssert.assertThat(publicKey, IsEqual.equalTo(original));
 	}
 }

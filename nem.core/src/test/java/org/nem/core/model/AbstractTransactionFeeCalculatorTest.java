@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
@@ -88,7 +89,7 @@ public class AbstractTransactionFeeCalculatorTest {
 		final long mosaicFee = calculator.calculateMinimumFee(mosaicTransfer).getNumNem();
 
 		// Assert:
-		Assert.assertThat(mosaicFee, IsEqual.equalTo((xemFee * 5) / 4));
+		MatcherAssert.assertThat(mosaicFee, IsEqual.equalTo((xemFee * 5) / 4));
 	}
 
 	//region calculateMinimumFee
@@ -275,7 +276,7 @@ public class AbstractTransactionFeeCalculatorTest {
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, -1);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(false));
+			MatcherAssert.assertThat(isValid, IsEqual.equalTo(false));
 		}
 
 		@Test
@@ -287,7 +288,7 @@ public class AbstractTransactionFeeCalculatorTest {
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(isValid, IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -299,7 +300,7 @@ public class AbstractTransactionFeeCalculatorTest {
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 1);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(isValid, IsEqual.equalTo(true));
 		}
 
 		protected abstract Transaction createTransaction();
@@ -381,7 +382,7 @@ public class AbstractTransactionFeeCalculatorTest {
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, -1);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(false));
+			MatcherAssert.assertThat(isValid, IsEqual.equalTo(false));
 		}
 
 		@Test
@@ -393,7 +394,7 @@ public class AbstractTransactionFeeCalculatorTest {
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(isValid, IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -470,7 +471,7 @@ public class AbstractTransactionFeeCalculatorTest {
 		final Amount fee = createCalculator().calculateMinimumFee(transaction);
 
 		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(expectedFee));
+		MatcherAssert.assertThat(fee, IsEqual.equalTo(expectedFee));
 	}
 
 	private static boolean isRelativeMinimumFeeValid(final Transaction transaction, final int delta) {
@@ -508,7 +509,7 @@ public class AbstractTransactionFeeCalculatorTest {
 		final boolean isValid = createCalculator().isFeeValid(transaction, new BlockHeight(height));
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				String.format("fee: %d, height: %d", fee, height),
 				isValid,
 				IsEqual.equalTo(expectedResult));

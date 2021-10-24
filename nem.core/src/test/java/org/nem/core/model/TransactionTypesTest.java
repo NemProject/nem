@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
 
@@ -24,7 +25,7 @@ public class TransactionTypesTest {
 		final Collection<Integer> types = TransactionTypes.getActiveTypes();
 
 		// Assert:
-		Assert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
+		MatcherAssert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
 	}
 
 	@Test
@@ -43,7 +44,7 @@ public class TransactionTypesTest {
 		final Collection<Integer> types = TransactionTypes.getBlockEmbeddableTypes();
 
 		// Assert:
-		Assert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
+		MatcherAssert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
 	}
 
 	@Test
@@ -61,6 +62,6 @@ public class TransactionTypesTest {
 		final Collection<Integer> types = TransactionTypes.getMultisigEmbeddableTypes();
 
 		// Assert:
-		Assert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
+		MatcherAssert.assertThat(types, IsEquivalent.equivalentTo(expectedTypes));
 	}
 }

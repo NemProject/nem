@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -30,7 +31,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(this.getZeroConstant(), IsEqual.equalTo(this.construct(0)));
+		MatcherAssert.assertThat(this.getZeroConstant(), IsEqual.equalTo(this.construct(0)));
 	}
 
 	//endregion
@@ -43,7 +44,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived quantity = this.fromValue(11);
 
 		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(quantity.getRaw(), IsEqual.equalTo(11L));
 	}
 
 	//endregion
@@ -63,7 +64,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived quantity = this.construct(0);
 
 		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(quantity.getRaw(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -72,7 +73,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived quantity = this.construct(1);
 
 		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(1L));
+		MatcherAssert.assertThat(quantity.getRaw(), IsEqual.equalTo(1L));
 	}
 
 	//endregion
@@ -90,8 +91,8 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived result2 = quantity2.add(quantity1);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(this.construct(176)));
-		Assert.assertThat(result2, IsEqual.equalTo(this.construct(176)));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(this.construct(176)));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(this.construct(176)));
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived result = quantity2.subtract(quantity1);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(this.construct(46)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.construct(46)));
 	}
 
 	@Test
@@ -132,8 +133,8 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("quantity"), IsEqual.equalTo(0x7712411223456L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("quantity"), IsEqual.equalTo(0x7712411223456L));
 	}
 
 	@Test
@@ -154,7 +155,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		final TDerived quantity = readFrom.apply(deserializer, "quantity");
 
 		// Assert:
-		Assert.assertThat(quantity, IsEqual.equalTo(original));
+		MatcherAssert.assertThat(quantity, IsEqual.equalTo(original));
 	}
 
 	//endregion

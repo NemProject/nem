@@ -3,6 +3,7 @@ package org.nem.core.connect.client;
 import net.minidev.json.JSONObject;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -67,7 +68,7 @@ public class DefaultAsyncNemConnectorTest {
 		final Deserializer deserializer = context.connector.getAsync(endpoint, NisApiId.NIS_REST_NODE_INFO, queryString).join();
 
 		// Assert:
-		Assert.assertThat(deserializer, IsNull.notNullValue());
+		MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
 		context.verifySingleGetRequest(url);
 	}
 
@@ -105,7 +106,7 @@ public class DefaultAsyncNemConnectorTest {
 		final Deserializer deserializer = context.connector.postAsync(NodeEndpoint.fromHost("10.0.0.88"), NisApiId.NIS_REST_NODE_INFO, postRequest).join();
 
 		// Assert:
-		Assert.assertThat(deserializer, IsNull.notNullValue());
+		MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
 		context.verifySinglePostRequest(url, postRequest);
 	}
 
@@ -170,7 +171,7 @@ public class DefaultAsyncNemConnectorTest {
 		// Assert:
 		final int initialCount = context.accountLookup.getNumFindByIdCalls();
 		deserializationContext.findAccountByAddress(Utils.generateRandomAddress());
-		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(initialCount + 1));
+		MatcherAssert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(initialCount + 1));
 	}
 
 	//endregion
@@ -238,7 +239,7 @@ public class DefaultAsyncNemConnectorTest {
 
 			//noinspection ThrowableResultOfMethodCallIgnored
 			Mockito.verify(this.errorResponseStrategy, Mockito.times(1)).mapToException(responseCaptor.capture());
-			Assert.assertThat(responseCaptor.getValue().getMessage(), IsEqual.equalTo("badness"));
+			MatcherAssert.assertThat(responseCaptor.getValue().getMessage(), IsEqual.equalTo("badness"));
 		}
 	}
 

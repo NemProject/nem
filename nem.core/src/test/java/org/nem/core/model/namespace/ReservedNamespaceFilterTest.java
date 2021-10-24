@@ -1,5 +1,6 @@
 package org.nem.core.model.namespace;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
@@ -13,8 +14,8 @@ public class ReservedNamespaceFilterTest {
 	@Test
 	public void setContainsAllExpectedValues() {
 		// Assert:
-		Assert.assertThat(ReservedNamespaceFilter.getAll().size(), IsEqual.equalTo(EXPECTED_RESERVED_ROOTS.length));
-		Assert.assertThat(
+		MatcherAssert.assertThat(ReservedNamespaceFilter.getAll().size(), IsEqual.equalTo(EXPECTED_RESERVED_ROOTS.length));
+		MatcherAssert.assertThat(
 				ReservedNamespaceFilter.getAll().stream().map(NamespaceIdPart::toString).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(EXPECTED_RESERVED_ROOTS));
 	}
@@ -24,7 +25,7 @@ public class ReservedNamespaceFilterTest {
 		// Assert:
 		Arrays.stream(EXPECTED_RESERVED_ROOTS)
 				.map(NamespaceId::new)
-				.forEach(nid -> Assert.assertThat(ReservedNamespaceFilter.isClaimable(nid), IsEqual.equalTo(false)));
+				.forEach(nid -> MatcherAssert.assertThat(ReservedNamespaceFilter.isClaimable(nid), IsEqual.equalTo(false)));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class ReservedNamespaceFilterTest {
 		// Assert:
 		Arrays.stream(new String[] { "xyz", "foo", "bar" })
 				.map(NamespaceId::new)
-				.forEach(nid -> Assert.assertThat(ReservedNamespaceFilter.isClaimable(nid), IsEqual.equalTo(true)));
+				.forEach(nid -> MatcherAssert.assertThat(ReservedNamespaceFilter.isClaimable(nid), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -41,7 +42,7 @@ public class ReservedNamespaceFilterTest {
 		final boolean isClaimable = ReservedNamespaceFilter.isClaimable(new NamespaceId("com.google.images"));
 
 		// Assert:
-		Assert.assertThat(isClaimable, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isClaimable, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -50,7 +51,7 @@ public class ReservedNamespaceFilterTest {
 		final boolean isClaimable = ReservedNamespaceFilter.isClaimable(new NamespaceId("google.com.google"));
 
 		// Assert:
-		Assert.assertThat(isClaimable, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isClaimable, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -59,6 +60,6 @@ public class ReservedNamespaceFilterTest {
 		final boolean isClaimable = ReservedNamespaceFilter.isClaimable(new NamespaceId("google.images.com"));
 
 		// Assert:
-		Assert.assertThat(isClaimable, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isClaimable, IsEqual.equalTo(false));
 	}
 }

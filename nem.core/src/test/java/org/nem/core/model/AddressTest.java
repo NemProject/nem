@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -22,9 +23,9 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("Sigma Gamma");
 
 		// Assert:
-		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
-		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x92));
+		MatcherAssert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
+		MatcherAssert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x92));
 	}
 
 	@Test
@@ -40,9 +41,9 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(address.getVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
+		MatcherAssert.assertThat(address.getEncoded(), IsNull.notNullValue());
+		MatcherAssert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
 	}
 
 	@Test
@@ -52,9 +53,9 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey((byte)0x88, publicKey);
 
 		// Assert:
-		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x88));
+		MatcherAssert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
+		MatcherAssert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x88));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class AddressTest {
 		final Address address2 = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address2, IsEqual.equalTo(address1));
+		MatcherAssert.assertThat(address2, IsEqual.equalTo(address1));
 	}
 
 	@Test
@@ -90,7 +91,7 @@ public class AddressTest {
 		final Address address2 = Address.fromPublicKey(publicKey2);
 
 		// Assert:
-		Assert.assertThat(address2, IsNot.not(IsEqual.equalTo(address1)));
+		MatcherAssert.assertThat(address2, IsNot.not(IsEqual.equalTo(address1)));
 	}
 
 	@Test
@@ -102,7 +103,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(address.isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -112,9 +113,9 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(addressAsLower(address).isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(addressAsUpper(address).isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(addressAsMixed(address).isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addressAsLower(address).isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addressAsUpper(address).isValid(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(addressAsMixed(address).isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -126,7 +127,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
+		MatcherAssert.assertThat(address.getEncoded().length(), IsEqual.equalTo(40));
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo(NetworkInfos.getDefault().getAddressStartChar()));
+		MatcherAssert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo(NetworkInfos.getDefault().getAddressStartChar()));
 	}
 
 	@Test
@@ -165,7 +166,7 @@ public class AddressTest {
 		final String invalidAddress = transform.apply(address.toString());
 
 		// Assert:
-		Assert.assertThat(Address.fromEncoded(invalidAddress).isValid(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(Address.fromEncoded(invalidAddress).isValid(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -195,7 +196,7 @@ public class AddressTest {
 		final String fakeAddress = Utils.modifyBase32AtIndex(address.getEncoded(), index);
 
 		// Assert:
-		Assert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(Address.fromEncoded(fakeAddress).isValid(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -223,7 +224,7 @@ public class AddressTest {
 		// Assert:
 		for (final String padding : new String[] { " ", "\t", "  \t \t " }) {
 			final String paddedAddress = paddingFunction.apply(address, padding);
-			Assert.assertThat(Address.fromEncoded(paddedAddress).isValid(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(Address.fromEncoded(paddedAddress).isValid(), IsEqual.equalTo(false));
 		}
 	}
 
@@ -236,15 +237,15 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(Address.fromPublicKey(publicKey), IsEqual.equalTo(address));
-		Assert.assertThat(Address.fromEncoded(address.getEncoded()), IsEqual.equalTo(address));
-		Assert.assertThat(addressAsLower(address), IsEqual.equalTo(address));
-		Assert.assertThat(addressAsUpper(address), IsEqual.equalTo(address));
-		Assert.assertThat(addressAsMixed(address), IsEqual.equalTo(address));
-		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)), IsNot.not(IsEqual.equalTo(address)));
-		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)), IsNot.not(IsEqual.equalTo(address)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(address)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)address)));
+		MatcherAssert.assertThat(Address.fromPublicKey(publicKey), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(Address.fromEncoded(address.getEncoded()), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(addressAsLower(address), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(addressAsUpper(address), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(addressAsMixed(address), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)), IsNot.not(IsEqual.equalTo(address)));
+		MatcherAssert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)), IsNot.not(IsEqual.equalTo(address)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(address)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)address)));
 	}
 
 	@Test
@@ -255,13 +256,13 @@ public class AddressTest {
 		final int hashCode = address.hashCode();
 
 		// Assert:
-		Assert.assertThat(Address.fromPublicKey(publicKey).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(Address.fromEncoded(address.getEncoded()).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(addressAsLower(address).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(addressAsUpper(address).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(addressAsMixed(address).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(Address.fromPublicKey(publicKey).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(Address.fromEncoded(address.getEncoded()).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(addressAsLower(address).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(addressAsUpper(address).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(addressAsMixed(address).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -282,9 +283,9 @@ public class AddressTest {
 		// Assert:
 		for (int i = 0; i < addresses.size(); i++) {
 			for (int j = 0; j < addresses.size(); j++) {
-				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) > 0, IsEqual.equalTo(i > j));
-				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) == 0, IsEqual.equalTo(i == j));
-				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) < 0, IsEqual.equalTo(i < j));
+				MatcherAssert.assertThat(addresses.get(i).compareTo(addresses.get(j)) > 0, IsEqual.equalTo(i > j));
+				MatcherAssert.assertThat(addresses.get(i).compareTo(addresses.get(j)) == 0, IsEqual.equalTo(i == j));
+				MatcherAssert.assertThat(addresses.get(i).compareTo(addresses.get(j)) < 0, IsEqual.equalTo(i < j));
 			}
 		}
 	}
@@ -304,8 +305,8 @@ public class AddressTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("address"), IsEqual.equalTo(address.getEncoded()));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("address"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test
@@ -356,8 +357,8 @@ public class AddressTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("address"), IsEqual.equalTo(expectedSerializedString));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("address"), IsEqual.equalTo(expectedSerializedString));
 	}
 
 	@Test
@@ -372,7 +373,7 @@ public class AddressTest {
 		final Address address = Address.readFrom(deserializer, "address");
 
 		// Assert:
-		Assert.assertThat(originalAddress, IsEqual.equalTo(address));
+		MatcherAssert.assertThat(originalAddress, IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -407,7 +408,7 @@ public class AddressTest {
 		final Address address = Address.readFromOptional(createEmptyDeserializer(), "address", AddressEncoding.COMPRESSED);
 
 		// Assert:
-		Assert.assertThat(address, IsNull.nullValue());
+		MatcherAssert.assertThat(address, IsNull.nullValue());
 	}
 
 	@Test
@@ -416,7 +417,7 @@ public class AddressTest {
 		final Address address = Address.readFromOptional(createEmptyDeserializer(), "address", AddressEncoding.PUBLIC_KEY);
 
 		// Assert:
-		Assert.assertThat(address, IsNull.nullValue());
+		MatcherAssert.assertThat(address, IsNull.nullValue());
 	}
 
 	private static Deserializer createEmptyDeserializer() {
@@ -440,11 +441,11 @@ public class AddressTest {
 				: Address.readFrom(deserializer, "address", encoding);
 
 		// Assert:
-		Assert.assertThat(address, IsEqual.equalTo(originalAddress));
+		MatcherAssert.assertThat(address, IsEqual.equalTo(originalAddress));
 		if (isPublicKeyPreserved) {
-			Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(originalAddress.getPublicKey()));
+			MatcherAssert.assertThat(address.getPublicKey(), IsEqual.equalTo(originalAddress.getPublicKey()));
 		} else {
-			Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+			MatcherAssert.assertThat(address.getPublicKey(), IsNull.nullValue());
 		}
 	}
 
@@ -460,7 +461,7 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("Sigma Gamma");
 
 		// Assert:
-		Assert.assertThat(address.toString(), IsEqual.equalTo("SIGMA GAMMA"));
+		MatcherAssert.assertThat(address.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
 	//endregion

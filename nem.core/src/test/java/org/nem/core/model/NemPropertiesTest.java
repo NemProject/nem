@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -24,7 +25,7 @@ public class NemPropertiesTest {
 			final String value = properties.getString("s");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("nem"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("nem"));
 		}
 
 		@Test
@@ -47,7 +48,7 @@ public class NemPropertiesTest {
 			final String value = properties.getOptionalString("s", "abc");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("nem"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("nem"));
 		}
 
 		@Test
@@ -59,7 +60,7 @@ public class NemPropertiesTest {
 			final String value = properties.getOptionalString("x", "abc");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("abc"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("abc"));
 		}
 	}
 
@@ -93,7 +94,7 @@ public class NemPropertiesTest {
 			final T value = this.getValue(properties, this.key);
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.parsedValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.parsedValue));
 		}
 
 		@Test
@@ -131,7 +132,7 @@ public class NemPropertiesTest {
 			final T value = this.getOptionalValue(properties, this.key);
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.parsedValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.parsedValue));
 		}
 
 		@Test
@@ -154,7 +155,7 @@ public class NemPropertiesTest {
 			final T value = this.getOptionalValue(properties, "x");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.defaultValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.defaultValue));
 		}
 
 		//endregion
@@ -226,7 +227,7 @@ public class NemPropertiesTest {
 			final String[] value = properties.getOptionalStringArray("x", "abc|xyz");
 
 			// Assert:
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					value,
 					IsEqual.equalTo(new String[] { "abc", "xyz" }));
 		}
@@ -269,7 +270,7 @@ public class NemPropertiesTest {
 			final String[] value = nemProperties.getOptionalStringArray("sa", "");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(expectedValues));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValues));
 		}
 	}
 

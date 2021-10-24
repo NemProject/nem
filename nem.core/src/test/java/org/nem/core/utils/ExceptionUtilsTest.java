@@ -1,5 +1,6 @@
 package org.nem.core.utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -17,7 +18,7 @@ public class ExceptionUtilsTest {
 		final int result = ExceptionUtils.propagate(() -> 7);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(7));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(7));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -73,8 +74,8 @@ public class ExceptionUtilsTest {
 		runner.run();
 
 		// Assert:
-		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-		Assert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
+		MatcherAssert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
+		MatcherAssert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
 	}
 
 	@Test
@@ -90,8 +91,8 @@ public class ExceptionUtilsTest {
 		runner.run();
 
 		// Assert:
-		Assert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
-		Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -158,8 +159,8 @@ public class ExceptionUtilsTest {
 		runner.run();
 
 		// Assert:
-		Assert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
-		Assert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
+		MatcherAssert.assertThat(runner.getUnhandledException(), IsNull.notNullValue());
+		MatcherAssert.assertThat(runner.getUnhandledException(), IsInstanceOf.instanceOf(IllegalStateException.class));
 	}
 
 	@Test
@@ -174,8 +175,8 @@ public class ExceptionUtilsTest {
 		runner.run();
 
 		// Assert:
-		Assert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
-		Assert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(runner.isInterruptedPreRun(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(runner.isInterruptedPostRun(), IsEqual.equalTo(true));
 	}
 
 	//endregion

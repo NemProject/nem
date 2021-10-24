@@ -1,6 +1,7 @@
 package org.nem.core.model.ncc;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.Supply;
@@ -19,8 +20,8 @@ public class MosaicIdSupplyPairTest {
 		final MosaicIdSupplyPair pair = new MosaicIdSupplyPair(Utils.createMosaicId(5), Supply.fromValue(12345));
 
 		// Assert:
-		Assert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
-		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
+		MatcherAssert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
 	}
 
 	@Test
@@ -44,9 +45,9 @@ public class MosaicIdSupplyPairTest {
 
 		// Assert:
 		final JSONObject mosaicIdJsonObject = (JSONObject)jsonObject.get("mosaicId");
-		Assert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
-		Assert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
-		Assert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
+		MatcherAssert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
+		MatcherAssert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
+		MatcherAssert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
 	}
 
 	@Test
@@ -59,8 +60,8 @@ public class MosaicIdSupplyPairTest {
 		final MosaicIdSupplyPair pair = new MosaicIdSupplyPair(deserializer);
 
 		// Assert:
-		Assert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
-		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
+		MatcherAssert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(12345)));
 	}
 
 	@Test
@@ -99,13 +100,13 @@ public class MosaicIdSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicIdSupplyPair> entry : createMosaicIdSupplyPairsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
 	}
 
 	@Test
@@ -115,7 +116,7 @@ public class MosaicIdSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicIdSupplyPair> entry : createMosaicIdSupplyPairsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

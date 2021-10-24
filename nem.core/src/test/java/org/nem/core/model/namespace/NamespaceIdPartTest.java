@@ -1,5 +1,6 @@
 package org.nem.core.model.namespace;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -24,7 +25,7 @@ public class NamespaceIdPartTest {
 			final NamespaceIdPart part = new NamespaceIdPart(name);
 
 			// Assert:
-			Assert.assertThat(part.toString(), IsEqual.equalTo(name));
+			MatcherAssert.assertThat(part.toString(), IsEqual.equalTo(name));
 		});
 	}
 
@@ -73,7 +74,7 @@ public class NamespaceIdPartTest {
 		final String name = part.toString();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("foo"));
 	}
 
 	// endregion
@@ -96,13 +97,13 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(part)) : IsEqual.equalTo(part));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(part)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(part)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(part)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(part)));
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

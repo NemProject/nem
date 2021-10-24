@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -12,7 +13,7 @@ public class RequestPrepareTest {
 		final RequestPrepare request = new RequestPrepare(new byte[] { 1, 3, 4, 7, 7, 8, 9 });
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
 	}
 
 	@Test
@@ -24,7 +25,7 @@ public class RequestPrepareTest {
 		final RequestPrepare request = createRoundTrippedRequest(originalRequest);
 
 		// Assert:
-		Assert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
 	}
 
 	private static RequestPrepare createRoundTrippedRequest(final RequestPrepare originalRequest) {

@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -17,7 +18,7 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
 		final byte[] decryptedBytes = blockCipher.decrypt(new byte[63]);
 
 		// Assert:
-		Assert.assertThat(decryptedBytes, IsNull.nullValue());
+		MatcherAssert.assertThat(decryptedBytes, IsNull.nullValue());
 	}
 
 	@Override

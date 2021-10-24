@@ -1,5 +1,6 @@
 package org.nem.core.time.synchronization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -21,9 +22,9 @@ public class TimeSynchronizationSampleTest {
 		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 23, 26);
 
 		// Assert:
-		Assert.assertThat(sample.getNode().getIdentity(), IsEqual.equalTo(new NodeIdentity(KEY_PAIR, "node")));
-		Assert.assertThat(sample.getLocalTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17))));
-		Assert.assertThat(sample.getRemoteTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(23), new NetworkTimeStamp(26))));
+		MatcherAssert.assertThat(sample.getNode().getIdentity(), IsEqual.equalTo(new NodeIdentity(KEY_PAIR, "node")));
+		MatcherAssert.assertThat(sample.getLocalTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17))));
+		MatcherAssert.assertThat(sample.getRemoteTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(23), new NetworkTimeStamp(26))));
 	}
 
 	//endregion
@@ -38,9 +39,9 @@ public class TimeSynchronizationSampleTest {
 		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 30, 30, 15, 13);
 
 		// Assert:
-		Assert.assertThat(sample1.getDuration(), IsEqual.equalTo(12L));
-		Assert.assertThat(sample2.getDuration(), IsEqual.equalTo(31L));
-		Assert.assertThat(sample3.getDuration(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(sample1.getDuration(), IsEqual.equalTo(12L));
+		MatcherAssert.assertThat(sample2.getDuration(), IsEqual.equalTo(31L));
+		MatcherAssert.assertThat(sample3.getDuration(), IsEqual.equalTo(0L));
 	}
 
 	//endregion
@@ -55,9 +56,9 @@ public class TimeSynchronizationSampleTest {
 		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 37, 43, 15, 13);
 
 		// Assert:
-		Assert.assertThat(sample1.getTimeOffsetToRemote(), IsEqual.equalTo(13L));
-		Assert.assertThat(sample2.getTimeOffsetToRemote(), IsEqual.equalTo(35L));
-		Assert.assertThat(sample3.getTimeOffsetToRemote(), IsEqual.equalTo(-26L));
+		MatcherAssert.assertThat(sample1.getTimeOffsetToRemote(), IsEqual.equalTo(13L));
+		MatcherAssert.assertThat(sample2.getTimeOffsetToRemote(), IsEqual.equalTo(35L));
+		MatcherAssert.assertThat(sample3.getTimeOffsetToRemote(), IsEqual.equalTo(-26L));
 	}
 
 	//endregion
@@ -72,9 +73,9 @@ public class TimeSynchronizationSampleTest {
 		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
 
 		// Assert:
-		Assert.assertThat(sample1.compareTo(sample2), IsEqual.equalTo(-1));
-		Assert.assertThat(sample2.compareTo(sample1), IsEqual.equalTo(1));
-		Assert.assertThat(sample1.compareTo(sample3), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(sample1.compareTo(sample2), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(sample2.compareTo(sample1), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(sample1.compareTo(sample3), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -88,12 +89,12 @@ public class TimeSynchronizationSampleTest {
 		final HashMap<String, TimeSynchronizationSample> sampleMap = this.createTestTimeSynchronizationSampleList();
 
 		// Assert:
-		Assert.assertThat(sampleMap.get("default"), IsEqual.equalTo(sample));
-		Assert.assertThat(sampleMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(sample)));
-		Assert.assertThat(sampleMap.get("diff-local"), IsNot.not(IsEqual.equalTo(sample)));
-		Assert.assertThat(sampleMap.get("diff-remote"), IsNot.not(IsEqual.equalTo(sample)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(sample)));
-		Assert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)sample)));
+		MatcherAssert.assertThat(sampleMap.get("default"), IsEqual.equalTo(sample));
+		MatcherAssert.assertThat(sampleMap.get("diff-identity"), IsNot.not(IsEqual.equalTo(sample)));
+		MatcherAssert.assertThat(sampleMap.get("diff-local"), IsNot.not(IsEqual.equalTo(sample)));
+		MatcherAssert.assertThat(sampleMap.get("diff-remote"), IsNot.not(IsEqual.equalTo(sample)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(sample)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)sample)));
 	}
 
 	@Test
@@ -103,10 +104,10 @@ public class TimeSynchronizationSampleTest {
 		final HashMap<String, TimeSynchronizationSample> sampleMap = this.createTestTimeSynchronizationSampleList();
 
 		// Assert:
-		Assert.assertThat(sampleMap.get("default").hashCode(), IsEqual.equalTo(sample.hashCode()));
-		Assert.assertThat(sampleMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
-		Assert.assertThat(sampleMap.get("diff-local-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
-		Assert.assertThat(sampleMap.get("diff-remote-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
+		MatcherAssert.assertThat(sampleMap.get("default").hashCode(), IsEqual.equalTo(sample.hashCode()));
+		MatcherAssert.assertThat(sampleMap.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
+		MatcherAssert.assertThat(sampleMap.get("diff-local-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
+		MatcherAssert.assertThat(sampleMap.get("diff-remote-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
 	}
 
 	//endregion

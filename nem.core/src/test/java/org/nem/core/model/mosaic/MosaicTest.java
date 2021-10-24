@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -18,8 +19,8 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(createMosaicId(), Quantity.fromValue(123));
 
 		// Assert:
-		Assert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
-		Assert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		MatcherAssert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
+		MatcherAssert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	@Test
@@ -48,8 +49,8 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(Utils.roundtripSerializableEntity(original, null));
 
 		// Assert:
-		Assert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
-		Assert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		MatcherAssert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
+		MatcherAssert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	// endregion
@@ -63,7 +64,7 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(mosaicId, Quantity.fromValue(123));
 
 		// Assert:
-		Assert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
+		MatcherAssert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
 	}
 
 	//endregion
@@ -85,7 +86,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaic)) : IsEqual.equalTo(mosaic));
 		}
@@ -98,7 +99,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

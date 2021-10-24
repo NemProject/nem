@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -43,8 +44,8 @@ public abstract class AbstractMetaDataPairTest<
 		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createPair.apply(entity, metaData);
 
 		// Assert:
-		Assert.assertThat(pair.getEntity(), IsSame.sameInstance(entity));
-		Assert.assertThat(pair.getMetaData(), IsSame.sameInstance(metaData));
+		MatcherAssert.assertThat(pair.getEntity(), IsSame.sameInstance(entity));
+		MatcherAssert.assertThat(pair.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test
@@ -56,8 +57,8 @@ public abstract class AbstractMetaDataPairTest<
 		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createRoundTrippedPair(account, 5678);
 
 		// Assert:
-		Assert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(account.getAddress()));
-		Assert.assertThat(this.getId.apply(pair.getMetaData()), IsEqual.equalTo(5678));
+		MatcherAssert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(account.getAddress()));
+		MatcherAssert.assertThat(this.getId.apply(pair.getMetaData()), IsEqual.equalTo(5678));
 	}
 
 	private AbstractMetaDataPair<TEntity, TMetaData> createRoundTrippedPair(final Account account, final int id) {

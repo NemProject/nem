@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.JsonSerializer;
@@ -18,8 +19,8 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty("foo", "bar");
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
-		Assert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
+		MatcherAssert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
 	}
 
 	@Test
@@ -28,8 +29,8 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty("FoO", "bAr");
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
-		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
+		MatcherAssert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
+		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
 	//endregion
@@ -45,9 +46,9 @@ public class NemPropertyTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(property);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		Assert.assertThat(jsonObject.get("name"), IsEqual.equalTo("FoO"));
-		Assert.assertThat(jsonObject.get("value"), IsEqual.equalTo("bAr"));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.get("name"), IsEqual.equalTo("FoO"));
+		MatcherAssert.assertThat(jsonObject.get("value"), IsEqual.equalTo("bAr"));
 	}
 
 	@Test
@@ -61,8 +62,8 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty(Utils.createDeserializer(jsonObject));
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
-		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
+		MatcherAssert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
+		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
 	@Test
@@ -74,8 +75,8 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
-		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
+		MatcherAssert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
+		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
 	//endregion
@@ -91,7 +92,7 @@ public class NemPropertyTest {
 		final String value = property.toString();
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo("Foo -> Bar"));
+		MatcherAssert.assertThat(value, IsEqual.equalTo("Foo -> Bar"));
 	}
 
 	//endregion
@@ -117,13 +118,13 @@ public class NemPropertyTest {
 
 		// Assert:
 		for (final Map.Entry<String, NemProperty> entry : createNemPropertiesForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(property)) : IsEqual.equalTo(property));
 		}
 
-		Assert.assertThat(property, IsNot.not(IsEqual.equalTo("foo")));
-		Assert.assertThat(property, IsNot.not(IsEqual.equalTo(null)));
+		MatcherAssert.assertThat(property, IsNot.not(IsEqual.equalTo("foo")));
+		MatcherAssert.assertThat(property, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class NemPropertyTest {
 
 		// Assert:
 		for (final Map.Entry<String, NemProperty> entry : createNemPropertiesForEqualityTests().entrySet()) {
-			Assert.assertThat(
+			MatcherAssert.assertThat(
 					entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}

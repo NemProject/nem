@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -23,7 +24,7 @@ public abstract class HttpDeserializerResponseStrategyContractTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public abstract class HttpDeserializerResponseStrategyContractTest {
 		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
 
 		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
 	protected abstract Deserializer coerceDeserializer(

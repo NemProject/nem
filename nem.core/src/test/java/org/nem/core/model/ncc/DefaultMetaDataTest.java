@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -13,7 +14,7 @@ public class DefaultMetaDataTest {
 		final DefaultMetaData metaData = new DefaultMetaData(321L);
 
 		// Assert:
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
 	}
 
 	@Test
@@ -22,7 +23,7 @@ public class DefaultMetaDataTest {
 		final DefaultMetaData metaData = createRoundTrippedMetaData(456L);
 
 		// Assert:
-		Assert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
+		MatcherAssert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
 	}
 
 	private static DefaultMetaData createRoundTrippedMetaData(final long id) {

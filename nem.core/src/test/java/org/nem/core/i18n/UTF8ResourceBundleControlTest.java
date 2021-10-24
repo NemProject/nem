@@ -1,5 +1,6 @@
 package org.nem.core.i18n;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -14,7 +15,7 @@ public class UTF8ResourceBundleControlTest {
 		final String str = BUNDLE.getString("Ascii");
 
 		// Assert:
-		Assert.assertThat(str, IsEqual.equalTo("something simple"));
+		MatcherAssert.assertThat(str, IsEqual.equalTo("something simple"));
 	}
 
 	@Test
@@ -23,6 +24,6 @@ public class UTF8ResourceBundleControlTest {
 		final String str = BUNDLE.getString("Utf8");
 
 		// Assert:
-		Assert.assertThat(str, IsEqual.equalTo("something with german umlaut: äöü"));
+		MatcherAssert.assertThat(str, IsEqual.equalTo("something with german umlaut: äöü"));
 	}
 }
