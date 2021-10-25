@@ -1,6 +1,8 @@
 package org.nem.deploy;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 
 import java.util.*;
@@ -81,7 +83,19 @@ public class CommonConfiguration {
 				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info|/account/get|/account/status");
 
 		this.networkName = properties.getOptionalString("nem.network", "mainnet");
-		this.networkInfo = NetworkInfos.fromFriendlyName(this.networkName);
+
+		if (NetworkInfos.isKnownNetworkFriendlyName(this.networkName)) {
+			this.networkInfo = NetworkInfos.fromFriendlyName(this.networkName);
+		} else {
+			this.networkInfo = new NetworkInfo(
+					(byte)properties.getInteger("nem.network.version"),
+					properties.getString("nem.network.addressStartChar").charAt(0),
+					new NemesisBlockInfo(
+							Hash.fromHexString(properties.getString("nem.network.generationHash")),
+							Address.fromEncoded(properties.getString("nem.network.nemesisSignerAddress")),
+							Amount.fromNem(properties.getLong("nem.network.totalAmount")),
+							properties.getString("nem.network.nemesisFilePath")));
+		}
 	}
 
 	//region basic settings

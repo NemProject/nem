@@ -3,7 +3,9 @@ package org.nem.deploy;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.NetworkInfos;
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.*;
 
@@ -50,9 +52,41 @@ public class CommonConfigurationTest {
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
-		// Assert
+		// Assert:
 		assertCustomRequiredConfiguration(config);
-		assertCustomOptionalConfiguration(config);
+		assertCustomOptionalConfiguration(config, true);
+	}
+
+	@Test
+	public void canReadConfigurationWithCustomNetwork() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nem.network", "foobar");
+		properties.setProperty("nem.network.version", "111");
+		properties.setProperty("nem.network.addressStartChar", "Z");
+		properties.setProperty("nem.network.generationHash", "0D35091344727AD5E175D7CE4DE7A6DAFD08EE135E09774DDCA2C55626264F45");
+		properties.setProperty("nem.network.nemesisSignerAddress", "ZAAFEBANNRXGOEIHNIRR5DDYYNN6IEKKO75O64RR");
+		properties.setProperty("nem.network.totalAmount", "888888888");
+		properties.setProperty("nem.network.nemesisFilePath", "path/to/file.bin");
+
+		// Act:
+		final CommonConfiguration config = new CommonConfiguration(properties);
+
+		// Assert:
+		assertCustomRequiredConfiguration(config);
+		assertCustomOptionalConfiguration(config, false);
+
+		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("foobar"));
+		MatcherAssert.assertThat(config.getNetworkInfo().getVersion(), IsEqual.equalTo((byte)111));
+		MatcherAssert.assertThat(config.getNetworkInfo().getAddressStartChar(), IsEqual.equalTo('Z'));
+
+		final NemesisBlockInfo nemesisBlockInfo = config.getNetworkInfo().getNemesisBlockInfo();
+		MatcherAssert.assertThat(
+				nemesisBlockInfo.getGenerationHash(),
+				IsEqual.equalTo(Hash.fromHexString("0D35091344727AD5E175D7CE4DE7A6DAFD08EE135E09774DDCA2C55626264F45")));
+		MatcherAssert.assertThat(nemesisBlockInfo.getAddress(), IsEqual.equalTo(Address.fromEncoded("ZAAFEBANNRXGOEIHNIRR5DDYYNN6IEKKO75O64RR")));
+		MatcherAssert.assertThat(nemesisBlockInfo.getAmount(), IsEqual.equalTo(Amount.fromNem(888888888)));
+		MatcherAssert.assertThat(nemesisBlockInfo.getDataFileName(), IsEqual.equalTo("path/to/file.bin"));
 	}
 
 	@Test
@@ -64,7 +98,7 @@ public class CommonConfigurationTest {
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
-		// Assert
+		// Assert:
 		assertCustomRequiredConfiguration(config);
 		assertDefaultOptionalConfiguration(config);
 	}
@@ -116,7 +150,7 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(config.getHomePath(), IsEqual.equalTo("/home"));
 	}
 
-	private static void assertCustomOptionalConfiguration(final CommonConfiguration config) {
+	private static void assertCustomOptionalConfiguration(final CommonConfiguration config, final boolean checkNetwork) {
 		// Assert:
 		MatcherAssert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
 		MatcherAssert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
@@ -128,8 +162,10 @@ public class CommonConfigurationTest {
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 
-		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
-		MatcherAssert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
+		if (checkNetwork) {
+			MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
+			MatcherAssert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
+		}
 	}
 
 	//endregion
@@ -223,22 +259,6 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(config.getPort(), IsEqual.equalTo(101));
 		MatcherAssert.assertThat(config.getBaseUrl(), IsEqual.equalTo("https://10.0.0.12:101"));
 		MatcherAssert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
-	}
-
-	//endregion
-
-	//region specific property tests
-
-	@Test
-	public void networkCannotBeParsedWithInvalidValue() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.setProperty("nem.network", "nxt");
-
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new CommonConfiguration(properties),
-				IllegalArgumentException.class);
 	}
 
 	//endregion
