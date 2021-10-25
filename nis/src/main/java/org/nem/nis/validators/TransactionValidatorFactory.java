@@ -82,6 +82,8 @@ public class TransactionValidatorFactory {
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
 				new MultisigTransactionSignerValidator(accountStateCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
+				new FeeSinkNonOperationalValidator(this.forkConfiguration)));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				new MultisigCosignatoryModificationValidator(accountStateCache)));

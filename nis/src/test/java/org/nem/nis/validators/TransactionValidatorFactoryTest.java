@@ -77,6 +77,7 @@ public class TransactionValidatorFactoryTest {
 
 				this.add("MultisigNonOperationalValidator");
 				this.add("MultisigTransactionSignerValidator");
+				this.add("FeeSinkNonOperationalValidator");
 				this.add("NumCosignatoryRangeValidator");
 				this.add("MultisigCosignatoryModificationValidator");
 
