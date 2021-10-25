@@ -24,7 +24,7 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		// Assert:
 		MatcherAssert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
 		MatcherAssert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("binary"));
-		MatcherAssert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
+		MatcherAssert.assertThat(mediaType.getCharset(), IsNull.nullValue());
 	}
 
 	//endregion

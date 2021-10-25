@@ -26,7 +26,7 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		// Assert:
 		MatcherAssert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
 		MatcherAssert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("json"));
-		MatcherAssert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
+		MatcherAssert.assertThat(mediaType.getCharset(), IsNull.nullValue());
 	}
 
 	//endregion
