@@ -137,6 +137,18 @@ public class NetworkInfosTest {
 			// Assert:
 			ExceptionAssert.assertThrows(v -> NetworkInfos.fromFriendlyName(friendlyName), IllegalArgumentException.class);
 		}
+
+		@Test
+		public void isKnownNetworkFriendlyNameReturnsFalseWhenNetworkNameIsUnknown() {
+			// Arrange:
+			final String friendlyName = DESC_TO_FRIENDLY_NAME_MAP.get(this.unknownIdentifier);
+
+			// Act:
+			final boolean isKnown = NetworkInfos.isKnownNetworkFriendlyName(friendlyName);
+
+			// Assert:
+			MatcherAssert.assertThat(isKnown, IsEqual.equalTo(false));
+		}
 	}
 
 	//endregion
@@ -184,6 +196,18 @@ public class NetworkInfosTest {
 
 			// Assert:
 			MatcherAssert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
+		}
+
+		@Test
+		public void isKnownNetworkFriendlyNameReturnsTrueWhenNetworkNameIsKnown() {
+			// Arrange:
+			final String friendlyName = DESC_TO_FRIENDLY_NAME_MAP.get(this.identifier);
+
+			// Act:
+			final boolean isKnown = NetworkInfos.isKnownNetworkFriendlyName(friendlyName);
+
+			// Assert:
+			MatcherAssert.assertThat(isKnown, IsEqual.equalTo(true));
 		}
 
 		@Test

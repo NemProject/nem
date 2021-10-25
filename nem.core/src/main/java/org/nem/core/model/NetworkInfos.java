@@ -5,6 +5,8 @@ import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.utils.SetOnce;
 
+import java.util.Arrays;
+
 /**
  * Central class responsible for providing access to network information.
  */
@@ -50,6 +52,15 @@ public class NetworkInfos {
 	 */
 	public static NetworkInfo fromAddress(final Address address) {
 		return fromVersion(address.getVersion());
+	}
+
+	/**
+	 * Determines if the specified name is a known network friendly name.
+	 *
+	 * @param name The network name.
+	 */
+	public static boolean isKnownNetworkFriendlyName(final String name) {
+		return Arrays.stream(new String[] { "mainnet", "testnet", "mijinnet" }).anyMatch(knownName -> knownName.equals(name));
 	}
 
 	/**
