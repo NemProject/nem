@@ -120,13 +120,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.6.2</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <failOnWarning>true</failOnWarning>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
                     <includes>
                         <include>org/nem/deploy/**/*.java</include>
                     </includes>
