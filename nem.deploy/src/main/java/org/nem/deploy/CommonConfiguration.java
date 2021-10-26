@@ -35,7 +35,7 @@ public class CommonConfiguration {
 	}
 
 	protected static Properties loadDefaultProperties() {
-		final Class clazz = CommonConfiguration.class;
+		final Class<?> clazz = CommonConfiguration.class;
 		final Collection<Properties> propertyBags = Arrays.asList(
 				PropertiesExtensions.loadFromResource(clazz, "config.properties", true),
 				PropertiesExtensions.loadFromResource(clazz, "config-user.properties", false));

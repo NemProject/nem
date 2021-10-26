@@ -36,7 +36,7 @@ public class PropertiesExtensions {
 	 * @param isRequired true if the resource is required.
 	 * @return The merged properties.
 	 */
-	public static Properties loadFromResource(final Class clazz, final String name, final boolean isRequired) {
+	public static Properties loadFromResource(final Class<?> clazz, final String name, final boolean isRequired) {
 		try (final InputStream inputStream = clazz.getClassLoader().getResourceAsStream(name)) {
 			if (null == inputStream) {
 				throw new IOException("resource does not exist");

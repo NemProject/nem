@@ -14,7 +14,7 @@ import java.util.EnumSet;
  */
 public abstract class AbstractNemServletContextListener implements ServletContextListener {
 	private final AnnotationConfigApplicationContext appCtx;
-	private final Class webAppInitializerClass;
+	private final Class<?> webAppInitializerClass;
 	private final boolean useDosFilter;
 
 	/**
@@ -26,7 +26,7 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 	 */
 	public AbstractNemServletContextListener(
 			final AnnotationConfigApplicationContext appCtx,
-			final Class webAppInitializerClass,
+			final Class<?> webAppInitializerClass,
 			final boolean useDosFilter) {
 		this.appCtx = appCtx;
 		this.webAppInitializerClass = webAppInitializerClass;

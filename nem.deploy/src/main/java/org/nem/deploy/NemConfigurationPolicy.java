@@ -12,21 +12,21 @@ public interface NemConfigurationPolicy {
 	 *
 	 * @return The application configuration class.
 	 */
-	Class getAppConfigClass();
+	Class<?> getAppConfigClass();
 
 	/**
 	 * Gets the web application initializer class used by NIS/NCC.
 	 *
 	 * @return The web application initializer class.
 	 */
-	Class getWebAppInitializerClass();
+	Class<?> getWebAppInitializerClass();
 
 	/**
 	 * Gets the web socket initializer class used by NIS/NCC.
 	 *
 	 * @return The web socket initializer class.
 	 */
-	Class getWebAppWebsockInitializerClass();
+	Class<?> getWebAppWebsockInitializerClass();
 
 	/**
 	 * Gets the jar file class used by NCC.

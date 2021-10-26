@@ -40,14 +40,14 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
+		final Class<?>[] types = new Class<?>[] {
 				MockSerializableEntity.class,
 				ObjectWithConstructorThatThrowsCheckedException.class,
 				ObjectWithConstructorThatThrowsUncheckedException.class
 		};
 
 		// Assert:
-		for (final Class type : types) {
+		for (final Class<?> type : types) {
 			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
 		}
 	}
@@ -58,7 +58,7 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
+		final Class<?>[] types = new Class<?>[] {
 				SerializableEntity.class,
 				ObjectWithoutDeserializerConstructor.class,
 				MediaType.class,
@@ -66,7 +66,7 @@ public class DeserializableEntityMessageConverterTest {
 		};
 
 		// Assert:
-		for (final Class type : types) {
+		for (final Class<?> type : types) {
 			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
 		}
 	}
@@ -77,14 +77,14 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "binary");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
+		final Class<?>[] types = new Class<?>[] {
 				MockSerializableEntity.class,
 				ObjectWithConstructorThatThrowsCheckedException.class,
 				ObjectWithConstructorThatThrowsUncheckedException.class
 		};
 
 		// Assert:
-		for (final Class type : types) {
+		for (final Class<?> type : types) {
 			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
 		}
 	}
