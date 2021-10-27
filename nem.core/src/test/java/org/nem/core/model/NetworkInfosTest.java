@@ -12,6 +12,7 @@ import org.nem.core.test.ExceptionAssert;
 import java.util.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("serial")
 public class NetworkInfosTest {
 	private static final Map<String, Address> DESC_TO_ADDRESS_MAP = new HashMap<String, Address>() {
 		{
@@ -31,7 +32,6 @@ public class NetworkInfosTest {
 			this.put("MIJIN_NETWORK", (byte)0x60);
 		}
 	};
-
 	private static final Map<String, String> DESC_TO_FRIENDLY_NAME_MAP = new HashMap<String, String>() {
 		{
 			this.put("UNKNOWN_NETWORK", "unknownnet");

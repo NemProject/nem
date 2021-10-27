@@ -251,7 +251,7 @@ public class MosaicIdTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicId> createMosaicIdsForEqualityTests() {
 		return new HashMap<String, MosaicId>() {
 			{

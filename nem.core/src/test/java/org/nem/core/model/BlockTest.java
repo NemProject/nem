@@ -404,6 +404,7 @@ public class BlockTest {
 
 	private static final Account DEFAULT_ACCOUNT = Utils.generateRandomAccount();
 
+	@SuppressWarnings("serial")
 	private static final Map<String, Block> DESC_TO_BLOCK_MAP = new HashMap<String, Block>() {
 		{
 			final Block defaultBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));

@@ -111,7 +111,7 @@ public class TimeSynchronizationSampleTest {
 	}
 
 	//endregion
-
+	@SuppressWarnings("serial")
 	private HashMap<String, TimeSynchronizationSample> createTestTimeSynchronizationSampleList() {
 		return new HashMap<String, TimeSynchronizationSample>() {
 			{

@@ -16,6 +16,7 @@ import java.io.Serializable;
  * [5] Christiane Pascale Peters: Curves, Codes, and Cryptography (PhD thesis)
  * [6] Daniel J. Bernstein, Peter Birkner, Tanja Lange and Christiane Peters: Optimizing double-base elliptic-curve single-scalar multiplication
  */
+@SuppressWarnings("serial")
 public class Ed25519GroupElement implements Serializable {
 
 	private final CoordinateSystem coordinateSystem;

@@ -139,7 +139,7 @@ public class MosaicDefinitionTest {
 				.forEach(n -> assertCannotDeserializeWithoutKey(n, MissingRequiredPropertyException.class));
 	}
 
-	private static void assertCannotDeserializeWithoutKey(final String key, final Class expectedExceptionClass) {
+	private static void assertCannotDeserializeWithoutKey(final String key, final Class<?> expectedExceptionClass) {
 		// Arrange:
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(Utils.generateRandomAccount());
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(mosaicDefinition);
@@ -200,6 +200,7 @@ public class MosaicDefinitionTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicDefinition> createMosaicDefinitionsForEqualityTests() {
 		return new HashMap<String, MosaicDefinition>() {
 			{

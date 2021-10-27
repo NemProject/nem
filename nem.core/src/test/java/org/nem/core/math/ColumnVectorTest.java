@@ -561,6 +561,7 @@ public class ColumnVectorTest {
 	//region removeNegatives
 
 	@Test
+	@SuppressWarnings("serial")
 	public void removeNegativesSetsNegativeValuesToZero() {
 		// Arrange:
 		final Map<ColumnVector, ColumnVector> testCases = new HashMap<ColumnVector, ColumnVector>() {

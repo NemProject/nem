@@ -95,6 +95,7 @@ public class LockFileTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void isLockedReturnsTrueWhenLockFileIsNotLocked() throws IOException {
 		// Arrange:
 		try (final Closeable ignored = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {

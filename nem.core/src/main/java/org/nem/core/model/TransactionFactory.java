@@ -21,6 +21,7 @@ public class TransactionFactory {
 	public static final ObjectDeserializer<Transaction> NON_VERIFIABLE =
 			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 
+	@SuppressWarnings("serial")
 	private static final Map<Integer, BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction>> TYPE_TO_CONSTRUCTOR_MAP =
 			new HashMap<Integer, BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction>>() {
 				{

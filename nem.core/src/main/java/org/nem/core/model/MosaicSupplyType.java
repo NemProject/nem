@@ -35,6 +35,10 @@ public enum MosaicSupplyType {
 			case Create:
 			case Delete:
 				return true;
+			case Unknown:
+				break;
+			default:
+				break;
 		}
 
 		return false;

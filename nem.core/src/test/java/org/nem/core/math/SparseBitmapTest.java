@@ -427,7 +427,7 @@ public class SparseBitmapTest {
 	//endregion
 
 	//region hashCode/equals
-
+	@SuppressWarnings("serial")
 	private static final Map<String, SparseBitmap> DESC_TO_SB_MAP = new HashMap<String, SparseBitmap>() {
 		{
 			this.put("default", SparseBitmap.createFromSortedData(4, 8, 16));

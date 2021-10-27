@@ -89,7 +89,6 @@ public abstract class AbstractTransactionFeeCalculator implements TransactionFee
 	@Override
 	public boolean isFeeValid(Transaction transaction, BlockHeight blockHeight) {
 		final Amount minimumFee = this.calculateMinimumFee(transaction);
-		final long FORK_HEIGHT = 92000;
 		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:

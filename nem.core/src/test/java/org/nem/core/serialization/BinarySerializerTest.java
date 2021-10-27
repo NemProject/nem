@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.nio.*;
 import java.util.*;
 
+@SuppressWarnings({"serial", "try"})
 public class BinarySerializerTest extends SerializerTest<BinarySerializer, BinaryDeserializer> {
 
 	@Override

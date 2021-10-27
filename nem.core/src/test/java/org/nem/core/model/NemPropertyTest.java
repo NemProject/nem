@@ -98,7 +98,7 @@ public class NemPropertyTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, NemProperty> createNemPropertiesForEqualityTests() {
 		return new HashMap<String, NemProperty>() {
 			{

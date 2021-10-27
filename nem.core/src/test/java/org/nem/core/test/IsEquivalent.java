@@ -74,6 +74,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	 */
 	@SafeVarargs
 	@org.hamcrest.Factory
+	@SuppressWarnings("varargs")
 	public static <T> org.hamcrest.Matcher<Collection<T>> equivalentTo(final T... array) {
 		return new IsEquivalent<>(array);
 	}

@@ -106,7 +106,7 @@ public class TransactionFactoryTest {
 
 		private static void assertCanDeserializeVerifiable(
 				final Transaction originalTransaction,
-				final Class expectedClass,
+				final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
 			final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
@@ -120,7 +120,7 @@ public class TransactionFactoryTest {
 
 		private static void assertCanDeserializeNonVerifiable(
 				final Transaction originalTransaction,
-				final Class expectedClass,
+				final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
 			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());

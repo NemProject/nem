@@ -81,7 +81,7 @@ public class MosaicLevyTest {
 	// endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicLevy> createLeviesForEqualityTests(final Account recipient) {
 		final MosaicId mosaicId = Utils.createMosaicId(5);
 		final Quantity quantity = Quantity.fromValue(123);

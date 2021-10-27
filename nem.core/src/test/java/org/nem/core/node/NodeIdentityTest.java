@@ -284,7 +284,7 @@ public class NodeIdentityTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, NodeIdentity> DESC_TO_IDENTITY_MAP = new HashMap<String, NodeIdentity>() {
 		{
 			final KeyPair keyPair = new KeyPair();

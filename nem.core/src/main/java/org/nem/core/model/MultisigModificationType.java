@@ -45,6 +45,10 @@ public enum MultisigModificationType {
 			case DelCosignatory:
 			case MinCosignatories:
 				return true;
+			case Unknown:
+				break;
+			default:
+				break;
 		}
 
 		return false;

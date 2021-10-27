@@ -3,6 +3,7 @@ package org.nem.core.model.primitive;
 /**
  * An exception that is thrown when a Quantity is attempted to be created around a negative quantity.
  */
+@SuppressWarnings("serial")
 public class NegativeQuantityException extends IllegalArgumentException {
 
 	/**

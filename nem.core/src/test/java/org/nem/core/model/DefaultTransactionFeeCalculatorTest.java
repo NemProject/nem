@@ -185,23 +185,6 @@ public class DefaultTransactionFeeCalculatorTest {
 		Mockito.verify(context.calculator3, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
 	}
 
-	private static void assertIsFeeValidCalculatorAtAndAfterSecondFork(final long testHeight, final long forkHeight) {
-		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(1000L),
-				new BlockHeight(forkHeight));
-		final Transaction transaction = Mockito.mock(Transaction.class);
-
-		// Act:
-		context.calculator.isFeeValid(transaction, new BlockHeight(testHeight));
-
-		// Assert:
-		Mockito.verify(context.calculator1, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
-		Mockito.verify(context.calculator2, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
-		Mockito.verify(context.calculator3, Mockito.only()).isFeeValid(transaction, new BlockHeight(testHeight));
-	}
-
 	// endregion
 
 	private static class TestContext {

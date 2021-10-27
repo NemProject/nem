@@ -711,7 +711,7 @@ public class NodeCollectionTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, NodeCollection> DESC_TO_NODES_MAP = new HashMap<String, NodeCollection>() {
 		{
 			this.put("default", createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" }));

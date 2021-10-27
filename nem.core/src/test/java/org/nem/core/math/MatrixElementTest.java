@@ -20,7 +20,7 @@ public class MatrixElementTest {
 	}
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, MatrixElement> DESC_TO_ELEMENT_MAP = new HashMap<String, MatrixElement>() {
 		{
 			this.put("default", new MatrixElement(5, 4, 7.0));

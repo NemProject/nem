@@ -83,6 +83,7 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void closeStopsRefreshing() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
@@ -234,6 +235,7 @@ public class AsyncTimerTest {
 	//region visitor
 
 	@Test
+	@SuppressWarnings("try")
 	public void visitorIsNotifiedOfOperationStarts() throws InterruptedException {
 		// Arrange:
 		// Arrange:
@@ -251,6 +253,7 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void visitorIsNotifiedOfSuccessfulCompletions() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
@@ -267,6 +270,7 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void visitorIsNotifiedOfExceptionalCompletions() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture(() -> () -> {
@@ -285,6 +289,7 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void visitorIsNotifiedOfDelays() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
@@ -305,6 +310,7 @@ public class AsyncTimerTest {
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void visitorIsNotifiedOfStops() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();

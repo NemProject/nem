@@ -433,6 +433,8 @@ public enum ValidationResult {
 		switch (this) {
 			case NEUTRAL:
 				return false;
+			default:
+				break;
 		}
 
 		return !this.isSuccess();

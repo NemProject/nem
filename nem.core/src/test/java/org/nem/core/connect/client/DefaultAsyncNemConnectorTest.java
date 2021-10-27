@@ -214,7 +214,7 @@ public class DefaultAsyncNemConnectorTest {
 			this.httpClient = Mockito.mock(HttpMethodClient.class);
 			this.errorResponseStrategy = Mockito.mock(ErrorResponseStrategy.class);
 			Mockito.when(this.errorResponseStrategy.mapToException(Mockito.any())).thenThrow(new TestException());
-			this.connector = new DefaultAsyncNemConnector(this.httpClient, this.errorResponseStrategy);
+			this.connector = new DefaultAsyncNemConnector<NisApiId>(this.httpClient, this.errorResponseStrategy);
 			this.connector.setAccountLookup(this.accountLookup);
 		}
 
@@ -249,6 +249,7 @@ public class DefaultAsyncNemConnectorTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static class TestException extends RuntimeException {
 	}
 }

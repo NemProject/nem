@@ -102,6 +102,7 @@ public class NamespaceTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<String, Namespace> createNamespacesForEqualityTests() {
 		return new HashMap<String, Namespace>() {
 			{

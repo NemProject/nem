@@ -147,7 +147,7 @@ public class NodeTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, Node> DESC_TO_NODE_MAP = new HashMap<String, Node>() {
 		{
 			this.put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));

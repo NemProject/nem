@@ -41,7 +41,7 @@ public class NisNodeInfoTest {
 	}
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, NisNodeInfo> createNisNodeInfosForEqualityTests(final KeyPair keyPair) {
 		final NodeEndpoint endpoint = NodeEndpoint.fromHost("localhost");
 		return new HashMap<String, NisNodeInfo>() {

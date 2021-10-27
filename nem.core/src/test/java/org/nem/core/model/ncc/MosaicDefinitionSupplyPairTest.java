@@ -85,7 +85,7 @@ public class MosaicDefinitionSupplyPairTest {
 	// endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicDefinitionSupplyPair> createMosaicDefinitionSupplyPairsForEqualityTests() {
 		return new HashMap<String, MosaicDefinitionSupplyPair>() {
 			{

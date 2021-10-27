@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * A multisig transaction.
  */
-public class MultisigTransaction extends Transaction implements SerializableEntity {
+public class MultisigTransaction extends Transaction {
 	private final Transaction otherTransaction;
 	private final Hash otherTransactionHash;
 	private final SortedSet<MultisigSignatureTransaction> signatureTransactions = new TreeSet<>(new MultisigSignatureTransactionComparator());

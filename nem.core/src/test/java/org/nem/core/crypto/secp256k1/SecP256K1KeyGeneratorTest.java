@@ -10,6 +10,7 @@ import java.util.*;
 public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 
 	@Test
+	@SuppressWarnings("serial")
 	public void derivePublicKeyProducesCorrectPublicKeysSuite() {
 		final Map<String, String> priv2Pub = new HashMap<String, String>() {{
 			this.put("9201D5322CDB870181830D7529EDB9A668A09324277263865B5D136500234CB2", "024095F37906AB8FFB9EA44085BED4748F3F5E3FFD66C5A70818399BFCD24308B4");

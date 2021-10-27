@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * A multisig signature transaction.
  */
-public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
+public class MultisigSignatureTransaction extends Transaction {
 	private final Hash otherTransactionHash;
 	private final Account multisig;
 

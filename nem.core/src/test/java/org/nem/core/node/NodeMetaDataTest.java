@@ -122,7 +122,7 @@ public class NodeMetaDataTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, NodeMetaData> DESC_TO_META_DATA_MAP = new HashMap<String, NodeMetaData>() {
 		{
 			this.put("default", new NodeMetaData("plat", "app", new NodeVersion(1, 0, 0), 4, 7));

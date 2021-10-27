@@ -80,7 +80,7 @@ public class NamespaceIdPartTest {
 	// endregion
 
 	// region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, NamespaceIdPart> createPartsForEqualityTests() {
 		return new HashMap<String, NamespaceIdPart>() {
 			{

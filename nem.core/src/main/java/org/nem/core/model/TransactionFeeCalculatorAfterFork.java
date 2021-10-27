@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 /**
  * Implementation for calculating and validating transaction fees after the first fee fork.
  */
-public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator implements TransactionFeeCalculator {
+public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final int FEE_MULTIPLIER = 3;
 

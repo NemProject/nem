@@ -48,6 +48,7 @@ public class HashMetaDataPairTest {
 		MatcherAssert.assertThat(map.get("differentMetaData").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
+	@SuppressWarnings("serial")
 	private static HashMap<String, HashMetaDataPair> createTestObjects() {
 		final Hash hash = Utils.generateRandomHash();
 		final HashMetaData metaData = new HashMetaData(new BlockHeight(10), new TimeInstant(123));

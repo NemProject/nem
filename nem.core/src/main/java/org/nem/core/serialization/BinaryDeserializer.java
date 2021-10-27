@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 /**
  * A binary deserializer that supports forward-only deserialization.
  */
+@SuppressWarnings({"serial", "try"})
 public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	private final ByteArrayInputStream stream;

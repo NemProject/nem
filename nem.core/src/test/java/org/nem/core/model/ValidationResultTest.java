@@ -6,6 +6,7 @@ import org.junit.*;
 
 import java.util.*;
 
+@SuppressWarnings("serial")
 public class ValidationResultTest {
 
 	//region getValue / fromValue

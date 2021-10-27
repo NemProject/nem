@@ -70,7 +70,7 @@ public class CommunicationTimeStampsTest {
 	}
 
 	//endregion
-
+	@SuppressWarnings("serial")
 	private HashMap<String, CommunicationTimeStamps> createTestCommunicationTimeStampsForEqualityTests() {
 		return new HashMap<String, CommunicationTimeStamps>() {
 			{

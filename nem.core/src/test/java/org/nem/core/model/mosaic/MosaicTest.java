@@ -70,7 +70,7 @@ public class MosaicTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, Mosaic> DESC_TO_MOSAIC_MAP = new HashMap<String, Mosaic>() {
 		{
 			this.put("default", new Mosaic(createMosaicId(), Quantity.fromValue(123)));

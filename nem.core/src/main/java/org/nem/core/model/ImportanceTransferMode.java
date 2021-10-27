@@ -31,6 +31,10 @@ public enum ImportanceTransferMode {
 			case Activate:
 			case Deactivate:
 				return true;
+			case Unknown:
+				break;
+			default:
+				break;
 		}
 
 		return false;

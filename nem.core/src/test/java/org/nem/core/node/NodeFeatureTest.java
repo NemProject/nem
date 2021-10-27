@@ -12,6 +12,7 @@ public class NodeFeatureTest {
 	//region fromString
 
 	@Test
+	@SuppressWarnings("serial")
 	public void fromStringCanParseValidNodeFeaturesStringRepresentation() {
 		// Arrange:
 		final Map<String, NodeFeature> expectedMappings = new HashMap<String, NodeFeature>() {

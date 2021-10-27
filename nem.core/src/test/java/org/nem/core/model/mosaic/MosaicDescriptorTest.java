@@ -135,7 +135,7 @@ public class MosaicDescriptorTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicDescriptor> createMosaicDescriptorsForEqualityTests() {
 		return new HashMap<String, MosaicDescriptor>() {
 			{

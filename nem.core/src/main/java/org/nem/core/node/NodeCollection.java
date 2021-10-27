@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Represents a collection of nodes.
  */
+@SuppressWarnings("serial")
 public class NodeCollection implements SerializableEntity {
 	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(
 			NodeStatus.ACTIVE,

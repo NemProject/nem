@@ -14,6 +14,7 @@ public class BlockChainFeatureTest {
 	@Test
 	public void fromStringCanParseValidBlockChainFeaturesStringRepresentation() {
 		// Arrange:
+		@SuppressWarnings("serial")
 		final Map<String, BlockChainFeature> expectedMappings = new HashMap<String, BlockChainFeature>() {
 			{
 				this.put("PROOF_OF_IMPORTANCE", BlockChainFeature.PROOF_OF_IMPORTANCE);

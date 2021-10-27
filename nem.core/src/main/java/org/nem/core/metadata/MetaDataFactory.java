@@ -7,6 +7,7 @@ import java.security.CodeSource;
 /**
  * Static class that is able to load meta data from various sources.
  */
+@SuppressWarnings("serial")
 public class MetaDataFactory {
 
 	/**
@@ -16,7 +17,7 @@ public class MetaDataFactory {
 	 * @param provider The time provider.
 	 * @return The application meta data.
 	 */
-	public static ApplicationMetaData loadApplicationMetaData(final Class clazz, final TimeProvider provider) {
+	public static ApplicationMetaData loadApplicationMetaData(final Class<?> clazz, final TimeProvider provider) {
 		return loadApplicationMetaData(clazz.getProtectionDomain().getCodeSource(), provider);
 	}
 

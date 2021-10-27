@@ -224,6 +224,7 @@ public class ExceptionUtilsTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private class MockExecutionException extends ExecutionException {
 
 		public MockExecutionException(final Throwable cause) {

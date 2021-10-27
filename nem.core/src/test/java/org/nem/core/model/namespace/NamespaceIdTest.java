@@ -250,7 +250,7 @@ public class NamespaceIdTest {
 	// endregion
 
 	// region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, NamespaceId> createNamespaceIdsForEqualityTests() {
 		return new HashMap<String, NamespaceId>() {
 			{

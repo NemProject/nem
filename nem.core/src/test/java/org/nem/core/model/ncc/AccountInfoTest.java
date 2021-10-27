@@ -221,6 +221,7 @@ public class AccountInfoTest {
 
 	private static final Address DEFAULT_ADDRESS = Utils.generateRandomAddressWithPublicKey();
 
+	@SuppressWarnings("serial")
 	private static final Map<String, AccountInfo> DESC_TO_INFO_MAP = new HashMap<String, AccountInfo>() {
 		{
 			this.put("default", createAccountInfo(DEFAULT_ADDRESS, 17, 14, 5, "foo", 2.3));

@@ -24,6 +24,7 @@ public class NetworkInfoTest {
 	}
 
 	@Test
+	@SuppressWarnings("serial")
 	public void isCompatibleOnlyReturnsTrueForCompatibleAddresses() {
 		// Arrange:
 		final Map<String, Address> descToAddressMap = new HashMap<String, Address>() {

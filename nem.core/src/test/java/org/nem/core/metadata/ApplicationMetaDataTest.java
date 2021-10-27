@@ -85,7 +85,7 @@ public class ApplicationMetaDataTest {
 	}
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static Map<String, ApplicationMetaData> createApplicationMetaDataForEqualityTests(final X509Certificate certificate) {
 		final X509Certificate otherCertificate = MetaDataTestUtils.createMockCertificateWithName("CN=SomeoneElse,O=NemSoft");
 		return new HashMap<String, ApplicationMetaData>() {

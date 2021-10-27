@@ -44,6 +44,7 @@ public class HashMetaDataTest {
 		MatcherAssert.assertThat(map.get("differentTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
+	@SuppressWarnings("serial")
 	private static HashMap<String, HashMetaData> createTestObjects() {
 		return new HashMap<String, HashMetaData>() {
 			{
