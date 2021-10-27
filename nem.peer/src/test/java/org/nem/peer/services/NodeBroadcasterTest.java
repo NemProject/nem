@@ -42,7 +42,7 @@ public class NodeBroadcasterTest {
 				}));
 
 		// Act:
-		final CompletableFuture future = context.broadcaster.broadcast(
+		final CompletableFuture<?> future = context.broadcaster.broadcast(
 				context.broadcastNodes,
 				NisPeerId.REST_PUSH_TRANSACTION,
 				new MockSerializableEntity());

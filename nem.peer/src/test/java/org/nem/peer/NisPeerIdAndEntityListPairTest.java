@@ -67,6 +67,7 @@ public class NisPeerIdAndEntityListPairTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<String, NisPeerIdAndEntityListPair> createBroadcastableEntityListForEqualityTests() {
 		return new HashMap<String, NisPeerIdAndEntityListPair>() {
 			{

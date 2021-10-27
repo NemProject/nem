@@ -10,6 +10,7 @@ import java.util.*;
 public class NodeInteractionResultTest {
 
 	@Test
+	@SuppressWarnings("serial")
 	public void canCreateResultFromValidationResult() {
 		// Arrange:
 		final Map<ValidationResult, NodeInteractionResult> expectedMappings = new HashMap<ValidationResult, NodeInteractionResult>() {

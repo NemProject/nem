@@ -43,9 +43,9 @@ public class PeerNetworkBroadcastBuffer {
 	 * @return The future.
 	 */
 	public CompletableFuture<Void> broadcastAll() {
-		final List<CompletableFuture> futures = this.buffer.getAllPairsAndClearMap().stream()
+		final List<CompletableFuture<?>> futures = this.buffer.getAllPairsAndClearMap().stream()
 				.map(p -> this.network.broadcast(p.getApiId(), p.getEntities()))
 				.collect(Collectors.toList());
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
 	}
 }

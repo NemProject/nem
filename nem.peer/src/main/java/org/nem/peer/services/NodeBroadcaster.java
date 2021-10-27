@@ -37,10 +37,10 @@ public class NodeBroadcaster {
 			final NisPeerId broadcastId,
 			final SerializableEntity entity) {
 
-		final List<CompletableFuture> futures = partnerNodes.stream()
+		final List<CompletableFuture<?>> futures = partnerNodes.stream()
 				.map(node -> this.connector.announce(node, broadcastId, entity))
 				.collect(Collectors.toList());
 
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
 	}
 }

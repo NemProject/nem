@@ -59,7 +59,7 @@ public class LocalNodeEndpointUpdater {
 		}
 
 		final CompletableFuture<Boolean> aggregateFuture = new CompletableFuture<>();
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]))
 				.thenAccept(v -> aggregateFuture.complete(this.setLocalEndpoint(findBestEndpoint(endpoints))));
 		return aggregateFuture;
 	}
@@ -100,7 +100,7 @@ public class LocalNodeEndpointUpdater {
 				}))
 				.collect(Collectors.toList());
 
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]))
 				.thenAccept(b -> aggregateFuture.complete(false));
 
 		return aggregateFuture;

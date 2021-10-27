@@ -567,7 +567,7 @@ public class NodeRefresherTest {
 		context.setBusyGetInfoForNode("b", DEFAULT_SLEEP);
 
 		// Act:
-		final CompletableFuture future = context.refresher.refresh(context.refreshNodes);
+		final CompletableFuture<?> future = context.refresher.refresh(context.refreshNodes);
 
 		// Assert:
 		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));

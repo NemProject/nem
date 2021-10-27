@@ -1,7 +1,6 @@
 package org.nem.peer.test;
 
 import org.hamcrest.MatcherAssert;
-import org.junit.Assert;
 import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
 

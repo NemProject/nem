@@ -56,7 +56,7 @@ public interface PeerConnector {
 	 * @param entity The entity to announce.
 	 * @return Void future.
 	 */
-	CompletableFuture announce(
+	CompletableFuture<?> announce(
 			final Node node,
 			final NisPeerId announceId,
 			final SerializableEntity entity);

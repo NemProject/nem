@@ -55,11 +55,11 @@ public class NodeRefresher {
 		// ensure that only direct communication is trusted for these nodes
 		this.connectedNodes.addAll(refreshNodes);
 
-		final List<CompletableFuture> futures = refreshNodes.stream()
+		final List<CompletableFuture<?>> futures = refreshNodes.stream()
 				.map(n -> this.getNodeInfo(n, true))
 				.collect(Collectors.toList());
 
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+		return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]))
 				.whenComplete((o, e) -> {
 					for (final Map.Entry<Node, NodeStatus> entry : this.nodesToUpdate.entrySet()) {
 						this.nodes.update(entry.getKey(), entry.getValue());
@@ -99,11 +99,11 @@ public class NodeRefresher {
 			future = future
 					.thenCompose(v -> this.connector.getKnownPeers(node))
 					.thenCompose(nodes -> {
-						final List<CompletableFuture> futures = nodes.asCollection().stream()
+						final List<CompletableFuture<?>> futures = nodes.asCollection().stream()
 								.map(n -> this.getNodeInfo(n, false))
 								.collect(Collectors.toList());
 
-						return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+						return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
 					})
 					.thenApply(v -> NodeStatus.ACTIVE)
 					.exceptionally(e -> getAndLogStatus(node, "DIRECT", e));

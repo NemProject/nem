@@ -234,6 +234,7 @@ public class LocalNodeEndpointUpdaterTest {
 		return CompletableFuture.completedFuture(NodeEndpoint.fromHost(host));
 	}
 
+	@SuppressWarnings("varargs")
 	private static class TestContext {
 		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final Node remoteNode = NodeUtils.createNodeWithName("p");
