@@ -137,18 +137,18 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	@Test
 	public void isFeeValidUsesCorrectCalculatorAtSecondForkHeight() {
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(1234L, 1234L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(2000L, 2000L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(10000L, 10000L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(1_000_000L, 1_000_000L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(1234L, 1234L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(2000L, 2000L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(10000L, 10000L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(1_000_000L, 1_000_000L);
 	}
 
 	@Test
 	public void isFeeValidUsesCorrectCalculatorAfterSecondForkHeight() {
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(1235L, 1234L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(2000L, 1234L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(10000L, 1234L);
-		assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(1_000_000L, 1234L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(1235L, 1234L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(2000L, 1234L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(10000L, 1234L);
+		assertIsFeeValidCalculatorAtAndAfterSecondFork(1_000_000L, 1234L);
 	}
 
 	private static void assertIsFeeValidCalculatorBeforeFirstFork(final long testHeight, final long forkHeight) {
@@ -183,6 +183,23 @@ public class DefaultTransactionFeeCalculatorTest {
 		Mockito.verify(context.calculator1, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
 		Mockito.verify(context.calculator2, Mockito.only()).isFeeValid(transaction, new BlockHeight(testHeight));
 		Mockito.verify(context.calculator3, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
+	}
+
+	private static void assertIsFeeValidCalculatorAtAndAfterSecondFork(final long testHeight, final long forkHeight) {
+		// Arrange:
+		final TestContext context = new TestContext(
+				() -> new BlockHeight(testHeight),
+				new BlockHeight(1000L),
+				new BlockHeight(forkHeight));
+		final Transaction transaction = Mockito.mock(Transaction.class);
+
+		// Act:
+		context.calculator.isFeeValid(transaction, new BlockHeight(testHeight));
+
+		// Assert:
+		Mockito.verify(context.calculator1, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
+		Mockito.verify(context.calculator2, Mockito.never()).isFeeValid(Mockito.any(), Mockito.any());
+		Mockito.verify(context.calculator3, Mockito.only()).isFeeValid(transaction, new BlockHeight(testHeight));
 	}
 
 	// endregion
