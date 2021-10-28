@@ -29,7 +29,7 @@ public class BlockChainDelegationContext {
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	private final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
-	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
+	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);
 	private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);

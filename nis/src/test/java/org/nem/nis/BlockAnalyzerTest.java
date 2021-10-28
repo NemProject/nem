@@ -240,7 +240,7 @@ public class BlockAnalyzerTest {
 		private final ReadOnlyNisCache nisCache;
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 		private final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao));
-		private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
+		private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(this.blockDao, this.mapper));
 		private final BlockChainScoreManager scoreManager;
 		private final NisMapperFactory nisMapperFactory;

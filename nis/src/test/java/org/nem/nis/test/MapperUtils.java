@@ -34,7 +34,7 @@ public class MapperUtils {
 	 * @param accountDao The account dao.
 	 * @return The mapper.
 	 */
-	public static NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDao accountDao) {
+	public static NisModelToDbModelMapper createModelToDbModelNisMapperAccountDao(final AccountDao accountDao) {
 		return createModelToDbModelNisMapper(new AccountDaoLookupAdapter(accountDao));
 	}
 

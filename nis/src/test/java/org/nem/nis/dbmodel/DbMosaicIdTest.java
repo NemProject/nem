@@ -24,6 +24,7 @@ public class DbMosaicIdTest {
 
 	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, DbMosaicId> DESC_TO_DB_MOSAIC_ID_MAP = new HashMap<String, DbMosaicId>() {
 		{
 			this.put("default", createDbMosaicId(1L));

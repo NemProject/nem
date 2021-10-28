@@ -37,6 +37,8 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 			case REMOTE_DEACTIVATING:
 			case REMOTE_ACTIVE:
 				return ValidationResult.SUCCESS;
+			default:
+				break;
 		}
 
 		return ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER;

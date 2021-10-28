@@ -43,6 +43,8 @@ public class BalanceValidator implements SingleTransactionValidator {
 				case BalanceDebit:
 					this.notify((BalanceAdjustmentNotification)notification);
 					break;
+				default:
+					break;
 			}
 		}
 

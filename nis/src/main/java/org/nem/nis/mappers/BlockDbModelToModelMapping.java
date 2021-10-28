@@ -51,7 +51,7 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 		block.addTransactions(transactions);
 		return block;
 	}
-
+	@SuppressWarnings("rawtypes")
 	private static Stream<AbstractBlockTransfer> getAllDirectBlockTransfers(final DbBlock dbBlock) {
 		return StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 				.flatMap(e -> e.getFromBlock.apply(dbBlock).stream())

@@ -129,16 +129,14 @@ public class PushService {
 		switch (result) {
 			case FAILURE_TRANSACTION_CACHE_TOO_FULL:
 				return false;
+			default:
+				break;
 		}
 
 		return result.isFailure();
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(final PushContext<T> context) {
-		final String message = String.format("   received: %s from %s  (signer: %s)",
-				context.entity.getType(),
-				context.identity,
-				context.entity.getSigner().getAddress());
 		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();

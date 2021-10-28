@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.function.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class MultisigTransactionModelToDbModelMappingTest {
 
 	//region General

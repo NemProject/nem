@@ -226,6 +226,7 @@ public class DbBlock {
 		this.blockMosaicSupplyChangeTransactions = blockMosaicSupplyChangeTransactions;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private <T extends AbstractBlockTransfer> List<T> filter(final List<T> transactions) {
 		return transactions.stream()
 				.filter(t -> null != t.getSenderProof())

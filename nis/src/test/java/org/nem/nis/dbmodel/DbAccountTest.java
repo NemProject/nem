@@ -75,6 +75,7 @@ public class DbAccountTest {
 
 	//region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, DbAccount> DESC_TO_DB_ACCOUNT_MAP = new HashMap<String, DbAccount>() {
 		{
 			final PublicKey publicKey = Utils.generateRandomPublicKey();

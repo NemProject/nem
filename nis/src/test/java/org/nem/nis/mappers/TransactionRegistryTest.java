@@ -14,10 +14,11 @@ import java.util.*;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class TransactionRegistryTest {
 
 	public static class All {
-		private static final Collection<Class> EXPECTED_MODEL_CLASSES = Arrays.asList(
+		private static final Collection<Class<?>> EXPECTED_MODEL_CLASSES = Arrays.asList(
 				TransferTransaction.class,
 				ImportanceTransferTransaction.class,
 				MultisigAggregateModificationTransaction.class,
@@ -45,7 +46,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void allExpectedEntriesAreReturnedViaIterator() {
 			// Act:
-			final Collection<Class> modelClasses = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
+			final Collection<Class<?>> modelClasses = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 					.map(e -> e.modelClass)
 					.collect(Collectors.toList());
 
@@ -57,7 +58,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void allExpectedEntriesAreReturnedViaStream() {
 			// Act:
-			final Collection<Class> modelClasses = TransactionRegistry.stream()
+			final Collection<Class<?>> modelClasses = TransactionRegistry.stream()
 					.map(e -> e.modelClass)
 					.collect(Collectors.toList());
 
@@ -94,6 +95,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
+		@SuppressWarnings("rawtypes")
 		public void findByDbModelClassCanReturnAllRegisteredTypes() {
 			// Arrange:
 			final List<Class<? extends AbstractBlockTransfer>> expectedRegisteredClasses = Arrays.asList(
@@ -132,7 +134,7 @@ public class TransactionRegistryTest {
 	}
 
 	//region SingleTransactionTest
-
+	@SuppressWarnings("rawtypes")
 	private static abstract class SingleTransactionTest<TDbModel extends AbstractBlockTransfer> {
 
 		//region full tests
@@ -168,7 +170,7 @@ public class TransactionRegistryTest {
 	}
 
 	//endregion
-
+	@SuppressWarnings("rawtypes")
 	private static abstract class NonMultisigSingleTransactionTest<TDbModel extends AbstractBlockTransfer> extends SingleTransactionTest<TDbModel> {
 
 		@Test
@@ -226,7 +228,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return TransferRetriever.class;
 		}
 
@@ -270,7 +272,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return ImportanceTransferRetriever.class;
 		}
 
@@ -314,7 +316,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return MultisigModificationRetriever.class;
 		}
 
@@ -369,7 +371,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return ProvisionNamespaceRetriever.class;
 		}
 
@@ -413,7 +415,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return MosaicDefinitionCreationRetriever.class;
 		}
 
@@ -489,7 +491,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return MosaicSupplyChangeRetriever.class;
 		}
 
@@ -531,7 +533,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Override
-		protected Class getRetrieverType() {
+		protected Class<?> getRetrieverType() {
 			return MultisigTransactionRetriever.class;
 		}
 
@@ -585,6 +587,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
+		@SuppressWarnings("rawtypes")
 		public void getInnerTransactionReturnsInnerTransactionForMultisigTransaction() {
 			// Arrange:
 			final DbTransferTransaction t = new DbTransferTransaction();

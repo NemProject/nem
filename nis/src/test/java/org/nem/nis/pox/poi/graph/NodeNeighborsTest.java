@@ -280,7 +280,7 @@ public class NodeNeighborsTest {
 	//endregion
 
 	//region hashCode/equals
-
+	@SuppressWarnings("serial")
 	private static final Map<String, NodeNeighbors> DESC_TO_NEIGHBORS_MAP = new HashMap<String, NodeNeighbors>() {
 		{
 			this.put("default", NisUtils.createNeighbors(2, 3, 6));

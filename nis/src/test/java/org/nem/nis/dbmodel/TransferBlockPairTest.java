@@ -5,6 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 
+@SuppressWarnings("rawtypes")
 public class TransferBlockPairTest {
 
 	@Test

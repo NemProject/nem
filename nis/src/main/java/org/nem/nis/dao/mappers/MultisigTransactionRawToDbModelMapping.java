@@ -10,6 +10,7 @@ import java.util.HashSet;
 /**
  * A mapping that is able to map raw multisig transaction data to a db multisig transaction.
  */
+@SuppressWarnings("rawtypes")
 public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawToDbModelMapping<DbMultisigTransaction> {
 	private final MultisigTransferMap multisigTransferMap;
 

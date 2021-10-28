@@ -44,6 +44,7 @@ public class DefaultMapperFactory implements MapperFactory {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(

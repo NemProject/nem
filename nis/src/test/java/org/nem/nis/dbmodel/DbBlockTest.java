@@ -16,6 +16,7 @@ import java.util.function.*;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class DbBlockTest {
 
 	// the Enclosed.class runner seems to require at least two inner classes (at least within IntelliJ),

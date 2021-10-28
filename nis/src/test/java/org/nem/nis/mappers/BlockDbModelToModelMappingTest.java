@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class BlockDbModelToModelMappingTest {
 
 	//region General

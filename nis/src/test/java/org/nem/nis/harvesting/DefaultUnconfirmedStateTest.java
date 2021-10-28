@@ -493,7 +493,7 @@ public class DefaultUnconfirmedStateTest {
 			assertCapturedValidationContext(pair.getContext());
 		}
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
 			return ArgumentCaptor.forClass((Class)List.class);
 		}

@@ -27,6 +27,7 @@ import java.util.stream.*;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
+@SuppressWarnings("rawtypes")
 public class TransferDaoTest {
 	private static final int USE_HASH = 1;
 	private static final int USE_ID = 2;

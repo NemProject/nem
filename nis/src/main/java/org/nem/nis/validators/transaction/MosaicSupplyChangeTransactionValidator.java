@@ -70,6 +70,8 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 					return ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE;
 				}
 				break;
+			default:
+				break;
 		}
 
 		return ValidationResult.SUCCESS;

@@ -132,7 +132,7 @@ public class CommunityTest {
 	//endregion
 
 	//region predicates
-
+	@SuppressWarnings("serial")
 	private static final Map<String, Community> NAME_TO_COMMUNITY_MAP = new HashMap<String, Community>() {
 		{
 			this.put("MU_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 4, 7), NisUtils.createNeighbors(8), MU));
@@ -162,7 +162,7 @@ public class CommunityTest {
 	//endregion
 
 	//region equals / hashCode
-
+	@SuppressWarnings("serial")
 	private static final Map<String, Community> DESC_TO_COMMUNITY_MAP = new HashMap<String, Community>() {
 		{
 			final NodeNeighbors similarNeighbors = NisUtils.createNeighbors(2, 5, 7);

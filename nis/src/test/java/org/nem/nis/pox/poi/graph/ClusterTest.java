@@ -162,6 +162,7 @@ public class ClusterTest {
 
 	// region hashCode / equals
 
+	@SuppressWarnings("serial")
 	private static final Map<String, Cluster> DESC_TO_CLUSTER_MAP = new HashMap<String, Cluster>() {
 		{
 			this.put("default", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1338, 1339, 1440)));

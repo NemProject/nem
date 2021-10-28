@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
  * Helper class used by the block loader that contains maps of ids to (inner)
  * multisig transactions.
  */
+@SuppressWarnings("rawtypes")
 public class MultisigTransferMap {
 	private final Map<Integer, Entry> typeEntryMap;
 

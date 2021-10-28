@@ -41,7 +41,7 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		final List<Node> nodes = this.selector.selectNodes();
 		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
-		final CompletableFuture[] futures = new CompletableFuture[nodes.size()];
+		final CompletableFuture<?>[] futures = new CompletableFuture<?>[nodes.size()];
 		int i = 0;
 		for (final Node n : nodes) {
 			final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();

@@ -3,6 +3,7 @@ package org.nem.nis.cache;
 /**
  * A cache that can be copied.
  */
+@SuppressWarnings("rawtypes")
 public interface CopyableCache<TDerived extends CopyableCache> {
 
 	/**

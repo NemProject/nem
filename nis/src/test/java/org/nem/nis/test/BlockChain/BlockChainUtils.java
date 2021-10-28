@@ -2,7 +2,6 @@ package org.nem.nis.test.BlockChain;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.mockito.Mockito;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.ReadOnlyAccountState;

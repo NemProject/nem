@@ -134,7 +134,7 @@ public class AggregateBlockTransactionObserverBuilderTest {
 			Mockito.doAnswer(this.createAnswer(4)).when(this.observer4).notify(Mockito.any(), Mockito.any());
 		}
 
-		private Answer createAnswer(final int id) {
+		private Answer<?> createAnswer(final int id) {
 			return invocationOnMock -> {
 				this.visitIds.add(id);
 				return null;

@@ -9,6 +9,7 @@ import java.util.*;
 /**
  * Predicate for determining whether a request is local or remote.
  */
+@SuppressWarnings("serial")
 public class LocalHostDetector {
 	private final List<AddressMatcher> matchers = new ArrayList<AddressMatcher>() {
 		{

@@ -9,6 +9,7 @@ import java.util.*;
 
 public class GroupedHeightTest {
 
+	@SuppressWarnings("serial")
 	private static final Map<Integer, Integer> HEIGHT_TO_GROUPED_HEIGHT_MAP = new HashMap<Integer, Integer>() {
 		{
 			this.put(1, 1);

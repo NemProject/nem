@@ -438,7 +438,7 @@ public class BlockChainHarvesterTest {
 			this.setupCopyHandshake();
 
 			// Act: start the threads
-			final CompletableFuture harvesterThread = this.runHarvesterThread();
+			final CompletableFuture<?> harvesterThread = this.runHarvesterThread();
 			final CompletableFuture<ValidationResult> processorThread = this.runProcessorThread();
 			final ValidationResult processResult = processorThread.join();
 			this.logWithThread("processor completed");
@@ -476,7 +476,7 @@ public class BlockChainHarvesterTest {
 			});
 		}
 
-		private CompletableFuture runHarvesterThread() {
+		private CompletableFuture<?> runHarvesterThread() {
 			return CompletableFuture.runAsync(() -> {
 				this.logWithThread("start (harvester)");
 

@@ -82,6 +82,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		MatcherAssert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(-1L));
 	}
 
+	@SuppressWarnings("serial")
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);

@@ -174,6 +174,8 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 					// the remote hasn't been deactivated yet
 					shouldUseRemote = settingHeight < remoteHarvestingDelay;
 					break;
+				case Unknown:
+					break;
 			}
 
 			return !shouldUseRemote ? state : this.findStateByAddress(remoteLink.getLinkedAddress());

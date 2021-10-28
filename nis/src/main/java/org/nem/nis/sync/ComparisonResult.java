@@ -181,6 +181,8 @@ public class ComparisonResult {
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 			case REMOTE_REPORTED_LOWER_CHAIN_SCORE:
 				return NodeInteractionResult.NEUTRAL;
+			default:
+				break;
 		}
 
 		return NodeInteractionResult.FAILURE;

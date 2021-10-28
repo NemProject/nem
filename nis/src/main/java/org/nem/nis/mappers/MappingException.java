@@ -3,6 +3,7 @@ package org.nem.nis.mappers;
 /**
  * Exception that is used when a mapping operation fails.
  */
+@SuppressWarnings("serial")
 public class MappingException extends RuntimeException {
 
 	/**

@@ -143,7 +143,7 @@ public class MosaicDefinitionController {
 					pageSize);
 		};
 		final Collection<MosaicDefinitionMetaDataPair> pairs = recursivelyGetMosaicDefinitions(retriever, page);
-		return new SerializableList<>(pairs.stream().map(AbstractMetaDataPair::getEntity).collect(Collectors.toList()));
+		return new SerializableList<>(pairs.stream().map(MosaicDefinitionMetaDataPair::getEntity).collect(Collectors.toList()));
 	}
 
 	//endregion

@@ -434,10 +434,6 @@ public class AccountTransfersControllerTest {
 		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
 
-		public TestContext() {
-			this(Mockito.mock(AccountIoAdapter.class));
-		}
-
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
 			this.controller = Mockito.spy(new AccountTransfersController(
 					accountIoAdapter,

@@ -3,6 +3,7 @@ package org.nem.nis;
 /**
  * An exception that is thrown when NIS is in an illegal state.
  */
+@SuppressWarnings("serial")
 public class NisIllegalStateException extends RuntimeException {
 	private final Reason reason;
 

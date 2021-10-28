@@ -37,6 +37,8 @@ public class NumCosignatoryRangeValidator implements TSingleTransactionValidator
 				case DelCosignatory:
 					--numCosigners;
 					break;
+				default:
+					break;
 			}
 		}
 

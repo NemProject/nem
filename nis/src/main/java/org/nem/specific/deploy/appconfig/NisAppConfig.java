@@ -60,6 +60,7 @@ public class NisAppConfig {
 	private BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired
+	@SuppressWarnings("unused")
 	private TransferDao transferDao;
 
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
@@ -265,6 +266,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	@SuppressWarnings("serial")
 	public ImportanceCalculator importanceCalculator() {
 		final Map<BlockChainFeature, Supplier<ImportanceCalculator>> featureSupplierMap = new HashMap<BlockChainFeature, Supplier<ImportanceCalculator>>() {
 			{
@@ -362,6 +364,7 @@ public class NisAppConfig {
 				System::exit);
 	}
 
+	@SuppressWarnings("serial")
 	private Supplier<WeightedBalances> weighedBalancesSupplier() {
 		final Map<BlockChainFeature, Supplier<Supplier<WeightedBalances>>> featureSupplierMap = new HashMap<BlockChainFeature, Supplier<Supplier<WeightedBalances>>>() {
 			{

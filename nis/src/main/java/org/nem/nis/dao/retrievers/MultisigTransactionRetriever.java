@@ -13,6 +13,7 @@ import java.util.stream.*;
 /**
  * Class for for retrieving multisig transactions.
  */
+@SuppressWarnings("rawtypes")
 public class MultisigTransactionRetriever implements TransactionRetriever {
 	private static final Map<Integer, String> TYPE_TO_FIELD_NAME_MAP = TransactionRegistry.stream()
 			.filter(e -> null != e.multisigJoinField)

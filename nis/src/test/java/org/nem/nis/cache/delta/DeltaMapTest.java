@@ -40,6 +40,7 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 	}
 
 	@Test
+	@SuppressWarnings("serial")
 	public void canCreateMapWithInitialValues() {
 		// Arrange:
 		final Map<Integer, String> initialValues = new HashMap<Integer, String>() {

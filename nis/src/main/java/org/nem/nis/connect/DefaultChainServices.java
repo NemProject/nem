@@ -44,7 +44,7 @@ public class DefaultChainServices implements ChainServices {
 				.map(n -> this.connectorPool.getSyncConnector(null).getChainHeightAsync(n).exceptionally(e -> null))
 				.collect(Collectors.toList());
 
-		return CompletableFuture.allOf(chainHeightFutures.toArray(new CompletableFuture[chainHeightFutures.size()]))
+		return CompletableFuture.allOf(chainHeightFutures.toArray(new CompletableFuture<?>[chainHeightFutures.size()]))
 				.thenApply(v -> {
 					final Optional<BlockHeight> maxChainHeight = chainHeightFutures.stream()
 							.map(CompletableFuture::join)

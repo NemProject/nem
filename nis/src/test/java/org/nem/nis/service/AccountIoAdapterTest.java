@@ -129,6 +129,7 @@ public class AccountIoAdapterTest {
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, 40);
 	}
 
+	@SuppressWarnings("serial")
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);

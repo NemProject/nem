@@ -58,6 +58,7 @@ public class TransactionValidatorFactoryTest {
 		return expectedClasses;
 	}
 
+	@SuppressWarnings("serial")
 	private static Collection<String> getIncompleteSingleValidatorNames() {
 		return new ArrayList<String>() {
 			{

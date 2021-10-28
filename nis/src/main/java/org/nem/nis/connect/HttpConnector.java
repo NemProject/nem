@@ -64,7 +64,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
-	public CompletableFuture announce(
+	public CompletableFuture<?> announce(
 			final Node node,
 			final NisPeerId announceId,
 			final SerializableEntity entity) {

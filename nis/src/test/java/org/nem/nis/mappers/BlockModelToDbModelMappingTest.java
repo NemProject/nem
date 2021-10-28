@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class BlockModelToDbModelMappingTest {
 
 	public static class General {

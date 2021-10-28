@@ -44,6 +44,7 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static final List<Entry<?, ?>> OTHER_ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(DbAccount.class, Account.class));
@@ -62,6 +63,7 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = TransactionRegistry.stream()
 			.map(e -> new TransactionEntry<>(e.dbModelClass, e.modelClass))
 			.collect(Collectors.toList());

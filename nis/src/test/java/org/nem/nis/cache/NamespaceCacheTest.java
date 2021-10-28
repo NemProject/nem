@@ -873,6 +873,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void copyCopiesAllEntries() {
 		// Assert:
 		this.assertBasicCopy(CopyableCache::copy);

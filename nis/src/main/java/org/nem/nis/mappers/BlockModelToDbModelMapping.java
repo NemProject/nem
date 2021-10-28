@@ -9,6 +9,7 @@ import java.util.*;
 /**
  * A mapping that is able to map a model block to a db block.
  */
+@SuppressWarnings("rawtypes")
 public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 	private final IMapper mapper;
 

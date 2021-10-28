@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Repository
+@SuppressWarnings("rawtypes")
 public class BlockDaoImpl implements BlockDao {
 	private static final Logger LOGGER = Logger.getLogger(BlockDaoImpl.class.getName());
 

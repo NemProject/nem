@@ -39,6 +39,8 @@ public class BlockTransferObserverToBlockTransactionObserverAdapter implements B
 			case BalanceDebit:
 				this.notifyDebit((BalanceAdjustmentNotification)notification, context);
 				break;
+			default:
+				break;
 		}
 	}
 

@@ -29,6 +29,7 @@ public class NisDbModelToModelMapper implements IMapper {
 	 * @param transfer The TDbModel derived from abstract block transfer.
 	 * @return The model transfer transaction.
 	 */
+	@SuppressWarnings("rawtypes")
 	public <TDbModel extends AbstractBlockTransfer> Transaction map(final TDbModel transfer) {
 		return this.mapper.map(transfer, Transaction.class);
 	}

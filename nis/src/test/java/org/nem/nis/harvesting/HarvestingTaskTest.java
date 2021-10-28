@@ -72,6 +72,7 @@ public class HarvestingTaskTest {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void harvestedBlockIsPushedIfItPassesBlockChainProcessing() {
 		// Arrange:
 		final TestContext context = new TestContext();

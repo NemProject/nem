@@ -97,6 +97,7 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);

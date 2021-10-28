@@ -32,6 +32,8 @@ public class BalanceCommitTransferObserver implements TransactionObserver {
 			case BalanceDebit:
 				this.notify((BalanceAdjustmentNotification)notification);
 				break;
+			default:
+				break;
 		}
 	}
 

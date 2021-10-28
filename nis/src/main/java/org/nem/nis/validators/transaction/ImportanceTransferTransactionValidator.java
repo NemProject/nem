@@ -145,6 +145,8 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 			case REMOTE_ACTIVE:
 			case REMOTE_DEACTIVATING:
 				return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
+			default:
+				break;
 		}
 
 		return ValidationResult.SUCCESS;

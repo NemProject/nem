@@ -17,6 +17,7 @@ import org.nem.nis.test.NisCacheFactory;
 import java.util.*;
 import java.util.function.Function;
 
+@SuppressWarnings("serial")
 public abstract class AbstractTransactionValidationTest {
 	protected static final TimeInstant CURRENT_TIME = new SystemTimeProvider().getCurrentTime();
 

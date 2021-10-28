@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * <br>
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
+@SuppressWarnings("rawtypes")
 public class BlockLoader {
 	private static final int NUM_MULTISIG_COLUMNS = 17;
 	private static final String[] MULTISIG_SIGNATURES_COLUMNS = {

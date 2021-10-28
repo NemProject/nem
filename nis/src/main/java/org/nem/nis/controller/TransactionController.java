@@ -156,6 +156,7 @@ public class TransactionController {
 		return ExceptionUtils.propagate(() -> this.deserializeTransactionChecked(bytes));
 	}
 
+	@SuppressWarnings("try")
 	private Transaction deserializeTransactionChecked(final byte[] bytes) throws Exception {
 		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
 			return deserializeTransaction(dataDeserializer);

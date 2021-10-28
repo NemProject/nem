@@ -6,6 +6,7 @@ import org.junit.*;
 
 import java.util.*;
 
+@SuppressWarnings("rawtypes")
 public class MappingTypePairTest {
 
 	@Test
@@ -20,6 +21,7 @@ public class MappingTypePairTest {
 
 	//region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, MappingTypePair> DESC_TO_PAIR_MAP = new HashMap<String, MappingTypePair>() {
 		{
 			this.put("default", new MappingTypePair(Integer.class, String.class));

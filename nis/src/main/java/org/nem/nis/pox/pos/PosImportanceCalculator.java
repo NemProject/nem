@@ -15,7 +15,6 @@ public class PosImportanceCalculator implements ImportanceCalculator {
 	public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
 		final double cumulativeBalance = (double)this.getCumulativeBalance(blockHeight, accountStates);
 		accountStates.stream().forEach(state -> {
-			final AccountInfo info = state.getAccountInfo();
 			final AccountImportance accountImportance = state.getImportanceInfo();
 			final double importance = state.getWeightedBalances().getVested(blockHeight).getNumMicroNem() / cumulativeBalance;
 			accountImportance.setLastPageRank(0.0);

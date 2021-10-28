@@ -64,6 +64,8 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 
 					accountsToRemove.add(cosignerAddress);
 					break;
+				default:
+					break;
 			}
 		}
 

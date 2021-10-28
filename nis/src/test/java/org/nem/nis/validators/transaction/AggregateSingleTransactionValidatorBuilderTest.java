@@ -105,7 +105,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		MatcherAssert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
 		return ArgumentCaptor.forClass((Class)List.class);
 	}

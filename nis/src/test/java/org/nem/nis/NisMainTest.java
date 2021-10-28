@@ -462,7 +462,7 @@ public class NisMainTest {
 				final boolean throwDuringBoot) {
 			this.blockDao = blockDao;
 			this.accountDao = accountDao;
-			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
+			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao));
 
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
 			this.nisCache = NisCacheFactory.createReal(poxFacade);
@@ -503,7 +503,7 @@ public class NisMainTest {
 		}
 
 		public void saveBlock(final Block block) {
-			final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapper(this.accountDao).map(block);
+			final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao).map(block);
 			this.blockDao.save(dbBlock);
 		}
 

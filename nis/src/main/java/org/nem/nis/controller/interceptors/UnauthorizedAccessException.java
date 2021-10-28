@@ -3,6 +3,7 @@ package org.nem.nis.controller.interceptors;
 /**
  * Exception that is thrown when an unauthorized request is made.
  */
+@SuppressWarnings("serial")
 public class UnauthorizedAccessException extends RuntimeException {
 
 	/**

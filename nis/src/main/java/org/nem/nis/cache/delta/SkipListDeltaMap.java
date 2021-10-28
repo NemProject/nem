@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * A skip list delta map.
  */
-public class SkipListDeltaMap<TKey extends Comparable, TValue> {
+public class SkipListDeltaMap<TKey extends Comparable<?>, TValue> {
 	private final DefaultSkipListMap<TKey, TValue> originalValues;
 	private final DefaultSkipListMap<TKey,TValue> addedValues;
 	private final DefaultSkipListMap<TKey, TValue> removedValues;

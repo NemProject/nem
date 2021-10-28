@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 /**
  * A default skip list map implementation.
  */
-public class DefaultSkipListMap<TKey extends Comparable, TValue> {
+public class DefaultSkipListMap<TKey extends Comparable<?>, TValue> {
 	private final ConcurrentSkipListMap<TKey, Set<TValue>> map;
 
 	/**

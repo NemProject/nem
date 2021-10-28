@@ -28,6 +28,7 @@ public class RemoteLinkTest {
 
 	//region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, RemoteLink> DESC_TO_LINK_MAP = new HashMap<String, RemoteLink>() {
 		{
 			this.put("default", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));

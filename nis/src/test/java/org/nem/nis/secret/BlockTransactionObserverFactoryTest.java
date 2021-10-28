@@ -123,6 +123,7 @@ public class BlockTransactionObserverFactoryTest {
 		return expectedClasses;
 	}
 
+	@SuppressWarnings("serial")
 	private static Collection<String> getBaseObserverNames() {
 		return new ArrayList<String>() {
 			{
@@ -349,7 +350,7 @@ public class BlockTransactionObserverFactoryTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<String> breadcrumbs = new ArrayList<>();
-		final Function<String, Answer> createAnswer = breadcrumb -> invocationOnMock -> {
+		final Function<String, Answer<?>> createAnswer = breadcrumb -> invocationOnMock -> {
 			breadcrumbs.add(breadcrumb);
 			return null;
 		};
@@ -373,7 +374,7 @@ public class BlockTransactionObserverFactoryTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<String> breadcrumbs = new ArrayList<>();
-		final Function<String, Answer> createAnswer = breadcrumb -> invocationOnMock -> {
+		final Function<String, Answer<?>> createAnswer = breadcrumb -> invocationOnMock -> {
 			breadcrumbs.add(breadcrumb);
 			return null;
 		};

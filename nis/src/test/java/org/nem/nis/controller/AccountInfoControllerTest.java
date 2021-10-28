@@ -305,6 +305,7 @@ public class AccountInfoControllerTest {
 		}
 
 		@Test
+		@SuppressWarnings("rawtypes")
 		public void accountGetBatchCanReturnInformationAboutMultipleAccounts() {
 			// Arrange:
 			final TestContext context = new TestContext();

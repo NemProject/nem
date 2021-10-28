@@ -56,6 +56,7 @@ public class TransferDaoImpl implements TransferDao {
 		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private TransferBlockPair getTransferBlockPairUsingHash(
 			final Hash hash,
 			final BlockHeight height) {

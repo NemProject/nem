@@ -262,7 +262,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 				.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static ArgumentCaptor<Collection<AccountState>> createAccountStateCollectionArgumentCaptor() {
 		return ArgumentCaptor.forClass((Class)Collection.class);
 	}

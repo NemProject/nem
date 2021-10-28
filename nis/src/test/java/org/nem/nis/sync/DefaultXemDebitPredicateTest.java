@@ -10,6 +10,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
+@SuppressWarnings("rawtypes")
 public class DefaultXemDebitPredicateTest {
 
 	@Test

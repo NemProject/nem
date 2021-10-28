@@ -15,6 +15,7 @@ public class DbBlockExtensions {
 	 * @param block The block.
 	 * @return The number of transactions.
 	 */
+	@SuppressWarnings("rawtypes")
 	public static int countTransactions(final DbBlock block) {
 		int numTransactions = 0;
 		for (final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {

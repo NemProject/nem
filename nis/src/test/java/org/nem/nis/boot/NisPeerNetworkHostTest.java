@@ -40,7 +40,7 @@ public class NisPeerNetworkHostTest {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
-			final CompletableFuture future = host.boot(createLocalNode());
+			final CompletableFuture<?> future = host.boot(createLocalNode());
 
 			// Assert:
 			MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));

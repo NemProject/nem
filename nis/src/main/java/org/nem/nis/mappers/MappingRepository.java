@@ -5,6 +5,7 @@ import java.util.*;
 /**
  * A repository of mappings.
  */
+@SuppressWarnings("rawtypes")
 public class MappingRepository implements IMapper {
 	private final Map<MappingTypePair, IMapping> knownMappings = new HashMap<>();
 

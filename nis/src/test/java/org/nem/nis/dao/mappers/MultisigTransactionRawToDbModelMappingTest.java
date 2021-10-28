@@ -48,6 +48,7 @@ public class MultisigTransactionRawToDbModelMappingTest {
 		}
 
 		@Test
+		@SuppressWarnings("rawtypes")
 		public void rawDataCanBeMappedToDbModelWithInnerTransfer() {
 			// Arrange:
 			final int offset = getOffset(this.entry.type);

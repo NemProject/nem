@@ -2,7 +2,6 @@ package org.nem.nis.validators.integration;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;

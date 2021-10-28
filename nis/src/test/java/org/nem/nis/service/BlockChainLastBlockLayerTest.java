@@ -165,7 +165,7 @@ public class BlockChainLastBlockLayerTest {
 	private BlockChainLastBlockLayer createBlockChainLastBlockLayer() {
 		final MockAccountDao accountDao = new MockAccountDao();
 		final MockBlockDao mockBlockDao = new MockBlockDao(null);
-		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
+		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao);
 		return new BlockChainLastBlockLayer(mockBlockDao, mapper);
 	}
 

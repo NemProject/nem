@@ -6,6 +6,7 @@ import org.junit.*;
 import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dbmodel.*;
 
+@SuppressWarnings("rawtypes")
 public class MultisigTransferMapTest {
 
 	@Test

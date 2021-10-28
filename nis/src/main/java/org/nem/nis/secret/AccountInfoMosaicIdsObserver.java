@@ -35,6 +35,8 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 			case MosaicTransfer:
 				this.notify((MosaicTransferNotification)notification);
 				break;
+			default:
+				break;
 		}
 	}
 

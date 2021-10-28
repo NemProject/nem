@@ -21,6 +21,7 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public DbMultisigTransaction mapImpl(final MultisigTransaction source) {
 		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 		dbMultisigTransfer.setReferencedTransaction(0L);

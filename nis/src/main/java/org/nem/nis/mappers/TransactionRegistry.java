@@ -11,6 +11,7 @@ import java.util.stream.*;
 /**
  * Contains transaction mapping metadata.
  */
+@SuppressWarnings("rawtypes")
 public class TransactionRegistry {
 
 	/**
@@ -144,6 +145,7 @@ public class TransactionRegistry {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(

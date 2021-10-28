@@ -78,6 +78,7 @@ public class SkipListDeltaMapTest {
 		};
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<TimeInstant, Set<Hash>> createStandardInnerMapEntries() {
 		return new HashMap<TimeInstant, Set<Hash>>() {
 			{

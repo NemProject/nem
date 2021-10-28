@@ -69,7 +69,7 @@ public class ValidationStateTest {
 		return createMockDebitPredicate(canDebit);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private static DebitPredicate createMockDebitPredicate(final boolean canDebit) {
 		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
 		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(canDebit);

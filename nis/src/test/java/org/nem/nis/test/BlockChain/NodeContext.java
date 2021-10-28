@@ -162,7 +162,7 @@ public class NodeContext {
 	}
 
 	private DbBlock mapBlockToDbModel(final Block block, final AccountDao accountDao) {
-		return MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
+		return MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao).map(block);
 	}
 
 	private void processHarvestFee(final NisCache nisCache, final Account account, final BlockHeight height, final Amount fee) {

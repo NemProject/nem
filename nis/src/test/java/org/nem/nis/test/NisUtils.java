@@ -2,7 +2,6 @@ package org.nem.nis.test;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountId;
