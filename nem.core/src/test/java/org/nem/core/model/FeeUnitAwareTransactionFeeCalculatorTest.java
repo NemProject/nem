@@ -15,10 +15,9 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 	public static void setup() {
 		DEFAULT_HEIGHT = new BlockHeight(100);
 		final MosaicFeeInformationLookup lookup = AbstractTransactionFeeCalculatorTest.createMosaicFeeInformationLookup();
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
-				lookup,
-				() -> DEFAULT_HEIGHT,
-				new BlockHeight[] { new BlockHeight(1), DEFAULT_HEIGHT.prev() }));
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(lookup, () -> DEFAULT_HEIGHT, new BlockHeight[]{
+				new BlockHeight(1), DEFAULT_HEIGHT.prev()
+		}));
 		setNamespaceAndMosaicRelatedDefaultFee(weightWithFeeUnit(Amount.fromNem(3)).getNumMicroNem());
 		setTransactionDefaultFee(weightWithFeeUnit(Amount.fromNem(3)).getNumMicroNem());
 		setMultisigSignatureMinimumFee(weightWithFeeUnit(Amount.fromNem(3)).getNumMicroNem());
@@ -38,12 +37,10 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 		return Amount.fromMicroNem(FEE_UNIT.getNumMicroNem() * fee.getNumNem());
 	}
 
-	//region calculateMinimumFee
-
-	//region transfer
-
 	public static class TransferMinimumFeeCalculation {
 		private static final long MIN_TRANSFER_FEE = 1;
+
+		// region transfer
 
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
@@ -120,9 +117,9 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 			assertMessageFee(128, 96, weightWithFeeUnit(Amount.fromNem(MIN_TRANSFER_FEE + 5)));
 		}
 
-		// region mosaic transfers
+		// endregion
 
-		// region small business mosaics
+		// region mosaic transfers - small business mosaics
 
 		// - A so-called small business mosaic has divisibility of 0 and a max supply of 10000
 		// - It is always charged 1 xem fee no matter how many mosaics are transferred
@@ -262,15 +259,9 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 			final TransactionFeeCalculator calculator = createCalculator();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> calculator.calculateMinimumFee(transaction),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> calculator.calculateMinimumFee(transaction), IllegalArgumentException.class);
 		}
 
 		// endregion
 	}
-
-	//endregion
-
-	//endregion
 }

@@ -79,8 +79,8 @@ public class NamespaceId {
 	 */
 	public NamespaceId getParent() {
 		return 1 == this.namespaceIdParts.length
-				? null :
-				new NamespaceId(Arrays.copyOfRange(this.namespaceIdParts, 0, this.namespaceIdParts.length - 1));
+				? null
+				: new NamespaceId(Arrays.copyOfRange(this.namespaceIdParts, 0, this.namespaceIdParts.length - 1));
 	}
 
 	/**
@@ -142,9 +142,7 @@ public class NamespaceId {
 
 	@Override
 	public String toString() {
-		return Arrays.stream(this.namespaceIdParts)
-				.map(NamespaceIdPart::toString)
-				.collect(Collectors.joining("."));
+		return Arrays.stream(this.namespaceIdParts).map(NamespaceIdPart::toString).collect(Collectors.joining("."));
 	}
 
 	@Override
@@ -158,7 +156,7 @@ public class NamespaceId {
 			return false;
 		}
 
-		final NamespaceId rhs = (NamespaceId)obj;
+		final NamespaceId rhs = (NamespaceId) obj;
 		if (this.namespaceIdParts.length != rhs.namespaceIdParts.length) {
 			return false;
 		}

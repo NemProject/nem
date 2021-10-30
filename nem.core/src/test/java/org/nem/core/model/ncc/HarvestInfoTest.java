@@ -12,12 +12,7 @@ public class HarvestInfoTest {
 	@Test
 	public void HarvestInfoCtorSetsProperFields() {
 		// Arrange + Act:
-		final HarvestInfo result = new HarvestInfo(
-				123L,
-				new BlockHeight(123),
-				new TimeInstant(654),
-				Amount.fromMicroNem(45678),
-				98765L);
+		final HarvestInfo result = new HarvestInfo(123L, new BlockHeight(123), new TimeInstant(654), Amount.fromMicroNem(45678), 98765L);
 
 		// Assert:
 		MatcherAssert.assertThat(result.getId(), IsEqual.equalTo(123L));
@@ -30,12 +25,7 @@ public class HarvestInfoTest {
 	@Test
 	public void canRoundTripHarvestInfo() {
 		// Arrange:
-		final HarvestInfo entity = new HarvestInfo(
-				123L,
-				new BlockHeight(123),
-				new TimeInstant(654),
-				Amount.fromMicroNem(45678),
-				98765L);
+		final HarvestInfo entity = new HarvestInfo(123L, new BlockHeight(123), new TimeInstant(654), Amount.fromMicroNem(45678), 98765L);
 
 		// Assert:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, null);

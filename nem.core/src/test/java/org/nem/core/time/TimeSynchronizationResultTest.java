@@ -8,7 +8,7 @@ import org.nem.core.test.Utils;
 
 public class TimeSynchronizationResultTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateTimeSynchronizationResult() {
@@ -21,14 +21,15 @@ public class TimeSynchronizationResultTest {
 		MatcherAssert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void timeSynchronizationResultCanBeRoundTripped() {
 		// Arrange:
-		final TimeSynchronizationResult originalResult = new TimeSynchronizationResult(new TimeInstant(50), new TimeOffset(17), new TimeOffset(7));
+		final TimeSynchronizationResult originalResult = new TimeSynchronizationResult(new TimeInstant(50), new TimeOffset(17),
+				new TimeOffset(7));
 
 		// Act:
 		final TimeSynchronizationResult result = new TimeSynchronizationResult(Utils.roundtripSerializableEntity(originalResult, null));
@@ -39,5 +40,5 @@ public class TimeSynchronizationResultTest {
 		MatcherAssert.assertThat(result.getChange(), IsEqual.equalTo(new TimeOffset(7)));
 	}
 
-	//endregion
+	// endregion
 }

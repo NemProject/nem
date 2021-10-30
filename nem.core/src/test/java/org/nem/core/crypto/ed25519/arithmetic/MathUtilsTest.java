@@ -11,10 +11,7 @@ public class MathUtilsTest {
 	 */
 	@Test
 	public void mathUtilsWorkAsExpected() {
-		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
+		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,
 				Ed25519Field.ZERO);
 		for (int i = 0; i < 1000; i++) {
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();

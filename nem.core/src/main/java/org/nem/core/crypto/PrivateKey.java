@@ -55,7 +55,7 @@ public class PrivateKey implements SerializableEntity {
 			return false;
 		}
 
-		final PrivateKey rhs = (PrivateKey)obj;
+		final PrivateKey rhs = (PrivateKey) obj;
 		return this.value.equals(rhs.value);
 	}
 

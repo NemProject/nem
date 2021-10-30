@@ -9,7 +9,7 @@ import java.util.*;
 
 public class ColumnVectorTest {
 
-	//region constructor / getAt / setAt
+	// region constructor / getAt / setAt
 
 	@Test
 	public void vectorIsInitializedToZero() {
@@ -91,9 +91,9 @@ public class ColumnVectorTest {
 		}, IndexOutOfBoundsException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region getRaw
+	// region getRaw
 
 	@Test
 	public void rawVectorIsAccessible() {
@@ -101,7 +101,9 @@ public class ColumnVectorTest {
 		final ColumnVector vector = new ColumnVector(9.0, 3.2, 5.4);
 
 		// Act:
-		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 3.2, 5.4 });
+		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[]{
+				9.0, 3.2, 5.4
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -114,15 +116,17 @@ public class ColumnVectorTest {
 
 		// Act:
 		vector.setAt(1, 7.1);
-		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[] { 9.0, 7.1, 5.4 });
+		final boolean areEqual = Arrays.equals(vector.getRaw(), new double[]{
+				9.0, 7.1, 5.4
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region setAll
+	// region setAll
 
 	@Test
 	public void setAllSetsAllVectorElementValues() {
@@ -136,9 +140,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(4, 4, 4)));
 	}
 
-	//endregion
+	// endregion
 
-	//region sum / absSum
+	// region sum / absSum
 
 	@Test
 	public void vectorSumCanBeCalculated() {
@@ -158,9 +162,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector.absSum(), IsEqual.equalTo(15.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region max / median
+	// region max / median
 
 	@Test
 	public void vectorMaxCanBeCalculated() {
@@ -180,9 +184,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector.median(), IsEqual.equalTo(7.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region align
+	// region align
 
 	@Test
 	public void cannotAlignVectorWithNonZeroInFirstPosition() {
@@ -210,9 +214,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(1, 1.5, -3.5)));
 	}
 
-	//endregion
+	// endregion
 
-	//region scale
+	// region scale
 
 	@Test
 	public void vectorCanBeScaledByArbitraryFactor() {
@@ -226,9 +230,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.25, -0.50, 0.125)));
 	}
 
-	//endregion
+	// endregion
 
-	//region normalize
+	// region normalize
 
 	@Test
 	public void vectorWithNonZeroSumCanBeNormalized() {
@@ -266,9 +270,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0, 0, 0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region add
+	// region add
 
 	@Test
 	public void scalarCanBeAddedToVector() {
@@ -283,9 +287,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(new ColumnVector(10, 4, 9)));
 	}
 
-	//endregion
+	// endregion
 
-	//region addElementWise
+	// region addElementWise
 
 	@Test
 	public void twoVectorsOfSameSizeCanBeAddedTogetherElementWise() {
@@ -313,9 +317,9 @@ public class ColumnVectorTest {
 		ExceptionAssert.assertThrows(v -> smallerVector.addElementWise(largerVector), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region distance / getMagnitude
+	// region distance / getMagnitude
 
 	@Test
 	public void l1DistanceCanBeCalculatedBetweenTwoVectorsOfSameSize() {
@@ -377,9 +381,9 @@ public class ColumnVectorTest {
 		Assert.assertEquals(13.96424, magnitude, 0.0000001);
 	}
 
-	//endregion
+	// endregion
 
-	//region correlation
+	// region correlation
 
 	@Test
 	public void correlationCannotBeCalculatedForDifferentSizedVectors() {
@@ -427,9 +431,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(rhs.correlation(lhs), IsRoundedEqual.equalTo(0.6877, 4));
 	}
 
-	//endregion
+	// endregion
 
-	//region multiply
+	// region multiply
 
 	@Test
 	public void vectorCanBeMultipliedByScalar() {
@@ -444,9 +448,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(new ColumnVector(16, -32, 8)));
 	}
 
-	//endregion
+	// endregion
 
-	//region multiplyElementWise
+	// region multiplyElementWise
 
 	@Test
 	public void vectorCanBeMultipliedByVectorElementWise() {
@@ -483,9 +487,9 @@ public class ColumnVectorTest {
 		v1.multiplyElementWise(v2);
 	}
 
-	//endregion
+	// endregion
 
-	//region roundTo / abs / sqrt
+	// region roundTo / abs / sqrt
 
 	@Test
 	public void vectorCanBeRounded() {
@@ -526,9 +530,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(new ColumnVector(25.0, 6.0, 11.0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region isZeroVector
+	// region isZeroVector
 
 	@Test
 	public void isZeroVectorReturnsTrueIfAndOnlyIfAllElementsAreZero() {
@@ -540,9 +544,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(new ColumnVector(0, 0, 0, 0, 0, 0).isZeroVector(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void vectorStringRepresentationIsCorrect() {
@@ -556,9 +560,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(vector.toString(), IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeNegatives
+	// region removeNegatives
 
 	@Test
 	@SuppressWarnings("serial")
@@ -583,9 +587,9 @@ public class ColumnVectorTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -598,7 +602,9 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(new ColumnVector(2, 8, 1), IsNot.not(IsEqual.equalTo(vector)));
 		MatcherAssert.assertThat(new ColumnVector(2, -4, 2), IsNot.not(IsEqual.equalTo(vector)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(vector)));
-		MatcherAssert.assertThat(new double[] { 2, -4, 1 }, IsNot.not(IsEqual.equalTo((Object)vector)));
+		MatcherAssert.assertThat(new double[]{
+				2, -4, 1
+		}, IsNot.not(IsEqual.equalTo((Object) vector)));
 	}
 
 	@Test
@@ -614,5 +620,5 @@ public class ColumnVectorTest {
 		MatcherAssert.assertThat(new ColumnVector(2, -4, 2).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 }

@@ -56,7 +56,9 @@ public class JsonPrimitiveSerializationTest {
 		}
 	}
 
-	public static class TruncatedStringSerializationTest extends AbstractTruncatedStringSerializationTest<JsonSerializer, JsonDeserializer> {
+	public static class TruncatedStringSerializationTest
+			extends
+				AbstractTruncatedStringSerializationTest<JsonSerializer, JsonDeserializer> {
 
 		public TruncatedStringSerializationTest() {
 			super(new JsonSerializationPolicy());

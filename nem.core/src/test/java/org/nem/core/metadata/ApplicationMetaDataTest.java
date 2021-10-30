@@ -70,10 +70,7 @@ public class ApplicationMetaDataTest {
 	public void getCurrentTimeAlwaysReturnsMostRecentTime() {
 		// Arrange:
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-		Mockito.when(timeProvider.getCurrentTime()).thenReturn(
-				new TimeInstant(100),
-				new TimeInstant(125),
-				new TimeInstant(136));
+		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(100), new TimeInstant(125), new TimeInstant(136));
 
 		// Act:
 		final ApplicationMetaData metaData = new ApplicationMetaData("foo", "12.0", null, timeProvider);
@@ -84,7 +81,8 @@ public class ApplicationMetaDataTest {
 		MatcherAssert.assertThat(metaData.getCurrentTime(), IsEqual.equalTo(new TimeInstant(136)));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, ApplicationMetaData> createApplicationMetaDataForEqualityTests(final X509Certificate certificate) {
 		final X509Certificate otherCertificate = MetaDataTestUtils.createMockCertificateWithName("CN=SomeoneElse,O=NemSoft");
@@ -121,7 +119,7 @@ public class ApplicationMetaDataTest {
 		MatcherAssert.assertThat(infoMap.get("diff-null-cert"), IsNot.not(IsEqual.equalTo(metaData)));
 		MatcherAssert.assertThat(infoMap.get("diff-time"), IsEqual.equalTo(metaData));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
-		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)metaData)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object) metaData)));
 	}
 
 	@Test
@@ -141,7 +139,7 @@ public class ApplicationMetaDataTest {
 		MatcherAssert.assertThat(infoMap.get("diff-time").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
 	private static ApplicationMetaData roundtripMetaData(final ApplicationMetaData metaData) {
 		return new ApplicationMetaData(Utils.roundtripSerializableEntity(metaData, null));

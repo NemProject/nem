@@ -34,13 +34,9 @@ public class NemRequestResultTest {
 	@Test
 	public void isErrorReturnsFalseForNeutralAndSuccessCode() {
 		// Arrange + Act:
-		final NemRequestResult result = new NemRequestResult(
-				NemRequestResult.TYPE_VALIDATION_RESULT,
-				NemRequestResult.CODE_NEUTRAL,
+		final NemRequestResult result = new NemRequestResult(NemRequestResult.TYPE_VALIDATION_RESULT, NemRequestResult.CODE_NEUTRAL,
 				"Neutral result");
-		final NemRequestResult result2 = new NemRequestResult(
-				NemRequestResult.TYPE_VALIDATION_RESULT,
-				NemRequestResult.CODE_SUCCESS,
+		final NemRequestResult result2 = new NemRequestResult(NemRequestResult.TYPE_VALIDATION_RESULT, NemRequestResult.CODE_SUCCESS,
 				"Neutral result");
 
 		// Assert:
@@ -51,10 +47,7 @@ public class NemRequestResultTest {
 	@Test
 	public void isErrorReturnsTrueForCodeOtherThanNeutralOrSuccess() {
 		// Arrange + Act:
-		final NemRequestResult result = new NemRequestResult(
-				NemRequestResult.TYPE_VALIDATION_RESULT,
-				2,
-				"Neutral result");
+		final NemRequestResult result = new NemRequestResult(NemRequestResult.TYPE_VALIDATION_RESULT, 2, "Neutral result");
 
 		// Assert:
 		MatcherAssert.assertThat(result.isError(), IsEqual.equalTo(true));
@@ -63,9 +56,7 @@ public class NemRequestResultTest {
 	@Test
 	public void canRoundTripNisRequestResult() {
 		// Arrange + Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new NemRequestResult(42, 1337, "Neutral result"),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new NemRequestResult(42, 1337, "Neutral result"), null);
 		final NemRequestResult result = new NemRequestResult(deserializer);
 
 		// Assert:

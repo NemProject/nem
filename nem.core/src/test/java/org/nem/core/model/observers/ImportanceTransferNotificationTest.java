@@ -13,7 +13,8 @@ public class ImportanceTransferNotificationTest {
 		// Act:
 		final Account lessor = Utils.generateRandomAccount();
 		final Account lessee = Utils.generateRandomAccount();
-		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee, ImportanceTransferMode.Activate);
+		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee,
+				ImportanceTransferMode.Activate);
 
 		// Assert:
 		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));

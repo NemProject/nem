@@ -49,12 +49,7 @@ public class MetaDataTestUtils {
 		};
 
 		final URL templateUrl = new URL(spec);
-		return new URL(
-				templateUrl.getProtocol(),
-				templateUrl.getHost(),
-				templateUrl.getPort(),
-				templateUrl.getFile(),
-				urlStreamHandler);
+		return new URL(templateUrl.getProtocol(), templateUrl.getHost(), templateUrl.getPort(), templateUrl.getFile(), urlStreamHandler);
 	}
 
 	/**

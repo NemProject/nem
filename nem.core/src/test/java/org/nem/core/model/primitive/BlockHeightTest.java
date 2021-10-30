@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class BlockHeightTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
@@ -18,9 +18,9 @@ public class BlockHeightTest {
 		MatcherAssert.assertThat(BlockHeight.MAX, IsEqual.equalTo(new BlockHeight(Long.MAX_VALUE)));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeHeight() {
@@ -43,9 +43,9 @@ public class BlockHeightTest {
 		MatcherAssert.assertThat(height.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region next / prev
+	// region next / prev
 
 	@Test
 	public void nextHeightIsOneGreaterThanCurrentHeight() {
@@ -73,9 +73,9 @@ public class BlockHeightTest {
 		MatcherAssert.assertThat(nextHeight, IsEqual.equalTo(new BlockHeight(44)));
 	}
 
-	//endregion
+	// endregion
 
-	//region subtract
+	// region subtract
 
 	@Test
 	public void heightsCanBeSubtracted() {
@@ -88,9 +88,9 @@ public class BlockHeightTest {
 		MatcherAssert.assertThat(-14L, IsEqual.equalTo(height2.subtract(height1)));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void heightCanBeSerialized() {
@@ -121,9 +121,9 @@ public class BlockHeightTest {
 		return new BlockHeight(deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteBlockHeight() {
@@ -156,5 +156,5 @@ public class BlockHeightTest {
 		MatcherAssert.assertThat(height, IsEqual.equalTo(originalHeight));
 	}
 
-	//endregion
+	// endregion
 }

@@ -51,12 +51,7 @@ public class RandomTransactionFactory {
 	 * @return The transfer.
 	 */
 	private static TransferTransaction createTransferWithAttachment(final Account signer, final TransferTransactionAttachment attachment) {
-		return new TransferTransaction(
-				TimeInstant.ZERO,
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(111),
-				attachment);
+		return new TransferTransaction(TimeInstant.ZERO, signer, Utils.generateRandomAccount(), Amount.fromNem(111), attachment);
 	}
 
 	/**
@@ -65,10 +60,7 @@ public class RandomTransactionFactory {
 	 * @return The importance transfer.
 	 */
 	public static ImportanceTransferTransaction createImportanceTransfer() {
-		return new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				ImportanceTransferMode.Activate,
+		return new ImportanceTransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 	}
 
@@ -78,10 +70,8 @@ public class RandomTransactionFactory {
 	 * @return The multisig aggregate modification.
 	 */
 	public static MultisigAggregateModificationTransaction createMultisigModification() {
-		return new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+		return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	/**
@@ -92,10 +82,7 @@ public class RandomTransactionFactory {
 	 * @return A multisig transfer.
 	 */
 	public static MultisigTransaction createMultisigTransfer(final Account multisig, final Account cosigner) {
-		return new MultisigTransaction(
-				TimeInstant.ZERO,
-				cosigner,
-				createTransfer(multisig));
+		return new MultisigTransaction(TimeInstant.ZERO, cosigner, createTransfer(multisig));
 	}
 
 	/**
@@ -115,7 +102,8 @@ public class RandomTransactionFactory {
 	public static MultisigTransaction createMultisigTransferWithThreeSignatures() {
 		final MultisigTransaction multisig = createMultisigTransfer();
 		IntStream.range(0, 3).forEach(i -> {
-			final MultisigSignatureTransaction signature = createSignatureWithHash(multisig.getDebtor(), multisig.getOtherTransactionHash());
+			final MultisigSignatureTransaction signature = createSignatureWithHash(multisig.getDebtor(),
+					multisig.getOtherTransactionHash());
 			multisig.addSignature(signature);
 		});
 
@@ -134,11 +122,7 @@ public class RandomTransactionFactory {
 	}
 
 	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Hash hash) {
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				cosigner,
-				multisig,
-				hash);
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, hash);
 		transaction.sign();
 		return transaction;
 	}
@@ -149,10 +133,7 @@ public class RandomTransactionFactory {
 	 * @return The multisig signature transaction.
 	 */
 	public static MultisigSignatureTransaction createMultisigSignature() {
-		return new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
+		return new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), Utils.generateRandomAccount(),
 				Utils.generateRandomHash());
 	}
 
@@ -162,13 +143,8 @@ public class RandomTransactionFactory {
 	 * @return The provision namespace transaction.
 	 */
 	public static ProvisionNamespaceTransaction createProvisionNamespaceTransaction() {
-		return new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(50_000),
-				new NamespaceIdPart("bar"),
-				new NamespaceId("foo"));
+		return new ProvisionNamespaceTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), Utils.generateRandomAccount(),
+				Amount.fromNem(50_000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
 	}
 
 	/**
@@ -187,13 +163,10 @@ public class RandomTransactionFactory {
 	 * @param signer The signer.
 	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new MosaicDefinitionCreationTransaction(
-				timeStamp,
-				signer,
-				Utils.createMosaicDefinition(signer),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(50_000));
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final TimeInstant timeStamp,
+			final Account signer) {
+		return new MosaicDefinitionCreationTransaction(timeStamp, signer, Utils.createMosaicDefinition(signer),
+				Utils.generateRandomAccount(), Amount.fromNem(50_000));
 	}
 
 	/**
@@ -213,11 +186,7 @@ public class RandomTransactionFactory {
 	 * @return The mosaic supply change transaction.
 	 */
 	public static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new MosaicSupplyChangeTransaction(
-				timeStamp,
-				signer,
-				Utils.createMosaicDefinition(signer).getId(),
-				MosaicSupplyType.Create,
+		return new MosaicSupplyChangeTransaction(timeStamp, signer, Utils.createMosaicDefinition(signer).getId(), MosaicSupplyType.Create,
 				Supply.fromValue(123));
 	}
 }

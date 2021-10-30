@@ -57,8 +57,7 @@ public class DefaultMosaicProperties implements MosaicProperties {
 
 	@Override
 	public Collection<NemProperty> asCollection() {
-		return Arrays.asList(
-				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
+		return Arrays.asList(new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
 				new NemProperty("initialSupply", Long.toString(this.getInitialSupply())),
 				new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())),
 				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
@@ -83,7 +82,7 @@ public class DefaultMosaicProperties implements MosaicProperties {
 			return false;
 		}
 
-		final DefaultMosaicProperties rhs = (DefaultMosaicProperties)obj;
+		final DefaultMosaicProperties rhs = (DefaultMosaicProperties) obj;
 		return this.asCollection().equals(rhs.asCollection());
 	}
 }

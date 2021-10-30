@@ -10,7 +10,9 @@ import java.util.function.Supplier;
 /**
  * A binary deserializer that supports forward-only deserialization.
  */
-@SuppressWarnings({"serial", "try"})
+@SuppressWarnings({
+		"serial", "try"
+})
 public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	private final ByteArrayInputStream stream;
@@ -30,10 +32,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 	public Integer readOptionalInt(final String label) {
 		return this.readIfNotEmpty(() -> {
 			final byte[] bytes = this.readBytes(4);
-			return bytes[0] & 0x000000FF
-					| (bytes[1] << 8) & 0x0000FF00
-					| (bytes[2] << 16) & 0x00FF0000
-					| (bytes[3] << 24) & 0xFF000000;
+			return bytes[0] & 0x000000FF | (bytes[1] << 8) & 0x0000FF00 | (bytes[2] << 16) & 0x00FF0000 | (bytes[3] << 24) & 0xFF000000;
 		});
 	}
 
@@ -42,8 +41,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 		return this.readIfNotEmpty(() -> {
 			final long lowPart = this.readInt(label);
 			final long highPart = this.readInt(label);
-			return lowPart & 0x00000000FFFFFFFFL
-					| (highPart << 32) & 0xFFFFFFFF00000000L;
+			return lowPart & 0x00000000FFFFFFFFL | (highPart << 32) & 0xFFFFFFFF00000000L;
 		});
 	}
 

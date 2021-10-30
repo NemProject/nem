@@ -6,7 +6,7 @@ import org.junit.*;
 
 public class MultisigModificationTypeTest {
 
-	//region isValid
+	// region isValid
 
 	@Test
 	public void isValidReturnsTrueForValidModifications() {
@@ -21,16 +21,17 @@ public class MultisigModificationTypeTest {
 		MatcherAssert.assertThat(MultisigModificationType.Unknown.isValid(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region fromValueOrDefault
+	// region fromValueOrDefault
 
 	@Test
 	public void fromValueOrDefaultReturnsCorrespondingEnumValueForKnownValue() {
 		// Assert:
 		MatcherAssert.assertThat(MultisigModificationType.fromValueOrDefault(1), IsEqual.equalTo(MultisigModificationType.AddCosignatory));
 		MatcherAssert.assertThat(MultisigModificationType.fromValueOrDefault(2), IsEqual.equalTo(MultisigModificationType.DelCosignatory));
-		MatcherAssert.assertThat(MultisigModificationType.fromValueOrDefault(3), IsEqual.equalTo(MultisigModificationType.MinCosignatories));
+		MatcherAssert.assertThat(MultisigModificationType.fromValueOrDefault(3),
+				IsEqual.equalTo(MultisigModificationType.MinCosignatories));
 	}
 
 	@Test
@@ -40,5 +41,5 @@ public class MultisigModificationTypeTest {
 		MatcherAssert.assertThat(MultisigModificationType.fromValueOrDefault(9999), IsEqual.equalTo(MultisigModificationType.Unknown));
 	}
 
-	//endregion
+	// endregion
 }

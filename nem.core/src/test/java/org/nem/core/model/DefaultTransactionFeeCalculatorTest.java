@@ -55,9 +55,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertMinimumFeeCalculatorBeforeFirstFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(forkHeight),
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(forkHeight),
 				new BlockHeight(999_999_999_999L));
 		final Transaction transaction = Mockito.mock(TransferTransaction.class);
 
@@ -72,9 +70,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertMinimumFeeCalculatorAtAndAfterFirstForkButBeforeSecondFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(forkHeight),
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(forkHeight),
 				new BlockHeight(999_999_999_999L));
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
@@ -89,10 +85,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertMinimumFeeCalculatorAtAndAfterSecondFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(1000L),
-				new BlockHeight(forkHeight));
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(1000L), new BlockHeight(forkHeight));
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
@@ -153,9 +146,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertIsFeeValidCalculatorBeforeFirstFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(forkHeight),
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(forkHeight),
 				new BlockHeight(999_999_999_999L));
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
@@ -170,9 +161,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertIsFeeValidCalculatorAtAndAfterFirstForkButBeforeSecondFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(forkHeight),
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(forkHeight),
 				new BlockHeight(999_999_999_999L));
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
@@ -187,10 +176,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertIsFeeValidCalculatorAtAndAfterSecondFork(final long testHeight, final long forkHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(
-				() -> new BlockHeight(testHeight),
-				new BlockHeight(1000L),
-				new BlockHeight(forkHeight));
+		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(1000L), new BlockHeight(forkHeight));
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
@@ -211,10 +197,11 @@ public class DefaultTransactionFeeCalculatorTest {
 		private final DefaultTransactionFeeCalculator calculator;
 
 		public TestContext(final Supplier<BlockHeight> heightSupplier, final BlockHeight forkHeight1, final BlockHeight forkHeight2) {
-			this.calculator = new DefaultTransactionFeeCalculator(
-					heightSupplier,
-					new BlockHeight[] { forkHeight1, forkHeight2 },
-					new TransactionFeeCalculator[] { this.calculator1, this.calculator2, this.calculator3 });
+			this.calculator = new DefaultTransactionFeeCalculator(heightSupplier, new BlockHeight[]{
+					forkHeight1, forkHeight2
+			}, new TransactionFeeCalculator[]{
+					this.calculator1, this.calculator2, this.calculator3
+			});
 		}
 	}
 }

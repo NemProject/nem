@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class AccountStatusTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void accountStatusCanBeCreatedFromCorrectStatusString() {
@@ -28,9 +28,9 @@ public class AccountStatusTest {
 		AccountStatus.fromString("TEST");
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteAccountStatus() {
@@ -63,5 +63,5 @@ public class AccountStatusTest {
 		MatcherAssert.assertThat(status, IsEqual.equalTo(originalStatus));
 	}
 
-	//endregion
+	// endregion
 }

@@ -49,8 +49,7 @@ public class HashMetaDataPair {
 			return false;
 		}
 
-		final HashMetaDataPair rhs = (HashMetaDataPair)obj;
-		return this.hash.equals(rhs.hash)
-				&& this.metaData.equals(rhs.metaData);
+		final HashMetaDataPair rhs = (HashMetaDataPair) obj;
+		return this.hash.equals(rhs.hash) && this.metaData.equals(rhs.metaData);
 	}
 }

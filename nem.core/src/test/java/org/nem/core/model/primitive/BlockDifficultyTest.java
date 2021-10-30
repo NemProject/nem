@@ -11,19 +11,17 @@ import java.math.BigInteger;
 
 public class BlockDifficultyTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		MatcherAssert.assertThat(
-				BlockDifficulty.INITIAL_DIFFICULTY,
-				IsEqual.equalTo(new BlockDifficulty(100_000_000_000_000L)));
+		MatcherAssert.assertThat(BlockDifficulty.INITIAL_DIFFICULTY, IsEqual.equalTo(new BlockDifficulty(100_000_000_000_000L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void valueInDifficultyRangeIsNotChanged() {
@@ -52,9 +50,9 @@ public class BlockDifficultyTest {
 		MatcherAssert.assertThat(difficulty.getRaw(), IsEqual.equalTo(1_000_000_000_000_000L));
 	}
 
-	//endregion
+	// endregion
 
-	//region converters
+	// region converters
 
 	@Test
 	public void valueCanBeReturnedAsBigInteger() {
@@ -65,9 +63,9 @@ public class BlockDifficultyTest {
 		MatcherAssert.assertThat(difficulty.asBigInteger(), IsEqual.equalTo(new BigInteger("79876543211237")));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteBlockDifficulty() {
@@ -100,5 +98,5 @@ public class BlockDifficultyTest {
 		MatcherAssert.assertThat(difficulty, IsEqual.equalTo(originalDifficulty));
 	}
 
-	//endregion
+	// endregion
 }

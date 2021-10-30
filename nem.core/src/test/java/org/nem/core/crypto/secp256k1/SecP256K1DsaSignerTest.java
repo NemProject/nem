@@ -89,9 +89,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 
 		// Act:
 		final Signature signature = dsaSigner.sign(input);
-		final Signature signature2 = new Signature(
-				engine.getCurve().getGroupOrder().subtract(signature.getR()),
-				signature.getS());
+		final Signature signature2 = new Signature(engine.getCurve().getGroupOrder().subtract(signature.getR()), signature.getS());
 
 		// Assert:
 		MatcherAssert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));

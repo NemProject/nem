@@ -74,8 +74,7 @@ public class Mosaic implements SerializableEntity {
 			return false;
 		}
 
-		final Mosaic rhs = (Mosaic)obj;
-		return this.mosaicId.equals(rhs.mosaicId) &&
-				this.quantity.equals(rhs.quantity);
+		final Mosaic rhs = (Mosaic) obj;
+		return this.mosaicId.equals(rhs.mosaicId) && this.quantity.equals(rhs.quantity);
 	}
 }

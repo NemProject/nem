@@ -4,10 +4,9 @@ import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 
 /**
- * A serializable account id.
- * <br>
- * This is done purposefully (instead of having AccountId directly implement SerializableEntity)
- * to make it explicit that derived classes of AccountId will most likely not serialize completely.
+ * A serializable account id. <br>
+ * This is done purposefully (instead of having AccountId directly implement SerializableEntity) to make it explicit that derived classes of
+ * AccountId will most likely not serialize completely.
  */
 public class SerializableAccountId extends AccountId implements SerializableEntity {
 

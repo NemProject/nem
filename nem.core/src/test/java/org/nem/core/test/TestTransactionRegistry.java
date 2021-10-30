@@ -36,11 +36,7 @@ public class TestTransactionRegistry {
 		 */
 		public final String tableName;
 
-		private Entry(
-				final int type,
-				final Class<TModel> modelClass,
-				final Supplier<TModel> createModel,
-				final String tableName) {
+		private Entry(final int type, final Class<TModel> modelClass, final Supplier<TModel> createModel, final String tableName) {
 			this.type = type;
 			this.modelClass = modelClass;
 			this.createModel = createModel;
@@ -51,53 +47,29 @@ public class TestTransactionRegistry {
 	@SuppressWarnings("serial")
 	private static final List<Entry<?>> ENTRIES = new ArrayList<Entry<?>>() {
 		{
-			this.add(new Entry<>(
-					TransactionTypes.TRANSFER,
-					TransferTransaction.class,
-					RandomTransactionFactory::createTransfer,
+			this.add(new Entry<>(TransactionTypes.TRANSFER, TransferTransaction.class, RandomTransactionFactory::createTransfer,
 					"Transfers"));
 
-			this.add(new Entry<>(
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					ImportanceTransferTransaction.class,
-					RandomTransactionFactory::createImportanceTransfer,
-					"ImportanceTransfers"));
+			this.add(new Entry<>(TransactionTypes.IMPORTANCE_TRANSFER, ImportanceTransferTransaction.class,
+					RandomTransactionFactory::createImportanceTransfer, "ImportanceTransfers"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					MultisigAggregateModificationTransaction.class,
-					RandomTransactionFactory::createMultisigModification,
-					"MultisigSignerModifications"));
+			this.add(new Entry<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, MultisigAggregateModificationTransaction.class,
+					RandomTransactionFactory::createMultisigModification, "MultisigSignerModifications"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MULTISIG,
-					org.nem.core.model.MultisigTransaction.class,
-					RandomTransactionFactory::createMultisigTransfer,
-					"MultisigTransactions"));
+			this.add(new Entry<>(TransactionTypes.MULTISIG, org.nem.core.model.MultisigTransaction.class,
+					RandomTransactionFactory::createMultisigTransfer, "MultisigTransactions"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MULTISIG_SIGNATURE,
-					org.nem.core.model.MultisigSignatureTransaction.class,
-					RandomTransactionFactory::createMultisigSignature,
-					null));
+			this.add(new Entry<>(TransactionTypes.MULTISIG_SIGNATURE, org.nem.core.model.MultisigSignatureTransaction.class,
+					RandomTransactionFactory::createMultisigSignature, null));
 
-			this.add(new Entry<>(
-					TransactionTypes.PROVISION_NAMESPACE,
-					ProvisionNamespaceTransaction.class,
-					RandomTransactionFactory::createProvisionNamespaceTransaction,
-					"NamespaceProvisions"));
+			this.add(new Entry<>(TransactionTypes.PROVISION_NAMESPACE, ProvisionNamespaceTransaction.class,
+					RandomTransactionFactory::createProvisionNamespaceTransaction, "NamespaceProvisions"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_DEFINITION_CREATION,
-					MosaicDefinitionCreationTransaction.class,
-					RandomTransactionFactory::createMosaicDefinitionCreationTransaction,
-					"MosaicDefinitionCreationTransactions"));
+			this.add(new Entry<>(TransactionTypes.MOSAIC_DEFINITION_CREATION, MosaicDefinitionCreationTransaction.class,
+					RandomTransactionFactory::createMosaicDefinitionCreationTransaction, "MosaicDefinitionCreationTransactions"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
-					MosaicSupplyChangeTransaction.class,
-					RandomTransactionFactory::createMosaicSupplyChangeTransaction,
-					"MosaicSupplyChanges"));
+			this.add(new Entry<>(TransactionTypes.MOSAIC_SUPPLY_CHANGE, MosaicSupplyChangeTransaction.class,
+					RandomTransactionFactory::createMosaicSupplyChangeTransaction, "MosaicSupplyChanges"));
 		}
 	};
 
@@ -108,7 +80,7 @@ public class TestTransactionRegistry {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Iterable<Entry<Transaction>> iterate() {
-		return () -> ENTRIES.stream().map(e -> (Entry<Transaction>)e).iterator();
+		return () -> ENTRIES.stream().map(e -> (Entry<Transaction>) e).iterator();
 	}
 
 	/**

@@ -24,7 +24,9 @@ public class MessageFactoryTest {
 	@Test
 	public void canDeserializePlainMessage() {
 		// Arrange:
-		final PlainMessage originalMessage = new PlainMessage(new byte[] { 1, 2, 4 });
+		final PlainMessage originalMessage = new PlainMessage(new byte[]{
+				1, 2, 4
+		});
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, new MockAccountLookup());
 
 		// Act:
@@ -33,7 +35,9 @@ public class MessageFactoryTest {
 		// Assert:
 		MatcherAssert.assertThat(message, IsInstanceOf.instanceOf(PlainMessage.class));
 		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.PLAIN));
-		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[]{
+				1, 2, 4
+		}));
 	}
 
 	@Test
@@ -46,7 +50,9 @@ public class MessageFactoryTest {
 		accountLookup.setMockAccount(sender);
 		accountLookup.setMockAccount(recipient);
 
-		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 1, 2, 4 });
+		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, new byte[]{
+				1, 2, 4
+		});
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, accountLookup);
 
 		// Act:
@@ -55,7 +61,9 @@ public class MessageFactoryTest {
 		// Assert:
 		MatcherAssert.assertThat(message, IsInstanceOf.instanceOf(SecureMessage.class));
 		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 4 }));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(new byte[]{
+				1, 2, 4
+		}));
 	}
 
 	private static Message deserialize(final Deserializer deserializer) {

@@ -14,7 +14,7 @@ public class TimeSynchronizationSampleTest {
 
 	private static final KeyPair KEY_PAIR = new KeyPair();
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateTimeSynchronizationSample() {
@@ -23,13 +23,15 @@ public class TimeSynchronizationSampleTest {
 
 		// Assert:
 		MatcherAssert.assertThat(sample.getNode().getIdentity(), IsEqual.equalTo(new NodeIdentity(KEY_PAIR, "node")));
-		MatcherAssert.assertThat(sample.getLocalTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17))));
-		MatcherAssert.assertThat(sample.getRemoteTimeStamps(), IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(23), new NetworkTimeStamp(26))));
+		MatcherAssert.assertThat(sample.getLocalTimeStamps(),
+				IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17))));
+		MatcherAssert.assertThat(sample.getRemoteTimeStamps(),
+				IsEqual.equalTo(new CommunicationTimeStamps(new NetworkTimeStamp(23), new NetworkTimeStamp(26))));
 	}
 
-	//endregion
+	// endregion
 
-	//region duration calculation
+	// region duration calculation
 
 	@Test
 	public void durationIsCalculatedCorrectly() {
@@ -44,9 +46,9 @@ public class TimeSynchronizationSampleTest {
 		MatcherAssert.assertThat(sample3.getDuration(), IsEqual.equalTo(0L));
 	}
 
-	//endregion
+	// endregion
 
-	//region offset calculation
+	// region offset calculation
 
 	@Test
 	public void timeOffsetIsCalculatedCorrectly() {
@@ -61,9 +63,9 @@ public class TimeSynchronizationSampleTest {
 		MatcherAssert.assertThat(sample3.getTimeOffsetToRemote(), IsEqual.equalTo(-26L));
 	}
 
-	//endregion
+	// endregion
 
-	//region compareTo
+	// region compareTo
 
 	@Test
 	public void canCompareTimeSynchronizationSamples() {
@@ -78,9 +80,9 @@ public class TimeSynchronizationSampleTest {
 		MatcherAssert.assertThat(sample1.compareTo(sample3), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -94,7 +96,7 @@ public class TimeSynchronizationSampleTest {
 		MatcherAssert.assertThat(sampleMap.get("diff-local"), IsNot.not(IsEqual.equalTo(sample)));
 		MatcherAssert.assertThat(sampleMap.get("diff-remote"), IsNot.not(IsEqual.equalTo(sample)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(sample)));
-		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)sample)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object) sample)));
 	}
 
 	@Test
@@ -110,7 +112,7 @@ public class TimeSynchronizationSampleTest {
 		MatcherAssert.assertThat(sampleMap.get("diff-remote-timeStamp").hashCode(), IsNot.not(IsEqual.equalTo(sample.hashCode())));
 	}
 
-	//endregion
+	// endregion
 	@SuppressWarnings("serial")
 	private HashMap<String, TimeSynchronizationSample> createTestTimeSynchronizationSampleList() {
 		return new HashMap<String, TimeSynchronizationSample>() {

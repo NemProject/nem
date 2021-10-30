@@ -15,8 +15,7 @@ public class TransactionExtensions {
 	 * @return The child signatures.
 	 */
 	public static Stream<Transaction> getChildSignatures(final Transaction transaction) {
-		return transaction.getChildTransactions().stream()
-				.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType());
+		return transaction.getChildTransactions().stream().filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType());
 	}
 
 	/**
@@ -40,8 +39,7 @@ public class TransactionExtensions {
 	}
 
 	/**
-	 * Streams the transaction, first level child transactions, and nth level child transactions.
-	 * <br>
+	 * Streams the transaction, first level child transactions, and nth level child transactions. <br>
 	 * This function is not needed currently.
 	 *
 	 * @param transaction The transaction.

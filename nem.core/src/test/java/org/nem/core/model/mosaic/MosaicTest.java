@@ -30,10 +30,8 @@ public class MosaicTest {
 	}
 
 	private static void assertCannotCreateWithNullParameter(final String parameterName) {
-		ExceptionAssert.assertThrows(v -> new Mosaic(
-						parameterName.equals("mosaicId") ? null : createMosaicId(),
-						parameterName.equals("quantity") ? null : Quantity.fromValue(123)),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(parameterName.equals("mosaicId") ? null : createMosaicId(),
+				parameterName.equals("quantity") ? null : Quantity.fromValue(123)), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -55,7 +53,7 @@ public class MosaicTest {
 
 	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsExpectedString() {
@@ -67,9 +65,10 @@ public class MosaicTest {
 		MatcherAssert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static final Map<String, Mosaic> DESC_TO_MOSAIC_MAP = new HashMap<String, Mosaic>() {
 		{
@@ -86,8 +85,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaic)) : IsEqual.equalTo(mosaic));
 		}
 	}
@@ -99,8 +97,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -109,7 +106,7 @@ public class MosaicTest {
 		return !propertyName.equals("default");
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicId createMosaicId() {
 		return new MosaicId(new NamespaceId("foo.bar"), "baz");

@@ -29,10 +29,10 @@ public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCal
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return this.calculateMinimumFeeImpl((TransferTransaction)transaction);
+				return this.calculateMinimumFeeImpl((TransferTransaction) transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				return this.calculateMinimumFeeImpl((MultisigAggregateModificationTransaction)transaction);
+				return this.calculateMinimumFeeImpl((MultisigAggregateModificationTransaction) transaction);
 
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:

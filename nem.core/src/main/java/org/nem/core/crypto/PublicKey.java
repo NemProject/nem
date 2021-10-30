@@ -68,7 +68,7 @@ public class PublicKey implements SerializableEntity {
 			return false;
 		}
 
-		final PublicKey rhs = (PublicKey)obj;
+		final PublicKey rhs = (PublicKey) obj;
 		return Arrays.equals(this.value, rhs.value);
 	}
 

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class TransactionTest {
 
-	//region Constructors
+	// region Constructors
 
 	@Test
 	public void ctorCanCreateTransactionForAccountWithSignerPrivateKey() {
@@ -54,9 +54,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(transaction.getCustomField(), IsEqual.equalTo(7));
 	}
 
-	//endregion
+	// endregion
 
-	//region Deadline
+	// region Deadline
 
 	@Test
 	public void transactionDeadlineCanBeSet() {
@@ -68,9 +68,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
 	}
 
-	//endregion
+	// endregion
 
-	//region Comparable
+	// region Comparable
 
 	@Test
 	public void compareResultIsZeroForTransactionsThatHaveAllPrimaryFieldsEqual() {
@@ -127,9 +127,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(transaction2.compareTo(transaction1), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region Fees
+	// region Fees
 
 	@Test
 	public void nemesisTransactionFeeIsAlwaysZero() {
@@ -188,9 +188,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(MockTransaction.DEFAULT_FEE));
 	}
 
-	//endregion
+	// endregion
 
-	//region Accounts
+	// region Accounts
 
 	@Test
 	public void accountsAlwaysIncludeSigner() {
@@ -238,9 +238,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2));
 	}
 
-	//endregion
+	// endregion
 
-	//region Child Transactions
+	// region Child Transactions
 
 	@Test
 	public void defaultGetChildTransactionsImplementationReturnsEmptyCollection() {
@@ -254,9 +254,9 @@ public class TransactionTest {
 		MatcherAssert.assertThat(childTransactions.isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region Execute and Undo
+	// region Execute and Undo
 
 	@Test
 	public void executeDelegatesToDerivedClass() {
@@ -303,9 +303,9 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		MatcherAssert.assertThat(
-				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
-				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceTransfer, NotificationType.ImportanceTransfer, NotificationType.BalanceDebit)));
+		MatcherAssert.assertThat(notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceTransfer, NotificationType.ImportanceTransfer,
+						NotificationType.BalanceDebit)));
 	}
 
 	@Test
@@ -332,9 +332,9 @@ public class TransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		MatcherAssert.assertThat(
-				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
-				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
+		MatcherAssert.assertThat(notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer,
+						NotificationType.BalanceTransfer)));
 	}
 
 	@Test
@@ -356,10 +356,8 @@ public class TransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
 		MatcherAssert.assertThat(
-				notificationCaptor.getAllValues().stream()
-						.filter(n -> NotificationType.Account != n.getType())
-						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())
-						.collect(Collectors.toList()),
+				notificationCaptor.getAllValues().stream().filter(n -> NotificationType.Account != n.getType())
+						.map(n -> ((BalanceAdjustmentNotification) n).getAmount().getNumNem()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(11L, 9L)));
 	}
 
@@ -382,18 +380,14 @@ public class TransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
 		MatcherAssert.assertThat(
-				notificationCaptor.getAllValues().stream()
-						.filter(n -> NotificationType.Account != n.getType())
-						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())
-						.collect(Collectors.toList()),
+				notificationCaptor.getAllValues().stream().filter(n -> NotificationType.Account != n.getType())
+						.map(n -> ((BalanceAdjustmentNotification) n).getAmount().getNumNem()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(11L, 9L)));
 	}
 
-	//endregion
+	// endregion
 
-	private MockTransaction createRoundTrippedTransaction(
-			final Transaction originalTransaction,
-			final Account deserializedSigner) {
+	private MockTransaction createRoundTrippedTransaction(final Transaction originalTransaction, final Account deserializedSigner) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, deserializedSigner);
 		return new MockTransaction(deserializer);

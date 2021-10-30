@@ -64,6 +64,6 @@ public class SystemTimeProvider implements TimeProvider {
 	 * @return The normalized time in seconds.
 	 */
 	public static int getTime(final long millis) {
-		return (int)((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);
+		return (int) ((millis - EPOCH_TIME_PLUS_ROUNDING) / 1000L);
 	}
 }

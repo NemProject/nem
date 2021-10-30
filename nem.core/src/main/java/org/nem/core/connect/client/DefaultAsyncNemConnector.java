@@ -24,22 +24,19 @@ public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiI
 	 * @param httpClient The HTTP client.
 	 * @param errorResponseStrategy The error response strategy.
 	 */
-	public DefaultAsyncNemConnector(
-			final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient,
+	public DefaultAsyncNemConnector(final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient,
 			final ErrorResponseStrategy errorResponseStrategy) {
 		this.httpClient = httpClient;
 		this.errorResponseStrategy = errorResponseStrategy;
 	}
 
 	/**
-	 * Sets the account lookup associated with this connector.
-	 * This allows address to automatically be deserialized into accounts.
+	 * Sets the account lookup associated with this connector. This allows address to automatically be deserialized into accounts.
 	 *
 	 * @param accountLookup The account lookup to use.
 	 */
 	public void setAccountLookup(final SimpleAccountLookup accountLookup) {
-		this.httpDeserializerResponseStrategy = new HttpErrorResponseDeserializerUnionStrategy(
-				new DeserializationContext(accountLookup));
+		this.httpDeserializerResponseStrategy = new HttpErrorResponseDeserializerUnionStrategy(new DeserializationContext(accountLookup));
 	}
 
 	/**
@@ -54,18 +51,14 @@ public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiI
 	@Override
 	public CompletableFuture<Deserializer> getAsync(final NodeEndpoint endpoint, final TApiId apiId, final String query) {
 		final String path = apiId + (null == query ? "" : "?" + query);
-		return ExceptionUtils.propagate(() ->
-				this.httpClient.get(
-						this.createNisUrl(endpoint, path),
-						this.httpDeserializerResponseStrategy)
-						.getFuture()
-						.thenApply(response -> {
-							if (response.hasError()) {
-								throw this.errorResponseStrategy.mapToException(response.getError());
-							}
+		return ExceptionUtils.propagate(() -> this.httpClient.get(this.createNisUrl(endpoint, path), this.httpDeserializerResponseStrategy)
+				.getFuture().thenApply(response -> {
+					if (response.hasError()) {
+						throw this.errorResponseStrategy.mapToException(response.getError());
+					}
 
-							return response.getDeserializer();
-						}));
+					return response.getDeserializer();
+				}));
 	}
 
 	@Override
@@ -78,20 +71,17 @@ public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiI
 		return this.postAsyncImpl(endpoint, apiId, postRequest).thenApply(response -> null);
 	}
 
-	private CompletableFuture<ErrorResponseDeserializerUnion> postAsyncImpl(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest) {
-		return ExceptionUtils.propagate(() ->
-				this.httpClient.post(
-						this.createNisUrl(endpoint, apiId.toString()),
-						postRequest,
-						this.httpDeserializerResponseStrategy)
-						.getFuture()
-						.thenApply(response -> {
-							if (response.hasError()) {
-								throw this.errorResponseStrategy.mapToException(response.getError());
-							}
+	private CompletableFuture<ErrorResponseDeserializerUnion> postAsyncImpl(final NodeEndpoint endpoint, final TApiId apiId,
+			final HttpPostRequest postRequest) {
+		return ExceptionUtils.propagate(() -> this.httpClient
+				.post(this.createNisUrl(endpoint, apiId.toString()), postRequest, this.httpDeserializerResponseStrategy).getFuture()
+				.thenApply(response -> {
+					if (response.hasError()) {
+						throw this.errorResponseStrategy.mapToException(response.getError());
+					}
 
-							return response;
-						}));
+					return response;
+				}));
 	}
 
 	private URL createNisUrl(final NodeEndpoint endpoint, final String nisPath) throws MalformedURLException {

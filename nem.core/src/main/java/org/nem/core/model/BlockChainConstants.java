@@ -6,8 +6,7 @@ package org.nem.core.model;
 public class BlockChainConstants {
 
 	/**
-	 * The maximum number of seconds in the future that an entity's timestamp can be
-	 * without the entity being rejected.
+	 * The maximum number of seconds in the future that an entity's timestamp can be without the entity being rejected.
 	 */
 	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 

@@ -10,7 +10,7 @@ import java.math.BigInteger;
 
 public class Ed25519UtilsTest {
 
-	//region prepareForScalarMultiply
+	// region prepareForScalarMultiply
 
 	@Test
 	public void prepareForScalarMultiplyReturnsClampedValue() {
@@ -26,5 +26,5 @@ public class Ed25519UtilsTest {
 		MatcherAssert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
 	}
 
-	//endregion
+	// endregion
 }

@@ -17,10 +17,9 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 	public static void setup() {
 		DEFAULT_HEIGHT = new BlockHeight(100);
 		final MosaicFeeInformationLookup lookup = AbstractTransactionFeeCalculatorTest.createMosaicFeeInformationLookup();
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
-				lookup,
-				() -> DEFAULT_HEIGHT,
-				new BlockHeight[] { DEFAULT_HEIGHT.next(), new BlockHeight(1_000_000_000L) }));
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(lookup, () -> DEFAULT_HEIGHT, new BlockHeight[]{
+				DEFAULT_HEIGHT.next(), new BlockHeight(1_000_000_000L)
+		}));
 		setNamespaceAndMosaicRelatedDefaultFee(108_000_000);
 		setTransactionDefaultFee(6_000_000);
 		setMultisigSignatureMinimumFee(6_000_000);
@@ -31,13 +30,11 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 		Utils.resetGlobals();
 	}
 
-	//region calculateMinimumFee
-
-	//region transfer
-
 	public static class TransferMinimumFeeCalculation {
 		private static final long SMALL_TRANSFER_PENALTY = 10;
 		private static final long MIN_TRANSFER_FEE = FEE_UNIT;
+
+		// region transfer
 
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
@@ -123,6 +120,8 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 			assertMessageFee(96, 128, Amount.fromNem(SMALL_TRANSFER_PENALTY + 12));
 			assertMessageFee(128, 96, Amount.fromNem(SMALL_TRANSFER_PENALTY + 16));
 		}
+
+		// endregion
 
 		// region mosaic transfers
 
@@ -231,14 +230,9 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 			final TransactionFeeCalculator calculator = createCalculator();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> calculator.calculateMinimumFee(transaction),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> calculator.calculateMinimumFee(transaction), IllegalArgumentException.class);
 		}
 
 		// endregion
-
 	}
-
-	//endregion
 }

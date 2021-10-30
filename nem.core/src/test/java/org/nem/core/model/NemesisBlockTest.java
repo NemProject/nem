@@ -101,8 +101,7 @@ public class NemesisBlockTest {
 
 			// Act:
 			final Set<Address> allAddresses = block.getTransactions().stream()
-					.flatMap(t -> t.getAccounts().stream().map(Account::getAddress))
-					.collect(Collectors.toSet());
+					.flatMap(t -> t.getAccounts().stream().map(Account::getAddress)).collect(Collectors.toSet());
 
 			// Assert:
 			for (final Address address : allAddresses) {
@@ -116,8 +115,7 @@ public class NemesisBlockTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Act:
-			final Set<Address> signerAddresses = block.getTransactions().stream()
-					.map(t -> t.getSigner().getAddress())
+			final Set<Address> signerAddresses = block.getTransactions().stream().map(t -> t.getSigner().getAddress())
 					.collect(Collectors.toSet());
 
 			// Assert:
@@ -126,9 +124,9 @@ public class NemesisBlockTest {
 			}
 		}
 
-		//endregion
+		// endregion
 
-		//region constants
+		// region constants
 
 		@Test
 		public void amountConstantIsConsistentWithNemesisBlock() {
@@ -137,7 +135,7 @@ public class NemesisBlockTest {
 			final Block block = this.loadNemesisBlock();
 			for (final Transaction transaction : block.getTransactions()) {
 				if (transaction instanceof TransferTransaction) {
-					totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
+					totalAmount = totalAmount.add(((TransferTransaction) transaction).getAmount());
 				}
 			}
 
@@ -166,7 +164,7 @@ public class NemesisBlockTest {
 			MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getGenerationHash()));
 		}
 
-		//endregion
+		// endregion
 
 		protected abstract Block loadNemesisBlock(final MockAccountLookup accountLookup);
 
@@ -175,7 +173,7 @@ public class NemesisBlockTest {
 		}
 	}
 
-	//region basic
+	// region basic
 
 	public static class ResourceNemesisBlockTest extends AbstractNemesisBlockTest {
 
@@ -205,7 +203,7 @@ public class NemesisBlockTest {
 
 		private static JSONObject loadNemesisBlockJsonObject() {
 			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-testnet.json")) {
-				return (JSONObject)JSONValue.parseStrict(fin);
+				return (JSONObject) JSONValue.parseStrict(fin);
 			} catch (IOException | net.minidev.json.parser.ParseException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
 				throw new RuntimeException(e);
@@ -234,15 +232,9 @@ public class NemesisBlockTest {
 		public void nemesisBlockCannotBeLoadedFromInvalidBlob() {
 			// Arrange:
 			final byte[] buffer = loadNemesisBlockBlobObject();
-			final byte[] badBuffer1 = ByteBuffer.allocate(3 + buffer.length)
-					.put("bad".getBytes())
-					.put(buffer)
-					.array();
-			final byte[] badBuffer2 = ByteBuffer.allocate(3 + buffer.length)
-					.put(Arrays.copyOfRange(buffer, 0, 100))
-					.put("bad".getBytes())
-					.put(Arrays.copyOfRange(buffer, 100, buffer.length))
-					.array();
+			final byte[] badBuffer1 = ByteBuffer.allocate(3 + buffer.length).put("bad".getBytes()).put(buffer).array();
+			final byte[] badBuffer2 = ByteBuffer.allocate(3 + buffer.length).put(Arrays.copyOfRange(buffer, 0, 100)).put("bad".getBytes())
+					.put(Arrays.copyOfRange(buffer, 100, buffer.length)).array();
 
 			// Act:
 			ExceptionAssert.assertThrows(

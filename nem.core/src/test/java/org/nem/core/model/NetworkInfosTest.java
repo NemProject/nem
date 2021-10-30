@@ -26,10 +26,10 @@ public class NetworkInfosTest {
 
 	private static final Map<String, Byte> DESC_TO_VERSION_MAP = new HashMap<String, Byte>() {
 		{
-			this.put("UNKNOWN_NETWORK", (byte)0x50);
-			this.put("TEST_NETWORK", (byte)0x98);
-			this.put("MAIN_NETWORK", (byte)0x68);
-			this.put("MIJIN_NETWORK", (byte)0x60);
+			this.put("UNKNOWN_NETWORK", (byte) 0x50);
+			this.put("TEST_NETWORK", (byte) 0x98);
+			this.put("MAIN_NETWORK", (byte) 0x68);
+			this.put("MIJIN_NETWORK", (byte) 0x60);
 		}
 	};
 	private static final Map<String, String> DESC_TO_FRIENDLY_NAME_MAP = new HashMap<String, String>() {
@@ -41,7 +41,7 @@ public class NetworkInfosTest {
 		}
 	};
 
-	//region default network
+	// region default network
 
 	public static class DefaultNetworkInfoTest {
 
@@ -53,9 +53,7 @@ public class NetworkInfosTest {
 		@Test
 		public void defaultNetworkIsTestNetworkByDefault() {
 			// Assert:
-			MatcherAssert.assertThat(
-					NetworkInfos.getDefault(),
-					IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+			MatcherAssert.assertThat(NetworkInfos.getDefault(), IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
 		}
 
 		@Test
@@ -64,9 +62,7 @@ public class NetworkInfosTest {
 			NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
 
 			// Assert:
-			MatcherAssert.assertThat(
-					NetworkInfos.getDefault(),
-					IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
+			MatcherAssert.assertThat(NetworkInfos.getDefault(), IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
 		}
 
 		@Test
@@ -78,9 +74,7 @@ public class NetworkInfosTest {
 			NetworkInfos.setDefault(null);
 
 			// Assert:
-			MatcherAssert.assertThat(
-					NetworkInfos.getDefault(),
-					IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+			MatcherAssert.assertThat(NetworkInfos.getDefault(), IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
 		}
 
 		@Test
@@ -89,15 +83,13 @@ public class NetworkInfosTest {
 			NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo()),
-					IllegalStateException.class);
+			ExceptionAssert.assertThrows(v -> NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo()), IllegalStateException.class);
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region unknown network
+	// region unknown network
 
 	public static class UnknownNetworkInfoTest {
 		private final String unknownIdentifier = "UNKNOWN_NETWORK";
@@ -151,7 +143,7 @@ public class NetworkInfosTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static abstract class AbstractNetworkInfoTest {
 		private final String identifier;
@@ -241,7 +233,7 @@ public class NetworkInfosTest {
 			// Assert:
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("8d07f90fb4bbe7715fa327c926770166a11be2e494a970605f2e12557f66c9b9");
-			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte) 0x68));
 			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
@@ -260,7 +252,7 @@ public class NetworkInfosTest {
 		protected void assertNetworkInfo(final NetworkInfo info) {
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
-			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x98));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte) 0x98));
 			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('T'));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
@@ -279,7 +271,7 @@ public class NetworkInfosTest {
 		protected void assertNetworkInfo(final NetworkInfo info) {
 			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 			final PublicKey expectedPublicKey = PublicKey.fromHexString("57b4832d9232ee410e93d595207cffc2b9e9c5002472c4b0bb3bb10a4ce152e3");
-			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x60));
+			MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte) 0x60));
 			MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('M'));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 			MatcherAssert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));

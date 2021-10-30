@@ -8,10 +8,14 @@ import org.nem.core.test.Utils;
 
 public class PublicKeyTest {
 
-	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
-	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final byte[] TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x71
+	};
+	private static final byte[] MODIFIED_TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x72
+	};
 
-	//region constructors / factories
+	// region constructors / factories
 
 	@Test
 	public void canCreateFromBytes() {
@@ -28,7 +32,9 @@ public class PublicKeyTest {
 		final PublicKey key = PublicKey.fromHexString("227F");
 
 		// Assert:
-		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
+		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new byte[]{
+				0x22, 0x7F
+		}));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -37,9 +43,9 @@ public class PublicKeyTest {
 		PublicKey.fromHexString("22G75");
 	}
 
-	//endregion
+	// endregion
 
-	//region serializer
+	// region serializer
 
 	@Test
 	public void keyCanBeRoundTripped() {
@@ -56,9 +62,9 @@ public class PublicKeyTest {
 		return new PublicKey(deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -69,7 +75,7 @@ public class PublicKeyTest {
 		MatcherAssert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
 		MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object) key)));
 	}
 
 	@Test
@@ -83,9 +89,9 @@ public class PublicKeyTest {
 		MatcherAssert.assertThat(new PublicKey(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsHexRepresentation() {
@@ -93,5 +99,5 @@ public class PublicKeyTest {
 		MatcherAssert.assertThat(new PublicKey(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
-	//endregion
+	// endregion
 }

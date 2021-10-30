@@ -3,8 +3,7 @@ package org.nem.core.model.transactions.extensions;
 import org.nem.core.serialization.*;
 
 /**
- * A transaction serialization extension that can be used to serialize different data for different
- * transaction versions.
+ * A transaction serialization extension that can be used to serialize different data for different transaction versions.
  *
  * @param <TData> The extended serialization data.
  */

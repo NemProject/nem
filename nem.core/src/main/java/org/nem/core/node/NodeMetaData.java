@@ -20,9 +20,7 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param platform The platform.
 	 * @param application The application.
 	 */
-	public NodeMetaData(
-			final String platform,
-			final String application) {
+	public NodeMetaData(final String platform, final String application) {
 		this(platform, application, null, 0, 0);
 	}
 
@@ -35,11 +33,7 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param networkId The network id.
 	 * @param featuresBitmask A bitmask of enabled node features.
 	 */
-	public NodeMetaData(
-			final String platform,
-			final String application,
-			final NodeVersion version,
-			final int networkId,
+	public NodeMetaData(final String platform, final String application, final NodeVersion version, final int networkId,
 			final int featuresBitmask) {
 		this.platform = platform;
 		this.application = application;
@@ -128,17 +122,13 @@ public class NodeMetaData implements SerializableEntity {
 			return false;
 		}
 
-		final NodeMetaData rhs = (NodeMetaData)obj;
+		final NodeMetaData rhs = (NodeMetaData) obj;
 		return Arrays.equals(this.getParts(), rhs.getParts());
 	}
 
 	private Object[] getParts() {
-		return new Object[] {
-				this.platform,
-				this.application,
-				this.version,
-				this.networkId,
-				this.featuresBitmask
+		return new Object[]{
+				this.platform, this.application, this.version, this.networkId, this.featuresBitmask
 		};
 	}
 }

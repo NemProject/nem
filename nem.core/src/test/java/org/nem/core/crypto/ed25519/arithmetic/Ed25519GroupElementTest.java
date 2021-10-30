@@ -76,11 +76,7 @@ public class Ed25519GroupElementTest {
 	@Test
 	public void canBeCreatedWithSpecifiedCoordinates() {
 		// Arrange:
-		final Ed25519GroupElement g = new Ed25519GroupElement(
-				CoordinateSystem.P3,
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
+		final Ed25519GroupElement g = new Ed25519GroupElement(CoordinateSystem.P3, Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,
 				Ed25519Field.ZERO);
 
 		// Assert:
@@ -389,10 +385,7 @@ public class Ed25519GroupElementTest {
 
 	@Test
 	public void addingNeutralGroupElementDoesNotChangeGroupElement() {
-		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
+		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,
 				Ed25519Field.ZERO);
 		for (int i = 0; i < 1000; i++) {
 			// Arrange:

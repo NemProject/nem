@@ -40,17 +40,16 @@ public class BlockedHarvesterPublicKeysTest {
 		final String firstAddressChar = Character.toString(NetworkInfos.getDefault().getAddressStartChar());
 		final List<String> expectedPrefixes = new ArrayList<>();
 		for (int c = 65; c < 65 + 26; c++) {
-			expectedPrefixes.add(firstAddressChar + "AFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "BFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "CFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "DFUND" + Character.toString((char)c));
+			expectedPrefixes.add(firstAddressChar + "AFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "BFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "CFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "DFUND" + Character.toString((char) c));
 		}
 
 		// Act:
 		final Set<String> addressPrefixes = BlockedHarvesterPublicKeys.getAll().stream()
 				.filter(publicKey -> !CORE_FUNDS.contains(publicKey))
-				.map(publicKey -> Address.fromPublicKey(publicKey).getEncoded().substring(0, 7))
-				.collect(Collectors.toSet());
+				.map(publicKey -> Address.fromPublicKey(publicKey).getEncoded().substring(0, 7)).collect(Collectors.toSet());
 
 		// Assert:
 		MatcherAssert.assertThat(addressPrefixes.size(), IsEqual.equalTo(expectedPrefixes.size()));

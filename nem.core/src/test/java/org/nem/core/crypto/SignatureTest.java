@@ -11,7 +11,7 @@ import java.math.BigInteger;
 
 public class SignatureTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void bigIntegerCtorInitializesFields() {
@@ -117,9 +117,9 @@ public class SignatureTest {
 		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
-	//endregion
+	// endregion
 
-	//region getBytes
+	// region getBytes
 
 	@Test
 	public void getBytesReturns64Bytes() {
@@ -138,16 +138,15 @@ public class SignatureTest {
 	}
 
 	private Signature[] createRoundtripTestSignatures() {
-		return new Signature[] {
+		return new Signature[]{
 				createSignature(Utils.createString('F', 64), Utils.createString('0', 64)),
-				createSignature(Utils.createString('0', 64), Utils.createString('F', 64)),
-				createSignature("99512345", "12351234")
+				createSignature(Utils.createString('0', 64), Utils.createString('F', 64)), createSignature("99512345", "12351234")
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region getBinaryR / getBinaryS
+	// region getBinaryR / getBinaryS
 
 	@Test
 	public void getBinaryRReturnsRAsByteArray() {
@@ -179,9 +178,9 @@ public class SignatureTest {
 		MatcherAssert.assertThat(s, IsEqual.equalTo(originalS));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -193,7 +192,7 @@ public class SignatureTest {
 		MatcherAssert.assertThat(createSignature(1234, 7789), IsNot.not(IsEqual.equalTo(signature)));
 		MatcherAssert.assertThat(createSignature(1235, 7790), IsNot.not(IsEqual.equalTo(signature)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(signature)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)signature)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) signature)));
 	}
 
 	@Test
@@ -208,9 +207,9 @@ public class SignatureTest {
 		MatcherAssert.assertThat(createSignature(1235, 7790).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteSignature() {
@@ -243,7 +242,7 @@ public class SignatureTest {
 		MatcherAssert.assertThat(signature, IsEqual.equalTo(originalSignature));
 	}
 
-	//endregion
+	// endregion
 
 	// region toString
 
@@ -253,13 +252,12 @@ public class SignatureTest {
 		final Signature signature = createSignature(12, 513);
 
 		// Assert:
-		final String expectedSignature =
-				"0c00000000000000000000000000000000000000000000000000000000000000" +
-						"0102000000000000000000000000000000000000000000000000000000000000";
+		final String expectedSignature = "0c00000000000000000000000000000000000000000000000000000000000000"
+				+ "0102000000000000000000000000000000000000000000000000000000000000";
 		MatcherAssert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
 	}
 
-	//endregion
+	// endregion
 
 	private static Signature createSignature(final String r, final String s) {
 		return new Signature(new BigInteger(r, 16), new BigInteger(s, 16));

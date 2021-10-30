@@ -3,7 +3,9 @@ package org.nem.core.serialization.primitive;
 import org.nem.core.serialization.*;
 import org.nem.core.test.MockSerializableEntity;
 
-public abstract class AbstractObjectSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, MockSerializableEntity> {
+public abstract class AbstractObjectSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, MockSerializableEntity> {
 	public AbstractObjectSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}

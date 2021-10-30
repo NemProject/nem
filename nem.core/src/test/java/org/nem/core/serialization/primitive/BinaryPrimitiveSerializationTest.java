@@ -49,14 +49,18 @@ public class BinaryPrimitiveSerializationTest {
 		}
 	}
 
-	public static class TruncatedBytesSerializationTest extends AbstractTruncatedBytesSerializationTest<BinarySerializer, BinaryDeserializer> {
+	public static class TruncatedBytesSerializationTest
+			extends
+				AbstractTruncatedBytesSerializationTest<BinarySerializer, BinaryDeserializer> {
 
 		public TruncatedBytesSerializationTest() {
 			super(new BinarySerializationPolicy());
 		}
 	}
 
-	public static class TruncatedStringSerializationTest extends AbstractTruncatedStringSerializationTest<BinarySerializer, BinaryDeserializer> {
+	public static class TruncatedStringSerializationTest
+			extends
+				AbstractTruncatedStringSerializationTest<BinarySerializer, BinaryDeserializer> {
 
 		public TruncatedStringSerializationTest() {
 			super(new BinarySerializationPolicy());

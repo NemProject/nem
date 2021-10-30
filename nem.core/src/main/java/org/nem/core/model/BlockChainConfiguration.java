@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 public interface BlockChainConfiguration {
 
-	//region transactions per sync
+	// region transactions per sync
 
 	/**
 	 * Gets the minimum number of transactions that a remote peer supplies in a chain part.
@@ -34,9 +34,9 @@ public interface BlockChainConfiguration {
 	 */
 	int getMaxTransactionsPerSyncAttempt();
 
-	//endregion
+	// endregion
 
-	//region blocks per sync
+	// region blocks per sync
 
 	/**
 	 * Gets the default number of blocks transferred during syncing.
@@ -56,7 +56,7 @@ public interface BlockChainConfiguration {
 		return this.getBlockChainRewriteLimit() + 40;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the maximum number of transactions allowed in a single block.
@@ -79,7 +79,7 @@ public interface BlockChainConfiguration {
 	 */
 	int getBlockChainRewriteLimit();
 
-	//region getEstimatedBlocksPerX
+	// region getEstimatedBlocksPerX
 
 	/**
 	 * Gets the estimated number of blocks per day.
@@ -108,9 +108,9 @@ public interface BlockChainConfiguration {
 		return this.getEstimatedBlocksPerDay() * 365;
 	}
 
-	//endregion
+	// endregion
 
-	//region block chain features
+	// region block chain features
 
 	/**
 	 * Gets the block chain features.
@@ -128,5 +128,5 @@ public interface BlockChainConfiguration {
 		return Arrays.stream(this.getBlockChainFeatures()).anyMatch(f -> f == feature);
 	}
 
-	//endregion
+	// endregion
 }

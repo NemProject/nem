@@ -24,7 +24,7 @@ public class TransferTransactionTest {
 	private static final Account MOSAIC_RECIPIENT9 = Utils.generateRandomAccount();
 	private static final Account MOSAIC_RECIPIENT11 = Utils.generateRandomAccount();
 
-	//region cross versions
+	// region cross versions
 
 	public static class Main {
 		@Test
@@ -55,23 +55,17 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(transaction2.getEntityVersion(), IsEqual.equalTo(123));
 		}
 
-		private static TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final long amount) {
+		private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount) {
 			return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), null);
 		}
 
-		private static TransferTransaction createTransferTransaction(
-				final int version,
-				final Account sender,
-				final Account recipient,
+		private static TransferTransaction createTransferTransaction(final int version, final Account sender, final Account recipient,
 				final long amount) {
 			return new TransferTransaction(version, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), null);
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static abstract class AbstractTransferTransactionTest {
 		protected static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
@@ -91,11 +85,7 @@ public class TransferTransactionTest {
 		}
 
 		private static MosaicLevy createTestLevy(final Account recipient, final MosaicId mosaicId, final int value) {
-			return new MosaicLevy(
-					MosaicTransferFeeType.Absolute,
-					recipient,
-					mosaicId,
-					Quantity.fromValue(value));
+			return new MosaicLevy(MosaicTransferFeeType.Absolute, recipient, mosaicId, Quantity.fromValue(value));
 		}
 
 		protected static TransactionExecutionState createExecutionState() {
@@ -120,53 +110,40 @@ public class TransferTransactionTest {
 			Utils.resetGlobals();
 		}
 
-		//region createTransferTransaction
+		// region createTransferTransaction
 
-		protected abstract TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final Amount amount,
+		protected abstract TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount,
 				final TransferTransactionAttachment attachment);
 
-		protected TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final long amount,
+		protected TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount,
 				final TransferTransactionAttachment attachment) {
 			return this.createTransferTransaction(sender, recipient, Amount.fromNem(amount), attachment);
 		}
 
-		protected TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final long amount,
-				final Message message,
-				Collection<Mosaic> mosaics) {
+		protected TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount,
+				final Message message, Collection<Mosaic> mosaics) {
 			mosaics = null == mosaics ? Collections.emptyList() : mosaics;
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 			mosaics.forEach(attachment::addMosaic);
 			return this.createTransferTransaction(sender, recipient, amount, attachment);
 		}
 
-		protected TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final long amount,
+		protected TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount,
 				final Message message) {
 			return this.createTransferTransaction(sender, recipient, amount, message, null);
 		}
 
-		//endregion
+		// endregion
 
-		//region basic
-
-		//region constructor
+		// region constructor
 
 		@Test(expected = IllegalArgumentException.class)
 		public void recipientIsRequired() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
-			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Message message = new PlainMessage(new byte[]{
+					12, 50, 21
+			});
 
 			// Act:
 			this.createTransferTransaction(signer, null, 123, message);
@@ -177,14 +154,18 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Message message = new PlainMessage(new byte[]{
+					12, 50, 21
+			});
 
 			// Act:
 			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, message);
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[]{
+					12, 50, 21
+			}));
 			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
 			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
@@ -196,7 +177,7 @@ public class TransferTransactionTest {
 			final Account recipient = Utils.generateRandomAccount();
 
 			// Act:
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, (Message)null);
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, (Message) null);
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
@@ -205,9 +186,9 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
-		//endregion
+		// endregion
 
-		//region transfer accessors
+		// region transfer accessors
 
 		@Test
 		public void getXemTransferAmountReturnsAmountWhenNoMosaicsArePresent() {
@@ -239,14 +220,16 @@ public class TransferTransactionTest {
 			return this.createTransferTransaction(signer, recipient, amount, null);
 		}
 
-		//endregion
+		// endregion
 
-		//region round trip
+		// region round trip
 
 		@Test
 		public void transactionCanBeRoundTrippedWithMessageAndWithoutMosaics() {
 			// Arrange:
-			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
+			this.assertCanBeRoundTripped(new byte[]{
+					12, 50, 21
+			}, null);
 		}
 
 		@Test
@@ -255,7 +238,7 @@ public class TransferTransactionTest {
 			this.assertCanBeRoundTripped(null, null);
 		}
 
-		//endregion
+		// endregion
 
 		protected void assertCanBeRoundTripped(final byte[] messageBytes, final Collection<Mosaic> mosaics) {
 			// Arrange:
@@ -269,18 +252,13 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			MatcherAssert.assertThat(
-					null == message ? transaction.getMessage() : transaction.getMessage().getDecodedPayload(),
+			MatcherAssert.assertThat(null == message ? transaction.getMessage() : transaction.getMessage().getDecodedPayload(),
 					IsEqual.equalTo(null == message ? null : messageBytes));
-			MatcherAssert.assertThat(
-					transaction.getAttachment().getMosaics(),
+			MatcherAssert.assertThat(transaction.getAttachment().getMosaics(),
 					IsEquivalent.equivalentTo(null == mosaics ? Collections.emptyList() : mosaics));
 		}
 
-		protected static void assertTransactionFields(
-				final TransferTransaction transaction,
-				final Account signer,
-				final Account recipient,
+		protected static void assertTransactionFields(final TransferTransaction transaction, final Account signer, final Account recipient,
 				final Amount amount) {
 			MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 			MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
@@ -288,9 +266,7 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(transaction.getAmount(), IsEqual.equalTo(amount));
 		}
 
-		//endregion
-
-		//region Message Length
+		// region Message Length
 
 		@Test
 		public void messageLengthReturnsEncodedLength() {
@@ -311,9 +287,9 @@ public class TransferTransactionTest {
 			return this.createTransferTransaction(signer, recipient, 0, message);
 		}
 
-		//endregion
+		// endregion
 
-		//region Message set to null if payload length is 0
+		// region Message set to null if payload length is 0
 
 		@Test
 		public void messageIsSetToNullIfPlainMessagePayloadIsNull() {
@@ -324,13 +300,15 @@ public class TransferTransactionTest {
 		@Test
 		public void messageIsSetToNullIfPlainMessagePayloadLengthIsZero() {
 			// Assert:
-			this.assertMessageFieldIsNull(new byte[] {}, MessageTypes.PLAIN, true);
+			this.assertMessageFieldIsNull(new byte[]{}, MessageTypes.PLAIN, true);
 		}
 
 		@Test
 		public void messageIsNotSetToNullIfPlainMessagePayloadLengthIsNotZero() {
 			// Assert:
-			this.assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.PLAIN, false);
+			this.assertMessageFieldIsNull(new byte[]{
+					1
+			}, MessageTypes.PLAIN, false);
 		}
 
 		@Test
@@ -342,13 +320,15 @@ public class TransferTransactionTest {
 		@Test
 		public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsZero() {
 			// Assert:
-			this.assertMessageFieldIsNull(new byte[] {}, MessageTypes.SECURE, false);
+			this.assertMessageFieldIsNull(new byte[]{}, MessageTypes.SECURE, false);
 		}
 
 		@Test
 		public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsNotZero() {
 			// Assert:
-			this.assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.SECURE, false);
+			this.assertMessageFieldIsNull(new byte[]{
+					1
+			}, MessageTypes.SECURE, false);
 		}
 
 		private void assertMessageFieldIsNull(final byte[] messageBytes, final int messageType, final boolean isNullMessageExpected) {
@@ -368,22 +348,23 @@ public class TransferTransactionTest {
 			deserializer.readInt("type");
 
 			// Act:
-			final TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+			final TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE,
+					deserializer);
 
 			// Assert:
 			MatcherAssert.assertThat(transaction.getMessage(), isNullMessageExpected ? IsNull.nullValue() : IsEqual.equalTo(message));
 		}
 
-		//endregion
+		// endregion
 
-		//region getAccounts
+		// region getAccounts
 
 		@Test
 		public void getAccountsIncludesSignerAndRecipientAccounts() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message)null);
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message) null);
 
 			// Act:
 			final Collection<Account> accounts = transaction.getAccounts();
@@ -392,16 +373,16 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, recipient));
 		}
 
-		//endregion
+		// endregion
 
-		//region execute
+		// region execute
 
 		@Test
 		public void executeRaisesAppropriateNotificationsForXemTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message)null);
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message) null);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
@@ -412,20 +393,21 @@ public class TransferTransactionTest {
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient, Amount.fromNem(99));
+			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient,
+					Amount.fromNem(99));
 			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
 		}
 
-		//endregion
+		// endregion
 
-		//region undo
+		// region undo
 
 		@Test
 		public void undoRaisesAppropriateNotificationsForXemTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message)null);
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message) null);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
@@ -436,13 +418,14 @@ public class TransferTransactionTest {
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer, Amount.fromNem(99));
+			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer,
+					Amount.fromNem(99));
 			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
 		}
 
-		//endregion
+		// endregion
 
-		//region Secure Message Consistency
+		// region Secure Message Consistency
 
 		@Test
 		public void consistentSecureMessageCanBeDecoded() {
@@ -451,7 +434,9 @@ public class TransferTransactionTest {
 			final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
 			final Account recipient = Utils.generateRandomAccount();
 			final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
-			final Message message = SecureMessage.fromDecodedPayload(sender, recipientPublicKeyOnly, new byte[] { 1, 2, 3 });
+			final Message message = SecureMessage.fromDecodedPayload(sender, recipientPublicKeyOnly, new byte[]{
+					1, 2, 3
+			});
 			final TransferTransaction originalTransaction = this.createTransferTransaction(sender, recipientPublicKeyOnly, 1L, message);
 
 			final MockAccountLookup accountLookup = new MockAccountLookup();
@@ -463,7 +448,9 @@ public class TransferTransactionTest {
 
 			// Assert:
 			MatcherAssert.assertThat(transaction.getMessage().canDecode(), IsEqual.equalTo(true));
-			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 1, 2, 3 }));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[]{
+					1, 2, 3
+			}));
 		}
 
 		@Test
@@ -471,7 +458,9 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account sender = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Message message = SecureMessage.fromDecodedPayload(sender, recipient, new byte[] { 1, 2, 3 });
+			final Message message = SecureMessage.fromDecodedPayload(sender, recipient, new byte[]{
+					1, 2, 3
+			});
 			final TransferTransaction originalTransaction = this.createTransferTransaction(sender, recipient, 1L, message);
 
 			final MockAccountLookup accountLookup = new MockAccountLookup();
@@ -486,19 +475,16 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsNull.nullValue());
 		}
 
-		//endregion
+		// endregion
 
-		protected static TransferTransaction createRoundTrippedTransaction(
-				final Transaction originalTransaction,
+		protected static TransferTransaction createRoundTrippedTransaction(final Transaction originalTransaction,
 				final AccountLookup accountLookup) {
 			// Act:
 			return createRoundTrippedTransaction(originalTransaction, accountLookup, originalTransaction.getEntityVersion());
 		}
 
-		protected static TransferTransaction createRoundTrippedTransaction(
-				final Transaction originalTransaction,
-				final AccountLookup accountLookup,
-				final int version) {
+		protected static TransferTransaction createRoundTrippedTransaction(final Transaction originalTransaction,
+				final AccountLookup accountLookup, final int version) {
 			// Act:
 			originalTransaction.sign();
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(originalTransaction);
@@ -527,15 +513,12 @@ public class TransferTransactionTest {
 			resetGlobalsBase();
 		}
 
-		protected TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final Amount amount,
+		protected TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount,
 				final TransferTransactionAttachment attachment) {
 			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
 
-		//region construction
+		// region construction
 
 		@Test
 		public void cannotCreateTransactionWithoutMessageAndWithMosaics() {
@@ -545,8 +528,7 @@ public class TransferTransactionTest {
 			final Collection<Mosaic> mosaics = createMosaics();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> this.createTransferTransaction(signer, recipient, 123, null, mosaics),
+			ExceptionAssert.assertThrows(v -> this.createTransferTransaction(signer, recipient, 123, null, mosaics),
 					IllegalArgumentException.class);
 		}
 
@@ -555,18 +537,19 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Message message = new PlainMessage(new byte[]{
+					12, 50, 21
+			});
 			final Collection<Mosaic> mosaics = createMosaics();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> this.createTransferTransaction(signer, recipient, 123, message, mosaics),
+			ExceptionAssert.assertThrows(v -> this.createTransferTransaction(signer, recipient, 123, message, mosaics),
 					IllegalArgumentException.class);
 		}
 
-		//endregion
+		// endregion
 
-		//region deserialization
+		// region deserialization
 
 		@Test
 		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() {
@@ -577,7 +560,9 @@ public class TransferTransactionTest {
 		@Test
 		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() {
 			// Assert:
-			this.assertMosaicsCannotBeRoundTripped(new byte[] { 12, 50, 21 });
+			this.assertMosaicsCannotBeRoundTripped(new byte[]{
+					12, 50, 21
+			});
 		}
 
 		protected void assertMosaicsCannotBeRoundTripped(final byte[] messageBytes) {
@@ -588,7 +573,8 @@ public class TransferTransactionTest {
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 			attachment.setMessage(message);
 			createMosaics().forEach(attachment::addMosaic);
-			final TransferTransaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(123), attachment);
+			final TransferTransaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient,
+					Amount.fromNem(123), attachment);
 
 			// Act:
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
@@ -599,7 +585,7 @@ public class TransferTransactionTest {
 			MatcherAssert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
-		//endregion
+		// endregion
 	}
 
 	public static class AbstractTransferTransactionV2Test extends AbstractTransferTransactionTest {
@@ -614,15 +600,12 @@ public class TransferTransactionTest {
 			resetGlobalsBase();
 		}
 
-		protected TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final Amount amount,
+		protected TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount,
 				final TransferTransactionAttachment attachment) {
 			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
 
-		//region construction
+		// region construction
 
 		@Test
 		public void canCreateTransactionWithoutMessageAndWithMosaics() {
@@ -644,7 +627,9 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Message message = new PlainMessage(new byte[]{
+					12, 50, 21
+			});
 			final Collection<Mosaic> mosaics = createMosaics();
 
 			// Act:
@@ -652,7 +637,9 @@ public class TransferTransactionTest {
 
 			// Assert:
 			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+			MatcherAssert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[]{
+					12, 50, 21
+			}));
 			MatcherAssert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
 			MatcherAssert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
 		}
@@ -662,7 +649,8 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Collection<Mosaic> mosaics = Collections.singleton(new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.fromValue(8_999_999_999_000_000L)));
+			final Collection<Mosaic> mosaics = Collections
+					.singleton(new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.fromValue(8_999_999_999_000_000L)));
 
 			// Act:
 			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 1, null, mosaics);
@@ -670,9 +658,10 @@ public class TransferTransactionTest {
 			// Assert
 			MatcherAssert.assertThat(transaction.getXemTransferAmount(), IsEqual.equalTo(Amount.fromMicroNem(8_999_999_999_000_000L)));
 		}
-		//endregion
 
-		//region deserialization
+		// endregion
+
+		// region deserialization
 
 		@Test
 		public void transactionCanBeRoundTrippedWithoutMessageAndWithMosaics() {
@@ -683,14 +672,17 @@ public class TransferTransactionTest {
 		@Test
 		public void transactionCanBeRoundTrippedWithMessageAndWithMosaics() {
 			// Assert:
-			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, createMosaics());
+			this.assertCanBeRoundTripped(new byte[]{
+					12, 50, 21
+			}, createMosaics());
 		}
 
-		//endregion
+		// endregion
 
-		//region execute /undo
+		// region execute /undo
 
-		// note: in the following execute/undo tests, mosaic transfers with mosaic id 7 do not trigger an additional transfer fee notification
+		// note: in the following execute/undo tests, mosaic transfers with mosaic id 7 do not trigger an additional transfer fee
+		// notification
 
 		@Test
 		public void executeRaisesAppropriateNotificationsForMosaicTransfers() {
@@ -709,11 +701,16 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, MOSAIC_RECIPIENT11, Utils.createMosaicId(21), new Quantity(16));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(11),
+					new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, MOSAIC_RECIPIENT11, Utils.createMosaicId(21),
+					new Quantity(16));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, recipient, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
 		}
 
@@ -735,9 +732,12 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(1), signer, recipient, Amount.fromMicroNem(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(5), signer, Amount.fromNem(10));
 		}
 
@@ -758,11 +758,15 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(8), new Quantity(30 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(8),
+					new Quantity(30 * 20));
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), signer, MOSAIC_RECIPIENT8, Amount.fromMicroNem(32));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, recipient, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
 		}
 
@@ -783,11 +787,16 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), MOSAIC_RECIPIENT11, signer, Utils.createMosaicId(21), new Quantity(16));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(11),
+					new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), MOSAIC_RECIPIENT11, signer, Utils.createMosaicId(21),
+					new Quantity(16));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
@@ -809,9 +818,12 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(5), recipient);
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(4), recipient, signer, Amount.fromMicroNem(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
@@ -832,17 +844,20 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), recipient, signer, Utils.createMosaicId(8), new Quantity(30 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(7),
+					new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), recipient, signer, Utils.createMosaicId(8),
+					new Quantity(30 * 20));
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), MOSAIC_RECIPIENT8, signer, Amount.fromMicroNem(32));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9),
+					new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19),
+					new Quantity(14));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
 		private Transaction createTransferWithMosaics(final Account signer, final Account recipient, final boolean transferXem) {
-			final Collection<Mosaic> mosaics = Arrays.asList(
-					Utils.createMosaic(7, 12),
+			final Collection<Mosaic> mosaics = Arrays.asList(Utils.createMosaic(7, 12),
 					transferXem
 							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaic(11, 5),
@@ -851,9 +866,7 @@ public class TransferTransactionTest {
 		}
 
 		private Transaction createTransferWithMosaicContainingXemLevy(final Account signer, final Account recipient) {
-			final Collection<Mosaic> mosaics = Arrays.asList(
-					Utils.createMosaic(7, 12),
-					Utils.createMosaic(8, 30),
+			final Collection<Mosaic> mosaics = Arrays.asList(Utils.createMosaic(7, 12), Utils.createMosaic(8, 30),
 					Utils.createMosaic(9, 24));
 			return this.createTransferWithMosaics(signer, recipient, mosaics);
 		}
@@ -866,9 +879,9 @@ public class TransferTransactionTest {
 			return transaction;
 		}
 
-		//endregion
+		// endregion
 
-		//region transfer accessors
+		// region transfer accessors
 
 		@Test
 		public void getXemTransferAmountReturnsNullWhenNoXemMosaicsArePresent() {
@@ -903,10 +916,9 @@ public class TransferTransactionTest {
 			final Collection<Mosaic> mosaics = transaction.getMosaics();
 
 			// Act:
-			final Collection<Mosaic> expectedMosaics = Arrays.asList(
-					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
-					Utils.createMosaic(11, 6),    //  5 * 1.2 =  6.0
-					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
+			final Collection<Mosaic> expectedMosaics = Arrays.asList(Utils.createMosaic(7, 14), // 12 * 1.2 = 14.4
+					Utils.createMosaic(11, 6), // 5 * 1.2 = 6.0
+					Utils.createMosaic(9, 28)); // 24 * 1.2 = 28.8
 			MatcherAssert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
 		}
 
@@ -919,17 +931,15 @@ public class TransferTransactionTest {
 			final Collection<Mosaic> mosaics = transaction.getMosaics();
 
 			// Act:
-			final Collection<Mosaic> expectedMosaics = Arrays.asList(
-					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
-					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
+			final Collection<Mosaic> expectedMosaics = Arrays.asList(Utils.createMosaic(7, 14), // 12 * 1.2 = 14.4
+					Utils.createMosaic(9, 28)); // 24 * 1.2 = 28.8
 			MatcherAssert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
 		}
 
 		private TransferTransaction createTransferWithMosaics(final Amount amount, final boolean transferXem) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Collection<Mosaic> mosaics = Arrays.asList(
-					Utils.createMosaic(7, 12),
+			final Collection<Mosaic> mosaics = Arrays.asList(Utils.createMosaic(7, 12),
 					transferXem
 							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaic(11, 5),
@@ -939,6 +949,6 @@ public class TransferTransactionTest {
 			return this.createTransferTransaction(signer, recipient, amount, attachment);
 		}
 
-		//endregion
+		// endregion
 	}
 }

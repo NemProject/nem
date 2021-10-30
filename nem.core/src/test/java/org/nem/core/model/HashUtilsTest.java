@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 
 public class HashUtilsTest {
 
-	//region calculateHash
+	// region calculateHash
 
 	@Test
 	public void identicalEntitiesHaveSameHash() {
@@ -73,9 +73,9 @@ public class HashUtilsTest {
 		MatcherAssert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region nextHash
+	// region nextHash
 
 	@Test
 	public void nextHashProducesHashEquivalentToConcatenatingTheInputs() {
@@ -91,7 +91,7 @@ public class HashUtilsTest {
 		MatcherAssert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
-	//endregion
+	// endregion
 
 	private static class HashPublicKeyPair implements SerializableEntity {
 

@@ -3,7 +3,9 @@ package org.nem.core.serialization.primitive;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
-public abstract class AbstractStringTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveTruncationTest<TSerializer, TDeserializer, String> {
+public abstract class AbstractStringTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveTruncationTest<TSerializer, TDeserializer, String> {
 
 	public AbstractStringTruncationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
@@ -14,7 +16,7 @@ public abstract class AbstractStringTruncationTest<TSerializer extends Serialize
 		final byte[] bytes = Utils.generateRandomBytes(length);
 		final StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < length; ++i) {
-			final char c = (char)('a' + (Math.abs(bytes[i] % 26)));
+			final char c = (char) ('a' + (Math.abs(bytes[i] % 26)));
 			builder.append(c);
 		}
 

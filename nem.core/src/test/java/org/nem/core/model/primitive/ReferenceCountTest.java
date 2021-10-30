@@ -6,7 +6,7 @@ import org.junit.*;
 
 public class ReferenceCountTest {
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeReferenceCount() {
@@ -32,9 +32,9 @@ public class ReferenceCountTest {
 		MatcherAssert.assertThat(refCount.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region increment/decrement
+	// region increment/decrement
 
 	@Test
 	public void referenceCountCanBeIncremented() {
@@ -69,5 +69,5 @@ public class ReferenceCountTest {
 		refCount.decrement();
 	}
 
-	//endregion
+	// endregion
 }

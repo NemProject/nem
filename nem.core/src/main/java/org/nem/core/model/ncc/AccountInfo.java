@@ -31,13 +31,8 @@ public class AccountInfo implements SerializableEntity {
 	 * @param label The label.
 	 * @param importance The importance.
 	 */
-	public AccountInfo(
-			final Address address,
-			final Amount balance,
-			final Amount vestedBalance,
-			final BlockAmount numHarvestedBlocks,
-			final String label,
-			final double importance) {
+	public AccountInfo(final Address address, final Amount balance, final Amount vestedBalance, final BlockAmount numHarvestedBlocks,
+			final String label, final double importance) {
 		this(address, balance, vestedBalance, numHarvestedBlocks, label, importance, null);
 	}
 
@@ -51,14 +46,8 @@ public class AccountInfo implements SerializableEntity {
 	 * @param label The label.
 	 * @param importance The importance.
 	 */
-	public AccountInfo(
-			final Address address,
-			final Amount balance,
-			final Amount vestedBalance,
-			final BlockAmount numHarvestedBlocks,
-			final String label,
-			final double importance,
-			final MultisigInfo multisigInfo) {
+	public AccountInfo(final Address address, final Amount balance, final Amount vestedBalance, final BlockAmount numHarvestedBlocks,
+			final String label, final double importance, final MultisigInfo multisigInfo) {
 		this.address = address;
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
@@ -190,7 +179,7 @@ public class AccountInfo implements SerializableEntity {
 			return false;
 		}
 
-		final AccountInfo rhs = (AccountInfo)obj;
+		final AccountInfo rhs = (AccountInfo) obj;
 		return this.address.equals(rhs.address);
 	}
 }

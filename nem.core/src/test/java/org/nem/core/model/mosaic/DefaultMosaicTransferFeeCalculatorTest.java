@@ -78,16 +78,15 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
+	// endregion
+
 	// region percentile xem fees
 
 	@Test
 	public void levyCanBeOneXemForTenMosaicsWhenFeeTypeIsPercentile() {
 		// Arrange:
 		// - peg a fee of 1 XEM to 10 PEG
-		final MosaicLevyLookup lookup = id -> new MosaicLevy(
-				MosaicTransferFeeType.Percentile,
-				RECIPIENT,
-				MosaicConstants.MOSAIC_ID_XEM,
+		final MosaicLevyLookup lookup = id -> new MosaicLevy(MosaicTransferFeeType.Percentile, RECIPIENT, MosaicConstants.MOSAIC_ID_XEM,
 				new Quantity(10000L * Amount.MICRONEMS_IN_NEM / 10L));
 		final MosaicTransferFeeCalculator calculator = new DefaultMosaicTransferFeeCalculator(lookup);
 
@@ -106,10 +105,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	public void levyCanBeTenXemForOneMosaicWhenFeeTypeIsPercentile() {
 		// Arrange:
 		// - peg a fee of 10 XEM to 1 PEG
-		final MosaicLevyLookup lookup = id -> new MosaicLevy(
-				MosaicTransferFeeType.Percentile,
-				RECIPIENT,
-				MosaicConstants.MOSAIC_ID_XEM,
+		final MosaicLevyLookup lookup = id -> new MosaicLevy(MosaicTransferFeeType.Percentile, RECIPIENT, MosaicConstants.MOSAIC_ID_XEM,
 				new Quantity(10000L * Amount.MICRONEMS_IN_NEM * 10));
 		final MosaicTransferFeeCalculator calculator = new DefaultMosaicTransferFeeCalculator(lookup);
 
@@ -134,14 +130,13 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 	// endregion
 
-	// endregion
-
 	private static Mosaic createMosaic(final String name, final long quantity) {
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), name);
 		return new Mosaic(mosaicId, Quantity.fromValue(quantity));
 	}
 
-	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId, final int expectedFee) {
+	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId,
+			final int expectedFee) {
 		// Assert:
 		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
 		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));

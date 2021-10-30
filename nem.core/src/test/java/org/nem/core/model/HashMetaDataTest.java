@@ -20,7 +20,7 @@ public class HashMetaDataTest {
 		MatcherAssert.assertThat(meta.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {

@@ -41,10 +41,10 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return this.calculateMinimumFee((TransferTransaction)transaction);
+				return this.calculateMinimumFee((TransferTransaction) transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
+				return calculateMinimumFee((MultisigAggregateModificationTransaction) transaction);
 
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
@@ -63,23 +63,20 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 			return Amount.fromNem(messageFee + transferFee);
 		}
 
-		final long transferFee = transaction.getAttachment().getMosaics().stream()
-				.map(m -> {
-					final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(m.getMosaicId());
-					if (null == information) {
-						throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", m.getMosaicId()));
-					}
+		final long transferFee = transaction.getAttachment().getMosaics().stream().map(m -> {
+			final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(m.getMosaicId());
+			if (null == information) {
+				throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", m.getMosaicId()));
+			}
 
-					return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
-				})
-				.map(TransactionFeeCalculatorBeforeFork::calculateXemTransferFee)
-				.reduce(0L, Long::sum);
+			return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
+		}).map(TransactionFeeCalculatorBeforeFork::calculateXemTransferFee).reduce(0L, Long::sum);
 		return Amount.fromNem(messageFee + (transferFee * 5) / 4);
 	}
 
 	private static long calculateXemTransferFee(final long numXem) {
 		final long smallTransferPenalty = FEE_UNIT.multiply(5).getNumNem() - numXem;
-		final long largeTransferFee = (long)(Math.atan(numXem / 150000.) * FEE_MULTIPLIER * 33);
+		final long largeTransferFee = (long) (Math.atan(numXem / 150000.) * FEE_MULTIPLIER * 33);
 		return Math.max(smallTransferPenalty, Math.max(FEE_UNIT_NUM_NEM, largeTransferFee));
 	}
 
@@ -89,11 +86,8 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 		}
 
 		return BigInteger.valueOf(MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties().getInitialSupply())
-				.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw()))
-				.multiply(BigInteger.valueOf(amount.getNumMicroNem()))
-				.divide(BigInteger.valueOf(supply.getRaw()))
-				.divide(BigInteger.TEN.pow(divisibility + 6))
-				.longValue();
+				.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw())).multiply(BigInteger.valueOf(amount.getNumMicroNem()))
+				.divide(BigInteger.valueOf(supply.getRaw())).divide(BigInteger.TEN.pow(divisibility + 6)).longValue();
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
@@ -117,7 +111,7 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 			case TransactionTypes.MULTISIG_SIGNATURE:
 				// minimumFee <= multisig signatures fee <= 1000
 				// reason: during spam attack cosignatories must be able to get their signature into the cache.
-				//         it is limited in order for the last cosignatory not to be able to drain the multisig account
+				// it is limited in order for the last cosignatory not to be able to drain the multisig account
 				return 0 <= transaction.getFee().compareTo(minimumFee) && 0 >= transaction.getFee().compareTo(maxCacheFee);
 		}
 

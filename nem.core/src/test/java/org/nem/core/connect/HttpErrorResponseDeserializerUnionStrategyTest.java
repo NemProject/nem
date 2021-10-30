@@ -19,9 +19,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		final DeserializationContext context = new DeserializationContext(null);
 
 		// Act:
-		final ErrorResponseDeserializerUnion union = coerceUnion(
-				200,
-				JsonSerializer.serializeToBytes(new MockSerializableEntity(2, s, 12)),
+		final ErrorResponseDeserializerUnion union = coerceUnion(200, JsonSerializer.serializeToBytes(new MockSerializableEntity(2, s, 12)),
 				context);
 		final MockSerializableEntity entity = new MockSerializableEntity(union.getDeserializer());
 
@@ -45,10 +43,8 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 	@Test
 	public void canCoerceErrorResponse() throws IOException {
 		// Act:
-		final ErrorResponseDeserializerUnion union = coerceUnion(
-				404,
-				JsonSerializer.serializeToBytes(new ErrorResponse(new TimeInstant(3), "badness", 700)),
-				null);
+		final ErrorResponseDeserializerUnion union = coerceUnion(404,
+				JsonSerializer.serializeToBytes(new ErrorResponse(new TimeInstant(3), "badness", 700)), null);
 		final ErrorResponse response = union.getError();
 
 		// Assert:
@@ -59,10 +55,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 	@Test
 	public void canCoerceEmptyString() throws IOException {
 		// Act:
-		final ErrorResponseDeserializerUnion union = coerceUnion(
-				404,
-				"".getBytes(),
-				null);
+		final ErrorResponseDeserializerUnion union = coerceUnion(404, "".getBytes(), null);
 
 		// Assert:
 		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(false));
@@ -77,9 +70,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		ConnectUtils.coerceStreamWithIoError(strategy);
 	}
 
-	private static ErrorResponseDeserializerUnion coerceUnion(
-			final int statusCode,
-			final byte[] serializedBytes,
+	private static ErrorResponseDeserializerUnion coerceUnion(final int statusCode, final byte[] serializedBytes,
 			final DeserializationContext context) throws IOException {
 		// Arrange:
 		final HttpErrorResponseDeserializerUnionStrategy strategy = new HttpErrorResponseDeserializerUnionStrategy(context);

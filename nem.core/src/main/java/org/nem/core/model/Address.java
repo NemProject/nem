@@ -57,8 +57,7 @@ public class Address implements Comparable<Address> {
 	}
 
 	/**
-	 * Creates an Address from both public key and an encoded address string.
-	 * This is protected because consistency is not checked.
+	 * Creates an Address from both public key and an encoded address string. This is protected because consistency is not checked.
 	 *
 	 * @param publicKey The public key.
 	 * @param encoded The encoded address string.
@@ -86,7 +85,9 @@ public class Address implements Comparable<Address> {
 		final byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
 
 		// step 3: add version byte in front of (2)
-		final byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[] { version }, ripemd160StepOneHash);
+		final byte[] versionPrefixedRipemd160Hash = ArrayUtils.concat(new byte[]{
+				version
+		}, ripemd160StepOneHash);
 
 		// step 4: get the checksum of (3)
 		final byte[] stepThreeChecksum = generateChecksum(versionPrefixedRipemd160Hash);
@@ -185,7 +186,7 @@ public class Address implements Comparable<Address> {
 			return false;
 		}
 
-		final Address rhs = (Address)obj;
+		final Address rhs = (Address) obj;
 		return this.encoded.equals(rhs.encoded);
 	}
 
@@ -218,11 +219,7 @@ public class Address implements Comparable<Address> {
 	 * @param address The object.
 	 * @param encoding The address encoding mode.
 	 */
-	public static void writeTo(
-			final Serializer serializer,
-			final String label,
-			final Address address,
-			final AddressEncoding encoding) {
+	public static void writeTo(final Serializer serializer, final String label, final Address address, final AddressEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
 				final PublicKey publicKey = address.getPublicKey();
@@ -230,7 +227,7 @@ public class Address implements Comparable<Address> {
 				break;
 
 			case COMPRESSED:
-			default:
+			default :
 				serializer.writeString(label, address.getEncoded());
 				break;
 		}
@@ -255,16 +252,13 @@ public class Address implements Comparable<Address> {
 	 * @param label The optional label.
 	 * @return The read object.
 	 */
-	public static Address readFrom(
-			final Deserializer deserializer,
-			final String label,
-			final AddressEncoding encoding) {
+	public static Address readFrom(final Deserializer deserializer, final String label, final AddressEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
 				return createAddressFromPublicKeyBytes(deserializer.readBytes(label));
 
 			case COMPRESSED:
-			default:
+			default :
 				return createAddressFromEncodedAddress(deserializer.readString(label));
 		}
 	}
@@ -277,16 +271,13 @@ public class Address implements Comparable<Address> {
 	 * @param label The optional label.
 	 * @return The read object.
 	 */
-	public static Address readFromOptional(
-			final Deserializer deserializer,
-			final String label,
-			final AddressEncoding encoding) {
+	public static Address readFromOptional(final Deserializer deserializer, final String label, final AddressEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
 				return createAddressFromPublicKeyBytes(deserializer.readOptionalBytes(label));
 
 			case COMPRESSED:
-			default:
+			default :
 				return createAddressFromEncodedAddress(deserializer.readOptionalString(label));
 		}
 	}

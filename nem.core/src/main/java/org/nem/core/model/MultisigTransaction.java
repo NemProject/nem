@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 public class MultisigTransaction extends Transaction {
 	private final Transaction otherTransaction;
 	private final Hash otherTransactionHash;
-	private final SortedSet<MultisigSignatureTransaction> signatureTransactions = new TreeSet<>(new MultisigSignatureTransactionComparator());
+	private final SortedSet<MultisigSignatureTransaction> signatureTransactions = new TreeSet<>(
+			new MultisigSignatureTransactionComparator());
 
 	/**
 	 * Creates a multisig transaction.
@@ -23,10 +24,7 @@ public class MultisigTransaction extends Transaction {
 	 * @param sender The transaction sender.
 	 * @param otherTransaction The other (enclosed) transaction.
 	 */
-	public MultisigTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Transaction otherTransaction) {
+	public MultisigTransaction(final TimeInstant timeStamp, final Account sender, final Transaction otherTransaction) {
 		super(TransactionTypes.MULTISIG, 1, timeStamp, sender);
 		this.otherTransaction = otherTransaction;
 		this.otherTransactionHash = HashUtils.calculateHash(otherTransaction.asNonVerifiable());
@@ -47,7 +45,7 @@ public class MultisigTransaction extends Transaction {
 				? deserializer.readObjectArray("signatures", TransactionFactory.VERIFIABLE)
 				: new ArrayList<>();
 
-		signatures.forEach(o -> this.addSignature((MultisigSignatureTransaction)o));
+		signatures.forEach(o -> this.addSignature((MultisigSignatureTransaction) o));
 	}
 
 	/**
@@ -107,7 +105,8 @@ public class MultisigTransaction extends Transaction {
 	 * @return All signers.
 	 */
 	public List<Account> getSigners() {
-		return Collections.unmodifiableList(this.signatureTransactions.stream().map(VerifiableEntity::getSigner).collect(Collectors.toList()));
+		return Collections
+				.unmodifiableList(this.signatureTransactions.stream().map(VerifiableEntity::getSigner).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -125,9 +124,7 @@ public class MultisigTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return this.getChildTransactions().stream()
-				.flatMap(t -> t.getAccounts().stream())
-				.collect(Collectors.toList());
+		return this.getChildTransactions().stream().flatMap(t -> t.getAccounts().stream()).collect(Collectors.toList());
 	}
 
 	@Override

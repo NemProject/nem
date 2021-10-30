@@ -21,9 +21,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDirectTransactions(block));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 100, 150));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 100, 150));
 	}
 
 	@Test
@@ -35,9 +33,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDirectAndFirstChildTransactions(block));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
 	}
 
 	@Test
@@ -49,9 +45,7 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamDefault(block));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80, 100, 110, 120, 130, 150, 160, 170, 180));
 	}
 
 	@Test
@@ -63,12 +57,8 @@ public class BlockExtensionsTest {
 		final List<Integer> customFields = getCustomFields(BlockExtensions.streamAllTransactions(block));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(
-						50, 60, 61, 62, 70, 80, 81, 82,
-						100, 110, 111, 112, 120, 130, 131, 132,
-						150, 160, 161, 162, 170, 180, 181, 182));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82, 100, 110, 111, 112, 120, 130, 131,
+				132, 150, 160, 161, 162, 170, 180, 181, 182));
 	}
 
 	private static List<Integer> getCustomFields(final Stream<Transaction> stream) {

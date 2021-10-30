@@ -14,10 +14,10 @@ public class SecP256K1KeyAnalyzerTest extends KeyAnalyzerTest {
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
 
 		// Assert:
-		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte)1)), IsEqual.equalTo(false));
-		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte)2)), IsEqual.equalTo(true));
-		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte)3)), IsEqual.equalTo(true));
-		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte)4)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte) 1)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte) 2)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte) 3)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(analyzer.isKeyCompressed(this.createKeyWithFirstByte(publicKey, (byte) 4)), IsEqual.equalTo(false));
 	}
 
 	private PublicKey createKeyWithFirstByte(final PublicKey key, final byte firstByte) {

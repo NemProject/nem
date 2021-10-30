@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class HashShortIdTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canBeCreated() {
@@ -20,9 +20,9 @@ public class HashShortIdTest {
 		MatcherAssert.assertThat(shortId.getValue(), IsEqual.equalTo(1234L));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void hashShortIdCanBeSerialized() {
@@ -53,5 +53,5 @@ public class HashShortIdTest {
 		return new HashShortId(deserializer);
 	}
 
-	//endregion
+	// endregion
 }

@@ -53,14 +53,11 @@ public class MosaicDefinitionTest {
 	private static void assertMosaicDefinitionCannotBeCreatedWithNull(final String parameterName) {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new MosaicDefinition(
-						parameterName.equals("creator") ? null : Utils.generateRandomAccount(),
+				v -> new MosaicDefinition(parameterName.equals("creator") ? null : Utils.generateRandomAccount(),
 						parameterName.equals("id") ? null : new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 						parameterName.equals("description") ? null : new MosaicDescriptor("precious vouchers"),
-						parameterName.equals("properties") ? null : Utils.createMosaicProperties(),
-						null),
-				IllegalArgumentException.class,
-				ex -> ex.getMessage().contains(parameterName));
+						parameterName.equals("properties") ? null : Utils.createMosaicProperties(), null),
+				IllegalArgumentException.class, ex -> ex.getMessage().contains(parameterName));
 	}
 
 	// endregion
@@ -87,9 +84,7 @@ public class MosaicDefinitionTest {
 
 	private static void assertIsMosaicLevyPresent(final MosaicLevy levy, final boolean expected) {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinition(
-				Utils.generateRandomAccount(),
-				Utils.createMosaicProperties(),
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(Utils.generateRandomAccount(), Utils.createMosaicProperties(),
 				levy);
 
 		// Assert:
@@ -109,7 +104,8 @@ public class MosaicDefinitionTest {
 		final MosaicDefinition original = createMosaicDefinition(creator, properties, levy);
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
+				Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
 		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, levy);
@@ -178,8 +174,7 @@ public class MosaicDefinitionTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaicDefinition)) : IsEqual.equalTo(mosaicDefinition));
 		}
 
@@ -194,8 +189,7 @@ public class MosaicDefinitionTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -223,75 +217,46 @@ public class MosaicDefinitionTest {
 	}
 
 	private static MosaicDefinition createMosaicDefinitionA(final String name) {
-		return new MosaicDefinition(
-				Utils.generateRandomAccount(),
-				new MosaicId(new NamespaceId("xyz"), name),
-				new MosaicDescriptor("precious vouchers"),
-				Utils.createMosaicProperties(),
-				createMosaicLevy(Quantity.fromValue(142)));
+		return new MosaicDefinition(Utils.generateRandomAccount(), new MosaicId(new NamespaceId("xyz"), name),
+				new MosaicDescriptor("precious vouchers"), Utils.createMosaicProperties(), createMosaicLevy(Quantity.fromValue(142)));
 	}
 
 	private static MosaicDefinition createMosaicDefinitionB(final String name) {
-		return new MosaicDefinition(
-				Utils.generateRandomAccount(),
-				new MosaicId(new NamespaceId("xyz"), name),
-				new MosaicDescriptor("silver coins"),
-				new DefaultMosaicProperties(new Properties()),
+		return new MosaicDefinition(Utils.generateRandomAccount(), new MosaicId(new NamespaceId("xyz"), name),
+				new MosaicDescriptor("silver coins"), new DefaultMosaicProperties(new Properties()),
 				createMosaicLevy(Quantity.fromValue(123)));
 	}
 
 	// endregion
 
-	private static void assertMosaicDefinitionProperties(
-			final MosaicDefinition mosaicDefinition,
-			final Account creator,
-			final MosaicProperties properties,
-			final MosaicLevy levy) {
+	private static void assertMosaicDefinitionProperties(final MosaicDefinition mosaicDefinition, final Account creator,
+			final MosaicProperties properties, final MosaicLevy levy) {
 		// Assert:
 		MatcherAssert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
-		MatcherAssert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers")));
+		MatcherAssert.assertThat(mosaicDefinition.getId(),
+				IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers")));
 		MatcherAssert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		MatcherAssert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
 		MatcherAssert.assertThat(mosaicDefinition.getMosaicLevy(), null == levy ? IsNull.nullValue() : IsEqual.equalTo(levy));
 	}
 
 	private static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
-		return new MosaicDefinition(
-				Utils.generateRandomAccount(),
-				new MosaicId(new NamespaceId(namespaceId), name),
-				new MosaicDescriptor("precious vouchers"),
-				Utils.createMosaicProperties(),
-				null);
+		return new MosaicDefinition(Utils.generateRandomAccount(), new MosaicId(new NamespaceId(namespaceId), name),
+				new MosaicDescriptor("precious vouchers"), Utils.createMosaicProperties(), null);
 	}
 
-	private static MosaicDefinition createMosaicDefinition(
-			final Account creator,
-			final MosaicProperties properties) {
-		return new MosaicDefinition(
-				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers"),
-				new MosaicDescriptor("precious vouchers"),
-				properties,
-				null);
+	private static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicProperties properties) {
+		return new MosaicDefinition(creator, new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers"),
+				new MosaicDescriptor("precious vouchers"), properties, null);
 	}
 
-	private static MosaicDefinition createMosaicDefinition(
-			final Account creator,
-			final MosaicProperties properties,
+	private static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicProperties properties,
 			final MosaicLevy levy) {
-		return new MosaicDefinition(
-				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers"),
-				new MosaicDescriptor("precious vouchers"),
-				properties,
-				levy);
+		return new MosaicDefinition(creator, new MosaicId(new NamespaceId("alice.vouchers"), "alice's vouchers"),
+				new MosaicDescriptor("precious vouchers"), properties, levy);
 	}
 
 	private static MosaicLevy createMosaicLevy(final Quantity fee) {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				Utils.generateRandomAccount(),
-				Utils.createMosaicId(2),
-				fee);
+		return new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), Utils.createMosaicId(2), fee);
 	}
 }

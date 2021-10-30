@@ -111,10 +111,8 @@ public class NodeEndpoint implements SerializableEntity {
 			return false;
 		}
 
-		final NodeEndpoint rhs = (NodeEndpoint)obj;
-		return this.protocol.equals(rhs.protocol)
-				&& this.normalizedHost.equals(rhs.normalizedHost)
-				&& this.port == rhs.port;
+		final NodeEndpoint rhs = (NodeEndpoint) obj;
+		return this.protocol.equals(rhs.protocol) && this.normalizedHost.equals(rhs.normalizedHost) && this.port == rhs.port;
 	}
 
 	@Override

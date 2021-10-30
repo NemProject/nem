@@ -6,10 +6,9 @@ package org.nem.core.model.primitive;
  * @param <TDerived> The derived class type.
  * @param <TValue> The value type.
  */
-public abstract class AbstractPrimitive<
-		TDerived extends AbstractPrimitive<?, TValue>,
-		TValue extends Number & Comparable<TValue>>
-		implements Comparable<TDerived> {
+public abstract class AbstractPrimitive<TDerived extends AbstractPrimitive<?, TValue>, TValue extends Number & Comparable<TValue>>
+		implements
+			Comparable<TDerived> {
 
 	private final TValue value;
 	private final Class<TDerived> derivedClass;
@@ -48,7 +47,7 @@ public abstract class AbstractPrimitive<
 	@Override
 	public int hashCode() {
 		final long longValue = this.value.longValue();
-		return (int)(longValue ^ (longValue >> 32));
+		return (int) (longValue ^ (longValue >> 32));
 	}
 
 	@Override

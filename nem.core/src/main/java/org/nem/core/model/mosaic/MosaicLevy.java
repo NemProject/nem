@@ -21,11 +21,7 @@ public class MosaicLevy implements SerializableEntity {
 	 * @param mosaicId The mosaic id.
 	 * @param fee The fee.
 	 */
-	public MosaicLevy(
-			final MosaicTransferFeeType type,
-			final Account recipient,
-			final MosaicId mosaicId,
-			final Quantity fee) {
+	public MosaicLevy(final MosaicTransferFeeType type, final Account recipient, final MosaicId mosaicId, final Quantity fee) {
 		this.type = type;
 		this.recipient = recipient;
 		this.mosaicId = mosaicId;
@@ -98,10 +94,7 @@ public class MosaicLevy implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.type.hashCode() ^
-				this.recipient.hashCode() ^
-				this.mosaicId.hashCode() ^
-				this.fee.hashCode();
+		return this.type.hashCode() ^ this.recipient.hashCode() ^ this.mosaicId.hashCode() ^ this.fee.hashCode();
 	}
 
 	@Override
@@ -110,10 +103,8 @@ public class MosaicLevy implements SerializableEntity {
 			return false;
 		}
 
-		final MosaicLevy rhs = (MosaicLevy)obj;
-		return this.type.equals(rhs.type) &&
-				this.recipient.equals(rhs.recipient) &&
-				this.mosaicId.equals(rhs.mosaicId) &&
-				this.fee.equals(rhs.fee);
+		final MosaicLevy rhs = (MosaicLevy) obj;
+		return this.type.equals(rhs.type) && this.recipient.equals(rhs.recipient) && this.mosaicId.equals(rhs.mosaicId)
+				&& this.fee.equals(rhs.fee);
 	}
 }

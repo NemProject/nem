@@ -12,7 +12,7 @@ import java.util.*;
 
 public class AccountMetaDataTest {
 
-	//region create
+	// region create
 
 	@Test
 	public void canCreateAccountMetaDataWithNeitherCosignatoriesNorCosignatoriesOf() {
@@ -38,14 +38,10 @@ public class AccountMetaDataTest {
 		assertCanCreateAccountMetaData(createAccountInfos(), createAccountInfos());
 	}
 
-	private static void assertCanCreateAccountMetaData(
-			final List<AccountInfo> multisigAccounts,
+	private static void assertCanCreateAccountMetaData(final List<AccountInfo> multisigAccounts,
 			final List<AccountInfo> cosignatoryAccounts) {
 		// Arrange:
-		final AccountMetaData metaData = createAccountMetaData(
-				AccountStatus.UNLOCKED,
-				AccountRemoteStatus.ACTIVE,
-				multisigAccounts,
+		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE, multisigAccounts,
 				cosignatoryAccounts);
 
 		// Assert:
@@ -67,9 +63,9 @@ public class AccountMetaDataTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
+	// region roundtrip
 
 	@Test
 	public void canRoundTripAccountMetaDataWithNeitherCosignatoriesNorCosignatoriesOf() {
@@ -95,16 +91,10 @@ public class AccountMetaDataTest {
 		assertCanRoundTrip(createAccountInfos(), createAccountInfos());
 	}
 
-	private static void assertCanRoundTrip(
-			final List<AccountInfo> multisigAccounts,
-			final List<AccountInfo> cosignatoryAccounts) {
+	private static void assertCanRoundTrip(final List<AccountInfo> multisigAccounts, final List<AccountInfo> cosignatoryAccounts) {
 		// Arrange:
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
-				createAccountMetaData(
-						AccountStatus.LOCKED,
-						AccountRemoteStatus.DEACTIVATING,
-						multisigAccounts,
-						cosignatoryAccounts));
+				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING, multisigAccounts, cosignatoryAccounts));
 
 		// Assert:
 		MatcherAssert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
@@ -125,13 +115,10 @@ public class AccountMetaDataTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	private static AccountMetaData createAccountMetaData(
-			final AccountStatus status,
-			final AccountRemoteStatus remoteStatus,
-			final List<AccountInfo> multisigAccounts,
-			final List<AccountInfo> cosignatoryAccounts) {
+	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus,
+			final List<AccountInfo> multisigAccounts, final List<AccountInfo> cosignatoryAccounts) {
 		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
 	}
 
@@ -143,8 +130,10 @@ public class AccountMetaDataTest {
 
 	private static List<AccountInfo> createAccountInfos() {
 		return Arrays.asList(
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), Amount.fromNem(111), new BlockAmount(234), "account1", 0.1),
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), Amount.fromNem(333), new BlockAmount(456), "account2", 0.2));
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), Amount.fromNem(111), new BlockAmount(234), "account1",
+						0.1),
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), Amount.fromNem(333), new BlockAmount(456), "account2",
+						0.2));
 	}
 
 	private static void assertAccountInfos(final List<AccountInfo> actual, final List<AccountInfo> expected) {

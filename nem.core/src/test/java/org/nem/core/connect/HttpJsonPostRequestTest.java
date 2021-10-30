@@ -20,9 +20,7 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(entity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				request.getPayload(),
-				IsEqual.equalTo(JsonSerializer.serializeToBytes(entity)));
+		MatcherAssert.assertThat(request.getPayload(), IsEqual.equalTo(JsonSerializer.serializeToBytes(entity)));
 	}
 
 	@Test
@@ -36,9 +34,7 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(jsonEntity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				request.getPayload(),
-				IsEqual.equalTo(jsonEntity.toString().getBytes("UTF-8")));
+		MatcherAssert.assertThat(request.getPayload(), IsEqual.equalTo(jsonEntity.toString().getBytes("UTF-8")));
 	}
 
 	@Test
@@ -50,8 +46,6 @@ public class HttpJsonPostRequestTest {
 		final HttpPostRequest request = new HttpJsonPostRequest(entity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				request.getContentType(),
-				IsEqual.equalTo("application/json"));
+		MatcherAssert.assertThat(request.getContentType(), IsEqual.equalTo("application/json"));
 	}
 }

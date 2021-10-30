@@ -35,8 +35,8 @@ public class AccountIdTest {
 	@Test
 	public void accountIdCannotBeCreatedAroundInvalidAddress() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountId((Address)null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new AccountId((String)null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountId((Address) null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountId((String) null), IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(v -> new AccountId("ABC"), IllegalArgumentException.class);
 	}
 
@@ -73,7 +73,7 @@ public class AccountIdTest {
 		MatcherAssert.assertThat(request.getAddress(), IsEqual.equalTo(address));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -87,7 +87,7 @@ public class AccountIdTest {
 		MatcherAssert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
 		MatcherAssert.assertThat(request, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()))));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(request)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)request)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) request)));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class AccountIdTest {
 		MatcherAssert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()).hashCode())));
 	}
 
-	//endregion
+	// endregion
 
 	private AccountId createAccountIdFromJson(final String address) {
 		final JSONObject jsonObject = new JSONObject();

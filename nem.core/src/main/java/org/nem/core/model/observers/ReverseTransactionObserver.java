@@ -3,8 +3,8 @@ package org.nem.core.model.observers;
 import java.util.*;
 
 /**
- * A TransactionObserver implementation that gathers all notifications and applies them in reverse order.
- * In addition, balance transfer and mosaic transfer notifications are automatically reversed.
+ * A TransactionObserver implementation that gathers all notifications and applies them in reverse order. In addition, balance transfer and
+ * mosaic transfer notifications are automatically reversed.
  */
 public class ReverseTransactionObserver implements TransactionObserver {
 	private final TransactionObserver observer;
@@ -37,18 +37,18 @@ public class ReverseTransactionObserver implements TransactionObserver {
 	private static Notification reverse(final Notification notification) {
 		switch (notification.getType()) {
 			case BalanceTransfer:
-				return swapAccounts((BalanceTransferNotification)notification);
+				return swapAccounts((BalanceTransferNotification) notification);
 
 			case MosaicTransfer:
-				return swapAccounts((MosaicTransferNotification)notification);
+				return swapAccounts((MosaicTransferNotification) notification);
 
 			case BalanceCredit:
-				return changeType((BalanceAdjustmentNotification)notification, NotificationType.BalanceDebit);
+				return changeType((BalanceAdjustmentNotification) notification, NotificationType.BalanceDebit);
 
 			case BalanceDebit:
-				return changeType((BalanceAdjustmentNotification)notification, NotificationType.BalanceCredit);
+				return changeType((BalanceAdjustmentNotification) notification, NotificationType.BalanceCredit);
 
-			default:
+			default :
 				return notification;
 		}
 	}
@@ -58,7 +58,8 @@ public class ReverseTransactionObserver implements TransactionObserver {
 	}
 
 	private static Notification swapAccounts(final MosaicTransferNotification notification) {
-		return new MosaicTransferNotification(notification.getRecipient(), notification.getSender(), notification.getMosaicId(), notification.getQuantity());
+		return new MosaicTransferNotification(notification.getRecipient(), notification.getSender(), notification.getMosaicId(),
+				notification.getQuantity());
 	}
 
 	private static Notification changeType(final BalanceAdjustmentNotification notification, final NotificationType type) {

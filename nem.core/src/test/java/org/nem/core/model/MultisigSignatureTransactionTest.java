@@ -15,7 +15,7 @@ import java.util.Collection;
 
 public class MultisigSignatureTransactionTest {
 
-	//region constructor / roundtrip
+	// region constructor / roundtrip
 
 	@Test
 	public void canCreateTransaction() {
@@ -23,11 +23,7 @@ public class MultisigSignatureTransactionTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final Account multisig = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
-				new TimeInstant(123),
-				cosigner,
-				multisig,
-				hash);
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(new TimeInstant(123), cosigner, multisig, hash);
 
 		// Assert:
 		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
@@ -44,10 +40,7 @@ public class MultisigSignatureTransactionTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final Account multisig = Utils.generateRandomAccount();
 		final Transaction otherTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
-				new TimeInstant(123),
-				cosigner,
-				multisig,
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(new TimeInstant(123), cosigner, multisig,
 				otherTransaction);
 
 		// Assert:
@@ -66,10 +59,7 @@ public class MultisigSignatureTransactionTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final Account multisig = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(
-				new TimeInstant(123),
-				cosigner,
-				multisig,
+		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(new TimeInstant(123), cosigner, multisig,
 				hash);
 
 		// Act:
@@ -91,18 +81,15 @@ public class MultisigSignatureTransactionTest {
 		return new MultisigSignatureTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region getAccounts
+	// region getAccounts
 
 	@Test
 	public void getAccountsIncludesOnlySigner() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		final Transaction transaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				signer,
-				Utils.generateRandomAccount(),
+		final Transaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, signer, Utils.generateRandomAccount(),
 				Utils.generateRandomHash());
 
 		// Act:
@@ -112,9 +99,9 @@ public class MultisigSignatureTransactionTest {
 		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
 	}
 
-	//endregion
+	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -150,13 +137,9 @@ public class MultisigSignatureTransactionTest {
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getValue(), multisig, Amount.fromNem(12));
 	}
 
-	//endregion
+	// endregion
 
 	private static MultisigSignatureTransaction createTransactionWithMultisig(final Account multisig) {
-		return new MultisigSignatureTransaction(
-				new TimeInstant(123),
-				Utils.generateRandomAccount(),
-				multisig,
-				Utils.generateRandomHash());
+		return new MultisigSignatureTransaction(new TimeInstant(123), Utils.generateRandomAccount(), multisig, Utils.generateRandomHash());
 	}
 }

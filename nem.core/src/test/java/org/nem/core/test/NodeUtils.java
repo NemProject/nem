@@ -18,16 +18,13 @@ public class NodeUtils {
 	}
 
 	/**
-	 * Creates a node with the specified port.
-	 * Note: this is around for legacy tests that are using port as a hallmark.
+	 * Creates a node with the specified port. Note: this is around for legacy tests that are using port as a hallmark.
 	 *
 	 * @param port The port.
 	 * @return The new node.
 	 */
 	public static Node createNodeWithPort(final int port) {
-		return new Node(
-				new WeakNodeIdentity(String.format("%d", port)),
-				new NodeEndpoint("http", "127.0.0.1", port));
+		return new Node(new WeakNodeIdentity(String.format("%d", port)), new NodeEndpoint("http", "127.0.0.1", port));
 	}
 
 	/**

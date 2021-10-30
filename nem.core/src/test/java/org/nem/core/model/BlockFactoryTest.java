@@ -62,9 +62,7 @@ public class BlockFactoryTest {
 
 	private static void canDeserializeNonVerifiableBlock(final Block originalBlock, final int expectedType) {
 		// Arrange:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				originalBlock.asNonVerifiable(),
-				new MockAccountLookup());
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalBlock.asNonVerifiable(), new MockAccountLookup());
 
 		// Act:
 		final Block block = BlockFactory.NON_VERIFIABLE.deserialize(deserializer);

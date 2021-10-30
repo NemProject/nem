@@ -74,8 +74,7 @@ public class MosaicDefinitionSupplyPair implements SerializableEntity {
 			return false;
 		}
 
-		final MosaicDefinitionSupplyPair rhs = (MosaicDefinitionSupplyPair)obj;
-		return this.mosaicDefinition.equals(rhs.mosaicDefinition) &&
-				this.supply.equals(rhs.supply);
+		final MosaicDefinitionSupplyPair rhs = (MosaicDefinitionSupplyPair) obj;
+		return this.mosaicDefinition.equals(rhs.mosaicDefinition) && this.supply.equals(rhs.supply);
 	}
 }

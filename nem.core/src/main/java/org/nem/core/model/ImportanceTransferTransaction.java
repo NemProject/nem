@@ -7,8 +7,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 /**
- * A transaction which describes cancellation or creation of
- * transfer of importance from signer to remote account.
+ * A transaction which describes cancellation or creation of transfer of importance from signer to remote account.
  */
 public class ImportanceTransferTransaction extends Transaction {
 
@@ -23,7 +22,8 @@ public class ImportanceTransferTransaction extends Transaction {
 	 * @param mode The transaction importance transfer mode.
 	 * @param remoteAccount The remote account.
 	 */
-	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final ImportanceTransferMode mode, final Account remoteAccount) {
+	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final ImportanceTransferMode mode,
+			final Account remoteAccount) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
 		this.remoteAccount = remoteAccount;

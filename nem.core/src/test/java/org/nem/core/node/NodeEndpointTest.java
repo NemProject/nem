@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class NodeEndpointTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void ctorCanCreateNewNodeEndpoint() throws Exception {
@@ -45,7 +45,7 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
-	//region invalid parameters
+	// region invalid parameters
 
 	@Test(expected = InvalidNodeEndpointException.class)
 	public void ctorFailsIfProtocolIsInvalid() throws Exception {
@@ -59,9 +59,9 @@ public class NodeEndpointTest {
 		new NodeEndpoint("ftp", "10.8.8.2.1", 12);
 	}
 
-	//endregion
+	// endregion
 
-	//region host name resolution
+	// region host name resolution
 
 	@Test
 	public void blankHostResolvesToLocalHost() throws Exception {
@@ -79,11 +79,9 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo(expectedHostName));
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region isLocal
+	// region isLocal
 
 	@Test
 	public void localhostIsDetectedAsLocal() {
@@ -122,9 +120,9 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(isHostLocal));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -137,7 +135,7 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.1", 12), IsNot.not(IsEqual.equalTo(endpoint)));
 		MatcherAssert.assertThat(new NodeEndpoint("ftp", "10.8.8.2", 13), IsNot.not(IsEqual.equalTo(endpoint)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(endpoint)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)endpoint)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) endpoint)));
 	}
 
 	@Test
@@ -154,10 +152,10 @@ public class NodeEndpointTest {
 	@Test
 	public void endpointsWithEquivalentHostNamesAreEqualAfterDeserialization() {
 		// Arrange:
-		final NodeEndpoint endpointWithHostIp =
-				new NodeEndpoint(Utils.roundtripSerializableEntity(new NodeEndpoint("http", "127.0.0.1", 12), null));
-		final NodeEndpoint endpointWithHostName =
-				new NodeEndpoint(Utils.roundtripSerializableEntity(new NodeEndpoint("http", "localhost", 12), null));
+		final NodeEndpoint endpointWithHostIp = new NodeEndpoint(
+				Utils.roundtripSerializableEntity(new NodeEndpoint("http", "127.0.0.1", 12), null));
+		final NodeEndpoint endpointWithHostName = new NodeEndpoint(
+				Utils.roundtripSerializableEntity(new NodeEndpoint("http", "localhost", 12), null));
 
 		// Assert:
 		MatcherAssert.assertThat(endpointWithHostIp, IsEqual.equalTo(endpointWithHostName));
@@ -187,9 +185,9 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(endpoint1, IsEqual.equalTo(endpoint2));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentationWhenEndpointHasHostIp() {
@@ -209,5 +207,5 @@ public class NodeEndpointTest {
 		MatcherAssert.assertThat(endpoint.toString(), IsEqual.equalTo("ftp://localhost:12/"));
 	}
 
-	//endregion
+	// endregion
 }

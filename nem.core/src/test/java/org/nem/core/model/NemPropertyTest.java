@@ -11,7 +11,7 @@ import java.util.*;
 
 public class NemPropertyTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateNemProperty() {
@@ -33,9 +33,9 @@ public class NemPropertyTest {
 		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization / deserialization
+	// region serialization / deserialization
 
 	@Test
 	public void canSerializeNemProperty() {
@@ -79,9 +79,9 @@ public class NemPropertyTest {
 		MatcherAssert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -95,9 +95,10 @@ public class NemPropertyTest {
 		MatcherAssert.assertThat(value, IsEqual.equalTo("Foo -> Bar"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, NemProperty> createNemPropertiesForEqualityTests() {
 		return new HashMap<String, NemProperty>() {
@@ -118,8 +119,7 @@ public class NemPropertyTest {
 
 		// Assert:
 		for (final Map.Entry<String, NemProperty> entry : createNemPropertiesForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(property)) : IsEqual.equalTo(property));
 		}
 
@@ -134,8 +134,7 @@ public class NemPropertyTest {
 
 		// Assert:
 		for (final Map.Entry<String, NemProperty> entry : createNemPropertiesForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}

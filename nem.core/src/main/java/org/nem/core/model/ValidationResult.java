@@ -7,7 +7,7 @@ import java.util.Iterator;
  */
 public enum ValidationResult {
 
-	//region general
+	// region general
 
 	/**
 	 * Validation is neutral.
@@ -65,8 +65,8 @@ public enum ValidationResult {
 	FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE(10),
 
 	/**
-	 * Validation failed because the block had an ineligible signer.
-	 * This usually occurs when remote harvesting is in the process of being activated or deactivated.
+	 * Validation failed because the block had an ineligible signer. This usually occurs when remote harvesting is in the process of being
+	 * activated or deactivated.
 	 */
 	FAILURE_INELIGIBLE_BLOCK_SIGNER(11),
 
@@ -125,9 +125,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_ENTITY_INVALID_VERSION(22),
 
-	//endregion
+	// endregion
 
-	//region forks 4x
+	// region forks 4x
 
 	/**
 	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
@@ -135,14 +135,14 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(41),
 
 	/**
-	 * Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic)
-	 * are not allowed before the second fork height.
+	 * Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic) are not allowed before
+	 * the second fork height.
 	 */
 	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(42),
 
-	//endregion
+	// endregion
 
-	//region importance 6x
+	// region importance 6x
 
 	/**
 	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
@@ -169,9 +169,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE(66),
 
-	//endregion
+	// endregion
 
-	//region multisig 7x 8x
+	// region multisig 7x 8x
 
 	/**
 	 * Validation failed because signer is not a cosigner of given multisig account.
@@ -233,9 +233,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
 
-	//endregion
+	// endregion
 
-	//region block chain validator 10x 11x
+	// region block chain validator 10x 11x
 
 	/**
 	 * Validation failed because received chain has too many blocks.
@@ -267,9 +267,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106),
 
-	//endregion
+	// endregion
 
-	//region namespace 12x
+	// region namespace 12x
 
 	/**
 	 * Validation failed because the namespace is unknown.
@@ -316,9 +316,9 @@ public enum ValidationResult {
 	 */
 	FAILURE_NAMESPACE_NOT_CLAIMABLE(129),
 
-	//endregion
+	// endregion
 
-	//region mosaic 14x
+	// region mosaic 14x
 
 	/**
 	 * Validation failed because the mosaic is unknown.
@@ -390,7 +390,7 @@ public enum ValidationResult {
 	 */
 	FAILURE_MOSAIC_LEVY_UNKNOWN(154);
 
-	//endregion
+	// endregion
 
 	private final int value;
 
@@ -433,7 +433,7 @@ public enum ValidationResult {
 		switch (this) {
 			case NEUTRAL:
 				return false;
-			default:
+			default :
 				break;
 		}
 

@@ -37,7 +37,7 @@ public enum MosaicSupplyType {
 				return true;
 			case Unknown:
 				break;
-			default:
+			default :
 				break;
 		}
 

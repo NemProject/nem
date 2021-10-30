@@ -49,9 +49,7 @@ public class NamespaceIdTest {
 	public void cannotCreateNamespaceIdWithUppercaseCharacters() {
 		// Assert:
 		final String[] invalid = {
-				"Foo.bar.baz",
-				"foo.BAR.baz",
-				"foo.bar.baZ"
+				"Foo.bar.baz", "foo.BAR.baz", "foo.bar.baZ"
 		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class, s));
 	}
@@ -60,24 +58,13 @@ public class NamespaceIdTest {
 	public void cannotCreateNamespaceIdFromInvalidString() {
 		// Assert:
 		final String[] invalid = {
-				"",
-				".",
-				"..",
-				"foo.",
-				".foo",
-				"foo..foo",
-				"fooä",
-				"foo bar",
-				"foo. .bar",
-				"0123456789abcdefg",
+				"", ".", "..", "foo.", ".foo", "foo..foo", "fooä", "foo bar", "foo. .bar", "0123456789abcdefg",
 				"foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"
 		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class));
 	}
 
 	// endregion
-
-	// region getRoot / getParent
 
 	// region isRoot
 
@@ -98,6 +85,8 @@ public class NamespaceIdTest {
 	}
 
 	// endregion
+
+	// region getRoot / getParent
 
 	@Test
 	public void getRootReturnsExpectedRoot() {
@@ -185,7 +174,7 @@ public class NamespaceIdTest {
 
 	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteToSerializer() {
@@ -231,7 +220,7 @@ public class NamespaceIdTest {
 		MatcherAssert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
-	//endregion
+	// endregion
 
 	// region toString
 
@@ -250,6 +239,7 @@ public class NamespaceIdTest {
 	// endregion
 
 	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, NamespaceId> createNamespaceIdsForEqualityTests() {
 		return new HashMap<String, NamespaceId>() {
@@ -271,8 +261,7 @@ public class NamespaceIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(id)) : IsEqual.equalTo(id));
 		}
 
@@ -287,8 +276,7 @@ public class NamespaceIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}

@@ -9,8 +9,7 @@ import java.util.concurrent.CompletionException;
 import java.util.function.*;
 
 /**
- * Helper class that contains functions for asserting that specific exceptions
- * are thrown.
+ * Helper class that contains functions for asserting that specific exceptions are thrown.
  */
 public class ExceptionAssert {
 
@@ -21,7 +20,8 @@ public class ExceptionAssert {
 	 * @param exceptionClass The expected exception class.
 	 */
 	public static void assertThrows(final Consumer<Void> consumer, final Class<?> exceptionClass) {
-		assertThrows(consumer, exceptionClass, ex -> { });
+		assertThrows(consumer, exceptionClass, ex -> {
+		});
 	}
 
 	/**
@@ -32,7 +32,8 @@ public class ExceptionAssert {
 	 * @param message The custom assertion message.
 	 */
 	public static void assertThrows(final Consumer<Void> consumer, final Class<?> exceptionClass, final String message) {
-		assertThrows(consumer, exceptionClass, ex -> { }, message);
+		assertThrows(consumer, exceptionClass, ex -> {
+		}, message);
 	}
 
 	/**
@@ -42,9 +43,7 @@ public class ExceptionAssert {
 	 * @param exceptionClass The expected exception class.
 	 * @param assertExceptionProperties Consumer that is passed the matching exception to run any additional validation.
 	 */
-	public static <T> void assertThrows(
-			final Consumer<Void> consumer,
-			final Class<T> exceptionClass,
+	public static <T> void assertThrows(final Consumer<Void> consumer, final Class<T> exceptionClass,
 			final Consumer<T> assertExceptionProperties) {
 		assertThrows(consumer, exceptionClass, assertExceptionProperties, null);
 	}
@@ -58,29 +57,26 @@ public class ExceptionAssert {
 	 * @param message The custom assertion message.
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> void assertThrows(
-			final Consumer<Void> consumer,
-			final Class<T> exceptionClass,
-			final Consumer<T> assertExceptionProperties,
-			final String message) {
+	private static <T> void assertThrows(final Consumer<Void> consumer, final Class<T> exceptionClass,
+			final Consumer<T> assertExceptionProperties, final String message) {
 		final String normalizedMessage = null == message ? "" : String.format("[%s]: ", message);
 		try {
 			consumer.accept(null);
 		} catch (final Exception ex) {
 			if (exceptionClass.isAssignableFrom(ex.getClass())) {
-				assertExceptionProperties.accept((T)ex);
+				assertExceptionProperties.accept((T) ex);
 				return;
 			}
 
-			Assert.fail(String.format("%sunexpected exception of type %s was thrown: '%s'", normalizedMessage, ex.getClass(), ex.getMessage()));
+			Assert.fail(
+					String.format("%sunexpected exception of type %s was thrown: '%s'", normalizedMessage, ex.getClass(), ex.getMessage()));
 		}
 
 		Assert.fail(String.format("%sexpected exception of type %s was not thrown", normalizedMessage, exceptionClass));
 	}
 
 	/**
-	 * Asserts that the execution of consumer throws a completion exception wrapping an exception of the
-	 * specific class.
+	 * Asserts that the execution of consumer throws a completion exception wrapping an exception of the specific class.
 	 *
 	 * @param consumer The consumer.
 	 * @param exceptionClass The expected exception class.
@@ -107,9 +103,7 @@ public class ExceptionAssert {
 	 * @param propertyName The expected missing property name.
 	 */
 	public static void assertThrowsMissingPropertyException(final Supplier<Object> consumer, final String propertyName) {
-		ExceptionAssert.assertThrows(
-				v -> consumer.get(),
-				MissingRequiredPropertyException.class,
+		ExceptionAssert.assertThrows(v -> consumer.get(), MissingRequiredPropertyException.class,
 				ex -> MatcherAssert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
 	}
 }

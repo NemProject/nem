@@ -14,9 +14,7 @@ public class ErrorResponseTest {
 	@Test
 	public void canBeCreatedAroundException() {
 		// Arrange:
-		final ErrorResponse response = new ErrorResponse(
-				new TimeInstant(18),
-				new RuntimeException("exception message"),
+		final ErrorResponse response = new ErrorResponse(new TimeInstant(18), new RuntimeException("exception message"),
 				HttpStatus.NOT_FOUND);
 
 		// Assert:
@@ -100,22 +98,17 @@ public class ErrorResponseTest {
 	@Test
 	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsKnown() {
 		// Assert:
-		MatcherAssert.assertThat(
-				"Http Status Code 404: badness",
+		MatcherAssert.assertThat("Http Status Code 404: badness",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", 404).toString()));
-		MatcherAssert.assertThat(
-				"Http Status Code 404: Not Found",
+		MatcherAssert.assertThat("Http Status Code 404: Not Found",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, 404).toString()));
 	}
 
 	@Test
 	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsUnknown() {
 		// Assert:
-		MatcherAssert.assertThat(
-				"Http Status Code -123: badness",
+		MatcherAssert.assertThat("Http Status Code -123: badness",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", -123).toString()));
-		MatcherAssert.assertThat(
-				"Http Status Code -123",
-				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, -123).toString()));
+		MatcherAssert.assertThat("Http Status Code -123", IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, -123).toString()));
 	}
 }

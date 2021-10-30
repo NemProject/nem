@@ -22,7 +22,8 @@ public class Ed25519GroupTest {
 		// Arrange:
 		final BigInteger y = new BigInteger("4").multiply(new BigInteger("5").modInverse(Ed25519Field.P));
 		final BigInteger x = MathUtils.getAffineXFromAffineY(y, false);
-		final Ed25519GroupElement basePoint = Ed25519GroupElement.p2(MathUtils.toFieldElement(x), MathUtils.toFieldElement(y), Ed25519Field.ONE);
+		final Ed25519GroupElement basePoint = Ed25519GroupElement.p2(MathUtils.toFieldElement(x), MathUtils.toFieldElement(y),
+				Ed25519Field.ONE);
 
 		// Assert:
 		MatcherAssert.assertThat(basePoint, IsEqual.equalTo(Ed25519Group.BASE_POINT));

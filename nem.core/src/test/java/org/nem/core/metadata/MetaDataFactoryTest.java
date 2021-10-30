@@ -29,7 +29,9 @@ public class MetaDataFactoryTest {
 			final URL url = MetaDataTestUtils.createMockUrl("file://path/nem.jar", inputStream);
 
 			final X509Certificate certificate = MetaDataTestUtils.createMockCertificateWithName("CN=Someone,O=NemSoft");
-			final CodeSource codeSource = new CodeSource(url, new Certificate[] { certificate });
+			final CodeSource codeSource = new CodeSource(url, new Certificate[]{
+					certificate
+			});
 
 			final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 			Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(11), new TimeInstant(14));

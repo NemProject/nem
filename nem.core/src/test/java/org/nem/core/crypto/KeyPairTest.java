@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 
 public class KeyPairTest {
 
-	//region basic construction
+	// region basic construction
 
 	@Test
 	public void ctorCanCreateNewKeyPair() {
@@ -48,7 +48,7 @@ public class KeyPairTest {
 		MatcherAssert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void ctorCreatesDifferentInstancesWithDifferentKeys() {
@@ -72,7 +72,7 @@ public class KeyPairTest {
 		new KeyPair(publicKey, context.engine);
 	}
 
-	//region delegation
+	// region delegation
 
 	@Test
 	public void ctorCreatesKeyGenerator() {
@@ -127,5 +127,5 @@ public class KeyPairTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

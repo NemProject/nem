@@ -9,7 +9,7 @@ import java.util.*;
 
 public class BlockChainFeatureTest {
 
-	//region fromString
+	// region fromString
 
 	@Test
 	public void fromStringCanParseValidBlockChainFeaturesStringRepresentation() {
@@ -40,14 +40,12 @@ public class BlockChainFeatureTest {
 	@Test
 	public void fromStringCannotParseInvalidBlockChainFeaturesStringRepresentation() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> BlockChainFeature.fromString("BLAH"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> BlockChainFeature.fromString("BLAH"), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region value / or / explode
+	// region value / or / explode
 
 	@Test
 	public void valueReturnsUnderlyingValue() {
@@ -91,7 +89,7 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(0);
 
 		// Assert:
-		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] {}));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[]{}));
 	}
 
 	@Test
@@ -100,7 +98,9 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(2);
 
 		// Assert:
-		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_STAKE
+		}));
 	}
 
 	@Test
@@ -109,10 +109,10 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(17);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				features,
-				IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES
+		}));
 	}
 
-	//endregion
+	// endregion
 }

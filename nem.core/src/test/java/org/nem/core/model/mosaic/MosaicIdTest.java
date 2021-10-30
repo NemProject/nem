@@ -13,41 +13,21 @@ import java.util.*;
 
 public class MosaicIdTest {
 
-	//region name strings
+	// region name strings
 
 	private static final String[] INVALID_NAME_STRINGS = {
-			"fo€",
-			" extra_leading_spaces",
-			"extra_trailing_spaces ",
-			"extra  inside spaces1",
-			"extra inside  spaces2",
-			"inside\ttabs",
-			"'id",
-			"-id",
-			"_id",
-			StringUtils.repeat("too long", 5)
+			"fo€", " extra_leading_spaces", "extra_trailing_spaces ", "extra  inside spaces1", "extra inside  spaces2", "inside\ttabs",
+			"'id", "-id", "_id", StringUtils.repeat("too long", 5)
 	};
 
 	private static final String[] VALID_NAME_STRINGS = {
-			"f",
-			"fo",
-			"foo",
-			"extra awesome foo7",
-			"valid'id",
-			"valid-id",
-			"valid_id",
-			"valid id '",
-			"valid id -",
-			"valid id _",
-			"0",
-			"01",
-			"012",
-			"own alice's 'l33t' vouchers"
+			"f", "fo", "foo", "extra awesome foo7", "valid'id", "valid-id", "valid_id", "valid id '", "valid id -", "valid id _", "0", "01",
+			"012", "own alice's 'l33t' vouchers"
 	};
 
-	//endregion
+	// endregion
 
-	//region ctor
+	// region ctor
 
 	@Test
 	public void canCreateMosaicId() {
@@ -62,26 +42,20 @@ public class MosaicIdTest {
 	@Test
 	public void cannotCreateMosaicIdWithUppercaseCharacters() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> createMosaicId("BoB.SilveR", "BaR"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> createMosaicId("BoB.SilveR", "BaR"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateMosaicIdWithNullNamespace() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new MosaicId(null, "foo"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new MosaicId(null, "foo"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateMosaicIdWithEmptyName() {
 		// Assert:
 		for (final String name : Arrays.asList(null, "", " \t ")) {
-			ExceptionAssert.assertThrows(
-					v -> createMosaicId("alice.vouchers", name),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> createMosaicId("alice.vouchers", name), IllegalArgumentException.class);
 		}
 	}
 
@@ -89,10 +63,7 @@ public class MosaicIdTest {
 	public void cannotCreateMosaicIdWithInvalidName() {
 		// Assert:
 		Arrays.stream(INVALID_NAME_STRINGS)
-				.forEach(s -> ExceptionAssert.assertThrows(
-						v -> createMosaicId("alice.vouchers", s),
-						IllegalArgumentException.class,
-						s));
+				.forEach(s -> ExceptionAssert.assertThrows(v -> createMosaicId("alice.vouchers", s), IllegalArgumentException.class, s));
 	}
 
 	@Test
@@ -108,9 +79,9 @@ public class MosaicIdTest {
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//region parse
+	// region parse
 
 	@Test
 	public void canParseMosaicIdWithValidName() {
@@ -128,22 +99,13 @@ public class MosaicIdTest {
 	public void cannotParseMosaicIdFromInvalidString() {
 		// Arrange:
 		final String[] invalidStrings = {
-				" * ",
-				"alice.vouchers * ",
-				" * foo",
-				"alice.vouchers* foo",
-				"alice.vouchers *foo",
-				"alice.vouchers*foo",
-				".alice.vouchers * foo",
-				"alice.vouchers. * foo",
-				"alic€.vouchers * foo",
-				"alice.vouchers.bar. * foo",
+				" * ", "alice.vouchers * ", " * foo", "alice.vouchers* foo", "alice.vouchers *foo", "alice.vouchers*foo",
+				".alice.vouchers * foo", "alice.vouchers. * foo", "alic€.vouchers * foo", "alice.vouchers.bar. * foo",
 				"alice.vouchers.bar.baz * foo",
 		};
 
 		// Act:
-		Arrays.stream(invalidStrings)
-				.forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class, s));
+		Arrays.stream(invalidStrings).forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class, s));
 	}
 
 	@Test
@@ -153,9 +115,9 @@ public class MosaicIdTest {
 				.forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class, s));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void canSerializeMosaicId() {
@@ -198,18 +160,14 @@ public class MosaicIdTest {
 	@Test
 	public void cannotDeserializeWithMissingNamespace() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> deserialize(null, "foo"),
-				MissingRequiredPropertyException.class);
+		ExceptionAssert.assertThrows(v -> deserialize(null, "foo"), MissingRequiredPropertyException.class);
 	}
 
 	@Test
 	public void cannotDeserializeWithMissingName() {
 		// Assert:
 		for (final String name : Arrays.asList(null, "")) {
-			ExceptionAssert.assertThrows(
-					v -> deserialize("alice.vouchers", name),
-					MissingRequiredPropertyException.class);
+			ExceptionAssert.assertThrows(v -> deserialize("alice.vouchers", name), MissingRequiredPropertyException.class);
 		}
 	}
 
@@ -217,9 +175,7 @@ public class MosaicIdTest {
 	public void cannotDeserializeMosaicIdWithInvalidName() {
 		// Assert:
 		Arrays.stream(INVALID_NAME_STRINGS)
-				.forEach(s -> ExceptionAssert.assertThrows(
-						v -> deserialize("alice.vouchers", s),
-						IllegalArgumentException.class));
+				.forEach(s -> ExceptionAssert.assertThrows(v -> deserialize("alice.vouchers", s), IllegalArgumentException.class));
 	}
 
 	private static MosaicId deserialize(final String namespaceId, final String name) {
@@ -235,9 +191,9 @@ public class MosaicIdTest {
 		return new MosaicId(new JsonDeserializer(jsonObject, null));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsId() {
@@ -248,9 +204,10 @@ public class MosaicIdTest {
 		MatcherAssert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver:bar"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, MosaicId> createMosaicIdsForEqualityTests() {
 		return new HashMap<String, MosaicId>() {
@@ -269,8 +226,7 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaicId)) : IsEqual.equalTo(mosaicId));
 		}
 
@@ -285,8 +241,7 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -295,7 +250,7 @@ public class MosaicIdTest {
 		return !propertyName.equals("default");
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicId createMosaicId(final String namespaceId, final String name) {
 		return new MosaicId(new NamespaceId(namespaceId), name);

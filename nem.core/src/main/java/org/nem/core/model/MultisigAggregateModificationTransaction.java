@@ -9,9 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A transaction that describes the addition or removal of one or more cosignatories to or from
- * a multisig account. Additionally the minimum number of cosignatories for a transaction can be set.
- * <br>
+ * A transaction that describes the addition or removal of one or more cosignatories to or from a multisig account. Additionally the minimum
+ * number of cosignatories for a transaction can be set. <br>
  * First such transaction converts an account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
@@ -20,85 +19,79 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	private final List<MultisigCosignatoryModification> cosignatoryModifications;
 	private final MultisigMinCosignatoriesModification minCosignatoriesModification;
 
-	//region VALIDATION_EXTENSIONS
+	// region VALIDATION_EXTENSIONS
 
 	private static final AggregateTransactionValidationExtension<MultisigAggregateModificationTransaction> VALIDATION_EXTENSIONS = new AggregateTransactionValidationExtension<>(
-			Arrays.asList(
-					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return true;
-						}
+			Arrays.asList(new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return true;
+				}
 
-						@Override
-						public void validate(final MultisigAggregateModificationTransaction transaction) {
-							if (null == transaction.cosignatoryModifications) {
-								throw new IllegalArgumentException("cosignatory modifications cannot be null");
-							}
-						}
-					},
-					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return version < MIN_MODIFICATION_VERSION;
-						}
-
-						@Override
-						public void validate(final MultisigAggregateModificationTransaction transaction) {
-							if (transaction.cosignatoryModifications.isEmpty()) {
-								throw new IllegalArgumentException("Cosignatory modifications cannot be empty");
-							}
-
-							if (null != transaction.minCosignatoriesModification) {
-								final String message = String.format(
-										"min cosignatory modification cannot be attached to transaction with version %d",
-										transaction.getEntityVersion());
-								throw new IllegalArgumentException(message);
-							}
-						}
-					},
-					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return version >= MIN_MODIFICATION_VERSION;
-						}
-
-						@Override
-						public void validate(final MultisigAggregateModificationTransaction transaction) {
-							if (transaction.cosignatoryModifications.isEmpty() && null == transaction.minCosignatoriesModification) {
-								throw new IllegalArgumentException("Either cosignatory modifications or change of minimum cosignatories must be present");
-							}
-						}
+				@Override
+				public void validate(final MultisigAggregateModificationTransaction transaction) {
+					if (null == transaction.cosignatoryModifications) {
+						throw new IllegalArgumentException("cosignatory modifications cannot be null");
 					}
-			));
+				}
+			}, new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return version < MIN_MODIFICATION_VERSION;
+				}
 
-	//endregion
+				@Override
+				public void validate(final MultisigAggregateModificationTransaction transaction) {
+					if (transaction.cosignatoryModifications.isEmpty()) {
+						throw new IllegalArgumentException("Cosignatory modifications cannot be empty");
+					}
 
-	//region SERIALIZATION_EXTENSIONS
+					if (null != transaction.minCosignatoriesModification) {
+						final String message = String.format(
+								"min cosignatory modification cannot be attached to transaction with version %d",
+								transaction.getEntityVersion());
+						throw new IllegalArgumentException(message);
+					}
+				}
+			}, new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return version >= MIN_MODIFICATION_VERSION;
+				}
+
+				@Override
+				public void validate(final MultisigAggregateModificationTransaction transaction) {
+					if (transaction.cosignatoryModifications.isEmpty() && null == transaction.minCosignatoriesModification) {
+						throw new IllegalArgumentException(
+								"Either cosignatory modifications or change of minimum cosignatories must be present");
+					}
+				}
+			}));
+
+	// endregion
+
+	// region SERIALIZATION_EXTENSIONS
 
 	private static final AggregateTransactionSerializationExtension<ExtendedData> SERIALIZATION_EXTENSIONS = new AggregateTransactionSerializationExtension<>(
-			Collections.singletonList(
-					new TransactionSerializationExtension<ExtendedData>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return version >= MIN_MODIFICATION_VERSION;
-						}
+			Collections.singletonList(new TransactionSerializationExtension<ExtendedData>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return version >= MIN_MODIFICATION_VERSION;
+				}
 
-						@Override
-						public void serialize(final Serializer serializer, final ExtendedData extendedData) {
-							serializer.writeObject("minCosignatories", extendedData.minCosignatoriesModification);
-						}
+				@Override
+				public void serialize(final Serializer serializer, final ExtendedData extendedData) {
+					serializer.writeObject("minCosignatories", extendedData.minCosignatoriesModification);
+				}
 
-						@Override
-						public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
-							extendedData.minCosignatoriesModification = deserializer.readOptionalObject(
-									"minCosignatories",
-									MultisigMinCosignatoriesModification::new);
-						}
-					}
-			));
+				@Override
+				public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
+					extendedData.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories",
+							MultisigMinCosignatoriesModification::new);
+				}
+			}));
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a multisig aggregate modification transaction.
@@ -107,9 +100,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 * @param sender The transaction sender (multisig account).
 	 * @param cosignatoryModifications The list of cosignatory modifications.
 	 */
-	public MultisigAggregateModificationTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
+	public MultisigAggregateModificationTransaction(final TimeInstant timeStamp, final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications) {
 		this(timeStamp, sender, cosignatoryModifications, null);
 	}
@@ -122,9 +113,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 * @param cosignatoryModifications The list of cosignatory modifications.
 	 * @param minCosignatoriesModification The change of the minimum number of cosignatories, is allowed to be null.
 	 */
-	public MultisigAggregateModificationTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
+	public MultisigAggregateModificationTransaction(final TimeInstant timeStamp, final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		this(CURRENT_VERSION, timeStamp, sender, cosignatoryModifications, minCosignatoriesModification);
@@ -139,10 +128,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 * @param cosignatoryModifications The list of cosignatory modifications.
 	 * @param minCosignatoriesModification The change of the minimum number of cosignatories, is allowed to be null.
 	 */
-	public MultisigAggregateModificationTransaction(
-			final int version,
-			final TimeInstant timeStamp,
-			final Account sender,
+	public MultisigAggregateModificationTransaction(final int version, final TimeInstant timeStamp, final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, version, timeStamp, sender);
@@ -214,7 +200,8 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return this.getCosignatoryModifications().stream().map(MultisigCosignatoryModification::getCosignatory).collect(Collectors.toList());
+		return this.getCosignatoryModifications().stream().map(MultisigCosignatoryModification::getCosignatory)
+				.collect(Collectors.toList());
 	}
 
 	private static class ExtendedData {

@@ -44,7 +44,7 @@ public class MosaicIdSupplyPairTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(pair);
 
 		// Assert:
-		final JSONObject mosaicIdJsonObject = (JSONObject)jsonObject.get("mosaicId");
+		final JSONObject mosaicIdJsonObject = (JSONObject) jsonObject.get("mosaicId");
 		MatcherAssert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
 		MatcherAssert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
 		MatcherAssert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
@@ -76,12 +76,14 @@ public class MosaicIdSupplyPairTest {
 		jsonObject.remove(keyToRemove);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new MosaicIdSupplyPair(new JsonDeserializer(jsonObject, null)), MissingRequiredPropertyException.class);
+		ExceptionAssert.assertThrows(v -> new MosaicIdSupplyPair(new JsonDeserializer(jsonObject, null)),
+				MissingRequiredPropertyException.class);
 	}
 
 	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, MosaicIdSupplyPair> createMosaicIdSupplyPairsForEqualityTests() {
 		return new HashMap<String, MosaicIdSupplyPair>() {
@@ -100,8 +102,7 @@ public class MosaicIdSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicIdSupplyPair> entry : createMosaicIdSupplyPairsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
@@ -116,8 +117,7 @@ public class MosaicIdSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicIdSupplyPair> entry : createMosaicIdSupplyPairsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}

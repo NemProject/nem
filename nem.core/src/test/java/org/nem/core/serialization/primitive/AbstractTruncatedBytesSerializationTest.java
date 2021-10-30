@@ -2,7 +2,9 @@ package org.nem.core.serialization.primitive;
 
 import org.nem.core.serialization.*;
 
-public abstract class AbstractTruncatedBytesSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractBytesSerializationTest<TSerializer, TDeserializer> {
+public abstract class AbstractTruncatedBytesSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractBytesSerializationTest<TSerializer, TDeserializer> {
 	private static final int LIMIT = 20;
 
 	public AbstractTruncatedBytesSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {

@@ -7,7 +7,8 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.primitive.*;
 
 public class MosaicConstantsTest {
-	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey
+			.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	private static final Quantity NEM_XEM_SUPPLY = Quantity.fromValue(8_999_999_999L);
 
 	// region nem namespace
@@ -41,7 +42,8 @@ public class MosaicConstantsTest {
 	public void mosaicDefinitionXemHasExpectedProperties() {
 		// Assert:
 		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
-		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
+		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(),
+				IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
 		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
 		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.isMosaicLevyPresent(), IsEqual.equalTo(false));
 		MatcherAssert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getMosaicLevy(), IsNull.nullValue());

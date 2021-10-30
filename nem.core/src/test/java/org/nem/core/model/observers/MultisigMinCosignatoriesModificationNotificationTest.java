@@ -13,7 +13,8 @@ public class MultisigMinCosignatoriesModificationNotificationTest {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
 		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(3);
-		final MultisigMinCosignatoriesModificationNotification notification = new MultisigMinCosignatoriesModificationNotification(multisig, modification);
+		final MultisigMinCosignatoriesModificationNotification notification = new MultisigMinCosignatoriesModificationNotification(multisig,
+				modification);
 
 		// Assert:
 		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MinCosignatoriesModification));

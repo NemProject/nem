@@ -10,7 +10,7 @@ import java.util.jar.*;
 
 public class JarFacadeTest {
 
-	//region from url
+	// region from url
 
 	@Test
 	public void canCreateFacadeAroundWebStartJarFile() throws IOException {
@@ -36,9 +36,9 @@ public class JarFacadeTest {
 		assertFacadeHasDefaultProperties(facade);
 	}
 
-	//endregion
+	// endregion
 
-	//region manifest processing
+	// region manifest processing
 
 	@Test
 	public void canCreateFacadeAroundJarStreamWithIoException() throws IOException {
@@ -124,7 +124,7 @@ public class JarFacadeTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertFacadeHasDefaultProperties(final JarFacade facade) {
 		// Assert:

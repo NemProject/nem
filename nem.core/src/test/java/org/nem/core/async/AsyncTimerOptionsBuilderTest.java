@@ -21,12 +21,8 @@ public class AsyncTimerOptionsBuilderTest {
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 
 		// Act:
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setRecurringFutureSupplier(recurringFutureSupplier)
-				.setTrigger(trigger)
-				.setDelayStrategy(delayStrategy)
-				.setVisitor(visitor)
-				.create();
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().setRecurringFutureSupplier(recurringFutureSupplier)
+				.setTrigger(trigger).setDelayStrategy(delayStrategy).setVisitor(visitor).create();
 
 		// Assert:
 		MatcherAssert.assertThat(options.getRecurringFutureSupplier(), IsSame.sameInstance(recurringFutureSupplier));
@@ -44,7 +40,7 @@ public class AsyncTimerOptionsBuilderTest {
 		MatcherAssert.assertThat(options.getVisitor(), IsNull.notNullValue());
 	}
 
-	//region getInitialTrigger
+	// region getInitialTrigger
 
 	@Test
 	public void canCreateOptionsWithInitialTrigger() {
@@ -58,9 +54,7 @@ public class AsyncTimerOptionsBuilderTest {
 	@Test
 	public void canSetInitialDelayAsMilliseconds() throws InterruptedException {
 		// Act:
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TIME_UNIT)
-				.create();
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().setInitialDelay(TIME_UNIT).create();
 
 		// Assert:
 		assertInitialTriggerFiresAtTime(options, TIME_UNIT);
@@ -69,17 +63,13 @@ public class AsyncTimerOptionsBuilderTest {
 	@Test
 	public void canSetInitialDelayAsTrigger() throws InterruptedException {
 		// Act:
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setTrigger(SleepFuture.create(TIME_UNIT))
-				.create();
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().setTrigger(SleepFuture.create(TIME_UNIT)).create();
 
 		// Assert:
 		assertInitialTriggerFiresAtTime(options, TIME_UNIT);
 	}
 
-	private static void assertInitialTriggerFiresAtTime(
-			final AsyncTimerOptions options,
-			final int time) throws InterruptedException {
+	private static void assertInitialTriggerFiresAtTime(final AsyncTimerOptions options, final int time) throws InterruptedException {
 		// Assert: 0 - trigger should not be done
 		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
@@ -100,10 +90,7 @@ public class AsyncTimerOptionsBuilderTest {
 	public void canSetInitialDelayAsTriggerAndMilliseconds() throws InterruptedException {
 		// Act:
 		final CompletableFuture<?> triggerFuture = new CompletableFuture<>();
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TIME_HALF_UNIT)
-				.setTrigger(triggerFuture)
-				.create();
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder().setInitialDelay(TIME_HALF_UNIT).setTrigger(triggerFuture).create();
 
 		// Assert: 0 - trigger should not be done
 		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
@@ -122,16 +109,15 @@ public class AsyncTimerOptionsBuilderTest {
 		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
 	}
 
-	//region visitors
+	// endregion
+
+	// region visitors
 
 	@Test
 	public void visitorIsNotifiedOfInitialDelayWhenTriggerIsNotSpecified() {
 		// Act:
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TIME_UNIT)
-				.setVisitor(visitor)
-				.create();
+		new AsyncTimerOptionsBuilder().setInitialDelay(TIME_UNIT).setVisitor(visitor).create();
 
 		// Assert:
 		Mockito.verify(visitor, Mockito.only()).notifyDelay(TIME_UNIT);
@@ -142,11 +128,7 @@ public class AsyncTimerOptionsBuilderTest {
 		// Act:
 		final CompletableFuture<?> triggerFuture = new CompletableFuture<>();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TIME_HALF_UNIT)
-				.setTrigger(triggerFuture)
-				.setVisitor(visitor)
-				.create();
+		new AsyncTimerOptionsBuilder().setInitialDelay(TIME_HALF_UNIT).setTrigger(triggerFuture).setVisitor(visitor).create();
 
 		// Assert: 0 - the visitor should not be notified (the delay happens after the trigger fires)
 		Mockito.verify(visitor, Mockito.never()).notifyDelay(Mockito.anyInt());
@@ -159,7 +141,5 @@ public class AsyncTimerOptionsBuilderTest {
 		Mockito.verify(visitor, Mockito.only()).notifyDelay(TIME_HALF_UNIT);
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 }

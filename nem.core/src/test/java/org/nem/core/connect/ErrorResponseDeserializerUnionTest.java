@@ -12,10 +12,8 @@ public class ErrorResponseDeserializerUnionTest {
 	@Test
 	public void canCreateAroundErrorResponse() {
 		// Arrange:
-		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(
-				500,
-				JsonSerializer.serializeToJson(new ErrorResponse(new TimeInstant(7), "badness", 700)),
-				null);
+		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(500,
+				JsonSerializer.serializeToJson(new ErrorResponse(new TimeInstant(7), "badness", 700)), null);
 
 		// Assert:
 		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(true));
@@ -32,10 +30,8 @@ public class ErrorResponseDeserializerUnionTest {
 	public void canCreateAroundDeserializer() {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(null);
-		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(
-				200,
-				JsonSerializer.serializeToJson(new MockSerializableEntity(2, "foo", 12)),
-				context);
+		final ErrorResponseDeserializerUnion union = new ErrorResponseDeserializerUnion(200,
+				JsonSerializer.serializeToJson(new MockSerializableEntity(2, "foo", 12)), context);
 
 		// Assert:
 		MatcherAssert.assertThat(union.hasBody(), IsEqual.equalTo(true));

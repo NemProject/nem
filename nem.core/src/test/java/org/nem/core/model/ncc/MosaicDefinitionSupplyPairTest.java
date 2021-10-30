@@ -28,7 +28,8 @@ public class MosaicDefinitionSupplyPairTest {
 	public void cannotCreatePairWithMissingParameter() {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new MosaicDefinitionSupplyPair(null, Supply.fromValue(123)), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new MosaicDefinitionSupplyPair(Utils.createMosaicDefinition(5), null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new MosaicDefinitionSupplyPair(Utils.createMosaicDefinition(5), null),
+				IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -44,8 +45,8 @@ public class MosaicDefinitionSupplyPairTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(pair);
 
 		// Assert:
-		final JSONObject mosaicDefinitionJsonObject = (JSONObject)jsonObject.get("mosaicDefinition");
-		final JSONObject mosaicIdJsonObject = (JSONObject)mosaicDefinitionJsonObject.get("id");
+		final JSONObject mosaicDefinitionJsonObject = (JSONObject) jsonObject.get("mosaicDefinition");
+		final JSONObject mosaicIdJsonObject = (JSONObject) mosaicDefinitionJsonObject.get("id");
 		MatcherAssert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
 		MatcherAssert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
 		MatcherAssert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
@@ -54,7 +55,8 @@ public class MosaicDefinitionSupplyPairTest {
 	@Test
 	public void canRoundTripPair() {
 		// Arrange:
-		final MosaicDefinitionSupplyPair original = new MosaicDefinitionSupplyPair(Utils.createMosaicDefinition(5), Supply.fromValue(12345));
+		final MosaicDefinitionSupplyPair original = new MosaicDefinitionSupplyPair(Utils.createMosaicDefinition(5),
+				Supply.fromValue(12345));
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(original, new MockAccountLookup());
 
 		// Act:
@@ -77,14 +79,14 @@ public class MosaicDefinitionSupplyPairTest {
 		jsonObject.remove(keyToRemove);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new MosaicDefinitionSupplyPair(Utils.createDeserializer(jsonObject)),
+		ExceptionAssert.assertThrows(v -> new MosaicDefinitionSupplyPair(Utils.createDeserializer(jsonObject)),
 				MissingRequiredPropertyException.class);
 	}
 
 	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, MosaicDefinitionSupplyPair> createMosaicDefinitionSupplyPairsForEqualityTests() {
 		return new HashMap<String, MosaicDefinitionSupplyPair>() {
@@ -103,8 +105,7 @@ public class MosaicDefinitionSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinitionSupplyPair> entry : createMosaicDefinitionSupplyPairsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
@@ -119,8 +120,7 @@ public class MosaicDefinitionSupplyPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinitionSupplyPair> entry : createMosaicDefinitionSupplyPairsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}

@@ -109,6 +109,8 @@ public class BlockChainConfigurationTest {
 	}
 
 	private static BlockChainConfiguration createConfigurationWithFeature(final BlockChainFeature feature) {
-		return Utils.createBlockChainConfiguration(1000, 100, 45, 30, new BlockChainFeature[] { feature });
+		return Utils.createBlockChainConfiguration(1000, 100, 45, 30, new BlockChainFeature[]{
+				feature
+		});
 	}
 }

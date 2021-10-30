@@ -8,7 +8,9 @@ import org.nem.core.test.MockSerializableEntity;
 
 import java.util.*;
 
-public abstract class AbstractObjectArraySerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, List<MockSerializableEntity>> {
+public abstract class AbstractObjectArraySerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, List<MockSerializableEntity>> {
 	public AbstractObjectArraySerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}

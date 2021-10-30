@@ -37,7 +37,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 			return false;
 		}
 
-		final Collection<T> rhs = (Collection<T>)arg;
+		final Collection<T> rhs = (Collection<T>) arg;
 		if (this.lhs.size() != rhs.size()) {
 			return false;
 		}

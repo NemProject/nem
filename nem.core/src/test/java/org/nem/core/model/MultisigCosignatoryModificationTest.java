@@ -11,7 +11,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class MultisigCosignatoryModificationTest {
-	//region creation
+	// region creation
+
 	@Test
 	public void canCreateMultisigCosignatoryModificationAdd() {
 		this.assertCreateMultisigCosignatoryModification(MultisigModificationType.AddCosignatory);
@@ -20,12 +21,14 @@ public class MultisigCosignatoryModificationTest {
 	@Test
 	public void createMultisigCosignatoryModificationWithUnknownTypeThrows() {
 		final Account account = Utils.generateRandomAccount();
-		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.Unknown, account), RuntimeException.class);
+		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.Unknown, account),
+				RuntimeException.class);
 	}
 
 	@Test
 	public void createMultisigCosignatoryModificationWithoutCosignatoryThrows() {
-		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, null), RuntimeException.class);
+		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, null),
+				RuntimeException.class);
 	}
 
 	private void assertCreateMultisigCosignatoryModification(final MultisigModificationType type) {
@@ -57,7 +60,8 @@ public class MultisigCosignatoryModificationTest {
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
 
-		final MultisigCosignatoryModification originalEntity = this.createMultisigModification(MultisigModificationType.AddCosignatory, cosignatory);
+		final MultisigCosignatoryModification originalEntity = this.createMultisigModification(MultisigModificationType.AddCosignatory,
+				cosignatory);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
 		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
 
@@ -66,9 +70,9 @@ public class MultisigCosignatoryModificationTest {
 		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(deserializer), exceptionClass);
 	}
 
-	//endregion
+	// endregion
 
-	//region compareTo
+	// region compareTo
 
 	@Test
 	public void compareToReturnsExpectedResult() {
@@ -91,13 +95,15 @@ public class MultisigCosignatoryModificationTest {
 		}
 	}
 
-	private MultisigCosignatoryModification createMultisigModification(final MultisigModificationType modificationType, final String encodedAddress) {
+	private MultisigCosignatoryModification createMultisigModification(final MultisigModificationType modificationType,
+			final String encodedAddress) {
 		return new MultisigCosignatoryModification(modificationType, new Account(Address.fromEncoded(encodedAddress)));
 	}
 
-	//endregion
+	// endregion
 
 	// region roundtrip
+
 	@Test
 	public void canRoundtripMultisigCosignatoryModification() {
 		// Arrange:
@@ -114,18 +120,16 @@ public class MultisigCosignatoryModificationTest {
 		MatcherAssert.assertThat(entity.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
-	private MultisigCosignatoryModification createRoundTrippedEntity(
-			final MultisigCosignatoryModification originalEntity,
+	private MultisigCosignatoryModification createRoundTrippedEntity(final MultisigCosignatoryModification originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, accountLookup);
 		return new MultisigCosignatoryModification(deserializer);
 	}
+
 	// endregion
 
 	private MultisigCosignatoryModification createMultisigModification(final MultisigModificationType add, final Account cosignatory) {
-		return new MultisigCosignatoryModification(
-				add,
-				cosignatory);
+		return new MultisigCosignatoryModification(add, cosignatory);
 	}
 }

@@ -33,9 +33,7 @@ public class MosaicLevyTest {
 		final Account recipient = new Account(Address.fromEncoded("FOO"));
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> createMosaicLevy(recipient),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> createMosaicLevy(recipient), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -80,7 +78,8 @@ public class MosaicLevyTest {
 
 	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, MosaicLevy> createLeviesForEqualityTests(final Account recipient) {
 		final MosaicId mosaicId = Utils.createMosaicId(5);
@@ -89,7 +88,8 @@ public class MosaicLevyTest {
 			{
 				this.put("default", createMosaicLevy(recipient));
 				this.put("diff-feeType", createMosaicLevy(MosaicTransferFeeType.Percentile, recipient, mosaicId, quantity));
-				this.put("diff-recipient", createMosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, quantity));
+				this.put("diff-recipient",
+						createMosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, quantity));
 				this.put("diff-mosaicId", createMosaicLevy(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(12), quantity));
 				this.put("diff-quantity", createMosaicLevy(MosaicTransferFeeType.Absolute, recipient, mosaicId, Quantity.fromValue(321)));
 			}
@@ -104,8 +104,7 @@ public class MosaicLevyTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicLevy> entry : createLeviesForEqualityTests(recipient).entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(levy)) : IsEqual.equalTo(levy));
 		}
 
@@ -121,8 +120,7 @@ public class MosaicLevyTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicLevy> entry : createLeviesForEqualityTests(recipient).entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -145,10 +143,7 @@ public class MosaicLevyTest {
 		return createMosaicLevy(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(5), Quantity.fromValue(123));
 	}
 
-	private static MosaicLevy createMosaicLevy(
-			final MosaicTransferFeeType feeType,
-			final Account recipient,
-			final MosaicId mosaicId,
+	private static MosaicLevy createMosaicLevy(final MosaicTransferFeeType feeType, final Account recipient, final MosaicId mosaicId,
 			final Quantity quantity) {
 		return new MosaicLevy(feeType, recipient, mosaicId, quantity);
 	}

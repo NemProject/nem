@@ -13,9 +13,7 @@ public class BalanceAdjustmentNotificationTest {
 	public void canCreateNotification() {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
-		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(
-				NotificationType.BalanceCredit,
-				account,
+		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account,
 				Amount.fromNem(123));
 
 		// Assert:

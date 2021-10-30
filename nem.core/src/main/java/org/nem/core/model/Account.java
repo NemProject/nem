@@ -20,8 +20,7 @@ public class Account {
 	}
 
 	/**
-	 * Creates an account around an address. This constructor should only be
-	 * used if the account's public key is not known.
+	 * Creates an account around an address. This constructor should only be used if the account's public key is not known.
 	 *
 	 * @param address The address.
 	 */
@@ -68,7 +67,7 @@ public class Account {
 			return false;
 		}
 
-		final Account rhs = (Account)obj;
+		final Account rhs = (Account) obj;
 		return this.address.equals(rhs.address);
 	}
 
@@ -77,7 +76,7 @@ public class Account {
 		return this.address.toString();
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes an account object.
@@ -98,11 +97,7 @@ public class Account {
 	 * @param account The object.
 	 * @param encoding The account encoding mode.
 	 */
-	public static void writeTo(
-			final Serializer serializer,
-			final String label,
-			final Account account,
-			final AddressEncoding encoding) {
+	public static void writeTo(final Serializer serializer, final String label, final Account account, final AddressEncoding encoding) {
 		Address.writeTo(serializer, label, account.getAddress(), encoding);
 	}
 
@@ -125,18 +120,15 @@ public class Account {
 	 * @param label The optional label.
 	 * @return The read object.
 	 */
-	public static Account readFrom(
-			final Deserializer deserializer,
-			final String label,
-			final AddressEncoding encoding) {
+	public static Account readFrom(final Deserializer deserializer, final String label, final AddressEncoding encoding) {
 		final Address address = Address.readFrom(deserializer, label, encoding);
 		final Account accountFromContext = deserializer.getContext().findAccountByAddress(address);
 		return null != address.getPublicKey() && !accountFromContext.hasPublicKey() ? new Account(address) : accountFromContext;
 	}
 
-	//endregion
+	// endregion
 
-	//region crypto
+	// region crypto
 
 	/**
 	 * Gets a value indicating whether or not this account has a private key.
@@ -178,16 +170,15 @@ public class Account {
 	 */
 	public Cipher createCipher(final Account other, final boolean encrypt) {
 		if (!this.hasPrivateKey() && !other.hasPrivateKey() || !this.hasPublicKey() || !other.hasPublicKey()) {
-			throw new CryptoException("in order to create a cipher, at least one account must have a private key and both accounts must have a public key");
+			throw new CryptoException(
+					"in order to create a cipher, at least one account must have a private key and both accounts must have a public key");
 		}
 
 		final KeyPair keyPairWithPrivateKey = this.hasPrivateKey() ? this.keyPair : other.keyPair;
 		final KeyPair otherKeyPair = !this.hasPrivateKey() ? this.keyPair : other.keyPair;
 
-		return encrypt
-				? new Cipher(keyPairWithPrivateKey, otherKeyPair)
-				: new Cipher(otherKeyPair, keyPairWithPrivateKey);
+		return encrypt ? new Cipher(keyPairWithPrivateKey, otherKeyPair) : new Cipher(otherKeyPair, keyPairWithPrivateKey);
 	}
 
-	//endregion
+	// endregion
 }

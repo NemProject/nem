@@ -26,7 +26,7 @@ public class IsRoundedEqual extends org.hamcrest.BaseMatcher<Double> {
 			return false;
 		}
 
-		final Double rhs = (Double)arg;
+		final Double rhs = (Double) arg;
 		return roundTo(this.lhs, this.numPlaces) == roundTo(rhs, this.numPlaces);
 	}
 

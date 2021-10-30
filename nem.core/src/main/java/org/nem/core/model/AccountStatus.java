@@ -38,7 +38,7 @@ public enum AccountStatus {
 		throw new IllegalArgumentException("Invalid account status: " + status);
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes an account status.
@@ -62,5 +62,5 @@ public enum AccountStatus {
 		return AccountStatus.fromString(deserializer.readString(label));
 	}
 
-	//endregion
+	// endregion
 }

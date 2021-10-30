@@ -15,7 +15,8 @@ public class TransactionHashesNotificationTest {
 		// Act:
 		final List<HashMetaDataPair> pairs = new ArrayList<>();
 		for (int i = 0; i < 5; ++i) {
-			pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
+			pairs.add(new HashMetaDataPair(Utils.generateRandomHash(),
+					new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
 		}
 
 		final TransactionHashesNotification notification = new TransactionHashesNotification(pairs);

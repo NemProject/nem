@@ -13,7 +13,7 @@ import java.util.*;
 public class MosaicDescriptorTest {
 	private static final String MAX_LENGTH_DESCRIPTION = StringUtils.repeat("abcd", 128);
 
-	//region ctor
+	// region ctor
 
 	@Test
 	public void canCreateMosaicDescriptor() {
@@ -39,9 +39,9 @@ public class MosaicDescriptorTest {
 		return Arrays.asList(null, "", "  ", "\t  \t");
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteToSerializer() {
@@ -119,9 +119,9 @@ public class MosaicDescriptorTest {
 		MatcherAssert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor(description)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsDescription() {
@@ -132,9 +132,10 @@ public class MosaicDescriptorTest {
 		MatcherAssert.assertThat(descriptor.toString(), IsEqual.equalTo("Bob's vouchers"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, MosaicDescriptor> createMosaicDescriptorsForEqualityTests() {
 		return new HashMap<String, MosaicDescriptor>() {
@@ -156,8 +157,7 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDescriptor> entry : createMosaicDescriptorsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(descriptor)) : IsEqual.equalTo(descriptor));
 		}
 
@@ -172,8 +172,7 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDescriptor> entry : createMosaicDescriptorsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -182,5 +181,5 @@ public class MosaicDescriptorTest {
 		return !propertyName.equals("default");
 	}
 
-	//endregion
+	// endregion
 }

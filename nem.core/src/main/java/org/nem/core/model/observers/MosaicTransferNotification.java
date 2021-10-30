@@ -21,11 +21,7 @@ public class MosaicTransferNotification extends Notification {
 	 * @param mosaicId The mosaic id.
 	 * @param quantity The quantity
 	 */
-	public MosaicTransferNotification(
-			final Account sender,
-			final Account recipient,
-			final MosaicId mosaicId,
-			final Quantity quantity) {
+	public MosaicTransferNotification(final Account sender, final Account recipient, final MosaicId mosaicId, final Quantity quantity) {
 		super(NotificationType.MosaicTransfer);
 		this.sender = sender;
 		this.recipient = recipient;

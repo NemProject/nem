@@ -29,9 +29,7 @@ public class AggregateTransactionSerializationExtension<TData> {
 	 * @param data The extended data.
 	 */
 	public void serialize(final Serializer serializer, final int version, final TData data) {
-		this.extensions.stream()
-				.filter(e -> e.isApplicable(version))
-				.forEach(e -> e.serialize(serializer, data));
+		this.extensions.stream().filter(e -> e.isApplicable(version)).forEach(e -> e.serialize(serializer, data));
 	}
 
 	/**
@@ -42,8 +40,6 @@ public class AggregateTransactionSerializationExtension<TData> {
 	 * @param data The extended data.
 	 */
 	public void deserialize(final Deserializer deserializer, final int version, final TData data) {
-		this.extensions.stream()
-				.filter(e -> e.isApplicable(version))
-				.forEach(e -> e.deserialize(deserializer, data));
+		this.extensions.stream().filter(e -> e.isApplicable(version)).forEach(e -> e.deserialize(deserializer, data));
 	}
 }

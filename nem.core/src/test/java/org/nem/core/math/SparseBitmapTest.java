@@ -13,7 +13,7 @@ import java.util.stream.*;
  */
 public class SparseBitmapTest {
 
-	//region createEmpty
+	// region createEmpty
 
 	@Test
 	public void createEmptyCanCreateEmptyBitmap() {
@@ -25,9 +25,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(0), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region createFromUnsortedData
+	// region createFromUnsortedData
 
 	@Test
 	public void createFromUnsortedDataCanCreateBitmapAroundNoBits() {
@@ -81,9 +81,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(4), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region createFromSortedData
+	// region createFromSortedData
 
 	@Test
 	public void createFromSortedDataCanCreateBitmapAroundNoBits() {
@@ -123,9 +123,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(4), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region get / set
+	// region get / set
 
 	@Test
 	public void getReturnsFalseOutOfBounds() {
@@ -198,9 +198,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(2000000), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region clear
+	// region clear
 
 	@Test
 	public void clearZerosOutAllBits() {
@@ -234,9 +234,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(3), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region getHighestBit
+	// region getHighestBit
 
 	@Test
 	public void getHighestBitReturnsCorrectResultWhenNoBitsAreSet() {
@@ -256,9 +256,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.getHighestBit(), IsEqual.equalTo(7));
 	}
 
-	//endregion
+	// endregion
 
-	//region batchOr
+	// region batchOr
 
 	@Test
 	public void batchOrCanCreateBitmapFromZeroBitmaps() {
@@ -283,9 +283,7 @@ public class SparseBitmapTest {
 	@Test
 	public void batchOrCanCreateBitmapFromMultipleBitmaps() {
 		// Act:
-		final SparseBitmap sb = SparseBitmap.batchOr(
-				SparseBitmap.createFromSortedData(1, 3),
-				SparseBitmap.createFromSortedData(5, 6),
+		final SparseBitmap sb = SparseBitmap.batchOr(SparseBitmap.createFromSortedData(1, 3), SparseBitmap.createFromSortedData(5, 6),
 				SparseBitmap.createFromSortedData(2, 7));
 
 		// Assert:
@@ -298,9 +296,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.get(7), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region toList / iterator
+	// region toList / iterator
 
 	@Test
 	public void toListReturnsSetBits() {
@@ -317,14 +315,13 @@ public class SparseBitmapTest {
 		final SparseBitmap sb = SparseBitmap.createFromSortedData(100, 200, 300);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				StreamSupport.stream(sb.spliterator(), false).collect(Collectors.toList()),
+		MatcherAssert.assertThat(StreamSupport.stream(sb.spliterator(), false).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(100, 200, 300)));
 	}
 
-	//endregion
+	// endregion
 
-	//region or / and / andNot
+	// region or / and / andNot
 
 	@Test
 	public void orCreatesCorrectBitmap() {
@@ -376,9 +373,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(result.get(8), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region cardinality / andCardinality
+	// region cardinality / andCardinality
 
 	@Test
 	public void cardinalityReturnsTheNumberOfSetBits() {
@@ -402,9 +399,9 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentationForEmptyBitmap() {
@@ -424,9 +421,10 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(sb.toString(), IsEqual.equalTo("{100,200,300,400,1337}"));
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode/equals
+	// region hashCode/equals
+
 	@SuppressWarnings("serial")
 	private static final Map<String, SparseBitmap> DESC_TO_SB_MAP = new HashMap<String, SparseBitmap>() {
 		{
@@ -448,7 +446,7 @@ public class SparseBitmapTest {
 		MatcherAssert.assertThat(DESC_TO_SB_MAP.get("diff-long"), IsNot.not(IsEqual.equalTo(sb)));
 		MatcherAssert.assertThat(DESC_TO_SB_MAP.get("diff-values"), IsNot.not(IsEqual.equalTo(sb)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(sb)));
-		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object)sb)));
+		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object) sb)));
 	}
 
 	@Test

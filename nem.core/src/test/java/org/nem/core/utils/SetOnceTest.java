@@ -53,8 +53,6 @@ public class SetOnceTest {
 		wrapper.set(54);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> wrapper.set(77),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrows(v -> wrapper.set(77), IllegalStateException.class);
 	}
 }

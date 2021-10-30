@@ -27,11 +27,9 @@ public class HttpErrorResponseDeserializerUnionStrategy implements HttpResponseS
 
 	@Override
 	public ErrorResponseDeserializerUnion coerce(final HttpRequestBase request, final HttpResponse response) {
-		return ExceptionUtils.propagate(() ->
-						new ErrorResponseDeserializerUnion(
-								response.getStatusLine().getStatusCode(),
-								JSONValue.parse(new InputStreamReader(response.getEntity().getContent(), Charset.forName("UTF-8"))),
-								this.context),
+		return ExceptionUtils.propagate(
+				() -> new ErrorResponseDeserializerUnion(response.getStatusLine().getStatusCode(),
+						JSONValue.parse(new InputStreamReader(response.getEntity().getContent(), Charset.forName("UTF-8"))), this.context),
 				FatalPeerException::new);
 	}
 

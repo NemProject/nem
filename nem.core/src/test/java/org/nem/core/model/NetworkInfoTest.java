@@ -15,10 +15,10 @@ public class NetworkInfoTest {
 	public void canCreateNetworkInfo() {
 		// Arrange:
 		final NemesisBlockInfo nemesisBlockInfo = createNemesisBlockInfo();
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', nemesisBlockInfo);
+		final NetworkInfo info = new NetworkInfo((byte) 0xC8, 'Z', nemesisBlockInfo);
 
 		// Assert:
-		MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0xC8));
+		MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte) 0xC8));
 		MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('Z'));
 		MatcherAssert.assertThat(info.getNemesisBlockInfo(), IsEqual.equalTo(nemesisBlockInfo));
 	}
@@ -36,7 +36,7 @@ public class NetworkInfoTest {
 			}
 		};
 
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', createNemesisBlockInfo());
+		final NetworkInfo info = new NetworkInfo((byte) 0xC8, 'Z', createNemesisBlockInfo());
 
 		// Assert:
 		MatcherAssert.assertThat(info.isCompatible(descToAddressMap.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));

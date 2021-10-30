@@ -95,7 +95,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 		return this.getValue() / MICRONEMS_IN_NEM;
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes an amount object.
@@ -131,5 +131,5 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 		return null == value ? null : new Amount(value);
 	}
 
-	//endregion
+	// endregion
 }

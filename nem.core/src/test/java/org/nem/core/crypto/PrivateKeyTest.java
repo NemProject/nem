@@ -10,7 +10,7 @@ import java.math.BigInteger;
 
 public class PrivateKeyTest {
 
-	//region constructors / factories
+	// region constructors / factories
 
 	@Test
 	public void canCreateFromBigInteger() {
@@ -54,7 +54,9 @@ public class PrivateKeyTest {
 		final PrivateKey key = PrivateKey.fromHexString("ABC");
 
 		// Assert:
-		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[] { (byte)0x0A, (byte)0xBC })));
+		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(new byte[]{
+				(byte) 0x0A, (byte) 0xBC
+		})));
 	}
 
 	@Test
@@ -63,7 +65,9 @@ public class PrivateKeyTest {
 		final PrivateKey key = PrivateKey.fromHexString("8000");
 
 		// Assert:
-		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x80, 0x00 })));
+		MatcherAssert.assertThat(key.getRaw(), IsEqual.equalTo(new BigInteger(1, new byte[]{
+				(byte) 0x80, 0x00
+		})));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -78,9 +82,9 @@ public class PrivateKeyTest {
 		PrivateKey.fromHexString("22G75");
 	}
 
-	//endregion
+	// endregion
 
-	//region serializer
+	// region serializer
 
 	@Test
 	public void keyCanBeRoundTripped() {
@@ -97,9 +101,9 @@ public class PrivateKeyTest {
 		return new PrivateKey(deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -111,7 +115,7 @@ public class PrivateKeyTest {
 		MatcherAssert.assertThat(PrivateKey.fromDecimalString("2276"), IsNot.not(IsEqual.equalTo(key)));
 		MatcherAssert.assertThat(PrivateKey.fromHexString("2276"), IsNot.not(IsEqual.equalTo(key)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)key)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) key)));
 	}
 
 	@Test
@@ -126,9 +130,9 @@ public class PrivateKeyTest {
 		MatcherAssert.assertThat(PrivateKey.fromHexString("2275").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsHexRepresentation() {
@@ -137,5 +141,5 @@ public class PrivateKeyTest {
 		MatcherAssert.assertThat(PrivateKey.fromDecimalString("2275").toString(), IsEqual.equalTo("08e3"));
 	}
 
-	//endregion
+	// endregion
 }

@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 
 public class NodeVersionTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void zeroConstantIsCorrect() {
@@ -17,7 +17,7 @@ public class NodeVersionTest {
 		MatcherAssert.assertThat(NodeVersion.ZERO, IsEqual.equalTo(new NodeVersion(0, 0, 0)));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void canCreateVersionWithTag() {
@@ -74,7 +74,7 @@ public class NodeVersionTest {
 		ExceptionAssert.assertThrows(v -> NodeVersion.parse("2.1.12.7"), IllegalArgumentException.class);
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -89,7 +89,7 @@ public class NodeVersionTest {
 		MatcherAssert.assertThat(new NodeVersion(2, 1, 12, "BETA"), IsNot.not(IsEqual.equalTo(version)));
 		MatcherAssert.assertThat(new NodeVersion(2, 1, 12), IsNot.not(IsEqual.equalTo(version)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(version)));
-		MatcherAssert.assertThat("ZETA", IsNot.not(IsEqual.equalTo((Object)version)));
+		MatcherAssert.assertThat("ZETA", IsNot.not(IsEqual.equalTo((Object) version)));
 	}
 
 	@Test
@@ -107,9 +107,9 @@ public class NodeVersionTest {
 		MatcherAssert.assertThat(new NodeVersion(2, 1, 12).hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteVersion() {
@@ -142,9 +142,9 @@ public class NodeVersionTest {
 		MatcherAssert.assertThat(version, IsEqual.equalTo(originalVersion));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void canCreateStringRepresentationForVersionWithTag() {
@@ -164,5 +164,5 @@ public class NodeVersionTest {
 		MatcherAssert.assertThat(version.toString(), IsEqual.equalTo("2.1.12"));
 	}
 
-	//endregion
+	// endregion
 }

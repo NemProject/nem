@@ -25,8 +25,7 @@ public abstract class AbstractDelayStrategy {
 	}
 
 	/**
-	 * Gets a value indicating whether or not all delays are exhausted
-	 * (and the recurring operation should stop).
+	 * Gets a value indicating whether or not all delays are exhausted (and the recurring operation should stop).
 	 *
 	 * @return true if the recurring operation should be stopped.
 	 */

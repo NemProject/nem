@@ -11,7 +11,7 @@ import java.math.BigInteger;
 
 public class BlockChainScoreTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void cannotBeCreatedAroundNegativeScore() {
@@ -34,9 +34,9 @@ public class BlockChainScoreTest {
 		MatcherAssert.assertThat(new BlockChainScore(BigInteger.ONE).getRaw(), IsEqual.equalTo(BigInteger.ONE));
 	}
 
-	//endregion
+	// endregion
 
-	//region add/subtract
+	// region add/subtract
 
 	@Test
 	public void scoresCanBeAdded() {
@@ -74,9 +74,9 @@ public class BlockChainScoreTest {
 		score2.subtract(score1);
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void scoreCanBeSerialized() {
@@ -90,9 +90,7 @@ public class BlockChainScoreTest {
 
 		// Assert:
 		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
-		MatcherAssert.assertThat(
-				jsonObject.get("score"),
-				IsEqual.equalTo("008e"));
+		MatcherAssert.assertThat(jsonObject.get("score"), IsEqual.equalTo("008e"));
 	}
 
 	@Test

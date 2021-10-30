@@ -15,7 +15,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap = bitmap;
 	}
 
-	//region factories
+	// region factories
 
 	/**
 	 * Creates a new <code>SparseBitmap</code> that is empty.
@@ -27,8 +27,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Creates a new <code>SparseBitmap</code> from data that are already sorted
-	 * in strictly ascending order (duplicate values are okay).
+	 * Creates a new <code>SparseBitmap</code> from data that are already sorted in strictly ascending order (duplicate values are okay).
 	 *
 	 * @param bitsToSet The bits to set.
 	 * @return A new <code>SparseBitmap</code> with the given bits set.
@@ -48,9 +47,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf(bitsToSet));
 	}
 
-	//endregion
+	// endregion
 
-	//region get / set
+	// region get / set
 
 	/**
 	 * Gets the value of the bit at the given index.
@@ -63,8 +62,8 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * For speed, this method sets bits at the given index, without checking that the bits
-	 * are set in strictly ascending order. If the bits are not in ascending order, performance could be adversely affected.
+	 * For speed, this method sets bits at the given index, without checking that the bits are set in strictly ascending order. If the bits
+	 * are not in ascending order, performance could be adversely affected.
 	 *
 	 * @param bitToSet index of the bit to set
 	 */
@@ -73,8 +72,8 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Set the bit at the given index. Throws an exception if bits are not set in strictly ascending order.
-	 * For performance reasons, bits must be set in ascending order.
+	 * Set the bit at the given index. Throws an exception if bits are not set in strictly ascending order. For performance reasons, bits
+	 * must be set in ascending order.
 	 *
 	 * @param bitToSet The index of the bit to set.
 	 */
@@ -87,9 +86,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap.set(bitToSet);
 	}
 
-	//endregion
+	// endregion
 
-	//region clear
+	// region clear
 
 	/**
 	 * Clears all the bits in this sparse bitmap.
@@ -98,9 +97,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap.clear();
 	}
 
-	//endregion
+	// endregion
 
-	//region logical operations
+	// region logical operations
 
 	/**
 	 * Creates a new SparseBitmap that is the logical <code>or</code> of all the given bitmaps.
@@ -127,44 +126,38 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Computes the logical <code>or</code> of the context bitmap
-	 * (<code>this</code>) and the given bitmap.
+	 * Computes the logical <code>or</code> of the context bitmap (<code>this</code>) and the given bitmap.
 	 *
 	 * @param rhs Bitmap to compute the logical <code>or</code> with.
-	 * @return Logical <code>or</code> of <code>this</code> bitmap
-	 * (context object) and the given bitmap.
+	 * @return Logical <code>or</code> of <code>this</code> bitmap (context object) and the given bitmap.
 	 */
 	public SparseBitmap or(final SparseBitmap rhs) {
 		return new SparseBitmap(this.bitmap.or(rhs.bitmap));
 	}
 
 	/**
-	 * Computes the logical <code>and</code> of the context bitmap
-	 * (<code>this</code>) and the given bitmap.
+	 * Computes the logical <code>and</code> of the context bitmap (<code>this</code>) and the given bitmap.
 	 *
 	 * @param rhs Bitmap to compute the logical <code>and</code> with.
-	 * @return Logical <code>and</code> of <code>this</code> bitmap
-	 * (context object) and the given bitmap.
+	 * @return Logical <code>and</code> of <code>this</code> bitmap (context object) and the given bitmap.
 	 */
 	public SparseBitmap and(final SparseBitmap rhs) {
 		return new SparseBitmap(this.bitmap.and(rhs.bitmap));
 	}
 
 	/**
-	 * Computes the logical <code>and not</code> of the context bitmap
-	 * (<code>this</code>) and the given bitmap.
+	 * Computes the logical <code>and not</code> of the context bitmap (<code>this</code>) and the given bitmap.
 	 *
 	 * @param rhs Bitmap to compute the logical <code>and not</code> with.
-	 * @return Logical <code>and not</code> of <code>this</code> bitmap
-	 * (context object) and the given bitmap.
+	 * @return Logical <code>and not</code> of <code>this</code> bitmap (context object) and the given bitmap.
 	 */
 	public SparseBitmap andNot(final SparseBitmap rhs) {
 		return new SparseBitmap(this.bitmap.andNot(rhs.bitmap));
 	}
 
-	//endregion
+	// endregion
 
-	//region highest bit / cardinality
+	// region highest bit / cardinality
 
 	/**
 	 * Gets the highest bit that is set in the bitmap.
@@ -176,8 +169,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Size of the intersection of <code>this</code> bitmap and
-	 * the given bitmap.
+	 * Size of the intersection of <code>this</code> bitmap and the given bitmap.
 	 *
 	 * @param rhs given sparse bitmap to compute the size of the intersection of
 	 * @return size of the intersection of <code>this</code> bitmap and the given bitmap.
@@ -195,9 +187,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return this.bitmap.cardinality();
 	}
 
-	//endregion
+	// endregion
 
-	//region list / iterator
+	// region list / iterator
 
 	/**
 	 * Creates a binary list representation of this sparse bitmap.
@@ -213,9 +205,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return this.bitmap.iterator();
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -228,7 +220,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 			return false;
 		}
 
-		final SparseBitmap rhs = (SparseBitmap)obj;
+		final SparseBitmap rhs = (SparseBitmap) obj;
 		return this.bitmap.equals(rhs.bitmap);
 	}
 
@@ -237,5 +229,5 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return this.bitmap.toString();
 	}
 
-	//endregion
+	// endregion
 }

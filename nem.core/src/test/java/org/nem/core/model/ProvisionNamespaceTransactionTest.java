@@ -56,15 +56,12 @@ public class ProvisionNamespaceTransactionTest {
 		final ProvisionNamespaceTransaction transaction = createTransactionWithDefaultRentalFee("bar", "foo");
 
 		// Assert:
-		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(5000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(5000), new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
 	}
 
-	private static void assertProperties(
-			final ProvisionNamespaceTransaction transaction,
-			final Account expectedRentalFeeSink,
-			final Amount expectedRentalFee,
-			final NamespaceIdPart expectedNewPart,
-			final NamespaceId expectedParent) {
+	private static void assertProperties(final ProvisionNamespaceTransaction transaction, final Account expectedRentalFeeSink,
+			final Amount expectedRentalFee, final NamespaceIdPart expectedNewPart, final NamespaceId expectedParent) {
 		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
 		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
@@ -138,7 +135,7 @@ public class ProvisionNamespaceTransactionTest {
 
 	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -242,25 +239,13 @@ public class ProvisionNamespaceTransactionTest {
 
 	// endregion
 
-	private static ProvisionNamespaceTransaction createTransactionWithDefaultRentalFee(
-			final String newPart,
-			final String parent) {
-		return new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				new NamespaceIdPart(newPart),
+	private static ProvisionNamespaceTransaction createTransactionWithDefaultRentalFee(final String newPart, final String parent) {
+		return new ProvisionNamespaceTransaction(TIME_INSTANT, SIGNER, new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));
 	}
 
-	private static ProvisionNamespaceTransaction createTransaction(
-			final String newPart,
-			final String parent) {
-		return new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				RENTAL_FEE_SINK,
-				RENTAL_FEE,
-				new NamespaceIdPart(newPart),
+	private static ProvisionNamespaceTransaction createTransaction(final String newPart, final String parent) {
+		return new ProvisionNamespaceTransaction(TIME_INSTANT, SIGNER, RENTAL_FEE_SINK, RENTAL_FEE, new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));
 	}
 }

@@ -13,7 +13,7 @@ import java.util.*;
 
 public class NodeIdentityTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void identityCanBeCreatedAroundPublicKey() {
@@ -60,9 +60,9 @@ public class NodeIdentityTest {
 		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
 	}
 
-	//endregion
+	// endregion
 
-	//region setName
+	// region setName
 
 	@Test
 	public void canChangeNodeIdentityFriendlyName() {
@@ -77,9 +77,9 @@ public class NodeIdentityTest {
 		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bbb"));
 	}
 
-	//endregion
+	// endregion
 
-	//region sign
+	// region sign
 
 	@Test
 	public void equalIdentitiesProduceSameSignatures() {
@@ -137,9 +137,9 @@ public class NodeIdentityTest {
 		identity.sign(salt);
 	}
 
-	//endregion
+	// endregion
 
-	//region verify
+	// region verify
 
 	@Test
 	public void signatureCanBeVerifiedByEqualIdentityWithoutPrivateKey() {
@@ -207,9 +207,9 @@ public class NodeIdentityTest {
 		MatcherAssert.assertThat(identity.verify(payload, signedDataWithoutPrefix), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void identityWithPublicKeyCanBeRoundTripped() {
@@ -281,9 +281,10 @@ public class NodeIdentityTest {
 		return NodeIdentity.deserializeWithPublicKey(Utils.roundtripSerializableEntity(originalIdentity, null));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static final Map<String, NodeIdentity> DESC_TO_IDENTITY_MAP = new HashMap<String, NodeIdentity>() {
 		{
@@ -330,12 +331,12 @@ public class NodeIdentityTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
-	private static final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS =
-			PublicKey.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
+	private static final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS = PublicKey
+			.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
 
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsPresent() {
@@ -357,5 +358,5 @@ public class NodeIdentityTest {
 		MatcherAssert.assertThat(identity.toString(), IsEqual.equalTo("<TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
 	}
 
-	//endregion
+	// endregion
 }

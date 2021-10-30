@@ -41,7 +41,6 @@ public abstract class HttpDeserializerResponseStrategyContractTest {
 		MatcherAssert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
-	protected abstract Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException;
+	protected abstract Deserializer coerceDeserializer(final SerializableEntity originalEntity, final AccountLookup accountLookup)
+			throws IOException;
 }

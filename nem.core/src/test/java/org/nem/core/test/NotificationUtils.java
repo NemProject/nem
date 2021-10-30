@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class NotificationUtils {
 
-	//region notify *
+	// region notify *
 
 	/**
 	 * Raises a credit notification on the specified observer.
@@ -47,13 +47,14 @@ public class NotificationUtils {
 	 * @param recipient The recipient.
 	 * @param amount The amount.
 	 */
-	public static void notifyTransfer(final TransactionObserver observer, final Account sender, final Account recipient, final Amount amount) {
+	public static void notifyTransfer(final TransactionObserver observer, final Account sender, final Account recipient,
+			final Amount amount) {
 		observer.notify(new BalanceTransferNotification(sender, recipient, amount));
 	}
 
-	//endregion
+	// endregion
 
-	//region assert *
+	// region assert *
 
 	/**
 	 * Asserts that the specified notification is an account notification.
@@ -62,7 +63,7 @@ public class NotificationUtils {
 	 * @param expectedAccount The expected account.
 	 */
 	public static void assertAccountNotification(final Notification notification, final Account expectedAccount) {
-		final AccountNotification n = (AccountNotification)notification;
+		final AccountNotification n = (AccountNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.Account));
 		MatcherAssert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
 	}
@@ -74,8 +75,9 @@ public class NotificationUtils {
 	 * @param expectedAccount The expected account.
 	 * @param expectedAmount The expected amount.
 	 */
-	public static void assertBalanceCreditNotification(final Notification notification, final Account expectedAccount, final Amount expectedAmount) {
-		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification)notification;
+	public static void assertBalanceCreditNotification(final Notification notification, final Account expectedAccount,
+			final Amount expectedAmount) {
+		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
 		MatcherAssert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
 		MatcherAssert.assertThat(n.getAmount(), IsEqual.equalTo(expectedAmount));
@@ -88,8 +90,9 @@ public class NotificationUtils {
 	 * @param expectedAccount The expected account.
 	 * @param expectedAmount The expected amount.
 	 */
-	public static void assertBalanceDebitNotification(final Notification notification, final Account expectedAccount, final Amount expectedAmount) {
-		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification)notification;
+	public static void assertBalanceDebitNotification(final Notification notification, final Account expectedAccount,
+			final Amount expectedAmount) {
+		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.BalanceDebit));
 		MatcherAssert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
 		MatcherAssert.assertThat(n.getAmount(), IsEqual.equalTo(expectedAmount));
@@ -102,8 +105,9 @@ public class NotificationUtils {
 	 * @param expectedAccount The expected account.
 	 * @param expectedAmount The expected amount.
 	 */
-	public static void assertBlockHarvestNotification(final Notification notification, final Account expectedAccount, final Amount expectedAmount) {
-		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification)notification;
+	public static void assertBlockHarvestNotification(final Notification notification, final Account expectedAccount,
+			final Amount expectedAmount) {
+		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.BlockHarvest));
 		MatcherAssert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
 		MatcherAssert.assertThat(n.getAmount(), IsEqual.equalTo(expectedAmount));
@@ -117,12 +121,9 @@ public class NotificationUtils {
 	 * @param expectedRecipient The expected recipient.
 	 * @param expectedAmount The expected amount.
 	 */
-	public static void assertBalanceTransferNotification(
-			final Notification notification,
-			final Account expectedSender,
-			final Account expectedRecipient,
-			final Amount expectedAmount) {
-		final BalanceTransferNotification n = (BalanceTransferNotification)notification;
+	public static void assertBalanceTransferNotification(final Notification notification, final Account expectedSender,
+			final Account expectedRecipient, final Amount expectedAmount) {
+		final BalanceTransferNotification n = (BalanceTransferNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
 		MatcherAssert.assertThat(n.getSender(), IsEqual.equalTo(expectedSender));
 		MatcherAssert.assertThat(n.getRecipient(), IsEqual.equalTo(expectedRecipient));
@@ -138,13 +139,9 @@ public class NotificationUtils {
 	 * @param expectedMosaicId The expected mosaic id.
 	 * @param expectedQuantity The expected quantity.
 	 */
-	public static void assertMosaicTransferNotification(
-			final Notification notification,
-			final Account expectedSender,
-			final Account expectedRecipient,
-			final MosaicId expectedMosaicId,
-			final Quantity expectedQuantity) {
-		final MosaicTransferNotification n = (MosaicTransferNotification)notification;
+	public static void assertMosaicTransferNotification(final Notification notification, final Account expectedSender,
+			final Account expectedRecipient, final MosaicId expectedMosaicId, final Quantity expectedQuantity) {
+		final MosaicTransferNotification n = (MosaicTransferNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
 		MatcherAssert.assertThat(n.getSender(), IsEqual.equalTo(expectedSender));
 		MatcherAssert.assertThat(n.getRecipient(), IsEqual.equalTo(expectedRecipient));
@@ -160,12 +157,9 @@ public class NotificationUtils {
 	 * @param expectedLessee The expected lessee.
 	 * @param expectedMode The expected mode.
 	 */
-	public static void assertImportanceTransferNotification(
-			final Notification notification,
-			final Account expectedLessor,
-			final Account expectedLessee,
-			final ImportanceTransferMode expectedMode) {
-		final ImportanceTransferNotification n = (ImportanceTransferNotification)notification;
+	public static void assertImportanceTransferNotification(final Notification notification, final Account expectedLessor,
+			final Account expectedLessee, final ImportanceTransferMode expectedMode) {
+		final ImportanceTransferNotification n = (ImportanceTransferNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		MatcherAssert.assertThat(n.getLessor(), IsEqual.equalTo(expectedLessor));
 		MatcherAssert.assertThat(n.getLessee(), IsEqual.equalTo(expectedLessee));
@@ -179,7 +173,7 @@ public class NotificationUtils {
 	 * @param pairs The expected transaction hashes.
 	 */
 	public static void assertTransactionHashesNotification(final Notification notification, final Collection<HashMetaDataPair> pairs) {
-		final TransactionHashesNotification n = (TransactionHashesNotification)notification;
+		final TransactionHashesNotification n = (TransactionHashesNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
 		MatcherAssert.assertThat(n.getPairs(), IsEquivalent.equivalentTo(pairs));
 	}
@@ -191,11 +185,9 @@ public class NotificationUtils {
 	 * @param expectedMultisig The expected multisig account.
 	 * @param expectedModification The expected multisig cosignatory modification.
 	 */
-	public static void assertCosignatoryModificationNotification(
-			final Notification notification,
-			final Account expectedMultisig,
+	public static void assertCosignatoryModificationNotification(final Notification notification, final Account expectedMultisig,
 			final MultisigCosignatoryModification expectedModification) {
-		final MultisigCosignatoryModificationNotification n = (MultisigCosignatoryModificationNotification)notification;
+		final MultisigCosignatoryModificationNotification n = (MultisigCosignatoryModificationNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
 		MatcherAssert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
 		MatcherAssert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
@@ -208,11 +200,9 @@ public class NotificationUtils {
 	 * @param expectedMultisig The expected multisig account.
 	 * @param expectedModification The expected multisig minimum cosignatories modification.
 	 */
-	public static void assertMinCosignatoriesModificationNotification(
-			final Notification notification,
-			final Account expectedMultisig,
+	public static void assertMinCosignatoriesModificationNotification(final Notification notification, final Account expectedMultisig,
 			final MultisigMinCosignatoriesModification expectedModification) {
-		final MultisigMinCosignatoriesModificationNotification n = (MultisigMinCosignatoriesModificationNotification)notification;
+		final MultisigMinCosignatoriesModificationNotification n = (MultisigMinCosignatoriesModificationNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MinCosignatoriesModification));
 		MatcherAssert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
 		MatcherAssert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
@@ -225,11 +215,9 @@ public class NotificationUtils {
 	 * @param expectedOwner The expected owner.
 	 * @param expectedNamespaceId The expected namespace id.
 	 */
-	public static void assertProvisionNamespaceNotification(
-			final Notification notification,
-			final Account expectedOwner,
+	public static void assertProvisionNamespaceNotification(final Notification notification, final Account expectedOwner,
 			final NamespaceId expectedNamespaceId) {
-		final ProvisionNamespaceNotification n = (ProvisionNamespaceNotification)notification;
+		final ProvisionNamespaceNotification n = (ProvisionNamespaceNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.ProvisionNamespace));
 		MatcherAssert.assertThat(n.getOwner(), IsEqual.equalTo(expectedOwner));
 		MatcherAssert.assertThat(n.getNamespaceId(), IsEqual.equalTo(expectedNamespaceId));
@@ -241,8 +229,9 @@ public class NotificationUtils {
 	 * @param notification The notification to test.
 	 * @param expectedMosaicDefinition The expected mosaic definition.
 	 */
-	public static void assertMosaicDefinitionCreationNotification(final Notification notification, final MosaicDefinition expectedMosaicDefinition) {
-		final MosaicDefinitionCreationNotification n = (MosaicDefinitionCreationNotification)notification;
+	public static void assertMosaicDefinitionCreationNotification(final Notification notification,
+			final MosaicDefinition expectedMosaicDefinition) {
+		final MosaicDefinitionCreationNotification n = (MosaicDefinitionCreationNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicDefinitionCreation));
 
 		MatcherAssert.assertThat(n.getMosaicDefinition().getCreator(), IsEqual.equalTo(expectedMosaicDefinition.getCreator()));
@@ -266,13 +255,9 @@ public class NotificationUtils {
 	 * @param expectedSupplyChange The expected supply change.
 	 * @param expectedSupplyType The expected supply type.
 	 */
-	public static void assertMosaicSupplyChangeNotification(
-			final Notification notification,
-			final Account expectedSupplier,
-			final MosaicId expectedMosaicId,
-			final Supply expectedSupplyChange,
-			final MosaicSupplyType expectedSupplyType) {
-		final MosaicSupplyChangeNotification n = (MosaicSupplyChangeNotification)notification;
+	public static void assertMosaicSupplyChangeNotification(final Notification notification, final Account expectedSupplier,
+			final MosaicId expectedMosaicId, final Supply expectedSupplyChange, final MosaicSupplyType expectedSupplyType) {
+		final MosaicSupplyChangeNotification n = (MosaicSupplyChangeNotification) notification;
 		MatcherAssert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicSupplyChange));
 		MatcherAssert.assertThat(n.getSupplier(), IsEqual.equalTo(expectedSupplier));
 		MatcherAssert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
@@ -280,5 +265,5 @@ public class NotificationUtils {
 		MatcherAssert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
 	}
 
-	//endregion
+	// endregion
 }

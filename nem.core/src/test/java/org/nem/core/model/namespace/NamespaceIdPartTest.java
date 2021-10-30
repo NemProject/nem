@@ -15,9 +15,7 @@ public class NamespaceIdPartTest {
 	public void canCreateNamespaceIdPartFromValidString() {
 		// Arrange:
 		final String[] validNames = {
-				"foo",
-				"foo-bar",
-				"f_"
+				"foo", "foo-bar", "f_"
 		};
 
 		// Act:
@@ -32,32 +30,32 @@ public class NamespaceIdPartTest {
 	@Test
 	public void cannotCreateNamespaceIdPartWithUppercaseCharacters() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new NamespaceIdPart("FoO"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NamespaceIdPart("FoO"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartFromEmptyString() {
 		// Assert:
 		for (final String name : Arrays.asList(null, "", " \t ")) {
-			ExceptionAssert.assertThrows(
-					v -> new NamespaceIdPart(name),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new NamespaceIdPart(name), IllegalArgumentException.class);
 		}
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartStartingWithSymbols() {
 		// Assert:
-		final String[] invalid = { "_", "-", "-foo", "_bar" };
+		final String[] invalid = {
+				"_", "-", "-foo", "_bar"
+		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartFromStringContainingDisallowedCharacters() {
 		// Assert:
-		final String[] invalid = { ".", "foo.", "fooä", "foo ", "foo bar" };
+		final String[] invalid = {
+				".", "foo.", "fooä", "foo ", "foo bar"
+		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
@@ -80,6 +78,7 @@ public class NamespaceIdPartTest {
 	// endregion
 
 	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static Map<String, NamespaceIdPart> createPartsForEqualityTests() {
 		return new HashMap<String, NamespaceIdPart>() {
@@ -97,8 +96,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(part)) : IsEqual.equalTo(part));
 		}
 
@@ -113,8 +111,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -125,4 +122,3 @@ public class NamespaceIdPartTest {
 
 	// endregion
 }
-

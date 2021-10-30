@@ -20,9 +20,8 @@ public class HttpBinaryResponseStrategyTest extends HttpDeserializerResponseStra
 	}
 
 	@Override
-	protected Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException {
+	protected Deserializer coerceDeserializer(final SerializableEntity originalEntity, final AccountLookup accountLookup)
+			throws IOException {
 		// Arrange:
 		final byte[] serializedBytes = BinarySerializer.serializeToBytes(originalEntity);
 
@@ -30,9 +29,7 @@ public class HttpBinaryResponseStrategyTest extends HttpDeserializerResponseStra
 		return coerceDeserializer(serializedBytes, accountLookup);
 	}
 
-	private static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
+	private static Deserializer coerceDeserializer(final byte[] serializedBytes, final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(context);

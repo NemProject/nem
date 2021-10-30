@@ -44,7 +44,5 @@ public abstract class SerializationPolicy<TSerializer extends Serializer, TDeser
 	 * @param context The deserialization context.
 	 * @return A deserializer.
 	 */
-	public abstract TDeserializer createDeserializer(
-			final TSerializer serializer,
-			final DeserializationContext context);
+	public abstract TDeserializer createDeserializer(final TSerializer serializer, final DeserializationContext context);
 }

@@ -32,10 +32,6 @@ public class MetaDataFactory {
 		final CodeSourceFacade codeSourceFacade = new CodeSourceFacade(codeSource);
 		final JarFacade jarFacade = new JarFacade(codeSourceFacade.getLocation());
 
-		return new ApplicationMetaData(
-				jarFacade.getTitle(),
-				jarFacade.getVersion(),
-				codeSourceFacade.getFirstCertificate(),
-				provider);
+		return new ApplicationMetaData(jarFacade.getTitle(), jarFacade.getVersion(), codeSourceFacade.getFirstCertificate(), provider);
 	}
 }

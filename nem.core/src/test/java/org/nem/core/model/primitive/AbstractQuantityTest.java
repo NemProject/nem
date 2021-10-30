@@ -26,7 +26,7 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 
 	protected abstract void writeTo(final Serializer serializer, final String label, final TDerived quantity);
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
@@ -34,9 +34,9 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		MatcherAssert.assertThat(this.getZeroConstant(), IsEqual.equalTo(this.construct(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region fromValue
+	// region fromValue
 
 	@Test
 	public void canCreateQuantityFromValue() {
@@ -47,9 +47,9 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		MatcherAssert.assertThat(quantity.getRaw(), IsEqual.equalTo(11L));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void cannotBeCreatedAroundNegativeQuantity() {
@@ -76,9 +76,9 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		MatcherAssert.assertThat(quantity.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region add / subtract
+	// region add / subtract
 
 	@Test
 	public void twoQuantitiesCanBeAdded() {
@@ -118,9 +118,9 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		ExceptionAssert.assertThrows(v -> quantity1.subtract(quantity2), NegativeQuantityException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteQuantity() {
@@ -158,5 +158,5 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 		MatcherAssert.assertThat(quantity, IsEqual.equalTo(original));
 	}
 
-	//endregion
+	// endregion
 }

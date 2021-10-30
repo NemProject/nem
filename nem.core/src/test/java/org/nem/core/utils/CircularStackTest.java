@@ -83,7 +83,7 @@ public class CircularStackTest {
 		MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(2));
 	}
 
-	//region shallowCopyTo
+	// region shallowCopyTo
 
 	@Test
 	public void canCopyLargerToSmaller() {
@@ -151,9 +151,9 @@ public class CircularStackTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region iteration
+	// region iteration
 
 	@Test
 	public void canIterateOverStackFromOldestToNewestElement() {
@@ -192,7 +192,7 @@ public class CircularStackTest {
 		MatcherAssert.assertThat(intStack.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
 	private CircularStack<Integer> createStack(final int i) {
 		return new CircularStack<>(i);

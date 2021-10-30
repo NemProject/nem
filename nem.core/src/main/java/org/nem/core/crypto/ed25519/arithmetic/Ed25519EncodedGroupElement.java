@@ -42,13 +42,11 @@ public class Ed25519EncodedGroupElement {
 	}
 
 	/**
-	 * Gets the affine x-coordinate.
-	 * x is recovered in the following way (p = field size):
-	 * <br>
-	 * x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1)) = sign(x) * sqrt(u / v) with u = y^2 - 1 and v = d * y^2 + 1.
-	 * Setting β = (u * v^3) * (u * v^7)^((p - 5) / 8) one has β^2 = +-(u / v).
-	 * If v * β = -u multiply β with i=sqrt(-1).
-	 * Set x := β.
+	 * Gets the affine x-coordinate. x is recovered in the following way (p = field size): <br>
+	 * x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1)) = sign(x) * sqrt(u / v) with u = y^2 - 1 and v = d * y^2 + 1. <br>
+	 * Setting β = (u * v^3) * (u * v^7)^((p - 5) / 8) one has β^2 = +-(u / v). <br>
+	 * If v * β = -u multiply β with i=sqrt(-1). <br>
+	 * Set x := β. <br>
 	 * If sign(x) != bit 255 of s then negate x.
 	 *
 	 * @return the affine x-coordinate.
@@ -115,15 +113,12 @@ public class Ed25519EncodedGroupElement {
 			return false;
 		}
 
-		final Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement)obj;
+		final Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement) obj;
 		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 
 	@Override
 	public String toString() {
-		return String.format(
-				"x=%s\ny=%s\n",
-				this.getAffineX().toString(),
-				this.getAffineY().toString());
+		return String.format("x=%s\ny=%s\n", this.getAffineX().toString(), this.getAffineY().toString());
 	}
 }

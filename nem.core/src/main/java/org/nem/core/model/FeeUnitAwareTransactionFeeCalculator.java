@@ -30,12 +30,12 @@ public class FeeUnitAwareTransactionFeeCalculator extends AbstractTransactionFee
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return this.weightWithFeeUnit(this.calculateMinimumFeeImpl((TransferTransaction)transaction));
+				return this.weightWithFeeUnit(this.calculateMinimumFeeImpl((TransferTransaction) transaction));
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				return this.weightWithFeeUnit(Amount.fromNem(10));
 
-			default:
+			default :
 				return this.weightWithFeeUnit(Amount.fromNem(3));
 		}
 	}

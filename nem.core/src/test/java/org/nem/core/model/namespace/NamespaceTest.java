@@ -76,9 +76,7 @@ public class NamespaceTest {
 		// Assert:
 		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
 			final String key = entry.getKey();
-			MatcherAssert.assertThat(
-					key,
-					infoMap.get(key),
+			MatcherAssert.assertThat(key, infoMap.get(key),
 					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(namespace)) : IsEqual.equalTo(namespace));
 		}
 
@@ -95,9 +93,7 @@ public class NamespaceTest {
 		// Assert:
 		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
 			final String key = entry.getKey();
-			MatcherAssert.assertThat(
-					key,
-					infoMap.get(key).hashCode(),
+			MatcherAssert.assertThat(key, infoMap.get(key).hashCode(),
 					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -116,15 +112,12 @@ public class NamespaceTest {
 
 	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void canRoundTripNamespace() {
 		// Arrange:
-		final Namespace original = new Namespace(
-				new NamespaceId("abc.def"),
-				OWNER,
-				new BlockHeight(737));
+		final Namespace original = new Namespace(new NamespaceId("abc.def"), OWNER, new BlockHeight(737));
 
 		// Act:
 		final Namespace namespace = new Namespace(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
@@ -138,9 +131,7 @@ public class NamespaceTest {
 	@Test
 	public void canSerializeNamespace() {
 		// Arrange:
-		final Namespace namespace = new Namespace(
-				new NamespaceId("abc.def"),
-				new Account(Address.fromEncoded("XYZ")),
+		final Namespace namespace = new Namespace(new NamespaceId("abc.def"), new Account(Address.fromEncoded("XYZ")),
 				new BlockHeight(737));
 
 		// Act:
@@ -153,5 +144,5 @@ public class NamespaceTest {
 		MatcherAssert.assertThat(jsonObject.get("height"), IsEqual.equalTo(737L));
 	}
 
-	//endregion
+	// endregion
 }

@@ -8,9 +8,9 @@ import org.nem.core.serialization.*;
  * @param <TEntity> The entity type.
  * @param <TMetaData> The metadata type.
  */
-public abstract class AbstractMetaDataPair<
-		TEntity extends SerializableEntity,
-		TMetaData extends SerializableEntity> implements SerializableEntity {
+public abstract class AbstractMetaDataPair<TEntity extends SerializableEntity, TMetaData extends SerializableEntity>
+		implements
+			SerializableEntity {
 	private final TEntity entity;
 	private final TMetaData metaData;
 	private final String entityKey;
@@ -24,11 +24,7 @@ public abstract class AbstractMetaDataPair<
 	 * @param entity The entity.
 	 * @param metaData The meta data.
 	 */
-	protected AbstractMetaDataPair(
-			final String entityKey,
-			final String metaDataKey,
-			final TEntity entity,
-			final TMetaData metaData) {
+	protected AbstractMetaDataPair(final String entityKey, final String metaDataKey, final TEntity entity, final TMetaData metaData) {
 		this.entityKey = entityKey;
 		this.metaDataKey = metaDataKey;
 		this.entity = entity;
@@ -44,12 +40,8 @@ public abstract class AbstractMetaDataPair<
 	 * @param metaDataActivator The meta data activator.
 	 * @param deserializer The deserializer.
 	 */
-	protected AbstractMetaDataPair(
-			final String entityKey,
-			final String metaDataKey,
-			final ObjectDeserializer<TEntity> entityActivator,
-			final ObjectDeserializer<TMetaData> metaDataActivator,
-			final Deserializer deserializer) {
+	protected AbstractMetaDataPair(final String entityKey, final String metaDataKey, final ObjectDeserializer<TEntity> entityActivator,
+			final ObjectDeserializer<TMetaData> metaDataActivator, final Deserializer deserializer) {
 		this.entityKey = entityKey;
 		this.metaDataKey = metaDataKey;
 		this.entity = deserializer.readObject(this.entityKey, entityActivator);

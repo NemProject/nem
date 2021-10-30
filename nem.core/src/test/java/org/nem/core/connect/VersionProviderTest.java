@@ -95,8 +95,7 @@ public class VersionProviderTest {
 		public void setHttpResult(final ErrorResponseDeserializerUnion result) {
 			@SuppressWarnings("unchecked")
 			final HttpMethodClient.AsyncToken<ErrorResponseDeserializerUnion> token = Mockito.mock(HttpMethodClient.AsyncToken.class);
-			Mockito.when(token.getFuture())
-					.thenReturn(CompletableFuture.completedFuture(result));
+			Mockito.when(token.getFuture()).thenReturn(CompletableFuture.completedFuture(result));
 			Mockito.when(this.client.get(Mockito.any(), Mockito.any())).thenReturn(token);
 		}
 

@@ -14,7 +14,7 @@ import java.util.*;
 
 public class BlockTest {
 
-	//region Constructors
+	// region Constructors
 
 	@Test
 	public void ctorCanCreateBlockForAccountWithSignerPrivateKey() {
@@ -83,16 +83,14 @@ public class BlockTest {
 		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 
 		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-		final Hash expectedGenerationHash = HashUtils.nextHash(
-				previousBlock.getGenerationHash(),
-				signer.getAddress().getPublicKey());
+		final Hash expectedGenerationHash = HashUtils.nextHash(previousBlock.getGenerationHash(), signer.getAddress().getPublicKey());
 		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region Setters
+	// region Setters
 
 	@Test
 	public void previousBlockCanSet() {
@@ -105,8 +103,7 @@ public class BlockTest {
 
 		// Assert:
 		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
-		final Hash expectedGenerationHash = HashUtils.nextHash(
-				previousBlock.getGenerationHash(),
+		final Hash expectedGenerationHash = HashUtils.nextHash(previousBlock.getGenerationHash(),
 				block.getSigner().getAddress().getPublicKey());
 		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
@@ -121,9 +118,7 @@ public class BlockTest {
 		block.setPreviousGenerationHash(previousGenerationHash);
 
 		// Assert:
-		final Hash expectedGenerationHash = HashUtils.nextHash(
-				previousGenerationHash,
-				block.getSigner().getAddress().getPublicKey());
+		final Hash expectedGenerationHash = HashUtils.nextHash(previousGenerationHash, block.getSigner().getAddress().getPublicKey());
 		MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 
@@ -164,9 +159,10 @@ public class BlockTest {
 		// Assert:
 		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
-	//endregion
 
-	//region Serialization
+	// endregion
+
+	// region Serialization
 
 	@Test
 	public void blockCanBeRoundTripped() {
@@ -190,10 +186,10 @@ public class BlockTest {
 		final List<Transaction> transactions = block.getTransactions();
 		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
-		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+		final TransferTransaction transaction1 = (TransferTransaction) transactions.get(0);
 		MatcherAssert.assertThat(transaction1.getAmount(), IsEqual.equalTo(Amount.fromNem(17)));
 
-		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+		final TransferTransaction transaction2 = (TransferTransaction) transactions.get(1);
 		MatcherAssert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
@@ -257,10 +253,10 @@ public class BlockTest {
 		final List<Transaction> transactions = block.getTransactions();
 		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
-		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+		final TransferTransaction transaction1 = (TransferTransaction) transactions.get(0);
 		MatcherAssert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
 
-		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+		final TransferTransaction transaction2 = (TransferTransaction) transactions.get(1);
 		MatcherAssert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
 	}
 
@@ -275,10 +271,10 @@ public class BlockTest {
 		final List<Transaction> transactions = block.getTransactions();
 		MatcherAssert.assertThat(transactions.size(), IsEqual.equalTo(2));
 
-		final TransferTransaction transaction1 = (TransferTransaction)transactions.get(0);
+		final TransferTransaction transaction1 = (TransferTransaction) transactions.get(0);
 		MatcherAssert.assertThat(transaction1.verify(), IsEqual.equalTo(true));
 
-		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
+		final TransferTransaction transaction2 = (TransferTransaction) transactions.get(1);
 		MatcherAssert.assertThat(transaction2.verify(), IsEqual.equalTo(true));
 	}
 
@@ -311,19 +307,15 @@ public class BlockTest {
 	}
 
 	private TransferTransaction createSignedTransactionWithAmount(final long amount) {
-		final TransferTransaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(amount),
-				null);
+		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(), Amount.fromNem(amount), null);
 		transaction.sign();
 		return transaction;
 	}
 
-	//endregion
+	// endregion
 
-	//region Transaction
+	// region Transaction
 
 	@Test
 	public void singleTransactionCanBeAddedToBlock() {
@@ -356,9 +348,9 @@ public class BlockTest {
 		MatcherAssert.assertThat((block.getTransactions().get(1)), IsEqual.equalTo(transactions.get(1)));
 	}
 
-	//endregion
+	// endregion
 
-	//region Fee
+	// region Fee
 
 	@Test
 	public void blockFeeIsSumOfTransactionFees() {
@@ -366,9 +358,7 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlock();
 		block.addTransaction(BlockUtils.createTransactionWithFee(17));
 		block.addTransaction(BlockUtils.createTransactionWithFee(11));
-		block.addTransactions(Arrays.asList(
-				(Transaction)BlockUtils.createTransactionWithFee(3),
-				BlockUtils.createTransactionWithFee(50)));
+		block.addTransactions(Arrays.asList((Transaction) BlockUtils.createTransactionWithFee(3), BlockUtils.createTransactionWithFee(50)));
 		block.addTransaction(BlockUtils.createTransactionWithFee(22));
 
 		// Assert:
@@ -398,9 +388,9 @@ public class BlockTest {
 		MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	private static final Account DEFAULT_ACCOUNT = Utils.generateRandomAccount();
 
@@ -441,7 +431,7 @@ public class BlockTest {
 		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash"), IsNot.not(IsEqual.equalTo(block)));
 		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature"), IsNot.not(IsEqual.equalTo(block)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(block)));
-		MatcherAssert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object)block)));
+		MatcherAssert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object) block)));
 	}
 
 	@Test
@@ -459,9 +449,9 @@ public class BlockTest {
 		MatcherAssert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -474,5 +464,5 @@ public class BlockTest {
 		MatcherAssert.assertThat(block.toString(), IsEqual.equalTo("height: 3, #tx: 2"));
 	}
 
-	//endregion
+	// endregion
 }

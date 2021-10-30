@@ -14,10 +14,7 @@ public class HashChainTest {
 	@Test
 	public void hashChainCanBeCreatedAroundRawHashes() {
 		// Arrange:
-		final List<Hash> hashes = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash());
 
 		final List<byte[]> rawHashes = hashes.stream().map(Hash::getRaw).collect(Collectors.toList());
 
@@ -34,10 +31,7 @@ public class HashChainTest {
 	@Test
 	public void hashChainCanBeRoundTripped() {
 		// Arrange:
-		final List<Hash> hashes = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash());
 
 		final HashChain hashChain1 = new HashChain(hashes);
 

@@ -50,7 +50,7 @@ public class NamespaceIdPart {
 			return false;
 		}
 
-		final NamespaceIdPart rhs = (NamespaceIdPart)obj;
+		final NamespaceIdPart rhs = (NamespaceIdPart) obj;
 		return this.id.equals(rhs.id);
 	}
 }

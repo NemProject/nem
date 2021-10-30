@@ -43,8 +43,7 @@ public class MockAccountLookup implements AccountLookup {
 	}
 
 	/**
-	 * Creates a new mock account lookup that can optionally return null accounts
-	 * instead of mock accounts.
+	 * Creates a new mock account lookup that can optionally return null accounts instead of mock accounts.
 	 *
 	 * @param unknownAccountBehavior The unknown account behavior.
 	 */
@@ -67,7 +66,7 @@ public class MockAccountLookup implements AccountLookup {
 
 			case REAL_ACCOUNT:
 			case MOCK_ACCOUNT:
-			default:
+			default :
 				return new Account(id);
 		}
 	}

@@ -6,12 +6,12 @@ import org.junit.*;
 
 public class StringEncoderTest {
 
-	private static final byte[] ENCODED_SIGMA_BYTES = new byte[] {
+	private static final byte[] ENCODED_SIGMA_BYTES = new byte[]{
 			0x53, 0x69, 0x67, 0x6D, 0x61
 	};
 
-	private static final byte[] ENCODED_CURRENCY_SYMBOLS_BYTES = new byte[] {
-			0x24, (byte)0xC2, (byte)0xA2, (byte)0xE2, (byte)0x82, (byte)0xAC
+	private static final byte[] ENCODED_CURRENCY_SYMBOLS_BYTES = new byte[]{
+			0x24, (byte) 0xC2, (byte) 0xA2, (byte) 0xE2, (byte) 0x82, (byte) 0xAC
 	};
 
 	@Test

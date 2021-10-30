@@ -6,26 +6,30 @@ import org.junit.*;
 
 public class ByteUtilsTest {
 
-	//region bytesToLong / longToBytes
-
 	// region bytesToLong
 
 	@Test
 	public void canConvertBytesToLong() {
 		// Assert:
-		assertBytesToLongConversion(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 0x0102030405060708L);
+		assertBytesToLongConversion(new byte[]{
+				1, 2, 3, 4, 5, 6, 7, 8
+		}, 0x0102030405060708L);
 	}
 
 	@Test
 	public void canConvertBytesToLongNegative() {
 		// Assert:
-		assertBytesToLongConversion(new byte[] { (byte)0x80, 2, 3, 4, 5, 6, 7, 8 }, 0x8002030405060708L);
+		assertBytesToLongConversion(new byte[]{
+				(byte) 0x80, 2, 3, 4, 5, 6, 7, 8
+		}, 0x8002030405060708L);
 	}
 
 	@Test
 	public void conversionToLongIgnoresExcessiveData() {
 		// Assert:
-		assertBytesToLongConversion(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9 }, 0x0102030405060708L);
+		assertBytesToLongConversion(new byte[]{
+				1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9
+		}, 0x0102030405060708L);
 	}
 
 	private static void assertBytesToLongConversion(final byte[] input, final long expected) {
@@ -39,26 +43,32 @@ public class ByteUtilsTest {
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void conversionToLongFailsOnDataUnderflow() {
 		// Arrange:
-		final byte[] data = { 1, 2, 3, 4, 5, 6 };
+		final byte[] data = {
+				1, 2, 3, 4, 5, 6
+		};
 
 		// Act:
 		ByteUtils.bytesToLong(data);
 	}
 
-	//endregion
+	// endregion
 
-	//region longToBytes
+	// region longToBytes
 
 	@Test
 	public void canConvertLongToBytes() {
 		// Assert:
-		assertLongToBytesConversion(0x0807060504030201L, new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 });
+		assertLongToBytesConversion(0x0807060504030201L, new byte[]{
+				8, 7, 6, 5, 4, 3, 2, 1
+		});
 	}
 
 	@Test
 	public void canConvertLongNegativeToBytes() {
 		// Arrange:
-		assertLongToBytesConversion(0x8070605040302010L, new byte[] { (byte)0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10 });
+		assertLongToBytesConversion(0x8070605040302010L, new byte[]{
+				(byte) 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10
+		});
 	}
 
 	private static void assertLongToBytesConversion(final long input, final byte[] expected) {
@@ -69,9 +79,9 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
+	// region roundtrip
 
 	@Test
 	public void canRoundtripLongViaBytes() {
@@ -88,7 +98,9 @@ public class ByteUtilsTest {
 	@Test
 	public void canRoundtripBytesViaLong() {
 		// Arrange:
-		final byte[] input = { (byte)0x80, 2, 3, 4, 5, 6, 7, 8 };
+		final byte[] input = {
+				(byte) 0x80, 2, 3, 4, 5, 6, 7, 8
+		};
 
 		// Act:
 		final byte[] result = ByteUtils.longToBytes(ByteUtils.bytesToLong(input));
@@ -97,30 +109,32 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(input));
 	}
 
-	//endregion
-
-	//endregion
-
-	//region bytesToInt / intToBytes
+	// endregion
 
 	// region bytesToInt
 
 	@Test
 	public void canConvertBytesToInt() {
 		// Assert:
-		assertBytesToIntConversion(new byte[] { 1, 2, 3, 4 }, 0x01020304);
+		assertBytesToIntConversion(new byte[]{
+				1, 2, 3, 4
+		}, 0x01020304);
 	}
 
 	@Test
 	public void canConvertBytesToIntNegative() {
 		// Assert:
-		assertBytesToIntConversion(new byte[] { (byte)0x80, 2, 3, 4 }, 0x80020304);
+		assertBytesToIntConversion(new byte[]{
+				(byte) 0x80, 2, 3, 4
+		}, 0x80020304);
 	}
 
 	@Test
 	public void conversionToIntIgnoresExcessiveData() {
 		// Assert:
-		assertBytesToIntConversion(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9 }, 0x01020304);
+		assertBytesToIntConversion(new byte[]{
+				1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9
+		}, 0x01020304);
 	}
 
 	private static void assertBytesToIntConversion(final byte[] input, final int expected) {
@@ -134,26 +148,32 @@ public class ByteUtilsTest {
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void conversionToIntFailsOnDataUnderflow() {
 		// Arrange:
-		final byte[] data = { 1, 2, 3 };
+		final byte[] data = {
+				1, 2, 3
+		};
 
 		// Act:
 		ByteUtils.bytesToInt(data);
 	}
 
-	//endregion
+	// endregion
 
-	//region intToBytes
+	// region intToBytes
 
 	@Test
 	public void canConvertIntToBytes() {
 		// Assert:
-		assertIntToBytesConversion(0x08070605, new byte[] { 8, 7, 6, 5 });
+		assertIntToBytesConversion(0x08070605, new byte[]{
+				8, 7, 6, 5
+		});
 	}
 
 	@Test
 	public void canConvertIntNegativeToBytes() {
 		// Arrange:
-		assertIntToBytesConversion(0x80706050, new byte[] { (byte)0x80, 0x70, 0x60, 0x50 });
+		assertIntToBytesConversion(0x80706050, new byte[]{
+				(byte) 0x80, 0x70, 0x60, 0x50
+		});
 	}
 
 	private static void assertIntToBytesConversion(final int input, final byte[] expected) {
@@ -164,9 +184,9 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expected));
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
+	// region roundtrip
 
 	@Test
 	public void canRoundtripIntViaBytes() {
@@ -183,7 +203,9 @@ public class ByteUtilsTest {
 	@Test
 	public void canRoundtripBytesViaInt() {
 		// Arrange:
-		final byte[] input = { (byte)0x80, 2, 3, 4 };
+		final byte[] input = {
+				(byte) 0x80, 2, 3, 4
+		};
 
 		// Act:
 		final byte[] result = ByteUtils.intToBytes(ByteUtils.bytesToInt(input));
@@ -192,11 +214,9 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(input));
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region isEqual
+	// region isEqual
 
 	@Test
 	public void isEqualReturnsOneIfBytesAreEqual() {
@@ -222,7 +242,7 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(ByteUtils.isEqualConstantTime(254, 255), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
 	// region isNegative
 
@@ -243,14 +263,14 @@ public class ByteUtilsTest {
 		MatcherAssert.assertThat(ByteUtils.isNegativeConstantTime(127), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringCreatesCorrectRepresentationForEmptyBytes() {
 		// Act:
-		final String result = ByteUtils.toString(new byte[] {});
+		final String result = ByteUtils.toString(new byte[]{});
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsEqual.equalTo("{ }"));
@@ -259,11 +279,13 @@ public class ByteUtilsTest {
 	@Test
 	public void toStringCreatesCorrectRepresentationForNonEmptyBytes() {
 		// Act:
-		final String result = ByteUtils.toString(new byte[] { 0x12, (byte)0x8A, 0x00, 0x07 });
+		final String result = ByteUtils.toString(new byte[]{
+				0x12, (byte) 0x8A, 0x00, 0x07
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsEqual.equalTo("{ 12 8A 00 07 }"));
 	}
 
-	//endregion
+	// endregion
 }

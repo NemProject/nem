@@ -34,7 +34,7 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 		this.timeProvider = timeProvider;
 	}
 
-	//region getters
+	// region getters
 
 	/**
 	 * Gets the number of executions.
@@ -112,9 +112,9 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 		return this.numSuccesses + this.numFailures;
 	}
 
-	//endregion
+	// endregion
 
-	//region AsyncTimerVisitor
+	// region AsyncTimerVisitor
 
 	@Override
 	public void notifyOperationStart() {
@@ -132,10 +132,7 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 
 	@Override
 	public void notifyOperationCompleteExceptionally(final Throwable ex) {
-		LOGGER.log(
-				Level.WARNING,
-				String.format("Timer %s raised exception: %s", this.getTimerName(), ex.getMessage()),
-				ex);
+		LOGGER.log(Level.WARNING, String.format("Timer %s raised exception: %s", this.getTimerName(), ex.getMessage()), ex);
 
 		this.handleOperationCompletion();
 		++this.numFailures;
@@ -159,11 +156,7 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 	}
 
 	private void log(final String message) {
-		LOGGER.fine(String.format(
-				"[%d] Timer %s: %s",
-				Thread.currentThread().getId(),
-				this.timerName,
-				message));
+		LOGGER.fine(String.format("[%d] Timer %s: %s", Thread.currentThread().getId(), this.timerName, message));
 	}
 
 	@Override
@@ -171,9 +164,9 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 		return this.timerName;
 	}
 
-	//endregion
+	// endregion
 
-	//region SerializableEntity
+	// region SerializableEntity
 
 	@Override
 	public void serialize(final Serializer serializer) {
@@ -188,5 +181,5 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 		serializer.writeInt("is-executing", this.isExecuting() ? 1 : 0);
 	}
 
-	//endregion
+	// endregion
 }

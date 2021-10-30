@@ -13,8 +13,10 @@ public class MultisigCosignatoryModificationNotificationTest {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosigner = Utils.generateRandomAccount();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner);
-		final MultisigCosignatoryModificationNotification notification = new MultisigCosignatoryModificationNotification(multisig, modification);
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory,
+				cosigner);
+		final MultisigCosignatoryModificationNotification notification = new MultisigCosignatoryModificationNotification(multisig,
+				modification);
 
 		// Assert:
 		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));

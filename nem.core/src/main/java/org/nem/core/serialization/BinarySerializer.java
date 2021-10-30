@@ -38,18 +38,15 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	@Override
 	public void writeInt(final String label, final int i) {
 		final byte[] bytes = {
-				(byte)(i & 0xFF),
-				(byte)((i >> 8) & 0xFF),
-				(byte)((i >> 16) & 0xFF),
-				(byte)((i >> 24) & 0xFF),
+				(byte) (i & 0xFF), (byte) ((i >> 8) & 0xFF), (byte) ((i >> 16) & 0xFF), (byte) ((i >> 24) & 0xFF),
 		};
 		this.writeBytesInternal(bytes);
 	}
 
 	@Override
 	public void writeLong(final String label, final long l) {
-		this.writeInt(label, (int)l);
-		this.writeInt(label, (int)(l >> 32));
+		this.writeInt(label, (int) l);
+		this.writeInt(label, (int) (l >> 32));
 	}
 
 	@Override

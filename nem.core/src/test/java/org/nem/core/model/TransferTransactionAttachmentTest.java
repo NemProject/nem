@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class TransferTransactionAttachmentTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateEmptyAttachment() {
@@ -36,9 +36,9 @@ public class TransferTransactionAttachmentTest {
 		MatcherAssert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region message
+	// region message
 
 	@Test
 	public void canSetMessage() {
@@ -62,17 +62,15 @@ public class TransferTransactionAttachmentTest {
 		attachment.setMessage(message1);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> attachment.setMessage(message2),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrows(v -> attachment.setMessage(message2), IllegalStateException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message1));
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaics
+	// region mosaics
 
 	@Test
 	public void canAddMosaics() {
@@ -85,10 +83,8 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId(3), new Quantity(41));
 
 		// Assert:
-		final Collection<Mosaic> expectedPairs = Arrays.asList(
-				new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
-				new Mosaic(Utils.createMosaicId(2), new Quantity(77)),
-				new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
+		final Collection<Mosaic> expectedPairs = Arrays.asList(new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
+				new Mosaic(Utils.createMosaicId(2), new Quantity(77)), new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
 		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
@@ -103,8 +99,7 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(41));
 
 		// Assert:
-		final Collection<Mosaic> expectedPairs = Collections.singletonList(
-				new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
+		final Collection<Mosaic> expectedPairs = Collections.singletonList(new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
 		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
@@ -120,15 +115,11 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId("aa", "a"), Quantity.ZERO);
 
 		// Assert:
-		final Collection<MosaicId> expectedMosaicIds = Arrays.asList(
-				Utils.createMosaicId("a", "b"),
-				Utils.createMosaicId("aa", "a"),
-				Utils.createMosaicId("b", "a"),
-				Utils.createMosaicId("b", "c"));
-		MatcherAssert.assertThat(
-				attachment.getMosaics().stream().map(Mosaic::getMosaicId).collect(Collectors.toList()),
+		final Collection<MosaicId> expectedMosaicIds = Arrays.asList(Utils.createMosaicId("a", "b"), Utils.createMosaicId("aa", "a"),
+				Utils.createMosaicId("b", "a"), Utils.createMosaicId("b", "c"));
+		MatcherAssert.assertThat(attachment.getMosaics().stream().map(Mosaic::getMosaicId).collect(Collectors.toList()),
 				IsEqual.equalTo(expectedMosaicIds));
 	}
 
-	//endregion
+	// endregion
 }

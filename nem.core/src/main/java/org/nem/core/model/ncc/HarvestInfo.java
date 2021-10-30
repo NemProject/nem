@@ -23,11 +23,7 @@ public class HarvestInfo implements SerializableEntity {
 	 * @param totalFee The total fee.
 	 * @param difficulty The difficulty.
 	 */
-	public HarvestInfo(
-			final Long blockId,
-			final BlockHeight height,
-			final TimeInstant timeStamp,
-			final Amount totalFee,
+	public HarvestInfo(final Long blockId, final BlockHeight height, final TimeInstant timeStamp, final Amount totalFee,
 			final Long difficulty) {
 		this.blockId = blockId;
 		this.height = height;

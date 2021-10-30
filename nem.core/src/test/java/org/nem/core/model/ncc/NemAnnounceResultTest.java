@@ -29,8 +29,7 @@ public class NemAnnounceResultTest {
 		@Test
 		public void canRoundtripResult() {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(
-					this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
 					null);
 			final NemAnnounceResult result = new NemAnnounceResult(deserializer);
 
@@ -43,8 +42,7 @@ public class NemAnnounceResultTest {
 		@Test
 		public void canRoundtripResultAsNemRequestResult() {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(
-					this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
 					null);
 			final NemRequestResult result = new NemRequestResult(deserializer);
 

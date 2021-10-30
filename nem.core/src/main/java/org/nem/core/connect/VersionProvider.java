@@ -47,12 +47,10 @@ public class VersionProvider {
 	public NodeVersion getLatestVersion() {
 		try {
 			final URL url = ExceptionUtils.propagate(() -> new URL(VERSION_PROVIDER_URL));
-			return this.httpClient.get(url, new HttpErrorResponseDeserializerUnionStrategy(null))
-					.getFuture()
-					.thenApply(union -> {
-						final Deserializer deserializer = union.getDeserializer();
-						return NodeVersion.parse(deserializer.readString(VERSION_FLAVOR));
-					}).join();
+			return this.httpClient.get(url, new HttpErrorResponseDeserializerUnionStrategy(null)).getFuture().thenApply(union -> {
+				final Deserializer deserializer = union.getDeserializer();
+				return NodeVersion.parse(deserializer.readString(VERSION_FLAVOR));
+			}).join();
 		} catch (final Exception e) {
 			// if there's an error retrieving the latest version, ignore it because
 			// we still want nem monitor to be able to boot up and run

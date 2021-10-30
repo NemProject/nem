@@ -8,10 +8,14 @@ import org.nem.core.test.Utils;
 
 public class HashTest {
 
-	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
-	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final byte[] TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x71
+	};
+	private static final byte[] MODIFIED_TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x72
+	};
 
-	//region constants
+	// region constants
 
 	@Test
 	public void zeroHashIsInitializedCorrectly() {
@@ -19,9 +23,9 @@ public class HashTest {
 		MatcherAssert.assertThat(Hash.ZERO, IsEqual.equalTo(new Hash(new byte[32])));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructors / factories
+	// region constructors / factories
 
 	@Test
 	public void canCreateFromBytes() {
@@ -38,7 +42,9 @@ public class HashTest {
 		final Hash hash = Hash.fromHexString("227F");
 
 		// Assert:
-		MatcherAssert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[] { 0x22, 0x7F }));
+		MatcherAssert.assertThat(hash.getRaw(), IsEqual.equalTo(new byte[]{
+				0x22, 0x7F
+		}));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -47,9 +53,9 @@ public class HashTest {
 		Hash.fromHexString("22G75");
 	}
 
-	//endregion
+	// endregion
 
-	//region serializer
+	// region serializer
 
 	@Test
 	public void hashCanBeRoundTripped() {
@@ -66,9 +72,9 @@ public class HashTest {
 		return new Hash(deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hash
+	// region equals / hash
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -79,7 +85,7 @@ public class HashTest {
 		MatcherAssert.assertThat(new Hash(TEST_BYTES), IsEqual.equalTo(hash));
 		MatcherAssert.assertThat(new Hash(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(hash)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(hash)));
-		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)hash)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object) hash)));
 	}
 
 	@Test
@@ -93,22 +99,24 @@ public class HashTest {
 		MatcherAssert.assertThat(new Hash(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region getShortId
+	// region getShortId
 
 	@Test
 	public void shortIdIsCalculatedCorrectly() {
 		// Arrange:
-		final Hash hash = new Hash(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 });
+		final Hash hash = new Hash(new byte[]{
+				0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(hash.getShortId(), IsEqual.equalTo(0x0001020304050607L));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsHexRepresentation() {
@@ -116,5 +124,5 @@ public class HashTest {
 		MatcherAssert.assertThat(new Hash(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
-	//endregion
+	// endregion
 }

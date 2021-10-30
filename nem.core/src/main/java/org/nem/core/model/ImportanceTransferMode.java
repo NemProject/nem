@@ -33,7 +33,7 @@ public enum ImportanceTransferMode {
 				return true;
 			case Unknown:
 				break;
-			default:
+			default :
 				break;
 		}
 

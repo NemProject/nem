@@ -10,28 +10,40 @@ public class RequestAnnounceTest {
 	@Test
 	public void canCreateRequest() {
 		// Arrange:
-		final RequestAnnounce request = new RequestAnnounce(
-				new byte[] { 1, 3, 4, 7, 7, 8, 9 },
-				new byte[] { 4, 5, 7, 2, 3 });
+		final RequestAnnounce request = new RequestAnnounce(new byte[]{
+				1, 3, 4, 7, 7, 8, 9
+		}, new byte[]{
+				4, 5, 7, 2, 3
+		});
 
 		// Assert:
-		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
-		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[]{
+				1, 3, 4, 7, 7, 8, 9
+		}));
+		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[]{
+				4, 5, 7, 2, 3
+		}));
 	}
 
 	@Test
 	public void canRoundTripRequest() {
 		// Arrange:
-		final RequestAnnounce originalRequest = new RequestAnnounce(
-				new byte[] { 1, 3, 4, 7, 7, 8, 9 },
-				new byte[] { 4, 5, 7, 2, 3 });
+		final RequestAnnounce originalRequest = new RequestAnnounce(new byte[]{
+				1, 3, 4, 7, 7, 8, 9
+		}, new byte[]{
+				4, 5, 7, 2, 3
+		});
 
 		// Act:
 		final RequestAnnounce request = createRoundTrippedRequest(originalRequest);
 
 		// Assert:
-		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[] { 1, 3, 4, 7, 7, 8, 9 }));
-		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[] { 4, 5, 7, 2, 3 }));
+		MatcherAssert.assertThat(request.getData(), IsEqual.equalTo(new byte[]{
+				1, 3, 4, 7, 7, 8, 9
+		}));
+		MatcherAssert.assertThat(request.getSignature(), IsEqual.equalTo(new byte[]{
+				4, 5, 7, 2, 3
+		}));
 	}
 
 	private static RequestAnnounce createRoundTrippedRequest(final RequestAnnounce originalRequest) {

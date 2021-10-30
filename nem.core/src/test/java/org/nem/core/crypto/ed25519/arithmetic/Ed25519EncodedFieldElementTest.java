@@ -242,14 +242,14 @@ public class Ed25519EncodedFieldElementTest {
 
 	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentation() {
 		// Arrange:
 		final byte[] bytes = new byte[32];
 		for (int i = 0; i < 32; i++) {
-			bytes[i] = (byte)(i + 1);
+			bytes[i] = (byte) (i + 1);
 		}
 		final Ed25519EncodedFieldElement encoded = new Ed25519EncodedFieldElement(bytes);
 

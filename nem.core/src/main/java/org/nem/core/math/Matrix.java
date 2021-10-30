@@ -4,10 +4,9 @@ import java.util.*;
 import java.util.function.*;
 
 /**
- * Abstract matrix class.
- * <br>
- * This class provides default implementations of most matrix functions
- * but they should be optimized in derived classes when performance is important.
+ * Abstract matrix class. <br>
+ * This class provides default implementations of most matrix functions but they should be optimized in derived classes when performance is
+ * important.
  */
 public abstract class Matrix {
 
@@ -25,7 +24,7 @@ public abstract class Matrix {
 		this.numCols = numCols;
 	}
 
-	//region get{Element|Row|Column}Count / {get|set|increment}At
+	// region get{Element|Row|Column}Count / {get|set|increment}At
 
 	/**
 	 * Gets the number of elements.
@@ -90,9 +89,9 @@ public abstract class Matrix {
 		this.setAtUnchecked(row, col, originalVal + val);
 	}
 
-	//endregion
+	// endregion
 
-	//region get{Row|Column}SumVector
+	// region get{Row|Column}SumVector
 
 	/**
 	 * Gets a vector containing the sums of each matrix row.
@@ -120,9 +119,9 @@ public abstract class Matrix {
 		return sums;
 	}
 
-	//endregion
+	// endregion
 
-	//region mutation functions
+	// region mutation functions
 
 	/**
 	 * Normalizes each column of the matrix.
@@ -179,13 +178,12 @@ public abstract class Matrix {
 		this.forEach((row, col, value, setter) -> setter.accept(value / scale));
 	}
 
-	//endregion
+	// endregion
 
-	//region element-wise operations
+	// region element-wise operations
 
 	/**
-	 * Creates a new Matrix by multiplying this matrix element-wise with
-	 * another matrix.
+	 * Creates a new Matrix by multiplying this matrix element-wise with another matrix.
 	 *
 	 * @param matrix The other matrix.
 	 * @return The new matrix.
@@ -195,8 +193,7 @@ public abstract class Matrix {
 	}
 
 	/**
-	 * Creates a new Matrix by adding this matrix element-wise with
-	 * another matrix.
+	 * Creates a new Matrix by adding this matrix element-wise with another matrix.
 	 *
 	 * @param matrix The other matrix.
 	 * @return The new matrix.
@@ -220,9 +217,9 @@ public abstract class Matrix {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region aggregation functions
+	// region aggregation functions
 
 	/**
 	 * Gets the sum of the absolute value of all the matrix's elements.
@@ -244,14 +241,16 @@ public abstract class Matrix {
 
 	private double aggregate(final DoubleUnaryOperator op) {
 		// use a double[1] instead of a double so that the sum can be updated by the lambda
-		final double[] sum = new double[] { 0.0 };
+		final double[] sum = new double[]{
+				0.0
+		};
 		this.forEach((r, c, v) -> sum[0] += op.applyAsDouble(v));
 		return sum[0];
 	}
 
-	//endregion
+	// endregion
 
-	//region vector operations
+	// region vector operations
 
 	/**
 	 * Multiplies this matrix by a vector.
@@ -271,9 +270,9 @@ public abstract class Matrix {
 		return new ColumnVector(rawResult);
 	}
 
-	//endregion
+	// endregion
 
-	//region transforms
+	// region transforms
 
 	/**
 	 * Transposes this matrix.
@@ -341,9 +340,9 @@ public abstract class Matrix {
 		return matrix;
 	}
 
-	//endregion
+	// endregion
 
-	//region predicates
+	// region predicates
 
 	/**
 	 * Determines if two this matrix and another matrix have the same dimensions.
@@ -374,9 +373,9 @@ public abstract class Matrix {
 		return 0 == this.absSum();
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -389,7 +388,7 @@ public abstract class Matrix {
 			return false;
 		}
 
-		final Matrix rhs = (Matrix)obj;
+		final Matrix rhs = (Matrix) obj;
 		if (!this.isSameSize(rhs)) {
 			return false;
 		}
@@ -398,9 +397,9 @@ public abstract class Matrix {
 		return 0 == inequalityMatrix.sum();
 	}
 
-	//endregion
+	// endregion
 
-	//region readonly-foreach
+	// region readonly-foreach
 
 	/**
 	 * Calls the specified function for every non-zero element.
@@ -412,8 +411,8 @@ public abstract class Matrix {
 	}
 
 	/**
-	 * Functional interface that visits every non-zero element in this matrix.
-	 * Depending on the implementation, zero elements may or may not be visited.
+	 * Functional interface that visits every non-zero element in this matrix. Depending on the implementation, zero elements may or may not
+	 * be visited.
 	 */
 	@FunctionalInterface
 	public interface ReadOnlyElementVisitorFunction {
@@ -428,9 +427,9 @@ public abstract class Matrix {
 		void visit(final int row, final int col, final double value);
 	}
 
-	//endregion
+	// endregion
 
-	//region abstract functions
+	// region abstract functions
 
 	/**
 	 * Creates a new matrix.
@@ -467,8 +466,8 @@ public abstract class Matrix {
 	protected abstract void forEach(final ElementVisitorFunction func);
 
 	/**
-	 * Functional interface that visits every non-zero element in this matrix.
-	 * Depending on the implementation, zero elements may or may not be visited.
+	 * Functional interface that visits every non-zero element in this matrix. Depending on the implementation, zero elements may or may not
+	 * be visited.
 	 */
 	@FunctionalInterface
 	protected interface ElementVisitorFunction {
@@ -492,5 +491,5 @@ public abstract class Matrix {
 	 */
 	public abstract MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row);
 
-	//endregion
+	// endregion
 }

@@ -63,16 +63,10 @@ public class MosaicSupplyChangeTransactionTest {
 	@Test
 	public void cannotCreateTransactionWithOutOfRangeQuantity() {
 		// Assert:
-		assertCannotCreateTransaction(
-				MOSAIC_ID,
-				MosaicSupplyType.Create,
-				Supply.fromValue(MAX_QUANTITY + 1));
+		assertCannotCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(MAX_QUANTITY + 1));
 	}
 
-	private static void assertCanCreateTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
-			final Supply delta) {
+	private static void assertCanCreateTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType, final Supply delta) {
 		// Act:
 		final MosaicSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, delta);
 
@@ -83,23 +77,16 @@ public class MosaicSupplyChangeTransactionTest {
 		MatcherAssert.assertThat(transaction.getDelta(), IsEqual.equalTo(delta));
 	}
 
-	private static void assertCannotCreateTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
-			final Supply delta) {
+	private static void assertCannotCreateTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType, final Supply delta) {
 		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, delta), IllegalArgumentException.class);
 	}
 
 	private static void assertTransactionCannotBeCreatedWithNull(final String parameterName) {
 		ExceptionAssert.assertThrows(
-				v -> new MosaicSupplyChangeTransaction(
-						TIME_INSTANT,
-						SIGNER,
-						parameterName.equals("mosaicId") ? null : MOSAIC_ID,
+				v -> new MosaicSupplyChangeTransaction(TIME_INSTANT, SIGNER, parameterName.equals("mosaicId") ? null : MOSAIC_ID,
 						parameterName.equals("supplyType") ? null : MosaicSupplyType.Create,
 						parameterName.equals("quantity") ? null : Supply.fromValue(123L)),
-				IllegalArgumentException.class,
-				ex -> ex.getMessage().contains(parameterName));
+				IllegalArgumentException.class, ex -> ex.getMessage().contains(parameterName));
 	}
 
 	// endregion
@@ -195,7 +182,7 @@ public class MosaicSupplyChangeTransactionTest {
 
 	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -211,11 +198,7 @@ public class MosaicSupplyChangeTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		NotificationUtils.assertMosaicSupplyChangeNotification(
-				values.get(0),
-				transaction.getSigner(),
-				MOSAIC_ID,
-				Supply.fromValue(123),
+		NotificationUtils.assertMosaicSupplyChangeNotification(values.get(0), transaction.getSigner(), MOSAIC_ID, Supply.fromValue(123),
 				MosaicSupplyType.Create);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -235,11 +218,7 @@ public class MosaicSupplyChangeTransactionTest {
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
-		NotificationUtils.assertMosaicSupplyChangeNotification(
-				values.get(1),
-				transaction.getSigner(),
-				MOSAIC_ID,
-				Supply.fromValue(123),
+		NotificationUtils.assertMosaicSupplyChangeNotification(values.get(1), transaction.getSigner(), MOSAIC_ID, Supply.fromValue(123),
 				MosaicSupplyType.Create);
 	}
 
@@ -258,15 +237,8 @@ public class MosaicSupplyChangeTransactionTest {
 		return createTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(123));
 	}
 
-	private static MosaicSupplyChangeTransaction createTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
+	private static MosaicSupplyChangeTransaction createTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType,
 			final Supply delta) {
-		return new MosaicSupplyChangeTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				mosaicId,
-				supplyType,
-				delta);
+		return new MosaicSupplyChangeTransaction(TIME_INSTANT, SIGNER, mosaicId, supplyType, delta);
 	}
 }

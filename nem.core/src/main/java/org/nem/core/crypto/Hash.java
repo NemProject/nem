@@ -88,7 +88,7 @@ public class Hash implements SerializableEntity {
 			return false;
 		}
 
-		final Hash rhs = (Hash)obj;
+		final Hash rhs = (Hash) obj;
 		return Arrays.equals(this.data, rhs.data);
 	}
 

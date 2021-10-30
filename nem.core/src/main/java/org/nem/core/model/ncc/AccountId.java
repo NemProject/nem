@@ -68,7 +68,7 @@ public class AccountId {
 			return false;
 		}
 
-		final AccountId rhs = (AccountId)obj;
+		final AccountId rhs = (AccountId) obj;
 		return this.address.equals(rhs.address);
 	}
 }

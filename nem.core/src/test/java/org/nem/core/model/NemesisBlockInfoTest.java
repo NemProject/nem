@@ -16,11 +16,7 @@ public class NemesisBlockInfoTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final NemesisBlockInfo info = new NemesisBlockInfo(
-				generationHash,
-				address,
-				Amount.fromNem(44221122),
-				"awesome-nemesis.bin");
+		final NemesisBlockInfo info = new NemesisBlockInfo(generationHash, address, Amount.fromNem(44221122), "awesome-nemesis.bin");
 
 		// Assert:
 		MatcherAssert.assertThat(info.getGenerationHash(), IsEqual.equalTo(generationHash));

@@ -41,13 +41,11 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		return this.getPolicy().createDeserializer(serializer, new DeserializationContext(null));
 	}
 
-	private TDeserializer createDeserializer(
-			final TSerializer serializer,
-			final DeserializationContext context) {
+	private TDeserializer createDeserializer(final TSerializer serializer, final DeserializationContext context) {
 		return this.getPolicy().createDeserializer(serializer, context);
 	}
 
-	//region Multiple Object Roundtrip
+	// region Multiple Object Roundtrip
 
 	@Test
 	public void canRoundtripMultipleValues() {
@@ -56,8 +54,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	/**
-	 * Asserts that using the specified serializer multiple values can be
-	 * round-tripped.
+	 * Asserts that using the specified serializer multiple values can be round-tripped.
 	 *
 	 * @param serializer The serializer.
 	 */
@@ -65,15 +62,16 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		// Act:
 		serializer.writeInt("alpha", 0x09513510);
 		serializer.writeLong("zeta", 0xF239A033CE951350L);
-		serializer.writeBytes("beta", new byte[] { 2, 4, 6 });
+		serializer.writeBytes("beta", new byte[]{
+				2, 4, 6
+		});
 		serializer.writeObject("object", new MockSerializableEntity(7, "foo", 5));
 		serializer.writeInt("gamma", 7);
 		serializer.writeDouble("omega", Double.MIN_NORMAL);
 		serializer.writeDouble("psi", Double.MIN_VALUE);
 		serializer.writeString("epsilon", "FooBar");
-		serializer.writeObjectArray("entities", Arrays.asList(
-				new MockSerializableEntity(5, "ooo", 62),
-				new MockSerializableEntity(8, "ala", 15)));
+		serializer.writeObjectArray("entities",
+				Arrays.asList(new MockSerializableEntity(5, "ooo", 62), new MockSerializableEntity(8, "ala", 15)));
 		serializer.writeBigInteger("bi", new BigInteger("14"));
 		serializer.writeLong("sigma", 8);
 
@@ -82,11 +80,11 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		// Assert:
 		MatcherAssert.assertThat(deserializer.readInt("alpha"), IsEqual.equalTo(0x09513510));
 		MatcherAssert.assertThat(deserializer.readLong("zeta"), IsEqual.equalTo(0xF239A033CE951350L));
-		MatcherAssert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[] { 2, 4, 6 }));
+		MatcherAssert.assertThat(deserializer.readBytes("beta"), IsEqual.equalTo(new byte[]{
+				2, 4, 6
+		}));
 
-		final MockSerializableEntity entity = deserializer.readObject(
-				"object",
-				new MockSerializableEntity.Activator());
+		final MockSerializableEntity entity = deserializer.readObject("object", new MockSerializableEntity.Activator());
 		MatcherAssert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(7, "foo", 5)));
 
 		MatcherAssert.assertThat(deserializer.readInt("gamma"), IsEqual.equalTo(7));
@@ -94,9 +92,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		MatcherAssert.assertThat(deserializer.readDouble("psi"), IsEqual.equalTo(Double.MIN_VALUE));
 		MatcherAssert.assertThat(deserializer.readString("epsilon"), IsEqual.equalTo("FooBar"));
 
-		final List<MockSerializableEntity> entities = deserializer.readObjectArray(
-				"entities",
-				new MockSerializableEntity.Activator());
+		final List<MockSerializableEntity> entities = deserializer.readObjectArray("entities", new MockSerializableEntity.Activator());
 		MatcherAssert.assertThat(entities.get(0), IsEqual.equalTo(new MockSerializableEntity(5, "ooo", 62)));
 		MatcherAssert.assertThat(entities.get(1), IsEqual.equalTo(new MockSerializableEntity(8, "ala", 15)));
 
@@ -121,11 +117,9 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		MatcherAssert.assertThat(deserializer.readOptionalInt("maxTransactions"), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region Context
-
-	//region Serializer
+	// region Context - Serializer
 
 	@Test
 	public void defaultContextIsCreatedIfNullContextIsPassedToSerializerConstructor() {
@@ -178,9 +172,9 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		MatcherAssert.assertThat(childContext[0], IsSame.sameInstance(context));
 	}
 
-	//endregion
+	// endregion
 
-	//region Deserializer
+	// region Context - Deserializer
 
 	@Test
 	public void defaultContextIsCreatedIfNullContextIsPassedToDeserializerConstructor() {
@@ -235,7 +229,5 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		MatcherAssert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 }

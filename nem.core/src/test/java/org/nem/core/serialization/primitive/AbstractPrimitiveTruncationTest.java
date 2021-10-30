@@ -172,8 +172,7 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		}
 
 		final TSerializer serializer = this.createSerializer();
-		final List<SerializableEntity> entities = originalValues.stream()
-				.map(o -> (SerializableEntity)s -> this.writeValue(s, "val", o))
+		final List<SerializableEntity> entities = originalValues.stream().map(o -> (SerializableEntity) s -> this.writeValue(s, "val", o))
 				.collect(Collectors.toList());
 		serializer.writeObjectArray("arr", entities);
 

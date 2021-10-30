@@ -10,7 +10,7 @@ import java.util.*;
 
 public class DefaultMosaicPropertiesTest {
 
-	//region ctor
+	// region ctor
 
 	@Test
 	public void canCreateMosaicPropertiesAroundDefaultProperties() {
@@ -42,10 +42,8 @@ public class DefaultMosaicPropertiesTest {
 	@Test
 	public void canCreateMosaicPropertiesAroundCustomNemPropertyCollection() {
 		// Act:
-		final Collection<NemProperty> nemProperties = Arrays.asList(
-				new NemProperty("divisibility", "2"),
-				new NemProperty("initialSupply", "123456"),
-				new NemProperty("supplyMutable", "true"),
+		final Collection<NemProperty> nemProperties = Arrays.asList(new NemProperty("divisibility", "2"),
+				new NemProperty("initialSupply", "123456"), new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"));
 		final MosaicProperties properties = new DefaultMosaicProperties(nemProperties);
 
@@ -85,7 +83,7 @@ public class DefaultMosaicPropertiesTest {
 
 	@Test
 	public void cannotCreateMosaicPropertiesAroundNullProperties() {
-		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties((Properties)null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties((Properties) null), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -107,10 +105,8 @@ public class DefaultMosaicPropertiesTest {
 		final List<NemProperty> invalidProperties = createInvalidPropertiesList();
 
 		// Assert:
-		invalidProperties.stream().forEach(e ->
-				ExceptionAssert.assertThrows(
-						v -> new DefaultMosaicProperties(Collections.singletonList(e)),
-						IllegalArgumentException.class));
+		invalidProperties.stream().forEach(e -> ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties(Collections.singletonList(e)),
+				IllegalArgumentException.class));
 	}
 
 	private static List<NemProperty> createInvalidPropertiesList() {
@@ -130,14 +126,12 @@ public class DefaultMosaicPropertiesTest {
 		properties.put("initialSupply", Long.toString(MosaicConstants.MAX_QUANTITY / 1000));
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new DefaultMosaicProperties(properties),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties(properties), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region asCollection
+	// region asCollection
 
 	@Test
 	public void asCollectionReturnsAllKnownDefaultProperties() {
@@ -149,10 +143,8 @@ public class DefaultMosaicPropertiesTest {
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();
 
 		// Assert:
-		final Collection<NemProperty> expectedProperties = Arrays.asList(
-				new NemProperty("divisibility", "0"),
-				new NemProperty("initialSupply", "1000"),
-				new NemProperty("supplyMutable", "false"),
+		final Collection<NemProperty> expectedProperties = Arrays.asList(new NemProperty("divisibility", "0"),
+				new NemProperty("initialSupply", "1000"), new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
 		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
@@ -167,10 +159,8 @@ public class DefaultMosaicPropertiesTest {
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();
 
 		// Assert:
-		final Collection<NemProperty> expectedProperties = Arrays.asList(
-				new NemProperty("divisibility", "2"),
-				new NemProperty("initialSupply", "123456"),
-				new NemProperty("supplyMutable", "true"),
+		final Collection<NemProperty> expectedProperties = Arrays.asList(new NemProperty("divisibility", "2"),
+				new NemProperty("initialSupply", "123456"), new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"));
 		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
@@ -187,17 +177,15 @@ public class DefaultMosaicPropertiesTest {
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();
 
 		// Assert:
-		final Collection<NemProperty> expectedProperties = Arrays.asList(
-				new NemProperty("divisibility", "4"),
-				new NemProperty("initialSupply", "1000"),
-				new NemProperty("supplyMutable", "false"),
+		final Collection<NemProperty> expectedProperties = Arrays.asList(new NemProperty("divisibility", "4"),
+				new NemProperty("initialSupply", "1000"), new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
 		MatcherAssert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	private static Map<String, DefaultMosaicProperties> createMosaicPropertiesForEqualityTests() {
 		final Map<String, DefaultMosaicProperties> map = new HashMap<>();
@@ -226,8 +214,7 @@ public class DefaultMosaicPropertiesTest {
 
 		// Assert:
 		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(properties)) : IsEqual.equalTo(properties));
 		}
 
@@ -243,8 +230,7 @@ public class DefaultMosaicPropertiesTest {
 
 		// Assert:
 		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -259,7 +245,7 @@ public class DefaultMosaicPropertiesTest {
 		return true;
 	}
 
-	//endregion
+	// endregion
 
 	private static Properties getCustomProperties() {
 		final Properties properties = new Properties();

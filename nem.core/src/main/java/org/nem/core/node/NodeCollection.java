@@ -10,18 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("serial")
 public class NodeCollection implements SerializableEntity {
-	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(
-			NodeStatus.ACTIVE,
-			NodeStatus.BUSY,
-			NodeStatus.INACTIVE,
+	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(NodeStatus.ACTIVE, NodeStatus.BUSY, NodeStatus.INACTIVE,
 			NodeStatus.FAILURE);
-	private static final Collection<NodeStatus> PRUNE_NODE_STATUSES = Arrays.asList(
-			NodeStatus.BUSY, // if a node is busy for an entire prune cycle, there is probably something wrong with it
-			NodeStatus.INACTIVE,
+	// BUSY - if a node is busy for an entire prune cycle, there is probably something wrong with it
+	private static final Collection<NodeStatus> PRUNE_NODE_STATUSES = Arrays.asList(NodeStatus.BUSY, NodeStatus.INACTIVE,
 			NodeStatus.FAILURE);
-	private static final Collection<NodeStatus> BLACKLIST_NODE_STATUSES = Arrays.asList(
-			NodeStatus.INACTIVE,
-			NodeStatus.FAILURE);
+	private static final Collection<NodeStatus> BLACKLIST_NODE_STATUSES = Arrays.asList(NodeStatus.INACTIVE, NodeStatus.FAILURE);
 
 	private final Map<NodeStatus, Set<Node>> statusNodesMap = new HashMap<NodeStatus, Set<Node>>() {
 		{
@@ -106,9 +100,7 @@ public class NodeCollection implements SerializableEntity {
 	 * @return The total number of nodes
 	 */
 	public int size() {
-		return this.statusNodesMap.entrySet().stream()
-				.map(entry -> entry.getValue().size())
-				.reduce(0, Integer::sum);
+		return this.statusNodesMap.entrySet().stream().map(entry -> entry.getValue().size()).reduce(0, Integer::sum);
 	}
 
 	/**
@@ -184,8 +176,8 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	/**
-	 * Updates this collection to include the specified node with the associated status.
-	 * The new node information will replace any previous node information.
+	 * Updates this collection to include the specified node with the associated status. The new node information will replace any previous
+	 * node information.
 	 *
 	 * @param node The node.
 	 * @param status The node status.
@@ -210,13 +202,11 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	/**
-	 * Takes a snapshot of all inactive nodes and drops the inactive nodes
-	 * that have stayed inactive since the last time this function was called.
+	 * Takes a snapshot of all inactive nodes and drops the inactive nodes that have stayed inactive since the last time this function was
+	 * called.
 	 */
 	public void prune() {
-		this.pruneCandidates.stream()
-				.filter(this::isPruneCandidate)
-				.forEach(node -> this.update(node, NodeStatus.UNKNOWN));
+		this.pruneCandidates.stream().filter(this::isPruneCandidate).forEach(node -> this.update(node, NodeStatus.UNKNOWN));
 
 		this.pruneCandidates.clear();
 		for (final NodeStatus status : PRUNE_NODE_STATUSES) {
@@ -234,9 +224,8 @@ public class NodeCollection implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.statusNodesMap.entrySet().stream()
-				.map(e -> Objects.hash(e.getKey()) * Objects.hash(e.getValue()))
-				.reduce(0, Integer::sum);
+		return this.statusNodesMap.entrySet().stream().map(e -> Objects.hash(e.getKey()) * Objects.hash(e.getValue())).reduce(0,
+				Integer::sum);
 	}
 
 	@Override
@@ -245,7 +234,7 @@ public class NodeCollection implements SerializableEntity {
 			return false;
 		}
 
-		final NodeCollection rhs = (NodeCollection)obj;
+		final NodeCollection rhs = (NodeCollection) obj;
 		return this.statusNodesMap.equals(rhs.statusNodesMap);
 	}
 }

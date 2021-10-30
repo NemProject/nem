@@ -17,10 +17,7 @@ public class MosaicSupplyChangeNotificationTest {
 		final Account supplier = Utils.generateRandomAccount();
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), "bar");
 		final Supply delta = Supply.fromValue(123);
-		final MosaicSupplyChangeNotification notification = new MosaicSupplyChangeNotification(
-				supplier,
-				mosaicId,
-				delta,
+		final MosaicSupplyChangeNotification notification = new MosaicSupplyChangeNotification(supplier, mosaicId, delta,
 				MosaicSupplyType.Create);
 
 		// Assert:

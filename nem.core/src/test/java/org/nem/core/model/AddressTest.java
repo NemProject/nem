@@ -15,7 +15,7 @@ import java.util.function.*;
 
 public class AddressTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void addressCanBeCreatedAroundEncodedAddress() {
@@ -25,7 +25,7 @@ public class AddressTest {
 		// Assert:
 		MatcherAssert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		MatcherAssert.assertThat(address.getPublicKey(), IsNull.nullValue());
-		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x92));
+		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte) 0x92));
 	}
 
 	@Test
@@ -50,22 +50,22 @@ public class AddressTest {
 	public void addressCanBeCreatedAroundPublicKeyAndCustomVersion() {
 		// Act:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
-		final Address address = Address.fromPublicKey((byte)0x88, publicKey);
+		final Address address = Address.fromPublicKey((byte) 0x88, publicKey);
 
 		// Assert:
-		MatcherAssert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
+		MatcherAssert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte) 0x88));
 		MatcherAssert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x88));
+		MatcherAssert.assertThat(address.getVersion(), IsEqual.equalTo((byte) 0x88));
 	}
 
 	@Test
 	public void addressCannotBeCreatedAroundNullPublicKey() {
 		// Act:
 		ExceptionAssert.assertThrows(v -> Address.fromPublicKey(null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> Address.fromPublicKey((byte)0x88, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> Address.fromPublicKey((byte) 0x88, null), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void sameAddressIsGeneratedForSameInputs() {
@@ -222,13 +222,15 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
 
 		// Assert:
-		for (final String padding : new String[] { " ", "\t", "  \t \t " }) {
+		for (final String padding : new String[]{
+				" ", "\t", "  \t \t "
+		}) {
 			final String paddedAddress = paddingFunction.apply(address, padding);
 			MatcherAssert.assertThat(Address.fromEncoded(paddedAddress).isValid(), IsEqual.equalTo(false));
 		}
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -245,7 +247,7 @@ public class AddressTest {
 		MatcherAssert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)), IsNot.not(IsEqual.equalTo(address)));
 		MatcherAssert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)), IsNot.not(IsEqual.equalTo(address)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(address)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)address)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) address)));
 	}
 
 	@Test
@@ -262,12 +264,13 @@ public class AddressTest {
 		MatcherAssert.assertThat(addressAsUpper(address).hashCode(), IsEqual.equalTo(hashCode));
 		MatcherAssert.assertThat(addressAsMixed(address).hashCode(), IsEqual.equalTo(hashCode));
 		MatcherAssert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		MatcherAssert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(),
+				IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region compareTo
+	// region compareTo
 
 	@Test
 	public void compareToReturnsExpectedResult() {
@@ -290,9 +293,9 @@ public class AddressTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteAddressWithDefaultEncoding() {
@@ -315,10 +318,7 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("BlahAddress");
 
 		// Assert:
-		assertCanWriteAddressWithEncoding(
-				address,
-				AddressEncoding.COMPRESSED,
-				address.getEncoded());
+		assertCanWriteAddressWithEncoding(address, AddressEncoding.COMPRESSED, address.getEncoded());
 	}
 
 	@Test
@@ -327,10 +327,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey((new KeyPair()).getPublicKey());
 
 		// Assert:
-		assertCanWriteAddressWithEncoding(
-				address,
-				AddressEncoding.PUBLIC_KEY,
-				address.getPublicKey().toString());
+		assertCanWriteAddressWithEncoding(address, AddressEncoding.PUBLIC_KEY, address.getPublicKey().toString());
 	}
 
 	@Test
@@ -339,15 +336,10 @@ public class AddressTest {
 		final Address address = Address.fromEncoded("BlahAddress");
 
 		// Assert:
-		assertCanWriteAddressWithEncoding(
-				address,
-				AddressEncoding.PUBLIC_KEY,
-				null);
+		assertCanWriteAddressWithEncoding(address, AddressEncoding.PUBLIC_KEY, null);
 	}
 
-	private static void assertCanWriteAddressWithEncoding(
-			final Address address,
-			final AddressEncoding encoding,
+	private static void assertCanWriteAddressWithEncoding(final Address address, final AddressEncoding encoding,
 			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -424,9 +416,7 @@ public class AddressTest {
 		return Utils.createDeserializer(new JsonSerializer().getObject());
 	}
 
-	private void assertAddressRoundTripInMode(
-			final AddressEncoding encoding,
-			final boolean isPublicKeyPreserved,
+	private void assertAddressRoundTripInMode(final AddressEncoding encoding, final boolean isPublicKeyPreserved,
 			final boolean useOptionalReadFrom) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -449,11 +439,9 @@ public class AddressTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsEncodedAddress() {
@@ -464,7 +452,7 @@ public class AddressTest {
 		MatcherAssert.assertThat(address.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
-	//endregion
+	// endregion
 
 	private static Address addressAsLower(final Address address) {
 		return Address.fromEncoded(address.getEncoded().toLowerCase());
@@ -475,8 +463,7 @@ public class AddressTest {
 	}
 
 	private static Address addressAsMixed(final Address address) {
-		return Address.fromEncoded(
-				addressAsLower(address).getEncoded().substring(0, 20) +
-						addressAsUpper(address).getEncoded().substring(20));
+		return Address
+				.fromEncoded(addressAsLower(address).getEncoded().substring(0, 20) + addressAsUpper(address).getEncoded().substring(20));
 	}
 }

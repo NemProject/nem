@@ -138,10 +138,7 @@ public class NodeIdentity implements SerializableEntity {
 	}
 
 	private byte[] getPayload(final byte[] salt) {
-		return ArrayUtils.concat(
-				CHALLENGE_PREFIX,
-				this.address.getPublicKey().getRaw(),
-				salt);
+		return ArrayUtils.concat(CHALLENGE_PREFIX, this.address.getPublicKey().getRaw(), salt);
 	}
 
 	@Override
@@ -161,7 +158,7 @@ public class NodeIdentity implements SerializableEntity {
 			return false;
 		}
 
-		final NodeIdentity rhs = (NodeIdentity)obj;
+		final NodeIdentity rhs = (NodeIdentity) obj;
 		return this.address.equals(rhs.address);
 	}
 

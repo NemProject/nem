@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 
 public class AmountTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
@@ -19,9 +19,9 @@ public class AmountTest {
 		MatcherAssert.assertThat(Amount.ZERO, IsEqual.equalTo(new Amount(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region factories
+	// region factories
 
 	@Test
 	public void canCreateAmountFromNem() {
@@ -43,9 +43,9 @@ public class AmountTest {
 		MatcherAssert.assertThat(amount.getNumNem(), IsEqual.equalTo(0L));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = NegativeBalanceException.class)
 	public void cannotBeCreatedAroundNegativeAmount() {
@@ -71,9 +71,9 @@ public class AmountTest {
 		MatcherAssert.assertThat(amount.getNumMicroNem(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNumNem
+	// region getNumNem
 
 	@Test
 	public void getNumNemRoundsDownToTheNearestWholeNem() {
@@ -83,9 +83,9 @@ public class AmountTest {
 		MatcherAssert.assertThat(Amount.fromMicroNem(11999999L).getNumNem(), IsEqual.equalTo(11L));
 	}
 
-	//endregion
+	// endregion
 
-	//region add / subtract
+	// region add / subtract
 
 	@Test
 	public void twoAmountsCanBeAddedTogether() {
@@ -125,9 +125,9 @@ public class AmountTest {
 		amount1.subtract(amount2);
 	}
 
-	//endregion
+	// endregion
 
-	//region multiply
+	// region multiply
 
 	@Test
 	public void amountCanBeMultipliedByScalar() {
@@ -141,9 +141,9 @@ public class AmountTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(new Amount(195)));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteAmount() {
@@ -200,5 +200,5 @@ public class AmountTest {
 		MatcherAssert.assertThat(amount, IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 }

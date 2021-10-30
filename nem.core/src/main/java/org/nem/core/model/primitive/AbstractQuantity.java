@@ -5,9 +5,7 @@ package org.nem.core.model.primitive;
  *
  * @param <TDerived> The derived class type.
  */
-public abstract class AbstractQuantity<
-		TDerived extends AbstractQuantity<?>>
-		extends AbstractPrimitive<TDerived, Long> {
+public abstract class AbstractQuantity<TDerived extends AbstractQuantity<?>> extends AbstractPrimitive<TDerived, Long> {
 
 	/**
 	 * Creates a quantity.

@@ -45,11 +45,7 @@ public class RequestPrepareAnnounceTest {
 	}
 
 	private static TransferTransaction createTransfer() {
-		return new TransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				new Amount(456),
+		return new TransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), Utils.generateRandomAccount(), new Amount(456),
 				null);
 	}
 }

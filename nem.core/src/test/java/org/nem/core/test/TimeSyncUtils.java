@@ -86,7 +86,8 @@ public class TimeSyncUtils {
 	 * @param count The number of samples needed.
 	 * @return The time synchronization sample
 	 */
-	public static List<TimeSynchronizationSample> createTimeSynchronizationSamplesWithDifferentKeyPairs(final int startValue, final int count) {
+	public static List<TimeSynchronizationSample> createTimeSynchronizationSamplesWithDifferentKeyPairs(final int startValue,
+			final int count) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			samples.add(createTimeSynchronizationSampleWithKeyPair(new KeyPair(), startValue + i));
@@ -102,7 +103,8 @@ public class TimeSyncUtils {
 	 * @param mean The mean time offset the samples should have.
 	 * @return The time synchronization sample
 	 */
-	public static List<TimeSynchronizationSample> createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(final int count, final long mean) {
+	public static List<TimeSynchronizationSample> createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(final int count,
+			final long mean) {
 		final SecureRandom random = new SecureRandom();
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		if (count % 2 == 1) {
@@ -125,8 +127,7 @@ public class TimeSyncUtils {
 	 * @return The time synchronization sample
 	 */
 	private static TimeSynchronizationSample createTimeSynchronizationSampleWithKeyPair(final KeyPair keyPair, final long timeOffset) {
-		return new TimeSynchronizationSample(
-				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
+		return new TimeSynchronizationSample(new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(5 + timeOffset), new NetworkTimeStamp(5 + timeOffset)));
 	}
@@ -154,14 +155,9 @@ public class TimeSyncUtils {
 	 * @param remoteReceiveTimeStamp The remote receive time stamp.
 	 * @return The time synchronization sample
 	 */
-	public static TimeSynchronizationSample createTimeSynchronizationSample(
-			final KeyPair keyPair,
-			final long localSendTimeStamp,
-			final long localReceiveTimeStamp,
-			final long remoteSendTimeStamp,
-			final long remoteReceiveTimeStamp) {
-		return new TimeSynchronizationSample(
-				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
+	public static TimeSynchronizationSample createTimeSynchronizationSample(final KeyPair keyPair, final long localSendTimeStamp,
+			final long localReceiveTimeStamp, final long remoteSendTimeStamp, final long remoteReceiveTimeStamp) {
+		return new TimeSynchronizationSample(new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(localSendTimeStamp), new NetworkTimeStamp(localReceiveTimeStamp)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(remoteSendTimeStamp), new NetworkTimeStamp(remoteReceiveTimeStamp)));
 	}

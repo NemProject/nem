@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class AccountRemoteStatusTest {
 
-	//region fromString
+	// region fromString
 
 	@Test
 	public void accountRemoteStatusCanBeCreatedFromCorrectStatusString() {
@@ -37,9 +37,9 @@ public class AccountRemoteStatusTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteAccountStatus() {
@@ -83,5 +83,6 @@ public class AccountRemoteStatusTest {
 		// Assert:
 		MatcherAssert.assertThat(status, IsEqual.equalTo(originalStatus));
 	}
-	//endregion
+
+	// endregion
 }

@@ -14,10 +14,7 @@ public class BalanceTransferNotificationTest {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final BalanceTransferNotification notification = new BalanceTransferNotification(
-				sender,
-				recipient,
-				Amount.fromNem(123));
+		final BalanceTransferNotification notification = new BalanceTransferNotification(sender, recipient, Amount.fromNem(123));
 
 		// Assert:
 		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));

@@ -60,12 +60,14 @@ public class StringUtilsTest {
 	@Test
 	public void replaceVariableCanReplaceVariableOccurrencesBetweenText() {
 		MatcherAssert.assertThat(StringUtils.replaceVariable("quick ${color} fox", "color", "brown"), IsEqual.equalTo("quick brown fox"));
-		MatcherAssert.assertThat(StringUtils.replaceVariable("jumps over the ${adj} dog", "adj", "lazy"), IsEqual.equalTo("jumps over the lazy dog"));
+		MatcherAssert.assertThat(StringUtils.replaceVariable("jumps over the ${adj} dog", "adj", "lazy"),
+				IsEqual.equalTo("jumps over the lazy dog"));
 	}
 
 	@Test
 	public void replaceVariableCanReplaceMultipleOccurrencesOfVariable() {
-		MatcherAssert.assertThat(StringUtils.replaceVariable("quick ${color} ${color} fox", "color", "brown"), IsEqual.equalTo("quick brown brown fox"));
+		MatcherAssert.assertThat(StringUtils.replaceVariable("quick ${color} ${color} fox", "color", "brown"),
+				IsEqual.equalTo("quick brown brown fox"));
 		MatcherAssert.assertThat(StringUtils.replaceVariable("Buffalo ${} Buffalo ${} ${} ${} Buffalo ${}", "", "buffalo"),
 				IsEqual.equalTo("Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"));
 	}

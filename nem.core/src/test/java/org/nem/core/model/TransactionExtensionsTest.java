@@ -10,7 +10,7 @@ import java.util.stream.*;
 
 public class TransactionExtensionsTest {
 
-	//region getChildSignatures
+	// region getChildSignatures
 
 	@Test
 	public void getSignaturesForNonMultisigReturnsEmptyStream() {
@@ -37,7 +37,7 @@ public class TransactionExtensionsTest {
 		MatcherAssert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void canStreamSelfAndFirstChildTransactions() {
@@ -48,9 +48,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndFirstChildTransactions(transaction));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}
 
 	@Test
@@ -62,9 +60,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndAllTransactions(transaction));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82));
 	}
 
 	@Test
@@ -76,9 +72,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamDefault(transaction));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}
 
 	private static List<Integer> getCustomFields(final Stream<Transaction> stream) {

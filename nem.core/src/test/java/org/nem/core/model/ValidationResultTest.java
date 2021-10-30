@@ -9,7 +9,7 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class ValidationResultTest {
 
-	//region getValue / fromValue
+	// region getValue / fromValue
 
 	@Test
 	public void getValueReturnsUnderlyingValue() {
@@ -35,15 +35,17 @@ public class ValidationResultTest {
 		ValidationResult.fromValue(1337);
 	}
 
-	//endregion
+	// endregion
 
-	//region predicates
+	// region predicates
 
 	@Test
 	public void isSuccessOnlyReturnsTrueForSuccessValues() {
 		// Arrange:
 		final Set<ValidationResult> successValues = new HashSet<ValidationResult>() {
-			{ this.add(ValidationResult.SUCCESS); }
+			{
+				this.add(ValidationResult.SUCCESS);
+			}
 		};
 
 		// Assert:
@@ -56,9 +58,13 @@ public class ValidationResultTest {
 	public void isFailureOnlyReturnsTrueForFailureValues() {
 		// Arrange:
 		final Set<ValidationResult> nonFailureValues = new HashSet<ValidationResult>() {
-			{ this.add(ValidationResult.SUCCESS); }
+			{
+				this.add(ValidationResult.SUCCESS);
+			}
 
-			{ this.add(ValidationResult.NEUTRAL); }
+			{
+				this.add(ValidationResult.NEUTRAL);
+			}
 		};
 
 		// Assert:
@@ -67,9 +73,9 @@ public class ValidationResultTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region aggregate
+	// region aggregate
 
 	@Test
 	public void canAggregateZeroResults() {
@@ -92,9 +98,7 @@ public class ValidationResultTest {
 	@Test
 	public void canAggregateMultipleResults() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.SUCCESS,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -104,9 +108,7 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateReturnsFailureWhenPassedIteratorWithAtLeastOneFailureResult() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_CHAIN_INVALID,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.FAILURE_CHAIN_INVALID,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -116,9 +118,7 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateReturnsNeutralWhenPassedIteratorWithAtLeastOneNeutralResultAndNoFailureResults() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -128,18 +128,14 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateGivesHigherPrecedenceToFailureResultThanNeutralResult() {
 		// Arrange:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Assert:
 		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, false);
 	}
 
-	private static void assertAggregationResult(
-			final Collection<ValidationResult> results,
-			final ValidationResult expectedResult,
+	private static void assertAggregationResult(final Collection<ValidationResult> results, final ValidationResult expectedResult,
 			final boolean isShortCircuited) {
 		// Act:
 		final Iterator<ValidationResult> resultIterator = results.iterator();
@@ -150,9 +146,9 @@ public class ValidationResultTest {
 		MatcherAssert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(isShortCircuited));
 	}
 
-	//endregion
+	// endregion
 
-	//region aggregate (no short circuit)
+	// region aggregate (no short circuit)
 
 	@Test
 	public void canNoShortCircuitAggregateZeroResults() {
@@ -175,9 +171,7 @@ public class ValidationResultTest {
 	@Test
 	public void canNoShortCircuitAggregateMultipleResults() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.SUCCESS,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -187,9 +181,7 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateNoShortCircuitReturnsFailureWhenPassedIteratorWithAtLeastOneFailureResult() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_CHAIN_INVALID,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.FAILURE_CHAIN_INVALID,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -199,9 +191,7 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateNoShortCircuitReturnsNeutralWhenPassedIteratorWithAtLeastOneNeutralResultAndNoFailureResults() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.SUCCESS);
 
 		// Assert:
@@ -211,17 +201,14 @@ public class ValidationResultTest {
 	@Test
 	public void aggregateNoShortCircuitGivesHigherPrecedenceToFailureResultThanNeutralResult() {
 		// Arrange:
-		final Collection<ValidationResult> results = Arrays.asList(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Assert:
 		assertNoShortCircuitAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID);
 	}
 
-	private static void assertNoShortCircuitAggregationResult(
-			final Collection<ValidationResult> results,
+	private static void assertNoShortCircuitAggregationResult(final Collection<ValidationResult> results,
 			final ValidationResult expectedResult) {
 		// Act:
 		final Iterator<ValidationResult> resultIterator = results.iterator();
@@ -232,5 +219,5 @@ public class ValidationResultTest {
 		MatcherAssert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 }

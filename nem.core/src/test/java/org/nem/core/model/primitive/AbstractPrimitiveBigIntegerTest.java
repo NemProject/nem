@@ -2,10 +2,9 @@ package org.nem.core.model.primitive;
 
 import java.math.BigInteger;
 
-public class AbstractPrimitiveBigIntegerTest extends AbstractPrimitiveTest<
-		AbstractPrimitiveBigIntegerTest.FooPrimitive,
-		AbstractPrimitiveBigIntegerTest.BarPrimitive,
-		BigInteger> {
+public class AbstractPrimitiveBigIntegerTest
+		extends
+			AbstractPrimitiveTest<AbstractPrimitiveBigIntegerTest.FooPrimitive, AbstractPrimitiveBigIntegerTest.BarPrimitive, BigInteger> {
 
 	@Override
 	protected FooPrimitive createFoo(final long value) {

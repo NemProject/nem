@@ -58,9 +58,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final Deserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		ExceptionAssert.assertThrowsMissingPropertyException(
-				() -> this.readValue(deserializer, "value"),
-				"value");
+		ExceptionAssert.assertThrowsMissingPropertyException(() -> this.readValue(deserializer, "value"), "value");
 	}
 
 	@Test
@@ -85,9 +83,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final Deserializer deserializer = this.createDeserializer(serializer);
 
 		// Act:
-		ExceptionAssert.assertThrowsMissingPropertyException(
-				() -> this.readValue(deserializer, "value"),
-				"value");
+		ExceptionAssert.assertThrowsMissingPropertyException(() -> this.readValue(deserializer, "value"), "value");
 	}
 
 	protected abstract T getValue();

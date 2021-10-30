@@ -15,11 +15,9 @@ import java.util.Collection;
 @RunWith(Enclosed.class)
 public class TransactionFactoryTest {
 
-	//region General
-
 	public static class General {
 
-		//region size / isSupported
+		// region size / isSupported
 
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
@@ -51,9 +49,9 @@ public class TransactionFactoryTest {
 			MatcherAssert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
 		}
 
-		//endregion
+		// endregion
 
-		//region Unknown Transaction Type
+		// region Unknown Transaction Type
 
 		@Test(expected = IllegalArgumentException.class)
 		public void cannotDeserializeUnknownTransaction() {
@@ -66,12 +64,10 @@ public class TransactionFactoryTest {
 			TransactionFactory.VERIFIABLE.deserialize(deserializer);
 		}
 
-		//endregion
+		// endregion
 	}
 
-	//endregion
-
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -104,9 +100,7 @@ public class TransactionFactoryTest {
 			assertCanDeserializeNonVerifiable(originalTransaction, this.entry.modelClass, this.entry.type);
 		}
 
-		private static void assertCanDeserializeVerifiable(
-				final Transaction originalTransaction,
-				final Class<?> expectedClass,
+		private static void assertCanDeserializeVerifiable(final Transaction originalTransaction, final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
 			final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
@@ -118,12 +112,11 @@ public class TransactionFactoryTest {
 			MatcherAssert.assertThat(transaction.getSignature(), IsNull.notNullValue());
 		}
 
-		private static void assertCanDeserializeNonVerifiable(
-				final Transaction originalTransaction,
-				final Class<?> expectedClass,
+		private static void assertCanDeserializeNonVerifiable(final Transaction originalTransaction, final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(),
+					new MockAccountLookup());
 			final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
 			// Assert:
@@ -133,5 +126,5 @@ public class TransactionFactoryTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

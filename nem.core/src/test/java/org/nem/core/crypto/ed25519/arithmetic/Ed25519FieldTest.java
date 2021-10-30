@@ -60,6 +60,7 @@ public class Ed25519FieldTest {
 
 		// Assert (i^2 == -1):
 		MatcherAssert.assertThat(I, IsEqual.equalTo(MathUtils.toBigInteger(Ed25519Field.I)));
-		MatcherAssert.assertThat(I.multiply(I).mod(Ed25519Field.P), IsEqual.equalTo(BigInteger.ONE.shiftLeft(255).subtract(new BigInteger("20"))));
+		MatcherAssert.assertThat(I.multiply(I).mod(Ed25519Field.P),
+				IsEqual.equalTo(BigInteger.ONE.shiftLeft(255).subtract(new BigInteger("20"))));
 	}
 }

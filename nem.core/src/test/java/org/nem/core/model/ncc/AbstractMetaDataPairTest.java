@@ -9,9 +9,7 @@ import org.nem.core.test.*;
 
 import java.util.function.*;
 
-public abstract class AbstractMetaDataPairTest<
-		TEntity extends SerializableEntity,
-		TMetaData extends SerializableEntity> {
+public abstract class AbstractMetaDataPairTest<TEntity extends SerializableEntity, TMetaData extends SerializableEntity> {
 	private final Function<Account, TEntity> createEntity;
 	private final Function<Integer, TMetaData> createMetaData;
 	private final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair;
@@ -19,13 +17,10 @@ public abstract class AbstractMetaDataPairTest<
 	private final Function<TEntity, Address> getAddress;
 	private final Function<TMetaData, Integer> getId;
 
-	protected AbstractMetaDataPairTest(
-			final Function<Account, TEntity> createEntity,
-			final Function<Integer, TMetaData> createMetaData,
+	protected AbstractMetaDataPairTest(final Function<Account, TEntity> createEntity, final Function<Integer, TMetaData> createMetaData,
 			final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair,
 			final Function<Deserializer, AbstractMetaDataPair<TEntity, TMetaData>> deserializePair,
-			final Function<TEntity, Address> getAddress,
-			final Function<TMetaData, Integer> getId) {
+			final Function<TEntity, Address> getAddress, final Function<TMetaData, Integer> getId) {
 		this.createEntity = createEntity;
 		this.createMetaData = createMetaData;
 		this.createPair = createPair;

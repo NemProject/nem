@@ -13,7 +13,7 @@ public class LockFileTest {
 	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");
 	private static final File TEST_EXISTING_FILE = new File(TEST_FILE_DIRECTORY, "test.lock");
 
-	//region BeforeClass / AfterClass
+	// region BeforeClass / AfterClass
 
 	@BeforeClass
 	public static void createTestFiles() throws IOException {
@@ -29,9 +29,9 @@ public class LockFileTest {
 		FileUtils.deleteDirectory(TEST_FILE_DIRECTORY);
 	}
 
-	//endregion
+	// endregion
 
-	//region tryAcquireLock
+	// region tryAcquireLock
 
 	@Test
 	public void tryAcquireLockReturnsNullWhenLockFileIsInvalid() throws IOException {
@@ -72,9 +72,9 @@ public class LockFileTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region isLocked
+	// region isLocked
 
 	@Test
 	public void isLockedReturnsFalseWhenLockFileIsInvalid() throws IOException {
@@ -119,5 +119,5 @@ public class LockFileTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

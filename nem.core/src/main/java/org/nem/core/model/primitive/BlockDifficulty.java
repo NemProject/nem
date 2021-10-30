@@ -10,10 +10,8 @@ import java.math.BigInteger;
 public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 
 	/**
-	 * The initial block difficulty.
-	 * 1_500_000_000 NEMs have the force to generate block every minute with initial difficulty.
-	 * This means that if the total number of coins used to harvest drops below 150_000_000
-	 * then the average block times will be higher than 1 minute.
+	 * The initial block difficulty. 1_500_000_000 NEMs have the force to generate block every minute with initial difficulty. This means
+	 * that if the total number of coins used to harvest drops below 150_000_000 then the average block times will be higher than 1 minute.
 	 * 150_000_000 is approximately 1.67% of all coins.
 	 */
 	public static final BlockDifficulty INITIAL_DIFFICULTY = new BlockDifficulty(100_000_000_000_000L, false);
@@ -63,7 +61,7 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 		return Math.min(MAX_DIFFICULTY, Math.max(MIN_DIFFICULTY, difficulty));
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a block difficulty object.
@@ -87,5 +85,5 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 		return new BlockDifficulty(deserializer.readLong(label));
 	}
 
-	//endregion
+	// endregion
 }

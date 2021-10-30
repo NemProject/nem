@@ -24,7 +24,7 @@ public class Hashes {
 	public static byte[] sha3_256(final byte[]... inputs) {
 		return hash("Keccak-256", inputs);
 	}
-	
+
 	/**
 	 * Performs a SHA3-512 hash of the concatenated inputs.
 	 *

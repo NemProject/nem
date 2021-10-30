@@ -9,12 +9,14 @@ import java.util.*;
 
 public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void matrixCanBeInitializedWithDefaultValues() {
 		// Arrange:
-		final double[] values = new double[] { 1, 4, 5, 7, 2, 3 };
+		final double[] values = new double[]{
+				1, 4, 5, 7, 2, 3
+		};
 		final DenseMatrix matrix = new DenseMatrix(2, 3, values);
 
 		// Assert:
@@ -33,19 +35,21 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 	@Test
 	public void matrixCannotBeInitializedWithIncompleteDefaultValues() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2 }),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new DenseMatrix(2, 3, new double[]{
+				1, 4, 5, 7, 2
+		}), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region forEach
+	// region forEach
 
 	@Test
 	public void forEachReturnsAllElements() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, 1, -5, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 0, 0, 1, -5, 8
+		});
 
 		// Act:
 		final List<Double> values = new ArrayList<>();
@@ -55,17 +59,21 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 		MatcherAssert.assertThat(values, IsEquivalent.equivalentTo(2.0, 0.0, 0.0, 1.0, -5.0, 8.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getRaw
+	// region getRaw
 
 	@Test
 	public void rawVectorIsAccessible() {
 		// Arrange:
-		final DenseMatrix matrix = this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final DenseMatrix matrix = this.createMatrix(3, 2, new double[]{
+				9.0, 3.2, 5.4, 1.2, 4.3, 7.6
+		});
 
 		// Act:
-		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[]{
+				9.0, 3.2, 5.4, 1.2, 4.3, 7.6
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
@@ -74,36 +82,37 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 	@Test
 	public void rawVectorIsMutable() {
 		// Arrange:
-		final DenseMatrix matrix = this.createMatrix(3, 2, new double[] { 9.0, 3.2, 5.4, 1.2, 4.3, 7.6 });
+		final DenseMatrix matrix = this.createMatrix(3, 2, new double[]{
+				9.0, 3.2, 5.4, 1.2, 4.3, 7.6
+		});
 
 		// Act:
 		matrix.setAt(0, 1, 12.1);
-		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[] { 9.0, 12.1, 5.4, 1.2, 4.3, 7.6 });
+		final boolean areEqual = Arrays.equals(matrix.getRaw(), new double[]{
+				9.0, 12.1, 5.4, 1.2, 4.3, 7.6
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(areEqual, IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void denseMatrixStringRepresentationIsCorrect() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] {
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
 				2.1234, 11.1234, 3.2345, 1, 5012.0126, 8
 		});
 
 		// Assert:
-		final String expectedResult =
-				"2.123 11.123" + System.lineSeparator() +
-						"3.235 1.000" + System.lineSeparator() +
-						"5012.013 8.000";
+		final String expectedResult = "2.123 11.123" + System.lineSeparator() + "3.235 1.000" + System.lineSeparator() + "5012.013 8.000";
 		MatcherAssert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	protected DenseMatrix createMatrix(final int rows, final int cols) {

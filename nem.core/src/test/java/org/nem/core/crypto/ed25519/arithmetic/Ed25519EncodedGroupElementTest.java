@@ -135,8 +135,7 @@ public class Ed25519EncodedGroupElementTest {
 
 		// Act:
 		final String encodedAsString = encoded.toString();
-		final String expectedString = String.format("x=%s\ny=%s\n",
-				"0000000000000000000000000000000000000000000000000000000000000000",
+		final String expectedString = String.format("x=%s\ny=%s\n", "0000000000000000000000000000000000000000000000000000000000000000",
 				"0100000000000000000000000000000000000000000000000000000000000000");
 
 		// Assert:

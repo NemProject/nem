@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class MultisigTransactionTest {
 	private static final Amount EXPECTED_FEE = Amount.fromNem(6);
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateTransaction() {
@@ -28,10 +28,7 @@ public class MultisigTransactionTest {
 		final Account multisig = Utils.generateRandomAccount();
 		final Transaction innerTransaction = createDefaultTransferTransaction(multisig);
 		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
-		final MultisigTransaction transaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
+		final MultisigTransaction transaction = new MultisigTransaction(new TimeInstant(123), account, innerTransaction);
 
 		// Assert:
 		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
@@ -43,11 +40,9 @@ public class MultisigTransactionTest {
 		MatcherAssert.assertThat(transaction.getOtherTransaction(), IsEqual.equalTo(innerTransaction));
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
-
-	//region roundtrip (verifiable)
+	// region roundtrip (verifiable)
 
 	@Test
 	public void canRoundtripTransaction() {
@@ -104,20 +99,19 @@ public class MultisigTransactionTest {
 
 		// Arrange: invalidate the signature other hash
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalTransaction);
-		((JSONObject)((JSONArray)jsonObject.get("signatures")).get(0))
-				.replace("otherHash", JsonSerializer.serializeToJson(Utils.generateRandomHash()));
+		((JSONObject) ((JSONArray) jsonObject.get("signatures")).get(0)).replace("otherHash",
+				JsonSerializer.serializeToJson(Utils.generateRandomHash()));
 		final Deserializer deserializer = Utils.createDeserializer(jsonObject);
 		deserializer.readInt("type");
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new MultisigTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer),
+		ExceptionAssert.assertThrows(v -> new MultisigTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer),
 				IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip (non-verifiable)
+	// region roundtrip (non-verifiable)
 
 	@Test
 	public void canRoundtripNonVerifiableTransaction() {
@@ -146,7 +140,9 @@ public class MultisigTransactionTest {
 		MatcherAssert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
+
+	// region roundtrip (test utils)
 
 	private static MultisigTransaction assertCanRoundtripNonVerifiableTransaction(
 			final Function<Transaction, MultisigTransaction> roundTripEntity) {
@@ -156,10 +152,7 @@ public class MultisigTransactionTest {
 		final Transaction innerTransaction = createDefaultTransferTransaction(multisig);
 		innerTransaction.sign();
 		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
-		final MultisigTransaction originalTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
+		final MultisigTransaction originalTransaction = new MultisigTransaction(new TimeInstant(123), account, innerTransaction);
 		originalTransaction.sign();
 
 		// Act:
@@ -184,12 +177,7 @@ public class MultisigTransactionTest {
 	}
 
 	private static TransferTransaction createDefaultTransferTransaction(final Account signer) {
-		return new TransferTransaction(
-				new TimeInstant(111),
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(789),
-				null);
+		return new TransferTransaction(new TimeInstant(111), signer, Utils.generateRandomAccount(), Amount.fromNem(789), null);
 	}
 
 	private static MultisigTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
@@ -206,9 +194,9 @@ public class MultisigTransactionTest {
 		return new MultisigTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region hash
+	// region hash
 
 	@Test
 	public void addingCosignersDoesNotAffectHash() {
@@ -228,9 +216,9 @@ public class MultisigTransactionTest {
 		MatcherAssert.assertThat(actualHash, IsEqual.equalTo(expectedHash));
 	}
 
-	//endregion
+	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotificationsWhenNoSignaturesArePresent() {
@@ -261,9 +249,7 @@ public class MultisigTransactionTest {
 		// Assert:
 		final List<Amount> expectedAmounts = context.getOrderedFees();
 		for (int i = 0; i < 4; ++i) {
-			NotificationUtils.assertBalanceDebitNotification(
-					notificationCaptor.getAllValues().get(i),
-					context.multisig,
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(i), context.multisig,
 					expectedAmounts.get(i));
 		}
 	}
@@ -297,9 +283,7 @@ public class MultisigTransactionTest {
 		// Assert:
 		final List<Amount> expectedAmounts = context.getOrderedFees();
 		for (int i = 0; i < 4; ++i) {
-			NotificationUtils.assertBalanceCreditNotification(
-					notificationCaptor.getAllValues().get(i),
-					context.multisig,
+			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(i), context.multisig,
 					expectedAmounts.get(3 - i));
 		}
 	}
@@ -315,11 +299,8 @@ public class MultisigTransactionTest {
 		}
 
 		public void addSignatureWithFee(final Amount amount) {
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-					this.transaction.getTimeStamp(),
-					Utils.generateRandomAccount(),
-					this.innerTransaction.getSigner(),
-					HashUtils.calculateHash(this.innerTransaction));
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(this.transaction.getTimeStamp(),
+					Utils.generateRandomAccount(), this.innerTransaction.getSigner(), HashUtils.calculateHash(this.innerTransaction));
 			signatureTransaction.setFee(amount);
 			this.transaction.addSignature(signatureTransaction);
 		}
@@ -358,9 +339,9 @@ public class MultisigTransactionTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getAccounts / getChildTransactions
+	// region getAccounts / getChildTransactions
 
 	@Test
 	public void getAccountsIncludesAllAccountsInChildAndSignatureTransactions() {
@@ -370,11 +351,8 @@ public class MultisigTransactionTest {
 		final MockTransaction innerTransaction = new MockTransaction(innerTransactionSigner);
 		final MultisigTransaction transaction = createDefaultTransaction(innerTransaction);
 
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-				transaction.getTimeStamp(),
-				cosigner,
-				innerTransaction.getSigner(),
-				innerTransaction);
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(transaction.getTimeStamp(), cosigner,
+				innerTransaction.getSigner(), innerTransaction);
 		transaction.addSignature(signatureTransaction);
 
 		// Act:
@@ -391,11 +369,8 @@ public class MultisigTransactionTest {
 		final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		final MultisigTransaction transaction = createDefaultTransaction(innerTransaction);
 
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-				transaction.getTimeStamp(),
-				Utils.generateRandomAccount(),
-				innerTransaction.getSigner(),
-				innerTransaction);
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(transaction.getTimeStamp(),
+				Utils.generateRandomAccount(), innerTransaction.getSigner(), innerTransaction);
 		transaction.addSignature(signatureTransaction);
 
 		// Act:
@@ -406,9 +381,9 @@ public class MultisigTransactionTest {
 		MatcherAssert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
-	//endregion
+	// endregion
 
-	//region addSignature / getSigners / getCosignerSignatures
+	// region addSignature / getSigners / getCosignerSignatures
 
 	@Test
 	public void cannotAddSignatureForDifferentTransaction() {
@@ -419,9 +394,7 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction sigTransaction = context.createSignatureWithHash(Utils.generateRandomHash());
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> msTransaction.addSignature(sigTransaction),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> msTransaction.addSignature(sigTransaction), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -433,9 +406,7 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction sigTransaction = context.createSignatureWithMultisig(Utils.generateRandomAccount());
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> msTransaction.addSignature(sigTransaction),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> msTransaction.addSignature(sigTransaction), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -538,9 +509,7 @@ public class MultisigTransactionTest {
 
 		// Act:
 		final List<Account> signers = msTransaction.getSigners();
-		ExceptionAssert.assertThrows(
-				v -> signers.add(Utils.generateRandomAccount()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> signers.add(Utils.generateRandomAccount()), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -552,21 +521,20 @@ public class MultisigTransactionTest {
 
 		// Act:
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
-		ExceptionAssert.assertThrows(
-				v -> signatures.add(context.createSignature()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> signatures.add(context.createSignature()), UnsupportedOperationException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region verify
+	// region verify
 
 	@Test
 	public void canVerifyMultisigTransactionWithThreeCosignerSignatures() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100),
+				null);
 		transferTransaction.sign();
 
 		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
@@ -587,11 +555,10 @@ public class MultisigTransactionTest {
 	@Test
 	public void cannotVerifyMultisigTransactionWithAtLeastOneNonVerifiableCosignerSignature() {
 		// Assert:
-		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-				signature -> {
-					signature.setSignature(Utils.generateRandomSignature());
-					return signature;
-				});
+		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(signature -> {
+			signature.setSignature(Utils.generateRandomSignature());
+			return signature;
+		});
 	}
 
 	private static void assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
@@ -599,7 +566,8 @@ public class MultisigTransactionTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100),
+				null);
 		transferTransaction.sign();
 
 		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
@@ -622,7 +590,8 @@ public class MultisigTransactionTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100),
+				null);
 		transferTransaction.sign();
 
 		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
@@ -640,12 +609,9 @@ public class MultisigTransactionTest {
 		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static MultisigTransaction createDefaultTransaction(final Transaction innerTransaction) {
-		return new MultisigTransaction(
-				new TimeInstant(123),
-				Utils.generateRandomAccount(),
-				innerTransaction);
+		return new MultisigTransaction(new TimeInstant(123), Utils.generateRandomAccount(), innerTransaction);
 	}
 }

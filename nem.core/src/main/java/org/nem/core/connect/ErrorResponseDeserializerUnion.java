@@ -20,10 +20,7 @@ public class ErrorResponseDeserializerUnion {
 	 * @param body The http response body.
 	 * @param context The deserialization context.
 	 */
-	public ErrorResponseDeserializerUnion(
-			final int status,
-			final Object body,
-			final DeserializationContext context) {
+	public ErrorResponseDeserializerUnion(final int status, final Object body, final DeserializationContext context) {
 		this.status = status;
 		this.body = body;
 		this.context = context;
@@ -53,7 +50,7 @@ public class ErrorResponseDeserializerUnion {
 	 * @return true if this instance has a body.
 	 */
 	public boolean hasBody() {
-		return !(this.body instanceof String) || !((String)this.body).isEmpty();
+		return !(this.body instanceof String) || !((String) this.body).isEmpty();
 	}
 
 	/**
@@ -87,6 +84,6 @@ public class ErrorResponseDeserializerUnion {
 			throw new IllegalStateException("body must be a JSONObject");
 		}
 
-		return new JsonDeserializer((JSONObject)this.body, this.context);
+		return new JsonDeserializer((JSONObject) this.body, this.context);
 	}
 }

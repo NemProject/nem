@@ -17,44 +17,44 @@ public class BlockChainConfigurationBuilderTest {
 		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
 		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
 		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
-		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_IMPORTANCE
+		}));
 	}
 
 	@Test
 	public void canCreateCustomBlockChainConfigurationWithDefaultFeatures() {
 		// Act:
-		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder()
-				.setMaxTransactionsPerSyncAttempt(1000)
-				.setMaxTransactionsPerBlock(100)
-				.setBlockGenerationTargetTime(45)
-				.setBlockChainRewriteLimit(30)
-				.build();
+		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder().setMaxTransactionsPerSyncAttempt(1000)
+				.setMaxTransactionsPerBlock(100).setBlockGenerationTargetTime(45).setBlockChainRewriteLimit(30).build();
 
 		// Assert:
 		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
 		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
 		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
 		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_IMPORTANCE
+		}));
 	}
 
 	@Test
 	public void canCreateCustomBlockChainConfigurationWithCustomFeatures() {
 		// Act:
-		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder()
-				.setMaxTransactionsPerSyncAttempt(1000)
-				.setMaxTransactionsPerBlock(100)
-				.setBlockGenerationTargetTime(45)
-				.setBlockChainRewriteLimit(30)
-				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE })
-				.build();
+		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder().setMaxTransactionsPerSyncAttempt(1000)
+				.setMaxTransactionsPerBlock(100).setBlockGenerationTargetTime(45).setBlockChainRewriteLimit(30)
+				.setBlockChainFeatures(new BlockChainFeature[]{
+						BlockChainFeature.PROOF_OF_STAKE
+				}).build();
 
 		// Assert:
 		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
 		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
 		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
 		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
+		MatcherAssert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_STAKE
+		}));
 	}
 
 	@Test

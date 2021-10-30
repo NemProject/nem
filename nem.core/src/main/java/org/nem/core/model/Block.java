@@ -8,10 +8,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 /**
- * A NEM block.
- * <br>
- * The harvester is an alias for the signer.
- * The harvester proof is the signature.
+ * A NEM block. The harvester is an alias for the signer. The harvester proof is the signature.
  */
 public class Block extends VerifiableEntity {
 	private static final int BLOCK_VERSION = 1;
@@ -36,11 +33,7 @@ public class Block extends VerifiableEntity {
 	 * @param timeStamp The block timestamp.
 	 * @param height The block height.
 	 */
-	public Block(
-			final Account harvester,
-			final Hash prevBlockHash,
-			final Hash generationHash,
-			final TimeInstant timeStamp,
+	public Block(final Account harvester, final Hash prevBlockHash, final Hash generationHash, final TimeInstant timeStamp,
 			final BlockHeight height) {
 		super(BlockHeight.ONE.equals(height) ? BlockTypes.NEMESIS : BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, harvester);
 		this.transactions = new ArrayList<>();
@@ -81,7 +74,7 @@ public class Block extends VerifiableEntity {
 		this.difficulty = BlockDifficulty.INITIAL_DIFFICULTY;
 	}
 
-	//region Getters
+	// region Getters
 
 	/**
 	 * Gets the height of this block in the block chain.
@@ -98,10 +91,8 @@ public class Block extends VerifiableEntity {
 	 * @return The total amount of fees of all transactions stored in this block.
 	 */
 	public Amount getTotalFee() {
-		final long rawTotalFee = this.transactions.stream()
-				.flatMap(TransactionExtensions::streamDefault)
-				.map(tx -> tx.getFee().getNumMicroNem())
-				.reduce(0L, Long::sum);
+		final long rawTotalFee = this.transactions.stream().flatMap(TransactionExtensions::streamDefault)
+				.map(tx -> tx.getFee().getNumMicroNem()).reduce(0L, Long::sum);
 		return Amount.fromMicroNem(rawTotalFee);
 	}
 
@@ -150,9 +141,9 @@ public class Block extends VerifiableEntity {
 		return this.lessor;
 	}
 
-	//endregion
+	// endregion
 
-	//region Setters
+	// region Setters
 
 	/**
 	 * Sets the previous block.
@@ -170,9 +161,7 @@ public class Block extends VerifiableEntity {
 	 * @param previousGenerationHash The previous generation hash.
 	 */
 	public void setPreviousGenerationHash(final Hash previousGenerationHash) {
-		this.generationHash = HashUtils.nextHash(
-				previousGenerationHash,
-				this.getSigner().getAddress().getPublicKey());
+		this.generationHash = HashUtils.nextHash(previousGenerationHash, this.getSigner().getAddress().getPublicKey());
 	}
 
 	/**
@@ -243,10 +232,9 @@ public class Block extends VerifiableEntity {
 			return false;
 		}
 
-		final Block rhs = (Block)obj;
-		return this.getHeight().equals(rhs.getHeight()) &&
-				Objects.equals(this.getSignature(), rhs.getSignature()) &&
-				HashUtils.calculateHash(this).equals(HashUtils.calculateHash(rhs));
+		final Block rhs = (Block) obj;
+		return this.getHeight().equals(rhs.getHeight()) && Objects.equals(this.getSignature(), rhs.getSignature())
+				&& HashUtils.calculateHash(this).equals(HashUtils.calculateHash(rhs));
 	}
 
 	@Override

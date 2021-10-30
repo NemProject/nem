@@ -13,8 +13,8 @@ public class AggregateTransactionValidationExtensionTest {
 	public void validateCallsApplicableChildExtension() {
 		// Arrange:
 		final TransactionValidationExtension<Transaction> extension = createMockExtension(true);
-		final AggregateTransactionValidationExtension<Transaction> aggregate =
-				new AggregateTransactionValidationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionValidationExtension<Transaction> aggregate = new AggregateTransactionValidationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -29,8 +29,8 @@ public class AggregateTransactionValidationExtensionTest {
 	public void validateDoesNotCallNonApplicableChildExtension() {
 		// Arrange:
 		final TransactionValidationExtension<Transaction> extension = createMockExtension(false);
-		final AggregateTransactionValidationExtension<Transaction> aggregate =
-				new AggregateTransactionValidationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionValidationExtension<Transaction> aggregate = new AggregateTransactionValidationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -47,8 +47,8 @@ public class AggregateTransactionValidationExtensionTest {
 		final TransactionValidationExtension<Transaction> extension1 = createMockExtension(true);
 		final TransactionValidationExtension<Transaction> extension2 = createMockExtension(false);
 		final TransactionValidationExtension<Transaction> extension3 = createMockExtension(true);
-		final AggregateTransactionValidationExtension<Transaction> aggregate =
-				new AggregateTransactionValidationExtension<>(Arrays.asList(extension1, extension2, extension3));
+		final AggregateTransactionValidationExtension<Transaction> aggregate = new AggregateTransactionValidationExtension<>(
+				Arrays.asList(extension1, extension2, extension3));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();

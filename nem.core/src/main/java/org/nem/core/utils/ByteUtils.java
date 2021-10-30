@@ -91,7 +91,7 @@ public class ByteUtils {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("{ ");
 		for (final byte b : bytes) {
-			builder.append(String.format("%02X ", (byte)(0xFF & b)));
+			builder.append(String.format("%02X ", (byte) (0xFF & b)));
 		}
 
 		builder.append("}");

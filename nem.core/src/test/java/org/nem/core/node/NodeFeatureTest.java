@@ -9,7 +9,7 @@ import java.util.*;
 
 public class NodeFeatureTest {
 
-	//region fromString
+	// region fromString
 
 	@Test
 	@SuppressWarnings("serial")
@@ -38,14 +38,12 @@ public class NodeFeatureTest {
 	@Test
 	public void fromStringCannotParseInvalidNodeFeaturesStringRepresentation() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> NodeFeature.fromString("BLAH"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> NodeFeature.fromString("BLAH"), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region value / or / explode
+	// region value / or / explode
 
 	@Test
 	public void valueReturnsUnderlyingValue() {
@@ -89,7 +87,7 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(0);
 
 		// Assert:
-		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[] {}));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{}));
 	}
 
 	@Test
@@ -98,7 +96,9 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(2);
 
 		// Assert:
-		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.HISTORICAL_ACCOUNT_DATA
+		}));
 	}
 
 	@Test
@@ -107,8 +107,10 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(5);
 
 		// Assert:
-		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2 }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2
+		}));
 	}
 
-	//endregion
+	// endregion
 }

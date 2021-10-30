@@ -6,7 +6,7 @@ import org.junit.*;
 
 public class NodeAgeTest {
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedFromNegativeValue() {
@@ -32,9 +32,9 @@ public class NodeAgeTest {
 		MatcherAssert.assertThat(nodeAge.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region increment
+	// region increment
 
 	@Test
 	public void nodeAgeCanBeIncremented() {
@@ -48,5 +48,5 @@ public class NodeAgeTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(new NodeAge(24L)));
 	}
 
-	//endregion
+	// endregion
 }

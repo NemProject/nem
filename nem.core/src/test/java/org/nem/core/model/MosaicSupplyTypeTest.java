@@ -6,7 +6,7 @@ import org.junit.*;
 
 public class MosaicSupplyTypeTest {
 
-	//region value
+	// region value
 
 	@Test
 	public void valueReturnsCorrespondingRawValueForKnownValue() {
@@ -15,9 +15,9 @@ public class MosaicSupplyTypeTest {
 		MatcherAssert.assertThat(MosaicSupplyType.Delete.value(), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region isValid
+	// region isValid
 
 	@Test
 	public void isValidReturnsTrueForValidSupplyTypes() {
@@ -31,9 +31,9 @@ public class MosaicSupplyTypeTest {
 		MatcherAssert.assertThat(MosaicSupplyType.Unknown.isValid(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region fromValueOrDefault
+	// region fromValueOrDefault
 
 	@Test
 	public void fromValueOrDefaultReturnsCorrespondingEnumValueForKnownValue() {
@@ -49,5 +49,5 @@ public class MosaicSupplyTypeTest {
 		MatcherAssert.assertThat(MosaicSupplyType.fromValueOrDefault(9999), IsEqual.equalTo(MosaicSupplyType.Unknown));
 	}
 
-	//endregion
+	// endregion
 }

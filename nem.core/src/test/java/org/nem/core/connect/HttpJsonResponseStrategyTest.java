@@ -25,13 +25,12 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 
 		// Act:
-		coerceDeserializer(new byte[] {}, accountLookup);
+		coerceDeserializer(new byte[]{}, accountLookup);
 	}
 
 	@Override
-	protected Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException {
+	protected Deserializer coerceDeserializer(final SerializableEntity originalEntity, final AccountLookup accountLookup)
+			throws IOException {
 		// Arrange:
 		final byte[] serializedBytes = JsonSerializer.serializeToBytes(originalEntity);
 
@@ -39,9 +38,7 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		return coerceDeserializer(serializedBytes, accountLookup);
 	}
 
-	private static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
+	private static Deserializer coerceDeserializer(final byte[] serializedBytes, final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(context);

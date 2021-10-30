@@ -40,7 +40,7 @@ public class WeakNodeIdentity extends NodeIdentity {
 			return false;
 		}
 
-		final WeakNodeIdentity rhs = (WeakNodeIdentity)obj;
+		final WeakNodeIdentity rhs = (WeakNodeIdentity) obj;
 		return this.name.equals(rhs.name);
 	}
 

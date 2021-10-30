@@ -7,7 +7,9 @@ import org.nem.core.serialization.*;
 
 import java.math.BigInteger;
 
-public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, BigInteger> {
+public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, BigInteger> {
 	public AbstractBigIntegerSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}
@@ -15,7 +17,9 @@ public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Se
 	@Test
 	public void canRoundtripPrefixedUnsignedBigInteger() {
 		// Arrange:
-		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
+		final BigInteger i = new BigInteger(1, new byte[]{
+				(byte) 0x90, 0x12
+		});
 
 		// Assert:
 		this.assertCanRoundtrip(i);
@@ -27,10 +31,14 @@ public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Se
 	@Test
 	public void canRoundtripNonPrefixedUnsignedBigInteger() throws Exception {
 		// Arrange:
-		final BigInteger i = new BigInteger(new byte[] { (byte)0x90, 0x12 });
+		final BigInteger i = new BigInteger(new byte[]{
+				(byte) 0x90, 0x12
+		});
 
 		// Assert:
-		this.assertCanRoundtrip(i, new BigInteger(1, new byte[] { (byte)0x90, 0x12 }));
+		this.assertCanRoundtrip(i, new BigInteger(1, new byte[]{
+				(byte) 0x90, 0x12
+		}));
 
 		// Sanity:
 		MatcherAssert.assertThat(2, IsEqual.equalTo(i.toByteArray().length));

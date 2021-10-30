@@ -11,7 +11,7 @@ import java.util.*;
 
 public class NodeMetaDataTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void metaDataCanBeCreated() {
@@ -39,9 +39,9 @@ public class NodeMetaDataTest {
 		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void metaDataCanBeDeserializedWithAllParameters() {
@@ -88,12 +88,8 @@ public class NodeMetaDataTest {
 		createMetaDataFromJson("plat", "app", null, 4, 7);
 	}
 
-	private static NodeMetaData createMetaDataFromJson(
-			final String platform,
-			final String application,
-			final String version,
-			final Integer networkId,
-			final Integer features) {
+	private static NodeMetaData createMetaDataFromJson(final String platform, final String application, final String version,
+			final Integer networkId, final Integer features) {
 		final JSONObject jsonObject = new JSONObject();
 		jsonObject.put("platform", platform);
 		jsonObject.put("application", application);
@@ -106,8 +102,7 @@ public class NodeMetaDataTest {
 	@Test
 	public void metaDataCanBeRoundTripped() {
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new NodeMetaData("plat", "app", new NodeVersion(3, 0, 0), 4, 7),
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new NodeMetaData("plat", "app", new NodeVersion(3, 0, 0), 4, 7),
 				null);
 		final NodeMetaData metaData = new NodeMetaData(deserializer);
 
@@ -119,9 +114,10 @@ public class NodeMetaDataTest {
 		MatcherAssert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(7));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static final Map<String, NodeMetaData> DESC_TO_META_DATA_MAP = new HashMap<String, NodeMetaData>() {
 		{
@@ -157,7 +153,7 @@ public class NodeMetaDataTest {
 		}
 
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(metaData)));
-		MatcherAssert.assertThat("plat", IsNot.not(IsEqual.equalTo((Object)metaData)));
+		MatcherAssert.assertThat("plat", IsNot.not(IsEqual.equalTo((Object) metaData)));
 	}
 
 	@Test
@@ -176,5 +172,5 @@ public class NodeMetaDataTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

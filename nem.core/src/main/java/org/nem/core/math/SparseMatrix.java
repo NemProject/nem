@@ -43,7 +43,7 @@ public class SparseMatrix extends Matrix {
 		}
 	}
 
-	//region Matrix abstract functions
+	// region Matrix abstract functions
 
 	@Override
 	protected final Matrix create(final int numRows, final int numCols) {
@@ -178,7 +178,7 @@ public class SparseMatrix extends Matrix {
 		};
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the number of non zero columns of a row.
@@ -235,7 +235,7 @@ public class SparseMatrix extends Matrix {
 	private void reallocate(final int row) {
 		// Hopefully doesn't happen too often
 		final int size = this.cols[row].length;
-		final int newSize = (int)Math.ceil(REALLOC_MULTIPLIER * size);
+		final int newSize = (int) Math.ceil(REALLOC_MULTIPLIER * size);
 		final int[] newCols = new int[newSize];
 		final double[] newValues = new double[newSize];
 		System.arraycopy(this.cols[row], 0, newCols, 0, size);
@@ -255,12 +255,7 @@ public class SparseMatrix extends Matrix {
 
 	private static String formatEntry(final int row, final int col, final double value) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		return String.format(
-				"%s(%d, %d) -> %s",
-				System.lineSeparator(),
-				row,
-				col,
-				format.format(value));
+		return String.format("%s(%d, %d) -> %s", System.lineSeparator(), row, col, format.format(value));
 	}
 
 	/**

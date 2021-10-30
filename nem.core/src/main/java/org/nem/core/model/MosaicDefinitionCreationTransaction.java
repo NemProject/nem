@@ -24,10 +24,7 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	 * @param sender The sender.
 	 * @param mosaicDefinition The mosaic definition.
 	 */
-	public MosaicDefinitionCreationTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final MosaicDefinition mosaicDefinition) {
+	public MosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account sender, final MosaicDefinition mosaicDefinition) {
 		this(timeStamp, sender, mosaicDefinition, MosaicConstants.MOSAIC_CREATION_FEE_SINK, Amount.fromNem(50000));
 	}
 
@@ -40,12 +37,8 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	 * @param creationFeeSink The creation fee sink.
 	 * @param creationFee The creation fee.
 	 */
-	public MosaicDefinitionCreationTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final MosaicDefinition mosaicDefinition,
-			final Account creationFeeSink,
-			final Amount creationFee) {
+	public MosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account sender, final MosaicDefinition mosaicDefinition,
+			final Account creationFeeSink, final Amount creationFee) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, 1, timeStamp, sender);
 		this.mosaicDefinition = mosaicDefinition;
 		this.creationFeeSink = creationFeeSink;

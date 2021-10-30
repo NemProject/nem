@@ -5,8 +5,7 @@ import org.nem.core.utils.ArrayUtils;
 import java.util.Comparator;
 
 /**
- * A custom comparator for comparing MultisigSignatureTransaction objects.
- * <br>
+ * A custom comparator for comparing MultisigSignatureTransaction objects. <br>
  * This comparator only looks at the transaction signer and other hash.
  */
 public class MultisigSignatureTransactionComparator implements Comparator<MultisigSignatureTransaction> {

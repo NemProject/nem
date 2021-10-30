@@ -9,7 +9,8 @@ import java.math.BigInteger;
 
 public class Ed25519CurveTest {
 
-	private static final BigInteger GROUP_ORDER = BigInteger.ONE.shiftLeft(252).add(new BigInteger("27742317777372353535851937790883648493"));
+	private static final BigInteger GROUP_ORDER = BigInteger.ONE.shiftLeft(252)
+			.add(new BigInteger("27742317777372353535851937790883648493"));
 
 	@Test
 	public void getNameReturnsCorrectName() {

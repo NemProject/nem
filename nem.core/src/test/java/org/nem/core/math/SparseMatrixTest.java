@@ -9,12 +9,14 @@ import java.util.*;
 
 public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
-	//region forEach
+	// region forEach
 
 	@Test
 	public void forEachReturnsAllNonZeroElements() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, 1, -5, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 0, 0, 1, -5, 8
+		});
 
 		// Act:
 		final List<Double> values = new ArrayList<>();
@@ -24,35 +26,33 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		MatcherAssert.assertThat(values, IsEquivalent.equivalentTo(2.0, 1.0, -5.0, 8.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void sparseMatrixStringRepresentationIsCorrect() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] {
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
 				2.1234, 11.1234, 0, 1, 5012.0126, 0
 		});
 
 		// Assert:
-		final String expectedString =
-				"[3 x 2]" + System.lineSeparator()
-						+ "(0, 0) -> 2.123" + System.lineSeparator()
-						+ "(0, 1) -> 11.123" + System.lineSeparator()
-						+ "(1, 1) -> 1.000" + System.lineSeparator()
-						+ "(2, 0) -> 5012.013";
+		final String expectedString = "[3 x 2]" + System.lineSeparator() + "(0, 0) -> 2.123" + System.lineSeparator() + "(0, 1) -> 11.123"
+				+ System.lineSeparator() + "(1, 1) -> 1.000" + System.lineSeparator() + "(2, 0) -> 5012.013";
 		MatcherAssert.assertThat(matrix.toString(), IsEqual.equalTo(expectedString));
 	}
 
-	//endregion
+	// endregion
 
-	//region removal / reallocation
+	// region removal / reallocation
 
 	@Test
 	public void entryCanBeRemoved() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
@@ -62,9 +62,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
-		MatcherAssert.assertThat(
-				sparseMatrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
+		MatcherAssert.assertThat(sparseMatrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				2, 0, 5, 11, 1, 8
+		})));
 	}
 
 	@Test
@@ -73,7 +73,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		final SparseMatrix sparseMatrix = this.createMatrix(3, 2);
 		final int numRows = 3;
 		final int numCols = 2;
-		final double[] values = new double[] { 2, 3, 5, 11, 1, 8 };
+		final double[] values = new double[]{
+				2, 3, 5, 11, 1, 8
+		};
 		for (int r = 0; r < numRows; ++r) {
 			for (int c = 0; c < numCols; ++c) {
 				final int r2 = numRows - r - 1;
@@ -90,15 +92,17 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(1));
-		MatcherAssert.assertThat(
-				sparseMatrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 0, 5, 11, 1, 8 })));
+		MatcherAssert.assertThat(sparseMatrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				2, 0, 5, 11, 1, 8
+		})));
 	}
 
 	@Test
 	public void lastEntryInRowCanBeRemoved() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Assert:
 		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(2));
@@ -109,15 +113,17 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		MatcherAssert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(0));
-		MatcherAssert.assertThat(
-				sparseMatrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 5, 11, 1, 8 })));
+		MatcherAssert.assertThat(sparseMatrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0, 0, 5, 11, 1, 8
+		})));
 	}
 
 	@Test
 	public void removeLessThanShrinksNumberOfEntries() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, -3, -5, 11, -1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[]{
+				2, -3, -5, 11, -1, 8
+		});
 
 		// Act:
 		sparseMatrix.removeLessThan(0);
@@ -162,9 +168,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		MatcherAssert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(3.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNumEntries
+	// region getNumEntries
 
 	@Test
 	public void getNumEntriesReturnsTotalNumberOfNonZeroElements() {
@@ -181,9 +187,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		MatcherAssert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(5));
 	}
 
-	//endregion
+	// endregion
 
-	//region sorted columns
+	// region sorted columns
 
 	@Test
 	public void setAtUncheckedKeepsColumnsSorted() {
@@ -204,7 +210,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	@Test
 	public void removeKeepsColumnsSorted() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, 3, 5, 11, 1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Act:
 		sparseMatrix.setAt(0, 1, 0.0);
@@ -217,7 +225,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	@Test
 	public void removeLessThanKeepsColumnsSorted() {
 		// Arrange:
-		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, -3, -5, 11, -1, 8 });
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[]{
+				2, -3, -5, 11, -1, 8
+		});
 
 		// Act:
 		sparseMatrix.removeLessThan(0);
@@ -235,7 +245,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	protected SparseMatrix createMatrix(final int rows, final int cols) {

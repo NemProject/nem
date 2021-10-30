@@ -19,7 +19,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		return new JsonSerializationPolicy();
 	}
 
-	//region Write
+	// region Write
 
 	@Test
 	public void canWriteInt() {
@@ -80,7 +80,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	@Test
 	public void canWriteUnsignedBigInteger() throws Exception {
 		// Arrange:
-		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
+		final BigInteger i = new BigInteger(1, new byte[]{
+				(byte) 0x90, 0x12
+		});
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
@@ -98,7 +100,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21, 0x5A };
+		final byte[] bytes = new byte[]{
+				0x50, (byte) 0xFF, 0x00, 0x7C, 0x21, 0x5A
+		};
 		serializer.writeBytes("bytes", bytes);
 
 		// Assert:
@@ -146,7 +150,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
-		assertMockSerializableJsonObject((JSONObject)object.get("SerializableEntity"), 17, "foo", 42);
+		assertMockSerializableJsonObject((JSONObject) object.get("SerializableEntity"), 17, "foo", 42);
 	}
 
 	@Test
@@ -165,29 +169,24 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JSONObject object = serializer.getObject();
 		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
 
-		final JSONArray serializableArray = (JSONArray)object.get("SerializableArray");
+		final JSONArray serializableArray = (JSONArray) object.get("SerializableArray");
 		MatcherAssert.assertThat(serializableArray.size(), IsEqual.equalTo(3));
-		assertMockSerializableJsonObject((JSONObject)serializableArray.get(0), 17, "foo", 42);
-		assertMockSerializableJsonObject((JSONObject)serializableArray.get(1), 111, "bar", 22);
-		assertMockSerializableJsonObject((JSONObject)serializableArray.get(2), 1, "alpha", 34);
+		assertMockSerializableJsonObject((JSONObject) serializableArray.get(0), 17, "foo", 42);
+		assertMockSerializableJsonObject((JSONObject) serializableArray.get(1), 111, "bar", 22);
+		assertMockSerializableJsonObject((JSONObject) serializableArray.get(2), 1, "alpha", 34);
 	}
 
-	private static void assertMockSerializableJsonObject(
-			final JSONObject object,
-			final int expectedIntValue,
-			final String expectedStringValue,
-			final long expectedLongValue) {
+	private static void assertMockSerializableJsonObject(final JSONObject object, final int expectedIntValue,
+			final String expectedStringValue, final long expectedLongValue) {
 		// Assert:
 		MatcherAssert.assertThat(object.get("int"), IsEqual.equalTo(expectedIntValue));
 		MatcherAssert.assertThat(object.get("s"), IsEqual.equalTo(expectedStringValue));
 		MatcherAssert.assertThat(object.get("long"), IsEqual.equalTo(expectedLongValue));
 	}
 
-	//endregion
+	// endregion
 
-	//region Read
-
-	//region readInt
+	// region readInt
 
 	@Test
 	public void canReadLongAsInt() {
@@ -215,14 +214,12 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		assertThrowsTypeMismatchException(
-				() -> deserializer.readInt("s"),
-				"s");
+		assertThrowsTypeMismatchException(() -> deserializer.readInt("s"), "s");
 	}
 
-	//endregion
+	// endregion
 
-	//region readLong
+	// region readLong
 
 	@Test
 	public void canReadIntAsLong() {
@@ -250,14 +247,12 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		assertThrowsTypeMismatchException(
-				() -> deserializer.readLong("s"),
-				"s");
+		assertThrowsTypeMismatchException(() -> deserializer.readLong("s"), "s");
 	}
 
-	//endregion
+	// endregion
 
-	//region readDouble
+	// region readDouble
 
 	@Test
 	public void canReadBigDecimalAsDouble() {
@@ -285,16 +280,12 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 
 		// Assert:
-		assertThrowsTypeMismatchException(
-				() -> deserializer.readDouble("s"),
-				"s");
+		assertThrowsTypeMismatchException(() -> deserializer.readDouble("s"), "s");
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region Roundtrip Multiple
+	// region Roundtrip Multiple
 
 	@Test
 	public void canRoundtripMultipleValuesWithOrderingChecksEnabled() {
@@ -302,11 +293,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		this.assertRoundtripMultipleValues(new JsonSerializer(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region Order Enforcement
-
-	//region default (off)
+	// region Order Enforcement - default (off)
 
 	@Test
 	public void defaultSerializerDoesNotPublishPropertyOrderMetadata() {
@@ -338,11 +327,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		MatcherAssert.assertThat(deserializer.readInt("Foo"), IsEqual.equalTo(17));
 	}
 
-	//endregion
+	// endregion
 
-	//region order serialization (on)
-
-	//region top-level object
+	// region Order Enforcement - top-level object (on)
 
 	@Test
 	public void serializerCanOptionallyPublishPropertyOrderMetadata() {
@@ -351,7 +338,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Act:
 		final JSONObject object = serializer.getObject();
-		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray orderArray = (JSONArray) object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
 		MatcherAssert.assertThat(orderArray, IsNull.notNullValue());
@@ -365,9 +352,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		ExceptionAssert.assertThrows(
-				v -> deserializer.readInt("Bar"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> deserializer.readInt("Bar"), IllegalArgumentException.class);
 	}
 
 	private static JsonSerializer createSerializerForFlatObjectWithOrderedReadsEnabled() {
@@ -377,9 +362,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		return serializer;
 	}
 
-	//endregion
+	// endregion
 
-	//region nested object
+	// region Order Enforcement - nested object (on)
 
 	@Test
 	public void serializerCanOptionallyPublishPropertyOrderMetadataForNestedObjects() {
@@ -388,8 +373,8 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Act:
 		final JSONObject object = serializer.getObject();
-		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
-		final JSONArray innerOrderArray = (JSONArray)((JSONObject)object.get("Obj")).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray orderArray = (JSONArray) object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray innerOrderArray = (JSONArray) ((JSONObject) object.get("Obj")).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
 		MatcherAssert.assertThat(orderArray, IsNull.notNullValue());
@@ -407,9 +392,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		deserializer.readInt("Foo");
 		deserializer.readInt("Bar");
 		deserializer.readObject("Obj", d1 -> {
-			ExceptionAssert.assertThrows(
-					v -> d1.readInt("Bar2"),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> d1.readInt("Bar2"), IllegalArgumentException.class);
 			return new Object();
 		});
 	}
@@ -426,7 +409,9 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		return serializer;
 	}
 
-	//endregion
+	// endregion
+
+	// region Order Enforcement - other
 
 	@Test
 	public void serializerCanOptionallyPublishPropertyOrderMetadataForNestedArrays() {
@@ -434,10 +419,10 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		final JsonSerializer serializer = createSerializerForObjectContainingNestedArrayWithOrderedReadsEnabled();
 
 		final JSONObject object = serializer.getObject();
-		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
-		final JSONArray objArray = ((JSONArray)object.get("Arr"));
-		final JSONArray innerOrderArray1 = (JSONArray)((JSONObject)objArray.get(0)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
-		final JSONArray innerOrderArray2 = (JSONArray)((JSONObject)objArray.get(1)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray orderArray = (JSONArray) object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray objArray = ((JSONArray) object.get("Arr"));
+		final JSONArray innerOrderArray1 = (JSONArray) ((JSONObject) objArray.get(0)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray innerOrderArray2 = (JSONArray) ((JSONObject) objArray.get(1)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
 		MatcherAssert.assertThat(orderArray, IsNull.notNullValue());
@@ -456,9 +441,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		deserializer.readInt("Foo");
 		deserializer.readInt("Bar");
 		deserializer.readObjectArray("Arr", d1 -> {
-			ExceptionAssert.assertThrows(
-					v -> d1.readInt("Bar2"),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> d1.readInt("Bar2"), IllegalArgumentException.class);
 			return new Object();
 		});
 	}
@@ -481,8 +464,6 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		return serializer;
 	}
 
-	//endregion
-
 	@Test
 	public void deserializerCannotDeserializeOptionalTrailingValuesWhenEnforcingOrderedReads() {
 		// Arrange:
@@ -497,17 +478,15 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// - for the binary serializer this means that no sentinel value was written and the end of stream would be passed
 		// - "optional" here means "can be null" vs "can be present"
 		// - ("optional" values must be present for binary serialization to work)
-		ExceptionAssert.assertThrows(
-				v -> deserializer.readOptionalInt("Bar"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> deserializer.readOptionalInt("Bar"), IllegalArgumentException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(value1, IsEqual.equalTo(17));
 	}
 
-	//endregion
+	// endregion
 
-	//region serializeToJson / serializeToBytes
+	// region serializeToJson / serializeToBytes
 
 	@Test
 	public void serializeToJsonProducesSameJsonObjectAsEntitySerialize() throws Exception {
@@ -534,18 +513,16 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// Act:
 		final byte[] resultingBytes = JsonSerializer.serializeToBytes(entity);
-		final JSONObject resultingJsonObject = (JSONObject)JSONValue.parse(StringEncoder.getString(resultingBytes));
+		final JSONObject resultingJsonObject = (JSONObject) JSONValue.parse(StringEncoder.getString(resultingBytes));
 
 		// Act / Assert:
 		MatcherAssert.assertThat(resultingJsonObject, IsEqual.equalTo(expectedJsonObject));
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertThrowsTypeMismatchException(final Supplier<Object> consumer, final String propertyName) {
-		ExceptionAssert.assertThrows(
-				v -> consumer.get(),
-				TypeMismatchException.class,
+		ExceptionAssert.assertThrows(v -> consumer.get(), TypeMismatchException.class,
 				ex -> MatcherAssert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
 	}
 }

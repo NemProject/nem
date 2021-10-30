@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class CommunicationTimeStampsTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateCommunicationTimeStamps() {
@@ -22,9 +22,9 @@ public class CommunicationTimeStampsTest {
 		MatcherAssert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void communicationTimeStampsCanBeRoundTripped() {
@@ -39,9 +39,9 @@ public class CommunicationTimeStampsTest {
 		MatcherAssert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -54,7 +54,7 @@ public class CommunicationTimeStampsTest {
 		MatcherAssert.assertThat(timeStampsMap.get("diff-sendTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
 		MatcherAssert.assertThat(timeStampsMap.get("diff-receiveTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(timeStamps)));
-		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)timeStamps)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object) timeStamps)));
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class CommunicationTimeStampsTest {
 		MatcherAssert.assertThat(timeStampsMap.get("diff-receiveTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(timeStamps.hashCode())));
 	}
 
-	//endregion
+	// endregion
 	@SuppressWarnings("serial")
 	private HashMap<String, CommunicationTimeStamps> createTestCommunicationTimeStampsForEqualityTests() {
 		return new HashMap<String, CommunicationTimeStamps>() {

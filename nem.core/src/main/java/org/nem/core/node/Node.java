@@ -3,8 +3,7 @@ package org.nem.core.node;
 import org.nem.core.serialization.*;
 
 /**
- * Represents a node in the NEM network.
- * Each Node is uniquely identified by its endpoint.
+ * Represents a node in the NEM network. Each Node is uniquely identified by its endpoint.
  */
 public class Node implements SerializableEntity {
 	private final NodeIdentity identity;
@@ -28,10 +27,7 @@ public class Node implements SerializableEntity {
 	 * @param endpoint The endpoint.
 	 * @param metaData The meta data.
 	 */
-	public Node(
-			final NodeIdentity identity,
-			final NodeEndpoint endpoint,
-			final NodeMetaData metaData) {
+	public Node(final NodeIdentity identity, final NodeEndpoint endpoint, final NodeMetaData metaData) {
 		this.identity = identity;
 		this.setEndpoint(endpoint);
 		this.setMetaData(getMetaData(metaData));
@@ -61,7 +57,7 @@ public class Node implements SerializableEntity {
 		serializer.writeObject("metaData", this.metaData);
 	}
 
-	//region Getters and Setters
+	// region Getters and Setters
 
 	/**
 	 * Gets the identity.
@@ -116,7 +112,7 @@ public class Node implements SerializableEntity {
 		this.metaData = metaData;
 	}
 
-	//endregion
+	// endregion
 
 	private void ensureValidity() {
 		if (null == this.identity) {
@@ -135,7 +131,7 @@ public class Node implements SerializableEntity {
 			return false;
 		}
 
-		final Node rhs = (Node)obj;
+		final Node rhs = (Node) obj;
 		return this.identity.equals(rhs.identity);
 	}
 

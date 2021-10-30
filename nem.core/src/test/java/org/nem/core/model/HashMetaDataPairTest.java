@@ -24,7 +24,7 @@ public class HashMetaDataPairTest {
 		MatcherAssert.assertThat(pair.getMetaData(), IsEqual.equalTo(metaData));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {

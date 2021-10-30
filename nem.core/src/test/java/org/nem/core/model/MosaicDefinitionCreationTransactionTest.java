@@ -40,17 +40,15 @@ public class MosaicDefinitionCreationTransactionTest {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
 
 		// Act:
-		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition);
+		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER,
+				mosaicDefinition);
 
 		// Assert:
 		assertProperties(transaction, mosaicDefinition, MosaicConstants.MOSAIC_CREATION_FEE_SINK, Amount.fromNem(50000));
 	}
 
-	private static void assertProperties(
-			final MosaicDefinitionCreationTransaction transaction,
-			final MosaicDefinition expectedMosaicDefinition,
-			final Account expectedCreationFeeSink,
-			final Amount expectedCreationFee) {
+	private static void assertProperties(final MosaicDefinitionCreationTransaction transaction,
+			final MosaicDefinition expectedMosaicDefinition, final Account expectedCreationFeeSink, final Amount expectedCreationFee) {
 		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_DEFINITION_CREATION));
 		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
@@ -78,7 +76,8 @@ public class MosaicDefinitionCreationTransactionTest {
 		ExceptionAssert.assertThrows(v -> createTransaction(context.mosaicDefinition), IllegalArgumentException.class);
 	}
 
-	private static void assertCannotCreateTransaction(final MosaicDefinition mosaicDefinition, final Account creationFeeSink, final Amount fee) {
+	private static void assertCannotCreateTransaction(final MosaicDefinition mosaicDefinition, final Account creationFeeSink,
+			final Amount fee) {
 		// Assert:
 		ExceptionAssert.assertThrows(
 				v -> new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, creationFeeSink, fee),
@@ -190,7 +189,7 @@ public class MosaicDefinitionCreationTransactionTest {
 
 	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -239,10 +238,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithLevyFeeRecipient(final Account feeRecipient) {
-		final MosaicLevy levy = new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				feeRecipient,
-				Utils.createMosaicId(2),
+		final MosaicLevy levy = new MosaicLevy(MosaicTransferFeeType.Absolute, feeRecipient, Utils.createMosaicId(2),
 				Quantity.fromValue(123));
 		return createTransaction(Utils.createMosaicDefinition(SIGNER, levy));
 	}
@@ -251,7 +247,8 @@ public class MosaicDefinitionCreationTransactionTest {
 		return createTransaction(mosaicDefinition, CREATION_FEE_SINK);
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition, final Account creationFeeSink) {
+	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition,
+			final Account creationFeeSink) {
 		return new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, creationFeeSink, CREATION_FEE);
 	}
 

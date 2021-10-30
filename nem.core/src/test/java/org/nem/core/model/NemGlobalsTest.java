@@ -12,13 +12,12 @@ public class NemGlobalsTest {
 		Utils.resetGlobals();
 	}
 
-	//region transaction fee calculator
+	// region transaction fee calculator
 
 	@Test
 	public void defaultTransactionFeeCalculatorIsNotNull() {
 		// Assert:
-		MatcherAssert.assertThat(
-				NemGlobals.getTransactionFeeCalculator(),
+		MatcherAssert.assertThat(NemGlobals.getTransactionFeeCalculator(),
 				IsInstanceOf.instanceOf(TransactionFeeCalculatorBeforeFork.class));
 	}
 
@@ -31,21 +30,17 @@ public class NemGlobalsTest {
 		NemGlobals.setTransactionFeeCalculator(calculator);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				NemGlobals.getTransactionFeeCalculator(),
-				IsEqual.equalTo(calculator));
+		MatcherAssert.assertThat(NemGlobals.getTransactionFeeCalculator(), IsEqual.equalTo(calculator));
 	}
 
-	//endregion
+	// endregion
 
-	//region block chain configuration
+	// region block chain configuration
 
 	@Test
 	public void defaultBlockChainConfigurationIsNotNull() {
 		// Assert:
-		MatcherAssert.assertThat(
-				NemGlobals.getBlockChainConfiguration(),
-				IsInstanceOf.instanceOf(BlockChainConfiguration.class));
+		MatcherAssert.assertThat(NemGlobals.getBlockChainConfiguration(), IsInstanceOf.instanceOf(BlockChainConfiguration.class));
 	}
 
 	@Test
@@ -57,10 +52,8 @@ public class NemGlobalsTest {
 		NemGlobals.setBlockChainConfiguration(configuration);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				NemGlobals.getBlockChainConfiguration(),
-				IsEqual.equalTo(configuration));
+		MatcherAssert.assertThat(NemGlobals.getBlockChainConfiguration(), IsEqual.equalTo(configuration));
 	}
 
-	//endregion
+	// endregion
 }

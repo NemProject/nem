@@ -8,14 +8,12 @@ import java.util.regex.Pattern;
 
 public class MustBeTest {
 
-	//region notNull
+	// region notNull
 
 	@Test
 	public void notNullThrowsIfObjectIsNull() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> MustBe.notNull(null, "test"),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.notNull(null, "test"), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("test"));
 	}
 
@@ -25,13 +23,12 @@ public class MustBeTest {
 		MustBe.notNull(new Object(), "test");
 	}
 
-	//region notWhitespace
+	// region notWhitespace
 
 	@Test
 	public void notWhitespaceThrowsIfStringContainsNoNonWhitespaceChars() {
 		// Assert:
-		Arrays.asList(null, "", " ", " \t \t  ")
-				.forEach(org.nem.core.utils.MustBeTest::assertNotWhitespaceThrows);
+		Arrays.asList(null, "", " ", " \t \t  ").forEach(org.nem.core.utils.MustBeTest::assertNotWhitespaceThrows);
 	}
 
 	@Test
@@ -49,15 +46,13 @@ public class MustBeTest {
 	}
 
 	private static void assertNotWhitespaceThrows(final String input) {
-		ExceptionAssert.assertThrows(
-				v -> MustBe.notWhitespace(input, "input", 10),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.notWhitespace(input, "input", 10), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("input"));
 	}
 
-	//endregion
+	// endregion
 
-	//region match
+	// region match
 
 	@Test
 	public void matchThrowsIfStringIsNull() {
@@ -91,15 +86,13 @@ public class MustBeTest {
 	}
 
 	private static void assertMatchThrows(final String input) {
-		ExceptionAssert.assertThrows(
-				v -> MustBe.match(input, "input", Pattern.compile("[0-9]*"), 10),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.match(input, "input", Pattern.compile("[0-9]*"), 10), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("input"));
 	}
 
-	//endregion
+	// endregion
 
-	//region inRange (integer)
+	// region inRange (integer)
 
 	@Test
 	public void inRangeThrowsIfValueIsLessThanMinValue() {
@@ -124,13 +117,11 @@ public class MustBeTest {
 	}
 
 	private static void assertInRangeThrows(final int input) {
-		ExceptionAssert.assertThrows(
-				v -> MustBe.inRange(input, "val", -2, 5),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.inRange(input, "val", -2, 5), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("val"));
 	}
 
-	//region inRange (long)
+	// region inRange (long)
 
 	@Test
 	public void inRangeThrowsIfLongValueIsLessThanMinValue() {
@@ -155,22 +146,18 @@ public class MustBeTest {
 	}
 
 	private static void assertLongInRangeThrows(final long input) {
-		ExceptionAssert.assertThrows(
-				v -> MustBe.inRange(input, "val", -2L, 5L),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.inRange(input, "val", -2L, 5L), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("val"));
 	}
 
-	//endregion
+	// endregion
 
-	//region empty
+	// region empty
 
 	@Test
 	public void emptyThrowsIfCollectionIsNotEmpty() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> MustBe.empty(Collections.singletonList(123), "list"),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.empty(Collections.singletonList(123), "list"), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("list"));
 	}
 
@@ -180,16 +167,14 @@ public class MustBeTest {
 		MustBe.empty(Collections.emptyList(), "list");
 	}
 
-	//endregion
+	// endregion
 
-	//region trueValue / falseValue
+	// region trueValue / falseValue
 
 	@Test
 	public void trueValueThrowsIfValueIsFalse() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> MustBe.trueValue(false, "bool"),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.trueValue(false, "bool"), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("bool"));
 	}
 
@@ -202,9 +187,7 @@ public class MustBeTest {
 	@Test
 	public void falseValueThrowsIfValueIsTrue() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> MustBe.falseValue(true, "bool"),
-				IllegalArgumentException.class,
+		ExceptionAssert.assertThrows(v -> MustBe.falseValue(true, "bool"), IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("bool"));
 	}
 
@@ -214,5 +197,5 @@ public class MustBeTest {
 		MustBe.falseValue(false, "bool");
 	}
 
-	//endregion
+	// endregion
 }

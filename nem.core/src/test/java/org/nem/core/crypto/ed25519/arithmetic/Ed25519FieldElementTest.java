@@ -206,10 +206,7 @@ public class Ed25519FieldElementTest {
 
 	private static boolean differsOnlyByAFactorOfAFourthRootOfOne(final Ed25519FieldElement x, final Ed25519FieldElement root) {
 		final Ed25519FieldElement rootTimesI = root.multiply(Ed25519Field.I);
-		return x.equals(root) ||
-				x.equals(root.negate()) ||
-				x.equals(rootTimesI) ||
-				x.equals(rootTimesI.negate());
+		return x.equals(root) || x.equals(root.negate()) || x.equals(rootTimesI) || x.equals(rootTimesI.negate());
 	}
 
 	private static void assertEquals(final Ed25519FieldElement f, final BigInteger b) {
@@ -245,7 +242,7 @@ public class Ed25519FieldElementTest {
 			// Arrange:
 			final byte[] bytes = new byte[32];
 			random.nextBytes(bytes);
-			bytes[31] = (byte)(bytes[31] & 0x7f);
+			bytes[31] = (byte) (bytes[31] & 0x7f);
 			final BigInteger b1 = MathUtils.toBigInteger(bytes);
 
 			// Act:
@@ -316,14 +313,14 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentation() {
 		// Arrange:
 		final byte[] bytes = new byte[32];
 		for (int i = 0; i < 32; i++) {
-			bytes[i] = (byte)(i + 1);
+			bytes[i] = (byte) (i + 1);
 		}
 		final Ed25519FieldElement f = new Ed25519EncodedFieldElement(bytes).decode();
 

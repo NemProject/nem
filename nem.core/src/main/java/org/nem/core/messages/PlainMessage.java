@@ -64,7 +64,7 @@ public class PlainMessage extends Message {
 			return false;
 		}
 
-		final PlainMessage rhs = (PlainMessage)obj;
+		final PlainMessage rhs = (PlainMessage) obj;
 		return Arrays.equals(this.payload, rhs.payload);
 	}
 }

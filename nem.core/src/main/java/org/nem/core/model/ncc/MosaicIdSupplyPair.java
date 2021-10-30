@@ -74,8 +74,7 @@ public class MosaicIdSupplyPair implements SerializableEntity {
 			return false;
 		}
 
-		final MosaicIdSupplyPair rhs = (MosaicIdSupplyPair)obj;
-		return this.mosaicId.equals(rhs.mosaicId) &&
-				this.supply.equals(rhs.supply);
+		final MosaicIdSupplyPair rhs = (MosaicIdSupplyPair) obj;
+		return this.mosaicId.equals(rhs.mosaicId) && this.supply.equals(rhs.supply);
 	}
 }

@@ -59,9 +59,7 @@ public class MatrixElement {
 			return false;
 		}
 
-		final MatrixElement rhs = (MatrixElement)obj;
-		return this.getRow().equals(rhs.getRow()) &&
-				this.getColumn().equals(rhs.getColumn()) &&
-				this.getValue().equals(rhs.getValue());
+		final MatrixElement rhs = (MatrixElement) obj;
+		return this.getRow().equals(rhs.getRow()) && this.getColumn().equals(rhs.getColumn()) && this.getValue().equals(rhs.getValue());
 	}
 }

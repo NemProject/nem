@@ -58,8 +58,10 @@ public class MultisigSignatureTransactionComparatorTest {
 	@Test
 	public void comparingTransactionsWithDifferentMultisigYieldsEqual() {
 		// Arrange:
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(), HASH);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(), HASH);
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(),
+				HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(),
+				HASH);
 
 		// Act
 		final int result = compare(lhs, rhs);

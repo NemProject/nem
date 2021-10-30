@@ -56,10 +56,8 @@ public class TransferTransactionAttachment {
 	 * @return The mosaics.
 	 */
 	public Collection<Mosaic> getMosaics() {
-		return this.mosaicTransfers.entrySet().stream()
-				.map(e -> new Mosaic(e.getKey(), e.getValue()))
-				.sorted((ml, mr) -> ml.toString().compareTo(mr.toString()))
-				.collect(Collectors.toList());
+		return this.mosaicTransfers.entrySet().stream().map(e -> new Mosaic(e.getKey(), e.getValue()))
+				.sorted((ml, mr) -> ml.toString().compareTo(mr.toString())).collect(Collectors.toList());
 	}
 
 	/**

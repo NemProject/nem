@@ -18,9 +18,7 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 	 * @param localTimeStamps The local time stamps for the request/response.
 	 * @param remoteTimeStamps The remote time stamps for the request/response.
 	 */
-	public TimeSynchronizationSample(
-			final Node node,
-			final CommunicationTimeStamps localTimeStamps,
+	public TimeSynchronizationSample(final Node node, final CommunicationTimeStamps localTimeStamps,
 			final CommunicationTimeStamps remoteTimeStamps) {
 		this.node = node;
 		this.localTimeStamps = localTimeStamps;
@@ -65,6 +63,7 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 
 	/**
 	 * Gets the offset that the local node's network time has to the remote node's network time.
+	 *
 	 * <pre>
 	 * {@code
 	 * S=Send, R=Receive
@@ -79,9 +78,8 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 	 * @return The offset in ms.
 	 */
 	public Long getTimeOffsetToRemote() {
-		final long roundTripTime =
-				this.localTimeStamps.getReceiveTimeStamp().subtract(this.localTimeStamps.getSendTimeStamp()) -
-						this.remoteTimeStamps.getSendTimeStamp().subtract(this.remoteTimeStamps.getReceiveTimeStamp());
+		final long roundTripTime = this.localTimeStamps.getReceiveTimeStamp().subtract(this.localTimeStamps.getSendTimeStamp())
+				- this.remoteTimeStamps.getSendTimeStamp().subtract(this.remoteTimeStamps.getReceiveTimeStamp());
 
 		return this.remoteTimeStamps.getReceiveTimeStamp().subtract(this.localTimeStamps.getSendTimeStamp()) - roundTripTime / 2;
 	}
@@ -93,9 +91,7 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 
 	@Override
 	public int hashCode() {
-		return this.node.hashCode() ^
-				this.localTimeStamps.hashCode() ^
-				this.remoteTimeStamps.hashCode();
+		return this.node.hashCode() ^ this.localTimeStamps.hashCode() ^ this.remoteTimeStamps.hashCode();
 	}
 
 	@Override
@@ -104,9 +100,8 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 			return false;
 		}
 
-		final TimeSynchronizationSample rhs = (TimeSynchronizationSample)obj;
-		return this.node.equals(rhs.node) &&
-				this.localTimeStamps.equals(rhs.localTimeStamps) &&
-				this.remoteTimeStamps.equals(rhs.remoteTimeStamps);
+		final TimeSynchronizationSample rhs = (TimeSynchronizationSample) obj;
+		return this.node.equals(rhs.node) && this.localTimeStamps.equals(rhs.localTimeStamps)
+				&& this.remoteTimeStamps.equals(rhs.remoteTimeStamps);
 	}
 }

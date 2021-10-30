@@ -17,8 +17,12 @@ public class SecP256K1BlockCipher implements BlockCipher {
 	private static final IESParameters IES_PARAMETERS;
 
 	static {
-		final byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-		final byte[] e = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
+		final byte[] d = new byte[]{
+				1, 2, 3, 4, 5, 6, 7, 8
+		};
+		final byte[] e = new byte[]{
+				8, 7, 6, 5, 4, 3, 2, 1
+		};
 		IES_PARAMETERS = new IESParameters(d, e, 64);
 	}
 
@@ -28,22 +32,16 @@ public class SecP256K1BlockCipher implements BlockCipher {
 	public SecP256K1BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
 		if (senderKeyPair.hasPrivateKey()) {
 			this.iesEncryptEngine = createIesEngine();
-			this.iesEncryptEngine.init(
-					true,
-					SecP256K1Utils.getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
-					SecP256K1Utils.getPublicKeyParameters(recipientKeyPair.getPublicKey()),
-					IES_PARAMETERS);
+			this.iesEncryptEngine.init(true, SecP256K1Utils.getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
+					SecP256K1Utils.getPublicKeyParameters(recipientKeyPair.getPublicKey()), IES_PARAMETERS);
 		} else {
 			this.iesEncryptEngine = null;
 		}
 
 		if (recipientKeyPair.hasPrivateKey()) {
 			this.iesDecryptEngine = createIesEngine();
-			this.iesDecryptEngine.init(
-					false,
-					SecP256K1Utils.getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
-					SecP256K1Utils.getPublicKeyParameters(senderKeyPair.getPublicKey()),
-					IES_PARAMETERS);
+			this.iesDecryptEngine.init(false, SecP256K1Utils.getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
+					SecP256K1Utils.getPublicKeyParameters(senderKeyPair.getPublicKey()), IES_PARAMETERS);
 		} else {
 			this.iesDecryptEngine = null;
 		}
@@ -68,9 +66,6 @@ public class SecP256K1BlockCipher implements BlockCipher {
 	}
 
 	private static IESEngine createIesEngine() {
-		return new IESEngine(
-				new ECDHBasicAgreement(),
-				new KDF2BytesGenerator(new SHA1Digest()),
-				new HMac(new SHA1Digest()));
+		return new IESEngine(new ECDHBasicAgreement(), new KDF2BytesGenerator(new SHA1Digest()), new HMac(new SHA1Digest()));
 	}
 }

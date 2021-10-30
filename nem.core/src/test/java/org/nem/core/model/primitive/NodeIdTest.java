@@ -6,7 +6,7 @@ import org.junit.*;
 
 public class NodeIdTest {
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeId() {
@@ -32,5 +32,5 @@ public class NodeIdTest {
 		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 }

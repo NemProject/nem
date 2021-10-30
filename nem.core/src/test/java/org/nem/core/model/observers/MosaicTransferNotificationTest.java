@@ -14,10 +14,7 @@ public class MosaicTransferNotificationTest {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final MosaicTransferNotification notification = new MosaicTransferNotification(
-				sender,
-				recipient,
-				Utils.createMosaicId(3),
+		final MosaicTransferNotification notification = new MosaicTransferNotification(sender, recipient, Utils.createMosaicId(3),
 				new Quantity(467));
 
 		// Assert:

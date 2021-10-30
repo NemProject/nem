@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class BlockAmountTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
@@ -17,9 +17,9 @@ public class BlockAmountTest {
 		MatcherAssert.assertThat(BlockAmount.ZERO, IsEqual.equalTo(new BlockAmount(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeAmount() {
@@ -45,9 +45,9 @@ public class BlockAmountTest {
 		MatcherAssert.assertThat(amount.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region inc/dec
+	// region inc/dec
 
 	@Test
 	public void incrementChangesAmountByOne() {
@@ -84,9 +84,9 @@ public class BlockAmountTest {
 		amount.decrement();
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteBlockAmount() {
@@ -119,5 +119,5 @@ public class BlockAmountTest {
 		MatcherAssert.assertThat(amount, IsEqual.equalTo(originalAmount));
 	}
 
-	//endregion
+	// endregion
 }

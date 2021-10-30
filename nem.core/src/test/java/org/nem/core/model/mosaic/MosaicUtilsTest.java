@@ -11,7 +11,7 @@ import org.nem.core.test.ExceptionAssert;
 @RunWith(Enclosed.class)
 public class MosaicUtilsTest {
 
-	//region add / tryAdd
+	// region add / tryAdd
 
 	private static abstract class AddBaseTest {
 
@@ -58,8 +58,7 @@ public class MosaicUtilsTest {
 		@Override
 		protected void assertCannotAdd(final int divisibility, final long s1, final long s2) {
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2)),
+			ExceptionAssert.assertThrows(v -> MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2)),
 					IllegalArgumentException.class);
 		}
 
@@ -94,13 +93,11 @@ public class MosaicUtilsTest {
 		}
 	}
 
-	//endregion
-
-	//region conversions
+	// endregion
 
 	public static class ConversionTest {
 
-		//region toSupply
+		// region toSupply
 
 		@Test
 		public void canConvertQuantityToSupplyWhenDivisibilityIsZero() {
@@ -131,9 +128,9 @@ public class MosaicUtilsTest {
 			MatcherAssert.assertThat(supply, IsEqual.equalTo(expectedSupply));
 		}
 
-		//endregion
+		// endregion
 
-		//region toQuantity
+		// region toQuantity
 
 		@Test
 		public void canConvertSupplyToQuantityWhenDivisibilityIsZero() {
@@ -157,8 +154,6 @@ public class MosaicUtilsTest {
 			MatcherAssert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
 		}
 
-		//endregion
+		// endregion
 	}
-
-	//endregion
 }

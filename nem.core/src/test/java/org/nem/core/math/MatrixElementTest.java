@@ -19,7 +19,8 @@ public class MatrixElementTest {
 		MatcherAssert.assertThat(element.getValue(), IsEqual.equalTo(2.34));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
+
 	@SuppressWarnings("serial")
 	private static final Map<String, MatrixElement> DESC_TO_ELEMENT_MAP = new HashMap<String, MatrixElement>() {
 		{
@@ -41,7 +42,7 @@ public class MatrixElementTest {
 		MatcherAssert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-col"), IsNot.not(IsEqual.equalTo(element)));
 		MatcherAssert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-val"), IsNot.not(IsEqual.equalTo(element)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(element)));
-		MatcherAssert.assertThat(5, IsNot.not(IsEqual.equalTo((Object)element)));
+		MatcherAssert.assertThat(5, IsNot.not(IsEqual.equalTo((Object) element)));
 	}
 
 	@Test
@@ -57,5 +58,5 @@ public class MatrixElementTest {
 		MatcherAssert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-val").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 }

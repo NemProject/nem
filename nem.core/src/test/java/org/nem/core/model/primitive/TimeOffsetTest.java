@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 public class TimeOffsetTest {
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canBeCreatedFromLongValue() {
@@ -28,9 +28,9 @@ public class TimeOffsetTest {
 		MatcherAssert.assertThat(offset.getRaw(), IsEqual.equalTo(-1234L));
 	}
 
-	//endregion
+	// endregion
 
-	//region add/subtract
+	// region add/subtract
 
 	@Test
 	public void timeOffsetsCanBeAdded() {
@@ -54,9 +54,9 @@ public class TimeOffsetTest {
 		MatcherAssert.assertThat(offset2.subtract(offset1), IsEqual.equalTo(new TimeOffset(-655L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteTimeOffset() {
@@ -89,5 +89,5 @@ public class TimeOffsetTest {
 		MatcherAssert.assertThat(timeOffset, IsEqual.equalTo(originalTimeOffset));
 	}
 
-	//endregion
+	// endregion
 }

@@ -46,18 +46,11 @@ public class HttpMethodClient<T> implements Closeable {
 	 * @param requestTimeout The request timeout (in milliseconds) that should be used.
 	 */
 	public HttpMethodClient(final int connectionTimeout, final int socketTimeout, final int requestTimeout) {
-		final RequestConfig config = RequestConfig.custom()
-				.setConnectTimeout(connectionTimeout)
-				.setConnectionRequestTimeout(connectionTimeout)
-				.setSocketTimeout(socketTimeout)
-				.setRedirectsEnabled(false)
-				.build();
+		final RequestConfig config = RequestConfig.custom().setConnectTimeout(connectionTimeout)
+				.setConnectionRequestTimeout(connectionTimeout).setSocketTimeout(socketTimeout).setRedirectsEnabled(false).build();
 
-		this.httpClient = HttpAsyncClients.custom()
-				.setDefaultRequestConfig(config)
-				.setMaxConnPerRoute(MAX_CONNECTIONS_PER_ROUTE)
-				.setMaxConnTotal(MAX_CONNECTIONS)
-				.build();
+		this.httpClient = HttpAsyncClients.custom().setDefaultRequestConfig(config).setMaxConnPerRoute(MAX_CONNECTIONS_PER_ROUTE)
+				.setMaxConnTotal(MAX_CONNECTIONS).build();
 		this.httpClient.start();
 
 		this.requestTimeout = requestTimeout;
@@ -82,10 +75,7 @@ public class HttpMethodClient<T> implements Closeable {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	public AsyncToken<T> post(
-			final URL url,
-			final HttpPostRequest request,
-			final HttpResponseStrategy<T> responseStrategy) {
+	public AsyncToken<T> post(final URL url, final HttpPostRequest request, final HttpResponseStrategy<T> responseStrategy) {
 		return this.sendRequest(url, uri -> createPostRequest(uri, request), responseStrategy);
 	}
 
@@ -104,9 +94,7 @@ public class HttpMethodClient<T> implements Closeable {
 	 * @param responseStrategy The response strategy.
 	 * @return The response from the server.
 	 */
-	private AsyncToken<T> sendRequest(
-			final URL url,
-			final Function<URI, HttpRequestBase> requestFactory,
+	private AsyncToken<T> sendRequest(final URL url, final Function<URI, HttpRequestBase> requestFactory,
 			final HttpResponseStrategy<T> responseStrategy) {
 		try {
 			final URI uri = url.toURI();
@@ -141,8 +129,8 @@ public class HttpMethodClient<T> implements Closeable {
 	}
 
 	/**
-	 * The result of an HttpMethodClient operation. This type exposes a future
-	 * for chaining async operations as well as a method for aborting the operation.
+	 * The result of an HttpMethodClient operation. This type exposes a future for chaining async operations as well as a method for
+	 * aborting the operation.
 	 *
 	 * @param <T> The type of result.
 	 */
@@ -166,8 +154,7 @@ public class HttpMethodClient<T> implements Closeable {
 		}
 
 		/**
-		 * Waits if necessary for the underlying future to complete, and then
-		 * returns its result.
+		 * Waits if necessary for the underlying future to complete, and then returns its result.
 		 *
 		 * @return The result value.
 		 */

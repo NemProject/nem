@@ -175,9 +175,7 @@ public class NemAsyncTimerVisitorTest {
 		MatcherAssert.assertThat(jsonObject.get("is-executing"), IsEqual.equalTo(executingAdjustment));
 	}
 
-	private static void assertDefaultValuesWithLastDelayTime(
-			final NemAsyncTimerVisitor visitor,
-			final int expectedLastDelayTime) {
+	private static void assertDefaultValuesWithLastDelayTime(final NemAsyncTimerVisitor visitor, final int expectedLastDelayTime) {
 		// Assert:
 		MatcherAssert.assertThat(visitor.getTimerName(), IsEqual.equalTo("timer a"));
 		MatcherAssert.assertThat(visitor.getNumExecutions(), IsEqual.equalTo(0));

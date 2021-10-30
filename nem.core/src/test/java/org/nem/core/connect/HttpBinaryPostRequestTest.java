@@ -17,9 +17,7 @@ public class HttpBinaryPostRequestTest {
 		final HttpPostRequest request = new HttpBinaryPostRequest(entity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				request.getPayload(),
-				IsEqual.equalTo(BinarySerializer.serializeToBytes(entity)));
+		MatcherAssert.assertThat(request.getPayload(), IsEqual.equalTo(BinarySerializer.serializeToBytes(entity)));
 	}
 
 	@Test
@@ -31,8 +29,6 @@ public class HttpBinaryPostRequestTest {
 		final HttpPostRequest request = new HttpBinaryPostRequest(entity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				request.getContentType(),
-				IsEqual.equalTo("application/binary"));
+		MatcherAssert.assertThat(request.getContentType(), IsEqual.equalTo("application/binary"));
 	}
 }

@@ -15,18 +15,13 @@ import java.util.function.Function;
 
 public class AccountInfoTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void infoCanBeCreatedWithoutPublicKey() {
 		// Act:
-		final AccountInfo info = new AccountInfo(
-				Address.fromEncoded("test"),
-				Amount.fromNem(1234),
-				Amount.fromNem(1222),
-				new BlockAmount(7),
-				"my account",
-				2.3);
+		final AccountInfo info = new AccountInfo(Address.fromEncoded("test"), Amount.fromNem(1234), Amount.fromNem(1222),
+				new BlockAmount(7), "my account", 2.3);
 
 		// Assert:
 		MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
@@ -45,12 +40,7 @@ public class AccountInfoTest {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
-		final AccountInfo info = new AccountInfo(
-				address,
-				Amount.fromNem(1234),
-				Amount.fromNem(1222),
-				new BlockAmount(7),
-				"my account",
+		final AccountInfo info = new AccountInfo(address, Amount.fromNem(1234), Amount.fromNem(1222), new BlockAmount(7), "my account",
 				2.3);
 
 		// Assert:
@@ -70,22 +60,16 @@ public class AccountInfoTest {
 		final MultisigInfo multisigInfo = new MultisigInfo(5, 8);
 
 		// Act:
-		final AccountInfo info = new AccountInfo(
-				Address.fromEncoded("test"),
-				Amount.fromNem(1234),
-				Amount.fromNem(1222),
-				new BlockAmount(7),
-				"my account",
-				2.3,
-				multisigInfo);
+		final AccountInfo info = new AccountInfo(Address.fromEncoded("test"), Amount.fromNem(1234), Amount.fromNem(1222),
+				new BlockAmount(7), "my account", 2.3, multisigInfo);
 
 		// Assert:
 		MatcherAssert.assertThat(info.getMultisigInfo(), IsEqual.equalTo(multisigInfo));
 	}
 
-	//endregion
+	// endregion
 
-	//region Serialization
+	// region Serialization
 
 	@Test
 	public void accountWithPublicKeyCanBeSerialized() {
@@ -127,14 +111,8 @@ public class AccountInfoTest {
 	public void accountWithMultisigInfoCanBeBeRoundTripped() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountInfo originalInfo = new AccountInfo(
-				address,
-				Amount.fromNem(747),
-				Amount.fromNem(727),
-				new BlockAmount(3),
-				"alpha gamma",
-				2.3,
-				new MultisigInfo(8, 11));
+		final AccountInfo originalInfo = new AccountInfo(address, Amount.fromNem(747), Amount.fromNem(727), new BlockAmount(3),
+				"alpha gamma", 2.3, new MultisigInfo(8, 11));
 
 		// Act:
 		final AccountInfo info = new AccountInfo(Utils.roundtripSerializableEntity(originalInfo, null));
@@ -150,9 +128,7 @@ public class AccountInfoTest {
 		assertAccountRoundTrip(address, AccountInfo::new, expectedPublicKey);
 	}
 
-	private static void assertAccountRoundTrip(
-			final Address address,
-			final Function<Deserializer, AccountInfo> infoDeserializer,
+	private static void assertAccountRoundTrip(final Address address, final Function<Deserializer, AccountInfo> infoDeserializer,
 			final PublicKey expectedPublicKey) {
 		// Arrange:
 		final AccountInfo originalInfo = createAccountInfoForSerializationTests(address);
@@ -206,18 +182,12 @@ public class AccountInfoTest {
 
 	private static AccountInfo createAccountInfoForSerializationTests(final Address address) {
 		// Arrange:
-		return new AccountInfo(
-				address,
-				Amount.fromNem(747),
-				Amount.fromNem(727),
-				new BlockAmount(3),
-				"alpha gamma",
-				2.3);
+		return new AccountInfo(address, Amount.fromNem(747), Amount.fromNem(727), new BlockAmount(3), "alpha gamma", 2.3);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	private static final Address DEFAULT_ADDRESS = Utils.generateRandomAddressWithPublicKey();
 
@@ -225,8 +195,10 @@ public class AccountInfoTest {
 	private static final Map<String, AccountInfo> DESC_TO_INFO_MAP = new HashMap<String, AccountInfo>() {
 		{
 			this.put("default", createAccountInfo(DEFAULT_ADDRESS, 17, 14, 5, "foo", 2.3));
-			this.put("same-address-from-encoded", createAccountInfo(Address.fromEncoded(DEFAULT_ADDRESS.getEncoded()), 17, 14, 5, "foo", 2.3));
-			this.put("same-address-from-public-key", createAccountInfo(Address.fromPublicKey(DEFAULT_ADDRESS.getPublicKey()), 17, 14, 5, "foo", 2.3));
+			this.put("same-address-from-encoded",
+					createAccountInfo(Address.fromEncoded(DEFAULT_ADDRESS.getEncoded()), 17, 14, 5, "foo", 2.3));
+			this.put("same-address-from-public-key",
+					createAccountInfo(Address.fromPublicKey(DEFAULT_ADDRESS.getPublicKey()), 17, 14, 5, "foo", 2.3));
 
 			this.put("diff-address", createAccountInfo(Utils.generateRandomAddress(), 17, 14, 5, "foo", 2.3));
 
@@ -256,7 +228,7 @@ public class AccountInfoTest {
 
 		MatcherAssert.assertThat(DESC_TO_INFO_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(info)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
-		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) info)));
 	}
 
 	@Test
@@ -276,26 +248,16 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(DESC_TO_INFO_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	private static AccountInfo createAccountInfo(
-			final Address address,
-			final long balance,
-			final long vestedBalance,
-			final int blockAmount,
-			final String label,
-			final double importance) {
+	private static AccountInfo createAccountInfo(final Address address, final long balance, final long vestedBalance, final int blockAmount,
+			final String label, final double importance) {
 		return createAccountInfo(address, balance, vestedBalance, blockAmount, label, importance, null);
 	}
 
-	private static AccountInfo createAccountInfo(
-			final Address address,
-			final long balance,
-			final long vestedBalance,
-			final int blockAmount,
-			final String label,
-			final double importance,
-			final MultisigInfo multisigInfo) {
-		return new AccountInfo(address, Amount.fromNem(balance), Amount.fromNem(vestedBalance), new BlockAmount(blockAmount), label, importance, multisigInfo);
+	private static AccountInfo createAccountInfo(final Address address, final long balance, final long vestedBalance, final int blockAmount,
+			final String label, final double importance, final MultisigInfo multisigInfo) {
+		return new AccountInfo(address, Amount.fromNem(balance), Amount.fromNem(vestedBalance), new BlockAmount(blockAmount), label,
+				importance, multisigInfo);
 	}
 
-	//endregion
+	// endregion
 }

@@ -3,8 +3,7 @@ package org.nem.core.model.transactions.extensions;
 import org.nem.core.model.Transaction;
 
 /**
- * A transaction validation extension that can be used to run different validation rules for different
- * transaction versions.
+ * A transaction validation extension that can be used to run different validation rules for different transaction versions.
  *
  * @param <TTransaction> The type of transaction.
  */

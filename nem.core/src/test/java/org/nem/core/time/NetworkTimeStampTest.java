@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class NetworkTimeStampTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canBeCreatedFromLongValue() {
@@ -20,9 +20,9 @@ public class NetworkTimeStampTest {
 		MatcherAssert.assertThat(networkTimeStamp.getRaw(), IsEqual.equalTo(1234L));
 	}
 
-	//endregion
+	// endregion
 
-	//region subtraction
+	// region subtraction
 
 	@Test
 	public void networkTimeStampsCanBeSubtracted() {
@@ -35,9 +35,9 @@ public class NetworkTimeStampTest {
 		MatcherAssert.assertThat(networkTimeStamp2.subtract(networkTimeStamp1), IsEqual.equalTo(-658L));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteNetworkTimeStamp() {
@@ -70,5 +70,5 @@ public class NetworkTimeStampTest {
 		MatcherAssert.assertThat(networkTimeStamp, IsEqual.equalTo(originalNetworkTimeStamp));
 	}
 
-	//endregion
+	// endregion
 }
