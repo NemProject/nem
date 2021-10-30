@@ -21,10 +21,6 @@ public interface TransactionRetriever {
 	 * @param transferType Type of returned transfers.
 	 * @return Collection of transfer block pairs.
 	 */
-	Collection<TransferBlockPair> getTransfersForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
+	Collection<TransferBlockPair> getTransfersForAccount(final Session session, final long accountId, final long maxId, final int limit,
 			final ReadOnlyTransferDao.TransferType transferType);
 }

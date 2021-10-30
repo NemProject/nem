@@ -13,15 +13,12 @@ import org.nem.nis.test.NisUtils;
 import java.util.*;
 
 public class AggregateBlockTransactionObserverBuilderTest {
-	private static final BalanceAdjustmentNotification NOTIFICATION = new BalanceAdjustmentNotification(
-			NotificationType.BalanceCredit,
-			Utils.generateRandomAccount(),
-			Amount.fromNem(12));
-	private static final BlockNotificationContext NOTIFICATION_CONTEXT = NisUtils.createBlockNotificationContext(
-			new BlockHeight(11),
+	private static final BalanceAdjustmentNotification NOTIFICATION = new BalanceAdjustmentNotification(NotificationType.BalanceCredit,
+			Utils.generateRandomAccount(), Amount.fromNem(12));
+	private static final BlockNotificationContext NOTIFICATION_CONTEXT = NisUtils.createBlockNotificationContext(new BlockHeight(11),
 			NotificationTrigger.Execute);
 
-	//region add
+	// region add
 
 	@Test
 	public void canAddBlockTransactionObserver() {
@@ -68,9 +65,9 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		Mockito.verify(observer, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
 	}
 
-	//endregion
+	// endregion
 
-	//region add multiple
+	// region add multiple
 
 	@Test
 	public void canAddMultipleObservers() {
@@ -82,9 +79,11 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		aggregate.notify(NOTIFICATION, NOTIFICATION_CONTEXT);
 
 		// Assert:
-		Mockito.verify(context.observer1, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
+		Mockito.verify(context.observer1, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(),
+				NOTIFICATION.getAmount());
 		Mockito.verify(context.observer2, Mockito.only()).notify(NOTIFICATION, NOTIFICATION_CONTEXT);
-		Mockito.verify(context.observer3, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
+		Mockito.verify(context.observer3, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(),
+				NOTIFICATION.getAmount());
 		Mockito.verify(context.observer4, Mockito.only()).notify(NOTIFICATION, NOTIFICATION_CONTEXT);
 	}
 
@@ -142,9 +141,9 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getName
+	// region getName
 
 	@Test
 	public void getNameReturnsCommaSeparatedListOfInnerObservers() {
@@ -168,5 +167,5 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		return validator;
 	}
 
-	//endregion
+	// endregion
 }

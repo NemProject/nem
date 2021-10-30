@@ -11,7 +11,9 @@ import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-public class MosaicSupplyChangeDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMosaicSupplyChangeTransaction, MosaicSupplyChangeTransaction> {
+public class MosaicSupplyChangeDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbMosaicSupplyChangeTransaction, MosaicSupplyChangeTransaction> {
 
 	@Test
 	public void dbTransactionCanBeMappedToModel() {

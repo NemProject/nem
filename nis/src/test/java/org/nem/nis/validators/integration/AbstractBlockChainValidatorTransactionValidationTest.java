@@ -94,12 +94,8 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 	}
 
 	@Override
-	protected void assertTransactions(
-			final BlockHeight chainHeight,
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			final List<Transaction> expectedFiltered,
-			final ValidationResult expectedResult) {
+	protected void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
+			final List<Transaction> expectedFiltered, final ValidationResult expectedResult) {
 		// Act:
 		final ValidationResult result = this.validateTransactions(chainHeight, nisCache.copy(), all);
 
@@ -117,9 +113,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Arrange:
 		final BlockChainValidator validator = new BlockChainValidatorFactory().create(nisCache);
 
-		final Block parentBlock = NisUtils.createParentBlock(
-				Utils.generateRandomAccount(),
-				chainHeight.getRaw());
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), chainHeight.getRaw());
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);
@@ -140,9 +134,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// change version
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(blockTemplate.asNonVerifiable());
 		jsonObject.put("version", version | NetworkInfos.getDefault().getVersion() << 24);
-		final Block block = new Block(
-				blockTemplate.getType(),
-				VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
+		final Block block = new Block(blockTemplate.getType(), VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
 				Utils.createDeserializer(jsonObject));
 		block.signBy(blockTemplate.getSigner());
 		return block;
@@ -159,13 +151,9 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		public BlockChainValidator create(final NisCache nisCache) {
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
-			return new BlockChainValidator(
-					block -> new BlockExecuteProcessor(nisCache, block, observer),
-					this.scorer,
-					this.maxChainSize,
+			return new BlockChainValidator(block -> new BlockExecuteProcessor(nisCache, block, observer), this.scorer, this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
-					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
-					NisCacheUtils.createValidationState(nisCache));
+					NisUtils.createTransactionValidatorFactory().createSingle(nisCache), NisCacheUtils.createValidationState(nisCache));
 		}
 	}
 }

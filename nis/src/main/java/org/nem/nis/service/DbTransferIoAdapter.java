@@ -31,15 +31,9 @@ public class DbTransferIoAdapter implements TransactionIo {
 		}
 
 		final Transaction transaction = this.mapper.map(pair.getTransfer());
-		return new TransactionMetaDataPair(
-				transaction,
-				new TransactionMetaData(
-						new BlockHeight(pair.getDbBlock().getHeight()),
-						pair.getTransfer().getId(),
-						pair.getTransfer().getTransferHash(),
-						transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction)transaction).getOtherTransactionHash() : null
-				)
-		);
+		return new TransactionMetaDataPair(transaction, new TransactionMetaData(new BlockHeight(pair.getDbBlock().getHeight()),
+				pair.getTransfer().getId(), pair.getTransfer().getTransferHash(),
+				transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction) transaction).getOtherTransactionHash() : null));
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

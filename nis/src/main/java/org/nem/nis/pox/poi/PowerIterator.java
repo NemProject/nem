@@ -25,10 +25,7 @@ public abstract class PowerIterator {
 	 * @param maxIterations The maximum number of iterations.
 	 * @param epsilon The convergence epsilon value.
 	 */
-	public PowerIterator(
-			final ColumnVector startVector,
-			final int maxIterations,
-			final double epsilon) {
+	public PowerIterator(final ColumnVector startVector, final int maxIterations, final double epsilon) {
 		this.startVector = startVector;
 		this.maxIterations = maxIterations;
 		this.epsilon = epsilon;
@@ -44,8 +41,7 @@ public abstract class PowerIterator {
 	}
 
 	/**
-	 * Runs the power iteration algorithm until convergence is reached
-	 * or the maximum number of iterations have occurred.
+	 * Runs the power iteration algorithm until convergence is reached or the maximum number of iterations have occurred.
 	 */
 	public void run() {
 		int numIterations = 0;

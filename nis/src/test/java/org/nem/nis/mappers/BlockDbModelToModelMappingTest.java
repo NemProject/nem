@@ -23,11 +23,11 @@ import java.util.stream.*;
 @SuppressWarnings("rawtypes")
 public class BlockDbModelToModelMappingTest {
 
-	//region General
+	// region General
 
 	public static class General {
 
-		//region nemesis block mapping
+		// region nemesis block mapping
 
 		@Test
 		public void nemesisDbModelCanBeMappedToNemesisModel() {
@@ -44,9 +44,9 @@ public class BlockDbModelToModelMappingTest {
 			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
-		//endregion
+		// endregion
 
-		//region no transaction mapping
+		// region no transaction mapping
 
 		@Test
 		public void blockWithMinimalInformationCanBeMappedToModel() {
@@ -90,9 +90,9 @@ public class BlockDbModelToModelMappingTest {
 			MatcherAssert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 
-		//endregion
+		// endregion
 
-		//region transaction mapping
+		// region transaction mapping
 
 		@Test
 		public void blockWithMixedTransfersCanBeMappedToModel() {
@@ -110,7 +110,7 @@ public class BlockDbModelToModelMappingTest {
 			int k = 0;
 			final List<Transaction> transactions = new ArrayList<>();
 			final List<Transaction> orderedTransactions = new ArrayList<>(numTransactions);
-			orderedTransactions.addAll(indexes.stream().map(i -> (Transaction)null).collect(Collectors.toList()));
+			orderedTransactions.addAll(indexes.stream().map(i -> (Transaction) null).collect(Collectors.toList()));
 			for (int i = 0; i < numTransactionsPerType; ++i) {
 				for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 					final int index = indexes.get(k);
@@ -133,9 +133,7 @@ public class BlockDbModelToModelMappingTest {
 			// Sanity:
 			MatcherAssert.assertThat(transactions, IsNot.not(IsEqual.equalTo(orderedTransactions)));
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				MatcherAssert.assertThat(
-						"not all transaction types are represented",
-						entry.getFromBlock.apply(dbBlock).isEmpty(),
+				MatcherAssert.assertThat("not all transaction types are represented", entry.getFromBlock.apply(dbBlock).isEmpty(),
 						IsEqual.equalTo(false));
 			}
 		}
@@ -168,18 +166,19 @@ public class BlockDbModelToModelMappingTest {
 			Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				final int numExpectedTransactions = TransactionTypes.MULTISIG == entry.type ? numTransactionsPerType + 2 : numTransactionsPerType;
+				final int numExpectedTransactions = TransactionTypes.MULTISIG == entry.type
+						? numTransactionsPerType + 2
+						: numTransactionsPerType;
 				MatcherAssert.assertThat(
 						String.format("transaction type %d should have %d transactions in block", entry.type, numExpectedTransactions),
-						entry.getFromBlock.apply(dbBlock).size(),
-						IsEqual.equalTo(numExpectedTransactions));
+						entry.getFromBlock.apply(dbBlock).size(), IsEqual.equalTo(numExpectedTransactions));
 			}
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -215,7 +214,7 @@ public class BlockDbModelToModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -283,48 +282,31 @@ public class BlockDbModelToModelMappingTest {
 			MatcherAssert.assertThat(model.getSignature(), IsEqual.equalTo(this.signature));
 		}
 
-		//region add*
+		// region add*
 
-		public Transaction addTransfer(
-				final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ? extends Transaction> typedEntry,
-				final DbBlock block,
-				final int blockIndex) {
+		public Transaction addTransfer(final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ? extends Transaction> typedEntry,
+				final DbBlock block, final int blockIndex) {
 			@SuppressWarnings("unchecked")
-			final TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction> entry =
-					(TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction>)typedEntry;
-			return this.addTransfer(
-					dbTransfer -> {
-						final List<AbstractBlockTransfer> transactions = entry.getFromBlock.apply(block);
-						transactions.add(dbTransfer);
-						entry.setInBlock.accept(block, transactions);
-					},
-					blockIndex,
-					DbTestUtils.createTransferDbModel(entry.dbModelClass),
-					entry.modelClass);
+			final TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction> entry = (TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction>) typedEntry;
+			return this.addTransfer(dbTransfer -> {
+				final List<AbstractBlockTransfer> transactions = entry.getFromBlock.apply(block);
+				transactions.add(dbTransfer);
+				entry.setInBlock.accept(block, transactions);
+			}, blockIndex, DbTestUtils.createTransferDbModel(entry.dbModelClass), entry.modelClass);
 		}
 
 		public void addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
 			final DbTransferTransaction dbInnerTransfer = new DbTransferTransaction();
-			this.addTransfer(
-					block::addTransferTransaction,
-					blockIndex,
-					dbInnerTransfer,
-					TransferTransaction.class);
+			this.addTransfer(block::addTransferTransaction, blockIndex, dbInnerTransfer, TransferTransaction.class);
 			dbInnerTransfer.setSenderProof(null);
 
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransfer);
-			this.addTransfer(
-					block::addMultisigTransaction,
-					blockIndex,
-					dbMultisigTransfer,
-					MultisigTransaction.class);
+			this.addTransfer(block::addMultisigTransaction, blockIndex, dbMultisigTransfer, MultisigTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
-				final Consumer<TDbTransfer> addTransaction,
-				final int blockIndex,
-				final TDbTransfer dbTransfer,
+				final Consumer<TDbTransfer> addTransaction, final int blockIndex, final TDbTransfer dbTransfer,
 				final Class<TModelTransfer> modelClass) {
 			dbTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 			dbTransfer.setBlkIndex(blockIndex);
@@ -335,6 +317,6 @@ public class BlockDbModelToModelMappingTest {
 			return transfer;
 		}
 
-		//endregion
+		// endregion
 	}
 }

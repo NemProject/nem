@@ -61,11 +61,10 @@ public class LocalHostInterceptorTest {
 	private static LocalHostInterceptor createInterceptor() {
 		// Arrange:
 		final LocalHostDetector detector = Mockito.mock(LocalHostDetector.class);
-		Mockito.when(detector.isLocal(Mockito.any()))
-				.thenAnswer(invocationOnMock -> {
-					final HttpServletRequest request = (HttpServletRequest)invocationOnMock.getArguments()[0];
-					return request.getRemoteAddr().equals(LOCAL_ADDRESS);
-				});
+		Mockito.when(detector.isLocal(Mockito.any())).thenAnswer(invocationOnMock -> {
+			final HttpServletRequest request = (HttpServletRequest) invocationOnMock.getArguments()[0];
+			return request.getRemoteAddr().equals(LOCAL_ADDRESS);
+		});
 		return new LocalHostInterceptor(detector);
 	}
 
@@ -83,16 +82,20 @@ public class LocalHostInterceptorTest {
 		return ExceptionUtils.propagate(() -> interceptor.preHandle(request, response, handlerMethod));
 	}
 
-	//region annotated methods
+	// region annotated methods
 
-	@SuppressWarnings({ "unused", "EmptyMethod" })
+	@SuppressWarnings({
+			"unused", "EmptyMethod"
+	})
 	public static void unannotatedMethod() {
 	}
 
 	@TrustedApi
-	@SuppressWarnings({ "unused", "EmptyMethod" })
+	@SuppressWarnings({
+			"unused", "EmptyMethod"
+	})
 	public static void trustedMethod() {
 	}
 
-	//endregion
+	// endregion
 }

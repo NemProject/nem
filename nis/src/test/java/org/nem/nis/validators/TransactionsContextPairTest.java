@@ -29,9 +29,7 @@ public class TransactionsContextPairTest {
 	public void canCreatePairWithMultipleTransactions() {
 		// Arrange:
 		final ValidationContext context = Mockito.mock(ValidationContext.class);
-		final Collection<Transaction> transactions = Arrays.asList(
-				Mockito.mock(Transaction.class),
-				Mockito.mock(Transaction.class),
+		final Collection<Transaction> transactions = Arrays.asList(Mockito.mock(Transaction.class), Mockito.mock(Transaction.class),
 				Mockito.mock(Transaction.class));
 
 		// Act:

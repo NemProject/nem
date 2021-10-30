@@ -11,7 +11,7 @@ import java.util.*;
 
 public class TransactionValidatorFactoryTest {
 
-	//region single
+	// region single
 
 	@Test
 	public void createSingleAddsDesiredSingleValidators() {
@@ -88,9 +88,9 @@ public class TransactionValidatorFactoryTest {
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region batch
+	// region batch
 
 	@Test
 	public void createBatchAddsDesiredBatchValidators() {
@@ -105,7 +105,7 @@ public class TransactionValidatorFactoryTest {
 		assertAreEquivalent(name, expectedSubValidatorNames);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertAreEquivalent(final String name, final Collection<String> expectedSubValidatorNames) {
 		// Act:

@@ -31,9 +31,7 @@ public class BlockUniqueHashTransactionValidatorTest {
 		assertValidationResult(ValidationResult.SUCCESS, 0, true);
 	}
 
-	private static void assertValidationResult(
-			final ValidationResult expectedResult,
-			final int numTransactions,
+	private static void assertValidationResult(final ValidationResult expectedResult, final int numTransactions,
 			final boolean anyHashExistsReturnValue) {
 		// Arrange:
 		final TestContext context = new TestContext(numTransactions);

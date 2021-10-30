@@ -8,10 +8,8 @@ import java.util.function.BiPredicate;
 import java.util.stream.*;
 
 /**
- * A cache of all unconfirmed transactions.
- * <br>
- * Note that this class is not inherently threadsafe, but it is used in a threadsafe way
- * by UnconfirmedTransactions.
+ * A cache of all unconfirmed transactions. <br>
+ * Note that this class is not inherently threadsafe, but it is used in a threadsafe way by UnconfirmedTransactions.
  */
 public class UnconfirmedTransactionsCache {
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
@@ -93,22 +91,18 @@ public class UnconfirmedTransactionsCache {
 		}
 
 		if (TransactionTypes.MULTISIG_SIGNATURE == transaction.getType()) {
-			return this.handleMultisigSignature((MultisigSignatureTransaction)transaction, transactionHash);
+			return this.handleMultisigSignature((MultisigSignatureTransaction) transaction, transactionHash);
 		}
 
 		this.addTransactionToCache(transaction, transactionHash);
 		return ValidationResult.SUCCESS;
 	}
 
-	private ValidationResult handleMultisigSignature(
-			final MultisigSignatureTransaction signatureTransaction,
+	private ValidationResult handleMultisigSignature(final MultisigSignatureTransaction signatureTransaction,
 			final Hash signatureTransactionHash) {
-		final Optional<MultisigTransaction> multisigTransaction = this.transactions.stream()
-				.map(e -> e.transaction)
-				.filter(t -> TransactionTypes.MULTISIG == t.getType())
-				.map(t -> (MultisigTransaction)t)
-				.filter(mt -> this.isMatch.test(signatureTransaction, mt))
-				.findAny();
+		final Optional<MultisigTransaction> multisigTransaction = this.transactions.stream().map(e -> e.transaction)
+				.filter(t -> TransactionTypes.MULTISIG == t.getType()).map(t -> (MultisigTransaction) t)
+				.filter(mt -> this.isMatch.test(signatureTransaction, mt)).findAny();
 
 		if (!multisigTransaction.isPresent()) {
 			return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
@@ -149,17 +143,16 @@ public class UnconfirmedTransactionsCache {
 	}
 
 	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
-		return this.transactionHashes.contains(transactionHash) ||
-				this.childTransactionHashes.contains(transactionHash) ||
-				transaction.getChildTransactions().stream()
-						.anyMatch(t -> {
-							final Hash key = HashUtils.calculateHash(t);
-							return this.childTransactionHashes.contains(key) || this.transactionHashes.contains(key);
-						});
+		return this.transactionHashes.contains(transactionHash) || this.childTransactionHashes.contains(transactionHash)
+				|| transaction.getChildTransactions().stream().anyMatch(t -> {
+					final Hash key = HashUtils.calculateHash(t);
+					return this.childTransactionHashes.contains(key) || this.transactionHashes.contains(key);
+				});
 	}
 
 	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
-		this.childTransactionHashes.addAll(transaction.getChildTransactions().stream().map(HashUtils::calculateHash).collect(Collectors.toList()));
+		this.childTransactionHashes
+				.addAll(transaction.getChildTransactions().stream().map(HashUtils::calculateHash).collect(Collectors.toList()));
 		this.transactions.add(new TransactionListEntry(transaction, transactionHash));
 		this.transactionHashes.add(transactionHash);
 	}
@@ -193,7 +186,7 @@ public class UnconfirmedTransactionsCache {
 				return false;
 			}
 
-			final TransactionListEntry rhs = (TransactionListEntry)obj;
+			final TransactionListEntry rhs = (TransactionListEntry) obj;
 			return this.hash.equals(rhs.hash);
 		}
 	}

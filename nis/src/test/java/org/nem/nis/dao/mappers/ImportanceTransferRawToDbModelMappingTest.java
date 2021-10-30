@@ -51,19 +51,19 @@ public class ImportanceTransferRawToDbModelMappingTest extends AbstractTransferR
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[14];
-			raw[0] = BigInteger.valueOf(123L);                              // block id
-			raw[1] = BigInteger.valueOf(234L);                              // id
-			raw[2] = rawHash;                                               // raw hash
-			raw[3] = 1;                                                     // version
-			raw[4] = BigInteger.valueOf(345L);                              // fee
-			raw[5] = 456;                                                   // timestamp
-			raw[6] = 567;                                                   // deadline
-			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
-			raw[8] = senderProof;                                           // sender proof
-			raw[9] = BigInteger.valueOf(this.remoteId);                     // remote id
-			raw[10] = 321;                                                  // mode
-			raw[11] = 432;                                                  // block index
-			raw[12] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[0] = BigInteger.valueOf(123L); // block id
+			raw[1] = BigInteger.valueOf(234L); // id
+			raw[2] = rawHash; // raw hash
+			raw[3] = 1; // version
+			raw[4] = BigInteger.valueOf(345L); // fee
+			raw[5] = 456; // timestamp
+			raw[6] = 567; // deadline
+			raw[7] = BigInteger.valueOf(this.senderId); // sender id
+			raw[8] = senderProof; // sender proof
+			raw[9] = BigInteger.valueOf(this.remoteId); // remote id
+			raw[10] = 321; // mode
+			raw[11] = 432; // block index
+			raw[12] = BigInteger.valueOf(654L); // referenced transaction
 
 			return raw;
 		}

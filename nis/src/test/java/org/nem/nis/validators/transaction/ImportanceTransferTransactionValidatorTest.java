@@ -20,15 +20,18 @@ import java.util.function.BiConsumer;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
-	private static final long FORK_HEIGHT_REMOTE_ACCOUNT
-			= new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private static final long FORK_HEIGHT_REMOTE_ACCOUNT = new BlockHeight(
+			BlockMarkerConstants.REMOTE_ACCOUNT_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
 	private static final int ABOVE_LIMIT = NisTestConstants.REMOTE_HARVESTING_DELAY;
 	private static final int BELOW_LIMIT = ABOVE_LIMIT - 1;
-	private static final long[] HEIGHTS_BEFORE_FORK = new long[] { 1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1 };
-	private static final long[] HEIGHTS_AT_AND_AFTER_FORK
-			= new long[] { FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100 };
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{
+			1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1
+	};
+	private static final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
+			FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1, FORK_HEIGHT_REMOTE_ACCOUNT + 100
+	};
 
-	//region first link
+	// region first link
 
 	@Test
 	public void activateImportanceTransferIsValidAsFirstLink() {
@@ -56,47 +59,39 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
 	}
 
-	//endregion
+	// endregion
 
-	//region account is acceptable as remote validation
+	// region account is acceptable as remote validation
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
 		// Arrange:
-		final long[] heights = new long[] {
-				1,
-				FORK_HEIGHT_REMOTE_ACCOUNT - 1,
-				FORK_HEIGHT_REMOTE_ACCOUNT,
-				FORK_HEIGHT_REMOTE_ACCOUNT + 1,
-				FORK_HEIGHT_REMOTE_ACCOUNT + 100};
+		final long[] heights = new long[]{
+				1, FORK_HEIGHT_REMOTE_ACCOUNT - 1, FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,
+				FORK_HEIGHT_REMOTE_ACCOUNT + 100
+		};
 
 		// Assert:
-		assertImportanceTransferTransactionValidation(
-				(c, t) -> c.getAccountInfo(t.getRemote()).incrementBalance(Amount.fromNem(1)),
-				heights,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+		assertImportanceTransferTransactionValidation((c, t) -> c.getAccountInfo(t.getRemote()).incrementBalance(Amount.fromNem(1)),
+				heights, ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
-	//region Remote Account Fork related
+	// endregion
 
-	//region before fork
+	// region Remote Account Fork related - before fork
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteOwnsMosaicBeforeFork() {
 		// Assert: remote account owns a mosaic
-		assertImportanceTransferTransactionValidation(
-				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
-				HEIGHTS_BEFORE_FORK,
-				ValidationResult.SUCCESS);
+		assertImportanceTransferTransactionValidation((c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
+				HEIGHTS_BEFORE_FORK, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteOwnsNamespaceBeforeFork() {
 		// Assert: remote account owns a namespace
-		assertImportanceTransferTransactionValidation(
-				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
-				HEIGHTS_BEFORE_FORK,
-				ValidationResult.SUCCESS);
+		assertImportanceTransferTransactionValidation((c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
+				HEIGHTS_BEFORE_FORK, ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -104,8 +99,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert: remote account is multisig account
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
-				HEIGHTS_BEFORE_FORK,
-				ValidationResult.SUCCESS);
+				HEIGHTS_BEFORE_FORK, ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -113,30 +107,25 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert: remote account is cosignatory
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
-				HEIGHTS_BEFORE_FORK,
-				ValidationResult.SUCCESS);
+				HEIGHTS_BEFORE_FORK, ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region after fork
+	// region Remote Account Fork related - after fork
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaicAtAndAfterFork() {
 		// Assert: remote account owns a mosaic
-		assertImportanceTransferTransactionValidation(
-				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
-				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+		assertImportanceTransferTransactionValidation((c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
+				HEIGHTS_AT_AND_AFTER_FORK, ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteOwnsNamespaceAtAndAfterFork() {
 		// Assert: remote account owns a namespace
-		assertImportanceTransferTransactionValidation(
-				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
-				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+		assertImportanceTransferTransactionValidation((c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
+				HEIGHTS_AT_AND_AFTER_FORK, ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -144,8 +133,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert: remote account is multisig account
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
-				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+				HEIGHTS_AT_AND_AFTER_FORK, ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -153,15 +141,13 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert: remote account is cosignatory
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
-				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+				HEIGHTS_AT_AND_AFTER_FORK, ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertImportanceTransferTransactionValidation(
-			final BiConsumer<TestContext, ImportanceTransferTransaction> contextSetup,
-			final long[] heights,
+			final BiConsumer<TestContext, ImportanceTransferTransaction> contextSetup, final long[] heights,
 			final ValidationResult expectedResult) {
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
@@ -176,30 +162,21 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 	}
 
-	//endregion
-
-	//endregion
-
-	//region one day after opposite link
+	// region one day after opposite link
 
 	@Test
 	public void activateImportanceTransferIsValidOneDayAfterDeactivateLink() {
 		// Assert:
-		assertTransferIsValidOneDayAfterOppositeLink(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Activate);
+		assertTransferIsValidOneDayAfterOppositeLink(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Activate);
 	}
 
 	@Test
 	public void deactivateImportanceTransferIsValidOneDayAfterActivateLink() {
 		// Assert:
-		assertTransferIsValidOneDayAfterOppositeLink(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Deactivate);
+		assertTransferIsValidOneDayAfterOppositeLink(ImportanceTransferMode.Activate, ImportanceTransferMode.Deactivate);
 	}
 
-	private static void assertTransferIsValidOneDayAfterOppositeLink(
-			final ImportanceTransferMode initialLink,
+	private static void assertTransferIsValidOneDayAfterOppositeLink(final ImportanceTransferMode initialLink,
 			final ImportanceTransferMode newLink) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -215,32 +192,26 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region less than one day after opposite link
+	// region less than one day after opposite link
 
 	@Test
 	public void activateImportanceTransferIsNotValidLessThanOneDayAfterDeactivateLink() {
 		// Assert:
-		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Activate,
+		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Activate,
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
 	public void deactivateImportanceTransferIsNotValidLessThanOneDayAfterActivateLink() {
 		// Assert:
-		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Deactivate,
+		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(ImportanceTransferMode.Activate, ImportanceTransferMode.Deactivate,
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
-	private static void assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
-			final ImportanceTransferMode initialLink,
-			final ImportanceTransferMode newLink,
-			final ValidationResult expectedValidationResult) {
+	private static void assertTransferIsNotValidLessThanOneDayAfterOppositeLink(final ImportanceTransferMode initialLink,
+			final ImportanceTransferMode newLink, final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(newLink);
@@ -255,28 +226,25 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region after same link
+	// region after same link
 
 	@Test
 	public void activateImportanceTransferIsNotValidAfterActivateLink() {
 		// Assert:
-		assertTransferIsNotValidAfterSameLink(
-				ImportanceTransferMode.Activate,
+		assertTransferIsNotValidAfterSameLink(ImportanceTransferMode.Activate,
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
 	public void deactivateImportanceTransferIsNotValidAfterDeactivateLink() {
 		// Assert:
-		assertTransferIsNotValidAfterSameLink(
-				ImportanceTransferMode.Deactivate,
+		assertTransferIsNotValidAfterSameLink(ImportanceTransferMode.Deactivate,
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
-	private static void assertTransferIsNotValidAfterSameLink(
-			final ImportanceTransferMode mode,
+	private static void assertTransferIsNotValidAfterSameLink(final ImportanceTransferMode mode,
 			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -292,90 +260,66 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region remote is already occupied
+	// region remote is already occupied
+
 	@Test
 	public void cannotActivateIfRemoteIsActiveBelowLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Activate,
-				new BlockHeight(BELOW_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Activate, ImportanceTransferMode.Activate, new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
 	public void cannotActivateIfRemoteIsActiveAboveLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Activate,
-				new BlockHeight(ABOVE_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Activate, ImportanceTransferMode.Activate, new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
 	public void cannotActivateIfRemoteIsDeactivatedBelowLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Activate,
-				new BlockHeight(BELOW_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Activate, new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
 	public void canActivateIfRemoteIsDeactivatedAboveLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Activate,
-				new BlockHeight(ABOVE_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Activate, new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void cannotDeactivateIfRemoteIsActiveBelowLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Deactivate,
-				new BlockHeight(BELOW_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Activate, ImportanceTransferMode.Deactivate, new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
 	public void cannotDeactivateIfRemoteIsActiveAboveLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Activate,
-				ImportanceTransferMode.Deactivate,
-				new BlockHeight(ABOVE_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Activate, ImportanceTransferMode.Deactivate, new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
 	public void cannotDeactivateIfRemoteIsDeactivatedBelowLimit() {
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Deactivate,
-				new BlockHeight(BELOW_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Deactivate, new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
 	public void cannotDeactivateIfRemoteIsDeactivatedAboveLimit() {
 		// note that this will actually fail in validateOwner not validateRemote
-		assertRemoteIsOccupiedTest(
-				ImportanceTransferMode.Deactivate,
-				ImportanceTransferMode.Deactivate,
-				new BlockHeight(ABOVE_LIMIT),
+		assertRemoteIsOccupiedTest(ImportanceTransferMode.Deactivate, ImportanceTransferMode.Deactivate, new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
-	//endregion
+	// endregion
 
-	//region transitive remote harvesting
+	// region transitive remote harvesting
 
 	@Test
 	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterBelowLimit() {
-		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(BELOW_LIMIT),
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -387,13 +331,11 @@ public class ImportanceTransferTransactionValidatorTest {
 	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
 	@Test
 	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAboveLimit() {
-		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(ABOVE_LIMIT),
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
-	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-			final BlockHeight height,
+	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(final BlockHeight height,
 			final ValidationResult validationResult) {
 		final TestContext context = new TestContext();
 
@@ -404,11 +346,8 @@ public class ImportanceTransferTransactionValidatorTest {
 		// - create another transaction around the dummy remote account set up previously
 		final Account furtherRemote = Utils.generateRandomAccount();
 		final Account remote = dummy.getRemote();
-		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				remote,
-				ImportanceTransferMode.Activate,
-				furtherRemote);
+		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, remote,
+				ImportanceTransferMode.Activate, furtherRemote);
 		context.addRemoteLinks(furtherRemote);
 
 		// Act:
@@ -419,11 +358,8 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
-	private static void assertRemoteIsOccupiedTest(
-			final ImportanceTransferMode previous,
-			final ImportanceTransferMode mode,
-			final BlockHeight blockHeight,
-			final ValidationResult expectedValidationResult) {
+	private static void assertRemoteIsOccupiedTest(final ImportanceTransferMode previous, final ImportanceTransferMode mode,
+			final BlockHeight blockHeight, final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -442,13 +378,12 @@ public class ImportanceTransferTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
-				this.accountStateCache,
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.accountStateCache,
 				this.namespaceCache);
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferMode mode) {
@@ -456,28 +391,25 @@ public class ImportanceTransferTransactionValidatorTest {
 			final Account remote = Utils.generateRandomAccount();
 			this.addRemoteLinks(signer);
 			this.addRemoteLinks(remote);
-			return new ImportanceTransferTransaction(
-					TimeInstant.ZERO,
-					signer,
-					mode,
-					remote);
+			return new ImportanceTransferTransaction(TimeInstant.ZERO, signer, mode, remote);
 		}
 
 		private void addRemoteLinks(final Account account) {
 			final Address address = account.getAddress();
 			final AccountState state = new AccountState(address);
-			Mockito.when(this.accountStateCache.findStateByAddress(address))
-					.thenReturn(state);
+			Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(state);
 		}
 
-		private void setLessorRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferMode mode) {
+		private void setLessorRemoteState(final ImportanceTransferTransaction account, final BlockHeight height,
+				final ImportanceTransferMode mode) {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
 			final RemoteLink link = new RemoteLink(remote, height, mode, RemoteLink.Owner.HarvestingRemotely);
 			this.accountStateCache.findStateByAddress(sender).getRemoteLinks().addLink(link);
 		}
 
-		private void setLesseeRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferMode mode) {
+		private void setLesseeRemoteState(final ImportanceTransferTransaction account, final BlockHeight height,
+				final ImportanceTransferMode mode) {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
 			final RemoteLink link = new RemoteLink(sender, height, mode, RemoteLink.Owner.RemoteHarvester);
@@ -494,11 +426,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		private ImportanceTransferTransaction createTransactionWithRemote(final Account remote, final ImportanceTransferMode mode) {
 			final Account signer = Utils.generateRandomAccount();
 			this.addRemoteLinks(signer);
-			return new ImportanceTransferTransaction(
-					TimeInstant.ZERO,
-					signer,
-					mode,
-					remote);
+			return new ImportanceTransferTransaction(TimeInstant.ZERO, signer, mode, remote);
 		}
 
 		private AccountInfo getAccountInfo(final Account account) {

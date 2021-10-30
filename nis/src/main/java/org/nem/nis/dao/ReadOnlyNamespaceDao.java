@@ -12,18 +12,15 @@ import java.util.Collection;
 public interface ReadOnlyNamespaceDao {
 
 	/**
-	 * Gets all namespaces that are owned by an account.
-	 * Optionally a parent can be supplied, in that case only children of the parent are returned.
+	 * Gets all namespaces that are owned by an account. Optionally a parent can be supplied, in that case only children of the parent are
+	 * returned.
 	 *
 	 * @param address The account address.
 	 * @param parent The parent namespace id (optional).
 	 * @param limit The maximum number of db namespaces to be returned.
 	 * @return The collection of db namespaces.
 	 */
-	Collection<DbNamespace> getNamespacesForAccount(
-			final Address address,
-			final NamespaceId parent,
-			final int limit);
+	Collection<DbNamespace> getNamespacesForAccount(final Address address, final NamespaceId parent, final int limit);
 
 	/**
 	 * Gets the specified namespace.

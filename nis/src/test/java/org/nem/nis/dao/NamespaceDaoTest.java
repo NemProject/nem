@@ -29,8 +29,7 @@ public class NamespaceDaoTest {
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
+		Mockito.verify(context.retriever, Mockito.only()).getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
 	}
 
 	@Test
@@ -45,7 +44,8 @@ public class NamespaceDaoTest {
 
 		// Assert:
 		MatcherAssert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
-		Mockito.verify(context.retriever, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.anyInt());
+		Mockito.verify(context.retriever, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(),
+				Mockito.anyInt());
 	}
 
 	@Test
@@ -54,8 +54,7 @@ public class NamespaceDaoTest {
 		final NamespaceId id = new NamespaceId("foo");
 		final DbNamespace retrieverResult = new DbNamespace();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getNamespace(Mockito.any(), Mockito.any()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.retriever.getNamespace(Mockito.any(), Mockito.any())).thenReturn(retrieverResult);
 
 		// Act:
 		final DbNamespace result = context.namespaceDao.getNamespace(id);
@@ -81,8 +80,7 @@ public class NamespaceDaoTest {
 		// Arrange:
 		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(retrieverResult);
 
 		// Act:
 		final Collection<DbNamespace> result = context.namespaceDao.getRootNamespaces(requestId, 25);

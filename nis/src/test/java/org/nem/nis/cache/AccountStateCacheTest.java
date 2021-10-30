@@ -35,7 +35,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	 */
 	protected abstract T createCacheWithoutAutoCache();
 
-	//region findStateByAddress
+	// region findStateByAddress
 
 	@Test
 	public void findStateByAddressReturnsStateForAddress() {
@@ -71,27 +71,24 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findStateByAddress(address));
 	}
 
 	@Test
 	public void findStateByAddressDoesNotCacheStateForUnknownAddressInNonAutoCacheMode() {
 		// Act:
-		this.assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode((address, cache) -> cache.findStateByAddress(address));
 	}
 
 	@Test
 	public void findStateByAddressSucceedsForKnownAddressInNonAutoCacheMode() {
 		// Assert:
-		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode((address, cache) -> cache.findStateByAddress(address));
 	}
 
-	//endregion
+	// endregion
 
-	//region findLatestForwardedStateByAddress
+	// region findLatestForwardedStateByAddress
 
 	@Test
 	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
@@ -129,11 +126,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 		final AccountState state = this.addToCache(cache.copy(), address);
-		final RemoteLink link = new RemoteLink(
-				Utils.generateRandomAddress(),
-				new BlockHeight(remoteBlockHeight),
-				mode,
-				owner);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, owner);
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
@@ -146,8 +139,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findLatestForwardedStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findLatestForwardedStateByAddress(address));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findLatestForwardedStateByAddress(address));
 	}
 
 	@Test
@@ -160,13 +152,12 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findLatestForwardedStateByAddressSucceedsForKnownAddressInNonAutoCacheMode() {
 		// Assert:
-		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findLatestForwardedStateByAddress(address));
+		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode((address, cache) -> cache.findLatestForwardedStateByAddress(address));
 	}
 
-	//endregion
+	// endregion
 
-	//region findForwardedStateByAddress
+	// region findForwardedStateByAddress
 
 	@Test
 	public void findForwardedStateByAddressReturnsStateForAddress() {
@@ -216,8 +207,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findForwardedStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
 	}
 
 	@Test
@@ -234,9 +224,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 				(address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
 	}
 
-	//endregion
+	// endregion
 
-	//region common helpers
+	// region common helpers
 
 	private void assertFunctionFailsForInvalidAddress(final BiFunction<Address, T, AccountState> findState) {
 		// Arrange:
@@ -244,9 +234,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> findState.apply(address, cache),
-				MissingResourceException.class);
+		ExceptionAssert.assertThrows(v -> findState.apply(address, cache), MissingResourceException.class);
 	}
 
 	private void assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode(final BiFunction<Address, T, AccountState> findState) {
@@ -278,9 +266,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(state2, IsSame.sameInstance(state1));
 	}
 
-	//endregion
+	// endregion
 
-	//region HarvestingRemotely
+	// region HarvestingRemotely
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
@@ -322,9 +310,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region RemoteHarvester
+	// region RemoteHarvester
 
 	@Test
 	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenActiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
@@ -366,18 +354,15 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight,
+			final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 		final AccountState state = this.addToCache(cache.copy(), address);
-		final RemoteLink link = new RemoteLink(
-				Utils.generateRandomAddress(),
-				new BlockHeight(remoteBlockHeight),
-				mode,
-				owner);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, owner);
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
@@ -387,9 +372,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		return forwardedState.equals(state);
 	}
 
-	//endregion
+	// endregion
 
-	//region removeFromCache
+	// region removeFromCache
 
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
@@ -433,9 +418,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCreatesUnlinkedAccountStateCopy() {
@@ -486,9 +471,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(copyStateFromEncoded, IsSame.sameInstance(copyStateFromPublicKey));
 	}
 
-	//endregion
+	// endregion
 
-	//region shallowCopyTo
+	// region shallowCopyTo
 
 	@Test
 	public void shallowCopyToCreatesLinkedCacheCopy() {
@@ -541,9 +526,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		MatcherAssert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2))); // note that copyState2 is created on access
 	}
 
-	//endregion
+	// endregion
 
-	//region undoVesting
+	// region undoVesting
 
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
@@ -577,9 +562,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		return accountStates;
 	}
 
-	//endregion
+	// endregion
 
-	//region contents / mutable contents
+	// region contents / mutable contents
 
 	@Test
 	public void contentsReturnsAllAccounts() {
@@ -593,7 +578,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		this.assertContentsReturnsAllAccounts(AccountStateCache::mutableContents);
 	}
 
-	private void assertContentsReturnsAllAccounts(final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {
+	private void assertContentsReturnsAllAccounts(
+			final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {
 		// Arrange:
 		final AccountStateCache cache = this.createCache();
 
@@ -607,12 +593,11 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 
 		// Assert:
 		MatcherAssert.assertThat(contents.size(), IsEqual.equalTo(3));
-		MatcherAssert.assertThat(
-				contents.stream().map(ReadOnlyAccountState::getAddress).collect(Collectors.toList()),
+		MatcherAssert.assertThat(contents.stream().map(ReadOnlyAccountState::getAddress).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(accountStates.stream().map(AccountState::getAddress).collect(Collectors.toList())));
 	}
 
-	//endregion
+	// endregion
 
 	private AccountState addToCache(final T cache, final Address address) {
 		// note: this is necessary in order for the state getting copied to the copiedValues map

@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 public class ChainControllerTest {
 
-	//region blockLast
+	// region blockLast
 
 	@Test
 	public void blockLastReturnsMappedBlockFromBlockChain() {
@@ -46,16 +46,12 @@ public class ChainControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runBlockLastTest(
-				context,
-				c -> c.controller.blockLast(challenge),
+		final AuthenticatedResponse<?> response = runBlockLastTest(context, c -> c.controller.blockLast(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runBlockLastTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runBlockLastTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, Block> getBlock) {
 		// Arrange:
 		final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStamp(443);
@@ -71,9 +67,9 @@ public class ChainControllerTest {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region hashesFrom
+	// region hashesFrom
 
 	@Test
 	public void hashesFromReturnsHashesFromHeight() {
@@ -99,9 +95,9 @@ public class ChainControllerTest {
 		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(height, defaultLimit);
 	}
 
-	//endregion
+	// endregion
 
-	//region chainScore
+	// region chainScore
 
 	@Test
 	public void chainScoreReturnsScore() {
@@ -120,16 +116,12 @@ public class ChainControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runChainScoreTest(
-				context,
-				c -> c.controller.chainScore(challenge),
+		final AuthenticatedResponse<?> response = runChainScoreTest(context, c -> c.controller.chainScore(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runChainScoreTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runChainScoreTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, BlockChainScore> getChainScore) {
 		// Arrange:
 		Mockito.when(context.blockChainScoreManager.getScore()).thenReturn(new BlockChainScore(21));
@@ -144,9 +136,9 @@ public class ChainControllerTest {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region chainHeight
+	// region chainHeight
 
 	@Test
 	public void chainHeightReturnsHeight() {
@@ -165,16 +157,12 @@ public class ChainControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runChainHeightTest(
-				context,
-				c -> c.controller.chainHeight(challenge),
+		final AuthenticatedResponse<?> response = runChainHeightTest(context, c -> c.controller.chainHeight(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runChainHeightTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runChainHeightTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, BlockHeight> getChainHeight) {
 		// Arrange:
 		context.setLastBlockHeight(1234L);
@@ -189,9 +177,9 @@ public class ChainControllerTest {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region blocksAfter
+	// region blocksAfter
 
 	@Test
 	public void blocksAfterAuthenticatedReturnsMappedBlocksFromDatabase() {
@@ -202,11 +190,8 @@ public class ChainControllerTest {
 		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(new ChainRequest(new BlockHeight(10), 10, 10), challenge);
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runBlocksAfterTest(
-				context,
-				c -> c.controller.blocksAfter(request),
-				r -> r.getEntity(localNode.getIdentity(), challenge),
-				createDbBlockList(11, 2));
+		final AuthenticatedResponse<?> response = runBlocksAfterTest(context, c -> c.controller.blocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge), createDbBlockList(11, 2));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
@@ -223,13 +208,8 @@ public class ChainControllerTest {
 		blockList.get(1).setHeight(11L);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> runBlocksAfterTest(
-						context,
-						c -> c.controller.blocksAfter(request),
-						r -> r.getEntity(localNode.getIdentity(), challenge),
-						blockList),
-				RuntimeException.class);
+		ExceptionAssert.assertThrows(v -> runBlocksAfterTest(context, c -> c.controller.blocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge), blockList), RuntimeException.class);
 	}
 
 	@Test
@@ -241,26 +221,19 @@ public class ChainControllerTest {
 		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(new ChainRequest(new BlockHeight(10), 10, 130), challenge);
 
 		// Assert:
-		final AuthenticatedResponse<SerializableList<Block>> response = runBlocksAfterTest(
-				context,
-				c -> c.controller.blocksAfter(request),
-				r -> r.getEntity(localNode.getIdentity(), challenge),
-				createDbBlockList(11, 150));
+		final AuthenticatedResponse<SerializableList<Block>> response = runBlocksAfterTest(context, c -> c.controller.blocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge), createDbBlockList(11, 150));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 
-		// (1 transfer + 1 multisig transaction containing 1 transfer  per block)
+		// (1 transfer + 1 multisig transaction containing 1 transfer per block)
 		MatcherAssert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130 / 3));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> T runBlocksAfterTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
-			final Function<T, SerializableList<Block>> getBlocks,
-			final List<DbBlock> blockList) {
+	private static <T> T runBlocksAfterTest(final TestContext context, final Function<TestContext, T> action,
+			final Function<T, SerializableList<Block>> getBlocks, final List<DbBlock> blockList) {
 		// Arrange:
-		Mockito.when(context.blockDao.getBlocksAfter(Mockito.any(), Mockito.anyInt()))
-				.thenReturn(blockList, new ArrayList<>());
+		Mockito.when(context.blockDao.getBlocksAfter(Mockito.any(), Mockito.anyInt())).thenReturn(blockList, new ArrayList<>());
 
 		// Act:
 		final T result = action.apply(context);
@@ -271,12 +244,10 @@ public class ChainControllerTest {
 		final int[] timeInstants = new int[1];
 		heights[0] = 11;
 		timeInstants[0] = 400;
-		blocks.stream()
-				.sorted((b1, b2) -> b1.getHeight().compareTo(b2.getHeight()))
-				.forEach(b -> {
-					MatcherAssert.assertThat(b.getHeight(), IsEqual.equalTo(new BlockHeight(heights[0]++)));
-					MatcherAssert.assertThat(b.getTimeStamp(), IsEqual.equalTo(new TimeInstant(timeInstants[0]++)));
-				});
+		blocks.stream().sorted((b1, b2) -> b1.getHeight().compareTo(b2.getHeight())).forEach(b -> {
+			MatcherAssert.assertThat(b.getHeight(), IsEqual.equalTo(new BlockHeight(heights[0]++)));
+			MatcherAssert.assertThat(b.getTimeStamp(), IsEqual.equalTo(new TimeInstant(timeInstants[0]++)));
+		});
 
 		// (the second parameter should be min blocks (10) + 100)
 		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(new BlockHeight(10), 110);
@@ -287,16 +258,18 @@ public class ChainControllerTest {
 		final List<DbBlock> dbBlockList = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
-			dbBlock.setId((long)(height + i));
-			dbBlock.setBlockTransferTransactions(Collections.singletonList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
-			dbBlock.setBlockMultisigTransactions(Collections.singletonList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
+			dbBlock.setId((long) (height + i));
+			dbBlock.setBlockTransferTransactions(
+					Collections.singletonList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockMultisigTransactions(
+					Collections.singletonList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 
 		return dbBlockList;
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
@@ -314,11 +287,7 @@ public class ChainControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new ChainController(
-					this.blockDao,
-					this.blockChainLastBlockLayer,
-					this.blockChainScoreManager,
-					this.host,
+			this.controller = new ChainController(this.blockDao, this.blockChainLastBlockLayer, this.blockChainScoreManager, this.host,
 					MapperUtils.createDbModelToModelNisMapper(this.accountLookup));
 		}
 

@@ -19,9 +19,7 @@ public class BlockChainFeatureDependentFactory {
 	 * @param featureSupplierMap The feature to supplier map.
 	 * @return The created object.
 	 */
-	public static <T> T createObject(
-			final BlockChainConfiguration config,
-			final String name,
+	public static <T> T createObject(final BlockChainConfiguration config, final String name,
 			final Map<BlockChainFeature, Supplier<T>> featureSupplierMap) {
 		T result = null;
 		for (final Map.Entry<BlockChainFeature, Supplier<T>> entry : featureSupplierMap.entrySet()) {

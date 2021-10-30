@@ -31,12 +31,8 @@ public interface AccountIo {
 	 * @param limit The maximum number of transactions to be returned.
 	 * @return The transaction information.
 	 */
-	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
-			final Address address,
-			final Hash transactionHash,
-			final BlockHeight height,
-			final ReadOnlyTransferDao.TransferType transfersType,
-			final int limit);
+	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(final Address address, final Hash transactionHash,
+			final BlockHeight height, final ReadOnlyTransferDao.TransferType transfersType, final int limit);
 
 	/**
 	 * Gets all transaction information associated with an account.
@@ -47,11 +43,8 @@ public interface AccountIo {
 	 * @param limit The maximum number of transactions to be returned.
 	 * @return The transaction information.
 	 */
-	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
-			final Address address,
-			final Long transactionId,
-			final ReadOnlyTransferDao.TransferType transfersType,
-			final int limit);
+	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(final Address address, final Long transactionId,
+			final ReadOnlyTransferDao.TransferType transfersType, final int limit);
 
 	/**
 	 * Gets information about blocks harvested by an account.

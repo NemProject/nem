@@ -28,8 +28,9 @@ public class AlphaTrimmedMeanFilterTest {
 		final List<TimeSynchronizationSample> samples = filter.filter(originalSamples, null);
 
 		// Assert:
-		final int value = (int)(originalSamples.size() * FilterConstants.ALPHA / 2);
+		final int value = (int) (originalSamples.size() * FilterConstants.ALPHA / 2);
 		MatcherAssert.assertThat(samples.size(), IsEqual.equalTo(originalSamples.size() - 2 * value));
-		MatcherAssert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(value, originalSamples.size() - 2 * value)));
+		MatcherAssert.assertThat(samples,
+				IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(value, originalSamples.size() - 2 * value)));
 	}
 }

@@ -19,7 +19,7 @@ import java.util.*;
 @RunWith(Enclosed.class)
 public class BlockExecutorTest {
 
-	//region ExecutorAsExecuteProcessorTests / ExecutorAsUndoProcessorTests
+	// region ExecutorAsExecuteProcessorTests / ExecutorAsUndoProcessorTests
 
 	public static class ExecutorAsExecuteProcessorTests extends AbstractBlockProcessorTest {
 
@@ -40,7 +40,8 @@ public class BlockExecutorTest {
 		}
 
 		@Override
-		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer) {
+		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+				final BlockTransactionObserver observer) {
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			executor.execute(block, observer);
 		}
@@ -65,13 +66,14 @@ public class BlockExecutorTest {
 		}
 
 		@Override
-		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer) {
+		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+				final BlockTransactionObserver observer) {
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			executor.undo(block, observer);
 		}
 	}
 
-	//endregion
+	// endregion
 
 	public static class UndoExecuteTransactionOrderTests {
 
@@ -112,10 +114,8 @@ public class BlockExecutorTest {
 
 			public UndoExecuteTransactionOrderTestContext() {
 				this.account = Utils.generateRandomAccount();
-				this.transactions = new MockTransaction[] {
-						this.createTransaction(1, 17),
-						this.createTransaction(2, 11),
-						this.createTransaction(3, 4)
+				this.transactions = new MockTransaction[]{
+						this.createTransaction(1, 17), this.createTransaction(2, 11), this.createTransaction(3, 4)
 				};
 
 				this.block = BlockUtils.createBlock(this.account);

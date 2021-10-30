@@ -7,7 +7,9 @@ import org.nem.nis.validators.*;
 
 import java.util.*;
 
-public class AggregateBatchTransactionValidatorBuilderTest extends AggregateValidatorBuilderTest<AggregateBatchTransactionValidatorBuilder, BatchTransactionValidator, List<TransactionsContextPair>> {
+public class AggregateBatchTransactionValidatorBuilderTest
+		extends
+			AggregateValidatorBuilderTest<AggregateBatchTransactionValidatorBuilder, BatchTransactionValidator, List<TransactionsContextPair>> {
 
 	@Override
 	public AggregateBatchTransactionValidatorBuilder createBuilder() {
@@ -42,7 +44,8 @@ public class AggregateBatchTransactionValidatorBuilderTest extends AggregateVali
 	}
 
 	@Override
-	public void verifyValidate(final BatchTransactionValidator validator, final List<TransactionsContextPair> param, final VerificationMode verificationMode) {
+	public void verifyValidate(final BatchTransactionValidator validator, final List<TransactionsContextPair> param,
+			final VerificationMode verificationMode) {
 		Mockito.verify(validator, verificationMode).validate(param);
 	}
 }

@@ -38,9 +38,7 @@ public class TimeSynchronizationControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		runCommunicationTimeStampsTest(
-				context,
-				c -> c.controller.getNetworkTime(challenge),
+		runCommunicationTimeStampsTest(context, c -> c.controller.getNetworkTime(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 
 		// Assert:
@@ -55,9 +53,7 @@ public class TimeSynchronizationControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		runCommunicationTimeStampsTest(
-				context,
-				c -> c.controller.getNetworkTime(challenge),
+		runCommunicationTimeStampsTest(context, c -> c.controller.getNetworkTime(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 
 		// Assert:
@@ -88,18 +84,14 @@ public class TimeSynchronizationControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runCommunicationTimeStampsTest(
-				context,
-				c -> c.controller.getNetworkTime(challenge),
+		final AuthenticatedResponse<?> response = runCommunicationTimeStampsTest(context, c -> c.controller.getNetworkTime(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
 	// endregion
 
-	private static <T> T runCommunicationTimeStampsTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runCommunicationTimeStampsTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, CommunicationTimeStamps> getCommunicationTimeStamps) {
 		// Act:
 		final T response = action.apply(context);

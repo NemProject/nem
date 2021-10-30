@@ -22,9 +22,9 @@ public class MosaicSupplyChangeRawToDbModelMapping extends AbstractTransferRawTo
 		final DbMosaicSupplyChangeTransaction dbTransaction = new DbMosaicSupplyChangeTransaction();
 		dbTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbTransaction.setDbMosaicId(RawMapperUtils.castToLong(source[9]));
-		dbTransaction.setSupplyType((Integer)source[10]);
+		dbTransaction.setSupplyType((Integer) source[10]);
 		dbTransaction.setQuantity(RawMapperUtils.castToLong(source[11]));
-		dbTransaction.setBlkIndex((Integer)source[12]);
+		dbTransaction.setBlkIndex((Integer) source[12]);
 		dbTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
 		return dbTransaction;
 	}

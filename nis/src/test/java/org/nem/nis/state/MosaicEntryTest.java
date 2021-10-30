@@ -11,7 +11,7 @@ import org.nem.core.test.*;
 public class MosaicEntryTest {
 	private static final int DEFAULT_DIVISIBILITY = 3;
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateEntryWithInitialSupply() {
@@ -40,14 +40,13 @@ public class MosaicEntryTest {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(3, createMosaicProperties(1, 1000));
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new MosaicEntry(mosaicDefinition, new Supply(MosaicConstants.MAX_QUANTITY)),
+		ExceptionAssert.assertThrows(v -> new MosaicEntry(mosaicDefinition, new Supply(MosaicConstants.MAX_QUANTITY)),
 				IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void canCreateEntryCopy() {
@@ -85,7 +84,7 @@ public class MosaicEntryTest {
 		MatcherAssert.assertThat(entry.getBalances().getBalance(address3), IsEqual.equalTo(new Quantity(33)));
 	}
 
-	//endregion
+	// endregion
 
 	// region increaseSupply
 

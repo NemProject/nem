@@ -11,12 +11,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * DbBlock entity.
- * <br>
- * Holds all the important information related to block data.
- * <br>
- * Associated harvester and transactions are obtained automatically (by BlockDao)
- * thanks to @Cascade annotations.
+ * DbBlock entity. <br>
+ * Holds all the important information related to block data. <br>
+ * Associated harvester and transactions are obtained automatically (by BlockDao) thanks to @Cascade annotations.
  */
 @Entity
 @Table(name = "blocks")
@@ -190,7 +187,8 @@ public class DbBlock {
 		return this.filter(this.blockMultisigAggregateModificationTransactions);
 	}
 
-	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions) {
+	public void setBlockMultisigAggregateModificationTransactions(
+			final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions) {
 		this.blockMultisigAggregateModificationTransactions = blockMultisigAggregateModificationTransactions;
 	}
 
@@ -214,7 +212,8 @@ public class DbBlock {
 		return this.filter(this.blockMosaicDefinitionCreationTransactions);
 	}
 
-	public void setBlockMosaicDefinitionCreationTransactions(final List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions) {
+	public void setBlockMosaicDefinitionCreationTransactions(
+			final List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions) {
 		this.blockMosaicDefinitionCreationTransactions = blockMosaicDefinitionCreationTransactions;
 	}
 
@@ -228,9 +227,7 @@ public class DbBlock {
 
 	@SuppressWarnings("rawtypes")
 	private <T extends AbstractBlockTransfer> List<T> filter(final List<T> transactions) {
-		return transactions.stream()
-				.filter(t -> null != t.getSenderProof())
-				.collect(Collectors.toList());
+		return transactions.stream().filter(t -> null != t.getSenderProof()).collect(Collectors.toList());
 	}
 
 	public void addTransferTransaction(final DbTransferTransaction transaction) {

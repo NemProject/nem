@@ -7,8 +7,7 @@ import java.util.Iterator;
 
 public interface ReadOnlyAccountImportance extends SerializableEntity {
 	/**
-	 * Gets an iterator that returns all outlinks between (inclusive) given start height and end height.
-	 * <br>
+	 * Gets an iterator that returns all outlinks between (inclusive) given start height and end height. <br>
 	 * Note that this is readonly because AccountLink is immutable.
 	 *
 	 * @param startHeight The start block height.

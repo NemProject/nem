@@ -10,34 +10,29 @@ import java.util.function.BiConsumer;
 
 public class DbModelUtilsTest {
 
-	//region getInnerTransaction
+	// region getInnerTransaction
 
 	@Test
 	public void getInnerTransactionReturnsTransferWhenPresent() {
 		// Assert:
-		assertGetInnerTransactionReturnsTransferWhenPresent(
-				new DbTransferTransaction(),
-				DbMultisigTransaction::setTransferTransaction);
+		assertGetInnerTransactionReturnsTransferWhenPresent(new DbTransferTransaction(), DbMultisigTransaction::setTransferTransaction);
 	}
 
 	@Test
 	public void getInnerTransactionReturnsImportanceTransferWhenPresent() {
 		// Assert:
-		assertGetInnerTransactionReturnsTransferWhenPresent(
-				new DbImportanceTransferTransaction(),
+		assertGetInnerTransactionReturnsTransferWhenPresent(new DbImportanceTransferTransaction(),
 				DbMultisigTransaction::setImportanceTransferTransaction);
 	}
 
 	@Test
 	public void getInnerTransactionReturnsMultisigModificationWhenPresent() {
 		// Assert:
-		assertGetInnerTransactionReturnsTransferWhenPresent(
-				new DbMultisigAggregateModificationTransaction(),
+		assertGetInnerTransactionReturnsTransferWhenPresent(new DbMultisigAggregateModificationTransaction(),
 				DbMultisigTransaction::setMultisigAggregateModificationTransaction);
 	}
 
-	private static <T extends AbstractTransfer> void assertGetInnerTransactionReturnsTransferWhenPresent(
-			final T dbTransfer,
+	private static <T extends AbstractTransfer> void assertGetInnerTransactionReturnsTransferWhenPresent(final T dbTransfer,
 			final BiConsumer<DbMultisigTransaction, T> setInnerTransaction) {
 		// Arrange:
 		final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
@@ -56,14 +51,12 @@ public class DbModelUtilsTest {
 		final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> DbModelUtils.getInnerTransaction(dbMultisig),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> DbModelUtils.getInnerTransaction(dbMultisig), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region isInnerTransaction
+	// region isInnerTransaction
 
 	@Test
 	public void isInnerTransactionReturnsTrueIfSignatureIsNull() {
@@ -90,5 +83,5 @@ public class DbModelUtilsTest {
 		MatcherAssert.assertThat(isInnerTransaction, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 }

@@ -34,15 +34,10 @@ public class DefaultPeerNetworkServicesFactory implements PeerNetworkServicesFac
 	 * @param timeSyncStrategy The time sync strategy to use.
 	 * @param compatibilityChecker The node compatibility checker.
 	 */
-	public DefaultPeerNetworkServicesFactory(
-			final PeerNetworkState state,
-			final PeerConnector peerConnector,
-			final TimeSynchronizationConnector timeSynchronizationConnector,
-			final SyncConnectorPool syncConnectorPool,
-			final BlockSynchronizer blockSynchronizer,
-			final ChainServices chainServices,
-			final TimeSynchronizationStrategy timeSyncStrategy,
-			final NodeCompatibilityChecker compatibilityChecker) {
+	public DefaultPeerNetworkServicesFactory(final PeerNetworkState state, final PeerConnector peerConnector,
+			final TimeSynchronizationConnector timeSynchronizationConnector, final SyncConnectorPool syncConnectorPool,
+			final BlockSynchronizer blockSynchronizer, final ChainServices chainServices,
+			final TimeSynchronizationStrategy timeSyncStrategy, final NodeCompatibilityChecker compatibilityChecker) {
 		this.state = state;
 		this.peerConnector = peerConnector;
 		this.timeSynchronizationConnector = timeSynchronizationConnector;

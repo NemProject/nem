@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsCacheTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void cacheIsInitiallyEmpty() {
@@ -24,9 +24,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region add
+	// region add
 
 	@Test
 	public void canAddNewTransactionWithoutChildTransactions() {
@@ -143,9 +143,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region add (multisig signature)
+	// region add (multisig signature)
 
 	@Test
 	public void cannotAddMultisigSignatureWithNoExistingTransactions() {
@@ -216,7 +216,8 @@ public class UnconfirmedTransactionsCacheTest {
 		// - check the cache state
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
-		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2 + 1)); // the multisig transaction has an inner transaction and a signature
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2 + 1)); // the multisig transaction has an inner transaction and a
+																			// signature
 		MatcherAssert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
 		MatcherAssert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
 		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
@@ -276,9 +277,9 @@ public class UnconfirmedTransactionsCacheTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region add (deterministic)
+	// region add (deterministic)
 
 	@Test
 	public void addedTransactionsAreStoredInOrder() {
@@ -297,9 +298,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.stream().collect(Collectors.toList()), IsEqual.equalTo(transactions));
 	}
 
-	//endregion
+	// endregion
 
-	//region remove
+	// region remove
 
 	@Test
 	public void canRemoveExistingTransactionWithoutChildTransactions() {
@@ -432,9 +433,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region clear
+	// region clear
 
 	@Test
 	public void clearRemovesAllTransactions() {
@@ -476,9 +477,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region contains
+	// region contains
 
 	@Test
 	public void containsReturnsTrueForRootTransactions() {
@@ -521,9 +522,9 @@ public class UnconfirmedTransactionsCacheTest {
 		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region stream / flatStream
+	// region stream / flatStream
 
 	@Test
 	public void streamReturnsAllRootTransactions() {
@@ -534,8 +535,7 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(createTransactionWithTwoChildTransaction(30));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				cache.stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(cache.stream().map(t -> ((MockTransaction) t).getCustomField()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(10, 20, 30));
 	}
 
@@ -548,12 +548,11 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(createTransactionWithTwoChildTransaction(30));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				cache.streamFlat().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(cache.streamFlat().map(t -> ((MockTransaction) t).getCustomField()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(10, 11, 12, 20, 21, 22, 30, 31, 32));
 	}
 
-	//endregion
+	// endregion
 
 	private static MockTransaction deepCopy(final MockTransaction transaction) {
 		final MockTransaction copy = new MockTransaction(transaction.getSigner());

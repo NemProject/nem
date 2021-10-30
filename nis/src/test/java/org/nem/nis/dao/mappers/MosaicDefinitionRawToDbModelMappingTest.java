@@ -79,16 +79,16 @@ public class MosaicDefinitionRawToDbModelMappingTest {
 
 		private Object[] createRaw(final boolean hasFee) {
 			final Object[] raw = new Object[9];
-			raw[0] = BigInteger.valueOf(123L);                    // id
-			raw[1] = BigInteger.valueOf(this.creatorId);          // creator id
-			raw[2] = "Alice's vouchers";                          // name
-			raw[3] = "precious vouchers";                         // description
-			raw[4] = "alice.voucher";                             // namespace id
+			raw[0] = BigInteger.valueOf(123L); // id
+			raw[1] = BigInteger.valueOf(this.creatorId); // creator id
+			raw[2] = "Alice's vouchers"; // name
+			raw[3] = "precious vouchers"; // description
+			raw[4] = "alice.voucher"; // namespace id
 			if (hasFee) {
-				raw[5] = 1;                                       // fee type
-				raw[6] = BigInteger.valueOf(this.recipientId);    // fee recipient id
-				raw[7] = BigInteger.valueOf(234L);                // fee db mosaic id
-				raw[8] = BigInteger.valueOf(345L);                // fee quantity
+				raw[5] = 1; // fee type
+				raw[6] = BigInteger.valueOf(this.recipientId); // fee recipient id
+				raw[7] = BigInteger.valueOf(234L); // fee db mosaic id
+				raw[8] = BigInteger.valueOf(345L); // fee quantity
 			}
 			return raw;
 		}

@@ -123,22 +123,13 @@ public class NisTimeSynchronizerTest {
 			final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList = this.createCommunicationTimeStamps();
 			this.samples = this.createSamples(this.nodes, timeStampsList);
 			Mockito.when(this.selector.selectNodes()).thenReturn(this.nodes);
-			Mockito.when(this.systemTimeProvider.getNetworkTime()).thenReturn(
-					new NetworkTimeStamp(0),
-					new NetworkTimeStamp(20),
-					new NetworkTimeStamp(10),
-					new NetworkTimeStamp(30),
-					new NetworkTimeStamp(20),
-					new NetworkTimeStamp(40));
+			Mockito.when(this.systemTimeProvider.getNetworkTime()).thenReturn(new NetworkTimeStamp(0), new NetworkTimeStamp(20),
+					new NetworkTimeStamp(10), new NetworkTimeStamp(30), new NetworkTimeStamp(20), new NetworkTimeStamp(40));
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(0))).thenReturn(timeStampsList.get(0));
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(1))).thenReturn(timeStampsList.get(1));
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(2))).thenReturn(timeStampsList.get(2));
 			Mockito.when(this.syncStrategy.calculateTimeOffset(this.samples, this.age)).thenReturn(new TimeOffset(offset));
-			this.synchronizer = new NisTimeSynchronizer(
-					this.selector,
-					this.syncStrategy,
-					this.connector,
-					this.systemTimeProvider,
+			this.synchronizer = new NisTimeSynchronizer(this.selector, this.syncStrategy, this.connector, this.systemTimeProvider,
 					this.networkState);
 		}
 
@@ -155,15 +146,14 @@ public class NisTimeSynchronizerTest {
 			return Arrays.asList(
 					CompletableFuture.completedFuture(new CommunicationTimeStamps(new NetworkTimeStamp(10), new NetworkTimeStamp(15))),
 					CompletableFuture.completedFuture(new CommunicationTimeStamps(new NetworkTimeStamp(20), new NetworkTimeStamp(25))),
-					CompletableFuture.completedFuture(new CommunicationTimeStamps(new NetworkTimeStamp(30), new NetworkTimeStamp(35)))
-			);
+					CompletableFuture.completedFuture(new CommunicationTimeStamps(new NetworkTimeStamp(30), new NetworkTimeStamp(35))));
 		}
 
-		private List<TimeSynchronizationSample> createSamples(final List<Node> nodes, final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList) {
+		private List<TimeSynchronizationSample> createSamples(final List<Node> nodes,
+				final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList) {
 			final List<TimeSynchronizationSample> samples = new ArrayList<>();
 			for (int i = 0; i < 3; i++) {
-				samples.add(new TimeSynchronizationSample(
-						nodes.get(i),
+				samples.add(new TimeSynchronizationSample(nodes.get(i),
 						new CommunicationTimeStamps(new NetworkTimeStamp(10 * i), new NetworkTimeStamp(10 * i + 20)),
 						timeStampsList.get(i).join()));
 			}

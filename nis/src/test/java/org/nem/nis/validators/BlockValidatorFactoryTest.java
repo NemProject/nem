@@ -15,17 +15,10 @@ public class BlockValidatorFactoryTest {
 	public void createAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = createFactory();
-		final List<String> expectedSubValidatorNames = Arrays.asList(
-				"TransactionDeadlineBlockValidator",
-				"BlockNonFutureEntityValidator",
-				"EligibleSignerBlockValidator",
-				"MaxTransactionsBlockValidator",
-				"NoSelfSignedTransactionsBlockValidator",
-				"BlockUniqueHashTransactionValidator",
-				"BlockNetworkValidator",
-				"VersionBlockValidator",
-				"BlockMultisigAggregateModificationValidator",
-				"BlockMosaicDefinitionCreationValidator");
+		final List<String> expectedSubValidatorNames = Arrays.asList("TransactionDeadlineBlockValidator", "BlockNonFutureEntityValidator",
+				"EligibleSignerBlockValidator", "MaxTransactionsBlockValidator", "NoSelfSignedTransactionsBlockValidator",
+				"BlockUniqueHashTransactionValidator", "BlockNetworkValidator", "VersionBlockValidator",
+				"BlockMultisigAggregateModificationValidator", "BlockMosaicDefinitionCreationValidator");
 
 		// Act:
 		final String name = factory.create(Mockito.mock(ReadOnlyNisCache.class)).getName();
@@ -39,8 +32,7 @@ public class BlockValidatorFactoryTest {
 	public void createTransactionOnlyAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = createFactory();
-		final List<String> expectedSubValidatorNames = Arrays.asList(
-				"BlockMultisigAggregateModificationValidator",
+		final List<String> expectedSubValidatorNames = Arrays.asList("BlockMultisigAggregateModificationValidator",
 				"BlockMosaicDefinitionCreationValidator");
 
 		// Act:

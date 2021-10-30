@@ -82,12 +82,11 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 	}
 
 	private static void addAccountMapping(final IMapper mapper) {
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class)))
-				.thenAnswer(invocationOnMock -> {
-					final DbAccount account = (DbAccount)(invocationOnMock.getArguments()[0]);
-					return null == account || null == account.getPublicKey()
-							? Utils.generateRandomAccount()
-							: new Account(Address.fromPublicKey(account.getPublicKey()));
-				});
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenAnswer(invocationOnMock -> {
+			final DbAccount account = (DbAccount) (invocationOnMock.getArguments()[0]);
+			return null == account || null == account.getPublicKey()
+					? Utils.generateRandomAccount()
+					: new Account(Address.fromPublicKey(account.getPublicKey()));
+		});
 	}
 }

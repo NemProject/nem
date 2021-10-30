@@ -13,9 +13,9 @@ public class MosaicDefinitionPropertyRawToDbModelMappingTest {
 	public void rawDataCanBeMappedToDbModel() {
 		// Arrange:
 		final Object[] raw = new Object[4];
-		raw[1] = BigInteger.valueOf(123L);           // id
-		raw[2] = "foo";                              // name
-		raw[3] = "bar";                              // value
+		raw[1] = BigInteger.valueOf(123L); // id
+		raw[2] = "foo"; // name
+		raw[3] = "bar"; // value
 
 		// Act:
 		final DbMosaicProperty dbModel = new MosaicPropertyRawToDbModelMapping().map(raw);

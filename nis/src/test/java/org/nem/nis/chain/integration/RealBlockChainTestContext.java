@@ -27,8 +27,7 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 /**
- * A test context for testing an almost real block-chain.
- * The only mocks are the daos.
+ * A test context for testing an almost real block-chain. The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
 	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
@@ -38,8 +37,7 @@ public class RealBlockChainTestContext {
 	private final DefaultMapperFactory mapperFactory = new DefaultMapperFactory(this.mosaicIdCache);
 	private final NisModelToDbModelMapper nisModelToDbModelMapper = new NisModelToDbModelMapper(
 			this.mapperFactory.createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
-	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(
-			this.blockDao,
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao,
 			this.nisModelToDbModelMapper);
 
 	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
@@ -85,12 +83,8 @@ public class RealBlockChainTestContext {
 	}
 
 	private Block createInitialBlock(final Account harvesterAccount, final BlockHeight blockHeight) {
-		final Block block = new Block(
-				harvesterAccount,
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				this.timeProvider.getCurrentTime().addMinutes(-2),
-				blockHeight);
+		final Block block = new Block(harvesterAccount, Utils.generateRandomHash(), Utils.generateRandomHash(),
+				this.timeProvider.getCurrentTime().addMinutes(-2), blockHeight);
 		block.sign();
 		return block;
 	}
@@ -102,7 +96,7 @@ public class RealBlockChainTestContext {
 		this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 	}
 
-	//region mapping helpers
+	// region mapping helpers
 
 	/**
 	 * Adds a mosaic id mapping.
@@ -114,82 +108,49 @@ public class RealBlockChainTestContext {
 		this.mosaicIdCache.add(mosaicId, dbMosaicId);
 	}
 
-	//endregion
+	// endregion
 
-	//region factory functions
+	// region factory functions
 
 	private UnconfirmedTransactions createUnconfirmedTransactions() {
-		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
-				this.transactionValidatorFactory,
-				this.blockTransactionObserverFactory::createExecuteCommitObserver,
-				this.timeProvider,
-				this.blockChainLastBlockLayer::getLastBlockHeight,
-				MAX_TRANSACTIONS_PER_BLOCK);
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(this.transactionValidatorFactory,
+				this.blockTransactionObserverFactory::createExecuteCommitObserver, this.timeProvider,
+				this.blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK);
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 
 	private UnlockedAccounts createUnlockedAccounts() {
-		return new UnlockedAccounts(
-				this.nisCache.getAccountCache(),
-				this.nisCache.getAccountStateCache(),
-				this.blockChainLastBlockLayer,
-				new CanHarvestPredicate(h -> this.poiOptions.getMinHarvesterBalance()),
-				this.nisConfiguration.getUnlockedLimit());
+		return new UnlockedAccounts(this.nisCache.getAccountCache(), this.nisCache.getAccountStateCache(), this.blockChainLastBlockLayer,
+				new CanHarvestPredicate(h -> this.poiOptions.getMinHarvesterBalance()), this.nisConfiguration.getUnlockedLimit());
 	}
 
 	private BlockChain createBlockChain() {
-		final BlockChainServices blockChainServices = new BlockChainServices(
-				this.blockDao,
-				this.blockTransactionObserverFactory,
-				this.blockValidatorFactory,
-				this.transactionValidatorFactory,
-				this.nisMapperFactory);
+		final BlockChainServices blockChainServices = new BlockChainServices(this.blockDao, this.blockTransactionObserverFactory,
+				this.blockValidatorFactory, this.transactionValidatorFactory, this.nisMapperFactory);
 
-		final BlockChainContextFactory blockChainContextFactory = new BlockChainContextFactory(
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				blockChainServices,
-				this.unconfirmedTransactions);
+		final BlockChainContextFactory blockChainContextFactory = new BlockChainContextFactory(this.nisCache, this.blockChainLastBlockLayer,
+				this.blockDao, blockChainServices, this.unconfirmedTransactions);
 
-		final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				blockChainContextFactory,
-				this.unconfirmedTransactions,
-				this.nisConfiguration);
+		final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(this.nisCache, this.blockChainLastBlockLayer, this.blockDao,
+				blockChainContextFactory, this.unconfirmedTransactions, this.nisConfiguration);
 
-		return new BlockChain(
-				this.blockChainLastBlockLayer,
-				blockChainUpdater);
+		return new BlockChain(this.blockChainLastBlockLayer, blockChainUpdater);
 	}
 
 	private Harvester createHarvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
-				this.nisCache,
-				this.transactionValidatorFactory,
-				this.blockValidatorFactory,
-				this.blockTransactionObserverFactory,
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(this.nisCache,
+				this.transactionValidatorFactory, this.blockValidatorFactory, this.blockTransactionObserverFactory,
 				this.unconfirmedTransactions.asFilter());
 
-		final BlockGenerator generator = new BlockGenerator(
-				this.nisCache,
-				transactionsProvider,
-				this.blockDao,
-				new BlockScorer(this.nisCache.getAccountStateCache()),
-				this.blockValidatorFactory.create(this.nisCache));
-		return new Harvester(
-				this.timeProvider,
-				this.blockChainLastBlockLayer,
-				this.unlockedAccounts,
-				this.nisMapperFactory.createDbModelToModelNisMapper(this.nisCache.getAccountCache()),
-				generator);
+		final BlockGenerator generator = new BlockGenerator(this.nisCache, transactionsProvider, this.blockDao,
+				new BlockScorer(this.nisCache.getAccountStateCache()), this.blockValidatorFactory.create(this.nisCache));
+		return new Harvester(this.timeProvider, this.blockChainLastBlockLayer, this.unlockedAccounts,
+				this.nisMapperFactory.createDbModelToModelNisMapper(this.nisCache.getAccountCache()), generator);
 	}
 
-	//endregion
+	// endregion
 
-	//region helper function
+	// region helper function
 
 	/**
 	 * Creates a new account.
@@ -243,13 +204,7 @@ public class RealBlockChainTestContext {
 	 * @return The transfer.
 	 */
 	public Transaction createTransfer(final Account signer, final Amount amount) {
-		final Transaction t = new TransferTransaction(
-				1,
-				this.getTimeStamp(),
-				signer,
-				Utils.generateRandomAccount(),
-				amount,
-				null);
+		final Transaction t = new TransferTransaction(1, this.getTimeStamp(), signer, Utils.generateRandomAccount(), amount, null);
 		return prepare(t);
 	}
 
@@ -264,12 +219,7 @@ public class RealBlockChainTestContext {
 	public Transaction createMosaicTransfer(final Account signer, final MosaicId mosaicId, final Quantity amount) {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, amount);
-		final Transaction t = new TransferTransaction(
-				2,
-				this.getTimeStamp(),
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
+		final Transaction t = new TransferTransaction(2, this.getTimeStamp(), signer, Utils.generateRandomAccount(), Amount.fromNem(1),
 				attachment);
 		t.setFee(Amount.fromNem(15));
 		return prepare(t);
@@ -284,11 +234,8 @@ public class RealBlockChainTestContext {
 	 * @return The transfer.
 	 */
 	public Transaction createImportanceTransfer(final Account signer, final Account remote, final boolean activate) {
-		final Transaction t = new ImportanceTransferTransaction(
-				this.getTimeStamp(),
-				signer,
-				activate ? ImportanceTransferMode.Activate : ImportanceTransferMode.Deactivate,
-				remote);
+		final Transaction t = new ImportanceTransferTransaction(this.getTimeStamp(), signer,
+				activate ? ImportanceTransferMode.Activate : ImportanceTransferMode.Deactivate, remote);
 		return prepare(t);
 	}
 
@@ -317,10 +264,7 @@ public class RealBlockChainTestContext {
 	 * @return The new block.
 	 */
 	public Block createNextBlock(final Account account) {
-		return new Block(
-				account,
-				this.initialBlock,
-				this.timeProvider.getCurrentTime().addSeconds(this.timeOffset));
+		return new Block(account, this.initialBlock, this.timeProvider.getCurrentTime().addSeconds(this.timeOffset));
 	}
 
 	/**
@@ -388,10 +332,9 @@ public class RealBlockChainTestContext {
 	 * @return The mosaic balance.
 	 */
 	public Quantity getMosaicBalance(final Account account, final MosaicId mosaicId) {
-		return this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().getBalance(account.getAddress());
+		return this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances()
+				.getBalance(account.getAddress());
 	}
 
-	//endregion
+	// endregion
 }
-
-//endregion

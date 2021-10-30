@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 public class MosaicInfoFactoryTest {
 
-
 	@Test
 	public void factoryFiltersMosaicsThatAreNotFoundInNamespaceCache() {
 		// Arrange: account info contains mosaic ids foo.bar and baz.qux
@@ -50,12 +49,8 @@ public class MosaicInfoFactoryTest {
 		private final ReadOnlyNamespaceDao namespaceDao = Mockito.mock(ReadOnlyNamespaceDao.class);
 		private final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		private final Supplier<BlockHeight> heightSupplier = () -> new BlockHeight(123);
-		private final MosaicInfoFactory factory = new MosaicInfoFactory(
-				this.accountStateCache,
-				this.namespaceCache,
-				this.namespaceDao,
-				this.mapper,
-				this.heightSupplier);
+		private final MosaicInfoFactory factory = new MosaicInfoFactory(this.accountStateCache, this.namespaceCache, this.namespaceDao,
+				this.mapper, this.heightSupplier);
 
 		public TestContext() {
 			final NamespaceId namespaceId1 = new NamespaceId("foo");

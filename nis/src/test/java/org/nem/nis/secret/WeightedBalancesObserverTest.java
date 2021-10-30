@@ -150,12 +150,8 @@ public class WeightedBalancesObserverTest {
 		verifyCallCounts(context.balances, 0, 0, 0, 1);
 	}
 
-	private static void verifyCallCounts(
-			final WeightedBalances balances,
-			final int addSendCounts,
-			final int addReceiveCounts,
-			final int undoSendCounts,
-			final int undoReceiveCounts) {
+	private static void verifyCallCounts(final WeightedBalances balances, final int addSendCounts, final int addReceiveCounts,
+			final int undoSendCounts, final int undoReceiveCounts) {
 		Mockito.verify(balances, Mockito.times(addSendCounts)).addSend(Mockito.any(), Mockito.any());
 		Mockito.verify(balances, Mockito.times(addReceiveCounts)).addReceive(Mockito.any(), Mockito.any());
 		Mockito.verify(balances, Mockito.times(undoSendCounts)).undoSend(Mockito.any(), Mockito.any());

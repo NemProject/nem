@@ -27,14 +27,8 @@ public class AccountHistoricalDataViewModel implements SerializableEntity {
 	 * @param importance The importance.
 	 * @param pageRank The page rank.
 	 */
-	public AccountHistoricalDataViewModel(
-			final BlockHeight height,
-			final Address address,
-			final Amount balance,
-			final Amount vestedBalance,
-			final Amount unvestedBalance,
-			final double importance,
-			final double pageRank) {
+	public AccountHistoricalDataViewModel(final BlockHeight height, final Address address, final Amount balance, final Amount vestedBalance,
+			final Amount unvestedBalance, final double importance, final double pageRank) {
 		this.height = height;
 		this.address = address;
 		this.balance = balance;

@@ -3,8 +3,7 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * Mosaic db entity
- * <br>
+ * Mosaic db entity <br>
  * Holds information about a single mosaic.
  */
 @Entity

@@ -19,8 +19,7 @@ public interface ReadOnlyMosaicBalances {
 	int size();
 
 	/**
-	 * Gets the balance for the specified account.
-	 * This function will return zero for unknown accounts.
+	 * Gets the balance for the specified account. This function will return zero for unknown accounts.
 	 *
 	 * @param address The account address.
 	 * @return The balance.

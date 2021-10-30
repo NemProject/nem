@@ -17,9 +17,7 @@ public class UndoBlockVisitor implements BlockVisitor {
 	 * @param observer The observer.
 	 * @param executor The executor
 	 */
-	public UndoBlockVisitor(
-			final BlockTransactionObserver observer,
-			final BlockExecutor executor) {
+	public UndoBlockVisitor(final BlockTransactionObserver observer, final BlockExecutor executor) {
 		this.observer = observer;
 		this.executor = executor;
 	}

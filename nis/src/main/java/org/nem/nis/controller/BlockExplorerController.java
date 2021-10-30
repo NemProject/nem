@@ -23,10 +23,7 @@ public class BlockExplorerController {
 	private final IMapper mapper;
 
 	@Autowired(required = true)
-	public BlockExplorerController(
-			final ReadOnlyBlockDao blockDao,
-			final MapperFactory mapperFactory,
-			final AccountLookup accountLookup) {
+	public BlockExplorerController(final ReadOnlyBlockDao blockDao, final MapperFactory mapperFactory, final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
 		this.mapper = mapperFactory.createDbModelToModelMapper(accountLookup);
 	}
@@ -37,9 +34,7 @@ public class BlockExplorerController {
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BLOCKS_LIMIT);
 		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT);
-		dbBlockList.stream()
-				.map(dbBlock -> this.mapper.map(dbBlock, ExplorerBlockViewModel.class))
-				.forEach(blockList::add);
+		dbBlockList.stream().map(dbBlock -> this.mapper.map(dbBlock, ExplorerBlockViewModel.class)).forEach(blockList::add);
 		return blockList;
 	}
 

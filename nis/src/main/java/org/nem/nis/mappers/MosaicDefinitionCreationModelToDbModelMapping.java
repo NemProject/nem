@@ -6,7 +6,9 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a model mosaic definition creation transaction to a db mosaic definition creation transaction.
  */
-public class MosaicDefinitionCreationModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
+public class MosaicDefinitionCreationModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
 
 	/**
 	 * Creates a new mapping.

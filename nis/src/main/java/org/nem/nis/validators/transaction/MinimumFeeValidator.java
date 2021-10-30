@@ -7,8 +7,8 @@ import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
 /**
- * A TransactionValidator implementation that applies to all transactions and validates that:
- * - the transaction fee is at least as large as the minimum fee
+ * A TransactionValidator implementation that applies to all transactions and validates that the transaction fee is at least as large as the
+ * minimum fee
  */
 public class MinimumFeeValidator implements SingleTransactionValidator {
 	private final ReadOnlyNamespaceCache namespaceCache;
@@ -32,12 +32,11 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 		}
 
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
-		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(
-				adapters.asMosaicFeeInformationLookup(),
-				context::getBlockHeight,
-				new BlockHeight[] {
+		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
+				context::getBlockHeight, new BlockHeight[]{
 						new BlockHeight(BlockMarkerConstants.FEE_FORK(transaction.getVersion())),
-						new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(transaction.getVersion()))});
+						new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(transaction.getVersion()))
+				});
 		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_INSUFFICIENT_FEE;

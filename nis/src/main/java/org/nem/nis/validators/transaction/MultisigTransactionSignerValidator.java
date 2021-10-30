@@ -6,8 +6,7 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * A transaction validator that validates that:
- * - A multisig signature transaction is signed by a cosigner of the multisig account.
+ * A transaction validator that validates that a multisig signature transaction is signed by a cosigner of the multisig account.
  */
 public class MultisigTransactionSignerValidator implements TSingleTransactionValidator<MultisigTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;

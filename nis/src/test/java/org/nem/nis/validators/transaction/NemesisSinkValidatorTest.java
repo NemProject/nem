@@ -21,7 +21,8 @@ public class NemesisSinkValidatorTest {
 	@Test
 	public void nemesisTransactionAfterNemesisBlockIsInvalid() {
 		// Assert:
-		assertValidationResult(NEMESIS_ADDRESS, new BlockHeight(2), ValidationResult.FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK);
+		assertValidationResult(NEMESIS_ADDRESS, new BlockHeight(2),
+				ValidationResult.FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK);
 	}
 
 	@Test
@@ -36,9 +37,7 @@ public class NemesisSinkValidatorTest {
 		assertValidationResult(Utils.generateRandomAddressWithPublicKey(), new BlockHeight(2), ValidationResult.SUCCESS);
 	}
 
-	private static void assertValidationResult(
-			final Address signerAddress,
-			final BlockHeight height,
+	private static void assertValidationResult(final Address signerAddress, final BlockHeight height,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final SingleTransactionValidator validator = new NemesisSinkValidator();

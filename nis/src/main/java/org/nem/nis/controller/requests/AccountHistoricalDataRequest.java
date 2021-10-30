@@ -17,16 +17,10 @@ public class AccountHistoricalDataRequest extends AccountId {
 	 * @param endHeight The end height.
 	 * @param incrementBy The increment by which to increase the height.
 	 */
-	public AccountHistoricalDataRequest(
-			final String address,
-			final String startHeight,
-			final String endHeight,
-			final String incrementBy) {
+	public AccountHistoricalDataRequest(final String address, final String startHeight, final String endHeight, final String incrementBy) {
 		super(address);
-		this.historicalDataRequest = new HistoricalDataRequest(
-				new BlockHeight(Long.parseLong(startHeight)),
-				new BlockHeight(Long.parseLong(endHeight)),
-				Long.parseLong(incrementBy));
+		this.historicalDataRequest = new HistoricalDataRequest(new BlockHeight(Long.parseLong(startHeight)),
+				new BlockHeight(Long.parseLong(endHeight)), Long.parseLong(incrementBy));
 	}
 
 	/**

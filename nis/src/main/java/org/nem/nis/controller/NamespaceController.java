@@ -26,16 +26,14 @@ public class NamespaceController {
 	private final MosaicInfoFactory mosaicInfoFactory;
 
 	@Autowired(required = true)
-	NamespaceController(
-			final ReadOnlyNamespaceDao namespaceDao,
-			final NisDbModelToModelMapper mapper,
+	NamespaceController(final ReadOnlyNamespaceDao namespaceDao, final NisDbModelToModelMapper mapper,
 			final MosaicInfoFactory mosaicInfoFactory) {
 		this.namespaceDao = namespaceDao;
 		this.mapper = mapper;
 		this.mosaicInfoFactory = mosaicInfoFactory;
 	}
 
-	//region getRoots
+	// region getRoots
 
 	/**
 	 * Gets all known root namespaces.
@@ -51,9 +49,9 @@ public class NamespaceController {
 		return new SerializableList<>(pairs);
 	}
 
-	//endregion
+	// endregion
 
-	//region get
+	// region get
 
 	/**
 	 * Gets information about the specified namespace.
@@ -77,9 +75,9 @@ public class NamespaceController {
 		return this.map(namespace);
 	}
 
-	//endregion
+	// endregion
 
-	//region account/namespaces
+	// region account/namespaces
 
 	/**
 	 * Gets information about an account's namespaces.
@@ -90,32 +88,27 @@ public class NamespaceController {
 	 */
 	@RequestMapping(value = "/account/namespace/page", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Namespace> accountNamespaces(
-			final AccountNamespaceBuilder idBuilder,
-			final DefaultPageBuilder pageBuilder) {
+	public SerializableList<Namespace> accountNamespaces(final AccountNamespaceBuilder idBuilder, final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
 		final AccountNamespace accountNamespace = idBuilder.build();
 
-		final Collection<DbNamespace> dbNamespaces = this.namespaceDao.getNamespacesForAccount(
-					accountNamespace.getAddress(),
-					accountNamespace.getParent(),
-					page.getPageSize());
-		return new SerializableList<>(dbNamespaces.stream()
-				.map(this::map)
-				.filter(n -> this.mosaicInfoFactory.isNamespaceActive(n.getId()))
+		final Collection<DbNamespace> dbNamespaces = this.namespaceDao.getNamespacesForAccount(accountNamespace.getAddress(),
+				accountNamespace.getParent(), page.getPageSize());
+		return new SerializableList<>(dbNamespaces.stream().map(this::map).filter(n -> this.mosaicInfoFactory.isNamespaceActive(n.getId()))
 				.collect(Collectors.toList()));
 	}
 
-	//endregion
+	// endregion
 
 	private Namespace map(final DbNamespace dbNamespace) {
 		return this.mapper.map(dbNamespace, Namespace.class);
 	}
 
-	private Collection<NamespaceMetaDataPair> recursivelyGetNamespaces(
-			final BiFunction<Long, Integer, Collection<DbNamespace>> retriever,
+	private Collection<NamespaceMetaDataPair> recursivelyGetNamespaces(final BiFunction<Long, Integer, Collection<DbNamespace>> retriever,
 			final DefaultPage page) {
-		Long[] curDbId = { page.getId() };
+		Long[] curDbId = {
+				page.getId()
+		};
 		final Collection<NamespaceMetaDataPair> pairs = new ArrayList<>();
 		while (pairs.size() < page.getPageSize()) {
 			final Collection<DbNamespace> dbNamespaces = retriever.apply(curDbId[0], page.getPageSize());
@@ -124,9 +117,7 @@ public class NamespaceController {
 			}
 
 			dbNamespaces.stream()
-					.map(dbNamespace -> new NamespaceMetaDataPair(
-							this.map(dbNamespace),
-							new DefaultMetaData(dbNamespace.getId())))
+					.map(dbNamespace -> new NamespaceMetaDataPair(this.map(dbNamespace), new DefaultMetaData(dbNamespace.getId())))
 					.forEach(pair -> {
 						curDbId[0] = pair.getMetaData().getId();
 						final NamespaceId namespaceId = pair.getEntity().getId();

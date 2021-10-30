@@ -47,7 +47,7 @@ public class MappingTypePair {
 			return false;
 		}
 
-		final MappingTypePair rhs = (MappingTypePair)obj;
+		final MappingTypePair rhs = (MappingTypePair) obj;
 		return this.sourceClass.equals(rhs.sourceClass) && this.targetClass.equals(rhs.targetClass);
 	}
 

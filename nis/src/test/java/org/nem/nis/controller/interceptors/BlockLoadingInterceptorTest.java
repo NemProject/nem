@@ -14,7 +14,7 @@ import javax.servlet.http.*;
 
 public class BlockLoadingInterceptorTest {
 
-	//region without last block
+	// region without last block
 
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithoutLastBlock() {
@@ -52,9 +52,9 @@ public class BlockLoadingInterceptorTest {
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
-	//endregion
+	// endregion
 
-	//region with last block
+	// region with last block
 
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithLastBlock() {
@@ -82,7 +82,7 @@ public class BlockLoadingInterceptorTest {
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertAccessGranted(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act:
@@ -94,8 +94,7 @@ public class BlockLoadingInterceptorTest {
 
 	private static void assertAccessDenied(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act / Assert:
-		NisUtils.assertThrowsNisIllegalStateException(
-				v -> preHandle(interceptor, requestUri),
+		NisUtils.assertThrowsNisIllegalStateException(v -> preHandle(interceptor, requestUri),
 				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 	}
 

@@ -26,16 +26,21 @@ public class RemoteLinkTest {
 		MatcherAssert.assertThat(link.getOwner(), IsEqual.equalTo(RemoteLink.Owner.RemoteHarvester));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@SuppressWarnings("serial")
 	private static final Map<String, RemoteLink> DESC_TO_LINK_MAP = new HashMap<String, RemoteLink>() {
 		{
-			this.put("default", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-address", new RemoteLink(Address.fromEncoded("b"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-height", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(10), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-mode", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), ACTIVATE, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-owner", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.HarvestingRemotely));
+			this.put("default",
+					new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-address",
+					new RemoteLink(Address.fromEncoded("b"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-height",
+					new RemoteLink(Address.fromEncoded("a"), new BlockHeight(10), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-mode",
+					new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), ACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-owner",
+					new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.HarvestingRemotely));
 		}
 	};
 
@@ -51,7 +56,7 @@ public class RemoteLinkTest {
 		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-mode"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-owner"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
-		MatcherAssert.assertThat(Address.fromEncoded("a"), IsNot.not(IsEqual.equalTo((Object)link)));
+		MatcherAssert.assertThat(Address.fromEncoded("a"), IsNot.not(IsEqual.equalTo((Object) link)));
 	}
 
 	@Test
@@ -68,5 +73,5 @@ public class RemoteLinkTest {
 		MatcherAssert.assertThat(DESC_TO_LINK_MAP.get("diff-owner").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 }

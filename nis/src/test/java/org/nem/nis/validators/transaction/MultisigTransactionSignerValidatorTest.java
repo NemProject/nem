@@ -28,8 +28,7 @@ public class MultisigTransactionSignerValidatorTest {
 		assertValidationResult(context -> context.signer, ValidationResult.SUCCESS);
 	}
 
-	private static void assertValidationResult(
-			final Function<MultisigTestContext, Account> getMultisigSigner,
+	private static void assertValidationResult(final Function<MultisigTestContext, Account> getMultisigSigner,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();

@@ -8,9 +8,9 @@ import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
 
 /**
- * A transaction validator that checks transactions that affect remote accounts:
- * a) the remote account can never be a signer of any transaction
- * b) the remote account can never be included in any non importance transfer
+ * A transaction validator that checks transactions that affect remote accounts:<br>
+ * 1. the remote account can never be a signer of any transaction<br>
+ * 2. the remote account can never be included in any non importance transfer
  */
 public class RemoteNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
@@ -34,11 +34,10 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 			return ValidationResult.SUCCESS;
 		}
 
-		return transaction.getAccounts().stream()
-				.filter(a -> !a.equals(transaction.getSigner()))
+		return transaction.getAccounts().stream().filter(a -> !a.equals(transaction.getSigner()))
 				.anyMatch(a -> !this.isRemoteInactive(a, context.getBlockHeight()))
-				? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE
-				: ValidationResult.SUCCESS;
+						? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE
+						: ValidationResult.SUCCESS;
 	}
 
 	private boolean isRemoteInactive(final Account account, final BlockHeight height) {

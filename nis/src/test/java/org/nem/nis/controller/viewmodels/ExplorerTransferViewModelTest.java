@@ -21,14 +21,12 @@ public class ExplorerTransferViewModelTest {
 		final Hash txHash = HashUtils.calculateHash(tx);
 
 		// Act:
-		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(
-				tx,
-				txHash);
+		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(tx, txHash);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
 		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		MatcherAssert.assertThat(getDeserializedTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
+		MatcherAssert.assertThat(getDeserializedTxHash((JSONObject) jsonObject.get("tx")), IsEqual.equalTo(txHash));
 		MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
 	}
 
@@ -41,14 +39,12 @@ public class ExplorerTransferViewModelTest {
 		final Hash innerTxHash = HashUtils.calculateHash(tx.getOtherTransaction());
 
 		// Act:
-		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(
-				tx,
-				txHash);
+		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(tx, txHash);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
 		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
-		MatcherAssert.assertThat(getDeserializedMultisigTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
+		MatcherAssert.assertThat(getDeserializedMultisigTxHash((JSONObject) jsonObject.get("tx")), IsEqual.equalTo(txHash));
 		MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
 		MatcherAssert.assertThat(jsonObject.get("innerHash"), IsEqual.equalTo(innerTxHash.toString()));
 	}
@@ -61,11 +57,9 @@ public class ExplorerTransferViewModelTest {
 		return getDeserializedTxHash(jsonObject, MultisigTransaction::new);
 	}
 
-	private static Hash getDeserializedTxHash(
-			final JSONObject jsonObject,
+	private static Hash getDeserializedTxHash(final JSONObject jsonObject,
 			final BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction> deserialize) {
-		final Transaction deserializedTx = deserialize.apply(
-				VerifiableEntity.DeserializationOptions.VERIFIABLE,
+		final Transaction deserializedTx = deserialize.apply(VerifiableEntity.DeserializationOptions.VERIFIABLE,
 				Utils.createDeserializer(jsonObject));
 		return HashUtils.calculateHash(deserializedTx);
 	}

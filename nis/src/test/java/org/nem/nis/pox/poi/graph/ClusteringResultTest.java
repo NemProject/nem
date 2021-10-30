@@ -10,7 +10,7 @@ import java.util.*;
 
 public class ClusteringResultTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void resultExposesAllConstructorParameters() {
@@ -28,18 +28,16 @@ public class ClusteringResultTest {
 		MatcherAssert.assertThat(result.getOutliers(), IsSame.sameInstance(outliers));
 	}
 
-	//endregion
+	// endregion
 
-	//region numClusters / numNodes
+	// region numClusters / numNodes
 
 	@Test
 	public void numClustersReturnsTotalNumberOfClustersAcrossAllClusterTypes() {
 		// Arrange:
 		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
 		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new ClusterId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(
-				new Cluster(new ClusterId(10)),
-				new Cluster(new ClusterId(12)),
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10)), new Cluster(new ClusterId(12)),
 				new Cluster(new ClusterId(15)));
 
 		// Act:
@@ -52,8 +50,7 @@ public class ClusteringResultTest {
 	@Test
 	public void numNodesReturnsTotalNumberOfNodesInAllClusters() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
 		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
 		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
@@ -65,9 +62,9 @@ public class ClusteringResultTest {
 		MatcherAssert.assertThat(result.numNodes(), IsEqual.equalTo(12));
 	}
 
-	//endregion
+	// endregion
 
-	//region isRegularCluster/isHub/isOutlier
+	// region isRegularCluster/isHub/isOutlier
 
 	@Test
 	public void isRegularClusterIsOnlyPredicateThatReturnsTrueForRegularClusterId() {
@@ -142,15 +139,14 @@ public class ClusteringResultTest {
 		return clusters;
 	}
 
-	//endregion
+	// endregion
 
-	//region getAverageClusterSize
+	// region getAverageClusterSize
 
 	@Test
 	public void getAverageClusterSizeReturnsAverageClusterSizeWhenThereAreClusters() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(17), NisUtils.toNodeIdList(17, 18)),
 				new Cluster(new ClusterId(20), NisUtils.toNodeIdList(20, 21)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
@@ -178,15 +174,14 @@ public class ClusteringResultTest {
 		MatcherAssert.assertThat(result.getAverageClusterSize(), IsEqual.equalTo(0.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getIdForNode
+	// region getIdForNode
 
 	@Test
 	public void getIdForNodeReturnsClusterInformationForAllClusterMembers() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
 		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
 		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
@@ -239,5 +234,5 @@ public class ClusteringResultTest {
 		MatcherAssert.assertThat(result.getIdForNode(new NodeId(17)), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 }

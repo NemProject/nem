@@ -4,8 +4,7 @@ import org.nem.core.model.*;
 import org.nem.nis.validators.*;
 
 /**
- * Block validator that:
- * - validates entities match the default network
+ * Block validator that validates entities match the default network
  */
 public class BlockNetworkValidator extends NetworkValidator implements BlockValidator {
 

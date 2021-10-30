@@ -22,13 +22,8 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 * @param nodes All known nodes.
 	 * @param random The random number generator.
 	 */
-	public ImportanceAwareNodeSelector(
-			final int maxNodes,
-			final ReadOnlyPoxFacade poxFacade,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final ColumnVector trustVector,
-			final Node[] nodes,
-			final Random random) {
+	public ImportanceAwareNodeSelector(final int maxNodes, final ReadOnlyPoxFacade poxFacade,
+			final ReadOnlyAccountStateCache accountStateCache, final ColumnVector trustVector, final Node[] nodes, final Random random) {
 		super(maxNodes, trustVector, nodes, random);
 		this.poxFacade = poxFacade;
 		this.accountStateCache = accountStateCache;

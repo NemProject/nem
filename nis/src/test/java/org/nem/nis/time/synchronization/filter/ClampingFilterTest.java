@@ -31,16 +31,19 @@ public class ClampingFilterTest {
 		// Assert:
 		// Assuming decay strength 0.3 for the following tests:
 		// tolerated = exp(-0.3) * 120 * 60000 = 5333891
-		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 1)), IsEqual.equalTo(5333891L));
+		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 1)),
+				IsEqual.equalTo(5333891L));
 		// tolerated = exp(-1.5) * 120 * 60000 = 1606537
-		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 5)), IsEqual.equalTo(1606537L));
+		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 5)),
+				IsEqual.equalTo(1606537L));
 		// tolerated = exp(-3.3) * 120 * 60000 = 265558
-		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 11)), IsEqual.equalTo(265558L));
+		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 11)),
+				IsEqual.equalTo(265558L));
 		// tolerated = exp(-4.5) * 120 * 60000 = 79984
-		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 15)), IsEqual.equalTo(79984L));
+		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 15)),
+				IsEqual.equalTo(79984L));
 		// exp(-4.8) * 120 * 60000 < TOLERATED_DEVIATION_MINIMUM
-		MatcherAssert.assertThat(
-				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 16)),
+		MatcherAssert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 16)),
 				IsEqual.equalTo(FilterConstants.TOLERATED_DEVIATION_MINIMUM));
 	}
 

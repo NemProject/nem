@@ -29,10 +29,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify(
-				(BalanceTransferNotification)notification,
-				NotificationTrigger.Execute == context.getTrigger(),
-				context.getHeight());
+		this.notify((BalanceTransferNotification) notification, NotificationTrigger.Execute == context.getTrigger(), context.getHeight());
 	}
 
 	private void notify(final BalanceTransferNotification notification, final boolean isExecute, final BlockHeight height) {
@@ -62,9 +59,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 		}
 
 		// only use the vested portion of an account's balance in outlink determination
-		final long rawAdjustedWeight = BigInteger.valueOf(amount.getNumMicroNem())
-				.multiply(vested)
-				.divide(vested.add(unvested))
+		final long rawAdjustedWeight = BigInteger.valueOf(amount.getNumMicroNem()).multiply(vested).divide(vested.add(unvested))
 				.longValue();
 		return Amount.fromMicroNem(rawAdjustedWeight);
 	}

@@ -29,17 +29,13 @@ public class BatchUniqueHashTransactionValidator implements BatchTransactionVali
 			return ValidationResult.SUCCESS;
 		}
 
-		final List<Hash> hashes = groupedTransactions.stream()
-				.flatMap(pair -> pair.getTransactions().stream())
-				.map(HashUtils::calculateHash)
-				.collect(Collectors.toList());
+		final List<Hash> hashes = groupedTransactions.stream().flatMap(pair -> pair.getTransactions().stream())
+				.map(HashUtils::calculateHash).collect(Collectors.toList());
 
 		return this.validate(hashes);
 	}
 
 	private ValidationResult validate(final Collection<Hash> hashes) {
-		return this.transactionHashCache.anyHashExists(hashes)
-				? ValidationResult.NEUTRAL
-				: ValidationResult.SUCCESS;
+		return this.transactionHashCache.anyHashExists(hashes) ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 	}
 }

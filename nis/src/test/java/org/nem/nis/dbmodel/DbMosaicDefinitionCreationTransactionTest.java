@@ -7,7 +7,7 @@ import org.nem.core.test.ExceptionAssert;
 
 public class DbMosaicDefinitionCreationTransactionTest {
 
-	//region setSender
+	// region setSender
 
 	@Test
 	public void setSenderSetsCreatorInMosaic() {
@@ -74,7 +74,7 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		MatcherAssert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(feeRecipient));
 	}
 
-	//endregion
+	// endregion
 
 	private static DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount feeRecipient) {
 		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();

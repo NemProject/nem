@@ -81,7 +81,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 
 		private TestContext() {
 			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
-					.then(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
+					.then(invocationOnMock -> new AccountState((Address) invocationOnMock.getArguments()[0]));
 		}
 
 		private void addTransaction() {

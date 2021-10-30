@@ -85,9 +85,7 @@ public class AuditedCommunicatorTest {
 		private final SerializableEntity entity = new MockSerializableEntity();
 		private final Deserializer deserializer = Mockito.mock(Deserializer.class);
 
-		protected abstract CompletableFuture<Deserializer> post(
-				final Communicator communicator,
-				final URL url,
+		protected abstract CompletableFuture<Deserializer> post(final Communicator communicator, final URL url,
 				final SerializableEntity entity);
 
 		public void assertPostAddsToAuditCollection() throws MalformedURLException {
@@ -121,13 +119,10 @@ public class AuditedCommunicatorTest {
 			final URL url = new URL("http://localhost/my/path");
 			final CompletableFuture<Deserializer> future = new CompletableFuture<>();
 			future.completeExceptionally(new RuntimeException());
-			Mockito.when(this.post(this.innerCommunicator, url, this.entity))
-					.thenReturn(future);
+			Mockito.when(this.post(this.innerCommunicator, url, this.entity)).thenReturn(future);
 
 			// Assert:
-			ExceptionAssert.assertThrows(
-					v -> this.post(this.communicator, url, this.entity).join(),
-					CompletionException.class);
+			ExceptionAssert.assertThrows(v -> this.post(this.communicator, url, this.entity).join(), CompletionException.class);
 
 			// Assert:
 			Mockito.verify(this.collection, Mockito.times(1)).remove("localhost", "/my/path");
@@ -136,20 +131,14 @@ public class AuditedCommunicatorTest {
 
 	private static class PostTestRunner extends TestRunner {
 		@Override
-		protected CompletableFuture<Deserializer> post(
-				final Communicator communicator,
-				final URL url,
-				final SerializableEntity entity) {
+		protected CompletableFuture<Deserializer> post(final Communicator communicator, final URL url, final SerializableEntity entity) {
 			return communicator.post(url, entity);
 		}
 	}
 
 	private static class PostVoidTestRunner extends TestRunner {
 		@Override
-		protected CompletableFuture<Deserializer> post(
-				final Communicator communicator,
-				final URL url,
-				final SerializableEntity entity) {
+		protected CompletableFuture<Deserializer> post(final Communicator communicator, final URL url, final SerializableEntity entity) {
 			return communicator.postVoid(url, entity);
 		}
 	}

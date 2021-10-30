@@ -37,17 +37,10 @@ public class BlockChainUpdateContext {
 	private BlockChainScore peerScore;
 	private final boolean hasOwnChain;
 
-	public BlockChainUpdateContext(
-			final NisCache nisCache,
-			final ReadOnlyNisCache originalNisCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockDao blockDao,
-			final BlockChainServices services,
-			final UnconfirmedTransactions unconfirmedTransactions,
-			final DbBlock dbParentBlock,
-			final Collection<Block> peerChain,
-			final BlockChainScore ourScore,
-			final boolean hasOwnChain) {
+	public BlockChainUpdateContext(final NisCache nisCache, final ReadOnlyNisCache originalNisCache,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer, final BlockDao blockDao, final BlockChainServices services,
+			final UnconfirmedTransactions unconfirmedTransactions, final DbBlock dbParentBlock, final Collection<Block> peerChain,
+			final BlockChainScore ourScore, final boolean hasOwnChain) {
 
 		this.nisCache = nisCache;
 		this.originalNisCache = originalNisCache;
@@ -81,11 +74,8 @@ public class BlockChainUpdateContext {
 		}
 		long stop = System.currentTimeMillis();
 		final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-		LOGGER.info(String.format("validated %d blocks (%d transactions) in %d ms (%d μs/tx)",
-				peerChain.size(),
-				numTransactions,
-				stop - start,
-				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
+		LOGGER.info(String.format("validated %d blocks (%d transactions) in %d ms (%d μs/tx)", peerChain.size(), numTransactions,
+				stop - start, 0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 
 		this.peerScore = this.getPeerChainScore();
 
@@ -95,9 +85,9 @@ public class BlockChainUpdateContext {
 		}
 
 		// BR: Do not accept a chain with the same score.
-		//     In case we got here via pushBlock the following can happen:
-		//     2 different blocks with the same height and score are pushed in the network.
-		//     This leads to switching between the 2 blocks indefinitely resulting in tons of pushes.
+		// In case we got here via pushBlock the following can happen:
+		// 2 different blocks with the same height and score are pushed in the network.
+		// This leads to switching between the 2 blocks indefinitely resulting in tons of pushes.
 		if (this.peerScore.compareTo(this.ourScore) <= 0) {
 			return ValidationResult.NEUTRAL;
 		}
@@ -108,11 +98,8 @@ public class BlockChainUpdateContext {
 		start = System.currentTimeMillis();
 		this.updateOurChain();
 		stop = System.currentTimeMillis();
-		LOGGER.info(String.format("chain update of %d blocks (%d transactions) needed %d ms (%d μs/tx)",
-				peerChain.size(),
-				numTransactions,
-				stop - start,
-				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
+		LOGGER.info(String.format("chain update of %d blocks (%d transactions) needed %d ms (%d μs/tx)", peerChain.size(), numTransactions,
+				stop - start, 0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 		return ValidationResult.SUCCESS;
 	}
 
@@ -150,14 +137,11 @@ public class BlockChainUpdateContext {
 		return scoreVisitor.getScore();
 	}
 
-	/*
-	 * 1. replace current accountAnalyzer with contemporaryAccountAnalyzer
-	 * 2. add unconfirmed transactions from "our" chain
-	 *    (except those transactions, that are included in peer's chain)
-	 *
-	 * 3. drop "our" blocks from the db
-	 *
-	 * 4. update db with "peer's" chain
+	/**
+	 * 1. replace current accountAnalyzer with contemporaryAccountAnalyzer <br>
+	 * 2. add unconfirmed transactions from "our" chain (except those transactions, that are included in peer's chain) <br>
+	 * 3. drop "our" blocks from the db <br>
+	 * 4. update db with "peer's" chain <br>
 	 */
 	private void updateOurChain() {
 		// copy back changes into the "real" nis cache
@@ -166,24 +150,19 @@ public class BlockChainUpdateContext {
 		Collection<Transaction> revertedTransactions = Collections.emptyList();
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) nisCache
-			final Set<Hash> transactionHashes = this.peerChain.stream()
-					.flatMap(bl -> bl.getTransactions().stream())
-					.map(HashUtils::calculateHash)
-					.collect(Collectors.toSet());
-			revertedTransactions = this.getRevertedTransactions(
-					transactionHashes,
-					this.parentBlock.getHeight().getRaw(),
+			final Set<Hash> transactionHashes = this.peerChain.stream().flatMap(bl -> bl.getTransactions().stream())
+					.map(HashUtils::calculateHash).collect(Collectors.toSet());
+			revertedTransactions = this.getRevertedTransactions(transactionHashes, this.parentBlock.getHeight().getRaw(),
 					this.originalNisCache.getAccountCache());
 		}
 
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 		final List<Transaction> transactionsToRemove = new ArrayList<>();
-		this.peerChain.stream()
-				.forEach(block -> {
-					this.blockChainLastBlockLayer.addBlockToDb(block);
-					transactionsToRemove.addAll(block.getTransactions());
-				});
+		this.peerChain.stream().forEach(block -> {
+			this.blockChainLastBlockLayer.addBlockToDb(block);
+			transactionsToRemove.addAll(block.getTransactions());
+		});
 
 		// update the unconfirmed transactions
 		// (as an optimization remove transactions first because removal will trigger a cache rebuild)
@@ -191,9 +170,7 @@ public class BlockChainUpdateContext {
 		revertedTransactions.forEach(this.unconfirmedTransactions::addExisting);
 	}
 
-	private Collection<Transaction> getRevertedTransactions(
-			final Set<Hash> transactionHashes,
-			final long wantedHeight,
+	private Collection<Transaction> getRevertedTransactions(final Set<Hash> transactionHashes, final long wantedHeight,
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 

@@ -112,7 +112,7 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public Long count() {
-		return (long)this.blocks.size();
+		return (long) this.blocks.size();
 	}
 
 	@Override
@@ -142,10 +142,7 @@ public class MockBlockDao implements BlockDao {
 		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
 		return new HashChain(
-				this.blocks.stream()
-						.filter(heightFilter(height, limit))
-						.map(DbBlock::getBlockHash)
-						.collect(Collectors.toList()));
+				this.blocks.stream().filter(heightFilter(height, limit)).map(DbBlock::getBlockHash).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -155,9 +152,7 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
-		return this.blocks.stream()
-				.filter(heightFilter(height.next(), limit))
-				.collect(Collectors.toList());
+		return this.blocks.stream().filter(heightFilter(height.next(), limit)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -167,19 +162,15 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
-		return this.blocks.stream()
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)
-				.map(bl -> new BlockDifficulty(bl.getDifficulty()))
+		return this.blocks.stream().filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0).map(bl -> new BlockDifficulty(bl.getDifficulty()))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
-		return this.blocks.stream()
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)
-				.map(bl -> new TimeInstant(bl.getTimeStamp()))
+		return this.blocks.stream().filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0).map(bl -> new TimeInstant(bl.getTimeStamp()))
 				.collect(Collectors.toList());
 	}
 
@@ -226,11 +217,9 @@ public class MockBlockDao implements BlockDao {
 			}
 		}
 
-		return this.accountDao.equals(rhs.accountDao) &&
-				this.mockMode == rhs.mockMode &&
-				this.lastId == rhs.lastId &&
-				this.lastSavedBlock.getBlockHash().equals(rhs.lastSavedBlock.getBlockHash()) &&
-				this.chain.asCollection().equals(rhs.chain.asCollection());
+		return this.accountDao.equals(rhs.accountDao) && this.mockMode == rhs.mockMode && this.lastId == rhs.lastId
+				&& this.lastSavedBlock.getBlockHash().equals(rhs.lastSavedBlock.getBlockHash())
+				&& this.chain.asCollection().equals(rhs.chain.asCollection());
 	}
 
 	public MockAccountDao getAccountDao() {

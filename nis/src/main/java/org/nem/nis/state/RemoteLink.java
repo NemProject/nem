@@ -37,11 +37,7 @@ public class RemoteLink {
 	 * @param mode The link mode.
 	 * @param owner The link owner.
 	 */
-	public RemoteLink(
-			final Address address,
-			final BlockHeight height,
-			final ImportanceTransferMode mode,
-			final Owner owner) {
+	public RemoteLink(final Address address, final BlockHeight height, final ImportanceTransferMode mode, final Owner owner) {
 		this.address = address;
 		this.height = height;
 		this.mode = mode;
@@ -95,10 +91,7 @@ public class RemoteLink {
 			return false;
 		}
 
-		final RemoteLink rhs = (RemoteLink)obj;
-		return this.owner == rhs.owner &&
-				this.address.equals(rhs.address) &&
-				this.height.equals(rhs.height) &&
-				this.mode.equals(rhs.mode);
+		final RemoteLink rhs = (RemoteLink) obj;
+		return this.owner == rhs.owner && this.address.equals(rhs.address) && this.height.equals(rhs.height) && this.mode.equals(rhs.mode);
 	}
 }

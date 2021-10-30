@@ -96,9 +96,8 @@ public class BlockDifficultyScorerTest {
 		final TimeInstant initialTime = new TimeInstant(100);
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(Arrays.asList(BASE_DIFF, BASE_DIFF));
-		final List<TimeInstant> timeInstants = new ArrayList<>(Arrays.asList(
-				initialTime,
-				initialTime.addSeconds(timeNeededForGeneratingBlock)));
+		final List<TimeInstant> timeInstants = new ArrayList<>(
+				Arrays.asList(initialTime, initialTime.addSeconds(timeNeededForGeneratingBlock)));
 
 		BlockDifficulty prevDifficulty = BASE_DIFF;
 		for (int i = 0; i < 60; ++i) {
@@ -137,9 +136,8 @@ public class BlockDifficultyScorerTest {
 		final TimeInstant initialTime = new TimeInstant(100);
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(Arrays.asList(BASE_DIFF, BASE_DIFF));
-		final List<TimeInstant> timeInstants = new ArrayList<>(Arrays.asList(
-				initialTime,
-				initialTime.addSeconds(timeNeededForGeneratingBlock)));
+		final List<TimeInstant> timeInstants = new ArrayList<>(
+				Arrays.asList(initialTime, initialTime.addSeconds(timeNeededForGeneratingBlock)));
 
 		// Act + Assert
 		BlockDifficulty prevDifficulty = blockDifficulties.get(1);
@@ -169,8 +167,7 @@ public class BlockDifficultyScorerTest {
 	}
 
 	private static boolean isClamped(final BlockDifficulty diff) {
-		return 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() + 1))
-				|| 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() - 1));
+		return 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() + 1)) || 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() - 1));
 	}
 
 	@Test

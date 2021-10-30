@@ -11,7 +11,7 @@ import org.nem.core.test.Utils;
 
 public class NamespaceCacheLookupAdaptersTest {
 
-	//region asMosaicFeeInformationLookup
+	// region asMosaicFeeInformationLookup
 
 	@Test
 	public void asMosaicFeeInformationLookupFindByIdReturnsNullIfNamespaceIdIsNotInCache() {
@@ -19,7 +19,8 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("bar", "coins"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("bar", "coins"));
 
 		// Assert:
 		MatcherAssert.assertThat(information, IsNull.nullValue());
@@ -31,7 +32,8 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "tokens"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("foo", "tokens"));
 
 		// Assert:
 		MatcherAssert.assertThat(information, IsNull.nullValue());
@@ -43,7 +45,8 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "coins"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("foo", "coins"));
 
 		// Assert:
 		MatcherAssert.assertThat(information, IsNull.notNullValue());
@@ -51,9 +54,9 @@ public class NamespaceCacheLookupAdaptersTest {
 		MatcherAssert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
-	//region asMosaicLevyLookup
+	// region asMosaicLevyLookup
 
 	@Test
 	public void asMosaicLevyLookupFindByIdReturnsNullIfNamespaceIdIsNotInCache() {
@@ -92,7 +95,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		MatcherAssert.assertThat(levy, IsEqual.equalTo(context.levy));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final NamespaceCache cache = new DefaultNamespaceCache().copy();
@@ -104,11 +107,8 @@ public class NamespaceCacheLookupAdaptersTest {
 			final Account namespaceOwner = Utils.generateRandomAccount();
 			this.cache.add(new Namespace(namespaceId, namespaceOwner, BlockHeight.ONE));
 
-			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-					namespaceOwner,
-					Utils.createMosaicId("foo", "coins"),
-					Utils.createMosaicProperties(1111L, 4, null, null),
-					this.levy);
+			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, Utils.createMosaicId("foo", "coins"),
+					Utils.createMosaicProperties(1111L, 4, null, null), this.levy);
 			this.cache.get(namespaceId).getMosaics().add(mosaicDefinition).increaseSupply(new Supply(22));
 		}
 	}

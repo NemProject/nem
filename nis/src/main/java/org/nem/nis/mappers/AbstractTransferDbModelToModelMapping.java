@@ -13,7 +13,8 @@ import org.nem.nis.dbmodel.AbstractTransfer;
  * @param <TModel> The model type.
  */
 public abstract class AbstractTransferDbModelToModelMapping<TDbModel extends AbstractTransfer, TModel extends Transaction>
-		implements IMapping<TDbModel, TModel> {
+		implements
+			IMapping<TDbModel, TModel> {
 
 	@Override
 	public final TModel map(final TDbModel source) {

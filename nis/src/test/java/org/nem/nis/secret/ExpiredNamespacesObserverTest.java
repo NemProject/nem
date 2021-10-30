@@ -103,15 +103,12 @@ public class ExpiredNamespacesObserverTest {
 		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(Mockito.any());
 	}
 
-	private static void notify(
-			final TestContext context,
-			final NotificationTrigger notificationTrigger) {
+	private static void notify(final TestContext context, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final ExpiredNamespacesObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -157,14 +154,12 @@ public class ExpiredNamespacesObserverTest {
 
 		private void addMosaicsToNamespaceMosaicsBalances() {
 			final MosaicId id1 = this.mosaicDefinition1.getId();
-			this.namespaceCache.get(id1.getNamespaceId()).getMosaics().get(id1).getBalances().incrementBalance(
-					mosaicDefinition1.getCreator().getAddress(),
-					Quantity.fromValue(1));
+			this.namespaceCache.get(id1.getNamespaceId()).getMosaics().get(id1).getBalances()
+					.incrementBalance(mosaicDefinition1.getCreator().getAddress(), Quantity.fromValue(1));
 
 			final MosaicId id2 = this.mosaicDefinition2.getId();
-			this.namespaceCache.get(id2.getNamespaceId()).getMosaics().get(id2).getBalances().incrementBalance(
-					mosaicDefinition2.getCreator().getAddress(),
-					Quantity.fromValue(1));
+			this.namespaceCache.get(id2.getNamespaceId()).getMosaics().get(id2).getBalances()
+					.incrementBalance(mosaicDefinition2.getCreator().getAddress(), Quantity.fromValue(1));
 		}
 
 		// account 1: owns only mosaic 1

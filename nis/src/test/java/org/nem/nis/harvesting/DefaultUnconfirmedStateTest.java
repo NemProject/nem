@@ -30,7 +30,7 @@ public class DefaultUnconfirmedStateTest {
 	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
 
-	//region getUnconfirmedBalance
+	// region getUnconfirmedBalance
 
 	public static class UnconfirmedBalanceTest {
 
@@ -52,8 +52,7 @@ public class DefaultUnconfirmedStateTest {
 			final TestContext context = new TestContext();
 			final Account account1 = context.addAccount(Amount.fromNem(14));
 			final Account account2 = context.addAccount(Amount.fromNem(110));
-			final List<Transaction> transactions = Arrays.asList(
-					createTransfer(account2, account1, 15, 2),
+			final List<Transaction> transactions = Arrays.asList(createTransfer(account2, account1, 15, 2),
 					createTransfer(account1, account2, 14, 3));
 			context.addAll(transactions);
 
@@ -76,9 +75,9 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getUnconfirmedMosaicBalance
+	// region getUnconfirmedMosaicBalance
 
 	public static class UnconfirmedMosaicBalanceTest {
 
@@ -94,10 +93,12 @@ public class DefaultUnconfirmedStateTest {
 			context.addMosaic(account2, mosaicId2, Supply.fromValue(21));
 
 			// Assert:
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(12_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1),
+					IsEqual.equalTo(Quantity.fromValue(12_000)));
 			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.ZERO));
 			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.ZERO));
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(21_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2),
+					IsEqual.equalTo(Quantity.fromValue(21_000)));
 		}
 
 		@Test
@@ -117,20 +118,24 @@ public class DefaultUnconfirmedStateTest {
 			context.addAll(transactions);
 
 			// Assert:
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(9_000)));
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.fromValue(5_000)));
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(16_000)));
-			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.fromValue(3_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1),
+					IsEqual.equalTo(Quantity.fromValue(9_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId2),
+					IsEqual.equalTo(Quantity.fromValue(5_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId2),
+					IsEqual.equalTo(Quantity.fromValue(16_000)));
+			MatcherAssert.assertThat(context.state.getUnconfirmedMosaicBalance(account2, mosaicId1),
+					IsEqual.equalTo(Quantity.fromValue(3_000)));
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private abstract static class AbstractAddTest {
 
 		protected abstract ValidationResult add(final UnconfirmedState state, final Transaction transaction);
 
-		//region cache add success
+		// region cache add success
 
 		@Test
 		public void addSucceedsIfAllValidationsSucceed() {
@@ -171,16 +176,17 @@ public class DefaultUnconfirmedStateTest {
 			final Collection<Transaction> transactions = createMockTransactions(context, 7, 9);
 
 			// Act:
-			final Collection<ValidationResult> results = transactions.stream().map(t -> this.add(context.state, t)).collect(Collectors.toList());
+			final Collection<ValidationResult> results = transactions.stream().map(t -> this.add(context.state, t))
+					.collect(Collectors.toList());
 
 			// Assert:
 			results.forEach(result -> MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS)));
 			context.assertTransactionsAdded(transactions);
 		}
 
-		//endregion
+		// endregion
 
-		//region cache add failure
+		// region cache add failure
 
 		@Test
 		public void addFailsIfCacheAddFails() {
@@ -214,9 +220,9 @@ public class DefaultUnconfirmedStateTest {
 			MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}
 
-		//endregion
+		// endregion
 
-		//region verify / single validation
+		// region verify / single validation
 
 		@Test
 		public void addFailsIfTransactionDoesNotVerify() {
@@ -278,9 +284,9 @@ public class DefaultUnconfirmedStateTest {
 			context.assertTransactionAdded(transaction);
 		}
 
-		//endregion
+		// endregion
 
-		//region insufficient balance
+		// region insufficient balance
 
 		@Test
 		public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
@@ -288,8 +294,7 @@ public class DefaultUnconfirmedStateTest {
 			final TestContext context = new TestContext(new BalanceValidator());
 			final Account account1 = context.addAccount(Amount.fromNem(14));
 			final Account account2 = context.addAccount(Amount.fromNem(110));
-			final List<Transaction> transactions = Arrays.asList(
-					createTransfer(account1, account2, 5, 1),
+			final List<Transaction> transactions = Arrays.asList(createTransfer(account1, account2, 5, 1),
 					createTransfer(account1, account2, 8, 2));
 			this.add(context.state, transactions.get(0));
 
@@ -325,9 +330,9 @@ public class DefaultUnconfirmedStateTest {
 			context.assertTransactionAdded(transactions.get(0));
 		}
 
-		//endregion
+		// endregion
 
-		//region expiry
+		// region expiry
 
 		@Test
 		public void addFailsIfTransactionHasExpired() {
@@ -345,9 +350,9 @@ public class DefaultUnconfirmedStateTest {
 			context.assertNoTransactionsAdded();
 		}
 
-		//endregion
+		// endregion
 
-		//region validator delegation
+		// region validator delegation
 
 		@Test
 		public void addDelegatesToSingleValidator() {
@@ -371,7 +376,7 @@ public class DefaultUnconfirmedStateTest {
 			MatcherAssert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
 		}
 
-		//endregion
+		// endregion
 
 		protected void assertResultWhenCacheContainsTransaction(final ValidationResult expectedResult) {
 			// Arrange:
@@ -421,9 +426,7 @@ public class DefaultUnconfirmedStateTest {
 			}
 		}
 
-		private static void assertTransactionAddition(
-				final TestContext context,
-				final ValidationResult expectedResult,
+		private static void assertTransactionAddition(final TestContext context, final ValidationResult expectedResult,
 				final Transaction transaction) {
 			if (expectedResult.isSuccess()) {
 				context.assertTransactionAdded(transaction);
@@ -433,7 +436,7 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
-	//region AddExistingTest
+	// region AddExistingTest
 
 	public static class AddExistingTest extends AbstractAddTest {
 
@@ -458,9 +461,9 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region AbstractAddNewTest / AddNewTest
+	// region AbstractAddNewTest / AddNewTest
 
 	private abstract static class AbstractAddNewTest extends AbstractAddTest {
 
@@ -493,9 +496,11 @@ public class DefaultUnconfirmedStateTest {
 			assertCapturedValidationContext(pair.getContext());
 		}
 
-		@SuppressWarnings({"unchecked", "rawtypes"})
+		@SuppressWarnings({
+				"unchecked", "rawtypes"
+		})
 		private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
-			return ArgumentCaptor.forClass((Class)List.class);
+			return ArgumentCaptor.forClass((Class) List.class);
 		}
 	}
 
@@ -512,9 +517,9 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region AddNewBatchTest
+	// region AddNewBatchTest
 
 	public static class AddNewBatchTest extends AbstractAddNewTest {
 
@@ -547,10 +552,7 @@ public class DefaultUnconfirmedStateTest {
 		public void addNewBatchDoesNotShortCircuitButReturnsFirstFailureIfAnyTransactionFailsSingleValidation() {
 			// Arrange:
 			final TestContext context = new TestContext();
-			context.setAddResult(
-					ValidationResult.SUCCESS,
-					ValidationResult.FAILURE_FUTURE_DEADLINE,
-					ValidationResult.SUCCESS,
+			context.setAddResult(ValidationResult.SUCCESS, ValidationResult.FAILURE_FUTURE_DEADLINE, ValidationResult.SUCCESS,
 					ValidationResult.FAILURE_UNKNOWN);
 			final List<Transaction> transactions = createMockTransactions(context, 3, 5);
 
@@ -594,7 +596,7 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTestContext {
 		private final NisCache nisCache = NisCacheFactory.createReal().copy();
@@ -630,17 +632,10 @@ public class DefaultUnconfirmedStateTest {
 			Mockito.when(this.validatorFactory.createIncompleteSingleBuilder(Mockito.any())).thenReturn(singleValidatorBuilder);
 			Mockito.when(this.validatorFactory.createBatch(Mockito.any())).thenReturn(this.batchValidator);
 
-			this.state = new DefaultUnconfirmedState(
-					this.transactions,
-					this.validatorFactory,
-					(notification, context) -> {
-						this.lastNotificationContext = context;
-						this.blockTransferObserver.notify(notification, context);
-					},
-					this.spamFilter,
-					this.nisCache,
-					this.timeProvider,
-					this.blockHeightSupplier);
+			this.state = new DefaultUnconfirmedState(this.transactions, this.validatorFactory, (notification, context) -> {
+				this.lastNotificationContext = context;
+				this.blockTransferObserver.notify(notification, context);
+			}, this.spamFilter, this.nisCache, this.timeProvider, this.blockHeightSupplier);
 		}
 
 		public void add(final Transaction transaction) {
@@ -661,15 +656,15 @@ public class DefaultUnconfirmedStateTest {
 		@Override
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
-			this.modifyCache(copyCache -> copyCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
+			this.modifyCache(copyCache -> copyCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo()
+					.incrementBalance(amount));
 			return account;
 		}
 
 		public void addMosaic(final Account account, final MosaicId mosaicId, final Supply supply) {
 			this.modifyCache(copyCache -> {
 				copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(11)));
-				final MosaicEntry entry = copyCache.getNamespaceCache().get(mosaicId.getNamespaceId())
-						.getMosaics()
+				final MosaicEntry entry = copyCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics()
 						.add(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()));
 				entry.increaseSupply(supply);
 			});

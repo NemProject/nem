@@ -11,7 +11,9 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigAggregateModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
 
 	@Override
 	protected int getVersion() {
@@ -96,14 +98,13 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 
 	@Override
 	protected MultisigAggregateModificationTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new MultisigAggregateModificationTransaction(
-				timeStamp,
-				sender,
-				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+		return new MultisigAggregateModificationTransaction(timeStamp, sender, Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	@Override
-	protected IMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> createMapping(
+			final IMapper mapper) {
 		return new MultisigAggregateModificationModelToDbModelMapping(mapper);
 	}
 
@@ -114,7 +115,8 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
 		final List<MultisigCosignatoryModification> cosignatoryModifications = new ArrayList<>();
 		MultisigMinCosignatoriesModification minCosignatoriesModification;
-		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(this.mapper);
+		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(
+				this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.sender, DbAccount.class)).thenReturn(this.dbSender);
@@ -134,16 +136,11 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		}
 
 		public MultisigAggregateModificationTransaction createModel() {
-			return new MultisigAggregateModificationTransaction(
-					TimeInstant.ZERO,
-					this.sender,
-					this.cosignatoryModifications,
+			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.sender, this.cosignatoryModifications,
 					this.minCosignatoriesModification);
 		}
 
-		public void assertModel(
-				final DbMultisigAggregateModificationTransaction dbModel,
-				final int numExpectedModifications,
+		public void assertModel(final DbMultisigAggregateModificationTransaction dbModel, final int numExpectedModifications,
 				final int expectedRelativeChange) {
 			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 

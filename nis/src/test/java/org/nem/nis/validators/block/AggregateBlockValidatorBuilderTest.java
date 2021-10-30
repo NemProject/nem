@@ -5,7 +5,9 @@ import org.mockito.verification.VerificationMode;
 import org.nem.core.model.*;
 import org.nem.nis.validators.*;
 
-public class AggregateBlockValidatorBuilderTest extends AggregateValidatorBuilderTest<AggregateBlockValidatorBuilder, BlockValidator, Block> {
+public class AggregateBlockValidatorBuilderTest
+		extends
+			AggregateValidatorBuilderTest<AggregateBlockValidatorBuilder, BlockValidator, Block> {
 
 	@Override
 	public AggregateBlockValidatorBuilder createBuilder() {

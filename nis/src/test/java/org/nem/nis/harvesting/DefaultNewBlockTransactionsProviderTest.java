@@ -21,7 +21,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 
-	//region candidate filtering
+	// region candidate filtering
 
 	@Test
 	public void getBlockTransactionsDelegatesToGetTransactionsBefore() {
@@ -30,10 +30,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final TimeInstant currentTime = new TimeInstant(6);
 		final Account account1 = context.addAccount(Amount.fromNem(100));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(4)),
-				new MockTransaction(account2, 2, new TimeInstant(6)),
-				new MockTransaction(account2, 3, new TimeInstant(8)));
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)), new MockTransaction(account2, 3, new TimeInstant(8)));
 		context.addTransactions(transactions);
 		Mockito.when(context.unconfirmedTransactions.getTransactionsBefore(currentTime))
 				.thenReturn(Collections.singletonList(transactions.get(0)));
@@ -53,10 +51,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final TestContext context = new TestContext();
 		final Account account1 = context.addAccount(Amount.fromNem(100));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account1, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account1, 3, new TimeInstant(6)),
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(account1, 1, new TimeInstant(2)),
+				new MockTransaction(account2, 2, new TimeInstant(4)), new MockTransaction(account1, 3, new TimeInstant(6)),
 				new MockTransaction(account2, 4, new TimeInstant(8)));
 		context.addTransactions(transactions);
 
@@ -74,10 +70,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final TestContext context = new TestContext();
 		final Account account1 = context.addAccount(Amount.fromNem(100));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account2, 3, new TimeInstant(6)),
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(account2, 1, new TimeInstant(2)),
+				new MockTransaction(account2, 2, new TimeInstant(4)), new MockTransaction(account2, 3, new TimeInstant(6)),
 				new MockTransaction(account2, 4, new TimeInstant(8)));
 		context.addTransactions(transactions);
 		final MockTransaction transaction = new MockTransaction(account2, 5, new TimeInstant(1));
@@ -119,11 +113,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		MatcherAssert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(2), new TimeInstant(3))));
 	}
 
-	//endregion
+	// endregion
 
-	//region revalidation checking
-
-	//region transaction
+	// region revalidation checking - transaction
 
 	@Test
 	public void getBlockTransactionsIncludesTransactionsWithSuccessValidationResult() {
@@ -143,14 +135,13 @@ public class DefaultNewBlockTransactionsProviderTest {
 		assertTransactionValidationFiltering(ValidationResult.FAILURE_UNKNOWN, Arrays.asList(1, 3));
 	}
 
-	private static void assertTransactionValidationFiltering(
-			final ValidationResult validationResult,
+	private static void assertTransactionValidationFiltering(final ValidationResult validationResult,
 			final List<Integer> expectedFilteredIds) {
 		// Arrange:
 		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		final TestContext context = createContextWithThreeTransactions(new ProviderFactories(validator));
-		Mockito.when(validator.validate(Mockito.any(), Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, validationResult, ValidationResult.SUCCESS);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS, validationResult,
+				ValidationResult.SUCCESS);
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.getBlockTransactions();
@@ -181,9 +172,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region block
+	// region revalidation checking - block
 
 	@Test
 	public void getBlockTransactionsIncludesTransactionsWithSuccessBlockValidationResult() {
@@ -203,14 +194,11 @@ public class DefaultNewBlockTransactionsProviderTest {
 		assertBlockValidationFiltering(ValidationResult.FAILURE_UNKNOWN, Arrays.asList(1, 3));
 	}
 
-	private static void assertBlockValidationFiltering(
-			final ValidationResult validationResult,
-			final List<Integer> expectedFilteredIds) {
+	private static void assertBlockValidationFiltering(final ValidationResult validationResult, final List<Integer> expectedFilteredIds) {
 		// Arrange:
 		final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		final TestContext context = createContextWithThreeTransactions(new ProviderFactories(validator));
-		Mockito.when(validator.validate(Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, validationResult, ValidationResult.SUCCESS);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS, validationResult, ValidationResult.SUCCESS);
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.getBlockTransactions();
@@ -243,9 +231,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region observer
+	// region revalidation checking - observer
 
 	@Test
 	public void getBlockTransactionsCallsObserversForAllValidTransactions() {
@@ -270,8 +258,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		factories.setValidator(validator);
 
 		final TestContext context = createContextWithThreeTransactions(factories);
-		Mockito.when(validator.validate(Mockito.any(), Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_UNKNOWN, ValidationResult.SUCCESS);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_UNKNOWN, ValidationResult.SUCCESS);
 
 		// Act:
 		context.getBlockTransactions();
@@ -290,8 +278,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		factories.setBlockValidator(validator);
 
 		final TestContext context = createContextWithThreeTransactions(factories);
-		Mockito.when(validator.validate(Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_UNKNOWN, ValidationResult.SUCCESS);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_UNKNOWN,
+				ValidationResult.SUCCESS);
 
 		// Act:
 		context.getBlockTransactions();
@@ -321,25 +309,19 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static TestContext createContextWithThreeTransactions(final ProviderFactories factories) {
 		// Arrange:
 		final TestContext context = new TestContext(factories);
 		final Account sender = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(sender, 1, new TimeInstant(4)),
-				new MockTransaction(sender, 2, new TimeInstant(6)),
-				new MockTransaction(sender, 3, new TimeInstant(8)));
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(sender, 1, new TimeInstant(4)),
+				new MockTransaction(sender, 2, new TimeInstant(6)), new MockTransaction(sender, 3, new TimeInstant(8)));
 		context.addTransactions(transactions);
 		return context;
 	}
 
-	//endregion
-
-	//region max transaction checking
-
-	//region no child transactions
+	// region max transaction checking - no child transactions
 
 	@Test
 	public void getBlockTransactionsReturnsAllTransactionsWhenLessThanMaximumTransactionsAreAvailable() {
@@ -375,9 +357,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(createIntRange(6, 6 + numFilteredTransactions)));
 	}
 
-	//endregion
+	// endregion
 
-	//region child transactions
+	// region max transaction checking - child transactions
 
 	@Test
 	public void getBlockTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
@@ -392,7 +374,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 15);
 	}
 
-	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions, final int numFilteredTransactions) {
+	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions,
+			final int numFilteredTransactions) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.addAccount(Amount.fromNem(1000));
@@ -411,16 +394,12 @@ public class DefaultNewBlockTransactionsProviderTest {
 		MatcherAssert.assertThat(numTotalTransactions, IsEqual.equalTo((numChildTransactions + 1) * numFilteredTransactions));
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region test utils
+	// region test utils
 
 	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(Transaction::getTimeStamp)
-				.collect(Collectors.toList());
+		return transactions.stream().map(Transaction::getTimeStamp).collect(Collectors.toList());
 	}
 
 	private static List<Integer> createIntRange(final int start, final int end) {
@@ -473,7 +452,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public BlockTransactionObserverFactory getObserverFactory() {
 			if (null == this.observerFactory) {
-				this.setObserver((notification, context) -> { });
+				this.setObserver((notification, context) -> {
+				});
 			}
 
 			return this.observerFactory;
@@ -521,12 +501,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			Mockito.when(nisCacheCopy.getAccountStateCache()).thenReturn(this.accountStateCache);
 			Mockito.when(this.nisCache.copy()).thenReturn(nisCacheCopy);
 
-			this.provider = new DefaultNewBlockTransactionsProvider(
-					this.nisCache,
-					factories.getValidatorFactory(),
-					factories.getBlockValidatorFactory(),
-					factories.getObserverFactory(),
-					this.unconfirmedTransactions);
+			this.provider = new DefaultNewBlockTransactionsProvider(this.nisCache, factories.getValidatorFactory(),
+					factories.getBlockValidatorFactory(), factories.getObserverFactory(), this.unconfirmedTransactions);
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
@@ -545,8 +521,6 @@ public class DefaultNewBlockTransactionsProviderTest {
 			return this.getBlockTransactions(Utils.generateRandomAccount());
 		}
 
-		//region addAccount
-
 		public Account addAccount(final Amount amount) {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
@@ -558,10 +532,6 @@ public class DefaultNewBlockTransactionsProviderTest {
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}
-
-		//endregion
-
-		//region addTransaction
 
 		public void addTransaction(final Transaction transaction) {
 			this.transactions.add(transaction);
@@ -577,7 +547,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			}
 		}
 
-		public void addTransactionsWithChildren(final Account signer, final int startCustomField, final int endCustomField, final int numChildren) {
+		public void addTransactionsWithChildren(final Account signer, final int startCustomField, final int endCustomField,
+				final int numChildren) {
 			for (int i = startCustomField; i <= endCustomField; ++i) {
 				final MockTransaction transaction = new MockTransaction(signer, i);
 				final List<Transaction> childTransactions = new ArrayList<>();
@@ -589,9 +560,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 				this.addTransaction(transaction);
 			}
 		}
-
-		//endregion
 	}
 
-	//endregion
+	// endregion
 }

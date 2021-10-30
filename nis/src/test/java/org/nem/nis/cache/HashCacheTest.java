@@ -40,7 +40,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 	 */
 	protected abstract T createReadOnlyCacheWithRetentionTime(final int retentionTime);
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void hashCacheIsInitiallyEmpty() {
@@ -65,8 +65,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		// Assert:
 		MatcherAssert.assertThat(this.createWritableCacheWithRetentionTime(-1).getRetentionTime(), IsEqual.equalTo(-1));
 	}
-
-	//endregion
 
 	// endregion
 
@@ -168,7 +166,8 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(123)));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(234))), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(234))),
+				IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -499,12 +498,11 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	// endregion
 
-	//region utilities
+	// region utilities
 
 	private T createHashCacheWithTimeStamps(final int... timeStamps) {
 		final T cache = this.createWritableCache();
-		Arrays.stream(timeStamps)
-				.forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
+		Arrays.stream(timeStamps).forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
 		cache.commit();
 		return cache;
 	}
@@ -536,5 +534,5 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		}
 	}
 
-	//endregion
+	// endregion
 }

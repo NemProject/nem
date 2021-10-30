@@ -11,9 +11,7 @@ public class AggregateTransactionObserverBuilderTest {
 	@Test
 	public void canAddTransactionObserver() {
 		// Arrange:
-		final Notification notification = new BalanceAdjustmentNotification(
-				NotificationType.BalanceCredit,
-				Utils.generateRandomAccount(),
+		final Notification notification = new BalanceAdjustmentNotification(NotificationType.BalanceCredit, Utils.generateRandomAccount(),
 				Amount.fromNem(12));
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
 		final AggregateTransactionObserverBuilder builder = new AggregateTransactionObserverBuilder();
@@ -30,10 +28,8 @@ public class AggregateTransactionObserverBuilderTest {
 	@Test
 	public void canAddMultipleObservers() {
 		// Arrange:
-		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(
-				NotificationType.BalanceCredit,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(12));
+		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.BalanceCredit,
+				Utils.generateRandomAccount(), Amount.fromNem(12));
 		final TransactionObserver observer1 = Mockito.mock(TransactionObserver.class);
 		final TransactionObserver observer2 = Mockito.mock(TransactionObserver.class);
 		final TransactionObserver observer3 = Mockito.mock(TransactionObserver.class);

@@ -28,7 +28,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final long FIRST_FEE_FORK_HEIGHT = BlockMarkerConstants.FEE_FORK(0x98 << 24);
 	private static final long SECOND_FEE_FORK_HEIGHT = BlockMarkerConstants.SECOND_FEE_FORK(0x98 << 24);
 
-	//region valid
+	// region valid
 
 	@Test
 	public void transactionIsValidIfMosaicDefinitionIsNew() {
@@ -46,7 +46,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionPropertyChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsEntireSupply() {
 		// Assert:
-		assertCreatorFullSupplyModificationAllowed(mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, createCustomMosaicProperties()));
+		assertCreatorFullSupplyModificationAllowed(
+				mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, createCustomMosaicProperties()));
 	}
 
 	@Test
@@ -59,8 +60,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionMosaicLevyChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsEntireSupply() {
 		// Assert:
-		assertCreatorFullSupplyModificationAllowed(
-				createCustomMosaicLevy(Utils.createMosaicId("alice", "1")),
+		assertCreatorFullSupplyModificationAllowed(createCustomMosaicLevy(Utils.createMosaicId("alice", "1")),
 				createCustomMosaicLevy(Utils.createMosaicId("alice", "2")));
 	}
 
@@ -73,12 +73,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionPropertyAndDescriptionAndMosaicLevyChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsFullSupply() {
 		// Assert:
-		assertCreatorFullSupplyModificationAllowed(mosaicDefinition ->
-				createAlteredMosaicDefinition(
-						mosaicDefinition,
-						"some desc",
-						createCustomMosaicProperties(),
-						createCustomMosaicLevy()));
+		assertCreatorFullSupplyModificationAllowed(mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, "some desc",
+				createCustomMosaicProperties(), createCustomMosaicLevy()));
 	}
 
 	private static void assertCreatorFullSupplyModificationAllowed(final Function<MosaicDefinition, MosaicDefinition> alter) {
@@ -88,20 +84,17 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static void assertCreatorFullSupplyModificationAllowed(final MosaicLevy originalLevy, final MosaicLevy changedLevy) {
 		// Assert:
-		assertCreatorFullSupplyModificationAllowed(
-				createTransactionWithLevy(changedLevy),
+		assertCreatorFullSupplyModificationAllowed(createTransactionWithLevy(changedLevy),
 				mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, originalLevy));
 	}
 
-	private static void assertCreatorFullSupplyModificationAllowed(
-			final MosaicDefinitionCreationTransaction transaction,
+	private static void assertCreatorFullSupplyModificationAllowed(final MosaicDefinitionCreationTransaction transaction,
 			final Function<MosaicDefinition, MosaicDefinition> alter) {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
 		final MosaicDefinition mosaicDefinition = alter.apply(transaction.getMosaicDefinition());
 		context.addMosaicDefinition(mosaicDefinition);
-		final Collection<MosaicId> mosaicIds = Arrays.asList(
-				getMosaicFeeId(transaction.getMosaicDefinition()),
+		final Collection<MosaicId> mosaicIds = Arrays.asList(getMosaicFeeId(transaction.getMosaicDefinition()),
 				getMosaicFeeId(mosaicDefinition));
 		context.addOptionalMosaicFeeIdDefinitions(mosaicIds);
 
@@ -159,7 +152,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfCreationFeeIsGreaterThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK + 100));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK + 100));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -168,9 +162,9 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region invalid
+	// region invalid
 
 	@Test
 	public void transactionIsInvalidIfNamespaceIsInactive() {
@@ -203,7 +197,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionPropertyChangeIsInvalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
 		// Assert:
-		assertCreatorPartialSupplyModificationDisallowed(mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, createCustomMosaicProperties()));
+		assertCreatorPartialSupplyModificationDisallowed(
+				mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, createCustomMosaicProperties()));
 	}
 
 	@Test
@@ -216,20 +211,15 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionMosaicLevyChangeIsInvalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
 		// Assert:
-		assertCreatorPartialSupplyModificationDisallowed(
-				createCustomMosaicLevy(Utils.createMosaicId("alice", "1")),
+		assertCreatorPartialSupplyModificationDisallowed(createCustomMosaicLevy(Utils.createMosaicId("alice", "1")),
 				createCustomMosaicLevy(Utils.createMosaicId("alice", "2")));
 	}
 
 	@Test
 	public void transactionPropertyAndDescriptionAndMosaicLevyChangeIsInvalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
 		// Assert:
-		assertCreatorPartialSupplyModificationDisallowed(mosaicDefinition ->
-				createAlteredMosaicDefinition(
-						mosaicDefinition,
-						"some desc",
-						createCustomMosaicProperties(),
-						createCustomMosaicLevy()));
+		assertCreatorPartialSupplyModificationDisallowed(mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, "some desc",
+				createCustomMosaicProperties(), createCustomMosaicLevy()));
 	}
 
 	private static void assertCreatorPartialSupplyModificationDisallowed(final Function<MosaicDefinition, MosaicDefinition> alter) {
@@ -239,20 +229,17 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static void assertCreatorPartialSupplyModificationDisallowed(final MosaicLevy originalLevy, final MosaicLevy changedLevy) {
 		// Assert:
-		assertCreatorPartialSupplyModificationDisallowed(
-				createTransactionWithLevy(changedLevy),
+		assertCreatorPartialSupplyModificationDisallowed(createTransactionWithLevy(changedLevy),
 				mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, originalLevy));
 	}
 
-	private static void assertCreatorPartialSupplyModificationDisallowed(
-			final MosaicDefinitionCreationTransaction transaction,
+	private static void assertCreatorPartialSupplyModificationDisallowed(final MosaicDefinitionCreationTransaction transaction,
 			final Function<MosaicDefinition, MosaicDefinition> alter) {
 		final TestContext context = createContextWithValidNamespace();
 		final MosaicDefinition mosaicDefinition = alter.apply(transaction.getMosaicDefinition());
 		context.addMosaicDefinition(mosaicDefinition);
 		context.makeOwnerHavePartialSupply(mosaicDefinition);
-		final Collection<MosaicId> mosaicIds = Arrays.asList(
-				getMosaicFeeId(transaction.getMosaicDefinition()),
+		final Collection<MosaicId> mosaicIds = Arrays.asList(getMosaicFeeId(transaction.getMosaicDefinition()),
 				getMosaicFeeId(mosaicDefinition));
 		context.addOptionalMosaicFeeIdDefinitions(mosaicIds);
 
@@ -294,14 +281,11 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfTransferablePropertyIsChanged() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinition originalMosaicDefinition = Utils.createMosaicDefinition(
-				SIGNER,
-				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"),
-				createCustomMosaicPropertiesWithTransferability(false),
+		final MosaicDefinition originalMosaicDefinition = Utils.createMosaicDefinition(SIGNER,
+				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"), createCustomMosaicPropertiesWithTransferability(false),
 				null);
 		final MosaicDefinitionCreationTransaction transaction = createTransaction(originalMosaicDefinition);
-		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(
-				transaction.getMosaicDefinition(),
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(),
 				createCustomMosaicPropertiesWithTransferability(true));
 		context.addMosaicDefinition(mosaicDefinition);
 
@@ -316,10 +300,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfMosaicLevyIsNotTransferable() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinition feeDefinition = Utils.createMosaicDefinition(
-				SIGNER,
-				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"),
-				createCustomMosaicPropertiesWithTransferability(false),
+		final MosaicDefinition feeDefinition = Utils.createMosaicDefinition(SIGNER,
+				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"), createCustomMosaicPropertiesWithTransferability(false),
 				null);
 		context.addMosaicDefinition(feeDefinition);
 		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeMosaicId(feeDefinition.getId());
@@ -336,11 +318,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers");
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				SIGNER,
-				mosaicId,
-				createCustomMosaicPropertiesWithTransferability(false),
-				createCustomMosaicLevy(mosaicId));
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER, mosaicId,
+				createCustomMosaicPropertiesWithTransferability(false), createCustomMosaicLevy(mosaicId));
 		final MosaicDefinitionCreationTransaction transaction = createTransaction(mosaicDefinition);
 
 		// Act:
@@ -367,7 +346,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfCreationFeeIsLessThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK - 1));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK - 1));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -376,11 +356,9 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE));
 	}
 
-	//endregion
+	// endregion
 
-	//region fee forks
-
-	//region first fee fork
+	// region fee forks - first fee fork
 
 	@Test
 	public void transactionBeforeForkWithLessThan50kXemFeeIsInvalid() {
@@ -390,10 +368,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+				assertValidationResult(Amount.fromNem(fee), new BlockHeight(height), ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
 			});
 		});
 	}
@@ -404,9 +379,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, CREATION_FEE_AFTER_FIRST_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
+			assertValidationResult(Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
 		});
 	}
@@ -418,10 +391,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+				assertValidationResult(Amount.fromNem(fee), new BlockHeight(height), ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
 			});
 		});
 	}
@@ -429,44 +399,30 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAtFirstForkHeightWithAtLeast500XemFeeIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				CREATION_FEE_AFTER_FIRST_FORK,
-				CREATION_FEE_AFTER_FIRST_FORK + 1,
-				CREATION_FEE_AFTER_FIRST_FORK + 100,
-				CREATION_FEE_AFTER_FIRST_FORK + 1000,
-				CREATION_FEE_AFTER_FIRST_FORK + 10000);
+		final Collection<Long> fees = Arrays.asList(CREATION_FEE_AFTER_FIRST_FORK, CREATION_FEE_AFTER_FIRST_FORK + 1,
+				CREATION_FEE_AFTER_FIRST_FORK + 100, CREATION_FEE_AFTER_FIRST_FORK + 1000, CREATION_FEE_AFTER_FIRST_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAfterFirstForkHeightWithAtLeast500XemFeeIsValid() {
 		final Collection<Long> heights = Arrays.asList(FIRST_FEE_FORK_HEIGHT + 1, FIRST_FEE_FORK_HEIGHT + 10, FIRST_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				CREATION_FEE_AFTER_FIRST_FORK,
-				CREATION_FEE_AFTER_FIRST_FORK + 1,
-				CREATION_FEE_AFTER_FIRST_FORK + 100,
-				CREATION_FEE_AFTER_FIRST_FORK + 1000,
-				CREATION_FEE_AFTER_FIRST_FORK + 10000);
+		final Collection<Long> fees = Arrays.asList(CREATION_FEE_AFTER_FIRST_FORK, CREATION_FEE_AFTER_FIRST_FORK + 1,
+				CREATION_FEE_AFTER_FIRST_FORK + 100, CREATION_FEE_AFTER_FIRST_FORK + 1000, CREATION_FEE_AFTER_FIRST_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//region second fee fork
+	// region fee forks - second fee fork
 
 	@Test
 	public void transactionAtSecondForkHeightWithLessThan10XemFeeIsInvalid() {
@@ -474,24 +430,20 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 5L, CREATION_FEE_AFTER_SECOND_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
+			assertValidationResult(Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
 		});
 	}
 
 	@Test
 	public void transactionAfterSecondForkHeightWithLessThan10XemFeeIsInvalid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 5L, CREATION_FEE_AFTER_SECOND_FORK - 1);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+				assertValidationResult(Amount.fromNem(fee), new BlockHeight(height), ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
 			});
 		});
 	}
@@ -499,47 +451,31 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAtSecondForkHeightWithAtLeast10XemFeeIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				CREATION_FEE_AFTER_SECOND_FORK,
-				CREATION_FEE_AFTER_SECOND_FORK + 1,
-				CREATION_FEE_AFTER_SECOND_FORK + 100,
-				CREATION_FEE_AFTER_SECOND_FORK + 1000,
-				CREATION_FEE_AFTER_SECOND_FORK + 10000);
+		final Collection<Long> fees = Arrays.asList(CREATION_FEE_AFTER_SECOND_FORK, CREATION_FEE_AFTER_SECOND_FORK + 1,
+				CREATION_FEE_AFTER_SECOND_FORK + 100, CREATION_FEE_AFTER_SECOND_FORK + 1000, CREATION_FEE_AFTER_SECOND_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAfterSecondForkHeightWithAtLeast10XemFeeIsValid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				CREATION_FEE_AFTER_SECOND_FORK,
-				CREATION_FEE_AFTER_SECOND_FORK + 1,
-				CREATION_FEE_AFTER_SECOND_FORK + 100,
-				CREATION_FEE_AFTER_SECOND_FORK + 1000,
-				CREATION_FEE_AFTER_SECOND_FORK + 10000);
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> fees = Arrays.asList(CREATION_FEE_AFTER_SECOND_FORK, CREATION_FEE_AFTER_SECOND_FORK + 1,
+				CREATION_FEE_AFTER_SECOND_FORK + 100, CREATION_FEE_AFTER_SECOND_FORK + 1000, CREATION_FEE_AFTER_SECOND_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
 
-	//endregion
+	// endregion
 
-	private static void assertValidationResult(
-			final Amount fee,
-			final BlockHeight height,
-			final ValidationResult expectedResult) {
+	private static void assertValidationResult(final Amount fee, final BlockHeight height, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace(height);
 		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(fee);
@@ -551,9 +487,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
-
-	//region createTransaction
+	// region createTransaction
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
 		return createTransaction(Utils.createMosaicDefinition(SIGNER));
@@ -561,10 +495,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFeeSink(final Account creationFeeSink) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(
-				TimeInstant.ZERO, SIGNER,
-				mosaicDefinition,
-				creationFeeSink,
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, creationFeeSink,
 				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
@@ -582,44 +513,37 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition) {
-		return new MosaicDefinitionCreationTransaction(
-				TimeInstant.ZERO,
-				SIGNER,
-				mosaicDefinition,
-				CREATION_FEE_SINK,
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK,
 				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
-	//endregion
+	// endregion
 
-	//region createAlteredMosaicDefinition
+	// region createAlteredMosaicDefinition
 
 	private static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final String description) {
-		return createAlteredMosaicDefinition(mosaicDefinition, description, mosaicDefinition.getProperties(), mosaicDefinition.getMosaicLevy());
+		return createAlteredMosaicDefinition(mosaicDefinition, description, mosaicDefinition.getProperties(),
+				mosaicDefinition.getMosaicLevy());
 	}
 
-	private static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicProperties properties) {
-		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), properties, mosaicDefinition.getMosaicLevy());
+	private static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition,
+			final MosaicProperties properties) {
+		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), properties,
+				mosaicDefinition.getMosaicLevy());
 	}
 
 	private static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicLevy levy) {
-		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), mosaicDefinition.getProperties(), levy);
+		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(),
+				mosaicDefinition.getProperties(), levy);
 	}
 
-	private static MosaicDefinition createAlteredMosaicDefinition(
-			final MosaicDefinition mosaicDefinition,
-			final String description,
-			final MosaicProperties properties,
-			final MosaicLevy levy) {
-		return new MosaicDefinition(
-				mosaicDefinition.getCreator(),
-				mosaicDefinition.getId(),
-				new MosaicDescriptor(description),
-				properties,
+	private static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final String description,
+			final MosaicProperties properties, final MosaicLevy levy) {
+		return new MosaicDefinition(mosaicDefinition.getCreator(), mosaicDefinition.getId(), new MosaicDescriptor(description), properties,
 				levy);
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicId getMosaicFeeId(final MosaicDefinition mosaicDefinition) {
 		return null == mosaicDefinition.getMosaicLevy() ? null : mosaicDefinition.getMosaicLevy().getMosaicId();
@@ -641,11 +565,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static MosaicLevy createCustomMosaicLevy(final MosaicId mosaicId) {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Percentile,
-				Utils.generateRandomAccount(),
-				mosaicId,
-				Quantity.fromValue(456));
+		return new MosaicLevy(MosaicTransferFeeType.Percentile, Utils.generateRandomAccount(), mosaicId, Quantity.fromValue(456));
 	}
 
 	private static TestContext createContextWithValidNamespace() {
@@ -660,7 +580,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static class TestContext {
 		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
-		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache);
+		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(
+				this.namespaceCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
 			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {
@@ -673,8 +594,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		}
 
 		public void addOptionalMosaicFeeIdDefinitions(final Collection<MosaicId> mosaicIds) {
-			mosaicIds.stream()
-					.filter(mid -> null != mid && !this.namespaceCache.get(mid.getNamespaceId()).getMosaics().contains(mid))
+			mosaicIds.stream().filter(mid -> null != mid && !this.namespaceCache.get(mid.getNamespaceId()).getMosaics().contains(mid))
 					.forEach(mid -> this.addMosaicDefinition(Utils.createMosaicDefinition(SIGNER, mid, Utils.createMosaicProperties())));
 		}
 

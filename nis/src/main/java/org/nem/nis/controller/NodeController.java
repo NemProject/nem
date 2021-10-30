@@ -31,10 +31,7 @@ public class NodeController {
 	private final NodeCompatibilityChecker compatibilityChecker;
 
 	@Autowired(required = true)
-	NodeController(
-			final NisPeerNetworkHost host,
-			final NetworkHostBootstrapper hostBootstrapper,
-			final ChainServices chainServices,
+	NodeController(final NisPeerNetworkHost host, final NetworkHostBootstrapper hostBootstrapper, final ChainServices chainServices,
 			final NodeCompatibilityChecker compatibilityChecker) {
 		this.host = host;
 		this.hostBootstrapper = hostBootstrapper;
@@ -42,7 +39,7 @@ public class NodeController {
 		this.compatibilityChecker = compatibilityChecker;
 	}
 
-	//region getInfo / getExtendedInfo
+	// region getInfo / getExtendedInfo
 
 	/**
 	 * Gets information about the running node.
@@ -80,16 +77,14 @@ public class NodeController {
 		return new NisNodeInfo(this.host.getNetwork().getLocalNode(), CommonStarter.META_DATA);
 	}
 
-	//endregion
+	// endregion
 
-	//region getPeerList / getActivePeerList
+	// region getPeerList / getActivePeerList
 
 	/**
-	 * Gets a list of the active and inactive nodes currently known by the
-	 * running node.
+	 * Gets a list of the active and inactive nodes currently known by the running node.
 	 *
-	 * @return A list of the active and inactive nodes currently known by the
-	 * running node.
+	 * @return A list of the active and inactive nodes currently known by the running node.
 	 */
 	@RequestMapping(value = "/node/peer-list/all", method = RequestMethod.GET)
 	@ClientApi
@@ -134,7 +129,7 @@ public class NodeController {
 		return new AuthenticatedResponse<>(this.getActivePeerList(), localNode.getIdentity(), challenge);
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the local node's experiences.
@@ -152,10 +147,7 @@ public class NodeController {
 	}
 
 	private ExtendedNodeExperiencePair extend(final NodeExperiencePair pair) {
-		return new ExtendedNodeExperiencePair(
-				pair.getNode(),
-				pair.getExperience(),
-				this.host.getSyncAttempts(pair.getNode()));
+		return new ExtendedNodeExperiencePair(pair.getNode(), pair.getExperience(), this.host.getSyncAttempts(pair.getNode()));
 	}
 
 	/**
@@ -182,17 +174,14 @@ public class NodeController {
 	}
 
 	/**
-	 * Ping that means the pinging node is part of the NEM P2P network.
-	 * This is only provided for backwards compatibility.
+	 * Ping that means the pinging node is part of the NEM P2P network. This is only provided for backwards compatibility.
 	 *
 	 * @param nodeExperiencesPair Information about the experiences the pinging node has had with other nodes.
 	 * @param request The http servlet request.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(
-			@RequestBody final NodeExperiencesPair nodeExperiencesPair,
-			final HttpServletRequest request) {
+	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair, final HttpServletRequest request) {
 		signOfLife(nodeExperiencesPair.getNode(), request);
 	}
 
@@ -212,9 +201,7 @@ public class NodeController {
 		}
 
 		final NodeEndpoint endpoint = node.getEndpoint();
-		final NodeEndpoint expectedEndpoint = new NodeEndpoint(
-				endpoint.getBaseUrl().getProtocol(),
-				request.getRemoteAddr(),
+		final NodeEndpoint expectedEndpoint = new NodeEndpoint(endpoint.getBaseUrl().getProtocol(), request.getRemoteAddr(),
 				endpoint.getBaseUrl().getPort());
 		if (!expectedEndpoint.equals(endpoint)) {
 			// the actual ip does not match the supplied ip
@@ -234,8 +221,7 @@ public class NodeController {
 	}
 
 	/**
-	 * Just return the Node info the requester "Can You See Me" using the IP
-	 * address from the request.
+	 * Just return the Node info the requester "Can You See Me" using the IP address from the request.
 	 *
 	 * @param localEndpoint The local endpoint (what the local node knows about itself).
 	 * @param request The http servlet request.
@@ -243,15 +229,10 @@ public class NodeController {
 	 */
 	@RequestMapping(value = "/node/cysm", method = RequestMethod.POST)
 	@P2PApi
-	public NodeEndpoint canYouSeeMe(
-			@RequestBody final NodeEndpoint localEndpoint,
-			final HttpServletRequest request) {
+	public NodeEndpoint canYouSeeMe(@RequestBody final NodeEndpoint localEndpoint, final HttpServletRequest request) {
 		// request.getRemotePort() is never the port on which the node is listening,
 		// so let the client specify its desired port
-		return new NodeEndpoint(
-				localEndpoint.getBaseUrl().getProtocol(),
-				request.getRemoteAddr(),
-				localEndpoint.getBaseUrl().getPort());
+		return new NodeEndpoint(localEndpoint.getBaseUrl().getProtocol(), request.getRemoteAddr(), localEndpoint.getBaseUrl().getPort());
 	}
 
 	/**
@@ -267,7 +248,7 @@ public class NodeController {
 		this.hostBootstrapper.boot(localNode);
 	}
 
-	//region activePeersMaxChainHeight
+	// region activePeersMaxChainHeight
 
 	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)
 	@PublicApi
@@ -275,5 +256,5 @@ public class NodeController {
 		return this.chainServices.getMaxChainHeightAsync(this.getActivePeerList().asCollection()).join();
 	}
 
-	//endregion
+	// endregion
 }

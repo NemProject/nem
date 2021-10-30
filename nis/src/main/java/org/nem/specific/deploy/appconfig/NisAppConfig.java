@@ -41,12 +41,14 @@ import java.util.*;
 import java.util.function.*;
 
 @Configuration
-@ComponentScan(
-		basePackages = { "org.nem.nis" },
-		excludeFilters = {
-				@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class),
-				@ComponentScan.Filter(type = FilterType.REGEX, pattern = { "org.nem.nis.websocket.*" })
+@ComponentScan(basePackages = {
+		"org.nem.nis"
+}, excludeFilters = {
+		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class),
+		@ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+				"org.nem.nis.websocket.*"
 		})
+})
 @EnableTransactionManagement
 public class NisAppConfig {
 
@@ -87,9 +89,8 @@ public class NisAppConfig {
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 
 		// replace url parameters with values from configuration
-		final String jdbcUrl = prop.getProperty("jdbc.url")
-				.replace("${nem.folder}", nemFolder)
-				.replace("${nem.network}", configuration.getNetworkName());
+		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder).replace("${nem.network}",
+				configuration.getNetworkName());
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
@@ -120,43 +121,28 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChain blockChain() {
-		return new BlockChain(
-				this.blockChainLastBlockLayer,
-				this.blockChainUpdater());
+		return new BlockChain(this.blockChainLastBlockLayer, this.blockChainUpdater());
 	}
 
 	@Bean
 	public BlockChainServices blockChainServices() {
-		return new BlockChainServices(
-				this.blockDao,
-				this.blockTransactionObserverFactory(),
-				this.blockValidatorFactory(),
-				this.transactionValidatorFactory(),
-				this.nisMapperFactory());
+		return new BlockChainServices(this.blockDao, this.blockTransactionObserverFactory(), this.blockValidatorFactory(),
+				this.transactionValidatorFactory(), this.nisMapperFactory());
 	}
 
 	@Bean
 	public BlockChainUpdater blockChainUpdater() {
-		return new BlockChainUpdater(
-				this.nisCache(),
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.blockChainContextFactory(),
-				this.unconfirmedTransactions(),
-				this.nisConfiguration());
+		return new BlockChainUpdater(this.nisCache(), this.blockChainLastBlockLayer, this.blockDao, this.blockChainContextFactory(),
+				this.unconfirmedTransactions(), this.nisConfiguration());
 	}
 
 	@Bean
 	public BlockChainContextFactory blockChainContextFactory() {
-		return new BlockChainContextFactory(
-				this.nisCache(),
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.blockChainServices(),
+		return new BlockChainContextFactory(this.nisCache(), this.blockChainLastBlockLayer, this.blockDao, this.blockChainServices(),
 				this.unconfirmedTransactions());
 	}
 
-	//region mappers
+	// region mappers
 
 	@Bean
 	public MapperFactory mapperFactory() {
@@ -178,9 +164,9 @@ public class NisAppConfig {
 		return this.nisMapperFactory().createDbModelToModelNisMapper(this.accountCache());
 	}
 
-	//endregion
+	// endregion
 
-	//region observers + validators
+	// region observers + validators
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
@@ -205,28 +191,17 @@ public class NisAppConfig {
 		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.nisCache()).build();
 	}
 
-	//endregion
+	// endregion
 
 	@Bean
 	public Harvester harvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
-				this.nisCache(),
-				this.transactionValidatorFactory(),
-				this.blockValidatorFactory(),
-				this.blockTransactionObserverFactory(),
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(this.nisCache(),
+				this.transactionValidatorFactory(), this.blockValidatorFactory(), this.blockTransactionObserverFactory(),
 				this.unconfirmedTransactionsFilter());
 
-		final BlockGenerator generator = new BlockGenerator(
-				this.nisCache(),
-				transactionsProvider,
-				this.blockDao,
-				new BlockScorer(this.accountStateCache()),
-				this.blockValidatorFactory().create(this.nisCache()));
-		return new Harvester(
-				this.timeProvider(),
-				this.blockChainLastBlockLayer,
-				this.unlockedAccounts(),
-				this.nisDbModelToModelMapper(),
+		final BlockGenerator generator = new BlockGenerator(this.nisCache(), transactionsProvider, this.blockDao,
+				new BlockScorer(this.accountStateCache()), this.blockValidatorFactory().create(this.nisCache()));
+		return new Harvester(this.timeProvider(), this.blockChainLastBlockLayer, this.unlockedAccounts(), this.nisDbModelToModelMapper(),
 				generator);
 	}
 
@@ -257,11 +232,7 @@ public class NisAppConfig {
 
 	@Bean
 	public ReadOnlyNisCache nisCache() {
-		return new DefaultNisCache(
-				this.accountCache(),
-				this.accountStateCache(),
-				this.poxFacade(),
-				this.transactionHashCache(),
+		return new DefaultNisCache(this.accountCache(), this.accountStateCache(), this.poxFacade(), this.transactionHashCache(),
 				this.namespaceCache());
 	}
 
@@ -270,25 +241,20 @@ public class NisAppConfig {
 	public ImportanceCalculator importanceCalculator() {
 		final Map<BlockChainFeature, Supplier<ImportanceCalculator>> featureSupplierMap = new HashMap<BlockChainFeature, Supplier<ImportanceCalculator>>() {
 			{
-				this.put(BlockChainFeature.PROOF_OF_IMPORTANCE, () -> new PoiImportanceCalculator(new PoiScorer(), NisAppConfig::getBlockDependentPoiOptions));
+				this.put(BlockChainFeature.PROOF_OF_IMPORTANCE,
+						() -> new PoiImportanceCalculator(new PoiScorer(), NisAppConfig::getBlockDependentPoiOptions));
 				this.put(BlockChainFeature.PROOF_OF_STAKE, PosImportanceCalculator::new);
 			}
 		};
 
-		return BlockChainFeatureDependentFactory.createObject(
-				this.nisConfiguration().getBlockChainConfiguration(),
-				"consensus algorithm",
+		return BlockChainFeatureDependentFactory.createObject(this.nisConfiguration().getBlockChainConfiguration(), "consensus algorithm",
 				featureSupplierMap);
 	}
 
 	@Bean
 	public UnlockedAccounts unlockedAccounts() {
-		return new UnlockedAccounts(
-				this.accountCache(),
-				this.accountStateCache(),
-				this.blockChainLastBlockLayer,
-				this.canHarvestPredicate(),
-				this.nisConfiguration().getUnlockedLimit());
+		return new UnlockedAccounts(this.accountCache(), this.accountStateCache(), this.blockChainLastBlockLayer,
+				this.canHarvestPredicate(), this.nisConfiguration().getUnlockedLimit());
 	}
 
 	@Bean
@@ -312,13 +278,11 @@ public class NisAppConfig {
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		final BlockChainConfiguration blockChainConfiguration = this.nisConfiguration().getBlockChainConfiguration();
-		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
-				this.transactionValidatorFactory(),
-				this.blockTransactionObserverFactory()::createExecuteCommitObserver,
-				this.timeProvider(),
-				this.lastBlockHeight(),
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(this.transactionValidatorFactory(),
+				this.blockTransactionObserverFactory()::createExecuteCommitObserver, this.timeProvider(), this.lastBlockHeight(),
 				blockChainConfiguration.getMaxTransactionsPerBlock());
-		final UnconfirmedTransactions unconfirmedTransactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache());
+		final UnconfirmedTransactions unconfirmedTransactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory,
+				this.nisCache());
 		return new SynchronizedUnconfirmedTransactions(unconfirmedTransactions);
 	}
 
@@ -342,26 +306,19 @@ public class NisAppConfig {
 		if (this.nisConfiguration().ignoreFees()) {
 			NemGlobals.setTransactionFeeCalculator(new ZeroTransactionFeeCalculator());
 		} else {
-			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
-					adapters.asMosaicFeeInformationLookup(),
-					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(),
-					new BlockHeight[] {
+			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
+					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(), new BlockHeight[]{
 							new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24)),
-							new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))
+							new BlockHeight(
+									BlockMarkerConstants.SECOND_FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))
 					}));
 		}
 
 		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
 
-		return new NisMain(
-				this.blockDao,
-				this.nisCache(),
-				this.networkHostBootstrapper(),
-				this.nisModelToDbModelMapper(),
-				this.nisConfiguration(),
-				this.blockAnalyzer(),
-				System::exit);
+		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(),
+				this.nisConfiguration(), this.blockAnalyzer(), System::exit);
 	}
 
 	@SuppressWarnings("serial")
@@ -373,20 +330,14 @@ public class NisAppConfig {
 			}
 		};
 
-		return BlockChainFeatureDependentFactory.createObject(
-				this.nisConfiguration().getBlockChainConfiguration(),
-				"weighted balance scheme",
-				featureSupplierMap);
+		return BlockChainFeatureDependentFactory.createObject(this.nisConfiguration().getBlockChainConfiguration(),
+				"weighted balance scheme", featureSupplierMap);
 	}
 
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
 		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
-		return new BlockAnalyzer(
-				this.blockDao,
-				this.blockChainUpdater(),
-				this.blockChainLastBlockLayer,
-				this.nisMapperFactory(),
+		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer, this.nisMapperFactory(),
 				estimatedBlocksPerYear);
 	}
 
@@ -400,34 +351,19 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		final HarvestingTask harvestingTask = new HarvestingTask(
-				this.blockChain(),
-				this.harvester(),
-				this.unconfirmedTransactions());
+		final HarvestingTask harvestingTask = new HarvestingTask(this.blockChain(), this.harvester(), this.unconfirmedTransactions());
 
 		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), harvestingTask);
 
 		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
 
-		return new NisPeerNetworkHost(
-				this.nisCache(),
-				synchronizer,
-				scheduler,
-				this.chainServices(),
-				this.nodeCompatibilityChecker(),
-				this.nisConfiguration(),
-				this.httpConnectorPool(),
-				this.trustProvider(),
-				this.incomingAudits(),
-				this.outgoingAudits());
+		return new NisPeerNetworkHost(this.nisCache(), synchronizer, scheduler, this.chainServices(), this.nodeCompatibilityChecker(),
+				this.nisConfiguration(), this.httpConnectorPool(), this.trustProvider(), this.incomingAudits(), this.outgoingAudits());
 	}
 
 	@Bean
 	public NetworkHostBootstrapper networkHostBootstrapper() {
-		return new HarvestAwareNetworkHostBootstrapper(
-				this.nisPeerNetworkHost(),
-				this.unlockedAccounts(),
-				this.nisConfiguration());
+		return new HarvestAwareNetworkHostBootstrapper(this.nisPeerNetworkHost(), this.unlockedAccounts(), this.nisConfiguration());
 	}
 
 	@Bean
@@ -444,9 +380,7 @@ public class NisAppConfig {
 	public TrustProvider trustProvider() {
 		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
 		final int TRUST_CACHE_TIME = 15 * 60;
-		return new CachedTrustProvider(
-				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
-				TRUST_CACHE_TIME,
+		return new CachedTrustProvider(new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT), TRUST_CACHE_TIME,
 				this.timeProvider());
 	}
 

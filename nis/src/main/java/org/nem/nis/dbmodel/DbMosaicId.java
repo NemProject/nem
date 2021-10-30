@@ -35,7 +35,7 @@ public class DbMosaicId {
 			return false;
 		}
 
-		final DbMosaicId rhs = (DbMosaicId)obj;
+		final DbMosaicId rhs = (DbMosaicId) obj;
 		return this.id.equals(rhs.id);
 	}
 }

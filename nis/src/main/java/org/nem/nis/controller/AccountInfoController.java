@@ -32,11 +32,8 @@ public class AccountInfoController {
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
-	AccountInfoController(
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final AccountInfoFactory accountInfoFactory,
-			final AccountMetaDataFactory accountMetaDataFactory,
-			final ReadOnlyAccountStateCache accountStateCache,
+	AccountInfoController(final BlockChainLastBlockLayer blockChainLastBlockLayer, final AccountInfoFactory accountInfoFactory,
+			final AccountMetaDataFactory accountMetaDataFactory, final ReadOnlyAccountStateCache accountStateCache,
 			final NisConfiguration nisConfiguration) {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
@@ -107,8 +104,7 @@ public class AccountInfoController {
 	@ClientApi
 	public SerializableList<AccountMetaDataPair> accountGetBatch(@RequestBody final Deserializer deserializer) {
 		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
-		final Collection<AccountMetaDataPair> pairs = accounts.asCollection().stream()
-				.map(a -> this.getMetaDataPair(a.getAddress()))
+		final Collection<AccountMetaDataPair> pairs = accounts.asCollection().stream().map(a -> this.getMetaDataPair(a.getAddress()))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
@@ -144,7 +140,8 @@ public class AccountInfoController {
 	 */
 	@RequestMapping(value = "/account/historical/get/batch", method = RequestMethod.POST)
 	@ClientApi
-	public SerializableList<SerializableList<AccountHistoricalDataViewModel>> accountHistoricalDataGetBatch(@RequestBody final Deserializer deserializer) {
+	public SerializableList<SerializableList<AccountHistoricalDataViewModel>> accountHistoricalDataGetBatch(
+			@RequestBody final Deserializer deserializer) {
 		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			throw new UnsupportedOperationException("this node does not support historical account data retrieval");
 		}
@@ -192,13 +189,7 @@ public class AccountInfoController {
 		final Amount vested = weightedBalances.getVested(height);
 		final Amount unvested = weightedBalances.getUnvested(height);
 		final ReadOnlyHistoricalImportances importances = accountState.getHistoricalImportances();
-		return new AccountHistoricalDataViewModel(
-				height,
-				address,
-				vested.add(unvested),
-				vested,
-				unvested,
-				importances.getHistoricalImportance(groupedHeight),
-				importances.getHistoricalPageRank(groupedHeight));
+		return new AccountHistoricalDataViewModel(height, address, vested.add(unvested), vested, unvested,
+				importances.getHistoricalImportance(groupedHeight), importances.getHistoricalPageRank(groupedHeight));
 	}
 }

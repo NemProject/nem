@@ -18,8 +18,8 @@ public class ExceptionControllerAdviceTest {
 	public void handleMissingResourceExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = createAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleMissingResourceException(
-				new MissingResourceException("badness", "class", "resource"));
+		final ResponseEntity<ErrorResponse> entity = advice
+				.handleMissingResourceException(new MissingResourceException("badness", "class", "resource"));
 
 		// Assert:
 		assertEntity(entity, HttpStatus.NOT_FOUND, "badness 'resource' (class)");
@@ -49,8 +49,8 @@ public class ExceptionControllerAdviceTest {
 	public void handleNisIllegalStateExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = createAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleNisIllegalStateException(
-				new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED));
+		final ResponseEntity<ErrorResponse> entity = advice
+				.handleNisIllegalStateException(new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED));
 
 		// Assert:
 		assertEntity(entity, HttpStatus.SERVICE_UNAVAILABLE, "NIS_ILLEGAL_STATE_NOT_BOOTED");
@@ -71,7 +71,8 @@ public class ExceptionControllerAdviceTest {
 		assertEntity(entity, expectedCode, "badness");
 	}
 
-	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode, final String expectedMessage) {
+	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode,
+			final String expectedMessage) {
 		// Assert:
 		MatcherAssert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
 		MatcherAssert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));

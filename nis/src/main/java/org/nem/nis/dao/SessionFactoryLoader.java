@@ -49,8 +49,7 @@ public class SessionFactoryLoader {
 		final Properties dbProperties = new Properties();
 		final Properties properties = new Properties();
 		dbProperties.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		dbProperties.stringPropertyNames().stream()
-				.filter(filter)
+		dbProperties.stringPropertyNames().stream().filter(filter)
 				.forEach(entry -> properties.setProperty(entry, dbProperties.getProperty(entry)));
 
 		return properties;

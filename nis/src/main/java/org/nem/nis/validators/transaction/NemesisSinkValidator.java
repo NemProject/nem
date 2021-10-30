@@ -5,8 +5,8 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.validators.*;
 
 /**
- * A TransactionValidator implementation that applies to all transactions and validates that:
- * - nemesis account transactions are not allowed after the nemesis block
+ * A TransactionValidator implementation that applies to all transactions and validates that nemesis account transactions are not allowed
+ * after the nemesis block
  */
 public class NemesisSinkValidator implements SingleTransactionValidator {
 

@@ -34,9 +34,7 @@ public class DefaultSkipListMap<TKey extends Comparable<?>, TValue> {
 	public int size() {
 		return this.map.isEmpty()
 				? 0
-				: this.map.keySet().stream()
-						.mapToInt(key -> this.map.get(key).size())
-						.reduce(Integer::sum).getAsInt();
+				: this.map.keySet().stream().mapToInt(key -> this.map.get(key).size()).reduce(Integer::sum).getAsInt();
 	}
 
 	/**

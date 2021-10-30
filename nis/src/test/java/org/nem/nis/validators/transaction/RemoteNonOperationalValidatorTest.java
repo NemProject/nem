@@ -20,14 +20,15 @@ import java.util.Arrays;
 
 @RunWith(Enclosed.class)
 public class RemoteNonOperationalValidatorTest {
-	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
-			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
-	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION = new BlockHeight(
+			BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{
+			1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1
+	};
 	private static final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
-			FORK_HEIGHT_MOSAIC_REDEFINITION,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
+			FORK_HEIGHT_MOSAIC_REDEFINITION, FORK_HEIGHT_MOSAIC_REDEFINITION + 1, FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000
+	};
 
 	private static abstract class DefaultTransactionValidationTest {
 
@@ -82,7 +83,7 @@ public class RemoteNonOperationalValidatorTest {
 			context.assertValidationResult(transaction, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 		}
 
-		//region mosaic redefinition fork
+		// region mosaic redefinition fork
 
 		@Test
 		public void transferContainingInactiveRemoteAccountAsSignerIsNotValidBeforeFork() {
@@ -92,9 +93,7 @@ public class RemoteNonOperationalValidatorTest {
 			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
 
 			// Act:
-			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(
-					transaction,
-					new BlockHeight(height),
+			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(transaction, new BlockHeight(height),
 					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE));
 		}
 
@@ -106,18 +105,16 @@ public class RemoteNonOperationalValidatorTest {
 			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
 
 			// Act:
-			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> context.assertValidationResult(
-					transaction,
-					new BlockHeight(height),
-					ValidationResult.SUCCESS));
+			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK)
+					.forEach(height -> context.assertValidationResult(transaction, new BlockHeight(height), ValidationResult.SUCCESS));
 		}
 
-		//endregion
+		// endregion
 
 		protected abstract Transaction createTransfer(final Account signer, final Account other);
 	}
 
-	//region non importance transfer
+	// region non importance transfer
 
 	public static class NonImportanceTransferValidationTest extends DefaultTransactionValidationTest {
 
@@ -142,7 +139,7 @@ public class RemoteNonOperationalValidatorTest {
 			context.assertValidationResult(transaction, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 		}
 
-		//region mosaic redefinition fork
+		// region mosaic redefinition fork
 
 		@Test
 		public void transferContainingInactiveRemoteAccountAsOtherIsNotValidBeforeFork() {
@@ -152,9 +149,7 @@ public class RemoteNonOperationalValidatorTest {
 			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
 
 			// Act:
-			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(
-					transaction,
-					new BlockHeight(height),
+			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(transaction, new BlockHeight(height),
 					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE));
 		}
 
@@ -166,28 +161,21 @@ public class RemoteNonOperationalValidatorTest {
 			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
 
 			// Act:
-			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> context.assertValidationResult(
-					transaction,
-					new BlockHeight(height),
-					ValidationResult.SUCCESS));
+			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK)
+					.forEach(height -> context.assertValidationResult(transaction, new BlockHeight(height), ValidationResult.SUCCESS));
 		}
 
-		//endregion
+		// endregion
 
 		@Override
 		protected Transaction createTransfer(final Account signer, final Account other) {
-			return new TransferTransaction(
-					TimeInstant.ZERO,
-					signer,
-					other,
-					Amount.fromNem(100),
-					null);
+			return new TransferTransaction(TimeInstant.ZERO, signer, other, Amount.fromNem(100), null);
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region importance transfer
+	// region importance transfer
 
 	public static class ImportanceTransferValidationTest extends DefaultTransactionValidationTest {
 
@@ -203,15 +191,11 @@ public class RemoteNonOperationalValidatorTest {
 
 		@Override
 		protected Transaction createTransfer(final Account signer, final Account other) {
-			return new ImportanceTransferTransaction(
-					TimeInstant.ZERO,
-					signer,
-					ImportanceTransferMode.Activate,
-					other);
+			return new ImportanceTransferTransaction(TimeInstant.ZERO, signer, ImportanceTransferMode.Activate, other);
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
@@ -222,7 +206,7 @@ public class RemoteNonOperationalValidatorTest {
 
 		public TestContext() {
 			Mockito.when(this.accountStateCache.findStateByAddress(Mockito.any()))
-					.thenAnswer(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
+					.thenAnswer(invocationOnMock -> new AccountState((Address) invocationOnMock.getArguments()[0]));
 
 			this.setupRemote(this.ownerAccount.getAddress(), this.remoteAccount.getAddress());
 		}
@@ -244,30 +228,19 @@ public class RemoteNonOperationalValidatorTest {
 
 		private void deactivateRemote(final Address ownerAddress, final Address remoteAddress) {
 			final AccountState ownerAccountState = this.accountStateCache.findStateByAddress(ownerAddress);
-			ownerAccountState.getRemoteLinks().addLink(new RemoteLink(
-					remoteAddress,
-					BlockHeight.ONE,
-					ImportanceTransferMode.Deactivate,
-					RemoteLink.Owner.HarvestingRemotely));
+			ownerAccountState.getRemoteLinks().addLink(
+					new RemoteLink(remoteAddress, BlockHeight.ONE, ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely));
 
 			final AccountState remoteAccountState = this.accountStateCache.findStateByAddress(remoteAddress);
-			remoteAccountState.getRemoteLinks().addLink(new RemoteLink(
-					ownerAddress,
-					BlockHeight.ONE,
-					ImportanceTransferMode.Deactivate,
-					RemoteLink.Owner.RemoteHarvester));
+			remoteAccountState.getRemoteLinks().addLink(
+					new RemoteLink(ownerAddress, BlockHeight.ONE, ImportanceTransferMode.Deactivate, RemoteLink.Owner.RemoteHarvester));
 		}
 
-		public void assertValidationResult(
-				final Transaction transaction,
-				final ValidationResult expectedResult) {
+		public void assertValidationResult(final Transaction transaction, final ValidationResult expectedResult) {
 			assertValidationResult(transaction, new BlockHeight(50), expectedResult);
 		}
 
-		public void assertValidationResult(
-				final Transaction transaction,
-				final BlockHeight height,
-				final ValidationResult expectedResult) {
+		public void assertValidationResult(final Transaction transaction, final BlockHeight height, final ValidationResult expectedResult) {
 			// Arrange:
 			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
 

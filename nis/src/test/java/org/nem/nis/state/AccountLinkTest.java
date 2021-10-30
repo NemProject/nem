@@ -68,7 +68,7 @@ public class AccountLinkTest {
 		MatcherAssert.assertThat(link2.compareTo(link1) <= -1, IsEqual.equalTo(true));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -81,7 +81,7 @@ public class AccountLinkTest {
 		MatcherAssert.assertThat(NisUtils.createLink(8, 2, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZA"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
-		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object)link)));
+		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object) link)));
 	}
 
 	@Test
@@ -97,9 +97,9 @@ public class AccountLinkTest {
 		MatcherAssert.assertThat(NisUtils.createLink(8, 1, "ZZA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -110,5 +110,5 @@ public class AccountLinkTest {
 		MatcherAssert.assertThat(link.toString(), IsEqual.equalTo("1000000 -> ZZZ @ 8"));
 	}
 
-	//endregion
+	// endregion
 }

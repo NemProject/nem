@@ -59,19 +59,14 @@ public class DefaultPeerNetworkServicesFactoryTest {
 	@Test
 	public void createTimeSynchronizerReturnsNonNull() {
 		// Assert:
-		MatcherAssert.assertThat(createFactory().createTimeSynchronizer(Mockito.mock(ImportanceAwareNodeSelector.class), Mockito.mock(SystemTimeProvider.class)),
-				IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createTimeSynchronizer(Mockito.mock(ImportanceAwareNodeSelector.class),
+				Mockito.mock(SystemTimeProvider.class)), IsNull.notNullValue());
 	}
 
 	private static PeerNetworkServicesFactory createFactory() {
-		return new DefaultPeerNetworkServicesFactory(
-				Mockito.mock(PeerNetworkState.class),
-				Mockito.mock(PeerConnector.class),
-				Mockito.mock(TimeSynchronizationConnector.class),
-				Mockito.mock(SyncConnectorPool.class),
-				Mockito.mock(BlockSynchronizer.class),
-				Mockito.mock(ChainServices.class),
-				Mockito.mock(TimeSynchronizationStrategy.class),
+		return new DefaultPeerNetworkServicesFactory(Mockito.mock(PeerNetworkState.class), Mockito.mock(PeerConnector.class),
+				Mockito.mock(TimeSynchronizationConnector.class), Mockito.mock(SyncConnectorPool.class),
+				Mockito.mock(BlockSynchronizer.class), Mockito.mock(ChainServices.class), Mockito.mock(TimeSynchronizationStrategy.class),
 				Mockito.mock(NodeCompatibilityChecker.class));
 	}
 }

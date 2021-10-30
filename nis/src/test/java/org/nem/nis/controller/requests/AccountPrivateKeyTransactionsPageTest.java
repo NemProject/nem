@@ -35,11 +35,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final Hash hash = Utils.generateRandomHash();
 
 		// Act:
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
-				keyPair.getPrivateKey(),
-				hash.toString(),
-				"1234",
-				"56");
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), hash.toString(),
+				"1234", "56");
 
 		// Assert:
 		MatcherAssert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
@@ -54,8 +51,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final Hash hash = Utils.generateRandomHash();
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), "1234", "56"),
+		ExceptionAssert.assertThrows(v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), "1234", "56"),
 				IllegalArgumentException.class);
 	}
 
@@ -102,9 +98,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final Deserializer deserializer = this.createDeserializer(null, hash, 1234L, 56);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new AccountPrivateKeyTransactionsPage(deserializer),
-				MissingRequiredPropertyException.class);
+		ExceptionAssert.assertThrows(v -> new AccountPrivateKeyTransactionsPage(deserializer), MissingRequiredPropertyException.class);
 	}
 
 	@Test
@@ -132,11 +126,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
-				keyPair.getPrivateKey(),
-				hash.toString(),
-				"1234",
-				"56");
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), hash.toString(),
+				"1234", "56");
 
 		// Act:
 		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
@@ -151,11 +142,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 	public void createIdBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
-				keyPair.getPrivateKey(),
-				null,
-				null,
-				null);
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), null, null, null);
 
 		// Act:
 		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
@@ -169,11 +156,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 	@Test
 	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
 		// Arrange:
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
-				new KeyPair().getPrivateKey(),
-				Utils.generateRandomHash().toString(),
-				"1234",
-				"56");
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(new KeyPair().getPrivateKey(),
+				Utils.generateRandomHash().toString(), "1234", "56");
 
 		// Act:
 		final DefaultPageBuilder builder = page.createPageBuilder();
@@ -187,10 +171,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 	@Test
 	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
 		// Arrange:
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
-				new KeyPair().getPrivateKey(),
-				null,
-				null,
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(new KeyPair().getPrivateKey(), null, null,
 				null);
 
 		// Act:

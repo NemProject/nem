@@ -13,46 +13,16 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class NisConfigurationTest {
-	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
-			"nem.shortServerName",
-			"nem.httpPort",
-			"nem.httpsPort",
-			"nem.webContext",
-			"nem.apiContext",
-			"nem.homePath",
-			"nem.maxThreads");
+	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",
+			"nem.webContext", "nem.apiContext", "nem.homePath", "nem.maxThreads");
 
-	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
-			"nem.folder",
-			"nem.protocol",
-			"nem.host",
-			"nem.websocketPort",
-			"nem.shutdownPath",
-			"nem.useDosFilter",
-			"nem.nonAuditedApiPaths",
-			"nem.network",
-			"nis.shouldAutoBoot",
-			"nis.bootName",
-			"nis.bootKey",
-			"nis.shouldAutoHarvestOnBoot",
-			"nis.additionalHarvesterPrivateKeys",
-			"nis.nodeLimit",
-			"nis.timeSyncNodeLimit",
-			"nis.useBinaryTransport",
-			"nis.useNetworkTime",
-			"nis.ignoreFees",
-			"nis.ipDetectionMode",
-			"nis.unlockedLimit",
-			"nis.maxTransactions",
-			"nis.maxTransactionsPerBlock",
-			"nis.blockGenerationTargetTime",
-			"nis.blockChainRewriteLimit",
-			"nis.transactionHashRetentionTime",
-			"nis.additionalLocalIps",
-			"nis.optionalFeatures",
-			"nis.blockChainFeatures",
-			"nis.allowedHarvesterAddresses",
-			"nis.delayBlockLoading");
+	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList("nem.folder", "nem.protocol", "nem.host", "nem.websocketPort",
+			"nem.shutdownPath", "nem.useDosFilter", "nem.nonAuditedApiPaths", "nem.network", "nis.shouldAutoBoot", "nis.bootName",
+			"nis.bootKey", "nis.shouldAutoHarvestOnBoot", "nis.additionalHarvesterPrivateKeys", "nis.nodeLimit", "nis.timeSyncNodeLimit",
+			"nis.useBinaryTransport", "nis.useNetworkTime", "nis.ignoreFees", "nis.ipDetectionMode", "nis.unlockedLimit",
+			"nis.maxTransactions", "nis.maxTransactionsPerBlock", "nis.blockGenerationTargetTime", "nis.blockChainRewriteLimit",
+			"nis.transactionHashRetentionTime", "nis.additionalLocalIps", "nis.optionalFeatures", "nis.blockChainFeatures",
+			"nis.allowedHarvesterAddresses", "nis.delayBlockLoading");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -81,7 +51,7 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 		MatcherAssert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 		MatcherAssert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(true));
-		MatcherAssert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[] {}));
+		MatcherAssert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[]{}));
 
 		MatcherAssert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
 		MatcherAssert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
@@ -92,9 +62,11 @@ public class NisConfigurationTest {
 
 		MatcherAssert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(4));
 		MatcherAssert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
-		MatcherAssert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] {}));
-		MatcherAssert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
-		MatcherAssert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] {}));
+		MatcherAssert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[]{}));
+		MatcherAssert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.TRANSACTION_HASH_LOOKUP
+		}));
+		MatcherAssert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[]{}));
 		MatcherAssert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
 		assertDefaultConfiguration(config.getBlockChainConfiguration());
 	}
@@ -104,9 +76,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
 		MatcherAssert.assertThat(config.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
 		MatcherAssert.assertThat(config.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
-		MatcherAssert.assertThat(
-				config.getBlockChainFeatures(),
-				IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.WB_TIME_BASED_VESTING }));
+		MatcherAssert.assertThat(config.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.WB_TIME_BASED_VESTING
+		}));
 	}
 
 	@Test
@@ -120,7 +92,8 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
 		properties.setProperty("nis.shouldAutoHarvestOnBoot", "false");
-		properties.setProperty("nis.additionalHarvesterPrivateKeys", additionalPrivateKey1.toString() + "|" + additionalPrivateKey2.toString());
+		properties.setProperty("nis.additionalHarvesterPrivateKeys",
+				additionalPrivateKey1.toString() + "|" + additionalPrivateKey2.toString());
 		properties.setProperty("nis.nodeLimit", "8");
 		properties.setProperty("nis.timeSyncNodeLimit", "12");
 		properties.setProperty("nis.useBinaryTransport", "false");
@@ -148,9 +121,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
 		MatcherAssert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
 		MatcherAssert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(false));
-		MatcherAssert.assertThat(
-				config.getAdditionalHarvesterPrivateKeys(),
-				IsEqual.equalTo(new PrivateKey[] { additionalPrivateKey1, additionalPrivateKey2 }));
+		MatcherAssert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[]{
+				additionalPrivateKey1, additionalPrivateKey2
+		}));
 
 		MatcherAssert.assertThat(config.getNodeLimit(), IsEqual.equalTo(8));
 		MatcherAssert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
@@ -161,15 +134,15 @@ public class NisConfigurationTest {
 
 		MatcherAssert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		MatcherAssert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
-		MatcherAssert.assertThat(
-				config.getAdditionalLocalIps(),
-				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));
-		MatcherAssert.assertThat(
-				config.getOptionalFeatures(),
-				IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.HISTORICAL_ACCOUNT_DATA }));
-		MatcherAssert.assertThat(
-				config.getAllowedHarvesterAddresses(),
-				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
+		MatcherAssert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[]{
+				"10.0.0.10", "10.0.0.20"
+		}));
+		MatcherAssert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.HISTORICAL_ACCOUNT_DATA
+		}));
+		MatcherAssert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[]{
+				Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ")
+		}));
 		MatcherAssert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
 
 		assertCustomConfiguration(config.getBlockChainConfiguration());
@@ -180,12 +153,14 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
 		MatcherAssert.assertThat(config.getBlockGenerationTargetTime(), IsEqual.equalTo(30));
 		MatcherAssert.assertThat(config.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
-		MatcherAssert.assertThat(config.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
+		MatcherAssert.assertThat(config.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[]{
+				BlockChainFeature.PROOF_OF_STAKE
+		}));
 	}
 
-	//endregion
+	// endregion
 
-	//region property required status
+	// region property required status
 
 	@Test
 	public void requiredPropertiesAreDetectedCorrectly() {
@@ -211,9 +186,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
 	}
 
-	//endregion
+	// endregion
 
-	//region specific property tests
+	// region specific property tests
 
 	@Test
 	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
@@ -228,7 +203,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
 
-	//region node features
+	// endregion
+
+	// region node features
 
 	@Test
 	public void optionalFeaturesCannotBeParsedWithInvalidValue() {
@@ -237,9 +214,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER9");
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new NisConfiguration(properties),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NisConfiguration(properties), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -300,9 +275,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
 	}
 
-	//endregion
+	// endregion
 
-	//region block chain features
+	// region block chain features
 
 	@Test
 	public void blockChainFeaturesCannotBeParsedWithInvalidValue() {
@@ -311,9 +286,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.blockChainFeatures", "PROOF_OF_UNKNOWN");
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new NisConfiguration(properties),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NisConfiguration(properties), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -338,11 +311,9 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(config.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region sanity
+	// region sanity
 
 	@Test
 	public void configPropertiesCopiesAreConsistent() throws Exception {
@@ -360,7 +331,7 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(areBuffersEqual, IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
 	private static byte[] readAllBytes(final String proxyResource, final String desiredResource) throws Exception {
 		final URL proxyUrl = NisConfigurationTest.class.getClassLoader().getResource(proxyResource);

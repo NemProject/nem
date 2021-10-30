@@ -20,37 +20,26 @@ public class DefaultTimeSynchronizationStrategyTest {
 	@Test
 	public void defaultTimeSynchronizationStrategyCanBeConstructed() {
 		// Act:
-		new DefaultTimeSynchronizationStrategy(
-				this.createAggregateFilter(),
-				this.createPoxFacade(),
-				this.createAccountStateCache());
+		new DefaultTimeSynchronizationStrategy(this.createAggregateFilter(), this.createPoxFacade(), this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
 	public void defaultTimeSynchronizationStrategyCtorThrowsIfFilterIsNull() {
 		// Act:
-		new DefaultTimeSynchronizationStrategy(
-				null,
-				this.createPoxFacade(),
-				this.createAccountStateCache());
+		new DefaultTimeSynchronizationStrategy(null, this.createPoxFacade(), this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
 	public void defaultTimeSynchronizationStrategyCtorThrowsIfPoxFacadeIsNull() {
 		// Act:
-		new DefaultTimeSynchronizationStrategy(
-				this.createAggregateFilter(),
-				null,
-				this.createAccountStateCache());
+		new DefaultTimeSynchronizationStrategy(this.createAggregateFilter(), null, this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
 	public void calculateTimeOffsetThrowsIfNoSamplesAreAvailable() {
 		// Arrange:
-		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(
-				this.createAggregateFilter(),
-				this.createPoxFacade(),
-				this.createAccountStateCache());
+		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(this.createAggregateFilter(),
+				this.createPoxFacade(), this.createAccountStateCache());
 
 		// Act:
 		strategy.calculateTimeOffset(new ArrayList<>(), new NodeAge(0));
@@ -82,7 +71,8 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, new NodeAge(0));
-		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_START / 100.0))));
+		MatcherAssert.assertThat(offset, IsEqual
+				.equalTo(new TimeOffset((long) ((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_START / 100.0))));
 	}
 
 	@Test
@@ -98,7 +88,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long)(100.0 * 500.0 * strategy.getCoupling(age) / 100.0))));
+		MatcherAssert.assertThat(offset, IsEqual.equalTo(new TimeOffset((long) (100.0 * 500.0 * strategy.getCoupling(age) / 100.0))));
 	}
 
 	@Test
@@ -114,9 +104,8 @@ public class DefaultTimeSynchronizationStrategyTest {
 
 		// Assert:
 		Mockito.verify(filter, Mockito.times(1)).filter(samples, age);
-		MatcherAssert.assertThat(
-				offset,
-				IsEqual.equalTo(new TimeOffset((long)((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_MINIMUM / 100.0))));
+		MatcherAssert.assertThat(offset, IsEqual
+				.equalTo(new TimeOffset((long) ((100000 + 99.0 * 100.0 / 2.0) * TimeSynchronizationConstants.COUPLING_MINIMUM / 100.0))));
 	}
 
 	@Test
@@ -124,7 +113,9 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// Act:
 		final NodeAge age = new NodeAge(0);
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(2, 1000);
-		final double[] importances = { 0.1, 0.9 };
+		final double[] importances = {
+				0.1, 0.9
+		};
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		final TimeSynchronizationStrategy strategy = this.createStrategy(age, samples, importances, 2, filter);
 
@@ -143,7 +134,9 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// Act:
 		final NodeAge age = new NodeAge(0);
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(2, 10000);
-		final double[] importances = { 0.0005, 0.0005 };
+		final double[] importances = {
+				0.0005, 0.0005
+		};
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		final TimeSynchronizationStrategy strategy = this.createStrategy(age, samples, importances, 20, filter);
 
@@ -161,8 +154,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final DefaultTimeSynchronizationStrategy strategy = this.createDefaultStrategy();
 
 		// Assert:
-		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(0)),
-				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_START));
+		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(0)), IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_START));
 		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_START));
 	}
@@ -176,23 +168,25 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final double epsilon = 1e-10;
 		// Assuming decay strength 0.3 for the following tests:
 		// coupling = exp(-0.3) = 0.74081822068171786606687377931782
-		Assert.assertEquals(0.74081822068171, strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 1)), epsilon);
+		Assert.assertEquals(0.74081822068171,
+				strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 1)), epsilon);
 		// coupling = exp(-0.9) = 0.40656965974059911188345423964563
-		Assert.assertEquals(0.40656965974059, strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 3)), epsilon);
+		Assert.assertEquals(0.40656965974059,
+				strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 3)), epsilon);
 		// coupling = exp(-1.5) = 0.22313016014842982893328047076401
-		Assert.assertEquals(0.22313016014842, strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 5)), epsilon);
+		Assert.assertEquals(0.22313016014842,
+				strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 5)), epsilon);
 		// coupling = exp(-2.1) = 0.12245642825298191021864737607263
-		Assert.assertEquals(0.12245642825298, strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 7)), epsilon);
+		Assert.assertEquals(0.12245642825298,
+				strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 7)), epsilon);
 		// exp(-2.4) = 0.09071795328941250337517222007969 < COUPLING_MINIMUM
 		MatcherAssert.assertThat(strategy.getCoupling(new NodeAge(TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND + 8)),
 				IsEqual.equalTo(TimeSynchronizationConstants.COUPLING_MINIMUM));
 	}
 
 	private SynchronizationFilter createAggregateFilter() {
-		return new AggregateSynchronizationFilter(Arrays.asList(
-				new ResponseDelayDetectionFilter(),
-				new ClampingFilter(),
-				new AlphaTrimmedMeanFilter()));
+		return new AggregateSynchronizationFilter(
+				Arrays.asList(new ResponseDelayDetectionFilter(), new ClampingFilter(), new AlphaTrimmedMeanFilter()));
 	}
 
 	private DefaultPoxFacade createPoxFacade() {
@@ -214,15 +208,10 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private DefaultTimeSynchronizationStrategy createDefaultStrategy() {
-		return new DefaultTimeSynchronizationStrategy(
-				this.createAggregateFilter(),
-				this.createPoxFacade(),
-				this.createAccountStateCache());
+		return new DefaultTimeSynchronizationStrategy(this.createAggregateFilter(), this.createPoxFacade(), this.createAccountStateCache());
 	}
 
-	private DefaultTimeSynchronizationStrategy createStrategy(
-			final NodeAge age,
-			final List<TimeSynchronizationSample> samples,
+	private DefaultTimeSynchronizationStrategy createStrategy(final NodeAge age, final List<TimeSynchronizationSample> samples,
 			final AggregateSynchronizationFilter filter) {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
 		final DefaultPoxFacade facade = this.createPoxFacade();
@@ -238,12 +227,8 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return new DefaultTimeSynchronizationStrategy(filter, facade, cache);
 	}
 
-	private TimeSynchronizationStrategy createStrategy(
-			final NodeAge age,
-			final List<TimeSynchronizationSample> samples,
-			final double[] importances,
-			final int lastVectorSize,
-			final AggregateSynchronizationFilter filter) {
+	private TimeSynchronizationStrategy createStrategy(final NodeAge age, final List<TimeSynchronizationSample> samples,
+			final double[] importances, final int lastVectorSize, final AggregateSynchronizationFilter filter) {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
 		final DefaultPoxFacade facade = this.createPoxFacade();
 

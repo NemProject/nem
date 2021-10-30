@@ -12,7 +12,9 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbTransferTransaction, TransferTransaction> {
+public class TransferDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbTransferTransaction, TransferTransaction> {
 
 	@Test
 	public void transferWithNoMessageAndNoMosaicsCanBeMappedToModel() {
@@ -102,8 +104,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		MatcherAssert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
 		MatcherAssert.assertThat(model.getAttachment().getMosaics(), IsEquivalent.equivalentTo(context.mosaics));
 
-		context.dbMosaics.forEach(dbMosaic ->
-				Mockito.verify(context.mapper, Mockito.times(1)).map(dbMosaic, Mosaic.class));
+		context.dbMosaics.forEach(dbMosaic -> Mockito.verify(context.mapper, Mockito.times(1)).map(dbMosaic, Mosaic.class));
 	}
 
 	@Override

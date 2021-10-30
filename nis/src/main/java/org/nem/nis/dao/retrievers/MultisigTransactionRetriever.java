@@ -15,49 +15,27 @@ import java.util.stream.*;
  */
 @SuppressWarnings("rawtypes")
 public class MultisigTransactionRetriever implements TransactionRetriever {
-	private static final Map<Integer, String> TYPE_TO_FIELD_NAME_MAP = TransactionRegistry.stream()
-			.filter(e -> null != e.multisigJoinField)
+	private static final Map<Integer, String> TYPE_TO_FIELD_NAME_MAP = TransactionRegistry.stream().filter(e -> null != e.multisigJoinField)
 			.collect(Collectors.toMap(e -> e.type, e -> e.multisigJoinField));
 
 	@Override
-	public Collection<TransferBlockPair> getTransfersForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
+	public Collection<TransferBlockPair> getTransfersForAccount(final Session session, final long accountId, final long maxId,
+			final int limit, final ReadOnlyTransferDao.TransferType transferType) {
 		if (ReadOnlyTransferDao.TransferType.ALL == transferType) {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
 		final Collection<TransferBlockPair> pairs = new ArrayList<>();
 		for (final Map.Entry<Integer, String> entry : TYPE_TO_FIELD_NAME_MAP.entrySet()) {
-			pairs.addAll(this.getMultisigTransactionsForAccount(
-					session,
-					accountId,
-					maxId,
-					limit,
-					transferType,
-					entry.getKey(),
+			pairs.addAll(this.getMultisigTransactionsForAccount(session, accountId, maxId, limit, transferType, entry.getKey(),
 					entry.getValue()));
 		}
 		return this.sortAndLimit(pairs, limit);
 	}
 
-	private Collection<TransferBlockPair> getMultisigTransactionsForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType,
-			final int transactionType,
-			final String joinField) {
-		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
-				session,
-				transferType,
-				accountId,
-				transactionType,
-				maxId,
+	private Collection<TransferBlockPair> getMultisigTransactionsForAccount(final Session session, final long accountId, final long maxId,
+			final int limit, final ReadOnlyTransferDao.TransferType transferType, final int transactionType, final String joinField) {
+		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(session, transferType, accountId, transactionType, maxId,
 				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
@@ -70,36 +48,27 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.collect(Collectors.toList());
 	}
 
-	private List<TransactionIdBlockHeightPair> getMultisigIds(
-			final Session session,
-			final ReadOnlyTransferDao.TransferType transferType,
-			final long accountId,
-			final int type,
-			final long maxId,
-			final int limit) {
+	private List<TransactionIdBlockHeightPair> getMultisigIds(final Session session, final ReadOnlyTransferDao.TransferType transferType,
+			final long accountId, final int type, final long maxId, final int limit) {
 		final String table = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "multisigsends" : "multisigreceives";
-		final String preQueryTemplate =
-				"SELECT transactionId, height FROM " + table +
-						" WHERE accountId=%d AND type=%d AND transactionId < %d " +
-						"ORDER BY accountId asc, type asc, transactionId DESC";
+		final String preQueryTemplate = "SELECT transactionId, height FROM " + table
+				+ " WHERE accountId=%d AND type=%d AND transactionId < %d " // preserve-newline
+				+ "ORDER BY accountId asc, type asc, transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
-		final Query preQuery = session
-				.createSQLQuery(preQueryString)
-				.addScalar("transactionId", LongType.INSTANCE)
-				.addScalar("height", LongType.INSTANCE)
+		final Query preQuery = session.createSQLQuery(preQueryString) // preserve-newline
+				.addScalar("transactionId", LongType.INSTANCE) // preserve-newline
+				.addScalar("height", LongType.INSTANCE) // preserve-newline
 				.setMaxResults(limit);
 		final List<Object[]> list = HibernateUtils.listAndCast(preQuery);
-		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long)o[0], (Long)o[1])).collect(Collectors.toList());
+		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long) o[0], (Long) o[1])).collect(Collectors.toList());
 	}
 
-	private List<DbMultisigTransaction> getMultisigTransactions(
-			final Session session,
-			final List<TransactionIdBlockHeightPair> pairs,
+	private List<DbMultisigTransaction> getMultisigTransactions(final Session session, final List<TransactionIdBlockHeightPair> pairs,
 			final String joinEntity) {
-		final Criteria criteria = session.createCriteria(DbMultisigTransaction.class)
-				.setFetchMode(joinEntity, FetchMode.JOIN)
-				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList())))
-				.add(Restrictions.isNotNull(joinEntity))
+		final Criteria criteria = session.createCriteria(DbMultisigTransaction.class) // preserve-newline
+				.setFetchMode(joinEntity, FetchMode.JOIN) // preserve-newline
+				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList()))) // preserve-newline
+				.add(Restrictions.isNotNull(joinEntity)) // preserve-newline
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
@@ -107,7 +76,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		// we deliberately set multisigSignatureTransactions to lazy, to avoid
 		// duplicates inside other entities within current "joinEntity"
 		// (i.e. TransferTransaction holds mosaics, so each mosaic would get duplicated
-		//  for every cosignatory)
+		// for every cosignatory)
 		// now we need to force loading of child entities
 		for (final DbMultisigTransaction transaction : result) {
 			transaction.getMultisigSignatureTransactions().size();
@@ -117,8 +86,8 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {
 		final HashMap<Long, DbBlock> blockMap = new HashMap<>();
-		final Criteria criteria = session.createCriteria(DbBlock.class)
-				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())))
+		final Criteria criteria = session.createCriteria(DbBlock.class) // preserve-newline
+				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList()))) // preserve-newline
 				.addOrder(Order.desc("height"));
 		final List<DbBlock> blocks = HibernateUtils.listAndCast(criteria);
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
@@ -126,9 +95,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
-		final List<TransferBlockPair> list = pairs.stream()
-				.sorted()
-				.collect(Collectors.toList());
+		final List<TransferBlockPair> list = pairs.stream().sorted().collect(Collectors.toList());
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
 		for (final TransferBlockPair pair : list) {

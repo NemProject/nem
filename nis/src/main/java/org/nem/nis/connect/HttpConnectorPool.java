@@ -7,8 +7,7 @@ import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.connect.*;
 
 /**
- * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern
- * (where HttpMethodClient is the shared resource).
+ * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern (where HttpMethodClient is the shared resource).
  */
 public class HttpConnectorPool implements SyncConnectorPool {
 	private final CommunicationMode communicationMode;

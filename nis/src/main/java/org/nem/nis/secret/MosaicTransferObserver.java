@@ -28,7 +28,7 @@ public class MosaicTransferObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((MosaicTransferNotification)notification);
+		this.notify((MosaicTransferNotification) notification);
 	}
 
 	private void notify(final MosaicTransferNotification notification) {

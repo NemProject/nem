@@ -33,7 +33,7 @@ public class PoiOptionsBuilder {
 	public PoiOptionsBuilder(final BlockHeight height) {
 	}
 
-	//region weights
+	// region weights
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -71,9 +71,9 @@ public class PoiOptionsBuilder {
 		this.outlierWeight = weight;
 	}
 
-	//endregion
+	// endregion
 
-	//region clustering
+	// region clustering
 
 	/**
 	 * Sets the graph clustering strategy.
@@ -102,9 +102,9 @@ public class PoiOptionsBuilder {
 		this.epsilon = epsilon;
 	}
 
-	//endregion
+	// endregion
 
-	//region teleportation
+	// region teleportation
 
 	/**
 	 * Sets the teleportation probability.
@@ -124,7 +124,7 @@ public class PoiOptionsBuilder {
 		this.interLevelTeleportationProbability = probability;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a new poi options.

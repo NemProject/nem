@@ -24,11 +24,9 @@ public class DefaultMapperFactory implements MapperFactory {
 		private final BiFunction<AccountDaoLookup, IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper;
 		private final BiFunction<AccountLookup, IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
 
-		private Entry(
-				final BiFunction<AccountDaoLookup, IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
+		private Entry(final BiFunction<AccountDaoLookup, IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final BiFunction<AccountLookup, IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
-				final Class<TDbModel> dbModelClass,
-				final Class<TModel> modelClass) {
+				final Class<TDbModel> dbModelClass, final Class<TModel> modelClass) {
 			this.createModelToDbModelMapper = createModelToDbModelMapper;
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
 			this.dbModelClass = dbModelClass;
@@ -47,41 +45,22 @@ public class DefaultMapperFactory implements MapperFactory {
 	@SuppressWarnings("serial")
 	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(
-					(lookup, mapper) -> new AccountModelToDbModelMapping(lookup),
-					(lookup, mapper) -> new AccountDbModelToModelMapping(lookup),
-					DbAccount.class,
-					Account.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new BlockModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new BlockDbModelToModelMapping(mapper),
-					DbBlock.class,
-					Block.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new MultisigSignatureModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new MultisigSignatureDbModelToModelMapping(mapper),
-					DbMultisigSignatureTransaction.class,
+			this.add(new Entry<>((lookup, mapper) -> new AccountModelToDbModelMapping(lookup),
+					(lookup, mapper) -> new AccountDbModelToModelMapping(lookup), DbAccount.class, Account.class));
+			this.add(new Entry<>((lookup, mapper) -> new BlockModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new BlockDbModelToModelMapping(mapper), DbBlock.class, Block.class));
+			this.add(new Entry<>((lookup, mapper) -> new MultisigSignatureModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MultisigSignatureDbModelToModelMapping(mapper), DbMultisigSignatureTransaction.class,
 					MultisigSignatureTransaction.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new NamespaceModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new NamespaceDbModelToModelMapping(mapper),
-					DbNamespace.class,
-					Namespace.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new MosaicDefinitionModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new MosaicDefinitionDbModelToModelMapping(mapper),
-					DbMosaicDefinition.class,
+			this.add(new Entry<>((lookup, mapper) -> new NamespaceModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new NamespaceDbModelToModelMapping(mapper), DbNamespace.class, Namespace.class));
+			this.add(new Entry<>((lookup, mapper) -> new MosaicDefinitionModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MosaicDefinitionDbModelToModelMapping(mapper), DbMosaicDefinition.class,
 					MosaicDefinition.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new MosaicPropertyModelToDbModelMapping(),
-					(lookup, mapper) -> new MosaicPropertyDbModelToModelMapping(),
-					DbMosaicProperty.class,
-					NemProperty.class));
-			this.add(new Entry<>(
-					(lookup, mapper) -> new MosaicModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new MosaicDbModelToModelMapping(mapper),
-					DbMosaic.class,
-					Mosaic.class));
+			this.add(new Entry<>((lookup, mapper) -> new MosaicPropertyModelToDbModelMapping(),
+					(lookup, mapper) -> new MosaicPropertyDbModelToModelMapping(), DbMosaicProperty.class, NemProperty.class));
+			this.add(new Entry<>((lookup, mapper) -> new MosaicModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MosaicDbModelToModelMapping(mapper), DbMosaic.class, Mosaic.class));
 		}
 	};
 
@@ -126,7 +105,8 @@ public class DefaultMapperFactory implements MapperFactory {
 		}
 
 		mappingRepository.addMapping(DbMosaicId.class, MosaicId.class, new MosaicIdDbModelToModelMapping(this.mosaicIdCache));
-		mappingRepository.addMapping(DbBlock.class, ExplorerBlockViewModel.class, new BlockDbModelToExplorerViewModelMapping(mappingRepository));
+		mappingRepository.addMapping(DbBlock.class, ExplorerBlockViewModel.class,
+				new BlockDbModelToExplorerViewModelMapping(mappingRepository));
 		return mappingRepository;
 	}
 }

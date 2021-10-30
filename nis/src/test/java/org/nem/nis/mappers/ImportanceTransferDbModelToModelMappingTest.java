@@ -8,7 +8,9 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
-public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
+public class ImportanceTransferDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToModel() {
@@ -43,9 +45,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 		final DbImportanceTransferTransaction dbTransfer = context.createDbTransfer(3);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(dbTransfer),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.mapping.map(dbTransfer), IllegalArgumentException.class);
 	}
 
 	@Override

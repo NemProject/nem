@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
- * A spring validator used to lock down private key request arguments:
- * - requests with non-configured harvester private keys are blocked
+ * A spring validator used to lock down private key request arguments such that requests with non-configured harvester private keys are
+ * blocked
  */
 public class ConfiguredPrivateKeyValidator implements Validator {
 	private static final Logger LOGGER = Logger.getLogger(ConfiguredPrivateKeyValidator.class.getName());
@@ -32,16 +32,13 @@ public class ConfiguredPrivateKeyValidator implements Validator {
 
 	@Override
 	public void validate(final Object target, final Errors errors) {
-		final PrivateKey privateKey = (PrivateKey)target;
+		final PrivateKey privateKey = (PrivateKey) target;
 		final Address address = Address.fromPublicKey(new KeyPair(privateKey).getPublicKey());
 
-		final boolean isAddressAllowed =
-				Arrays.stream(this.allowedAddresses).anyMatch(allowedAddress -> allowedAddress.equals(address));
+		final boolean isAddressAllowed = Arrays.stream(this.allowedAddresses).anyMatch(allowedAddress -> allowedAddress.equals(address));
 
 		if (this.allowedAddresses.length > 0 && !isAddressAllowed) {
-			final String message = String.format(
-					"blocking private key request with non-configured address %s",
-					address);
+			final String message = String.format("blocking private key request with non-configured address %s", address);
 			LOGGER.warning(message);
 			throw new UnauthorizedAccessException(message);
 		}

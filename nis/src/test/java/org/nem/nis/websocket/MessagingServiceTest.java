@@ -33,7 +33,8 @@ import java.util.stream.IntStream;
 @RunWith(Enclosed.class)
 public class MessagingServiceTest {
 
-	//region
+	// region misc forwarding
+
 	public static class MiscForwarding {
 		@Test
 		public void pushAccountNotifiesProperAccount() {
@@ -45,8 +46,10 @@ public class MessagingServiceTest {
 			testContext.messagingService.pushAccount(address);
 
 			// Assert:
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/account"), Mockito.any(AccountMetaDataPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + address.getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/account"),
+					Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + address.getEncoded()),
+					Mockito.any(AccountMetaDataPair.class));
 		}
 
 		@Test
@@ -59,8 +62,10 @@ public class MessagingServiceTest {
 			testContext.messagingService.pushTransactions(address, null);
 
 			// Assert:
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/recenttransactions"), Mockito.any(SerializableList.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/recenttransactions/" + address.getEncoded()), Mockito.any(SerializableList.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/recenttransactions"),
+					Mockito.any(SerializableList.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/recenttransactions/" + address.getEncoded()), Mockito.any(SerializableList.class));
 		}
 
 		@Test
@@ -115,16 +120,18 @@ public class MessagingServiceTest {
 			Mockito.verify(testContext.mosaicInfoFactory, Mockito.times(1)).getAccountOwnedMosaics(address);
 		}
 	}
-	//endregion
 
+	// endregion
 
-	//region UnconfirmedTransactionListener
+	// region UnconfirmedTransactionListener
+
 	public static class UnconfirmedTransactionListenerTests {
 		@Test
 		public void pushingTransactionForwardsToMessagingTemplate() {
 			// Arrange:
 			final TestContext testContext = new TestContext();
-			final Transaction transaction = testContext.createTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount());
+			final Transaction transaction = testContext.createTransferTransaction(Utils.generateRandomAccount(),
+					Utils.generateRandomAccount());
 
 			// Act:
 			testContext.messagingService.pushTransaction(transaction, ValidationResult.NEUTRAL);
@@ -133,9 +140,11 @@ public class MessagingServiceTest {
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
 		}
 	}
-	//endregion UnconfirmedTransactionListener
 
-	//region pushTransaction (all supported txes)
+	// endregion
+
+	// region pushTransaction (all supported txes)
+
 	private static abstract class AbstractPushTransactionTests {
 		protected abstract Transaction wrapTransaction(final Transaction transaction);
 		protected abstract void transactionAssert(final TestContext testContext, final Transaction transaction);
@@ -154,7 +163,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -162,7 +172,8 @@ public class MessagingServiceTest {
 			// Arrange:
 			final TestContext testContext = new TestContext();
 			final Account recipient = Utils.generateRandomAccount();
-			final Transaction transaction = wrapTransaction(testContext.createTransferTransaction(Utils.generateRandomAccount(), recipient));
+			final Transaction transaction = wrapTransaction(
+					testContext.createTransferTransaction(Utils.generateRandomAccount(), recipient));
 			testContext.messagingService.registerAccount(recipient.getAddress());
 			testPrepare(testContext);
 
@@ -170,7 +181,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + recipient.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + recipient.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -186,7 +198,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(2)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(2)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -203,7 +216,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -220,7 +234,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -229,7 +244,8 @@ public class MessagingServiceTest {
 			final TestContext testContext = new TestContext();
 			final Account levyRecipient = Utils.generateRandomAccount();
 			final MosaicLevy mosaicLevy = testContext.createMosaicLevy(levyRecipient);
-			final Transaction transaction = wrapTransaction(testContext.createMosaicDefinitionCreationTransaction(Utils.generateRandomAccount(), mosaicLevy));
+			final Transaction transaction = wrapTransaction(
+					testContext.createMosaicDefinitionCreationTransaction(Utils.generateRandomAccount(), mosaicLevy));
 			testContext.messagingService.registerAccount(levyRecipient.getAddress());
 			testPrepare(testContext);
 
@@ -238,7 +254,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + levyRecipient.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + levyRecipient.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 		@Test
@@ -255,7 +272,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 			transactionAssert(testContext, transaction);
 		}
 	}
@@ -267,10 +285,12 @@ public class MessagingServiceTest {
 		}
 
 		@Override
-		protected void transactionAssert(TestContext testContext, Transaction transaction) {}
+		protected void transactionAssert(TestContext testContext, Transaction transaction) {
+		}
 
 		@Override
-		protected void testPrepare(TestContext testContext) {}
+		protected void testPrepare(TestContext testContext) {
+		}
 	}
 
 	public static class MultisigNonObservingPushTransactionTests extends AbstractPushTransactionTests {
@@ -278,16 +298,13 @@ public class MessagingServiceTest {
 
 		@Override
 		protected Transaction wrapTransaction(final Transaction transaction) {
-			return new MultisigTransaction(
-					TimeInstant.ZERO,
-					issuer,
-					transaction
-			);
+			return new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 		}
 
 		@Override
 		protected void transactionAssert(TestContext testContext, Transaction transaction) {
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/unconfirmed/" + issuer.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + issuer.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 		}
 
 		@Override
@@ -301,16 +318,13 @@ public class MessagingServiceTest {
 
 		@Override
 		protected Transaction wrapTransaction(final Transaction transaction) {
-			return new MultisigTransaction(
-					TimeInstant.ZERO,
-					issuer,
-					transaction
-			);
+			return new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 		}
 
 		@Override
 		protected void transactionAssert(TestContext testContext, Transaction transaction) {
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + issuer.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/unconfirmed/" + issuer.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 		}
 
 		@Override
@@ -318,9 +332,11 @@ public class MessagingServiceTest {
 			testContext.messagingService.registerAccount(issuer.getAddress());
 		}
 	}
-	//endregion pushTransaction
 
-	//region pushBlock (those tests do not check /transaction/<address>, as they should already be covered by pushTransaction tests)
+	// endregion pushTransaction
+
+	// region pushBlock (those tests do not check /transaction/<address>, as they should already be covered by pushTransaction tests)
+
 	private static abstract class AbstractPushBlockTests {
 		protected abstract Transaction wrapTransaction(final Transaction transaction);
 
@@ -336,7 +352,8 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 		}
 
 		@Test
@@ -380,11 +397,14 @@ public class MessagingServiceTest {
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
 			int senderTimes = registerSender ? 1 : 0;
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(senderTimes)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(senderTimes))
+					.convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 			int recipientTimes = registerRecipient ? 1 : 0;
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(recipientTimes)).convertAndSend(Mockito.eq("/account/" + recipient.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(recipientTimes))
+					.convertAndSend(Mockito.eq("/account/" + recipient.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 		}
 
 		@Test
@@ -393,7 +413,8 @@ public class MessagingServiceTest {
 			final TestContext testContext = new TestContext();
 			final Account harvester = Utils.generateRandomAccount();
 			final Account sender = Utils.generateRandomAccount();
-			final ProvisionNamespaceTransaction namespaceTransaction = (ProvisionNamespaceTransaction)testContext.createProvisionNamespaceTransaction(sender);
+			final ProvisionNamespaceTransaction namespaceTransaction = (ProvisionNamespaceTransaction) testContext
+					.createProvisionNamespaceTransaction(sender);
 			final Transaction transaction = wrapTransaction(namespaceTransaction);
 			transaction.sign();
 
@@ -408,10 +429,13 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/namespace/owned/" + sender.getAddress().getEncoded()), Mockito.any(Namespace.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/account/namespace/owned/" + sender.getAddress().getEncoded()), Mockito.any(Namespace.class));
 		}
 
 		@Test
@@ -431,7 +455,8 @@ public class MessagingServiceTest {
 			final Account sender = Utils.generateRandomAccount();
 			final Account levyRecipient = Utils.generateRandomAccount();
 			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
-			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction)testContext.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
+			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction) testContext
+					.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
 			final Transaction transaction = wrapTransaction(creationTransaction);
 			transaction.sign();
 
@@ -450,14 +475,22 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()),
+					Mockito.any(MosaicDefinitionSupplyPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
 			if (withLevy) {
-				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
-				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+						Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()),
+						Mockito.any(MosaicDefinitionSupplyPair.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+						Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
 			}
 		}
 
@@ -481,7 +514,8 @@ public class MessagingServiceTest {
 			final Account levyRecipient = Utils.generateRandomAccount();
 			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
 
-			final MosaicSupplyChangeTransaction supplyTransaction = (MosaicSupplyChangeTransaction)testContext.createMosaicSupplyChangeTransaction(sender, mosaicLevy);
+			final MosaicSupplyChangeTransaction supplyTransaction = (MosaicSupplyChangeTransaction) testContext
+					.createMosaicSupplyChangeTransaction(sender, mosaicLevy);
 			final Transaction transaction = wrapTransaction(supplyTransaction);
 			transaction.sign();
 
@@ -489,7 +523,8 @@ public class MessagingServiceTest {
 			block.addTransaction(transaction);
 
 			testContext.messagingService.registerAccount(sender.getAddress());
-			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction)testContext.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
+			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction) testContext
+					.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
 			testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
 			if (withLevy) {
 				testContext.messagingService.registerAccount(levyRecipient.getAddress());
@@ -501,15 +536,23 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+					Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()),
+					Mockito.any(MosaicDefinitionSupplyPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
+					.convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
 
 			if (withLevy) {
-				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
-				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+						Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()),
+						Mockito.any(MosaicDefinitionSupplyPair.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(
+						Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
 			}
 		}
 	}
@@ -526,16 +569,14 @@ public class MessagingServiceTest {
 
 		@Override
 		protected Transaction wrapTransaction(final Transaction transaction) {
-			return new MultisigTransaction(
-					TimeInstant.ZERO,
-					issuer,
-					transaction
-			);
+			return new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 		}
 	}
-	//endregion pushBlock
 
-	//region pushBlocks
+	// endregion pushBlock
+
+	// region pushBlocks
+
 	private static class PushBlockTests {
 		@Test
 		public void pushBlocksNotifiesAboutHeight() {
@@ -553,7 +594,8 @@ public class MessagingServiceTest {
 			}
 		}
 	}
-	//endregion
+
+	// endregion
 
 	private static class TestContext {
 		final BlockChain blockChain = Mockito.mock(BlockChain.class);
@@ -567,77 +609,46 @@ public class MessagingServiceTest {
 		final MessagingService messagingService;
 
 		TestContext() {
-			messagingService = new MessagingService(
-					blockChain,
-					unconfirmedState,
-					messagingTemplate,
-					accountInfoFactory,
-					accountMetaDataFactory,
-					mosaicInfoFactory,
-					unconfirmedTransactions,
-					host
-			);
+			messagingService = new MessagingService(blockChain, unconfirmedState, messagingTemplate, accountInfoFactory,
+					accountMetaDataFactory, mosaicInfoFactory, unconfirmedTransactions, host);
 		}
 
 		public Transaction createTransferTransaction(final Account sender, final Account recipient) {
-			return new TransferTransaction(
-					TimeInstant.ZERO,
-					sender,
-					recipient,
-					Amount.fromNem(100),
-					null
-			);
+			return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
 		}
 		public Transaction createProvisionNamespaceTransaction(final Account sender) {
-			return new ProvisionNamespaceTransaction(
-					TimeInstant.ZERO,
-					sender,
-					new NamespaceIdPart("bar"),
-					new NamespaceId("fizzbuzz")
-			);
+			return new ProvisionNamespaceTransaction(TimeInstant.ZERO, sender, new NamespaceIdPart("bar"), new NamespaceId("fizzbuzz"));
 		}
 
 		public Transaction createMosaicDefinitionCreationTransaction(final Account sender, final MosaicLevy mosaicLevy) {
-			return new MosaicDefinitionCreationTransaction(
-					TimeInstant.ZERO,
-					sender,
-					testMosaicDefinition(sender, mosaicLevy)
-			);
+			return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, sender, testMosaicDefinition(sender, mosaicLevy));
 		}
 
 		private MosaicDefinition testMosaicDefinition(final Account sender, final MosaicLevy mosaicLevy) {
-			return new MosaicDefinition(
-					sender,
-					new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
+			return new MosaicDefinition(sender, new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
 					new MosaicDescriptor("fizzbuzz.bar:baz is a great mosaic, something everyone should have"),
-					new DefaultMosaicProperties(new Properties()),
-					mosaicLevy
-			);
+					new DefaultMosaicProperties(new Properties()), mosaicLevy);
 		}
 
-		public void addMosaicEntryInMosaicInfoFactory(final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction, final Account account, long quantity) {
+		public void addMosaicEntryInMosaicInfoFactory(final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction,
+				final Account account, long quantity) {
 			final MosaicDefinition mosaicDefinition = mosaicDefinitionCreationTransaction.getMosaicDefinition();
-			Mockito.when(this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(account.getAddress())).thenReturn(
-					Collections.singleton(new MosaicDefinitionSupplyPair(mosaicDefinition, Supply.fromValue(mosaicDefinition.getProperties().getInitialSupply())))
-			);
-			Mockito.when(this.mosaicInfoFactory.getAccountOwnedMosaics(account.getAddress())).thenReturn(
-					Collections.singletonList(new Mosaic(mosaicDefinition.getId(), Quantity.fromValue(quantity)))
-			);
+			Mockito.when(this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(account.getAddress()))
+					.thenReturn(Collections.singleton(new MosaicDefinitionSupplyPair(mosaicDefinition,
+							Supply.fromValue(mosaicDefinition.getProperties().getInitialSupply()))));
+			Mockito.when(this.mosaicInfoFactory.getAccountOwnedMosaics(account.getAddress()))
+					.thenReturn(Collections.singletonList(new Mosaic(mosaicDefinition.getId(), Quantity.fromValue(quantity))));
 		}
 
-		public void addNamespaceEntryInMosaicInfoFactory(final ProvisionNamespaceTransaction provisionNamespaceTransaction, final Account account, long height) {
-			Mockito.when(this.mosaicInfoFactory.getAccountOwnedNamespaces(account.getAddress())).thenReturn(
-					Collections.singleton(new Namespace(provisionNamespaceTransaction.getResultingNamespaceId(), account, new BlockHeight(height)))
-			);
+		public void addNamespaceEntryInMosaicInfoFactory(final ProvisionNamespaceTransaction provisionNamespaceTransaction,
+				final Account account, long height) {
+			Mockito.when(this.mosaicInfoFactory.getAccountOwnedNamespaces(account.getAddress())).thenReturn(Collections
+					.singleton(new Namespace(provisionNamespaceTransaction.getResultingNamespaceId(), account, new BlockHeight(height))));
 		}
 
 		public MosaicLevy createMosaicLevy(final Account levyRecipient) {
-			return new MosaicLevy(
-					MosaicTransferFeeType.Percentile,
-					levyRecipient,
-					new MosaicId(new NamespaceId("fizzbuzz.bar"), "42"),
-					Quantity.fromValue(1234L)
-			);
+			return new MosaicLevy(MosaicTransferFeeType.Percentile, levyRecipient, new MosaicId(new NamespaceId("fizzbuzz.bar"), "42"),
+					Quantity.fromValue(1234L));
 		}
 
 		public Transaction createMosaicSupplyChangeTransaction(final Account sender, final MosaicLevy mosaicLevy) {
@@ -645,34 +656,16 @@ public class MessagingServiceTest {
 			final MosaicDefinition mosaicDefinition = this.testMosaicDefinition(sender, mosaicLevy);
 			Mockito.when(this.mosaicInfoFactory.getMosaicDefinition(mosaicId)).thenReturn(mosaicDefinition);
 
-			return new MosaicSupplyChangeTransaction(
-					TimeInstant.ZERO,
-					sender,
-					mosaicId,
-					MosaicSupplyType.Create,
-					Supply.fromValue(1234L)
-			);
+			return new MosaicSupplyChangeTransaction(TimeInstant.ZERO, sender, mosaicId, MosaicSupplyType.Create, Supply.fromValue(1234L));
 		}
 
 		public Block createBlock(final Account harvester) {
-			return new Block(
-					harvester,
-					Hash.ZERO,
-					Hash.ZERO,
-					TimeInstant.ZERO,
-					BlockHeight.ONE
-			);
+			return new Block(harvester, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
 		}
 
 		public Collection<Block> createBlocks(int startingHeight, int len) {
-			return IntStream.range(startingHeight, startingHeight+len)
-					.mapToObj(i -> new Block(
-							Utils.generateRandomAccount(),
-							Hash.ZERO,
-							Hash.ZERO,
-							TimeInstant.ZERO,
-							new BlockHeight(i)
-					))
+			return IntStream.range(startingHeight, startingHeight + len)
+					.mapToObj(i -> new Block(Utils.generateRandomAccount(), Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(i)))
 					.collect(Collectors.toList());
 		}
 	}

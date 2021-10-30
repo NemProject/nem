@@ -26,18 +26,13 @@ public class PoiContext {
 	 * @param height The current block height.
 	 * @param options The poi options.
 	 */
-	public PoiContext(
-			final Iterable<AccountState> accountStates,
-			final BlockHeight height,
-			final PoiOptions options) {
+	public PoiContext(final Iterable<AccountState> accountStates, final BlockHeight height, final PoiOptions options) {
 		// (1) build the account vectors and matrices
 		this.accountProcessor = new AccountProcessor(accountStates, height, options);
 		this.accountProcessor.process();
 	}
 
-	//region getters
-
-	//region vectors
+	// region getters - vectors
 
 	/**
 	 * Gets the vested balance vector.
@@ -84,9 +79,9 @@ public class PoiContext {
 		return this.accountProcessor.graphWeightVector;
 	}
 
-	//endregion
+	// endregion
 
-	//region dangle indexes
+	// region getters - dangle indexes
 
 	/**
 	 * Gets the dangle indexes.
@@ -97,9 +92,9 @@ public class PoiContext {
 		return this.accountProcessor.dangleIndexes;
 	}
 
-	//endregion
+	// endregion
 
-	//region matrices
+	// region getters - matrices
 
 	/**
 	 * Gets the out-link matrix.
@@ -119,9 +114,9 @@ public class PoiContext {
 		return this.accountProcessor.interLevelMatrix;
 	}
 
-	//endregion
+	// endregion
 
-	//region clustering result
+	// region getters - clustering result
 
 	/**
 	 * Gets the clustering result.
@@ -132,7 +127,7 @@ public class PoiContext {
 		return this.accountProcessor.clusteringResult;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Updates the importance information for all harvesting-eligible accounts.
@@ -140,9 +135,7 @@ public class PoiContext {
 	 * @param pageRankVector The calculated page ranks.
 	 * @param importanceVector The calculated importances.
 	 */
-	public void updateImportances(
-			final ColumnVector pageRankVector,
-			final ColumnVector importanceVector) {
+	public void updateImportances(final ColumnVector pageRankVector, final ColumnVector importanceVector) {
 		this.accountProcessor.updateImportances(pageRankVector, importanceVector);
 	}
 
@@ -165,10 +158,7 @@ public class PoiContext {
 		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
-		public AccountProcessor(
-				final Iterable<AccountState> accountStates,
-				final BlockHeight height,
-				final PoiOptions options) {
+		public AccountProcessor(final Iterable<AccountState> accountStates, final BlockHeight height, final PoiOptions options) {
 			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
 			this.options = options;
@@ -218,9 +208,7 @@ public class PoiContext {
 			this.initializeStartVector();
 		}
 
-		public void updateImportances(
-				final ColumnVector pageRankVector,
-				final ColumnVector importanceVector) {
+		public void updateImportances(final ColumnVector pageRankVector, final ColumnVector importanceVector) {
 			if (pageRankVector.size() != this.accountInfos.size()) {
 				throw new IllegalArgumentException("page rank vector is an unexpected dimension");
 			}
@@ -238,7 +226,8 @@ public class PoiContext {
 				// on machines that do not support historical information, each HistoricalImportances will only contain a
 				// single entry in-between pruning
 				final HistoricalImportances historicalImportances = accountInfo.getState().getHistoricalImportances();
-				historicalImportances.addHistoricalImportance(new AccountImportance(this.height, importanceVector.getAt(i), pageRankVector.getAt(i)));
+				historicalImportances
+						.addHistoricalImportance(new AccountImportance(this.height, importanceVector.getAt(i), pageRankVector.getAt(i)));
 				++i;
 			}
 		}
@@ -305,18 +294,12 @@ public class PoiContext {
 
 		private void clusterAccounts() {
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
-			this.neighborhood = new Neighborhood(
-					nodeNeighborMap,
-					new StructuralSimilarityStrategy(nodeNeighborMap),
-					this.options.getMuClusteringValue(),
-					this.options.getEpsilonClusteringValue());
+			this.neighborhood = new Neighborhood(nodeNeighborMap, new StructuralSimilarityStrategy(nodeNeighborMap),
+					this.options.getMuClusteringValue(), this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
-			LOGGER.info(String.format(
-					"clustering completed: { clusters: %d (average size: %s), hubs: %d, outliers: %d }",
-					this.clusteringResult.getClusters().size(),
-					FormatUtils.format(this.clusteringResult.getAverageClusterSize(), 2),
-					this.clusteringResult.getHubs().size(),
-					this.clusteringResult.getOutliers().size()));
+			LOGGER.info(String.format("clustering completed: { clusters: %d (average size: %s), hubs: %d, outliers: %d }",
+					this.clusteringResult.getClusters().size(), FormatUtils.format(this.clusteringResult.getAverageClusterSize(), 2),
+					this.clusteringResult.getHubs().size(), this.clusteringResult.getOutliers().size()));
 
 			this.graphWeightVector.setAll(1.0);
 			for (final Cluster cluster : this.clusteringResult.getOutliers()) {

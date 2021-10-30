@@ -21,10 +21,7 @@ public class HistoricalDataRequest {
 	 * @param endHeight The end height.
 	 * @param increment The increment by which to increase the height.
 	 */
-	public HistoricalDataRequest(
-			final BlockHeight startHeight,
-			final BlockHeight endHeight,
-			final Long increment) {
+	public HistoricalDataRequest(final BlockHeight startHeight, final BlockHeight endHeight, final Long increment) {
 		this.startHeight = startHeight;
 		this.endHeight = endHeight;
 		this.increment = increment;

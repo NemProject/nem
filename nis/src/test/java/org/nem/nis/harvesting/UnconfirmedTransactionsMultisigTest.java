@@ -20,7 +20,7 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 	private static final TimeInstant CURRENT_TIME = new TimeInstant(UnconfirmedTransactionsTestUtils.CURRENT_TIME);
 	private static final TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
-	//region multisig signature
+	// region multisig signature
 
 	@Test
 	public void properSignatureIsAccepted() {
@@ -78,9 +78,9 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		MatcherAssert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
-	//endregion
+	// endregion
 
-	//region dropExpiredTransactions
+	// region dropExpiredTransactions
 
 	@Test
 	public void dropExpiredTransactionsDropsMultisigTransactionWithExpiredSignature() {
@@ -110,15 +110,17 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		MatcherAssert.assertThat(context.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region MultisigSignatureTestContext
+	// region MultisigSignatureTestContext
 
 	private MultisigSignatureTestContext createTestContext() {
 		return new MultisigSignatureTestContext(this::createUnconfirmedTransactions);
 	}
 
-	private static class MultisigSignatureTestContext extends UnconfirmedTransactionsTestUtils.NonExecutingUnconfirmedTransactionsTestContext {
+	private static class MultisigSignatureTestContext
+			extends
+				UnconfirmedTransactionsTestUtils.NonExecutingUnconfirmedTransactionsTestContext {
 		private final Transaction t1;
 		private final MultisigTransaction multisigTransaction;
 
@@ -143,8 +145,6 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 			this.multisigTransaction = this.createMultisigTransaction(CURRENT_TIME, this.t1);
 		}
 
-		//region create transaction
-
 		public MultisigSignatureTransaction createSignatureTransaction(final TimeInstant signatureTime) {
 			return prepare(new MultisigSignatureTransaction(signatureTime, this.cosigner2, this.multisig, this.t1));
 		}
@@ -156,10 +156,6 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		public TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Amount amount) {
 			return prepareWithoutSignature(new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null));
 		}
-
-		//endregion
-
-		//region add transaction
 
 		public ValidationResult addMultisigTransaction() {
 			return this.add(this.multisigTransaction);
@@ -174,19 +170,13 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 			return this.add(signatureTransaction);
 		}
 
-		//endregion
-
-		//region modify state
-
 		public void makeCosignatory(final Account signer, final Account multisig) {
 			this.modifyCache(accountStateCache -> {
 				accountStateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 				accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 			});
 		}
-
-		//endregion
 	}
 
-	//endregion
+	// endregion
 }

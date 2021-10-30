@@ -10,7 +10,7 @@ import org.nem.nis.test.*;
 
 public class RemoteLinksTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void remotesAreNotSetUpByDefault() {
@@ -24,9 +24,9 @@ public class RemoteLinksTest {
 		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region addLink
+	// region addLink
 
 	@Test
 	public void canAddLinkMarkingAccountAsHarvestingRemotely() {
@@ -60,9 +60,9 @@ public class RemoteLinksTest {
 		MatcherAssert.assertThat(links.getCurrent(), IsEqual.equalTo(link));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeLink
+	// region removeLink
 
 	@Test
 	public void cannotRemoveLinkWhenNoLinksArePresent() {
@@ -101,9 +101,9 @@ public class RemoteLinksTest {
 		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region storage
+	// region storage
 
 	@Test
 	public void canStoreMaximumOfTwoLinks() {
@@ -126,7 +126,7 @@ public class RemoteLinksTest {
 		MatcherAssert.assertThat(links.getCurrent(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
 	// region getRemoteStatus
 
@@ -145,119 +145,72 @@ public class RemoteLinksTest {
 	@Test
 	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinLimit(
-				ImportanceTransferMode.Activate,
-				RemoteLink.Owner.HarvestingRemotely,
-				RemoteStatus.OWNER_ACTIVATING);
+		assertRemoteStatusWithinLimit(ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely, RemoteStatus.OWNER_ACTIVATING);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationAboveLimit() {
 		// Assert:
-		assertRemoteStatusAboveLimit(
-				ImportanceTransferMode.Activate,
-				RemoteLink.Owner.HarvestingRemotely,
-				RemoteStatus.OWNER_ACTIVE);
+		assertRemoteStatusAboveLimit(ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely, RemoteStatus.OWNER_ACTIVE);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinLimit(
-				ImportanceTransferMode.Deactivate,
-				RemoteLink.Owner.HarvestingRemotely,
+		assertRemoteStatusWithinLimit(ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_DEACTIVATING);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusAboveLimit(
-				ImportanceTransferMode.Deactivate,
-				RemoteLink.Owner.HarvestingRemotely,
-				RemoteStatus.OWNER_INACTIVE);
+		assertRemoteStatusAboveLimit(ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely, RemoteStatus.OWNER_INACTIVE);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinLimit(
-				ImportanceTransferMode.Activate,
-				RemoteLink.Owner.RemoteHarvester,
-				RemoteStatus.REMOTE_ACTIVATING);
+		assertRemoteStatusWithinLimit(ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester, RemoteStatus.REMOTE_ACTIVATING);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusAboveLimit(
-				ImportanceTransferMode.Activate,
-				RemoteLink.Owner.RemoteHarvester,
-				RemoteStatus.REMOTE_ACTIVE);
+		assertRemoteStatusAboveLimit(ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester, RemoteStatus.REMOTE_ACTIVE);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinLimit(
-				ImportanceTransferMode.Deactivate,
-				RemoteLink.Owner.RemoteHarvester,
+		assertRemoteStatusWithinLimit(ImportanceTransferMode.Deactivate, RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_DEACTIVATING);
 	}
 
 	@Test
 	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusAboveLimit(
-				ImportanceTransferMode.Deactivate,
-				RemoteLink.Owner.RemoteHarvester,
-				RemoteStatus.REMOTE_INACTIVE);
+		assertRemoteStatusAboveLimit(ImportanceTransferMode.Deactivate, RemoteLink.Owner.RemoteHarvester, RemoteStatus.REMOTE_INACTIVE);
 	}
 
-	private static void assertRemoteStatusWithinLimit(
-			final ImportanceTransferMode mode,
-			final RemoteLink.Owner owner,
+	private static void assertRemoteStatusWithinLimit(final ImportanceTransferMode mode, final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
-		assertRemoteStatus(
-				new BlockHeight(linkHeight),
-				new BlockHeight(linkHeight),
-				mode,
-				owner,
-				expectedStatus);
-		assertRemoteStatus(
-				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY - 1),
-				new BlockHeight(linkHeight),
-				mode,
-				owner,
-				expectedStatus);
+		assertRemoteStatus(new BlockHeight(linkHeight), new BlockHeight(linkHeight), mode, owner, expectedStatus);
+		assertRemoteStatus(new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY - 1), new BlockHeight(linkHeight), mode,
+				owner, expectedStatus);
 	}
 
-	private static void assertRemoteStatusAboveLimit(
-			final ImportanceTransferMode mode,
-			final RemoteLink.Owner owner,
+	private static void assertRemoteStatusAboveLimit(final ImportanceTransferMode mode, final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
-		assertRemoteStatus(
-				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY),
-				new BlockHeight(linkHeight),
-				mode,
-				owner,
+		assertRemoteStatus(new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY), new BlockHeight(linkHeight), mode, owner,
 				expectedStatus);
-		assertRemoteStatus(
-				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY + 1),
-				new BlockHeight(linkHeight),
-				mode,
-				owner,
-				expectedStatus);
+		assertRemoteStatus(new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY + 1), new BlockHeight(linkHeight), mode,
+				owner, expectedStatus);
 	}
 
-	private static void assertRemoteStatus(
-			final BlockHeight height,
-			final BlockHeight linkHeight,
-			final ImportanceTransferMode mode,
-			final RemoteLink.Owner owner,
-			final RemoteStatus expectedStatus) {
+	private static void assertRemoteStatus(final BlockHeight height, final BlockHeight linkHeight, final ImportanceTransferMode mode,
+			final RemoteLink.Owner owner, final RemoteStatus expectedStatus) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final RemoteLinks links = new RemoteLinks();
@@ -272,7 +225,7 @@ public class RemoteLinksTest {
 
 	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesAllLinks() {
@@ -298,7 +251,7 @@ public class RemoteLinksTest {
 		MatcherAssert.assertThat(copy.getCurrent(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
 	private static RemoteLink createRandomLink() {
 		return RemoteLinkFactory.activateRemoteHarvester(Utils.generateRandomAddress(), new BlockHeight(7));

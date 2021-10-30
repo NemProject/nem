@@ -12,7 +12,7 @@ import java.util.*;
 
 public class DbAccountTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateAccountUsingDefaultConstructor() {
@@ -71,9 +71,9 @@ public class DbAccountTest {
 		MatcherAssert.assertThat(account.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@SuppressWarnings("serial")
 	private static final Map<String, DbAccount> DESC_TO_DB_ACCOUNT_MAP = new HashMap<String, DbAccount>() {
@@ -120,7 +120,7 @@ public class DbAccountTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static DbAccount createDbAccount(final Long id, final String printableKey, final PublicKey publicKey) {
 		final DbAccount account = new DbAccount(printableKey, publicKey);

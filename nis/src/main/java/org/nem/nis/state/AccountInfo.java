@@ -15,7 +15,7 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 	private ReferenceCount refCount = ReferenceCount.ZERO;
 	private final Collection<MosaicId> mosaicIds = new HashSet<>();
 
-	//region balance
+	// region balance
 
 	@Override
 	public Amount getBalance() {
@@ -40,9 +40,9 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.balance = this.balance.subtract(amount);
 	}
 
-	//endregion
+	// endregion
 
-	//region harvested blocks
+	// region harvested blocks
 
 	@Override
 	public BlockAmount getHarvestedBlocks() {
@@ -63,9 +63,9 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.harvestedBlocks = this.harvestedBlocks.decrement();
 	}
 
-	//endregion
+	// endregion
 
-	//region label
+	// region label
 
 	@Override
 	public String getLabel() {
@@ -81,9 +81,9 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.label = label;
 	}
 
-	//endregion
+	// endregion
 
-	//region reference count
+	// region reference count
 
 	@Override
 	public ReferenceCount getReferenceCount() {
@@ -110,9 +110,9 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		return this.refCount;
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaic ids
+	// region mosaic ids
 
 	/**
 	 * Gets the mosaic ids this account is invested in.
@@ -142,7 +142,7 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.mosaicIds.remove(mosaicId);
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a copy of this info.

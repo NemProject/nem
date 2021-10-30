@@ -11,7 +11,9 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
+public class MosaicDefinitionCreationModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
 
 	@Test
 	public void transactionCanBeMappedToDbModel() {
@@ -49,7 +51,8 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		private final Account creationFeeSink = Utils.generateRandomAccount();
 		private final DbAccount dbCreationFeeSink = Mockito.mock(DbAccount.class);
-		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(this.mapper);
+		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(
+				this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicDefinition, DbMosaicDefinition.class)).thenReturn(this.dbMosaicDefinition);
@@ -58,11 +61,7 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		}
 
 		public MosaicDefinitionCreationTransaction createModel() {
-			return new MosaicDefinitionCreationTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					this.mosaicDefinition,
-					this.creationFeeSink,
+			return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, this.signer, this.mosaicDefinition, this.creationFeeSink,
 					Amount.fromNem(25));
 		}
 	}

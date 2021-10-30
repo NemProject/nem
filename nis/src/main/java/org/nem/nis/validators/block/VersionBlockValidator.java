@@ -4,8 +4,7 @@ import org.nem.core.model.*;
 import org.nem.nis.validators.BlockValidator;
 
 /**
- * A BlockValidator implementation that validates that:
- * - higher versioned blocks do not appear before the respective fork heights
+ * A BlockValidator implementation that validates that higher versioned blocks do not appear before the respective fork heights
  */
 public class VersionBlockValidator implements BlockValidator {
 

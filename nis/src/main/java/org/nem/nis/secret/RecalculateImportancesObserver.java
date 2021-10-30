@@ -31,7 +31,9 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 
 		final PoxFacade poxFacade = this.nisCache.getPoxFacade();
 		final BlockHeight lastRecalculationHeight = poxFacade.getLastRecalculationHeight();
-		final BlockHeight effectiveHeight = NotificationTrigger.Execute == context.getTrigger() ? context.getHeight().next() : context.getHeight();
+		final BlockHeight effectiveHeight = NotificationTrigger.Execute == context.getTrigger()
+				? context.getHeight().next()
+				: context.getHeight();
 		if (null != lastRecalculationHeight && 0 == lastRecalculationHeight.compareTo(GroupedHeight.fromHeight(effectiveHeight))) {
 			return;
 		}

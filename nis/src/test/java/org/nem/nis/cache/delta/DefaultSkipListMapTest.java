@@ -45,13 +45,9 @@ public class DefaultSkipListMapTest {
 	public void clearRemovesAllElementsFromMap() {
 		// Arrange:
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final Set<Hash> hashes1 = new HashSet<>(Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash()));
-		final Set<Hash> hashes2 = new HashSet<>(Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash()));
+		final Set<Hash> hashes1 = new HashSet<>(
+				Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash()));
+		final Set<Hash> hashes2 = new HashSet<>(Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash()));
 		innerMap.put(TimeInstant.ZERO, hashes1);
 		innerMap.put(new TimeInstant(1), hashes2);
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
@@ -140,10 +136,8 @@ public class DefaultSkipListMapTest {
 	@Test
 	public void canPutKeyWithMultipleValuesIntoMapIfKeyIsUnknown() {
 		// Arrange:
-		final Set<Hash> hashes = new HashSet<>(Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash()));
+		final Set<Hash> hashes = new HashSet<>(
+				Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash()));
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
@@ -158,10 +152,8 @@ public class DefaultSkipListMapTest {
 	@Test
 	public void canPutKeyWithMultipleValuesIntoMapIfKeyIsKnown() {
 		// Arrange:
-		final Set<Hash> hashes = new HashSet<>(Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash()));
+		final Set<Hash> hashes = new HashSet<>(
+				Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash()));
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, Utils.generateRandomHash());
@@ -186,8 +178,8 @@ public class DefaultSkipListMapTest {
 
 		// Assert:
 		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(6));
-		map.entrySet().forEach(e -> e.getValue().stream()
-				.forEach(h -> MatcherAssert.assertThat(original.contains(e.getKey(), h), IsEqual.equalTo(true))));
+		map.entrySet().forEach(
+				e -> e.getValue().stream().forEach(h -> MatcherAssert.assertThat(original.contains(e.getKey(), h), IsEqual.equalTo(true))));
 	}
 
 	// endregion
@@ -197,10 +189,7 @@ public class DefaultSkipListMapTest {
 	@Test
 	public void removeRemovesKeyValuePairFromMap() {
 		// Arrange:
-		final List<Hash> hashes = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash());
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, new HashSet<>(hashes));
@@ -211,20 +200,15 @@ public class DefaultSkipListMapTest {
 
 		// Assert:
 		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(1));
-		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, hashes.get(i)), IsEqual.equalTo(1 == i % 2)));
+		IntStream.range(0, 3)
+				.forEach(i -> MatcherAssert.assertThat(map.contains(TimeInstant.ZERO, hashes.get(i)), IsEqual.equalTo(1 == i % 2)));
 	}
 
 	@Test
 	public void removeAllRemovesAllGivenKeyValuePairsFromMap() {
 		// Arrange:
-		final List<Hash> hashes1 = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
-		final List<Hash> hashes2 = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes1 = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash());
+		final List<Hash> hashes2 = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash());
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> original = new DefaultSkipListMap<>(innerMap);
 		original.put(TimeInstant.ZERO, new HashSet<>(hashes1));
@@ -240,8 +224,10 @@ public class DefaultSkipListMapTest {
 
 		// Assert:
 		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(original.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(1 == i % 2)));
-		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(original.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(0 == i % 2)));
+		IntStream.range(0, 3)
+				.forEach(i -> MatcherAssert.assertThat(original.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(1 == i % 2)));
+		IntStream.range(0, 3)
+				.forEach(i -> MatcherAssert.assertThat(original.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(0 == i % 2)));
 	}
 
 	// endregion
@@ -254,12 +240,8 @@ public class DefaultSkipListMapTest {
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> original = new DefaultSkipListMap<>(innerMap);
 		final Hash hash = Utils.generateRandomHash();
-		final List<Hash> hashes1 = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
-		final List<Hash> hashes2 = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes1 = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash());
+		final List<Hash> hashes2 = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash());
 		final List<Hash> hashes3 = new ArrayList<>(hashes1);
 		hashes3.add(hash);
 
@@ -286,17 +268,14 @@ public class DefaultSkipListMapTest {
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		final Hash hash = Utils.generateRandomHash();
-		final List<Hash> hashes = Arrays.asList(
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash());
+		final List<Hash> hashes = Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash());
 		map.put(TimeInstant.ZERO, hash);
 		map.put(new TimeInstant(1), hashes);
 
 		// Act:
 		final Set<Map.Entry<TimeInstant, Set<Hash>>> entrySet = map.entrySet();
 		final List<Map.Entry<TimeInstant, Set<Hash>>> sortedEntries = entrySet.stream()
-				.sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
-				.collect(Collectors.toList());
+				.sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey())).collect(Collectors.toList());
 
 		// Assert:
 		MatcherAssert.assertThat(entrySet.size(), IsEqual.equalTo(2));
@@ -306,7 +285,7 @@ public class DefaultSkipListMapTest {
 		MatcherAssert.assertThat(sortedEntries.get(1).getValue(), IsEquivalent.equivalentTo(hashes));
 	}
 
-	//endregion
+	// endregion
 
 	private static DefaultSkipListMap<TimeInstant, Hash> createMapWithThreeKeys() {
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();

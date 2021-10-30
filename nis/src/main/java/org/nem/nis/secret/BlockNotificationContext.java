@@ -18,10 +18,7 @@ public class BlockNotificationContext {
 	 * @param timeStamp The block timestamp.
 	 * @param trigger The trigger.
 	 */
-	public BlockNotificationContext(
-			final BlockHeight height,
-			final TimeInstant timeStamp,
-			final NotificationTrigger trigger) {
+	public BlockNotificationContext(final BlockHeight height, final TimeInstant timeStamp, final NotificationTrigger trigger) {
 		this.height = height;
 		this.timeStamp = timeStamp;
 		this.trigger = trigger;

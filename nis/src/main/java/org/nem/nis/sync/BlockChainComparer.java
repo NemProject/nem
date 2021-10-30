@@ -56,7 +56,7 @@ public class BlockChainComparer {
 
 		public ComparisonResult compare() {
 			// BR: Don't call getLastBlock in the constructor. The purpose of the chain score is to let the remote peer
-			//     only look up the last block if it is really needed.
+			// only look up the last block if it is really needed.
 			ComparisonResult.Code code = this.compareChainScores();
 
 			if (ComparisonResult.Code.UNKNOWN == code) {
@@ -78,11 +78,7 @@ public class BlockChainComparer {
 			}
 
 			final BlockHeight height = null == this.remoteLastBlock ? null : this.remoteLastBlock.getHeight();
-			return new ComparisonResult(
-					code,
-					this.commonBlockIndex,
-					this.areChainsConsistent,
-					height);
+			return new ComparisonResult(code, this.commonBlockIndex, this.areChainsConsistent, height);
 		}
 
 		private boolean isRemoteTooFarBehind() {
@@ -102,9 +98,8 @@ public class BlockChainComparer {
 		}
 
 		private ComparisonResult.Code compareHashes() {
-			final BlockHeight startingBlockHeight = new BlockHeight(Math.max(
-					1,
-					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite()));
+			final BlockHeight startingBlockHeight = new BlockHeight(
+					Math.max(1, this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite()));
 			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
 
 			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node

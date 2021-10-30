@@ -7,7 +7,7 @@ import org.nem.core.test.ExceptionAssert;
 
 public class MappingRepositoryTest {
 
-	//region add success
+	// region add success
 
 	@Test
 	public void canAddSingleMapping() {
@@ -46,9 +46,9 @@ public class MappingRepositoryTest {
 		MatcherAssert.assertThat(repository.map(7.1, String.class), IsEqual.equalTo("7.1"));
 	}
 
-	//endregion
+	// endregion
 
-	//region add failure
+	// region add failure
 
 	@Test
 	public void cannotAddMappingForSameTypePairMoreThanOnce() {
@@ -57,9 +57,7 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> repository.addMapping(Integer.class, String.class, Object::toString),
-				MappingException.class);
+		ExceptionAssert.assertThrows(v -> repository.addMapping(Integer.class, String.class, Object::toString), MappingException.class);
 		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
 
@@ -70,15 +68,13 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> repository.map(7, Double.class),
-				MappingException.class);
+		ExceptionAssert.assertThrows(v -> repository.map(7, Double.class), MappingException.class);
 		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region size / isSupported
+	// region size / isSupported
 
 	@Test
 	public void sizeReturnsTotalNumberOfKnownMappings() {
@@ -125,5 +121,5 @@ public class MappingRepositoryTest {
 		MatcherAssert.assertThat(repository.isSupported(Long.class, Double.class), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 }

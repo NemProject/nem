@@ -14,7 +14,7 @@ import java.util.*;
 
 public class ChildAwareSingleTransactionValidatorTest {
 
-	//region getName
+	// region getName
 
 	@Test
 	public void getNameDelegatesToInnerValidator() {
@@ -31,9 +31,9 @@ public class ChildAwareSingleTransactionValidatorTest {
 		Mockito.verify(innerValidator, Mockito.only()).getName();
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction without child transactions
+	// region transaction without child transactions
 
 	@Test
 	public void validateDelegatesToInnerValidatorForValidTransactionWithoutChildTransactions() {
@@ -47,7 +47,8 @@ public class ChildAwareSingleTransactionValidatorTest {
 		assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(final ValidationResult expectedResult) {
+	private static void assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final SingleTransactionValidator innerValidator = Mockito.mock(SingleTransactionValidator.class);
 		final SingleTransactionValidator validator = new ChildAwareSingleTransactionValidator(innerValidator);
@@ -64,9 +65,9 @@ public class ChildAwareSingleTransactionValidatorTest {
 		Mockito.verify(innerValidator, Mockito.only()).validate(transaction, context);
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction with child transactions
+	// region transaction with child transactions
 
 	@Test
 	public void validateSucceedsForValidTransactionWithValidChildTransactions() {
@@ -139,9 +140,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		private final ValidationContext context = new ValidationContext(ValidationStates.Throw);
 
 		private ThreeChildTransactionTestContext() {
-			final Collection<Transaction> transactions = Arrays.asList(
-					this.innerTransaction1,
-					this.innerTransaction2,
+			final Collection<Transaction> transactions = Arrays.asList(this.innerTransaction1, this.innerTransaction2,
 					this.innerTransaction3);
 			for (final Transaction transaction : transactions) {
 				Mockito.when(this.innerValidator.validate(transaction, this.context)).thenReturn(ValidationResult.SUCCESS);
@@ -162,10 +161,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 			return this.validator.validate(this.transaction, this.context);
 		}
 
-		private void verifyValidation(
-				final boolean isOuterValidated,
-				final boolean isInner1Validated,
-				final boolean isInner2Validated,
+		private void verifyValidation(final boolean isOuterValidated, final boolean isInner1Validated, final boolean isInner2Validated,
 				final boolean isInner3Validated) {
 			Mockito.verify(this.innerValidator, getModeFromFlag(isOuterValidated)).validate(this.transaction, this.context);
 			Mockito.verify(this.innerValidator, getModeFromFlag(isInner1Validated)).validate(this.innerTransaction1, this.context);
@@ -178,5 +174,5 @@ public class ChildAwareSingleTransactionValidatorTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

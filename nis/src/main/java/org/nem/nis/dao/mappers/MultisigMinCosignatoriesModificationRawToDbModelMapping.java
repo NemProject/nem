@@ -16,7 +16,7 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMapping implements 
 
 		final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = new DbMultisigMinCosignatoriesModification();
 		dbMinCosignatoriesModification.setId(RawMapperUtils.castToLong(source[16]));
-		dbMinCosignatoriesModification.setRelativeChange((Integer)source[17]);
+		dbMinCosignatoriesModification.setRelativeChange((Integer) source[17]);
 		return dbMinCosignatoriesModification;
 	}
 }

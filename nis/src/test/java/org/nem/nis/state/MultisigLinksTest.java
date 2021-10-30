@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 
-	//region MultisigLinks
+	// region MultisigLinks
 
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
@@ -57,9 +57,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		context.addCosignatoryOf(context.address);
-		ExceptionAssert.assertThrows(
-				v -> context.addCosignatory(context.address),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.addCosignatory(context.address), IllegalArgumentException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
@@ -74,9 +72,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		context.addCosignatory(context.address);
-		ExceptionAssert.assertThrows(
-				v -> context.addCosignatoryOf(context.address),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.addCosignatoryOf(context.address), IllegalArgumentException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(false));
@@ -84,9 +80,9 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region removal
+	// region removal
 
 	@Test
 	public void canRemoveCosignatory() {
@@ -116,9 +112,9 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesMultisig() {
@@ -165,9 +161,9 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region getCosignatories
+	// region getCosignatories
 
 	@Test
 	public void getCosignatoriesIsReadOnly() {
@@ -176,9 +172,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
-		ExceptionAssert.assertThrows(
-				v -> cosignatories.add(Utils.generateRandomAddress()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> cosignatories.add(Utils.generateRandomAddress()), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -197,9 +191,9 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(cosignatories, IsEquivalent.equivalentTo(cosignatory1, cosignatory2));
 	}
 
-	//endregion
+	// endregion
 
-	//region getCosignatoriesOf
+	// region getCosignatoriesOf
 
 	@Test
 	public void getCosignatoriesOfIsReadOnly() {
@@ -208,9 +202,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		final Collection<Address> multisigAddresses = context.multisigLinks.getCosignatoriesOf();
-		ExceptionAssert.assertThrows(
-				v -> multisigAddresses.add(Utils.generateRandomAddress()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> multisigAddresses.add(Utils.generateRandomAddress()), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -229,9 +221,9 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(multisigAddresses, IsEquivalent.equivalentTo(multisig1, multisig2));
 	}
 
-	//endregion
+	// endregion
 
-	//region incrementCosignatoriesBy
+	// region incrementCosignatoriesBy
 
 	@Test
 	public void incrementCosignatoriesByFailsIfResultingMinCosignatoriesIsNegative() {
@@ -300,7 +292,7 @@ public class MultisigLinksTest {
 		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();

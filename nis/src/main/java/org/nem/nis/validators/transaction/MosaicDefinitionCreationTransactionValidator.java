@@ -12,9 +12,10 @@ import org.nem.nis.validators.ValidationContext;
 import java.util.Objects;
 
 /**
- * A single transaction validator implementation that validates mosaic definition creation transaction.
- * 1. mosaic definition namespace must belong to creator and be active
- * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire supply
+ * A single transaction validator implementation that validates mosaic definition creation transaction.<br>
+ * 1. mosaic definition namespace must belong to creator and be active<br>
+ * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire
+ * supply
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
@@ -85,7 +86,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		final MosaicDefinition originalDefinition = mosaicEntry.getMosaicDefinition();
 		final MosaicProperties originalProperties = originalDefinition.getProperties();
 		final MosaicProperties newProperties = mosaicDefinition.getProperties();
-		if (!originalProperties.equals(newProperties) || !Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+		if (!originalProperties.equals(newProperties)
+				|| !Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
 			return arePropertiesChangesValid(originalProperties, newProperties) && isFullSupplyOwnedByCreator(mosaicEntry);
 		}
 
@@ -107,8 +109,6 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 	private static Amount getMosaicCreationFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(50000)
-				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
-						? Amount.fromNem(500)
-						: Amount.fromNem(10);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw() ? Amount.fromNem(500) : Amount.fromNem(10);
 	}
 }

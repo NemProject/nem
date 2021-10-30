@@ -15,14 +15,8 @@ public class AccountHistoricalDataViewModelTest {
 	public void canCreateAccountHistoricalDataViewModel() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountHistoricalDataViewModel viewModel = new AccountHistoricalDataViewModel(
-				new BlockHeight(123),
-				address,
-				Amount.fromNem(234),
-				Amount.fromNem(345),
-				Amount.fromNem(456),
-				0.567,
-				0.678);
+		final AccountHistoricalDataViewModel viewModel = new AccountHistoricalDataViewModel(new BlockHeight(123), address,
+				Amount.fromNem(234), Amount.fromNem(345), Amount.fromNem(456), 0.567, 0.678);
 
 		// Assert:
 		MatcherAssert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(123L)));
@@ -38,14 +32,8 @@ public class AccountHistoricalDataViewModelTest {
 	public void canSerializeViewModel() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountHistoricalDataViewModel viewModel = new AccountHistoricalDataViewModel(
-				new BlockHeight(123),
-				address,
-				Amount.fromNem(234),
-				Amount.fromNem(345),
-				Amount.fromNem(456),
-				0.567,
-				0.678);
+		final AccountHistoricalDataViewModel viewModel = new AccountHistoricalDataViewModel(new BlockHeight(123), address,
+				Amount.fromNem(234), Amount.fromNem(345), Amount.fromNem(456), 0.567, 0.678);
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);

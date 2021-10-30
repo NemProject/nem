@@ -3,8 +3,7 @@ package org.nem.nis.state;
 import org.nem.core.model.primitive.*;
 
 /**
- * Container for vested balances.
- * <br>
+ * Container for vested balances. <br>
  * Methods of this interface assume that they are called in paired order.
  */
 public interface WeightedBalances extends ReadOnlyWeightedBalances {
@@ -57,14 +56,14 @@ public interface WeightedBalances extends ReadOnlyWeightedBalances {
 	void undoSend(final BlockHeight height, final Amount amount);
 
 	/**
-	 * Converts the unvested balance to a fully vested balance.
-	 * This is only possible at height one and if the balances contain exactly one entry.
+	 * Converts the unvested balance to a fully vested balance. This is only possible at height one and if the balances contain exactly one
+	 * entry.
 	 */
 	void convertToFullyVested();
 
 	/**
-	 * Undoes all changes to weighted balances after the specified block height.
-	 * In other words, reverts the weighted balances to the specified block height.
+	 * Undoes all changes to weighted balances after the specified block height. In other words, reverts the weighted balances to the
+	 * specified block height.
 	 *
 	 * @param height The block height.
 	 */

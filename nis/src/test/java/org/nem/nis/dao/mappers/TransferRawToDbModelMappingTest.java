@@ -76,21 +76,21 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[16];
-			raw[0] = BigInteger.valueOf(123L);                              // block id
-			raw[1] = BigInteger.valueOf(234L);                              // id
-			raw[2] = rawHash;                                               // raw hash
-			raw[3] = 1;                                                     // version
-			raw[4] = BigInteger.valueOf(345L);                              // fee
-			raw[5] = 456;                                                   // timestamp
-			raw[6] = 567;                                                   // deadline
-			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
-			raw[8] = senderProof;                                           // sender proof
-			raw[9] = BigInteger.valueOf(this.recipientId);                  // recipient id
-			raw[10] = 321;                                                  // block index
-			raw[11] = BigInteger.valueOf(543L);                             // amount
-			raw[12] = BigInteger.valueOf(654L);                             // referenced transaction
-			raw[13] = null == message ? null : 765;                         // message type
-			raw[14] = message;                                              // raw message bytes
+			raw[0] = BigInteger.valueOf(123L); // block id
+			raw[1] = BigInteger.valueOf(234L); // id
+			raw[2] = rawHash; // raw hash
+			raw[3] = 1; // version
+			raw[4] = BigInteger.valueOf(345L); // fee
+			raw[5] = 456; // timestamp
+			raw[6] = 567; // deadline
+			raw[7] = BigInteger.valueOf(this.senderId); // sender id
+			raw[8] = senderProof; // sender proof
+			raw[9] = BigInteger.valueOf(this.recipientId); // recipient id
+			raw[10] = 321; // block index
+			raw[11] = BigInteger.valueOf(543L); // amount
+			raw[12] = BigInteger.valueOf(654L); // referenced transaction
+			raw[13] = null == message ? null : 765; // message type
+			raw[14] = message; // raw message bytes
 
 			return raw;
 		}

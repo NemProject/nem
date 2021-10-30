@@ -77,7 +77,7 @@ public class HarvestingTaskTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block block = createSignedBlock();
-		final Hash blockHash = HashUtils.calculateHash((SerializableEntity)block);
+		final Hash blockHash = HashUtils.calculateHash((SerializableEntity) block);
 		Mockito.when(context.harvester.harvestBlock()).thenReturn(block);
 		Mockito.when(context.blockChain.processBlock(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 

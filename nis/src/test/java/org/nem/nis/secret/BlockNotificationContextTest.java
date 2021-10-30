@@ -11,9 +11,7 @@ public class BlockNotificationContextTest {
 	@Test
 	public void canCreateContext() {
 		// Act:
-		final BlockNotificationContext context = new BlockNotificationContext(
-				new BlockHeight(11),
-				new TimeInstant(123),
+		final BlockNotificationContext context = new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123),
 				NotificationTrigger.Undo);
 
 		// Assert:

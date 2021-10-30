@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class BlockExplorerControllerTest {
 	private static final int BLOCKS_LIMIT = 10;
 
-	//region localBlocksAfter
+	// region localBlocksAfter
 
 	@Test
 	public void localBlocksAfterDelegatesToBlockDao() {
@@ -65,14 +65,13 @@ public class BlockExplorerControllerTest {
 
 		// Assert:
 		MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(3));
-		MatcherAssert.assertThat(
-				blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
+		MatcherAssert.assertThat(blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region localBlockAt
+	// region localBlockAt
 
 	@Test
 	public void localBlockAtReturnsRequestedBlock() {
@@ -92,7 +91,7 @@ public class BlockExplorerControllerTest {
 		MatcherAssert.assertThat(getHeight(block), IsEqual.equalTo(16L));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
@@ -102,15 +101,13 @@ public class BlockExplorerControllerTest {
 		public TestContext() {
 			final MapperFactory mapperFactory = Mockito.mock(MapperFactory.class);
 			final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-			Mockito.when(mapperFactory.createDbModelToModelMapper(accountLookup))
-					.thenReturn(this.mapper);
-			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(ExplorerBlockViewModel.class)))
-					.then(invocationOnMock -> {
-						final long height = ((DbBlock)invocationOnMock.getArguments()[0]).getHeight();
-						final Block block = BlockUtils.createBlockWithHeight(new BlockHeight(height));
-						block.sign();
-						return new ExplorerBlockViewModel(block, Hash.ZERO);
-					});
+			Mockito.when(mapperFactory.createDbModelToModelMapper(accountLookup)).thenReturn(this.mapper);
+			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(ExplorerBlockViewModel.class))).then(invocationOnMock -> {
+				final long height = ((DbBlock) invocationOnMock.getArguments()[0]).getHeight();
+				final Block block = BlockUtils.createBlockWithHeight(new BlockHeight(height));
+				block.sign();
+				return new ExplorerBlockViewModel(block, Hash.ZERO);
+			});
 			this.controller = new BlockExplorerController(this.blockDao, mapperFactory, accountLookup);
 		}
 
@@ -120,12 +117,11 @@ public class BlockExplorerControllerTest {
 				dbBlocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(i, heights[i]));
 			}
 
-			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT))
-					.thenReturn(dbBlocks);
+			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT)).thenReturn(dbBlocks);
 		}
 	}
 
 	private static long getHeight(final ExplorerBlockViewModel viewModel) {
-		return (Long)((JSONObject)JsonSerializer.serializeToJson(viewModel).get("block")).get("height");
+		return (Long) ((JSONObject) JsonSerializer.serializeToJson(viewModel).get("block")).get("height");
 	}
 }

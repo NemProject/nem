@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 
 public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 
-	//region 1:1 delegation
+	// region 1:1 delegation
 
 	@Test
 	public void getUnconfirmedBalanceDelegatesToState() {
@@ -91,9 +91,9 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		add.apply(Mockito.verify(context.state, Mockito.only()), transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//region create transactions
+	// region create transactions
 
 	private static MockTransaction createMockTransaction(final int customField) {
 		return new MockTransaction(Utils.generateRandomAccount(), customField, new TimeInstant(customField));
@@ -109,9 +109,9 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		return transactions;
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private TestContext createTestContext() {
 		return new TestContext(this::createUnconfirmedTransactions);
@@ -128,5 +128,5 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		}
 	}
 
-	//endregion
+	// endregion
 }

@@ -26,8 +26,7 @@ public class NamespaceCacheLookupAdapters {
 	 * @return A MosaicFeeInformationLookup.
 	 */
 	public MosaicFeeInformationLookup asMosaicFeeInformationLookup() {
-		return id -> this.getEntityData(
-				id,
+		return id -> this.getEntityData(id,
 				entry -> new MosaicFeeInformation(entry.getSupply(), entry.getMosaicDefinition().getProperties().getDivisibility()));
 	}
 

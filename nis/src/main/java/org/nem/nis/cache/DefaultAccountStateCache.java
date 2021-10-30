@@ -31,8 +31,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		this(addressToStateMap, AccountState::new);
 	}
 
-	private DefaultAccountStateCache(
-			final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap,
+	private DefaultAccountStateCache(final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap,
 			final Function<Address, AccountState> unknownAddressHandler) {
 		this.addressToStateMap = addressToStateMap;
 		this.stateFinder = new StateFinder(this.addressToStateMap, unknownAddressHandler);
@@ -60,7 +59,8 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public CacheContents<ReadOnlyAccountState> contents() {
-		return new CacheContents<>(this.addressToStateMap.readOnlyEntrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+		return new CacheContents<>(
+				this.addressToStateMap.readOnlyEntrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -95,13 +95,11 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		// note that this is not copying at all.
 		final MutableObjectAwareDeltaMap<Address, AccountState> rebasedDeltaMap = this.addressToStateMap.rebase();
-		final DefaultAccountStateCache copy = new DefaultAccountStateCache(
-				rebasedDeltaMap,
-				address -> {
-					final AccountState state = new AccountState(address);
-					rebasedDeltaMap.put(address, state);
-					return state;
-				});
+		final DefaultAccountStateCache copy = new DefaultAccountStateCache(rebasedDeltaMap, address -> {
+			final AccountState state = new AccountState(address);
+			rebasedDeltaMap.put(address, state);
+			return state;
+		});
 		copy.isCopy = true;
 		return copy;
 	}
@@ -126,8 +124,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		private final DeltaMap<Address, AccountState> addressToStateMap;
 		private final Function<Address, AccountState> unknownAddressHandler;
 
-		public StateFinder(
-				final DeltaMap<Address, AccountState> addressToStateMap,
+		public StateFinder(final DeltaMap<Address, AccountState> addressToStateMap,
 				final Function<Address, AccountState> unknownAddressHandler) {
 			this.addressToStateMap = addressToStateMap;
 			this.unknownAddressHandler = unknownAddressHandler;

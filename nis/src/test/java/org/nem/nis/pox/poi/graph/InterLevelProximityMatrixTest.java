@@ -327,7 +327,8 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithThreeClustersTwoHubsAndThreeOutliers() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(
+				GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		// Assert:
 		assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(interLevel);
@@ -343,8 +344,8 @@ public class InterLevelProximityMatrixTest {
 		final SparseMatrix r = new SparseMatrix(8, 20, 4);
 
 		// note: the entries in the a and r matrices depend on the order in which the clusters are found!
-		//       for example if cluster 1 and cluster 2 are switched in the list of clusters, then column 0 and 1
-		//       have to be switched for matrix a (row 0 and 1 for matrix r).
+		// for example if cluster 1 and cluster 2 are switched in the list of clusters, then column 0 and 1
+		// have to be switched for matrix a (row 0 and 1 for matrix r).
 		// cluster 1
 		for (final int i : Arrays.asList(0, 1, 4, 10, 14)) {
 			a.setAt(i, 1, 1);
@@ -408,21 +409,14 @@ public class InterLevelProximityMatrixTest {
 
 		// pretend each node is an outlier in its own cluster
 		// the important part of this test is that the cluster ids are in NON-ASCENDING order
-		final ClusteringResult clusteringResult = new ClusteringResult(
-				new ArrayList<>(),
-				new ArrayList<>(),
-				Arrays.asList(
-						new Cluster(new ClusterId(3), NisUtils.toNodeIdList(0)),
-						new Cluster(new ClusterId(2), NisUtils.toNodeIdList(1)),
-						new Cluster(new ClusterId(1), NisUtils.toNodeIdList(2)),
+		final ClusteringResult clusteringResult = new ClusteringResult(new ArrayList<>(), new ArrayList<>(),
+				Arrays.asList(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(0)),
+						new Cluster(new ClusterId(2), NisUtils.toNodeIdList(1)), new Cluster(new ClusterId(1), NisUtils.toNodeIdList(2)),
 						new Cluster(new ClusterId(0), NisUtils.toNodeIdList(3))));
 
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new StructuralSimilarityStrategy(nodeNeighborMap));
-		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(
-				clusteringResult,
-				neighborhood,
-				outlinkMatrix);
+		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);
 
 		// Assert:
 		// note that A is not a map of node-id -> cluster-id;
@@ -446,7 +440,7 @@ public class InterLevelProximityMatrixTest {
 		MatcherAssert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
-	//region test infrastructure
+	// region test infrastructure
 
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphType graphType) {
 		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
@@ -466,5 +460,5 @@ public class InterLevelProximityMatrixTest {
 		return new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);
 	}
 
-	//endregion
+	// endregion
 }

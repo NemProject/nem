@@ -22,7 +22,8 @@ import java.util.*;
 
 public class BlockAnalyzerTest {
 	private static final EnumSet<ObserverOption> DEFAULT_OPTIONS = EnumSet.of(ObserverOption.NoIncrementalPoi);
-	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
+	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey
+			.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
 	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 
@@ -31,7 +32,7 @@ public class BlockAnalyzerTest {
 		NetworkInfos.setDefault(null);
 	}
 
-	//region loadNemesisBlock
+	// region loadNemesisBlock
 
 	@Test
 	public void loadNemesisBlockReturnsExpectedBlockForTestNetwork() {
@@ -64,7 +65,7 @@ public class BlockAnalyzerTest {
 		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(1353));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void analyzeWithNullMaxHeightLoadsCompleteDb() {
@@ -145,9 +146,7 @@ public class BlockAnalyzerTest {
 		final NemesisBlockInfo nemesisBlockInfo = NetworkInfos.getTestNetworkInfo().getNemesisBlockInfo();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 		context.fillDatabase(nemesisBlock, 0);
-		final Amount nemesisFees = BlockExtensions.streamDefault(nemesisBlock)
-				.map(Transaction::getFee)
-				.reduce(Amount.ZERO, Amount::add);
+		final Amount nemesisFees = BlockExtensions.streamDefault(nemesisBlock).map(Transaction::getFee).reduce(Amount.ZERO, Amount::add);
 
 		// Act:
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
@@ -187,12 +186,8 @@ public class BlockAnalyzerTest {
 		final NisCache copy = context.nisCache.copy();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 		final Block block = NisUtils.createBlockList(nemesisBlock, 1).get(0);
-		final Transaction transfer = new TransferTransaction(
-				TimeInstant.ZERO,
-				new Account(new KeyPair(TEST_ADDRESS1_PK)),
-				new Account(TEST_ADDRESS2),
-				Amount.fromNem(1_000_000),
-				null);
+		final Transaction transfer = new TransferTransaction(TimeInstant.ZERO, new Account(new KeyPair(TEST_ADDRESS1_PK)),
+				new Account(TEST_ADDRESS2), Amount.fromNem(1_000_000), null);
 		transfer.setFee(Amount.fromNem(100));
 		transfer.sign();
 		block.addTransaction(transfer);
@@ -241,7 +236,8 @@ public class BlockAnalyzerTest {
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 		private final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao));
 		private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao);
-		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(this.blockDao, this.mapper));
+		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito
+				.spy(new BlockChainLastBlockLayer(this.blockDao, this.mapper));
 		private final BlockChainScoreManager scoreManager;
 		private final NisMapperFactory nisMapperFactory;
 		private final BlockAnalyzer blockAnalyzer;
@@ -252,11 +248,7 @@ public class BlockAnalyzerTest {
 			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));
-			this.blockAnalyzer = new BlockAnalyzer(
-					this.blockDao,
-					this.scoreManager,
-					this.blockChainLastBlockLayer,
-					this.nisMapperFactory,
+			this.blockAnalyzer = new BlockAnalyzer(this.blockDao, this.scoreManager, this.blockChainLastBlockLayer, this.nisMapperFactory,
 					ESTIMATED_BLOCKS_PER_YEAR);
 		}
 

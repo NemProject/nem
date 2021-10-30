@@ -67,13 +67,10 @@ public class BlockHeightBlockValidatorDecoratorTest {
 	private static class TestContext {
 		private final BlockHeight effectiveBlockHeight = new BlockHeight(123);
 		private final BlockValidator innerValidator = Mockito.mock(BlockValidator.class);
-		private final BlockValidator validator = new BlockHeightBlockValidatorDecorator(
-				this.effectiveBlockHeight,
-				this.innerValidator);
+		private final BlockValidator validator = new BlockHeightBlockValidatorDecorator(this.effectiveBlockHeight, this.innerValidator);
 
 		public TestContext() {
-			Mockito.when(this.innerValidator.validate(Mockito.any()))
-					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
+			Mockito.when(this.innerValidator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 
 		public ValidationResult validateAtHeight(final BlockHeight height) {

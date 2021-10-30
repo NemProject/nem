@@ -35,7 +35,7 @@ public class RemoteObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((ImportanceTransferNotification)notification, context);
+		this.notify((ImportanceTransferNotification) notification, context);
 	}
 
 	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
@@ -45,15 +45,9 @@ public class RemoteObserver implements BlockTransactionObserver {
 						? notification.getLessee().getAddress()
 						: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
 
-		final RemoteLink lessorLink = new RemoteLink(
-				remoteAddress,
-				context.getHeight(),
-				notification.getMode(),
+		final RemoteLink lessorLink = new RemoteLink(remoteAddress, context.getHeight(), notification.getMode(),
 				RemoteLink.Owner.HarvestingRemotely);
-		final RemoteLink lesseeLink = new RemoteLink(
-				notification.getLessor().getAddress(),
-				context.getHeight(),
-				notification.getMode(),
+		final RemoteLink lesseeLink = new RemoteLink(notification.getLessor().getAddress(), context.getHeight(), notification.getMode(),
 				RemoteLink.Owner.RemoteHarvester);
 
 		if (context.getTrigger() == NotificationTrigger.Execute) {

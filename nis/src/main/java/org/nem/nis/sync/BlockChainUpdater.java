@@ -35,13 +35,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final ArrayList<BlockListener> listeners;
 	private BlockChainScore score;
 
-	public BlockChainUpdater(
-			final ReadOnlyNisCache nisCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockDao blockDao,
-			final BlockChainContextFactory blockChainContextFactory,
-			final UnconfirmedTransactions unconfirmedTransactions,
-			final NisConfiguration configuration) {
+	public BlockChainUpdater(final ReadOnlyNisCache nisCache, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao, final BlockChainContextFactory blockChainContextFactory,
+			final UnconfirmedTransactions unconfirmedTransactions, final NisConfiguration configuration) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -52,7 +48,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		this.listeners = new ArrayList<>();
 	}
 
-	//region BlockChainScoreManager
+	// region BlockChainScoreManager
 
 	@Override
 	public BlockChainScore getScore() {
@@ -65,9 +61,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateChain
+	// region updateChain
 
 	/**
 	 * Synchronizes the chain with another node.
@@ -85,8 +81,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(
-						node,
+				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node,
 						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.asFilter().getAll()));
 				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				return result.toNodeInteractionResult();
@@ -94,7 +89,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			case REMOTE_IS_NOT_SYNCED:
 				break;
 
-			default:
+			default :
 				return result.toNodeInteractionResult();
 		}
 
@@ -102,20 +97,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockChainSyncContext context = this.createSyncContext();
 			final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 			final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-			final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
+			final int minBlocks = (int) (this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
 			final int maxTransactions = this.configuration.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt();
 			final long start = System.currentTimeMillis();
-			final Collection<Block> peerChain = syncConnector.getChainAfter(
-					node,
+			final Collection<Block> peerChain = syncConnector.getChainAfter(node,
 					new ChainRequest(commonBlockHeight, minBlocks, maxTransactions));
 
 			final long stop = System.currentTimeMillis();
 			final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-			LOGGER.info(String.format("received %d blocks (%d transactions) in %d ms from remote (%d μs/tx)",
-					peerChain.size(),
-					numTransactions,
-					stop - start,
-					0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
+			LOGGER.info(String.format("received %d blocks (%d transactions) in %d ms from remote (%d μs/tx)", peerChain.size(),
+					numTransactions, stop - start, 0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
 				// last block has changed due to another call (probably processBlock), don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
@@ -127,14 +118,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			// revert TXes inside contemporaryAccountAnalyzer
 			BlockChainScore ourScore = BlockChainScore.ZERO;
 			if (!result.areChainsConsistent()) {
-				LOGGER.info(String.format(
-						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
+				LOGGER.info(String.format("synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
 						this.blockChainLastBlockLayer.getLastBlockHeight().getRaw() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 			}
 
 			// verify peer's chain
-			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore,
+					!result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
 	}
@@ -154,9 +145,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region updateBlock
+	// region updateBlock
 
 	/**
 	 * Synchronizes the chain with a received block.
@@ -193,10 +184,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// we have parent, check if it has child
 		if (this.blockDao.findByHeight(new BlockHeight(dbParent.getHeight() + 1)) != null) {
 			final long lastBlockHeightRaw = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
-			LOGGER.info(String.format(
-					"processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks to: %d).",
-					lastBlockHeightRaw - dbParent.getHeight(),
-					lastBlockHeightRaw));
+			LOGGER.info(String.format("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks to: %d).",
+					lastBlockHeightRaw - dbParent.getHeight(), lastBlockHeightRaw));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
@@ -223,7 +212,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
-	//endregion
+	// endregion
 
 	private BlockChainSyncContext createSyncContext() {
 		return this.blockChainContextFactory.createSyncContext(this.score);
@@ -233,19 +222,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return this.blockChainContextFactory.createComparisonContext(this.score);
 	}
 
-	private ValidationResult updateOurChain(
-			final BlockChainSyncContext context,
-			final DbBlock dbParentBlock,
-			final Collection<Block> peerChain,
-			final BlockChainScore ourScore,
-			final boolean hasOwnChain,
+	private ValidationResult updateOurChain(final BlockChainSyncContext context, final DbBlock dbParentBlock,
+			final Collection<Block> peerChain, final BlockChainScore ourScore, final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore) {
-		final BlockChainUpdateContext updateContext = this.blockChainContextFactory.createUpdateContext(
-				context,
-				dbParentBlock,
-				peerChain,
-				ourScore,
-				hasOwnChain);
+		final BlockChainUpdateContext updateContext = this.blockChainContextFactory.createUpdateContext(context, dbParentBlock, peerChain,
+				ourScore, hasOwnChain);
 		final UpdateChainResult updateResult = updateContext.update();
 
 		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) <= 0) {

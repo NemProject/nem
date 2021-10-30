@@ -8,7 +8,7 @@ import org.nem.nis.secret.BlockTransactionObserver;
 
 public class TransactionHashCachePruningObserverTest extends AbstractPruningObserverTest {
 
-	//region overrides
+	// region overrides
 
 	@Override
 	protected BlockTransactionObserver createObserver(final NisCache nisCache) {
@@ -17,7 +17,7 @@ public class TransactionHashCachePruningObserverTest extends AbstractPruningObse
 
 	@Override
 	protected void assertPruning(final NisCache nisCache, final long state) {
-		Mockito.verify(nisCache.getTransactionHashCache(), Mockito.only()).prune(new TimeInstant((int)state));
+		Mockito.verify(nisCache.getTransactionHashCache(), Mockito.only()).prune(new TimeInstant((int) state));
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class TransactionHashCachePruningObserverTest extends AbstractPruningObse
 		Mockito.verify(nisCache.getTransactionHashCache(), Mockito.never()).prune(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void timeBasedPruningIsTriggeredAtInitialTime() {
@@ -55,5 +55,5 @@ public class TransactionHashCachePruningObserverTest extends AbstractPruningObse
 		this.assertTimeBasedPruning(relativeTime3.addSeconds(1), 3 * RETENTION_SECONDS + 1);
 	}
 
-	//endregion
+	// endregion
 }

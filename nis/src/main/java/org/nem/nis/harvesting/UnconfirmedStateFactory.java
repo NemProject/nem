@@ -27,12 +27,9 @@ public class UnconfirmedStateFactory {
 	 * @param blockHeightSupplier The block height supplier.
 	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
-	public UnconfirmedStateFactory(
-			final TransactionValidatorFactory validatorFactory,
-			final Function<NisCache, BlockTransactionObserver> observerFactory,
-			final TimeProvider timeProvider,
-			final Supplier<BlockHeight> blockHeightSupplier,
-			final int maxTransactionsPerBlock) {
+	public UnconfirmedStateFactory(final TransactionValidatorFactory validatorFactory,
+			final Function<NisCache, BlockTransactionObserver> observerFactory, final TimeProvider timeProvider,
+			final Supplier<BlockHeight> blockHeightSupplier, final int maxTransactionsPerBlock) {
 		this.validatorFactory = validatorFactory;
 		this.observerFactory = observerFactory;
 		this.timeProvider = timeProvider;
@@ -47,16 +44,9 @@ public class UnconfirmedStateFactory {
 	 * @param transactions the unconfirmed transactions.
 	 * @return The unconfirmed state.
 	 */
-	public UnconfirmedState create(
-			final NisCache nisCache,
-			final UnconfirmedTransactionsCache transactions) {
-		return new DefaultUnconfirmedState(
-				transactions,
-				this.validatorFactory,
-				this.observerFactory.apply(nisCache),
-				new TransactionSpamFilter(nisCache, transactions, this.maxTransactionsPerBlock),
-				nisCache,
-				this.timeProvider,
+	public UnconfirmedState create(final NisCache nisCache, final UnconfirmedTransactionsCache transactions) {
+		return new DefaultUnconfirmedState(transactions, this.validatorFactory, this.observerFactory.apply(nisCache),
+				new TransactionSpamFilter(nisCache, transactions, this.maxTransactionsPerBlock), nisCache, this.timeProvider,
 				this.blockHeightSupplier);
 	}
 }

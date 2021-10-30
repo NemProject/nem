@@ -75,12 +75,9 @@ public class NisDbModelToModelMapper implements IMapper {
 		return this.mapper.map(source, targetClass);
 	}
 
-	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(
-			final Collection<TDbModel> dbTransactions,
+	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(final Collection<TDbModel> dbTransactions,
 			final Predicate<AbstractTransfer> shouldInclude) {
-		return dbTransactions.stream()
-				.filter(shouldInclude::test)
-				.map(t -> this.mapper.map(t, Transaction.class))
+		return dbTransactions.stream().filter(shouldInclude::test).map(t -> this.mapper.map(t, Transaction.class))
 				.collect(Collectors.toList());
 	}
 }

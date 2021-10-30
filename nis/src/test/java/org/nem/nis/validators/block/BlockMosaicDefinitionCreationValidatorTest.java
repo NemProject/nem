@@ -13,7 +13,7 @@ import org.nem.nis.test.NisUtils;
 
 public class BlockMosaicDefinitionCreationValidatorTest {
 
-	//region valid
+	// region valid
 
 	@Test
 	public void blockWithNoTransactionsValidates() {
@@ -83,9 +83,9 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 		context.assertValidation(ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region invalid
+	// region invalid
 
 	@Test
 	public void blockWithMosaicDefinitionCreationAndConflictingSupplyChangeDoesNotValidate() {
@@ -175,7 +175,7 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
@@ -184,22 +184,14 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 
 		public void addMosaicDefinitionCreation(final MosaicId mosaicId) {
 			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(this.signer, mosaicId, Utils.createMosaicProperties());
-			final Transaction transaction = new MosaicDefinitionCreationTransaction(
-					TimeInstant.ZERO,
-					mosaicDefinition.getCreator(),
-					mosaicDefinition,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(25));
+			final Transaction transaction = new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, mosaicDefinition.getCreator(),
+					mosaicDefinition, Utils.generateRandomAccount(), Amount.fromNem(25));
 			this.block.addTransaction(transaction);
 		}
 
 		public void addMosaicSupplyChange(final MosaicId mosaicId) {
-			final Transaction transaction = new MosaicSupplyChangeTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					mosaicId,
-					MosaicSupplyType.Create,
-					new Supply(1000));
+			final Transaction transaction = new MosaicSupplyChangeTransaction(TimeInstant.ZERO, this.signer, mosaicId,
+					MosaicSupplyType.Create, new Supply(1000));
 			this.block.addTransaction(transaction);
 		}
 
@@ -208,21 +200,13 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 			attachment.addMosaic(Utils.createMosaicId(1), new Quantity(1));
 			attachment.addMosaic(mosaicId, new Quantity(43));
 			attachment.addMosaic(Utils.createMosaicId(2), new Quantity(3));
-			final Transaction transaction = new TransferTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(1234),
-					attachment);
+			final Transaction transaction = new TransferTransaction(TimeInstant.ZERO, this.signer, Utils.generateRandomAccount(),
+					Amount.fromNem(1234), attachment);
 			this.block.addTransaction(transaction);
 		}
 
 		public void addNamespaceProvisioning(final NamespaceIdPart part, NamespaceId parent) {
-			final Transaction transaction = new ProvisionNamespaceTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					part,
-					parent);
+			final Transaction transaction = new ProvisionNamespaceTransaction(TimeInstant.ZERO, this.signer, part, parent);
 			this.block.addTransaction(transaction);
 		}
 

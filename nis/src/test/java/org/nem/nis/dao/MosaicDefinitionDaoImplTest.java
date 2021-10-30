@@ -45,16 +45,13 @@ public class MosaicDefinitionDaoImplTest {
 		Mockito.when(context.getMosaicDefinitionsForAccountMocked()).thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				context.address,
-				new NamespaceId("foo"),
-				Long.MAX_VALUE,
-				25);
+		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(context.address,
+				new NamespaceId("foo"), Long.MAX_VALUE, 25);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"), Long.MAX_VALUE, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"),
+				Long.MAX_VALUE, 25);
 	}
 
 	@Test
@@ -65,20 +62,13 @@ public class MosaicDefinitionDaoImplTest {
 		context.markUnknown(address);
 
 		// Act:
-		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				address,
-				new NamespaceId("foo"),
-				Long.MAX_VALUE,
-				25);
+		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(address,
+				new NamespaceId("foo"), Long.MAX_VALUE, 25);
 
 		// Assert:
 		MatcherAssert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
-		Mockito.verify(context.retriever, Mockito.never()).getMosaicDefinitionsForAccount(
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt());
+		Mockito.verify(context.retriever, Mockito.never()).getMosaicDefinitionsForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(),
+				Mockito.anyLong(), Mockito.anyInt());
 	}
 
 	@Test
@@ -100,16 +90,13 @@ public class MosaicDefinitionDaoImplTest {
 		Mockito.when(context.getMosaicDefinitionsForAccountMocked()).thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				context.address,
-				new NamespaceId("foo"),
-				requestId,
-				25);
+		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(context.address,
+				new NamespaceId("foo"), requestId, 25);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"), retrieverId, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinitionsForAccount(context.session, 1L, new NamespaceId("foo"),
+				retrieverId, 25);
 	}
 
 	// endregion
@@ -121,19 +108,16 @@ public class MosaicDefinitionDaoImplTest {
 		// Arrange:
 		final Collection<DbMosaicDefinition> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.getMosaicDefinitionsForNamespaceMocked())
-				.thenReturn(retrieverResult);
+		Mockito.when(context.getMosaicDefinitionsForNamespaceMocked()).thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(
-				new NamespaceId("foo"),
-				Long.MAX_VALUE,
-				25);
+		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(new NamespaceId("foo"),
+				Long.MAX_VALUE, 25);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"), Long.MAX_VALUE, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"),
+				Long.MAX_VALUE, 25);
 	}
 
 	@Test
@@ -155,15 +139,13 @@ public class MosaicDefinitionDaoImplTest {
 		Mockito.when(context.getMosaicDefinitionsForNamespaceMocked()).thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(
-				new NamespaceId("foo"),
-				requestId,
-				25);
+		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(new NamespaceId("foo"),
+				requestId, 25);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"), retrieverId, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinitionsForNamespace(context.session, new NamespaceId("foo"),
+				retrieverId, 25);
 	}
 
 	// endregion
@@ -193,8 +175,7 @@ public class MosaicDefinitionDaoImplTest {
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getMosaicDefinitions(context.session, retrieverId, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinitions(context.session, retrieverId, 25);
 	}
 
 	// endregion
@@ -222,33 +203,20 @@ public class MosaicDefinitionDaoImplTest {
 		}
 
 		private DbMosaicDefinition getMosaicDefinitionMocked() {
-			return this.retriever.getMosaicDefinition(
-					Mockito.any(),
-					Mockito.any());
+			return this.retriever.getMosaicDefinition(Mockito.any(), Mockito.any());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsForAccountMocked() {
-			return this.retriever.getMosaicDefinitionsForAccount(
-					Mockito.any(),
-					Mockito.anyLong(),
-					Mockito.any(),
-					Mockito.anyLong(),
+			return this.retriever.getMosaicDefinitionsForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.anyLong(),
 					Mockito.anyInt());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsForNamespaceMocked() {
-			return this.retriever.getMosaicDefinitionsForNamespace(
-					Mockito.any(),
-					Mockito.any(),
-					Mockito.anyLong(),
-					Mockito.anyInt());
+			return this.retriever.getMosaicDefinitionsForNamespace(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsMocked() {
-			return this.retriever.getMosaicDefinitions(
-					Mockito.any(),
-					Mockito.anyLong(),
-					Mockito.anyInt());
+			return this.retriever.getMosaicDefinitions(Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
 		}
 	}
 }

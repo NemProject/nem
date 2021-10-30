@@ -32,9 +32,7 @@ public class AuthenticatedChainRequestTest {
 		final ChainRequest chainRequest = new ChainRequest(new BlockHeight(100), 123, 1234);
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedRequest<>(chainRequest, challenge),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new AuthenticatedRequest<>(chainRequest, challenge), null);
 		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(deserializer);
 
 		// Assert:

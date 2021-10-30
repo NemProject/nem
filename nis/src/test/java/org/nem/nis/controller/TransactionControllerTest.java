@@ -28,7 +28,7 @@ import java.util.function.Function;
 public class TransactionControllerTest {
 	private static final BlockHeight CURRENT_HEIGHT = new BlockHeight(12345);
 
-	//region transactionPrepare
+	// region transactionPrepare
 
 	@Test
 	@SuppressWarnings("deprecation")
@@ -41,9 +41,7 @@ public class TransactionControllerTest {
 		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.transactionPrepare(deserializer),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.transactionPrepare(deserializer), IllegalArgumentException.class);
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -61,7 +59,8 @@ public class TransactionControllerTest {
 		final RequestPrepare requestPrepare = context.controller.transactionPrepare(deserializer);
 
 		// Assert:
-		MatcherAssert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+		MatcherAssert.assertThat(requestPrepare.getData(),
+				IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -88,9 +87,9 @@ public class TransactionControllerTest {
 		MatcherAssert.assertThat(validationContext.getState(), IsEqual.equalTo(context.validationState));
 	}
 
-	//endregion
+	// endregion
 
-	//region transactionPrepareAnnounce
+	// region transactionPrepareAnnounce
 
 	@Test
 	public void transactionPrepareAnnounceSignsAndPushesNonMultisigTransactionIfTransactionPassesValidation() {
@@ -106,9 +105,7 @@ public class TransactionControllerTest {
 
 	private static void assertTransactionPrepareAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {
 		// Assert:
-		assertTransactionPrepareAnnounceSignsAndPushesTransaction(
-				validationResult,
-				TransactionControllerTest::createTransactionWithSender,
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(validationResult, TransactionControllerTest::createTransactionWithSender,
 				null);
 	}
 
@@ -129,19 +126,14 @@ public class TransactionControllerTest {
 		final Transaction innerTransaction = createTransaction();
 
 		// Assert:
-		assertTransactionPrepareAnnounceSignsAndPushesTransaction(
-				validationResult,
-				signer -> new MultisigTransaction(TimeInstant.ZERO, signer, innerTransaction),
-				HashUtils.calculateHash(innerTransaction));
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(validationResult,
+				signer -> new MultisigTransaction(TimeInstant.ZERO, signer, innerTransaction), HashUtils.calculateHash(innerTransaction));
 	}
 
-	private static void assertTransactionPrepareAnnounceSignsAndPushesTransaction(
-			final ValidationResult validationResult,
-			final Function<Account, Transaction> createTransaction,
-			final Hash expectedInnerTransactionHash) {
+	private static void assertTransactionPrepareAnnounceSignsAndPushesTransaction(final ValidationResult validationResult,
+			final Function<Account, Transaction> createTransaction, final Hash expectedInnerTransactionHash) {
 		final TestContext context = new TestContext();
-		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
-				.thenReturn(validationResult);
+		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any())).thenReturn(validationResult);
 
 		final KeyPair keyPair = new KeyPair();
 		final Account account = new Account(keyPair);
@@ -166,9 +158,9 @@ public class TransactionControllerTest {
 		MatcherAssert.assertThat(pushedTransaction.verify(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region transactionAnnounce
+	// region transactionAnnounce
 
 	@Test
 	public void transactionAnnounceSignsAndPushesNonMultisigTransactionIfTransactionPassesValidation() {
@@ -184,10 +176,7 @@ public class TransactionControllerTest {
 
 	private static void assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {
 		// Assert:
-		assertTransactionAnnounceSignsAndPushesTransaction(
-				validationResult,
-				createTransaction(),
-				null);
+		assertTransactionAnnounceSignsAndPushesTransaction(validationResult, createTransaction(), null);
 	}
 
 	@Test
@@ -207,23 +196,18 @@ public class TransactionControllerTest {
 		final Transaction innerTransaction = createTransaction();
 
 		// Assert:
-		assertTransactionAnnounceSignsAndPushesTransaction(
-				validationResult,
+		assertTransactionAnnounceSignsAndPushesTransaction(validationResult,
 				new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction),
 				HashUtils.calculateHash(innerTransaction));
 	}
 
-	private static void assertTransactionAnnounceSignsAndPushesTransaction(
-			final ValidationResult validationResult,
-			final Transaction transaction,
-			final Hash expectedInnerTransactionHash) {
+	private static void assertTransactionAnnounceSignsAndPushesTransaction(final ValidationResult validationResult,
+			final Transaction transaction, final Hash expectedInnerTransactionHash) {
 		final TestContext context = new TestContext();
-		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
-				.thenReturn(validationResult);
+		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any())).thenReturn(validationResult);
 
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
-		final RequestAnnounce requestAnnounce = new RequestAnnounce(
-				BinarySerializer.serializeToBytes(transaction.asNonVerifiable()),
+		final RequestAnnounce requestAnnounce = new RequestAnnounce(BinarySerializer.serializeToBytes(transaction.asNonVerifiable()),
 				signature.getBytes());
 
 		// Act:
@@ -239,9 +223,9 @@ public class TransactionControllerTest {
 		MatcherAssert.assertThat(transactionCaptor.getValue().getSignature(), IsEqual.equalTo(signature));
 	}
 
-	//endregion
+	// endregion
 
-	//region unconfirmed
+	// region unconfirmed
 
 	@Test
 	public void transactionsUnconfirmedReturnsListOfUnconfirmedTransactions() {
@@ -251,16 +235,13 @@ public class TransactionControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runTransactionsUnconfirmedTest(
-				context,
+		final AuthenticatedResponse<?> response = runTransactionsUnconfirmedTest(context,
 				c -> c.controller.transactionsUnconfirmed(new AuthenticatedUnconfirmedTransactionsRequest(challenge)),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runTransactionsUnconfirmedTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runTransactionsUnconfirmedTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, SerializableList<Transaction>> getUnconfirmedTransactions) {
 		// Arrange:
 		Mockito.when(context.unconfirmedTransactions.getUnknownTransactions(Mockito.any())).thenReturn(createTransactionList());
@@ -276,9 +257,9 @@ public class TransactionControllerTest {
 		return result;
 	}
 
-	//endregion
+	// endregion
 
-	//region getTransaction
+	// region getTransaction
 
 	@Test
 	public void getTransactionThrowsIfHashLookupIsNotSupported() {
@@ -289,9 +270,7 @@ public class TransactionControllerTest {
 		hashBuilder.setHash(Utils.generateRandomHash().toString());
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.getTransaction(hashBuilder),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.getTransaction(hashBuilder), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -302,9 +281,7 @@ public class TransactionControllerTest {
 		hashBuilder.setHash(Utils.generateRandomHash().toString());
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.getTransaction(hashBuilder),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.getTransaction(hashBuilder), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -314,9 +291,7 @@ public class TransactionControllerTest {
 		final HashBuilder hashBuilder = new HashBuilder();
 		Hash hash = Utils.generateRandomHash();
 		hashBuilder.setHash(hash.toString());
-		final HashMetaDataPair hashMetaDataPair = new HashMetaDataPair(
-				hash,
-				new HashMetaData(new BlockHeight(123), new TimeInstant(321)));
+		final HashMetaDataPair hashMetaDataPair = new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(123), new TimeInstant(321)));
 		Mockito.when(context.hashCache.get(hash)).thenReturn(hashMetaDataPair.getMetaData());
 		final TransactionMetaDataPair originalPair = Mockito.mock(TransactionMetaDataPair.class);
 		Mockito.when(context.transactionIo.getTransactionUsingHash(hash, new BlockHeight(123))).thenReturn(originalPair);
@@ -331,7 +306,7 @@ public class TransactionControllerTest {
 		Mockito.verify(context.transactionIo, Mockito.only()).getTransactionUsingHash(hash, new BlockHeight(123));
 	}
 
-	//endregion
+	// endregion
 
 	private static Transaction createTransaction() {
 		return createTransactionWithSender(Utils.generateRandomAccount());
@@ -369,21 +344,12 @@ public class TransactionControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			Mockito.when(this.accountLookup.findByAddress(Mockito.any()))
-					.thenAnswer(invocationOnMock -> new Account((Address)invocationOnMock.getArguments()[0]));
+					.thenAnswer(invocationOnMock -> new Account((Address) invocationOnMock.getArguments()[0]));
 
 			Mockito.when(this.nisConfiguration.isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP)).thenReturn(true);
 
-			this.controller = new TransactionController(
-					this.accountLookup,
-					this.pushService,
-					this.unconfirmedTransactions,
-					this.validator,
-					this.host,
-					this.validationState,
-					() -> CURRENT_HEIGHT,
-					transactionIo,
-					hashCache,
-					nisConfiguration);
+			this.controller = new TransactionController(this.accountLookup, this.pushService, this.unconfirmedTransactions, this.validator,
+					this.host, this.validationState, () -> CURRENT_HEIGHT, transactionIo, hashCache, nisConfiguration);
 		}
 	}
 }

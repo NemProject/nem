@@ -43,13 +43,11 @@ public class DefaultMosaicDebitPredicateTest {
 		MatcherAssert.assertThat(debitPredicate.canDebit(account, createMosaic(4, 1)), IsEqual.equalTo(false));
 	}
 
-	private static Account addAccountWithMosaicBalance(final NamespaceCache namespaceCache, final MosaicId mosaicId, final Quantity balance) {
+	private static Account addAccountWithMosaicBalance(final NamespaceCache namespaceCache, final MosaicId mosaicId,
+			final Quantity balance) {
 		final Account namespaceOwner = Utils.generateRandomAccount();
 		final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE);
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				namespaceOwner,
-				mosaicId,
-				Utils.createMosaicProperties());
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, mosaicId, Utils.createMosaicProperties());
 		namespaceCache.add(namespace);
 		final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
 		final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().add(mosaicDefinition);

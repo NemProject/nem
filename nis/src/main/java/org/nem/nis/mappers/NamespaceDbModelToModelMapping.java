@@ -23,9 +23,6 @@ public class NamespaceDbModelToModelMapping implements IMapping<DbNamespace, Nam
 	@Override
 	public Namespace map(final DbNamespace dbNamespace) {
 		final Account owner = this.mapper.map(dbNamespace.getOwner(), Account.class);
-		return new Namespace(
-				new NamespaceId(dbNamespace.getFullName()),
-				owner,
-				new BlockHeight(dbNamespace.getHeight()));
+		return new Namespace(new NamespaceId(dbNamespace.getFullName()), owner, new BlockHeight(dbNamespace.getHeight()));
 	}
 }

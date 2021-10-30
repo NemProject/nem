@@ -1,8 +1,7 @@
 package org.nem.nis.test;
 
 /**
- * An enum of well-known graph types where epsilon is assumed to have a value of 0.40.
- * <br>
+ * An enum of well-known graph types where epsilon is assumed to have a value of 0.40. <br>
  * Graph interpretation: i----oj means i has directed edge to j
  */
 public enum GraphTypeEpsilon040 {
@@ -102,10 +101,9 @@ public enum GraphTypeEpsilon040 {
 	 * sim(16, 4) = (|{16,4}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
 	 * sim(16, 5) = (|{16,5}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
 	 * </pre>
-	 * Expected:
-	 * Clusters {0, 1, 4, 10, 14}, {2, 3, 7, 9, 15}, {5, 6, 8, 11, 12}
-	 * Hubs: {16}, {18}
-	 * Outliers: {13}, {17}, {19}
+	 *
+	 * Expected:<br>
+	 * Clusters {0, 1, 4, 10, 14}, {2, 3, 7, 9, 15}, {5, 6, 8, 11, 12} Hubs: {16}, {18} Outliers: {13}, {17}, {19}
 	 */
 	GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS
 }

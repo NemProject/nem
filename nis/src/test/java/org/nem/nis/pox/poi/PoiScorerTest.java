@@ -9,7 +9,7 @@ public class PoiScorerTest {
 	private static final double OUTLINK_WEIGHT = 1.25;
 	private static final double IMPORTANCE_WEIGHT = 0.1337;
 
-	//region all vectors
+	// region all vectors
 
 	@Test
 	public void finalScoreIsCalculatedCorrectly() {
@@ -26,27 +26,16 @@ public class PoiScorerTest {
 
 		// Assert:
 		// weighted-outlinks: l1norm(max(0, stakes + outlinkWeight*outlinkVector))
-		final ColumnVector weightedOutlinks = new ColumnVector(
-				4.00 * OUTLINK_WEIGHT + 80.0,
-				1.00 * OUTLINK_WEIGHT + 5.00,
-				7.00 * OUTLINK_WEIGHT + 140.,
-				9.00 * OUTLINK_WEIGHT + 45.0,
-				2.00 * OUTLINK_WEIGHT + 40.0,
-				5.00 * OUTLINK_WEIGHT + 25.0);
+		final ColumnVector weightedOutlinks = new ColumnVector(4.00 * OUTLINK_WEIGHT + 80.0, 1.00 * OUTLINK_WEIGHT + 5.00,
+				7.00 * OUTLINK_WEIGHT + 140., 9.00 * OUTLINK_WEIGHT + 45.0, 2.00 * OUTLINK_WEIGHT + 40.0, 5.00 * OUTLINK_WEIGHT + 25.0);
 		weightedOutlinks.normalize();
 
 		// weighted-importance: importanceWeight * PR
-		final ColumnVector weightedImportance = new ColumnVector(
-				1.00 * IMPORTANCE_WEIGHT,
-				0.80 * IMPORTANCE_WEIGHT,
-				0.20 * IMPORTANCE_WEIGHT,
-				0.50 * IMPORTANCE_WEIGHT,
-				0.60 * IMPORTANCE_WEIGHT,
-				0.30 * IMPORTANCE_WEIGHT);
+		final ColumnVector weightedImportance = new ColumnVector(1.00 * IMPORTANCE_WEIGHT, 0.80 * IMPORTANCE_WEIGHT,
+				0.20 * IMPORTANCE_WEIGHT, 0.50 * IMPORTANCE_WEIGHT, 0.60 * IMPORTANCE_WEIGHT, 0.30 * IMPORTANCE_WEIGHT);
 
 		// final: l1norm((weighted-outlinks + weighted-importance) * graphWeightVector)
-		final ColumnVector expectedFinalScoresVector = new ColumnVector(
-				1.0 * (weightedOutlinks.getAt(0) + weightedImportance.getAt(0)),
+		final ColumnVector expectedFinalScoresVector = new ColumnVector(1.0 * (weightedOutlinks.getAt(0) + weightedImportance.getAt(0)),
 				0.8 * (weightedOutlinks.getAt(1) + weightedImportance.getAt(1)),
 				1.0 * (weightedOutlinks.getAt(2) + weightedImportance.getAt(2)),
 				1.2 * (weightedOutlinks.getAt(3) + weightedImportance.getAt(3)),
@@ -72,27 +61,16 @@ public class PoiScorerTest {
 
 		// Assert:
 		// weighted-outlinks: l1norm(max(0, stakes + outlinkWeight*outlinkVector))
-		final ColumnVector weightedOutlinks = new ColumnVector(
-				-4.00 * OUTLINK_WEIGHT + 80.0,
-				1.00 * OUTLINK_WEIGHT + 140.,
-				7.00 * OUTLINK_WEIGHT + -5.00,
-				0,
-				0,
-				5.00 * OUTLINK_WEIGHT + 25.0);
+		final ColumnVector weightedOutlinks = new ColumnVector(-4.00 * OUTLINK_WEIGHT + 80.0, 1.00 * OUTLINK_WEIGHT + 140.,
+				7.00 * OUTLINK_WEIGHT + -5.00, 0, 0, 5.00 * OUTLINK_WEIGHT + 25.0);
 		weightedOutlinks.normalize();
 
 		// weighted-importance: importanceWeight * PR
-		final ColumnVector weightedImportance = new ColumnVector(
-				1.00 * IMPORTANCE_WEIGHT,
-				0.80 * IMPORTANCE_WEIGHT,
-				0.20 * IMPORTANCE_WEIGHT,
-				0.50 * IMPORTANCE_WEIGHT,
-				0.60 * IMPORTANCE_WEIGHT,
-				0.30 * IMPORTANCE_WEIGHT);
+		final ColumnVector weightedImportance = new ColumnVector(1.00 * IMPORTANCE_WEIGHT, 0.80 * IMPORTANCE_WEIGHT,
+				0.20 * IMPORTANCE_WEIGHT, 0.50 * IMPORTANCE_WEIGHT, 0.60 * IMPORTANCE_WEIGHT, 0.30 * IMPORTANCE_WEIGHT);
 
 		// final: l1norm((weighted-outlinks + weighted-importance) * graphWeightVector)
-		final ColumnVector expectedFinalScoresVector = new ColumnVector(
-				1.0 * (weightedOutlinks.getAt(0) + weightedImportance.getAt(0)),
+		final ColumnVector expectedFinalScoresVector = new ColumnVector(1.0 * (weightedOutlinks.getAt(0) + weightedImportance.getAt(0)),
 				0.8 * (weightedOutlinks.getAt(1) + weightedImportance.getAt(1)),
 				1.0 * (weightedOutlinks.getAt(2) + weightedImportance.getAt(2)),
 				1.2 * (weightedOutlinks.getAt(3) + weightedImportance.getAt(3)),
@@ -103,9 +81,9 @@ public class PoiScorerTest {
 		MatcherAssert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}
 
-	//endregion
+	// endregion
 
-	//region single vectors
+	// region single vectors
 
 	@Test
 	public void finalScoreIsCalculatedCorrectlyWhenOnlyInputIsImportanceVector() {
@@ -169,7 +147,7 @@ public class PoiScorerTest {
 		assertRoundedEquality(finalScoresVector, expectedFinalScoresVector);
 	}
 
-	//endregion
+	// endregion
 
 	private static ImportanceScorerContextBuilder createBuilderWithDefaultVectors() {
 		final ImportanceScorerContextBuilder builder = new ImportanceScorerContextBuilder();

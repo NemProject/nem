@@ -48,17 +48,15 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 	}
 
 	private static Hash getDeserializedBlockHash(final JSONObject jsonObject) {
-		final Block deserializedBlock = new Block(
-				BlockTypes.REGULAR,
-				VerifiableEntity.DeserializationOptions.VERIFIABLE,
+		final Block deserializedBlock = new Block(BlockTypes.REGULAR, VerifiableEntity.DeserializationOptions.VERIFIABLE,
 				Utils.createDeserializer(jsonObject));
 		return HashUtils.calculateHash(deserializedBlock);
 	}
 
 	private static List<Hash> getTransactionHashes(final ExplorerBlockViewModel viewModel) {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
-		final JSONArray jsonTransactions = (JSONArray)jsonObject.get("txes");
-		return jsonTransactions.stream().map(o -> Hash.fromHexString((String)((JSONObject)o).get("hash"))).collect(Collectors.toList());
+		final JSONArray jsonTransactions = (JSONArray) jsonObject.get("txes");
+		return jsonTransactions.stream().map(o -> Hash.fromHexString((String) ((JSONObject) o).get("hash"))).collect(Collectors.toList());
 	}
 
 	private static class TestContext {
@@ -92,16 +90,17 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 			return hashes;
 		}
 
-		public void assertViewModel(final ExplorerBlockViewModel viewModel, final Hash expectedBlockHash, final int expectedNumTransactions) {
+		public void assertViewModel(final ExplorerBlockViewModel viewModel, final Hash expectedBlockHash,
+				final int expectedNumTransactions) {
 			// Act:
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 			// Assert:
 			MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
-			MatcherAssert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
+			MatcherAssert.assertThat(getDeserializedBlockHash((JSONObject) jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
 			MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(this.dbBlockHash.toString()));
 			MatcherAssert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(this.blockDifficulty.getRaw()));
-			MatcherAssert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
+			MatcherAssert.assertThat(((JSONArray) jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
 		}
 	}
 }

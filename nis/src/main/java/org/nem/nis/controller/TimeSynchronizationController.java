@@ -46,7 +46,8 @@ public class TimeSynchronizationController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<CommunicationTimeStamps> getNetworkTime(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(this.timeProvider.getNetworkTime(), this.timeProvider.getNetworkTime());
+		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(this.timeProvider.getNetworkTime(),
+				this.timeProvider.getNetworkTime());
 		return new AuthenticatedResponse<>(timeStamps, localNode.getIdentity(), challenge);
 	}
 }

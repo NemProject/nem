@@ -47,7 +47,8 @@ public class ClusterTest {
 		// Assert:
 		MatcherAssert.assertThat(cluster.getId(), IsEqual.equalTo(new ClusterId(1337)));
 		MatcherAssert.assertThat(cluster.getMemberIds().size(), IsEqual.equalTo(7));
-		MatcherAssert.assertThat(cluster.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 1541, 1542, 1443, 1444)));
+		MatcherAssert.assertThat(cluster.getMemberIds(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 1541, 1542, 1443, 1444)));
 	}
 
 	@Test
@@ -96,7 +97,8 @@ public class ClusterTest {
 		cluster.add(new NodeId(3000));
 
 		// Assert:
-		MatcherAssert.assertThat(cluster.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 42, 4242, 3000)));
+		MatcherAssert.assertThat(cluster.getMemberIds(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 42, 4242, 3000)));
 	}
 
 	@Test
@@ -113,9 +115,9 @@ public class ClusterTest {
 		MatcherAssert.assertThat(cluster.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440)));
 	}
 
-	//endregion
+	// endregion
 
-	//region merge
+	// region merge
 
 	@Test
 	public void mergeMergesTwoClustersCorrectly() {
@@ -127,7 +129,8 @@ public class ClusterTest {
 		cluster1.merge(cluster2);
 
 		// Assert:
-		MatcherAssert.assertThat(cluster1.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 129, 625, 1105)));
+		MatcherAssert.assertThat(cluster1.getMemberIds(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440, 129, 625, 1105)));
 		MatcherAssert.assertThat(cluster2.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(1338, 1339, 1440)));
 	}
 
@@ -185,7 +188,7 @@ public class ClusterTest {
 		MatcherAssert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-less-member-ids"), IsNot.not(IsEqual.equalTo(cluster)));
 		MatcherAssert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-more-member-ids"), IsNot.not(IsEqual.equalTo(cluster)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(cluster)));
-		MatcherAssert.assertThat(new ClusterId(1337), IsNot.not(IsEqual.equalTo((Object)cluster)));
+		MatcherAssert.assertThat(new ClusterId(1337), IsNot.not(IsEqual.equalTo((Object) cluster)));
 	}
 
 	@Test
@@ -219,9 +222,9 @@ public class ClusterTest {
 		MatcherAssert.assertThat(cluster3.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentation() {

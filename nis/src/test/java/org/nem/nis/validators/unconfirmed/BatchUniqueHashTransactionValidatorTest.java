@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 public class BatchUniqueHashTransactionValidatorTest {
 
-	//region some transaction hash already exists in cache
+	// region some transaction hash already exists in cache
 
 	@Test
 	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInHashCache() {
@@ -37,7 +37,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void validateReturnsSuccessIfCalledWithEmptyList() {
@@ -80,8 +80,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private void setTransactionHashCacheForHashes() {
-			Mockito.when(this.transactionHashCache.anyHashExists(this.hashes))
-					.thenReturn(true);
+			Mockito.when(this.transactionHashCache.anyHashExists(this.hashes)).thenReturn(true);
 		}
 
 		private ValidationResult validateAtHeight(final long height) {
@@ -92,9 +91,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private TransactionsContextPair createPair(final int start, final int end, final long height) {
-			final ValidationContext validationContext = new ValidationContext(
-					new BlockHeight(height),
-					this.confirmedBlockHeight,
+			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight,
 					ValidationStates.Throw);
 			final List<Transaction> transactions = new ArrayList<>();
 			for (int i = start; i <= end; ++i) {

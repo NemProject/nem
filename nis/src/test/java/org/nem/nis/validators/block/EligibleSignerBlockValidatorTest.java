@@ -42,13 +42,15 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY,
+				ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY,
+				ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
 	}
 
 	@Test
@@ -60,7 +62,8 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY,
+				ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
 	}
 
 	@Test
@@ -78,7 +81,8 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY,
+				ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
 	}
 
 	@Test
@@ -87,18 +91,16 @@ public class EligibleSignerBlockValidatorTest {
 		assertValidationResultForRemoteLinkOwner(null, INVALID_DELAY, ValidationResult.SUCCESS, ON);
 	}
 
-	private static void assertValidationResultForRemoteLinkOwner(
-			final RemoteLink.Owner owner,
-			final int blockHeight,
-			final ValidationResult expectedResult,
-			final ImportanceTransferMode mode) {
+	private static void assertValidationResultForRemoteLinkOwner(final RemoteLink.Owner owner, final int blockHeight,
+			final ValidationResult expectedResult, final ImportanceTransferMode mode) {
 		// Arrange:
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);
 
 		final AccountState accountState = new AccountState(block.getSigner().getAddress());
 		if (null != owner) {
-			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
+			accountState.getRemoteLinks()
+					.addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}
 
 		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);

@@ -36,15 +36,9 @@ public class NodeContext {
 	private final DefaultNisCache nisCache;
 	private SyncConnectorPool connectorPool;
 
-	public NodeContext(
-			final Node node,
-			final BlockChain blockChain,
-			final BlockChainUpdater blockChainUpdater,
-			final BlockChainServices blockChainServices,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final List<Block> chain,
-			final MockBlockDao blockDao,
-			final DefaultNisCache nisCache) {
+	public NodeContext(final Node node, final BlockChain blockChain, final BlockChainUpdater blockChainUpdater,
+			final BlockChainServices blockChainServices, final BlockChainLastBlockLayer blockChainLastBlockLayer, final List<Block> chain,
+			final MockBlockDao blockDao, final DefaultNisCache nisCache) {
 		this.node = node;
 		this.blockChain = blockChain;
 		this.blockChainUpdater = blockChainUpdater;
@@ -54,8 +48,7 @@ public class NodeContext {
 		this.nisCache = nisCache;
 		this.processChain(chain);
 		final NisCache nisCacheCopy = this.nisCache.copy();
-		nisCacheCopy.getPoxFacade().recalculateImportances(
-				this.blockChainLastBlockLayer.getLastBlockHeight().next(),
+		nisCacheCopy.getPoxFacade().recalculateImportances(this.blockChainLastBlockLayer.getLastBlockHeight().next(),
 				nisCacheCopy.getAccountStateCache().mutableContents().asCollection());
 		nisCacheCopy.commit();
 	}
@@ -99,7 +92,7 @@ public class NodeContext {
 	public void setupSyncConnectorPool() {
 		this.connectorPool = Mockito.mock(SyncConnectorPool.class);
 		Mockito.when(this.connectorPool.getSyncConnector(Mockito.any()))
-				.thenAnswer(invocation -> new MockSyncConnector((AccountLookup)invocation.getArguments()[0]));
+				.thenAnswer(invocation -> new MockSyncConnector((AccountLookup) invocation.getArguments()[0]));
 	}
 
 	private class MockSyncConnector implements SyncConnector {
@@ -111,12 +104,14 @@ public class NodeContext {
 
 		@Override
 		public Block getLastBlock(final Node node) {
-			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
+			return this
+					.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
 		public Block getBlockAt(final Node node, final BlockHeight height) {
-			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
+			return this.checkNull(
+					MapperUtils.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
@@ -138,7 +133,8 @@ public class NodeContext {
 		}
 
 		@Override
-		public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
+		public Collection<Transaction> getUnconfirmedTransactions(final Node node,
+				final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
 			return new ArrayList<>();
 		}
 
@@ -179,50 +175,40 @@ public class NodeContext {
 		return nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
 	}
 
-	private Account addAccount(
-			final Account account,
-			final NisCache nisCache) {
+	private Account addAccount(final Account account, final NisCache nisCache) {
 		final AccountCache cache = nisCache.getAccountCache();
 		return cache.addAccountToCache(account.getAddress());
 	}
 
-	private void processTransaction(
-			final TransferTransaction transaction,
-			final BlockHeight height,
-			final NisCache nisCache) {
+	private void processTransaction(final TransferTransaction transaction, final BlockHeight height, final NisCache nisCache) {
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new AccountsHeightObserver(nisCache));
 		builder.add(new BalanceCommitTransferObserver(nisCache.getAccountStateCache()));
 		builder.add(new WeightedBalancesObserver(nisCache.getAccountStateCache()));
 		builder.add(new OutlinkObserver(nisCache.getAccountStateCache()));
-		final TransactionObserver observer = new BlockTransactionObserverToTransactionObserverAdapter(
-				builder.build(),
+		final TransactionObserver observer = new BlockTransactionObserverToTransactionObserverAdapter(builder.build(),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 		transaction.execute(observer, NisCacheUtils.createTransactionExecutionState(nisCache));
 	}
 
-	public void processBlock(
-			final Block block,
-			final MockBlockDao blockDao,
-			final DefaultNisCache nisCache) {
+	public void processBlock(final Block block, final MockBlockDao blockDao, final DefaultNisCache nisCache) {
 		final NisCache nisCacheCopy = nisCache.copy();
 		final Account harvester = this.addAccount(block.getSigner(), nisCacheCopy);
 		this.processHarvestFee(nisCacheCopy, harvester, block.getHeight(), block.getTotalFee());
 		for (final Transaction transaction : block.getTransactions()) {
-			this.processTransaction((TransferTransaction)transaction, block.getHeight(), nisCacheCopy);
+			this.processTransaction((TransferTransaction) transaction, block.getHeight(), nisCacheCopy);
 		}
 
 		nisCacheCopy.commit();
 		blockDao.save(this.mapBlockToDbModel(block, blockDao.getAccountDao()));
 	}
 
-	public void processChain(
-			final List<Block> newChainPart) {
+	public void processChain(final List<Block> newChainPart) {
 		for (final Block block : newChainPart) {
 			this.chain.add(block);
 			this.processBlock(block, this.blockDao, this.nisCache);
 			if (block.getHeight().compareTo(BlockHeight.ONE) > 0) {
-				final Block parent = this.chain.get((int)block.getHeight().getRaw() - 2);
+				final Block parent = this.chain.get((int) block.getHeight().getRaw() - 2);
 				this.blockChainUpdater.updateScore(parent, block);
 			}
 		}

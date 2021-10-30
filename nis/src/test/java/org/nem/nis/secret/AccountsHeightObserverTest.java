@@ -14,7 +14,7 @@ import org.nem.nis.test.*;
 
 public class AccountsHeightObserverTest {
 
-	//region AccountNotification / NotificationTrigger.Execute
+	// region AccountNotification / NotificationTrigger.Execute
 
 	@Test
 	public void accountNotificationExecuteDelegatesToAccountCache() {
@@ -86,9 +86,9 @@ public class AccountsHeightObserverTest {
 		MatcherAssert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region AccountNotification / NotificationTrigger.Undo
+	// region AccountNotification / NotificationTrigger.Undo
 
 	@Test
 	public void accountNotificationUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountCaches() {
@@ -195,9 +195,9 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 	}
 
-	//endregion
+	// endregion
 
-	//region Other Notification
+	// region Other Notification
 
 	@Test
 	public void nonAccountNotificationsAreIgnored() {
@@ -206,15 +206,14 @@ public class AccountsHeightObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account1, Amount.fromNem(12)),
+		context.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account1, Amount.fromNem(12)),
 				createExecuteNotificationContext(12));
 
 		// Assert:
 		Mockito.verifyZeroInteractions(context.accountCache, context.accountStateCache);
 	}
 
-	//endregion
+	// endregion
 
 	private static BlockNotificationContext createExecuteNotificationContext(final int height) {
 		return NisUtils.createBlockNotificationContext(new BlockHeight(height), NotificationTrigger.Execute);

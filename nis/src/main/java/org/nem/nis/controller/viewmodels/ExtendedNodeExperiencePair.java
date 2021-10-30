@@ -18,10 +18,7 @@ public class ExtendedNodeExperiencePair extends NodeExperiencePair {
 	 * @param experience The node experience.
 	 * @param numSyncAttempts The number of sync attempts.
 	 */
-	public ExtendedNodeExperiencePair(
-			final Node node,
-			final NodeExperience experience,
-			final int numSyncAttempts) {
+	public ExtendedNodeExperiencePair(final Node node, final NodeExperience experience, final int numSyncAttempts) {
 		super(node, experience);
 		this.numSyncAttempts = numSyncAttempts;
 	}
@@ -62,7 +59,7 @@ public class ExtendedNodeExperiencePair extends NodeExperiencePair {
 			return false;
 		}
 
-		final ExtendedNodeExperiencePair rhs = (ExtendedNodeExperiencePair)obj;
+		final ExtendedNodeExperiencePair rhs = (ExtendedNodeExperiencePair) obj;
 		return super.equals(rhs) && this.numSyncAttempts == rhs.numSyncAttempts;
 	}
 }

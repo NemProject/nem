@@ -18,7 +18,7 @@ public class HibernateUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> listAndCast(final Query query) {
-		return (List<T>)query.list();
+		return (List<T>) query.list();
 	}
 
 	/**
@@ -30,6 +30,6 @@ public class HibernateUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> listAndCast(final Criteria criteria) {
-		return (List<T>)criteria.list();
+		return (List<T>) criteria.list();
 	}
 }

@@ -40,8 +40,7 @@ public class MosaicControllerTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo:bar")),
+		ExceptionAssert.assertThrows(v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo:bar")),
 				MissingResourceException.class);
 		context.assertNamespaceCacheGetDelegation("foo", false);
 	}
@@ -53,13 +52,17 @@ public class MosaicControllerTest {
 	@Test
 	public void getMosaicSupplyBatchReturnsExpectedPairs() {
 		// Assert:
-		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[] { 1, 5, 6, 9 });
+		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[]{
+				1, 5, 6, 9
+		});
 	}
 
 	@Test
 	public void getMosaicSupplyBatchReturnsExpectedPairsAndCollapsesDuplicateIds() {
 		// Assert:
-		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[] { 1, 5, 5, 9, 6, 9 });
+		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[]{
+				1, 5, 5, 9, 6, 9
+		});
 	}
 
 	private static void assertGetMosaicSupplyBatchReturnsExpectedPairs(final int[] requestIds) {
@@ -71,8 +74,7 @@ public class MosaicControllerTest {
 		// Act:
 		final Collection<MosaicIdSupplyPair> pairs = context.controller.getMosaicSupplyBatch(deserializer).asCollection();
 		final Collection<MosaicIdSupplyPair> expectedPairs = Arrays.stream(requestIds)
-				.mapToObj(i -> new MosaicIdSupplyPair(Utils.createMosaicId(i), Supply.fromValue(100 * i)))
-				.collect(Collectors.toSet());
+				.mapToObj(i -> new MosaicIdSupplyPair(Utils.createMosaicId(i), Supply.fromValue(100 * i))).collect(Collectors.toSet());
 
 		// Assert:
 		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(4));
@@ -85,14 +87,14 @@ public class MosaicControllerTest {
 	public void cannotGetMosaicSupplyBatchIfListContainsAtLeastOneUnknownMosaicId() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final int[] requestIds = new int[] { 1, 123, 6, 9 };
+		final int[] requestIds = new int[]{
+				1, 123, 6, 9
+		};
 		final SerializableList<MosaicId> list = new SerializableList<>(getMosaicIds(requestIds));
 		final JsonDeserializer deserializer = new JsonDeserializer(JsonSerializer.serializeToJson(list), null);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.getMosaicSupplyBatch(deserializer),
-				MissingResourceException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.getMosaicSupplyBatch(deserializer), MissingResourceException.class);
 
 		// Assert:
 		context.assertNamespaceCacheNumGetDelegations(1);
@@ -105,8 +107,7 @@ public class MosaicControllerTest {
 
 		public TestContext() {
 			this.controller = new MosaicController(this.namespaceCache);
-			final List<MosaicId> mosaicIds = IntStream.range(0, 10)
-					.mapToObj(i -> this.createMosaicId(i, 100L * i))
+			final List<MosaicId> mosaicIds = IntStream.range(0, 10).mapToObj(i -> this.createMosaicId(i, 100L * i))
 					.collect(Collectors.toList());
 			this.prepareMosaics(mosaicIds);
 		}

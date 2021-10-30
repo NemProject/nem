@@ -29,14 +29,8 @@ public class TransactionDebugInfo implements SerializableEntity {
 	 * @param fee The transaction fee.
 	 * @param message The transaction message.
 	 */
-	public TransactionDebugInfo(
-			final TimeInstant timeStamp,
-			final TimeInstant deadline,
-			final Address sender,
-			final Address recipient,
-			final Amount amount,
-			final Amount fee,
-			final String message) {
+	public TransactionDebugInfo(final TimeInstant timeStamp, final TimeInstant deadline, final Address sender, final Address recipient,
+			final Amount amount, final Amount fee, final String message) {
 		this.timeStamp = timeStamp;
 		this.deadline = deadline;
 		this.sender = sender;
@@ -139,10 +133,7 @@ public class TransactionDebugInfo implements SerializableEntity {
 		return UnixTime.fromDateString(deserializer.readString(name), TimeInstant.ZERO).getTimeInstant();
 	}
 
-	private static void writeTimeInstantAsTimeString(
-			final Serializer serializer,
-			final String label,
-			final TimeInstant timeInstant) {
+	private static void writeTimeInstantAsTimeString(final Serializer serializer, final String label, final TimeInstant timeInstant) {
 		serializer.writeString(label, UnixTime.fromTimeInstant(timeInstant).getDateString());
 	}
 }

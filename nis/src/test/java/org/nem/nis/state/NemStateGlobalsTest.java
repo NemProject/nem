@@ -12,14 +12,12 @@ public class NemStateGlobalsTest {
 		NemStateGlobals.setWeightedBalancesSupplier(null);
 	}
 
-	//region weighted balances supplier
+	// region weighted balances supplier
 
 	@Test
 	public void canCreateWeightedBalancesUsingDefaultSupplier() {
 		// Assert:
-		MatcherAssert.assertThat(
-				NemStateGlobals.createWeightedBalances(),
-				IsInstanceOf.instanceOf(TimeBasedVestingWeightedBalances.class));
+		MatcherAssert.assertThat(NemStateGlobals.createWeightedBalances(), IsInstanceOf.instanceOf(TimeBasedVestingWeightedBalances.class));
 	}
 
 	@Test
@@ -31,10 +29,8 @@ public class NemStateGlobalsTest {
 		NemStateGlobals.setWeightedBalancesSupplier(() -> balances);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				NemStateGlobals.createWeightedBalances(),
-				IsEqual.equalTo(balances));
+		MatcherAssert.assertThat(NemStateGlobals.createWeightedBalances(), IsEqual.equalTo(balances));
 	}
 
-	//endregion
+	// endregion
 }

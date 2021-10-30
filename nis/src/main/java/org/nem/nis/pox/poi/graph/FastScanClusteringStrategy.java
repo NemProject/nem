@@ -19,8 +19,8 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 	}
 
 	/**
-	 * FastScan class uses the fast scan algorithm to cluster vertices (nodes) of a (transaction) graph
-	 * into different groups: regular clusters, hubs and outliers.
+	 * FastScan class uses the fast scan algorithm to cluster vertices (nodes) of a (transaction) graph into different groups: regular
+	 * clusters, hubs and outliers.
 	 */
 	private static class FastScan extends AbstractScan {
 
@@ -79,12 +79,10 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		}
 
 		/**
-		 * If the community belongs to the core,
-		 * then if the community overlaps an existing cluster,
-		 * - then merge the community into that cluster,
-		 * - else create a new cluster,
-		 * else mark community as non member.
-		 * <br>
+		 * If the community belongs to the core, then if the community overlaps an existing cluster, <br>
+		 * - then merge the community into that cluster, <br>
+		 * - else create a new cluster, <br>
+		 * else mark community as non member. <br>
 		 * <em>This function should only be called by processCommunity.</em>
 		 *
 		 * @param community The community to add.
@@ -101,12 +99,8 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			// Find out if some of the similar neighbors already have an id.
 			// This would mean the new cluster overlaps with at least one existing cluster.
 			// In that case we merge the existing clusters and then expand the cluster.
-			final List<ClusterId> clusterIds = community.getSimilarNeighbors().toList().stream()
-					.filter(this::isClustered)
-					.map(this::getNodeState)
-					.distinct()
-					.map(ClusterId::new)
-					.collect(Collectors.toList());
+			final List<ClusterId> clusterIds = community.getSimilarNeighbors().toList().stream().filter(this::isClustered)
+					.map(this::getNodeState).distinct().map(ClusterId::new).collect(Collectors.toList());
 			if (!clusterIds.isEmpty()) {
 				cluster = this.mergeClusters(clusterIds);
 				clusterId = cluster.getId();
@@ -122,8 +116,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		}
 
 		/**
-		 * Returns a collection of all unvisited node ids that are two hops away
-		 * from an already visited collection of nodes.
+		 * Returns a collection of all unvisited node ids that are two hops away from an already visited collection of nodes.
 		 *
 		 * @param newlyVisited Nodes visited in the last iteration of the while loop.
 		 * @param allVisited All nodes visited up until now.

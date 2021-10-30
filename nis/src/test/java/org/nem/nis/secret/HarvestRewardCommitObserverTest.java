@@ -14,7 +14,7 @@ import org.nem.nis.test.NisUtils;
 
 public class HarvestRewardCommitObserverTest {
 
-	//region execute
+	// region execute
 
 	@Test
 	public void harvestRewardExecuteIncrementsHarvestedBlocks() {
@@ -40,9 +40,9 @@ public class HarvestRewardCommitObserverTest {
 		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region undo
 
 	@Test
 	public void harvestRewardUndoDecrementsHarvestedBlocks() {
@@ -67,9 +67,10 @@ public class HarvestRewardCommitObserverTest {
 		// Assert:
 		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
-	//endregion
 
-	//region other types
+	// endregion
+
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -77,8 +78,7 @@ public class HarvestRewardCommitObserverTest {
 		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account, Amount.fromNem(22)),
+		context.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account, Amount.fromNem(22)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
@@ -86,7 +86,7 @@ public class HarvestRewardCommitObserverTest {
 		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddress();
@@ -107,14 +107,12 @@ public class HarvestRewardCommitObserverTest {
 		}
 
 		private void notifyHarvestRewardExecute() {
-			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 		}
 
 		public void notifyHarvestRewardUndo() {
-			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 		}
 	}

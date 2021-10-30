@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 /**
  * A special map implementation that tracks pending changes inbetween commits.
- * TODO 20151012 J-J: review/add tests for classes in cache.delta package
  *
  * @param <TKey> The key type.
  * @param <TValue> The value type.

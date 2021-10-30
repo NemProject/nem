@@ -41,8 +41,7 @@ public class WeightedLink {
 
 	@Override
 	public int hashCode() {
-		return (int)this.getWeight() ^
-				this.otherAccountAddress.getEncoded().hashCode();
+		return (int) this.getWeight() ^ this.otherAccountAddress.getEncoded().hashCode();
 	}
 
 	@Override
@@ -51,7 +50,7 @@ public class WeightedLink {
 			return false;
 		}
 
-		final WeightedLink rhs = (WeightedLink)obj;
+		final WeightedLink rhs = (WeightedLink) obj;
 		return this.weight == rhs.weight && this.otherAccountAddress.equals(rhs.otherAccountAddress);
 	}
 

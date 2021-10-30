@@ -14,7 +14,7 @@ import java.util.*;
 
 public class NamespaceCacheUtilsTest {
 
-	//region getMosaicDefinition
+	// region getMosaicDefinition
 
 	@Test
 	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicDefinitionIsInCache() {
@@ -47,9 +47,9 @@ public class NamespaceCacheUtilsTest {
 		MatcherAssert.assertThat(mosaicDefinition, IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region getMosaicEntry
+	// region getMosaicEntry
 
 	@Test
 	public void getMosaicEntryReturnsMosaicEntryIfMosaicEntryIsInCache() {
@@ -82,9 +82,9 @@ public class NamespaceCacheUtilsTest {
 		MatcherAssert.assertThat(entry, IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region getMosaicOwners
+	// region getMosaicOwners
 
 	@Test
 	public void getMosaicOwnersReturnsEmptyCollectionIfMosaicIdIsNotInCache() {
@@ -134,7 +134,8 @@ public class NamespaceCacheUtilsTest {
 	public void getMosaicOwnersReturnsAllOwnersIfNamespaceHasMosaicWithMultipleOwners() {
 		// Arrange:
 		final NamespaceCache cache = createCache();
-		Collection<Address> owners = Arrays.asList(Utils.generateRandomAddress(), Utils.generateRandomAddress(), Utils.generateRandomAddress());
+		Collection<Address> owners = Arrays.asList(Utils.generateRandomAddress(), Utils.generateRandomAddress(),
+				Utils.generateRandomAddress());
 		addOwners(cache, createMosaicId("foo", "tokens"), owners);
 
 		// Act:
@@ -144,9 +145,9 @@ public class NamespaceCacheUtilsTest {
 		MatcherAssert.assertThat(addresses, IsEquivalent.equivalentTo(owners));
 	}
 
-	//endregion
+	// endregion
 
-	//region getMosaicIds
+	// region getMosaicIds
 
 	@Test
 	public void getMosaicIdsReturnsEmptyCollectionIfNamespaceIdIsNotInCache() {
@@ -179,13 +180,11 @@ public class NamespaceCacheUtilsTest {
 		final Collection<MosaicId> mosaicIds = NamespaceCacheUtils.getMosaicIds(cache, new NamespaceId("foo"));
 
 		// Assert:
-		MatcherAssert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Arrays.asList(
-				createMosaicId("foo", "tokens"),
-				createMosaicId("foo", "coins"),
-				createMosaicId("foo", "paddles"))));
+		MatcherAssert.assertThat(mosaicIds, IsEquivalent.equivalentTo(
+				Arrays.asList(createMosaicId("foo", "tokens"), createMosaicId("foo", "coins"), createMosaicId("foo", "paddles"))));
 	}
 
-	//endregion
+	// endregion
 
 	private static NamespaceCache createCache() {
 		final DefaultNamespaceCache cache = new DefaultNamespaceCache().copy();
@@ -200,7 +199,8 @@ public class NamespaceCacheUtilsTest {
 	}
 
 	private static void addOwners(final NamespaceCache cache, final MosaicId mosaicId, final Collection<Address> owners) {
-		owners.forEach(owner -> cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner, Quantity.fromValue(1)));
+		owners.forEach(owner -> cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner,
+				Quantity.fromValue(1)));
 	}
 
 	private static MosaicId createMosaicId(final String namespaceName, final String mosaicName) {

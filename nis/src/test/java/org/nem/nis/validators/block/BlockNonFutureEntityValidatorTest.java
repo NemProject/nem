@@ -28,10 +28,7 @@ public class BlockNonFutureEntityValidatorTest {
 		this.assertBlockValidationResult(11, 22, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
-	private void assertBlockValidationResult(
-			final int currentTime,
-			final int entityTime,
-			final ValidationResult expectedResult) {
+	private void assertBlockValidationResult(final int currentTime, final int entityTime, final ValidationResult expectedResult) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithTimeStamp(entityTime);
 		final BlockValidator validator = createValidator(currentTime);

@@ -36,9 +36,7 @@ public class NamespaceConstantsTest {
 		final NamespaceEntry entry = NamespaceConstants.NAMESPACE_ENTRY_NEM;
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> entry.getMosaics().add(Utils.createMosaicDefinition(12)),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> entry.getMosaics().add(Utils.createMosaicDefinition(12)), UnsupportedOperationException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
@@ -50,8 +48,7 @@ public class NamespaceConstantsTest {
 		final NamespaceEntry entry = NamespaceConstants.NAMESPACE_ENTRY_NEM;
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> entry.getMosaics().remove(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()),
+		ExceptionAssert.assertThrows(v -> entry.getMosaics().remove(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()),
 				UnsupportedOperationException.class);
 
 		// Assert:
@@ -68,9 +65,7 @@ public class NamespaceConstantsTest {
 		final MosaicEntry mosaicEntry = getMosaicXemEntry();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> mosaicEntry.increaseSupply(new Supply(1)),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> mosaicEntry.increaseSupply(new Supply(1)), UnsupportedOperationException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
@@ -82,9 +77,7 @@ public class NamespaceConstantsTest {
 		final MosaicEntry mosaicEntry = getMosaicXemEntry();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> mosaicEntry.decreaseSupply(new Supply(1)),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> mosaicEntry.decreaseSupply(new Supply(1)), UnsupportedOperationException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));

@@ -14,7 +14,9 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
+public class TransferModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
 
 	@Before
 	public void setup() {
@@ -69,7 +71,8 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
-		final TransferTransaction transfer = context.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload));
+		final TransferTransaction transfer = context
+				.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload));
 
 		// Act:
 		final DbTransferTransaction dbModel = context.mapping.map(transfer);
@@ -104,12 +107,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 	@Override
 	protected TransferTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new TransferTransaction(
-				timeStamp,
-				sender,
-				Utils.generateRandomAccount(),
-				Amount.fromMicroNem(111111),
-				null);
+		return new TransferTransaction(timeStamp, sender, Utils.generateRandomAccount(), Amount.fromMicroNem(111111), null);
 	}
 
 	@Override
@@ -130,7 +128,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
 			for (int i = 0; i < 5; ++i) {
 				final DbMosaic dbMosaic = new DbMosaic();
-				dbMosaic.setId((long)i);
+				dbMosaic.setId((long) i);
 				this.mosaics.add(Utils.createMosaic(i));
 				this.dbMosaics.add(dbMosaic);
 				Mockito.when(this.mapper.map(this.mosaics.get(i), DbMosaic.class)).thenReturn(this.dbMosaics.get(i));
@@ -145,12 +143,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 			mosaics.forEach(attachment::addMosaic);
 
-			return new TransferTransaction(
-					TimeInstant.ZERO,
-					this.sender,
-					this.recipient,
-					Amount.fromMicroNem(111111),
-					attachment);
+			return new TransferTransaction(TimeInstant.ZERO, this.sender, this.recipient, Amount.fromMicroNem(111111), attachment);
 		}
 
 		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {

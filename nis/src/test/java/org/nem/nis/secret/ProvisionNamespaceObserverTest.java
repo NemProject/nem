@@ -76,21 +76,15 @@ public class ProvisionNamespaceObserverTest {
 		final ProvisionNamespaceObserver observer = new ProvisionNamespaceObserver(namespaceCache, accountStateCache);
 
 		// Act:
-		observer.notify(
-				new ProvisionNamespaceNotification(namespaceOwner, new NamespaceId("foo")),
+		observer.notify(new ProvisionNamespaceNotification(namespaceOwner, new NamespaceId("foo")),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), NotificationTrigger.Execute));
 
 		// Assert:
-		MatcherAssert.assertThat(
-				accountStateCache.findStateByAddress(namespaceOwner.getAddress()).getAccountInfo().getMosaicIds(),
-				IsEquivalent.equivalentTo(Arrays.asList(
-						createMosaicId("foo", "tokens"),
-						createMosaicId("foo.bar", "coins"))));
-		MatcherAssert.assertThat(
-				accountStateCache.findStateByAddress(tokensOwners.get(0)).getAccountInfo().getMosaicIds(),
+		MatcherAssert.assertThat(accountStateCache.findStateByAddress(namespaceOwner.getAddress()).getAccountInfo().getMosaicIds(),
+				IsEquivalent.equivalentTo(Arrays.asList(createMosaicId("foo", "tokens"), createMosaicId("foo.bar", "coins"))));
+		MatcherAssert.assertThat(accountStateCache.findStateByAddress(tokensOwners.get(0)).getAccountInfo().getMosaicIds(),
 				IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo", "tokens"))));
-		MatcherAssert.assertThat(
-				accountStateCache.findStateByAddress(coinsOwners.get(0)).getAccountInfo().getMosaicIds(),
+		MatcherAssert.assertThat(accountStateCache.findStateByAddress(coinsOwners.get(0)).getAccountInfo().getMosaicIds(),
 				IsEquivalent.equivalentTo(Collections.singletonList(createMosaicId("foo.bar", "coins"))));
 	}
 
@@ -106,12 +100,13 @@ public class ProvisionNamespaceObserverTest {
 		return new MosaicId(new NamespaceId(namespaceName), mosaicName);
 	}
 	private static void addOwners(final NamespaceCache cache, final MosaicId mosaicId, final Collection<Address> owners) {
-		owners.forEach(owner -> cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner, Quantity.fromValue(1)));
+		owners.forEach(owner -> cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner,
+				Quantity.fromValue(1)));
 	}
 
 	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -120,11 +115,7 @@ public class ProvisionNamespaceObserverTest {
 		final ProvisionNamespaceObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(
-						Utils.generateRandomAccount(),
-						Utils.generateRandomAccount(),
-						Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
@@ -132,17 +123,14 @@ public class ProvisionNamespaceObserverTest {
 		Mockito.verify(context.namespaceCache, Mockito.never()).remove(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	private void notifyProvisionNamespace(
-			final TestContext context,
-			final NotificationTrigger notificationTrigger) {
+	private void notifyProvisionNamespace(final TestContext context, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final ProvisionNamespaceObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new ProvisionNamespaceNotification(context.owner, context.namespaceId),
+		observer.notify(new ProvisionNamespaceNotification(context.owner, context.namespaceId),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 

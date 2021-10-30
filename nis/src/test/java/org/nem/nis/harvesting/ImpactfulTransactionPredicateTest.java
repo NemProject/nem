@@ -14,7 +14,7 @@ import java.util.function.*;
 
 public class ImpactfulTransactionPredicateTest {
 
-	//region non-multisig
+	// region non-multisig
 
 	@Test
 	public void transactionSignerIsImpacted() {
@@ -45,9 +45,9 @@ public class ImpactfulTransactionPredicateTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig
+	// region multisig
 
 	@Test
 	public void cosignerOfMultisigIsImpacted() {
@@ -57,8 +57,7 @@ public class ImpactfulTransactionPredicateTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 		cosignerAccountState.getMultisigLinks().addCosignatory(multisig.getAddress());
-		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress()))
-				.thenReturn(cosignerAccountState);
+		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress())).thenReturn(cosignerAccountState);
 
 		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransfer(multisig, cosigner);
 
@@ -77,8 +76,7 @@ public class ImpactfulTransactionPredicateTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 		cosignerAccountState.getMultisigLinks().addCosignatory(multisig.getAddress());
-		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress()))
-				.thenReturn(cosignerAccountState);
+		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress())).thenReturn(cosignerAccountState);
 
 		final Account nonCosigner = Utils.generateRandomAccount();
 		Mockito.when(context.accountStateCache.findStateByAddress(nonCosigner.getAddress()))
@@ -93,7 +91,7 @@ public class ImpactfulTransactionPredicateTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);

@@ -24,12 +24,8 @@ public class PushControllerTest {
 	@Test
 	public void pushTransactionDelegatesToPushService() {
 		// Arrange:
-		final Transaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(11),
-				null);
+		final Transaction transaction = new TransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(), Amount.fromNem(11), null);
 
 		// Assert:
 		assertPushTransactionDelegatesToPushService(transaction);
@@ -38,11 +34,8 @@ public class PushControllerTest {
 	@Test
 	public void pushTransactionDelegatesToPushServiceForImportanceTransferTransactions() {
 		// Arrange:
-		final Transaction transaction = new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				ImportanceTransferMode.Activate,
-				Utils.generateRandomAccount());
+		final Transaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+				ImportanceTransferMode.Activate, Utils.generateRandomAccount());
 
 		// Assert:
 		assertPushTransactionDelegatesToPushService(transaction);
@@ -55,8 +48,7 @@ public class PushControllerTest {
 		transaction.sign();
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SecureSerializableEntity<>(transaction, identity),
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new SecureSerializableEntity<>(transaction, identity),
 				new MockAccountLookup());
 
 		// Act:
@@ -73,8 +65,7 @@ public class PushControllerTest {
 	@Test
 	public void pushTransactionsDelegatesToPushService() {
 		// Arrange:
-		final Collection<Transaction> transactions = IntStream.range(0, 5)
-				.mapToObj(i -> RandomTransactionFactory.createTransfer())
+		final Collection<Transaction> transactions = IntStream.range(0, 5).mapToObj(i -> RandomTransactionFactory.createTransfer())
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -89,7 +80,8 @@ public class PushControllerTest {
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SerializableList<>(transactions.stream().map(t -> new SecureSerializableEntity<>(t, identity)).collect(Collectors.toList())),
+				new SerializableList<>(
+						transactions.stream().map(t -> new SecureSerializableEntity<>(t, identity)).collect(Collectors.toList())),
 				new MockAccountLookup());
 
 		// Act:
@@ -113,8 +105,7 @@ public class PushControllerTest {
 		block.sign();
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SecureSerializableEntity<>(block, identity),
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new SecureSerializableEntity<>(block, identity),
 				new MockAccountLookup());
 
 		// Act:

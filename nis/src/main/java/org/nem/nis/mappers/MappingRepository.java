@@ -18,9 +18,7 @@ public class MappingRepository implements IMapper {
 	 * @param <TSource> The source type.
 	 * @param <TTarget> The target type.
 	 */
-	public <TSource, TTarget> void addMapping(
-			final Class<? extends TSource> sourceClass,
-			final Class<? super TTarget> targetClass,
+	public <TSource, TTarget> void addMapping(final Class<? extends TSource> sourceClass, final Class<? super TTarget> targetClass,
 			final IMapping<TSource, TTarget> mapping) {
 		final MappingTypePair pair = new MappingTypePair(sourceClass, targetClass);
 		if (null != this.knownMappings.putIfAbsent(pair, mapping)) {
@@ -59,6 +57,6 @@ public class MappingRepository implements IMapper {
 			throw new MappingException(String.format("cannot find mapping for pair: %s", pair));
 		}
 
-		return (TTarget)mapping.map(source);
+		return (TTarget) mapping.map(source);
 	}
 }

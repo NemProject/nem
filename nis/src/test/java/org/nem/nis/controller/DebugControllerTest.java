@@ -19,8 +19,7 @@ public class DebugControllerTest {
 	@Test
 	public void timersInfoDelegatesToHost() {
 		// Arrange:
-		final List<NemAsyncTimerVisitor> originalVisitors = Arrays.asList(
-				new NemAsyncTimerVisitor("foo", null),
+		final List<NemAsyncTimerVisitor> originalVisitors = Arrays.asList(new NemAsyncTimerVisitor("foo", null),
 				new NemAsyncTimerVisitor("bar", null));
 		final TestContext context = new TestContext();
 		Mockito.when(context.host.getVisitors()).thenReturn(originalVisitors);
@@ -30,8 +29,7 @@ public class DebugControllerTest {
 
 		// Assert:
 		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
-		MatcherAssert.assertThat(
-				visitors.asCollection().stream().map(NemAsyncTimerVisitor::getTimerName).collect(Collectors.toList()),
+		MatcherAssert.assertThat(visitors.asCollection().stream().map(NemAsyncTimerVisitor::getTimerName).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("foo", "bar"));
 	}
 

@@ -27,7 +27,7 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		final Account account = ((AccountNotification)(notification)).getAccount();
+		final Account account = ((AccountNotification) (notification)).getAccount();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			this.addToNisCache(context.getHeight(), account);
 		} else {

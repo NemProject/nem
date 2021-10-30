@@ -38,14 +38,15 @@ public class AuditedCommunicator implements Communicator {
 
 	private CompletableFuture<Deserializer> wrap(final URL url, final CompletableFuture<Deserializer> future) {
 		this.auditCollection.add(url.getHost(), url.getPath());
-		return future
-				.handle((d, e) -> {
-					this.auditCollection.remove(url.getHost(), url.getPath());
-					if (null != e) {
-						ExceptionUtils.propagateVoid(() -> { throw (Exception)e; });
-					}
-
-					return d;
+		return future.handle((d, e) -> {
+			this.auditCollection.remove(url.getHost(), url.getPath());
+			if (null != e) {
+				ExceptionUtils.propagateVoid(() -> {
+					throw (Exception) e;
 				});
+			}
+
+			return d;
+		});
 	}
 }

@@ -42,14 +42,9 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	 * @param timeProvider The time provider.
 	 * @param blockHeightSupplier The block height supplier.
 	 */
-	public DefaultUnconfirmedState(
-			final UnconfirmedTransactionsCache transactions,
-			final TransactionValidatorFactory validatorFactory,
-			final BlockTransactionObserver transferObserver,
-			final TransactionSpamFilter spamFilter,
-			final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider,
-			final Supplier<BlockHeight> blockHeightSupplier) {
+	public DefaultUnconfirmedState(final UnconfirmedTransactionsCache transactions, final TransactionValidatorFactory validatorFactory,
+			final BlockTransactionObserver transferObserver, final TransactionSpamFilter spamFilter, final ReadOnlyNisCache nisCache,
+			final TimeProvider timeProvider, final Supplier<BlockHeight> blockHeightSupplier) {
 		this.transactions = transactions;
 		this.transferObserver = transferObserver;
 		this.spamFilter = spamFilter;
@@ -62,9 +57,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 		this.batchValidator = validatorFactory.createBatch(nisCache.getTransactionHashCache());
 
-		this.notificationContextSupplier = () -> new BlockNotificationContext(
-				blockHeightSupplier.get(),
-				timeProvider.getCurrentTime(),
+		this.notificationContextSupplier = () -> new BlockNotificationContext(blockHeightSupplier.get(), timeProvider.getCurrentTime(),
 				NotificationTrigger.Execute);
 
 		this.listeners = new ArrayList<>();
@@ -72,19 +65,12 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	@Override
 	public Amount getUnconfirmedBalance(final Account account) {
-		return this.nisCache.getAccountStateCache()
-				.findStateByAddress(account.getAddress())
-				.getAccountInfo()
-				.getBalance();
+		return this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 	}
 
 	@Override
 	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
-		return this.nisCache.getNamespaceCache()
-				.get(mosaicId.getNamespaceId())
-				.getMosaics()
-				.get(mosaicId)
-				.getBalances()
+		return this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances()
 				.getBalance(account.getAddress());
 	}
 
@@ -116,9 +102,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		}
 
 		final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
-		return transactionValidationResult.isSuccess()
-				? this.add(transaction)
-				: transactionValidationResult;
+		return transactionValidationResult.isSuccess() ? this.add(transaction) : transactionValidationResult;
 	}
 
 	@Override

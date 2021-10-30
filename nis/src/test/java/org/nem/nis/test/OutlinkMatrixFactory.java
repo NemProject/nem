@@ -125,7 +125,7 @@ public class OutlinkMatrixFactory {
 				matrix.setAt(8, 5, 1);
 				break;
 
-			default:
+			default :
 				throw new IllegalArgumentException("unknown graph");
 		}
 
@@ -237,7 +237,7 @@ public class OutlinkMatrixFactory {
 				matrix = makeAntiSymmetric(matrix);
 				break;
 
-			default:
+			default :
 				throw new IllegalArgumentException("unknown graph");
 		}
 
@@ -336,7 +336,7 @@ public class OutlinkMatrixFactory {
 				matrix = makeAntiSymmetric(matrix);
 				break;
 
-			default:
+			default :
 				throw new IllegalArgumentException("unknown graph");
 		}
 

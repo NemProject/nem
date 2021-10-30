@@ -34,24 +34,21 @@ public class TransactionValidatorFactory {
 	}
 
 	/**
-	 * Creates a transaction validator builder that is only initialized with single validators and can be used
-	 * for verifying blocks.
+	 * Creates a transaction validator builder that is only initialized with single validators and can be used for verifying blocks.
 	 *
 	 * @param nisCache The nis cache.
 	 * @return The builder.
 	 */
 	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(nisCache);
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG,
-						new MultisigSignaturesPresentValidator(nisCache.getAccountStateCache())));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
+				new MultisigSignaturesPresentValidator(nisCache.getAccountStateCache())));
 		return builder;
 	}
 
 	/**
-	 * Creates a transaction validator builder that is only initialized with single validators and should be used
-	 * for verifying transactions outside of blocks (it excludes validators that check for "incomplete" transactions).
+	 * Creates a transaction validator builder that is only initialized with single validators and should be used for verifying transactions
+	 * outside of blocks (it excludes validators that check for "incomplete" transactions).
 	 *
 	 * @param nisCache The nis cache.
 	 * @return The builder.
@@ -72,49 +69,29 @@ public class TransactionValidatorFactory {
 		builder.add(new RemoteNonOperationalValidator(accountStateCache));
 		builder.add(new MultisigNonOperationalValidator(accountStateCache));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.TRANSFER,
-						new TransferTransactionValidator()));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new TransferTransactionValidator()));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache, namespaceCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.IMPORTANCE_TRANSFER,
+				new ImportanceTransferTransactionValidator(accountStateCache, namespaceCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG,
-						new MultisigTransactionSignerValidator(accountStateCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
+				new MultisigTransactionSignerValidator(accountStateCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigCosignatoryModificationValidator(accountStateCache)));
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new NumCosignatoryRangeValidator(accountStateCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				new MultisigCosignatoryModificationValidator(accountStateCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				new NumCosignatoryRangeValidator(accountStateCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.PROVISION_NAMESPACE,
-						new ProvisionNamespaceTransactionValidator(namespaceCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.PROVISION_NAMESPACE,
+				new ProvisionNamespaceTransactionValidator(namespaceCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MOSAIC_DEFINITION_CREATION,
-						new MosaicDefinitionCreationTransactionValidator(namespaceCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MOSAIC_DEFINITION_CREATION,
+				new MosaicDefinitionCreationTransactionValidator(namespaceCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MOSAIC_SUPPLY_CHANGE,
-						new MosaicSupplyChangeTransactionValidator(namespaceCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+				new MosaicSupplyChangeTransactionValidator(namespaceCache)));
 
-		builder.add(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.TRANSFER,
-						new MosaicBagValidator(namespaceCache)));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new MosaicBagValidator(namespaceCache)));
 
 		builder.add(new MosaicBalanceValidator());
 

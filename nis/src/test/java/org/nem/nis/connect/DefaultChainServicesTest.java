@@ -134,7 +134,7 @@ public class DefaultChainServicesTest {
 
 	// endregion
 
-	//region delegation
+	// region delegation
 
 	@Test
 	public void isChainSynchronizedDelegatesToBlockChainLastBlockChainLayer() {
@@ -192,8 +192,7 @@ public class DefaultChainServicesTest {
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(this.createNodesFuture());
 			Mockito.when(this.connector.getChainHeightAsync(Mockito.any(Node.class))).thenReturn(
-					CompletableFuture.completedFuture(new BlockHeight(10)),
-					CompletableFuture.completedFuture(new BlockHeight(30)),
+					CompletableFuture.completedFuture(new BlockHeight(10)), CompletableFuture.completedFuture(new BlockHeight(30)),
 					CompletableFuture.completedFuture(new BlockHeight(20)));
 		}
 
@@ -202,9 +201,7 @@ public class DefaultChainServicesTest {
 		}
 
 		public Node createNode(final String name) {
-			return new Node(
-					new WeakNodeIdentity(name),
-					new NodeEndpoint("http", "10.10.10.12", 1234),
+			return new Node(new WeakNodeIdentity(name), new NodeEndpoint("http", "10.10.10.12", 1234),
 					new NodeMetaData("platform", "FooBar"));
 		}
 

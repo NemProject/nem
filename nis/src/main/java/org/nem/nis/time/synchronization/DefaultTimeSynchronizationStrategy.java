@@ -12,9 +12,8 @@ import java.util.function.BiConsumer;
 import java.util.logging.*;
 
 /**
- * The default implementation for the synchronization strategy based on the thesis
- * Algorithms and Services for Peer-to-Peer Internal Clock Synchronization:
- * http://www.dis.uniroma1.it/~dottoratoii/media/students/documents/thesis_scipioni.pdf
+ * The default implementation for the synchronization strategy based on the thesis Algorithms and Services for Peer-to-Peer Internal Clock
+ * Synchronization: http://www.dis.uniroma1.it/~dottoratoii/media/students/documents/thesis_scipioni.pdf
  */
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
 	private static final Logger LOGGER = Logger.getLogger(DefaultTimeSynchronizationStrategy.class.getName());
@@ -32,9 +31,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 */
-	public DefaultTimeSynchronizationStrategy(
-			final SynchronizationFilter filter,
-			final ReadOnlyPoxFacade poxFacade,
+	public DefaultTimeSynchronizationStrategy(final SynchronizationFilter filter, final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyAccountStateCache accountStateCache) {
 		this(filter, poxFacade, accountStateCache, (o, s) -> {
 			final Level logLevel = WARNING_THRESHOLD_MILLIS.compareTo(Math.abs(o)) > 0 ? Level.INFO : Level.WARNING;
@@ -50,11 +47,8 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * @param accountStateCache The account state cache.
 	 * @param logger The consumer which optionally logs calculated time offsets.
 	 */
-	public DefaultTimeSynchronizationStrategy(
-			final SynchronizationFilter filter,
-			final ReadOnlyPoxFacade poxFacade,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final BiConsumer<Long, String> logger) {
+	public DefaultTimeSynchronizationStrategy(final SynchronizationFilter filter, final ReadOnlyPoxFacade poxFacade,
+			final ReadOnlyAccountStateCache accountStateCache, final BiConsumer<Long, String> logger) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
@@ -70,21 +64,22 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	/**
-	 * Gets a value indicating how strong the coupling should be.
-	 * Starting value should be chosen such that coupling is strong to achieve a fast convergence in the beginning.
-	 * Minimum value should be chosen such that the network time shows some inertia.
+	 * Gets a value indicating how strong the coupling should be. Starting value should be chosen such that coupling is strong to achieve a
+	 * fast convergence in the beginning. Minimum value should be chosen such that the network time shows some inertia.
 	 *
 	 * @param age The node's age.
 	 * @return The coupling.
 	 */
 	public double getCoupling(final NodeAge age) {
 		final long ageToUse = Math.max(age.getRaw() - TimeSynchronizationConstants.START_COUPLING_DECAY_AFTER_ROUND, 0);
-		return Math.max(Math.exp(-TimeSynchronizationConstants.COUPLING_DECAY_STRENGTH * ageToUse) * TimeSynchronizationConstants.COUPLING_START,
+		return Math.max(
+				Math.exp(-TimeSynchronizationConstants.COUPLING_DECAY_STRENGTH * ageToUse) * TimeSynchronizationConstants.COUPLING_START,
 				TimeSynchronizationConstants.COUPLING_MINIMUM);
 	}
 
 	private double getAccountImportance(final Address address) {
-		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findLatestForwardedStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findLatestForwardedStateByAddress(address)
+				.getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 
@@ -95,24 +90,21 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 			throw new TimeSynchronizationException("No synchronization samples available to calculate network time.");
 		}
 
-		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> this.getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
-		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poxFacade.getLastVectorSize();
+		final double cumulativeImportance = filteredSamples.stream()
+				.mapToDouble(s -> this.getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
+		final double viewSizePercentage = (double) filteredSamples.size() / (double) this.poxFacade.getLastVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
-		final double sum = filteredSamples.stream()
-				.mapToDouble(s -> {
-					final long offset = s.getTimeOffsetToRemote();
-					final String entry = String.format(
-							"%s: network time offset to local node is %dms",
-							s.getNode().getIdentity().getAddress().getEncoded(),
-							offset);
+		final double sum = filteredSamples.stream().mapToDouble(s -> {
+			final long offset = s.getTimeOffsetToRemote();
+			final String entry = String.format("%s: network time offset to local node is %dms",
+					s.getNode().getIdentity().getAddress().getEncoded(), offset);
 
-					this.logger.accept(offset, entry);
+			this.logger.accept(offset, entry);
 
-					final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
-					return offset * importance * scaling;
-				})
-				.sum();
+			final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
+			return offset * importance * scaling;
+		}).sum();
 
-		return new TimeOffset((long)(sum * this.getCoupling(age)));
+		return new TimeOffset((long) (sum * this.getCoupling(age)));
 	}
 }

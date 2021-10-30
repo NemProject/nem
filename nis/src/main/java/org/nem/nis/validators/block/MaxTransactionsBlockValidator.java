@@ -12,8 +12,6 @@ public class MaxTransactionsBlockValidator implements BlockValidator {
 	public ValidationResult validate(final Block block) {
 		final long numTransactions = BlockExtensions.streamDefault(block).count();
 		final int maxTransactionsPerBlock = NemGlobals.getBlockChainConfiguration().getMaxTransactionsPerBlock();
-		return numTransactions <= maxTransactionsPerBlock
-				? ValidationResult.SUCCESS
-				: ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
+		return numTransactions <= maxTransactionsPerBlock ? ValidationResult.SUCCESS : ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
 	}
 }

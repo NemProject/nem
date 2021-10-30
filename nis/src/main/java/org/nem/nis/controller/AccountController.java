@@ -29,11 +29,8 @@ public class AccountController {
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	@Autowired(required = true)
-	AccountController(
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
-			final UnlockedAccounts unlockedAccounts,
-			final AccountIo accountIo,
-			final ReadOnlyAccountStateCache accountStateCache) {
+	AccountController(final UnconfirmedTransactionsFilter unconfirmedTransactions, final UnlockedAccounts unlockedAccounts,
+			final AccountIo accountIo, final ReadOnlyAccountStateCache accountStateCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
@@ -69,7 +66,7 @@ public class AccountController {
 		this.unlockedAccounts.removeUnlockedAccount(account);
 	}
 
-	//region [/local]/account/isunlocked
+	// region [/local]/account/isunlocked
 
 	/**
 	 * Checks if the given account is unlocked.
@@ -97,9 +94,9 @@ public class AccountController {
 		return this.isAccountUnlocked(Address.fromPublicKey(new KeyPair(privateKey).getPublicKey()));
 	}
 
-	//endregion
+	// endregion
 
-	//region unlocked/info
+	// region unlocked/info
 
 	/**
 	 * Gets information about the unlocked accounts.
@@ -115,7 +112,7 @@ public class AccountController {
 		};
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets unconfirmed transaction information for the specified account.
@@ -127,19 +124,16 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<UnconfirmedTransactionMetaDataPair> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(
-				address,
+		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address,
 				MAX_UNCONFIRMED_TRANSACTIONS);
-		final Collection<UnconfirmedTransactionMetaDataPair> pairs = transactions.stream()
-				.map(t -> {
-					if (TransactionTypes.MULTISIG == t.getType()) {
-						final MultisigTransaction multisig = (MultisigTransaction)t;
-						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData(multisig.getOtherTransactionHash()));
-					} else {
-						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData((Hash)null));
-					}
-				})
-				.collect(Collectors.toList());
+		final Collection<UnconfirmedTransactionMetaDataPair> pairs = transactions.stream().map(t -> {
+			if (TransactionTypes.MULTISIG == t.getType()) {
+				final MultisigTransaction multisig = (MultisigTransaction) t;
+				return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData(multisig.getOtherTransactionHash()));
+			} else {
+				return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData((Hash) null));
+			}
+		}).collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
 
@@ -152,9 +146,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvestInfo> accountHarvests(
-			final AccountIdBuilder idBuilder,
-			final DefaultPageBuilder pageBuilder) {
+	public SerializableList<HarvestInfo> accountHarvests(final AccountIdBuilder idBuilder, final DefaultPageBuilder pageBuilder) {
 		final Address address = idBuilder.build().getAddress();
 		final DefaultPage page = pageBuilder.build();
 		return this.accountIo.getAccountHarvests(address, page.getId(), page.getPageSize());
@@ -169,8 +161,7 @@ public class AccountController {
 	@PublicApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
 		final List<AccountImportanceViewModel> viewModels = this.accountStateCache.contents().stream()
-				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
-				.collect(Collectors.toList());
+				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo())).collect(Collectors.toList());
 
 		return new SerializableList<>(viewModels);
 	}

@@ -17,7 +17,7 @@ import org.nem.nis.test.NisUtils;
 public class MosaicSupplyChangeObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
-	//region supply change
+	// region supply change
 
 	@Test
 	public void notifyExecuteCreateMosaicIncreasesSupply() {
@@ -85,9 +85,9 @@ public class MosaicSupplyChangeObserverTest {
 		MatcherAssert.assertThat(context.accountState.getAccountInfo().getMosaicIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -96,27 +96,22 @@ public class MosaicSupplyChangeObserverTest {
 		final MosaicSupplyChangeObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		context.assertSupply(new Supply(1000));
 	}
 
-	//endregion
+	// endregion
 
-	private static void notifyMosaicSupplyChange(
-			final TestContext context,
-			final Supply delta,
-			final MosaicSupplyType supplyType,
+	private static void notifyMosaicSupplyChange(final TestContext context, final Supply delta, final MosaicSupplyType supplyType,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final MosaicSupplyChangeObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicSupplyChangeNotification(context.supplier, context.mosaicDefinition.getId(), delta, supplyType),
+		observer.notify(new MosaicSupplyChangeNotification(context.supplier, context.mosaicDefinition.getId(), delta, supplyType),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 

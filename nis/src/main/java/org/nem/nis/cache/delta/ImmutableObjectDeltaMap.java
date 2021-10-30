@@ -9,7 +9,10 @@ import java.util.stream.*;
  * @param <TKey> The key type.
  * @param <TValue> The value type.
  */
-public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TValue>, CopyableDeltaMap<ImmutableObjectDeltaMap<TKey, TValue>> {
+public class ImmutableObjectDeltaMap<TKey, TValue>
+		implements
+			DeltaMap<TKey, TValue>,
+			CopyableDeltaMap<ImmutableObjectDeltaMap<TKey, TValue>> {
 	private final Map<TKey, TValue> originalValues;
 	private final Map<TKey, TValue> addedValues;
 	private final Map<TKey, TValue> removedValues;
@@ -34,7 +37,7 @@ public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TVa
 		this.removedValues = new HashMap<>();
 	}
 
-	//region DeltaMap
+	// region DeltaMap
 
 	@Override
 	public int size() {
@@ -112,16 +115,14 @@ public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TVa
 
 	@Override
 	public Stream<TValue> streamValues() {
-		return Stream.concat(
-				this.originalValues.entrySet().stream()
-						.filter(e -> !this.addedValues.containsKey(e.getKey()) && !this.removedValues.containsKey(e.getKey()))
-						.map(Map.Entry::getValue),
-				this.addedValues.values().stream());
+		return Stream.concat(this.originalValues.entrySet().stream()
+				.filter(e -> !this.addedValues.containsKey(e.getKey()) && !this.removedValues.containsKey(e.getKey()))
+				.map(Map.Entry::getValue), this.addedValues.values().stream());
 	}
 
-	//endregion
+	// endregion
 
-	//region CopyableDeltaMap
+	// region CopyableDeltaMap
 
 	@Override
 	public void commit() {
@@ -157,5 +158,5 @@ public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TVa
 		return map;
 	}
 
-	//endregion
+	// endregion
 }

@@ -18,7 +18,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 	 */
 	protected abstract T createAccountCache();
 
-	//region addAccountToCache
+	// region addAccountToCache
 
 	@Test
 	public void accountWithoutPublicKeyCanBeAddedToCache() {
@@ -95,9 +95,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(cachedAccount2.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeFromCache
+	// region removeFromCache
 
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
@@ -141,9 +141,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region findByAddress
+	// region findByAddress
 
 	@Test(expected = MissingResourceException.class)
 	public void findByAddressFailsIfAddressIsInvalid() {
@@ -211,9 +211,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final Address address = Utils.generateRandomAddress();
 
 		// Assert:
-		this.assertFindByAddressReturnsNonCachedAccount(
-				address,
-				cache -> cache.findByAddress(address, a -> true));
+		this.assertFindByAddressReturnsNonCachedAccount(address, cache -> cache.findByAddress(address, a -> true));
 	}
 
 	@Test(expected = MissingResourceException.class)
@@ -226,9 +224,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		cache.findByAddress(address, a -> false);
 	}
 
-	private void assertFindByAddressReturnsNonCachedAccount(
-			final Address address,
-			final Function<AccountCache, Account> findByAddress) {
+	private void assertFindByAddressReturnsNonCachedAccount(final Address address, final Function<AccountCache, Account> findByAddress) {
 		// Arrange:
 		final AccountCache cache = this.createAccountCache();
 
@@ -241,9 +237,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
-	//endregion
+	// endregion
 
-	//region isKnownAddress
+	// region isKnownAddress
 
 	@Test
 	public void isKnownAddressReturnsTrueIfAddressIsKnown() {
@@ -272,9 +268,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(cache.isKnownAddress(address2), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCreatesFullCopyOfAllAccounts() {
@@ -343,9 +339,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(copyAccountFromEncoded, IsSame.sameInstance(copyAccountFromPublicKey));
 	}
 
-	//endregion
+	// endregion
 
-	//region shallowCopyTo
+	// region shallowCopyTo
 
 	@Test
 	public void shallowCopyToCreatesLinkedCacheCopy() {
@@ -398,9 +394,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region contents
+	// region contents
 
 	@Test
 	public void contentsReturnsAllAccounts() {
@@ -420,5 +416,5 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		MatcherAssert.assertThat(iteratedAccounts, IsEquivalent.equivalentTo(accounts));
 	}
 
-	//endregion
+	// endregion
 }

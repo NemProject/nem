@@ -4,8 +4,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 
 /**
- * A link between a source account and another account.
- * <br>
+ * A link between a source account and another account. <br>
  * This class is immutable.
  */
 public class AccountLink implements Comparable<AccountLink> {
@@ -56,9 +55,8 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	@Override
 	public int compareTo(final AccountLink rhs) {
-		final int[] comparisonResults = new int[] {
-				this.getHeight().compareTo(rhs.getHeight()),
-				this.getAmount().compareTo(rhs.getAmount()),
+		final int[] comparisonResults = new int[]{
+				this.getHeight().compareTo(rhs.getHeight()), this.getAmount().compareTo(rhs.getAmount()),
 				this.otherAccountAddress.compareTo(rhs.otherAccountAddress),
 		};
 
@@ -73,14 +71,12 @@ public class AccountLink implements Comparable<AccountLink> {
 
 	@Override
 	public int hashCode() {
-		return this.getHeight().hashCode() ^
-				this.getAmount().hashCode() ^
-				this.otherAccountAddress.getEncoded().hashCode();
+		return this.getHeight().hashCode() ^ this.getAmount().hashCode() ^ this.otherAccountAddress.getEncoded().hashCode();
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		return obj instanceof AccountLink && 0 == this.compareTo((AccountLink)obj);
+		return obj instanceof AccountLink && 0 == this.compareTo((AccountLink) obj);
 	}
 
 	@Override

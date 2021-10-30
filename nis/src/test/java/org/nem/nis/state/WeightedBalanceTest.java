@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 
 public class WeightedBalanceTest {
 
-	//region constants / create*
+	// region constants / create*
 
 	@Test
 	public void weightedBalanceZeroIsInitializedCorrectly() {
@@ -42,16 +42,17 @@ public class WeightedBalanceTest {
 	@Test
 	public void partiallyVestedAndUnvestedBalanceCanBeCreated() {
 		// Arrange:
-		final WeightedBalance weightedBalance = WeightedBalance.create(new BlockHeight(120), Amount.fromNem(1_000_000), Amount.fromNem(2_000_000));
+		final WeightedBalance weightedBalance = WeightedBalance.create(new BlockHeight(120), Amount.fromNem(1_000_000),
+				Amount.fromNem(2_000_000));
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.fromNem(2_000_000));
 		MatcherAssert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(3_000_000)));
 	}
 
-	//endregion ctor
+	// endregion ctor
 
-	//region receive
+	// region receive
 
 	@Test
 	public void canReceiveIfBalanceIsFullyUnvested() {
@@ -111,9 +112,9 @@ public class WeightedBalanceTest {
 		assertWeightedBalance(result3, 2881, Amount.fromMicroNem(23_370_000L), Amount.fromMicroNem(444_630_000L));
 	}
 
-	//endregion
+	// endregion
 
-	//region next
+	// region next
 
 	@Test
 	public void balanceCanBeAdvancedOneDay() {
@@ -169,9 +170,9 @@ public class WeightedBalanceTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region send
+	// region send
 
 	@Test
 	public void canSendIfBalanceIsFullyUnvested() {
@@ -277,9 +278,9 @@ public class WeightedBalanceTest {
 		return vestedBalance / (0d + vestedBalance + unvestedBalance);
 	}
 
-	//endregion
+	// endregion
 
-	//region compare / copy
+	// region compare / copy
 
 	@Test
 	public void balanceCanBeCompared() {
@@ -319,7 +320,7 @@ public class WeightedBalanceTest {
 		MatcherAssert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(29)));
 	}
 
-	//endregion
+	// endregion
 
 	private static WeightedBalance advanceDays(final WeightedBalance weightedBalance, final int numDays) {
 		WeightedBalance result = weightedBalance;
@@ -330,10 +331,7 @@ public class WeightedBalanceTest {
 		return result;
 	}
 
-	private static void assertWeightedBalance(
-			final WeightedBalance balance,
-			final int blockHeight,
-			final Amount vestedAmount,
+	private static void assertWeightedBalance(final WeightedBalance balance, final int blockHeight, final Amount vestedAmount,
 			final Amount unvestedAmount) {
 		// Assert
 		MatcherAssert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));

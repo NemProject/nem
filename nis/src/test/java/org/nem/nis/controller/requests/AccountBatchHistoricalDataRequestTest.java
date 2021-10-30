@@ -15,10 +15,7 @@ import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POI
 
 public class AccountBatchHistoricalDataRequestTest {
 
-	private static JSONObject createValidJsonObject(
-			final Collection<SerializableAccountId> accountIds,
-			long startHeight,
-			long endHeight,
+	private static JSONObject createValidJsonObject(final Collection<SerializableAccountId> accountIds, long startHeight, long endHeight,
 			long increment) {
 		final JsonSerializer serializer = new JsonSerializer();
 		serializer.writeObjectArray("accounts", accountIds);
@@ -32,10 +29,8 @@ public class AccountBatchHistoricalDataRequestTest {
 	@Test
 	public void canCreateAccountBatchHistoricalDataRequestFromValidDeserializer() {
 		// Arrange:
-		final Collection<SerializableAccountId> accountIds = Arrays.asList(
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()));
+		final Collection<SerializableAccountId> accountIds = Arrays.asList(new SerializableAccountId(Utils.generateRandomAddress()),
+				new SerializableAccountId(Utils.generateRandomAddress()), new SerializableAccountId(Utils.generateRandomAddress()));
 
 		final Deserializer deserializer = new JsonDeserializer(createValidJsonObject(accountIds, 10L, 20L, 5L), null);
 
@@ -53,8 +48,7 @@ public class AccountBatchHistoricalDataRequestTest {
 	public void canCreateAccountBatchHistoricalDataRequestForRequestingMaxDataPoints() {
 		// Arrange:
 		final long endHeight = MAX_DATA_POINTS / 2 + 1;
-		final Collection<SerializableAccountId> accountIds = Arrays.asList(
-				new SerializableAccountId(Utils.generateRandomAddress()),
+		final Collection<SerializableAccountId> accountIds = Arrays.asList(new SerializableAccountId(Utils.generateRandomAddress()),
 				new SerializableAccountId(Utils.generateRandomAddress()));
 
 		final Deserializer deserializer = new JsonDeserializer(createValidJsonObject(accountIds, 1L, endHeight, 1L), null);
@@ -78,10 +72,8 @@ public class AccountBatchHistoricalDataRequestTest {
 
 	private static void assertCannotCreateAccountBatchHistoricalDataRequestWhenPropertyIsMissing(final String missingPropertyName) {
 		// Arrange:
-		final Collection<SerializableAccountId> accountIds = Arrays.asList(
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()));
+		final Collection<SerializableAccountId> accountIds = Arrays.asList(new SerializableAccountId(Utils.generateRandomAddress()),
+				new SerializableAccountId(Utils.generateRandomAddress()), new SerializableAccountId(Utils.generateRandomAddress()));
 
 		final JSONObject jsonObject = createValidJsonObject(accountIds, 10L, 20L, 5L);
 		jsonObject.remove(missingPropertyName);
@@ -94,10 +86,8 @@ public class AccountBatchHistoricalDataRequestTest {
 	@Test
 	public void cannotCreateAccountBatchHistoricalDataRequestForTooManyDataPoints() {
 		// Arrange:
-		final Collection<SerializableAccountId> accountIds = Arrays.asList(
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()),
-				new SerializableAccountId(Utils.generateRandomAddress()));
+		final Collection<SerializableAccountId> accountIds = Arrays.asList(new SerializableAccountId(Utils.generateRandomAddress()),
+				new SerializableAccountId(Utils.generateRandomAddress()), new SerializableAccountId(Utils.generateRandomAddress()));
 
 		final Deserializer deserializer = new JsonDeserializer(createValidJsonObject(accountIds, 1L, 4000L, 1L), null);
 

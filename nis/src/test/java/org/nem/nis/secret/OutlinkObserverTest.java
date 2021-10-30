@@ -12,7 +12,7 @@ import org.nem.nis.test.NisUtils;
 
 public class OutlinkObserverTest {
 
-	//region notifyTransfer
+	// region notifyTransfer
 
 	@Test
 	public void notifyTransferExecuteAddsSenderOutlink() {
@@ -21,8 +21,7 @@ public class OutlinkObserverTest {
 		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(context.account1, context.account2, new Amount(752)),
+		observer.notify(new BalanceTransferNotification(context.account1, context.account2, new Amount(752)),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert (752 * 0.3 = 225.5):
@@ -39,8 +38,7 @@ public class OutlinkObserverTest {
 		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(context.account2, context.account1, new Amount(752)),
+		observer.notify(new BalanceTransferNotification(context.account2, context.account1, new Amount(752)),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Undo));
 
 		// Assert (752 * 0.3 = 225.5):
@@ -57,8 +55,7 @@ public class OutlinkObserverTest {
 		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(context.account1, context.account1, new Amount(752)),
+		observer.notify(new BalanceTransferNotification(context.account1, context.account1, new Amount(752)),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert:
@@ -66,9 +63,9 @@ public class OutlinkObserverTest {
 		verifyCallCounts(context.importance2, 0, 0);
 	}
 
-	//endregion
+	// endregion
 
-	//region notifyCredit
+	// region notifyCredit
 
 	@Test
 	public void notifyCreditExecuteDoesNotChangeOutlinks() {
@@ -88,17 +85,16 @@ public class OutlinkObserverTest {
 		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account1, new Amount(432)),
-				NisUtils.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account1, new Amount(432)), NisUtils
+				.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
 	}
 
-	//endregion
+	// endregion
 
-	//region notifyDebit
+	// region notifyDebit
 
 	@Test
 	public void notifyDebitExecuteDoesNotChangeOutlinks() {
@@ -118,20 +114,16 @@ public class OutlinkObserverTest {
 		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.account1, new Amount(432)),
-				NisUtils.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.account1, new Amount(432)), NisUtils
+				.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
 	}
 
-	//endregion
+	// endregion
 
-	private static void verifyCallCounts(
-			final AccountImportance importance,
-			final int addOutlinkCounts,
-			final int removeOutlinkCounts) {
+	private static void verifyCallCounts(final AccountImportance importance, final int addOutlinkCounts, final int removeOutlinkCounts) {
 		Mockito.verify(importance, Mockito.times(addOutlinkCounts)).addOutlink(Mockito.any());
 		Mockito.verify(importance, Mockito.times(removeOutlinkCounts)).removeOutlink(Mockito.any());
 	}
@@ -162,7 +154,8 @@ public class OutlinkObserverTest {
 			return new OutlinkObserver(this.accountStateCache);
 		}
 
-		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
+		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances,
+				final BlockHeight height) {
 			final Address address = Utils.generateRandomAddress();
 			Mockito.when(account.getAddress()).thenReturn(address);
 

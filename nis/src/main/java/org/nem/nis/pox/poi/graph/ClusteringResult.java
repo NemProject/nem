@@ -20,10 +20,7 @@ public class ClusteringResult {
 	 * @param hubs The hub clusters.
 	 * @param outliers The outlier clusters.
 	 */
-	public ClusteringResult(
-			final Collection<Cluster> clusters,
-			final Collection<Cluster> hubs,
-			final Collection<Cluster> outliers) {
+	public ClusteringResult(final Collection<Cluster> clusters, final Collection<Cluster> hubs, final Collection<Cluster> outliers) {
 		this.clusters = clusters;
 		this.hubs = hubs;
 		this.outliers = outliers;
@@ -36,8 +33,7 @@ public class ClusteringResult {
 	}
 
 	private void addClustersToIdMap(final Collection<Cluster> clusters) {
-		clusters.stream()
-				.forEach(c -> c.getMemberIds().stream().forEach(n -> this.idMap.put(n, c.getId())));
+		clusters.stream().forEach(c -> c.getMemberIds().stream().forEach(n -> this.idMap.put(n, c.getId())));
 	}
 
 	/**

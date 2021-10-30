@@ -35,13 +35,11 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 			dbTransfer.setMessagePayload(message.getEncodedPayload());
 		}
 
-		final Set<DbMosaic> dbMosaics = source.getAttachment().getMosaics().stream()
-				.map(st -> {
-					final DbMosaic dbMosaic = this.mapper.map(st, DbMosaic.class);
-					dbMosaic.setTransferTransaction(dbTransfer);
-					return dbMosaic;
-				})
-				.collect(Collectors.toSet());
+		final Set<DbMosaic> dbMosaics = source.getAttachment().getMosaics().stream().map(st -> {
+			final DbMosaic dbMosaic = this.mapper.map(st, DbMosaic.class);
+			dbMosaic.setTransferTransaction(dbTransfer);
+			return dbMosaic;
+		}).collect(Collectors.toSet());
 		dbTransfer.setMosaics(dbMosaics);
 		return dbTransfer;
 	}

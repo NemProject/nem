@@ -22,7 +22,8 @@ public class HistoricalOutlinksTest {
 		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
 	}
 
-	//region add
+	// region add
+
 	@Test
 	public void canAddOutlinkToHistoricalOutlink() {
 		// Arrange:
@@ -52,9 +53,11 @@ public class HistoricalOutlinksTest {
 		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
 		MatcherAssert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1235)));
 	}
-	//endregion
 
-	//region remove
+	// endregion
+
+	// region remove
+
 	@Test
 	public void canRemoveOutlinkFromHistoricalOutlink() {
 		// Arrange:
@@ -108,9 +111,10 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
 		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 	}
-	//endregion
 
-	//region size/iterator
+	// endregion
+
+	// region size/iterator
 
 	@Test
 	public void historicalOutlinksSizeReturnsProperValue() {
@@ -183,9 +187,9 @@ public class HistoricalOutlinksTest {
 		Assert.assertFalse(it.hasNext());
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void pruneRemovesAllOlderOutlinks() {
@@ -203,14 +207,13 @@ public class HistoricalOutlinksTest {
 		// Assert:
 		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
-				.map(link -> link.getAmount().getNumNem())
-				.collect(Collectors.toList());
+				.map(link -> link.getAmount().getNumNem()).collect(Collectors.toList());
 		MatcherAssert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(345L, 456L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesOutlinks() {
@@ -227,8 +230,7 @@ public class HistoricalOutlinksTest {
 		// Assert:
 		final Iterator<AccountLink> it = copy.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
-				.map(link -> link.getAmount().getNumNem())
-				.collect(Collectors.toList());
+				.map(link -> link.getAmount().getNumNem()).collect(Collectors.toList());
 		MatcherAssert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(123L, 234L, 345L)));
 	}
 
@@ -250,5 +252,5 @@ public class HistoricalOutlinksTest {
 		MatcherAssert.assertThat(copy.getLastHistoricalOutlink().size(), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 }

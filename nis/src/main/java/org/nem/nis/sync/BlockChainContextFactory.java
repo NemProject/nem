@@ -20,12 +20,8 @@ public class BlockChainContextFactory {
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 
-	public BlockChainContextFactory(
-			final ReadOnlyNisCache nisCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockDao blockDao,
-			final BlockChainServices services,
-			final UnconfirmedTransactions unconfirmedTransactions) {
+	public BlockChainContextFactory(final ReadOnlyNisCache nisCache, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao, final BlockChainServices services, final UnconfirmedTransactions unconfirmedTransactions) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -40,11 +36,7 @@ public class BlockChainContextFactory {
 	 * @return The comparison context.
 	 */
 	public BlockChainComparisonContext createComparisonContext(final BlockChainScore localScore) {
-		return new BlockChainComparisonContext(
-				this.nisCache.getAccountCache(),
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.services,
+		return new BlockChainComparisonContext(this.nisCache.getAccountCache(), this.blockChainLastBlockLayer, this.blockDao, this.services,
 				localScore);
 	}
 
@@ -55,12 +47,7 @@ public class BlockChainContextFactory {
 	 * @return The sync context.
 	 */
 	public BlockChainSyncContext createSyncContext(final BlockChainScore localScore) {
-		return new BlockChainSyncContext(
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.services,
-				localScore);
+		return new BlockChainSyncContext(this.nisCache, this.blockChainLastBlockLayer, this.blockDao, this.services, localScore);
 	}
 
 	/**
@@ -70,26 +57,13 @@ public class BlockChainContextFactory {
 	 * @param dbParentBlock The parent block (from the database).
 	 * @param peerChain The peer chain.
 	 * @param localScore The local chain score.
-	 * @param hasOwnChain true if the peer chain is inconsistent with the local chain
-	 * (i.e. if the peer chain is accepted, parts of the local chain will need to be rolled back).
+	 * @param hasOwnChain true if the peer chain is inconsistent with the local chain (i.e. if the peer chain is accepted, parts of the
+	 *            local chain will need to be rolled back).
 	 * @return The update context.
 	 */
-	public BlockChainUpdateContext createUpdateContext(
-			final BlockChainSyncContext syncContext,
-			final DbBlock dbParentBlock,
-			final Collection<Block> peerChain,
-			final BlockChainScore localScore,
-			final boolean hasOwnChain) {
-		return new BlockChainUpdateContext(
-				syncContext.nisCache(),
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.services,
-				this.unconfirmedTransactions,
-				dbParentBlock,
-				peerChain,
-				localScore,
-				hasOwnChain);
+	public BlockChainUpdateContext createUpdateContext(final BlockChainSyncContext syncContext, final DbBlock dbParentBlock,
+			final Collection<Block> peerChain, final BlockChainScore localScore, final boolean hasOwnChain) {
+		return new BlockChainUpdateContext(syncContext.nisCache(), this.nisCache, this.blockChainLastBlockLayer, this.blockDao,
+				this.services, this.unconfirmedTransactions, dbParentBlock, peerChain, localScore, hasOwnChain);
 	}
 }

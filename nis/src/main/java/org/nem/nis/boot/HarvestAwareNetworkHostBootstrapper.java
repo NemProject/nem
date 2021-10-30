@@ -26,9 +26,7 @@ public class HarvestAwareNetworkHostBootstrapper implements NetworkHostBootstrap
 	 * @param unlockedAccounts The unlocked accounts.
 	 * @param configuration The configuration.
 	 */
-	public HarvestAwareNetworkHostBootstrapper(
-			final NisPeerNetworkHost networkHost,
-			final UnlockedAccounts unlockedAccounts,
+	public HarvestAwareNetworkHostBootstrapper(final NisPeerNetworkHost networkHost, final UnlockedAccounts unlockedAccounts,
 			final NisConfiguration configuration) {
 		this.networkHost = networkHost;
 		this.unlockedAccounts = unlockedAccounts;
@@ -37,8 +35,7 @@ public class HarvestAwareNetworkHostBootstrapper implements NetworkHostBootstrap
 
 	@Override
 	public CompletableFuture<Void> boot(final Node localNode) {
-		return this.networkHost.boot(localNode)
-				.thenAccept(v -> this.autoHarvest(localNode.getIdentity().getKeyPair().getPrivateKey()));
+		return this.networkHost.boot(localNode).thenAccept(v -> this.autoHarvest(localNode.getIdentity().getKeyPair().getPrivateKey()));
 	}
 
 	private void autoHarvest(final PrivateKey bootKey) {
@@ -53,8 +50,7 @@ public class HarvestAwareNetworkHostBootstrapper implements NetworkHostBootstrap
 		}
 
 		this.addHarvester(bootKey);
-		Arrays.stream(this.configuration.getAdditionalHarvesterPrivateKeys())
-				.forEach(this::addHarvester);
+		Arrays.stream(this.configuration.getAdditionalHarvesterPrivateKeys()).forEach(this::addHarvester);
 	}
 
 	private void addHarvester(final PrivateKey privateKey) {
@@ -63,7 +59,7 @@ public class HarvestAwareNetworkHostBootstrapper implements NetworkHostBootstrap
 
 		LOGGER.info(String.format("auto harvesting with '%s' -> '%s'", account, result));
 		if (UnlockResult.SUCCESS != result) {
-			LOGGER.severe(String.format("Could not start harvesting with account %s, reason: %s",account.toString(), result.toString()));
+			LOGGER.severe(String.format("Could not start harvesting with account %s, reason: %s", account.toString(), result.toString()));
 		}
 	}
 }

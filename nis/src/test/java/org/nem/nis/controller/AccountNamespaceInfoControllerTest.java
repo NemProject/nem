@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class AccountNamespaceInfoControllerTest {
 
-	//region accountGetMosaicDefinitionsDelegatesToNamespaceCache
+	// region accountGetMosaicDefinitionsDelegatesToNamespaceCache
 
 	@Test
 	public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
@@ -29,11 +29,9 @@ public class AccountNamespaceInfoControllerTest {
 		// Assert:
 		context.assertAccountStateDelegation();
 		context.assertNamespaceCacheNumGetDelegations(5); // three from first call and two from second
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions1.asCollection(),
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions1.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId4));
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions2.asCollection(),
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions2.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId2, context.mosaicId3));
 	}
 
@@ -49,17 +47,15 @@ public class AccountNamespaceInfoControllerTest {
 		// Assert:
 		context.assertAccountStateDelegation();
 		context.assertNamespaceCacheNumGetDelegations(9); // five from first call and four from second
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions1.asCollection(),
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions1.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId4, context.mosaic1Levy));
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions2.asCollection(),
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions2.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId2, context.mosaicId3, context.mosaicId1));
 	}
 
-	//endregion
+	// endregion
 
-	//region accountGetMosaicDefinitionsBatchDelegatesToNamespaceCache
+	// region accountGetMosaicDefinitionsBatchDelegatesToNamespaceCache
 
 	@Test
 	public void accountGetMosaicDefinitionsBatchDelegatesToNamespaceCache() {
@@ -67,15 +63,13 @@ public class AccountNamespaceInfoControllerTest {
 		final ThreeMosaicsWithNoLeviesTestContext context = new ThreeMosaicsWithNoLeviesTestContext();
 
 		// Act:
-		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
-				context,
+		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(context,
 				Arrays.asList(context.address, context.another));
 
 		// Assert:
 		context.assertAccountStateDelegation();
 		context.assertNamespaceCacheNumGetDelegations(5);
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions.asCollection(),
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3, context.mosaicId4));
 	}
 
@@ -85,21 +79,19 @@ public class AccountNamespaceInfoControllerTest {
 		final ThreeMosaicsWithLeviesTestContext context = new ThreeMosaicsWithLeviesTestContext();
 
 		// Act:
-		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
-				context,
+		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(context,
 				Arrays.asList(context.address, context.another));
 
 		// Assert:
 		context.assertAccountStateDelegation();
 		context.assertNamespaceCacheNumGetDelegations(9);
-		context.assertMosaicDefinitionsOwned(
-				returnedMosaicDefinitions.asCollection(),
-				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3, context.mosaicId4, context.mosaic1Levy));
+		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions.asCollection(), Arrays.asList(MosaicConstants.MOSAIC_ID_XEM,
+				context.mosaicId1, context.mosaicId2, context.mosaicId3, context.mosaicId4, context.mosaic1Levy));
 	}
 
-	//endregion
+	// endregion
 
-	//region accountGetOwnedMosaicsDelegatesToNamespaceCache
+	// region accountGetOwnedMosaicsDelegatesToNamespaceCache
 
 	@Test
 	public void accountGetOwnedMosaicsDelegatesToNamespaceCache() {
@@ -130,22 +122,15 @@ public class AccountNamespaceInfoControllerTest {
 		// 3) 6 calls in getOwnedMosaics() for context.address
 		// 4) 4 calls in getOwnedMosaics() for context.another
 		context.assertNamespaceCacheNumGetDelegations(4 + 6 + 4);
-		context.assertMosaicsOwned(
-				returnedMosaics1.asCollection(),
-				Arrays.asList(
-						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, new Quantity(444000000)),
-						new Mosaic(context.mosaicId1, new Quantity(123)),
-						new Mosaic(context.mosaicId2, Quantity.ZERO),
+		context.assertMosaicsOwned(returnedMosaics1.asCollection(),
+				Arrays.asList(new Mosaic(MosaicConstants.MOSAIC_ID_XEM, new Quantity(444000000)),
+						new Mosaic(context.mosaicId1, new Quantity(123)), new Mosaic(context.mosaicId2, Quantity.ZERO),
 						new Mosaic(context.mosaicId4, Quantity.ZERO)));
-		context.assertMosaicsOwned(
-				returnedMosaics2.asCollection(),
-				Arrays.asList(
-						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.ZERO),
-						new Mosaic(context.mosaicId2, new Quantity(528)),
-						new Mosaic(context.mosaicId3, Quantity.ZERO)));
+		context.assertMosaicsOwned(returnedMosaics2.asCollection(), Arrays.asList(new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.ZERO),
+				new Mosaic(context.mosaicId2, new Quantity(528)), new Mosaic(context.mosaicId3, Quantity.ZERO)));
 	}
 
-	//endregion
+	// endregion
 
 	private SerializableList<Mosaic> getOwnedMosaics(final ThreeMosaicsTestContext context, final Address address) {
 		return context.controller.accountGetOwnedMosaics(context.getBuilder(address));
@@ -155,7 +140,8 @@ public class AccountNamespaceInfoControllerTest {
 		return context.controller.accountGetMosaicDefinitions(context.getBuilder(address));
 	}
 
-	private SerializableList<MosaicDefinition> getAccountMosaicDefinitionsBatch(final ThreeMosaicsTestContext context, final List<Address> addresses) {
+	private SerializableList<MosaicDefinition> getAccountMosaicDefinitionsBatch(final ThreeMosaicsTestContext context,
+			final List<Address> addresses) {
 		final Collection<AccountId> accountIds = addresses.stream().map(a -> new AccountId(a.getEncoded())).collect(Collectors.toList());
 		return context.controller.accountGetMosaicDefinitionsBatch(NisUtils.getAccountIdsDeserializer(accountIds));
 	}
@@ -193,7 +179,8 @@ public class AccountNamespaceInfoControllerTest {
 
 		public ThreeMosaicsWithNoLeviesTestContext() {
 			this.addXemMosaic();
-			this.prepareMosaics(Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4));
+			this.prepareMosaics(
+					Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4));
 			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId4));
 			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
 		}
@@ -206,16 +193,10 @@ public class AccountNamespaceInfoControllerTest {
 
 	private static class ThreeMosaicsWithLeviesTestContext extends ThreeMosaicsTestContext {
 		private final MosaicId mosaic1Levy = this.createMosaicId("gimre.games.pong", "ball-levy");
-		private final MosaicId mosaicId1 = this.createMosaicId(
-				"gimre.games.pong",
-				"paddle",
-				0L,
+		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "paddle", 0L,
 				new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), this.mosaic1Levy, new Quantity(11)));
 		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "ball");
-		private final MosaicId mosaicId3 = this.createMosaicId(
-				"gimre.games.pong",
-				"goal",
-				0L,
+		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "goal", 0L,
 				new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), this.mosaicId1, new Quantity(11)));
 		private final MosaicId mosaicId4 = this.createMosaicId("gimre.games.pong", "game");
 

@@ -14,7 +14,7 @@ import java.util.*;
 
 public class TransactionHashesObserverTest {
 
-	//region execute
+	// region execute
 
 	@Test
 	public void transactionHashesExecutePutsPairsIntoTransactionHashCache() {
@@ -31,9 +31,9 @@ public class TransactionHashesObserverTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region undo
 
 	@Test
 	public void transactionHashesUndoRemovesPairsFromTransactionHashCache() {
@@ -48,14 +48,11 @@ public class TransactionHashesObserverTest {
 		MatcherAssert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	private static void notifyTransactionHashes(
-			final TransactionHashesObserver observer,
-			final List<HashMetaDataPair> pairs,
+	private static void notifyTransactionHashes(final TransactionHashesObserver observer, final List<HashMetaDataPair> pairs,
 			final NotificationTrigger trigger) {
-		observer.notify(
-				new TransactionHashesNotification(pairs),
+		observer.notify(new TransactionHashesNotification(pairs),
 				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), trigger));
 	}
 
@@ -72,7 +69,8 @@ public class TransactionHashesObserverTest {
 		private List<HashMetaDataPair> createPairs() {
 			final List<HashMetaDataPair> pairs = new ArrayList<>();
 			for (int i = 0; i < 10; i++) {
-				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
+				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(),
+						new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
 			}
 
 			return pairs;

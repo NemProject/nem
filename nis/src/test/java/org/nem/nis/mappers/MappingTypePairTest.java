@@ -19,7 +19,7 @@ public class MappingTypePairTest {
 		MatcherAssert.assertThat(pair.getTargetClass(), IsEqual.equalTo(String.class));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@SuppressWarnings("serial")
 	private static final Map<String, MappingTypePair> DESC_TO_PAIR_MAP = new HashMap<String, MappingTypePair>() {
@@ -42,7 +42,7 @@ public class MappingTypePairTest {
 		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("diff-target"), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types"), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		MatcherAssert.assertThat(Integer.class, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(Integer.class, IsNot.not(IsEqual.equalTo((Object) pair)));
 	}
 
 	@Test
@@ -57,9 +57,9 @@ public class MappingTypePairTest {
 		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -70,5 +70,5 @@ public class MappingTypePairTest {
 		MatcherAssert.assertThat(pair.toString(), IsEqual.equalTo("java.lang.Integer -> java.lang.String"));
 	}
 
-	//endregion
+	// endregion
 }

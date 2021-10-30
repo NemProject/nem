@@ -19,7 +19,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 	private static final long MAX_SUPPLY = MosaicConstants.MAX_QUANTITY / 100000;
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 
-	//region valid
+	// region valid
 
 	@Test
 	public void createMosaicsIncreasingSupplyValidates() {
@@ -70,9 +70,9 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region unknown mosaic
+	// region unknown mosaic
 
 	@Test
 	public void transactionIsInvalidIfNamespaceIdIsUnknown() {
@@ -99,9 +99,9 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
 	}
 
-	//endregion
+	// endregion
 
-	//region expired namespace
+	// region expired namespace
 
 	@Test
 	public void transactionIsInvalidIfNamespaceIsNotActive() {
@@ -118,16 +118,17 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
 	}
 
-	//endregion
+	// endregion
 
-	//region creator conflict
+	// region creator conflict
 
 	@Test
 	public void transactionIsInvalidIfMosaicCreatorDiffersFromTransactionSigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaicDefinition(Utils.createMosaicDefinition(Utils.generateRandomAccount(), mosaicId, createMosaicProperties(INITIAL_SUPPLY, true)));
+		context.addMosaicDefinition(
+				Utils.createMosaicDefinition(Utils.generateRandomAccount(), mosaicId, createMosaicProperties(INITIAL_SUPPLY, true)));
 		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
 
 		// Act:
@@ -137,9 +138,9 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
 	}
 
-	//endregion
+	// endregion
 
-	//region immutable
+	// region immutable
 
 	@Test
 	public void createMosaicsSupplyTypeForImmutableMosaicIsInvalid() {
@@ -167,9 +168,9 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE));
 	}
 
-	//endregion
+	// endregion
 
-	//region quantity bounds
+	// region quantity bounds
 
 	@Test
 	public void createSupplyTransactionIsInvalidIfMaxQuantityIsExceeded() {
@@ -209,10 +210,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT, new Supply(creatorSupply));
-		final MosaicSupplyChangeTransaction transaction = context.createTransaction(
-				mosaicId,
-				MosaicSupplyType.Delete,
-				decreaseSupply);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, MosaicSupplyType.Delete, decreaseSupply);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -221,7 +219,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE));
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicProperties createMosaicProperties(final long quantity, final boolean mutableSupply) {
 		return Utils.createMosaicProperties(quantity, 5, mutableSupply, null);
@@ -240,8 +238,10 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 			this.addMosaicDefinition(mosaicDefinition, namespaceHeight, new Supply(mosaicDefinition.getProperties().getInitialSupply()));
 		}
 
-		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition, final BlockHeight namespaceHeight, final Supply creatorSupply) {
-			final Namespace namespace = new Namespace(mosaicDefinition.getId().getNamespaceId(), mosaicDefinition.getCreator(), namespaceHeight);
+		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition, final BlockHeight namespaceHeight,
+				final Supply creatorSupply) {
+			final Namespace namespace = new Namespace(mosaicDefinition.getId().getNamespaceId(), mosaicDefinition.getCreator(),
+					namespaceHeight);
 			this.namespaceCache.add(namespace);
 			final MosaicEntry entry = this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaicDefinition);
 
@@ -262,25 +262,13 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 			return Utils.createMosaicDefinition(this.signer, mosaicId, properties);
 		}
 
-		private MosaicSupplyChangeTransaction createTransaction(
-				final MosaicId mosaicId,
-				final long quantity) {
-			return this.createTransaction(
-					mosaicId,
-					MosaicSupplyType.Create,
-					quantity);
+		private MosaicSupplyChangeTransaction createTransaction(final MosaicId mosaicId, final long quantity) {
+			return this.createTransaction(mosaicId, MosaicSupplyType.Create, quantity);
 		}
 
-		private MosaicSupplyChangeTransaction createTransaction(
-				final MosaicId mosaicId,
-				final MosaicSupplyType supplyType,
+		private MosaicSupplyChangeTransaction createTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType,
 				final long quantity) {
-			return new MosaicSupplyChangeTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					mosaicId,
-					supplyType,
-					new Supply(quantity));
+			return new MosaicSupplyChangeTransaction(TimeInstant.ZERO, this.signer, mosaicId, supplyType, new Supply(quantity));
 		}
 	}
 }

@@ -35,7 +35,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 		this.challengeFactory = new NodeChallengeFactory();
 	}
 
-	//region PeerConnector
+	// region PeerConnector
 
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {
@@ -50,9 +50,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
-	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(
-			final Node node,
-			final NodeEndpoint localEndpoint) {
+	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(final Node node, final NodeEndpoint localEndpoint) {
 		final URL url = getUrl(node, NisPeerId.REST_NODE_CAN_YOU_SEE_ME);
 		return this.post(url, localEndpoint).thenApply(NodeEndpoint::new);
 	}
@@ -64,15 +62,12 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
-	public CompletableFuture<?> announce(
-			final Node node,
-			final NisPeerId announceId,
-			final SerializableEntity entity) {
+	public CompletableFuture<?> announce(final Node node, final NisPeerId announceId, final SerializableEntity entity) {
 		final URL url = getUrl(node, announceId);
 		return this.postVoidAsync(url, entity);
 	}
 
-	//endregion
+	// endregion
 
 	// region SyncConnector
 
@@ -91,11 +86,8 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_BLOCKS_AFTER);
-		return this.postAuthenticated(
-				url,
-				node.getIdentity(),
-				d -> new SerializableList<>(d, BlockFactory.VERIFIABLE),
-				chainRequest).join().asCollection();
+		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, BlockFactory.VERIFIABLE), chainRequest).join()
+				.asCollection();
 	}
 
 	@Override
@@ -111,12 +103,10 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
-	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
+	public Collection<Transaction> getUnconfirmedTransactions(final Node node,
+			final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
 		final URL url = getUrl(node, NisPeerId.REST_TRANSACTIONS_UNCONFIRMED);
-		return this.postAuthenticated(
-				url,
-				node.getIdentity(),
-				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE),
+		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE),
 				unconfirmedTransactionsRequest).join().asCollection();
 	}
 
@@ -126,7 +116,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 		return this.postAuthenticated(url, node.getIdentity(), BlockHeight::new);
 	}
 
-	//endregion
+	// endregion
 
 	// region TimeSynchronizationConnector
 
@@ -135,7 +125,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 		return this.postAuthenticated(url, node.getIdentity(), CommunicationTimeStamps::new);
 	}
 
-	//endregion
+	// endregion
 
 	private static URL getUrl(final Node node, final NisPeerId id) {
 		return ExceptionUtils.propagate(() -> new URL(node.getEndpoint().getBaseUrl(), id.toString()));
@@ -149,30 +139,22 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 		return this.communicator.post(url, entity);
 	}
 
-	private <T extends SerializableEntity> CompletableFuture<T> postAuthenticated(
-			final URL url,
-			final NodeIdentity remoteNodeIdentity,
+	private <T extends SerializableEntity> CompletableFuture<T> postAuthenticated(final URL url, final NodeIdentity remoteNodeIdentity,
 			final ObjectDeserializer<T> entityDeserializer) {
 		final NodeChallenge challenge = this.challengeFactory.next();
 		return unwrapAuthenticatedResponse(this.post(url, challenge), challenge, remoteNodeIdentity, entityDeserializer);
 	}
 
-	private <TOut extends SerializableEntity, TEntity extends SerializableEntity> CompletableFuture<TOut> postAuthenticated(
-			final URL url,
-			final NodeIdentity remoteNodeIdentity,
-			final ObjectDeserializer<TOut> entityDeserializer,
-			final TEntity entity) {
+	private <TOut extends SerializableEntity, TEntity extends SerializableEntity> CompletableFuture<TOut> postAuthenticated(final URL url,
+			final NodeIdentity remoteNodeIdentity, final ObjectDeserializer<TOut> entityDeserializer, final TEntity entity) {
 		final NodeChallenge challenge = this.challengeFactory.next();
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
 		return unwrapAuthenticatedResponse(this.post(url, request), challenge, remoteNodeIdentity, entityDeserializer);
 	}
 
 	private static <T extends SerializableEntity> CompletableFuture<T> unwrapAuthenticatedResponse(
-			final CompletableFuture<Deserializer> future,
-			final NodeChallenge challenge,
-			final NodeIdentity remoteNodeIdentity,
+			final CompletableFuture<Deserializer> future, final NodeChallenge challenge, final NodeIdentity remoteNodeIdentity,
 			final ObjectDeserializer<T> entityDeserializer) {
-		return future
-				.thenApply(d -> new AuthenticatedResponse<>(d, entityDeserializer).getEntity(remoteNodeIdentity, challenge));
+		return future.thenApply(d -> new AuthenticatedResponse<>(d, entityDeserializer).getEntity(remoteNodeIdentity, challenge));
 	}
 }

@@ -27,14 +27,15 @@ public class TransactionHashesObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((TransactionHashesNotification)notification, context);
+		this.notify((TransactionHashesNotification) notification, context);
 	}
 
 	public void notify(final TransactionHashesNotification notification, final BlockNotificationContext context) {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			this.transactionHashCache.putAll(notification.getPairs());
 		} else {
-			this.transactionHashCache.removeAll(notification.getPairs().stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
+			this.transactionHashCache
+					.removeAll(notification.getPairs().stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 		}
 	}
 }

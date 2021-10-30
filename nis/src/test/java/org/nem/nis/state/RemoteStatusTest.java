@@ -7,7 +7,7 @@ import org.nem.core.model.AccountRemoteStatus;
 
 public class RemoteStatusTest {
 
-	//region toAccountRemoteStatus
+	// region toAccountRemoteStatus
 
 	@Test
 	public void remoteStatusCanBeConvertedIntoAccountRemoteStatus() {
@@ -29,5 +29,5 @@ public class RemoteStatusTest {
 		MatcherAssert.assertThat(remoteStatus.toAccountRemoteStatus(), IsEqual.equalTo(accountRemoteStatus));
 	}
 
-	//endregion
+	// endregion
 }

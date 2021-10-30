@@ -14,9 +14,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MultisigCosignatoryModificationValidatorTest {
-	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
+	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants
+			.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
-	//region add (single)
+	// region add (single)
 
 	@Test
 	public void addingNewCosignatoryIsValid() {
@@ -30,15 +31,14 @@ public class MultisigCosignatoryModificationValidatorTest {
 		assertSingleAddModificationValidationResult(context -> context.signer, ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER);
 	}
 
-	private static void assertSingleAddModificationValidationResult(
-			final Function<MultisigTestContext, Account> getModificationAccount,
+	private static void assertSingleAddModificationValidationResult(final Function<MultisigTestContext, Account> getModificationAccount,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(
-				MultisigModificationType.AddCosignatory,
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory,
 				getModificationAccount.apply(context));
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
+		final MultisigAggregateModificationTransaction transaction = context
+				.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -48,9 +48,9 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region remove (single)
+	// region remove (single)
 
 	@Test
 	public void removingNonExistingCosignatoryIsInvalid() {
@@ -70,15 +70,14 @@ public class MultisigCosignatoryModificationValidatorTest {
 		assertSingleDelModificationValidationResult(context -> context.signer, ValidationResult.SUCCESS);
 	}
 
-	private static void assertSingleDelModificationValidationResult(
-			final Function<MultisigTestContext, Account> getModificationAccount,
+	private static void assertSingleDelModificationValidationResult(final Function<MultisigTestContext, Account> getModificationAccount,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(
-				MultisigModificationType.DelCosignatory,
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory,
 				getModificationAccount.apply(context));
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
+		final MultisigAggregateModificationTransaction transaction = context
+				.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -88,16 +87,15 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region add / remove (multiple)
-
-	//region add
+	// region add (multiple)
 
 	@Test
 	public void addingMultipleNewCosignatoriesIsValid() {
 		// Arrange:
-		final List<Account> otherAccounts = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
+		final List<Account> otherAccounts = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
 		final MultisigTestContext context = new MultisigTestContext();
 		otherAccounts.forEach(context::addState);
 
@@ -131,14 +129,15 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS));
 	}
 
-	//endregion
+	// endregion
 
-	//region remove
+	// region remove (multiple)
 
 	@Test
 	public void removingMultipleExistingCosignatoriesIsNotAllowed() {
 		// Arrange:
-		final List<Account> otherAccounts = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
+		final List<Account> otherAccounts = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
 		final MultisigTestContext context = new MultisigTestContext();
 		otherAccounts.forEach(account -> {
 			context.addState(account);
@@ -175,7 +174,9 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS));
 	}
 
-	//endregion
+	// endregion
+
+	// region add / remove (multiple)
 
 	@Test
 	public void singleInvalidModificationInvalidatesAllModifications() {
@@ -250,9 +251,9 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
 	}
 
-	//endregion
+	// endregion
 
-	//region prevent multisig account being cosignatory
+	// region prevent multisig account being cosignatory
 
 	@Test
 	public void cannotAddMultisigAccountAsCosignatory() {
@@ -264,8 +265,8 @@ public class MultisigCosignatoryModificationValidatorTest {
 		context.makeCosignatory(dummyCosigner, context.dummy);
 
 		// - attempt to add dummy as a cosigner to multisig
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Collections
+				.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
 		// Act:
@@ -281,8 +282,8 @@ public class MultisigCosignatoryModificationValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 
 		// - attempt to create multisig account where the multisig account is cosigner of its own account
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.multisig));
+		final List<MultisigCosignatoryModification> modifications = Collections
+				.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.multisig));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
 		// Act:
@@ -300,8 +301,8 @@ public class MultisigCosignatoryModificationValidatorTest {
 		context.makeCosignatory(context.multisig, context.signer);
 
 		// - attempt to make multisig a multisig by adding dummy as a cosigner
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Collections
+				.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
 		// Act:
@@ -311,9 +312,9 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig aggregate modification transaction V2 fork
+	// region multisig aggregate modification transaction V2 fork
 
 	@Test
 	public void versionOneIsAcceptedBeforeFork() {
@@ -335,9 +336,7 @@ public class MultisigCosignatoryModificationValidatorTest {
 	@Test
 	public void versionTwoIsRejectedBeforeFork() {
 		assertValidationResultAtHeight(2, 1, ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
-		assertValidationResultAtHeight(
-				2,
-				MULTISIG_M_OF_N_FORK - 1,
+		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK - 1,
 				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 	}
 
@@ -352,15 +351,12 @@ public class MultisigCosignatoryModificationValidatorTest {
 		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
 	}
 
-	private static void assertValidationResultAtHeight(
-			final int version,
-			final long height,
-			final ValidationResult expectedResult) {
+	private static void assertValidationResultAtHeight(final int version, final long height, final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy);
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
-				version,
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory,
+				context.dummy);
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(version,
 				Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -371,5 +367,5 @@ public class MultisigCosignatoryModificationValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 }

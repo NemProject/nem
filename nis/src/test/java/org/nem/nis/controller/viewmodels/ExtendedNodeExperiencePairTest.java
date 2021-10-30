@@ -9,7 +9,7 @@ import org.nem.peer.trust.score.NodeExperience;
 
 public class ExtendedNodeExperiencePairTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void pairCanBeCreated() {
@@ -44,9 +44,9 @@ public class ExtendedNodeExperiencePairTest {
 		MatcherAssert.assertThat(pair.getNumSyncAttempts(), IsEqual.equalTo(89));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -60,7 +60,7 @@ public class ExtendedNodeExperiencePairTest {
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7, 9), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object) pair)));
 	}
 
 	@Test
@@ -77,9 +77,9 @@ public class ExtendedNodeExperiencePairTest {
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -87,30 +87,19 @@ public class ExtendedNodeExperiencePairTest {
 		final ExtendedNodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", "bob", 5, 1, 9);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				pair.toString(),
-				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) bob] @ [10.0.0.1]]"));
+		MatcherAssert.assertThat(pair.toString(), IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) bob] @ [10.0.0.1]]"));
 	}
 
-	//endregion
+	// endregion
 
-	private static ExtendedNodeExperiencePair createNodeExperiencePair(
-			final String host,
-			final int numSuccess,
-			final int numFailures,
+	private static ExtendedNodeExperiencePair createNodeExperiencePair(final String host, final int numSuccess, final int numFailures,
 			final int numSyncAttempts) {
 		return createNodeExperiencePair(host, host, numSuccess, numFailures, numSyncAttempts);
 	}
 
-	private static ExtendedNodeExperiencePair createNodeExperiencePair(
-			final String host,
-			final String name,
-			final int numSuccess,
-			final int numFailures,
-			final int numSyncAttempts) {
-		return new ExtendedNodeExperiencePair(
-				NodeUtils.createNodeWithHost(host, name),
-				new NodeExperience(numSuccess, numFailures),
+	private static ExtendedNodeExperiencePair createNodeExperiencePair(final String host, final String name, final int numSuccess,
+			final int numFailures, final int numSyncAttempts) {
+		return new ExtendedNodeExperiencePair(NodeUtils.createNodeWithHost(host, name), new NodeExperience(numSuccess, numFailures),
 				numSyncAttempts);
 	}
 }

@@ -113,20 +113,13 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		}
 
 		private MosaicDefinition createMosaic(final MosaicId feeMosaicId) {
-			return new MosaicDefinition(
-					this.creator,
-					this.mosaicId,
-					new MosaicDescriptor("precious vouchers"),
+			return new MosaicDefinition(this.creator, this.mosaicId, new MosaicDescriptor("precious vouchers"),
 					new DefaultMosaicProperties(this.propertiesMap.values()),
 					null == feeMosaicId ? null : this.createMosaicLevy(feeMosaicId));
 		}
 
 		private MosaicLevy createMosaicLevy(final MosaicId feeMosaicId) {
-			return new MosaicLevy(
-					MosaicTransferFeeType.Absolute,
-					this.feeRecipient,
-					feeMosaicId,
-					Quantity.fromValue(123));
+			return new MosaicLevy(MosaicTransferFeeType.Absolute, this.feeRecipient, feeMosaicId, Quantity.fromValue(123));
 		}
 	}
 }

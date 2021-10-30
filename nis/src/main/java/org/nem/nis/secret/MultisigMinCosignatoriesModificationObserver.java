@@ -6,8 +6,7 @@ import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 
 /**
- * Observer that intercepts MinCosignatoriesModification to update the minimum number of
- * cosignatories a multisig account requires.
+ * Observer that intercepts MinCosignatoriesModification to update the minimum number of cosignatories a multisig account requires.
  */
 public class MultisigMinCosignatoriesModificationObserver implements BlockTransactionObserver {
 	private final AccountStateCache stateCache;
@@ -27,7 +26,7 @@ public class MultisigMinCosignatoriesModificationObserver implements BlockTransa
 			return;
 		}
 
-		this.notify((MultisigMinCosignatoriesModificationNotification)notification, context);
+		this.notify((MultisigMinCosignatoriesModificationNotification) notification, context);
 	}
 
 	private void notify(final MultisigMinCosignatoriesModificationNotification notification, final BlockNotificationContext context) {

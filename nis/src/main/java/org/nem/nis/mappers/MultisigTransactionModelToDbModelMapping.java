@@ -9,7 +9,9 @@ import java.util.stream.Collectors;
 /**
  * A mapping that is able to map a multisig transaction to a db multisig transaction.
  */
-public class MultisigTransactionModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigTransaction, DbMultisigTransaction> {
+public class MultisigTransactionModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<MultisigTransaction, DbMultisigTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -35,13 +37,11 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 		final AbstractBlockTransfer inner = this.mapper.map(transaction, entry.dbModelClass);
 		entry.setInMultisig.accept(dbMultisigTransfer, inner);
 
-		final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions = source.getCosignerSignatures().stream()
-				.map(model -> {
-					final DbMultisigSignatureTransaction signature = this.mapper.map(model, DbMultisigSignatureTransaction.class);
-					signature.setMultisigTransaction(dbMultisigTransfer);
-					return signature;
-				})
-				.collect(Collectors.toSet());
+		final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions = source.getCosignerSignatures().stream().map(model -> {
+			final DbMultisigSignatureTransaction signature = this.mapper.map(model, DbMultisigSignatureTransaction.class);
+			signature.setMultisigTransaction(dbMultisigTransfer);
+			return signature;
+		}).collect(Collectors.toSet());
 
 		dbMultisigTransfer.setMultisigSignatureTransactions(multisigSignatureTransactions);
 		return dbMultisigTransfer;

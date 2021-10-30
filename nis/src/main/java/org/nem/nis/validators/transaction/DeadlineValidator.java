@@ -5,8 +5,8 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.validators.*;
 
 /**
- * A TransactionValidator implementation that applies to all transactions and validates that:
- * - the transaction timestamp is before the transaction deadline
+ * A TransactionValidator implementation that applies to all transactions and validates that:<br>
+ * - the transaction timestamp is before the transaction deadline<br>
  * - the transaction deadline is no more than one day past the transaction timestamp
  */
 public class DeadlineValidator implements SingleTransactionValidator {

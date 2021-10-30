@@ -11,13 +11,11 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
- * This is a first draft implementation of the POI importance calculation.
- * Because a lot of the infrastructure is not yet in place, I am making the
- * following assumptions in this code:
- * 1) This class's calculateImportancesImpl is called with a list of all the accounts.
- * 2) POI is calculated by the harvester after processing new transactions.
- * This algorithm is not currently iterative, so importances are calculated from scratch every time.
- * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
+ * This is a first draft implementation of the POI importance calculation. Because a lot of the infrastructure is not yet in place, I am
+ * making the following assumptions in this code: (1) This class's calculateImportancesImpl is called with a list of all the accounts (2)
+ * POI is calculated by the harvester after processing new transactions. This algorithm is not currently iterative, so importances are
+ * calculated from scratch every time. I plan to make this iterative so that we update importances only for accounts affected by new
+ * transactions and their links.
  */
 public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
@@ -34,28 +32,20 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	 * @param scorer The poi scorer to use.
 	 * @param getPoiOptions A function that returns the poi options given a block height.
 	 */
-	public PoiImportanceCalculator(
-			final ImportanceScorer scorer,
-			final Function<BlockHeight, PoiOptions> getPoiOptions) {
+	public PoiImportanceCalculator(final ImportanceScorer scorer, final Function<BlockHeight, PoiOptions> getPoiOptions) {
 		this.scorer = scorer;
 		this.getPoiOptions = getPoiOptions;
 	}
 
 	@Override
-	public void recalculate(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates) {
+	public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
 		final PoiOptions options = this.getPoiOptions.apply(blockHeight);
 		final PoiContext context = new PoiContext(accountStates, blockHeight, options);
 
 		// (2) run the power iteration algorithm
-		final PowerIterator iterator = new PoiPowerIterator(
-				context,
-				options,
-				accountStates.size(),
-				options.isClusteringEnabled());
+		final PowerIterator iterator = new PoiPowerIterator(context, options, accountStates.size(), options.isClusteringEnabled());
 
 		final long start = System.currentTimeMillis();
 		iterator.run();
@@ -63,9 +53,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		LOGGER.info("POI iterator needed " + (stop - start) + "ms.");
 
 		if (!iterator.hasConverged()) {
-			final String message = String.format(
-					"POI: power iteration failed to converge in %s iterations",
-					DEFAULT_MAX_ITERATIONS);
+			final String message = String.format("POI: power iteration failed to converge in %s iterations", DEFAULT_MAX_ITERATIONS);
 			throw new IllegalStateException(message);
 		}
 
@@ -84,11 +72,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		private final PoiOptions options;
 		private final boolean useClustering;
 
-		public PoiPowerIterator(
-				final PoiContext context,
-				final PoiOptions options,
-				final int numAccounts,
-				final boolean useClustering) {
+		public PoiPowerIterator(final PoiContext context, final PoiOptions options, final int numAccounts, final boolean useClustering) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.options = options;
@@ -110,10 +94,8 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
-			final double dangleSum = PoiUtils.calculateDangleSum(
-					this.context.getDangleIndexes(),
-					this.options.getTeleportationProbability(),
-					prevIterImportances);
+			final double dangleSum = PoiUtils.calculateDangleSum(this.context.getDangleIndexes(),
+					this.options.getTeleportationProbability(), prevIterImportances);
 
 			// V(dangle-sum + inverseTeleportation / N)
 			final int size = prevIterImportances.size();
@@ -124,16 +106,13 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 
 		private ColumnVector createImportancesVector(final ColumnVector prevIterImportances) {
 			// M(out-link) * V(last iter) .* V(teleportation)
-			return this.context.getOutlinkMatrix()
-					.multiply(prevIterImportances)
-					.multiply(this.options.getTeleportationProbability());
+			return this.context.getOutlinkMatrix().multiply(prevIterImportances).multiply(this.options.getTeleportationProbability());
 		}
 
 		private ColumnVector createInterLeverVector(final ColumnVector prevIterImportances) {
 			// inter-level proximity calc for NCD-Aware Rank: (R*(last iter) * A)
 			final InterLevelProximityMatrix interLevelMatrix = this.context.getInterLevelMatrix();
-			return interLevelMatrix.getA()
-					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
+			return interLevelMatrix.getA().multiply(interLevelMatrix.getR().multiply(prevIterImportances))
 					.multiply(this.options.getInterLevelTeleportationProbability());
 		}
 	}

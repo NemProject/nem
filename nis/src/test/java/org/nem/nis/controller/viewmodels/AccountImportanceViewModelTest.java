@@ -10,7 +10,7 @@ import org.nem.nis.state.*;
 
 public class AccountImportanceViewModelTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void viewModelCanBeCreated() {
@@ -43,9 +43,9 @@ public class AccountImportanceViewModelTest {
 		MatcherAssert.assertThat(viewModel.getImportance().getImportance(BlockHeight.ONE), IsEqual.equalTo(123.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -58,7 +58,7 @@ public class AccountImportanceViewModelTest {
 		MatcherAssert.assertThat(createViewModel("foo", 2, 1), IsNot.not(IsEqual.equalTo(viewModel)));
 		MatcherAssert.assertThat(createViewModel("foo", 5, 7), IsNot.not(IsEqual.equalTo(viewModel)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(viewModel)));
-		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)viewModel)));
+		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object) viewModel)));
 	}
 
 	@Test
@@ -96,13 +96,14 @@ public class AccountImportanceViewModelTest {
 		// Assert:
 		MatcherAssert.assertThat(viewModelWithSetImportance.hashCode(), IsEqual.equalTo(createViewModel("foo", 5, 1).hashCode()));
 		MatcherAssert.assertThat(viewModelWithSetImportance.hashCode(), IsNot.not(IsEqual.equalTo(createViewModel("foo").hashCode())));
-		MatcherAssert.assertThat(viewModelWithUnsetImportance.hashCode(), IsNot.not(IsEqual.equalTo(createViewModel("foo", 5, 1).hashCode())));
+		MatcherAssert.assertThat(viewModelWithUnsetImportance.hashCode(),
+				IsNot.not(IsEqual.equalTo(createViewModel("foo", 5, 1).hashCode())));
 		MatcherAssert.assertThat(viewModelWithUnsetImportance.hashCode(), IsEqual.equalTo(createViewModel("foo").hashCode()));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -113,16 +114,14 @@ public class AccountImportanceViewModelTest {
 		MatcherAssert.assertThat(viewModel.toString(), IsEqual.equalTo("FOO -> (5 : 1.000000)"));
 	}
 
-	//endregion
+	// endregion
 
 	private static AccountImportanceViewModel createViewModel(final String encodedAddress) {
 		final ReadOnlyAccountImportance importance = new AccountImportance();
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), importance);
 	}
 
-	private static AccountImportanceViewModel createViewModel(
-			final String encodedAddress,
-			final int blockHeight,
+	private static AccountImportanceViewModel createViewModel(final String encodedAddress, final int blockHeight,
 			final double rawImportance) {
 		final AccountImportance importance = new AccountImportance();
 		importance.setImportance(new BlockHeight(blockHeight), rawImportance);

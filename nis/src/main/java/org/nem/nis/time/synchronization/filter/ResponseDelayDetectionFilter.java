@@ -13,8 +13,6 @@ public class ResponseDelayDetectionFilter implements SynchronizationFilter {
 
 	@Override
 	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age) {
-		return samples.stream()
-				.filter(s -> FilterConstants.TOLERATED_DURATION_MAXIMUM >= s.getDuration())
-				.collect(Collectors.toList());
+		return samples.stream().filter(s -> FilterConstants.TOLERATED_DURATION_MAXIMUM >= s.getDuration()).collect(Collectors.toList());
 	}
 }

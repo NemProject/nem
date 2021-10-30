@@ -21,12 +21,8 @@ public class MosaicTestContext {
 	private final Map<Address, AccountState> stateMap = new HashMap<>();
 	protected final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	protected final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(
-			this.accountStateCache,
-			this.namespaceCache,
-			Mockito.mock(ReadOnlyNamespaceDao.class),
-			Mockito.mock(NisDbModelToModelMapper.class),
-			() -> new BlockHeight(123));
+	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(this.accountStateCache, this.namespaceCache,
+			Mockito.mock(ReadOnlyNamespaceDao.class), Mockito.mock(NisDbModelToModelMapper.class), () -> new BlockHeight(123));
 	private final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
 
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
@@ -41,14 +37,11 @@ public class MosaicTestContext {
 		return this.createMosaicId(namespaceName, mosaicName, initialSupply, null);
 	}
 
-	protected MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply, final MosaicLevy levy) {
+	protected MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply,
+			final MosaicLevy levy) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-				Utils.generateRandomAccount(),
-				mosaicId,
-				new MosaicDescriptor("descriptor"),
-				Utils.createMosaicPropertiesWithInitialSupply(initialSupply),
-				levy);
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.generateRandomAccount(), mosaicId,
+				new MosaicDescriptor("descriptor"), Utils.createMosaicPropertiesWithInitialSupply(initialSupply), levy);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
 	}

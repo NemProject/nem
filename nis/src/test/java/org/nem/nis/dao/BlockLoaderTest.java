@@ -111,13 +111,15 @@ public class BlockLoaderTest {
 
 	private DbProvisionNamespaceTransaction createRoundTrippedDbProvisionNamespaceTransaction() {
 		// Act:
-		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createProvisionNamespaceTransaction());
+		final DbBlock dbBlock = this
+				.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createProvisionNamespaceTransaction());
 		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
 	}
 
 	private DbMosaicDefinitionCreationTransaction createRoundTrippedDbMosaicDefinitionCreationTransaction() {
 		// Act:
-		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicDefinitionCreationTransaction());
+		final DbBlock dbBlock = this
+				.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicDefinitionCreationTransaction());
 		return dbBlock.getBlockMosaicDefinitionCreationTransactions().get(0);
 	}
 

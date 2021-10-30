@@ -73,17 +73,12 @@ public class PowerIteratorTest {
 		 * Creates a new poi power iterator.
 		 *
 		 * @param startVector The start vector.
-		 * @param matrix The matrix.
-		 * This matrix must be a multiple of a left stochastic matrix.
-		 * (i.e. all the matrix columns must sum to the same value).
+		 * @param matrix The matrix. This matrix must be a multiple of a left stochastic matrix. (i.e. all the matrix columns must sum to
+		 *            the same value).
 		 * @param maxIterations The maximum number of iterations.
 		 * @param epsilon The convergence epsilon value.
 		 */
-		public SimplePowerIterator(
-				final ColumnVector startVector,
-				final Matrix matrix,
-				final int maxIterations,
-				final double epsilon) {
+		public SimplePowerIterator(final ColumnVector startVector, final Matrix matrix, final int maxIterations, final double epsilon) {
 			super(startVector, maxIterations, epsilon);
 			this.matrix = matrix;
 		}

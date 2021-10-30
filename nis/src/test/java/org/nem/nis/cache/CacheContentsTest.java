@@ -14,8 +14,7 @@ public class CacheContentsTest {
 	@Test
 	public void iteratorExposesCopyOfSourceCollection() {
 		// Assert:
-		assertCopyOfSourceCollection(
-				contents -> StreamSupport.stream(contents.spliterator(), false).collect(Collectors.toList()));
+		assertCopyOfSourceCollection(contents -> StreamSupport.stream(contents.spliterator(), false).collect(Collectors.toList()));
 	}
 
 	@Test

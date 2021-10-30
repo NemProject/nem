@@ -3,8 +3,7 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * NemProperty db entity for mosaic definition properties.
- * <br>
+ * NemProperty db entity for mosaic definition properties. <br>
  * Holds information about a single mosaic definition property.
  */
 @Entity

@@ -26,12 +26,8 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	 * @param chainScore The chain score.
 	 * @param maxHashesToReturn The maximum number of hashes to return.
 	 */
-	public LocalBlockLookupAdapter(
-			final ReadOnlyBlockDao blockDao,
-			final NisDbModelToModelMapper mapper,
-			final DbBlock lastBlock,
-			final BlockChainScore chainScore,
-			final int maxHashesToReturn) {
+	public LocalBlockLookupAdapter(final ReadOnlyBlockDao blockDao, final NisDbModelToModelMapper mapper, final DbBlock lastBlock,
+			final BlockChainScore chainScore, final int maxHashesToReturn) {
 		this.blockDao = blockDao;
 		this.mapper = mapper;
 		this.lastBlock = this.mapper.map(lastBlock);

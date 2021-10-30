@@ -16,10 +16,7 @@ public class NamespaceModelToDbModelMappingTest {
 	public void canMapNamespaceToDbNamespace() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Namespace namespace = new Namespace(
-				new NamespaceId("foo.bar"),
-				context.owner,
-				new BlockHeight(123));
+		final Namespace namespace = new Namespace(new NamespaceId("foo.bar"), context.owner, new BlockHeight(123));
 
 		// Act:
 		final DbNamespace dbNamespace = context.mapping.map(namespace);

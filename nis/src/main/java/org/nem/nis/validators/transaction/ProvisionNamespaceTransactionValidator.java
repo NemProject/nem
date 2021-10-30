@@ -10,15 +10,15 @@ import org.nem.nis.state.ReadOnlyNamespaceEntry;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * A single transaction validator implementation that validates provision namespace transactions:
- * - [non-root] must have a parent in the namespace cache
- * - [non-root] must have an active root
- * - [non-root] must have same owner as parent
- * - [all] must not have a part length exceeding max length
- * - [all] must have default rental fee sink specified
- * - [all] must have a rental fee at least the minimum
- * - [non-root] must not exist
- * - [root] is renewable by owner exclusively expiration +/- one month
+ * A single transaction validator implementation that validates provision namespace transactions:<br>
+ * - [non-root] must have a parent in the namespace cache<br>
+ * - [non-root] must have an active root<br>
+ * - [non-root] must have same owner as parent<br>
+ * - [all] must not have a part length exceeding max length<br>
+ * - [all] must have default rental fee sink specified<br>
+ * - [all] must have a rental fee at least the minimum<br>
+ * - [non-root] must not exist<br>
+ * - [root] is renewable by owner exclusively expiration +/- one month<br>
  * - [root] is renewable by anyone one month and one day after expiration
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
@@ -80,7 +80,8 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			// if the transaction signer is not the last owner of the root namespace,
 			// block him from leasing the namespace for a month after expiration.
 			final Namespace root = this.getNamespace(resultingNamespaceId.getRoot());
-			if (!transaction.getSigner().equals(root.getOwner()) && expiryHeight.getRaw() + blocksPerMonth > context.getBlockHeight().getRaw()) {
+			if (!transaction.getSigner().equals(root.getOwner())
+					&& expiryHeight.getRaw() + blocksPerMonth > context.getBlockHeight().getRaw()) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 		}
@@ -108,16 +109,12 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(50000)
-				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
-						? Amount.fromNem(1500)
-						: Amount.fromNem(100);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw() ? Amount.fromNem(1500) : Amount.fromNem(100);
 	}
 
 	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(5000)
-				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
-						? Amount.fromNem(200)
-						: Amount.fromNem(10);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw() ? Amount.fromNem(200) : Amount.fromNem(10);
 	}
 }

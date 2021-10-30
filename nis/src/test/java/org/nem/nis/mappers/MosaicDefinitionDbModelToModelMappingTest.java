@@ -78,10 +78,12 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(NemProperty.class));
 
 		MatcherAssert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(context.creator));
-		MatcherAssert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers")));
+		MatcherAssert.assertThat(mosaicDefinition.getId(),
+				IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers")));
 		MatcherAssert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		MatcherAssert.assertThat(mosaicDefinition.getProperties().asCollection().size(), IsEqual.equalTo(4));
-		MatcherAssert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(context.propertiesMap.values()));
+		MatcherAssert.assertThat(mosaicDefinition.getProperties().asCollection(),
+				IsEquivalent.equivalentTo(context.propertiesMap.values()));
 
 		final MosaicLevy levy = mosaicDefinition.getMosaicLevy();
 		if (null != feeDbMosaicId) {

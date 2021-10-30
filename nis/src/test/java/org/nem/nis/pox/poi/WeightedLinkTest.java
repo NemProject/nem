@@ -20,7 +20,7 @@ public class WeightedLinkTest {
 		MatcherAssert.assertThat(link.getWeight(), IsEqual.equalTo(amount));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -32,7 +32,7 @@ public class WeightedLinkTest {
 		MatcherAssert.assertThat(createLink(9, "ZZZ"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(createLink(8, "ZZA"), IsNot.not(IsEqual.equalTo(link)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(link)));
-		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object)link)));
+		MatcherAssert.assertThat(8, IsNot.not(IsEqual.equalTo((Object) link)));
 	}
 
 	@Test
@@ -47,9 +47,9 @@ public class WeightedLinkTest {
 		MatcherAssert.assertThat(createLink(8, "ZZA").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -60,7 +60,7 @@ public class WeightedLinkTest {
 		MatcherAssert.assertThat(link.toString(), IsEqual.equalTo("8.0 -> ZZZ"));
 	}
 
-	//endregion
+	// endregion
 
 	private static WeightedLink createLink(final double weight, final String address) {
 		return new WeightedLink(Address.fromEncoded(address), weight);

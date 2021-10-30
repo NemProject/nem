@@ -15,9 +15,7 @@ public interface ReadOnlyTransferDao {
 	 * Types of transfers that can be requested.
 	 */
 	enum TransferType {
-		ALL,
-		INCOMING,
-		OUTGOING
+		ALL, INCOMING, OUTGOING
 	}
 
 	/**
@@ -27,9 +25,7 @@ public interface ReadOnlyTransferDao {
 	 * @param height The block height at which to search for the hash.
 	 * @return transfer block pair.
 	 */
-	TransferBlockPair getTransactionUsingHash(
-			final Hash hash,
-			final BlockHeight height);
+	TransferBlockPair getTransactionUsingHash(final Hash hash, final BlockHeight height);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
@@ -41,16 +37,11 @@ public interface ReadOnlyTransferDao {
 	 * @param limit The limit.
 	 * @return Collection of transfer block pairs.
 	 */
-	Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
-			final Account account,
-			final Hash hash,
-			final BlockHeight height,
-			final TransferType transferType,
-			final int limit);
+	Collection<TransferBlockPair> getTransactionsForAccountUsingHash(final Account account, final Hash hash, final BlockHeight height,
+			final TransferType transferType, final int limit);
 
 	/**
-	 * Retrieves limit transfers from db for given account.
-	 * These transfers can by of any type.
+	 * Retrieves limit transfers from db for given account. These transfers can by of any type.
 	 *
 	 * @param account The account.
 	 * @param id The id of "top-most" transfer.
@@ -58,9 +49,6 @@ public interface ReadOnlyTransferDao {
 	 * @param limit The limit.
 	 * @return Collection of transfer block pairs.
 	 */
-	Collection<TransferBlockPair> getTransactionsForAccountUsingId(
-			final Account account,
-			final Long id,
-			final TransferType transferType,
+	Collection<TransferBlockPair> getTransactionsForAccountUsingId(final Account account, final Long id, final TransferType transferType,
 			final int limit);
 }

@@ -12,9 +12,11 @@ import org.nem.nis.validators.*;
 
 import java.util.*;
 
-public class AggregateSingleTransactionValidatorBuilderTest extends AggregateValidatorBuilderTest<AggregateSingleTransactionValidatorBuilder, SingleTransactionValidator, Transaction> {
+public class AggregateSingleTransactionValidatorBuilderTest
+		extends
+			AggregateValidatorBuilderTest<AggregateSingleTransactionValidatorBuilder, SingleTransactionValidator, Transaction> {
 
-	//region AggregateValidatorBuilderTest
+	// region AggregateValidatorBuilderTest
 
 	@Override
 	public AggregateSingleTransactionValidatorBuilder createBuilder() {
@@ -49,15 +51,14 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 	}
 
 	@Override
-	public void verifyValidate(final SingleTransactionValidator validator, final Transaction transaction, final VerificationMode verificationMode) {
+	public void verifyValidate(final SingleTransactionValidator validator, final Transaction transaction,
+			final VerificationMode verificationMode) {
 		Mockito.verify(validator, verificationMode).validate(Mockito.eq(transaction), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region mapping
-
-	//region SingleTransactionValidator mapping
+	// region SingleTransactionValidator mapping
 
 	@Test
 	public void singleValidationDelegatesToSingleTransactionValidator() {
@@ -77,9 +78,9 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		Mockito.verify(validator, Mockito.only()).validate(transaction, validationContext);
 	}
 
-	//endregion
+	// endregion
 
-	//region BatchTransactionValidator mapping
+	// region BatchTransactionValidator mapping
 
 	@Test
 	public void singleValidationDelegatesToBatchTransactionValidator() {
@@ -105,14 +106,14 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		MatcherAssert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
-		return ArgumentCaptor.forClass((Class)List.class);
+		return ArgumentCaptor.forClass((Class) List.class);
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 
 	private static BatchTransactionValidator createBatchValidator(final ValidationResult result) {
 		final BatchTransactionValidator validator = Mockito.mock(BatchTransactionValidator.class);

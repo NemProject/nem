@@ -10,7 +10,7 @@ public class BlockMarkerConstantsTest {
 	private static final int MAINNET_VERSION = NetworkInfos.getMainNetworkInfo().getVersion();
 	private static final int MIJINNET_VERSION = NetworkInfos.getMijinNetworkInfo().getVersion();
 
-	//region MULTISIG_M_OF_N_FORK
+	// region MULTISIG_M_OF_N_FORK
 
 	@Test
 	public void multisigMOfNForkTestnetVersionReturns90k() {
@@ -44,7 +44,7 @@ public class BlockMarkerConstantsTest {
 		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
-	//region MOSAICS_FORK
+	// region MOSAICS_FORK
 
 	@Test
 	public void mosaicsForkTestnetVersionReturns180k() {
@@ -78,9 +78,9 @@ public class BlockMarkerConstantsTest {
 		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
-	//endregion
+	// endregion
 
-	//region FEE_FORK
+	// region FEE_FORK
 
 	@Test
 	public void feeForkTestnetVersionReturns572500() {
@@ -114,9 +114,9 @@ public class BlockMarkerConstantsTest {
 		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
-	//endregion
+	// endregion
 
-	//region SECOND_FEE_FORK
+	// region SECOND_FEE_FORK
 
 	@Test
 	public void secondFeeForkTestnetVersionReturns975000() {
@@ -150,5 +150,5 @@ public class BlockMarkerConstantsTest {
 		MatcherAssert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
-	//endregion
+	// endregion
 }

@@ -23,7 +23,7 @@ public class DbTestUtils {
 
 		// initialize any derived required fields
 		if (dbModelClass.equals(DbProvisionNamespaceTransaction.class)) {
-			((DbProvisionNamespaceTransaction)dbTransfer).setNamespace(new DbNamespace());
+			((DbProvisionNamespaceTransaction) dbTransfer).setNamespace(new DbNamespace());
 		}
 
 		return dbTransfer;

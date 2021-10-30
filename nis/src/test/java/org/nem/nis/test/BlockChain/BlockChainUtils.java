@@ -9,12 +9,8 @@ import org.nem.nis.test.MockBlockDao;
 
 public class BlockChainUtils {
 
-	public static void assertNisCacheCalls(
-			final ReadOnlyNisCache nisCache,
-			final int getAccountCacheCalls,
-			final int getAccountStateCacheCalls,
-			final int getPoxFacadeCalls,
-			final int copyCalls) {
+	public static void assertNisCacheCalls(final ReadOnlyNisCache nisCache, final int getAccountCacheCalls,
+			final int getAccountStateCacheCalls, final int getPoxFacadeCalls, final int copyCalls) {
 		Mockito.verify(nisCache, Mockito.times(getAccountCacheCalls)).getAccountCache();
 		Mockito.verify(nisCache, Mockito.times(getAccountStateCacheCalls)).getAccountStateCache();
 		Mockito.verify(nisCache, Mockito.times(getPoxFacadeCalls)).getPoxFacade();

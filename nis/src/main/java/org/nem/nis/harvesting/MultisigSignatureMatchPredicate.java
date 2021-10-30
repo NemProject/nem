@@ -29,10 +29,9 @@ public class MultisigSignatureMatchPredicate {
 	public boolean isMatch(final MultisigSignatureTransaction signatureTransaction, final MultisigTransaction multisigTransaction) {
 		final ReadOnlyAccountState cosignerState = this.accountStateCache.findStateByAddress(signatureTransaction.getSigner().getAddress());
 		final Address multisigAddress = multisigTransaction.getOtherTransaction().getSigner().getAddress();
-		return
-				!signatureTransaction.getSigner().equals(multisigTransaction.getSigner())
-						&& signatureTransaction.getOtherTransactionHash().equals(multisigTransaction.getOtherTransactionHash())
-						&& signatureTransaction.getDebtor().equals(multisigTransaction.getOtherTransaction().getSigner())
-						&& cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
+		return !signatureTransaction.getSigner().equals(multisigTransaction.getSigner())
+				&& signatureTransaction.getOtherTransactionHash().equals(multisigTransaction.getOtherTransactionHash())
+				&& signatureTransaction.getDebtor().equals(multisigTransaction.getOtherTransaction().getSigner())
+				&& cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
 	}
 }

@@ -35,12 +35,8 @@ public class BlockChainValidator {
 	 * @param transactionValidator The validator to use for validating transactions.
 	 * @param validationState The validation state.
 	 */
-	public BlockChainValidator(
-			final Function<Block, BlockProcessor> processorFactory,
-			final BlockScorer scorer,
-			final int maxChainSize,
-			final BlockValidator blockValidator,
-			final SingleTransactionValidator transactionValidator,
+	public BlockChainValidator(final Function<Block, BlockProcessor> processorFactory, final BlockScorer scorer, final int maxChainSize,
+			final BlockValidator blockValidator, final SingleTransactionValidator transactionValidator,
 			final ValidationState validationState) {
 		this.processorFactory = processorFactory;
 		this.scorer = scorer;

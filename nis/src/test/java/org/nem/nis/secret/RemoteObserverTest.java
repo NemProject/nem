@@ -14,16 +14,17 @@ import org.nem.nis.test.*;
 import java.util.Arrays;
 
 public class RemoteObserverTest {
-	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
-			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
-	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION = new BlockHeight(
+			BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{
+			1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1
+	};
 	private static final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
-			FORK_HEIGHT_MOSAIC_REDEFINITION,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
+			FORK_HEIGHT_MOSAIC_REDEFINITION, FORK_HEIGHT_MOSAIC_REDEFINITION + 1, FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000
+	};
 
-	//region execute
+	// region execute
 
 	@Test
 	public void notifyExecuteAddsCorrectLessorRemoteLinkInModeActivate() {
@@ -31,8 +32,7 @@ public class RemoteObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
+		context.observer.notify(new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
 
 		// Assert:
@@ -46,8 +46,7 @@ public class RemoteObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
+		context.observer.notify(new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
 
 		// Assert:
@@ -55,7 +54,9 @@ public class RemoteObserverTest {
 				.addLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
 
-	//region mosaic redefinition fork
+	// endregion
+
+	// region mosaic redefinition fork
 
 	@Test
 	public void notifyExecuteAddsLessorRemoteLinkWithFakeLesseeInModeDeactivateBeforeFork() {
@@ -75,10 +76,7 @@ public class RemoteObserverTest {
 		assertNotifyExecuteForkBehavior(HEIGHTS_AT_AND_AFTER_FORK, context, context.lessee);
 	}
 
-	private void assertNotifyExecuteForkBehavior(
-			final long[] heights,
-			final TestContext context,
-			final Account linkedAccount) {
+	private void assertNotifyExecuteForkBehavior(final long[] heights, final TestContext context, final Account linkedAccount) {
 		// Arrange:
 		context.linkLessorToLessee();
 
@@ -95,11 +93,9 @@ public class RemoteObserverTest {
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region undo
+	// region undo
 
 	@Test
 	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeActivate() {
@@ -107,8 +103,7 @@ public class RemoteObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
+		context.observer.notify(new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
 
 		// Assert:
@@ -122,8 +117,7 @@ public class RemoteObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
+		context.observer.notify(new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
 
 		// Assert:
@@ -131,7 +125,9 @@ public class RemoteObserverTest {
 				.removeLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
 
-	//region mosaic redefinition fork
+	// endregion
+
+	// region mosaic redefinition fork
 
 	@Test
 	public void notifyUndoRemovesLessorRemoteLinkWithFakeLesseeInModeDeactivateBeforeFork() {
@@ -151,10 +147,7 @@ public class RemoteObserverTest {
 		assertNotifyUndoForkBehavior(HEIGHTS_AT_AND_AFTER_FORK, context, context.lessee);
 	}
 
-	private void assertNotifyUndoForkBehavior(
-			final long[] heights,
-			final TestContext context,
-			final Account linkedAccount) {
+	private void assertNotifyUndoForkBehavior(final long[] heights, final TestContext context, final Account linkedAccount) {
 		// Arrange:
 		context.linkLessorToLessee();
 
@@ -171,11 +164,9 @@ public class RemoteObserverTest {
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region other type
+	// region other type
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -183,8 +174,7 @@ public class RemoteObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.lessor, Amount.fromNem(22)),
+		context.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.lessor, Amount.fromNem(22)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
@@ -192,7 +182,7 @@ public class RemoteObserverTest {
 		Mockito.verify(context.lessorRemoteLinks, Mockito.never()).removeLink(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final Account lessor = Utils.generateRandomAccount();
@@ -217,10 +207,7 @@ public class RemoteObserverTest {
 		}
 
 		private void linkLessorToLessee() {
-			final RemoteLink remoteLink = new RemoteLink(
-					this.lessee.getAddress(),
-					BlockHeight.ONE,
-					ImportanceTransferMode.Activate,
+			final RemoteLink remoteLink = new RemoteLink(this.lessee.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate,
 					RemoteLink.Owner.HarvestingRemotely);
 			Mockito.when(this.lessorRemoteLinks.getCurrent()).thenReturn(remoteLink);
 		}

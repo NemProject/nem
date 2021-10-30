@@ -61,10 +61,8 @@ public class MosaicController {
 	private MosaicIdSupplyPair getPair(final MosaicId mosaicId) {
 		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, mosaicId);
 		if (null == entry) {
-			throw new MissingResourceException(
-					String.format("mosaic id %s is unknown", mosaicId.toString()),
-					MosaicIdSupplyPair.class.getName(),
-					mosaicId.toString());
+			throw new MissingResourceException(String.format("mosaic id %s is unknown", mosaicId.toString()),
+					MosaicIdSupplyPair.class.getName(), mosaicId.toString());
 		}
 
 		return new MosaicIdSupplyPair(mosaicId, entry.getSupply());

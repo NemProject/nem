@@ -4,8 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.time.*;
 
 /**
- * Base class for validators that:
- * - validates entities are not too far in the future
+ * Base class for validators that validates entities are not too far in the future
  */
 public abstract class NonFutureEntityValidator {
 	private final TimeProvider timeProvider;

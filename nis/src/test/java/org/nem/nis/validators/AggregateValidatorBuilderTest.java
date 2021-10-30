@@ -12,7 +12,7 @@ import org.nem.core.model.ValidationResult;
  */
 public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends NamedValidator, TParam> {
 
-	//region protected abstract members
+	// region protected abstract members
 
 	/**
 	 * Creates a validator builder.
@@ -70,9 +70,9 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	 */
 	protected abstract void verifyValidate(final TValidator validator, final TParam param, final VerificationMode verificationMode);
 
-	//endregion
+	// endregion
 
-	//region basic aggregation
+	// region basic aggregation
 
 	@Test
 	public void canAddSingleValidator() {
@@ -94,9 +94,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	@Test
 	public void canAddMultipleValidators() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.SUCCESS,
 				ValidationResult.SUCCESS);
 
 		// Act:
@@ -111,10 +109,8 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	@Test
 	public void validationShortCircuitsOnFirstSubValidatorFailure() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.SUCCESS);
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_CHAIN_INVALID, ValidationResult.SUCCESS);
 
 		// Act:
 		final TValidator aggregate = this.build(context.builder);
@@ -128,9 +124,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	@Test
 	public void validationDoesNotShortCircuitOnFirstSubValidatorNeutralResult() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.SUCCESS);
 
 		// Act:
@@ -145,9 +139,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	@Test
 	public void validationFailureHasHigherPrecedenceThanNeutralResult() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Act:
@@ -167,9 +159,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		private final TBuilder builder = AggregateValidatorBuilderTest.this.createBuilder();
 		private final AggregateValidatorBuilderTest<TBuilder, TValidator, TParam> parent = AggregateValidatorBuilderTest.this;
 
-		private ThreeSubValidatorTestContext(
-				final ValidationResult result1,
-				final ValidationResult result2,
+		private ThreeSubValidatorTestContext(final ValidationResult result1, final ValidationResult result2,
 				final ValidationResult result3) {
 			this.validator1 = this.parent.createValidator(result1);
 			this.validator2 = this.parent.createValidator(result2);
@@ -193,9 +183,9 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region name aggregation
+	// region name aggregation
 
 	@Test
 	public void getNameReturnsCommaSeparatedListOfInnerValidators() {
@@ -219,5 +209,5 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		return validator;
 	}
 
-	//endregion
+	// endregion
 }

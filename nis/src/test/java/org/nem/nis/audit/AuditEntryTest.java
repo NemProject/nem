@@ -54,7 +54,7 @@ public class AuditEntryTest {
 		MatcherAssert.assertThat(deserializer.readInt("elapsed-time"), IsEqual.equalTo(41));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -69,7 +69,7 @@ public class AuditEntryTest {
 		MatcherAssert.assertThat(new AuditEntry(7, "host", "path2", timeProvider), IsNot.not(IsEqual.equalTo(entry)));
 		MatcherAssert.assertThat(new AuditEntry(7, "host", "path", Mockito.mock(TimeProvider.class)), IsEqual.equalTo(entry));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(entry)));
-		MatcherAssert.assertThat("host", IsNot.not(IsEqual.equalTo((Object)entry)));
+		MatcherAssert.assertThat("host", IsNot.not(IsEqual.equalTo((Object) entry)));
 	}
 
 	@Test
@@ -87,9 +87,9 @@ public class AuditEntryTest {
 		MatcherAssert.assertThat(new AuditEntry(7, "host", "path", Mockito.mock(TimeProvider.class)).hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -101,5 +101,5 @@ public class AuditEntryTest {
 		MatcherAssert.assertThat(entry.toString(), IsEqual.equalTo("#7 (localhost -> /chain/last-block)"));
 	}
 
-	//endregion
+	// endregion
 }

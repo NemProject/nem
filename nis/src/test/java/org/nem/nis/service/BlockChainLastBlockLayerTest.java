@@ -14,7 +14,7 @@ import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void layerIsInitializedWithNoLastBlock() {
@@ -72,9 +72,9 @@ public class BlockChainLastBlockLayerTest {
 		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region addBlockToDb
+	// region addBlockToDb
 
 	@Test
 	public void addBlockToDbDelegatesToBlockDaoAndMapper() {
@@ -109,9 +109,9 @@ public class BlockChainLastBlockLayerTest {
 		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region dropDbBlocksAfter
+	// region dropDbBlocksAfter
 
 	@Test
 	public void dropDbBlocksAfterDelegatesToBlockDao() {
@@ -146,9 +146,9 @@ public class BlockChainLastBlockLayerTest {
 		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region helper functions
+	// region helper functions
 
 	private static org.nem.core.model.Block createBlock(final long height) {
 		// Arrange:
@@ -172,9 +172,7 @@ public class BlockChainLastBlockLayerTest {
 	private static class TestContext {
 		private final BlockDao mockBlockDao = Mockito.mock(BlockDao.class);
 		private final NisModelToDbModelMapper mapper = Mockito.mock(NisModelToDbModelMapper.class);
-		private final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(
-				this.mockBlockDao,
-				this.mapper);
+		private final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(this.mockBlockDao, this.mapper);
 
 		public TestContext() {
 			this.lastBlockLayer.setLoaded();
@@ -188,5 +186,5 @@ public class BlockChainLastBlockLayerTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

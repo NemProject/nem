@@ -8,9 +8,9 @@ import org.nem.nis.state.ReadOnlyMosaicEntry;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * Single transaction validator that validates a bag of mosaics. For all mosaics in the bag:
- * - [mosaic] underlying mosaic definition must be known
- * - [namespace] underlying namespace must be active at the context height
+ * Single transaction validator that validates a bag of mosaics. For all mosaics in the bag:<br>
+ * - [mosaic] underlying mosaic definition must be known<br>
+ * - [namespace] underlying namespace must be active at the context height<br>
  * - [mosaic] if mosaic creator is not a participant, then the mosaic definition must have the property 'transferable'
  */
 public class MosaicBagValidator implements TSingleTransactionValidator<TransferTransaction> {
@@ -60,8 +60,10 @@ public class MosaicBagValidator implements TSingleTransactionValidator<TransferT
 		return ValidationResult.SUCCESS;
 	}
 
-	private static boolean isMosaicDefinitionCreatorParticipant(final MosaicDefinition mosaicDefinition, final TransferTransaction transaction) {
-		return mosaicDefinition.getCreator().equals(transaction.getSigner()) || mosaicDefinition.getCreator().equals(transaction.getRecipient());
+	private static boolean isMosaicDefinitionCreatorParticipant(final MosaicDefinition mosaicDefinition,
+			final TransferTransaction transaction) {
+		return mosaicDefinition.getCreator().equals(transaction.getSigner())
+				|| mosaicDefinition.getCreator().equals(transaction.getRecipient());
 	}
 
 	private static boolean isDivisibilityAllowed(final TransferTransaction transaction) {

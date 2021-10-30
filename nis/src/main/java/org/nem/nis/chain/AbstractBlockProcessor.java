@@ -26,10 +26,7 @@ public abstract class AbstractBlockProcessor implements BlockProcessor {
 	 * @param observer The block observer.
 	 * @param trigger The notification trigger.
 	 */
-	protected AbstractBlockProcessor(
-			final ReadOnlyNisCache nisCache,
-			final Block block,
-			final BlockTransactionObserver observer,
+	protected AbstractBlockProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer,
 			final NotificationTrigger trigger) {
 		this.nisCache = nisCache;
 		this.block = block;
@@ -53,7 +50,8 @@ public abstract class AbstractBlockProcessor implements BlockProcessor {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote harvesting)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = this.block.getSigner().getAddress();
-		final ReadOnlyAccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address, this.block.getHeight());
+		final ReadOnlyAccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address,
+				this.block.getHeight());
 
 		final Account endowed = accountState.getAddress().equals(address)
 				? this.block.getSigner()
@@ -72,15 +70,15 @@ public abstract class AbstractBlockProcessor implements BlockProcessor {
 	 * Raises a TransactionHashes notification.
 	 */
 	protected void notifyTransactionHashes() {
-		final List<HashMetaDataPair> pairs =
-				BlockExtensions.streamDefault(this.block)
-						.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(this.block.getHeight(), t.getTimeStamp())))
-						.collect(Collectors.toList());
+		final List<HashMetaDataPair> pairs = BlockExtensions.streamDefault(this.block)
+				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(this.block.getHeight(), t.getTimeStamp())))
+				.collect(Collectors.toList());
 		this.observer.notify(new TransactionHashesNotification(pairs));
 	}
 
 	private TransactionObserver createTransactionObserver(final BlockTransactionObserver observer) {
-		final BlockNotificationContext context = new BlockNotificationContext(this.block.getHeight(), this.block.getTimeStamp(), this.trigger);
+		final BlockNotificationContext context = new BlockNotificationContext(this.block.getHeight(), this.block.getTimeStamp(),
+				this.trigger);
 		return new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 	}
 }

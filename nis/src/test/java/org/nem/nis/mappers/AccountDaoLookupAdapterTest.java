@@ -11,7 +11,7 @@ import org.nem.nis.test.MockAccountDao;
 
 public class AccountDaoLookupAdapterTest {
 
-	//region new object
+	// region new object
 
 	@Test
 	public void newObjectIsCreatedOnCacheMiss() {
@@ -44,9 +44,9 @@ public class AccountDaoLookupAdapterTest {
 		MatcherAssert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
 	}
 
-	//endregion
+	// endregion
 
-	//region existing object
+	// region existing object
 
 	@Test
 	public void existingObjectIsReturnedFromDaoOnCacheMiss() {
@@ -84,9 +84,9 @@ public class AccountDaoLookupAdapterTest {
 		MatcherAssert.assertThat(accountDao.getNumGetAccountByPrintableAddressCalls(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region public key updating
+	// region public key updating
 
 	@Test
 	public void cachedObjectPublicKeyCanBeUpdated() {
@@ -128,5 +128,5 @@ public class AccountDaoLookupAdapterTest {
 		MatcherAssert.assertThat(dbAccount1.getPublicKey(), IsEqual.equalTo(originalPublicKey));
 	}
 
-	//endregion
+	// endregion
 }

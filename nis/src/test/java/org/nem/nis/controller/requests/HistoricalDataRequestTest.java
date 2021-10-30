@@ -11,10 +11,7 @@ import org.nem.core.test.ExceptionAssert;
 import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
 
 public class HistoricalDataRequestTest {
-	private static JSONObject createValidJsonObject(
-			long startHeight,
-			long endHeight,
-			long increment) {
+	private static JSONObject createValidJsonObject(long startHeight, long endHeight, long increment) {
 		final JsonSerializer serializer = new JsonSerializer();
 		BlockHeight.writeTo(serializer, "startHeight", new BlockHeight(startHeight));
 		BlockHeight.writeTo(serializer, "endHeight", new BlockHeight(endHeight));
@@ -80,48 +77,41 @@ public class HistoricalDataRequestTest {
 	@Test
 	public void cannotCreateHistoricalDataRequestWithNullEndHeight() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(10), null, 5L),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(10), null, 5L), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateHistoricalDataRequestWithNullIncrement() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), null),
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), null),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateHistoricalDataRequestWithStartHeightLargerThanEndHeight() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(9), 5L),
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(9), 5L),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateHistoricalDataRequestWithZeroIncrement() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), 0L),
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), 0L),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateHistoricalDataRequestWithNegativeIncrement() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), -1L),
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), -1L),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateHistoricalDataRequestWithTooManyDataPoints() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(MAX_DATA_POINTS + 2), 1L),
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(MAX_DATA_POINTS + 2), 1L),
 				IllegalArgumentException.class);
 	}
 }

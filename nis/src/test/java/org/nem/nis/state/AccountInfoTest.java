@@ -25,7 +25,7 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getMosaicIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//region Label
+	// region Label
 
 	@Test
 	public void labelCanBeSet() {
@@ -39,9 +39,9 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("Beta Gamma"));
 	}
 
-	//endregion
+	// endregion
 
-	//region Balance
+	// region Balance
 
 	@Test
 	public void balanceCanBeIncremented() {
@@ -83,9 +83,9 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(85)));
 	}
 
-	//endregion
+	// endregion
 
-	//region refCount
+	// region refCount
 
 	@Test
 	public void referenceCountCanBeIncremented() {
@@ -114,9 +114,9 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region harvested blocks
+	// region harvested blocks
 
 	@Test
 	public void harvestedBlocksCanBeIncremented() {
@@ -162,9 +162,9 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaic ids
+	// region mosaic ids
 
 	@Test
 	public void mosaicIdsCanBeAdded() {
@@ -196,9 +196,9 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 7)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCreatesDeepCopy() {
@@ -243,7 +243,7 @@ public class AccountInfoTest {
 		MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(7)));
 	}
 
-	//endregion
+	// endregion
 
 	private static Collection<MosaicId> getMosaicIds(final int... ids) {
 		return Arrays.stream(ids).mapToObj(Utils::createMosaicId).collect(Collectors.toList());

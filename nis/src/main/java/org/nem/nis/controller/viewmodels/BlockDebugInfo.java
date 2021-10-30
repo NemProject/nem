@@ -33,14 +33,8 @@ public class BlockDebugInfo implements SerializableEntity {
 	 * @param target The block target.
 	 * @param interBlockTime The block time - parent block time.
 	 */
-	public BlockDebugInfo(
-			final BlockHeight blockHeight,
-			final TimeInstant timeStamp,
-			final Address harvesterAddress,
-			final BlockDifficulty difficulty,
-			final BigInteger hit,
-			final BigInteger target,
-			final int interBlockTime) {
+	public BlockDebugInfo(final BlockHeight blockHeight, final TimeInstant timeStamp, final Address harvesterAddress,
+			final BlockDifficulty difficulty, final BigInteger hit, final BigInteger target, final int interBlockTime) {
 		this.height = blockHeight;
 		this.harvesterAddress = harvesterAddress;
 		this.timeStamp = timeStamp;
@@ -164,10 +158,7 @@ public class BlockDebugInfo implements SerializableEntity {
 		return UnixTime.fromDateString(deserializer.readString(name), TimeInstant.ZERO).getTimeInstant();
 	}
 
-	private static void writeTimeInstantAsTimeString(
-			final Serializer serializer,
-			final String label,
-			final TimeInstant timeInstant) {
+	private static void writeTimeInstantAsTimeString(final Serializer serializer, final String label, final TimeInstant timeInstant) {
 		serializer.writeString(label, UnixTime.fromTimeInstant(timeInstant).getDateString());
 	}
 }

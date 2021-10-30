@@ -134,35 +134,37 @@ public class MosaicsTest {
 	@Test
 	public void containsReturnsTrueIfMosaicWithMatchingNamespaceExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
 		// Assert:
-		IntStream.range(0, names.length)
-				.forEach(i -> MatcherAssert.assertThat(
-						mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, names[i]).getId()),
-						IsEqual.equalTo(true)));
+		IntStream.range(0, names.length).forEach(i -> MatcherAssert
+				.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, names[i]).getId()), IsEqual.equalTo(true)));
 	}
 
 	@Test
 	public void containsReturnsFalseIfMosaicWithDifferentNamespaceExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
 		// Assert:
-		IntStream.range(0, names.length)
-				.forEach(i -> MatcherAssert.assertThat(
-						mosaics.contains(Utils.createMosaicDefinition("coupons", names[i]).getId()),
-						IsEqual.equalTo(false)));
+		IntStream.range(0, names.length).forEach(i -> MatcherAssert
+				.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", names[i]).getId()), IsEqual.equalTo(false)));
 	}
 
 	@Test
 	public void containsReturnsTrueOnlyWhenBothMosaicWithMatchingNamespaceAndNameExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
@@ -445,8 +447,7 @@ public class MosaicsTest {
 	// endregion
 
 	private static void addToCache(final Mosaics mosaics, final String[] names) {
-		IntStream.range(0, names.length)
-				.forEach(i -> mosaics.add(Utils.createMosaicDefinition(DEFAULT_NID, names[i])));
+		IntStream.range(0, names.length).forEach(i -> mosaics.add(Utils.createMosaicDefinition(DEFAULT_NID, names[i])));
 	}
 
 	private static void addToCache(final Mosaics mosaics, final int count) {

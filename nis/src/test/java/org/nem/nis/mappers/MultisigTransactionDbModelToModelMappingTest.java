@@ -20,7 +20,7 @@ import java.util.function.*;
 @SuppressWarnings("rawtypes")
 public class MultisigTransactionDbModelToModelMappingTest {
 
-	//region General
+	// region General
 
 	public static class General extends AbstractTransferDbModelToModelMappingTest<DbMultisigTransaction, MultisigTransaction> {
 
@@ -31,9 +31,7 @@ public class MultisigTransactionDbModelToModelMappingTest {
 			final DbMultisigTransaction dbTransfer = context.createDbModel();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> context.mapping.map(dbTransfer),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> context.mapping.map(dbTransfer), IllegalArgumentException.class);
 		}
 
 		@Test
@@ -90,9 +88,9 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -133,7 +131,7 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -152,11 +150,8 @@ public class MultisigTransactionDbModelToModelMappingTest {
 
 		private void addSignature() {
 			final DbMultisigSignatureTransaction dbSignature = Mockito.mock(DbMultisigSignatureTransaction.class);
-			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					Utils.generateRandomAccount(),
-					this.expectedOtherTransaction.getSigner(),
-					HashUtils.calculateHash(this.expectedOtherTransaction));
+			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+					this.expectedOtherTransaction.getSigner(), HashUtils.calculateHash(this.expectedOtherTransaction));
 			Mockito.when(this.mapper.map(dbSignature, MultisigSignatureTransaction.class)).thenReturn(signature);
 
 			this.dbSignatures.add(dbSignature);
@@ -164,15 +159,12 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 
 		public void addTransfer() {
-			this.addTransfer(
-					new DbTransferTransaction(),
-					RandomTransactionFactory.createTransfer(),
+			this.addTransfer(new DbTransferTransaction(), RandomTransactionFactory.createTransfer(),
 					DbMultisigTransaction::setTransferTransaction);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> void addTransfer(
-				final TDbTransfer dbTransfer,
-				final TModelTransfer transfer,
+				final TDbTransfer dbTransfer, final TModelTransfer transfer,
 				final BiConsumer<DbMultisigTransaction, TDbTransfer> setTransferInMultisig) {
 			Mockito.when(this.mapper.map(dbTransfer, Transaction.class)).thenReturn(transfer);
 

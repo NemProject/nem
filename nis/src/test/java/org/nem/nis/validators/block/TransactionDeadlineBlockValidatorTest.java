@@ -27,10 +27,7 @@ public class TransactionDeadlineBlockValidatorTest {
 		assertBlockValidationResult(123, TEST_HEIGHT + 1, 124, ValidationResult.SUCCESS);
 	}
 
-	private static void assertBlockValidationResult(
-			final int blockTimeStamp,
-			final long blockHeight,
-			final int transactionDeadline,
+	private static void assertBlockValidationResult(final int blockTimeStamp, final long blockHeight, final int transactionDeadline,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithTimeStampAndHeight(blockTimeStamp, blockHeight);

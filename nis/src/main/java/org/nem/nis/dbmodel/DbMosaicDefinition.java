@@ -9,8 +9,7 @@ import javax.persistence.Table;
 import java.util.Set;
 
 /**
- * Mosaic definition db entity.
- * <br>
+ * Mosaic definition db entity. <br>
  * Holds information about a single mosaic definition.
  */
 @Entity

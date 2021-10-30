@@ -29,10 +29,7 @@ public class TransactionNonFutureEntityValidatorTest {
 		this.assertTransactionValidationResult(11, 22, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
-	private void assertTransactionValidationResult(
-			final int currentTime,
-			final int entityTime,
-			final ValidationResult expectedResult) {
+	private void assertTransactionValidationResult(final int currentTime, final int entityTime, final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(7, new TimeInstant(entityTime));
 		final SingleTransactionValidator validator = createValidator(currentTime);

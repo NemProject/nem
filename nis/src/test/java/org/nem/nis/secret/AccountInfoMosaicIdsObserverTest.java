@@ -19,7 +19,7 @@ public class AccountInfoMosaicIdsObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 	private static final Quantity INITIAL_QUANTITY = MosaicUtils.toQuantity(new Supply(1000), 4);
 
-	//region mosaic creation
+	// region mosaic creation
 
 	@Test
 	public void notifyExecuteMosaicDefinitionCreationUpdatesMosaicIds() {
@@ -48,9 +48,9 @@ public class AccountInfoMosaicIdsObserverTest {
 		context.assertMosaicIds(context.recipient, false);
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaic transfer
+	// region mosaic transfer
 
 	@Test
 	public void notifyExecuteMosaicTransferWithPartialBalanceTransferUpdatesMosaicIds() {
@@ -145,9 +145,9 @@ public class AccountInfoMosaicIdsObserverTest {
 		context.assertMosaicIds(context.recipient2, false);
 	}
 
-	//endregion
+	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -156,8 +156,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		final BlockTransactionObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
@@ -165,40 +164,30 @@ public class AccountInfoMosaicIdsObserverTest {
 		context.assertMosaicIds(context.recipient, false);
 	}
 
-	//endregion
+	// endregion
 
-	private void notifyMosaicDefinitionCreation(
-			final TestContext context,
-			final NotificationTrigger notificationTrigger) {
+	private void notifyMosaicDefinitionCreation(final TestContext context, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final BlockTransactionObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicDefinitionCreationNotification(context.mosaicDefinition),
+		observer.notify(new MosaicDefinitionCreationNotification(context.mosaicDefinition),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
-	private static void notifyMosaicTransfer(
-			final TestContext context,
-			final Quantity quantity,
+	private static void notifyMosaicTransfer(final TestContext context, final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
 		// Act:
 		notifyMosaicTransfer(context, context.sender, context.recipient, quantity, notificationTrigger);
 	}
 
-	private static void notifyMosaicTransfer(
-			final TestContext context,
-			final Account sender,
-			final Account recipient,
-			final Quantity quantity,
-			final NotificationTrigger notificationTrigger) {
+	private static void notifyMosaicTransfer(final TestContext context, final Account sender, final Account recipient,
+			final Quantity quantity, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final BlockTransactionObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicTransferNotification(sender, recipient, context.mosaicDefinition.getId(), quantity),
+		observer.notify(new MosaicTransferNotification(sender, recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -234,7 +223,8 @@ public class AccountInfoMosaicIdsObserverTest {
 			final AccountInfo info = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 			MatcherAssert.assertThat(info.getMosaicIds().size(), IsEqual.equalTo(hasMosaicSubscription ? 1 : 0));
 			if (hasMosaicSubscription) {
-				MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(Collections.singletonList(this.mosaicDefinition.getId())));
+				MatcherAssert.assertThat(info.getMosaicIds(),
+						IsEquivalent.equivalentTo(Collections.singletonList(this.mosaicDefinition.getId())));
 			}
 		}
 

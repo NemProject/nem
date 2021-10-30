@@ -19,10 +19,7 @@ public class BlockIterator {
 	 * @param desiredHeight The height.
 	 * @param visitor The visitor.
 	 */
-	public static void unwindUntil(
-			final BlockLookup lookup,
-			final BlockHeight desiredHeight,
-			final BlockVisitor visitor) {
+	public static void unwindUntil(final BlockLookup lookup, final BlockHeight desiredHeight, final BlockVisitor visitor) {
 
 		Block currentBlock = lookup.getLastBlock();
 

@@ -11,7 +11,8 @@ import org.nem.nis.dbmodel.*;
  * @param <TDbModel> The db model type.
  */
 public abstract class AbstractTransferModelToDbModelMapping<TModel extends Transaction, TDbModel extends AbstractTransfer>
-		implements IMapping<TModel, TDbModel> {
+		implements
+			IMapping<TModel, TDbModel> {
 	protected final IMapper mapper;
 
 	/**

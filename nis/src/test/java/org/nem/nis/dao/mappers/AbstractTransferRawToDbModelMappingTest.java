@@ -36,14 +36,14 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 	private void assertRawCanBeMappedToDbModel(final byte[] senderProof) {
 		final byte[] rawHash = Utils.generateRandomBytes(32);
 		final Object[] raw = new Object[RAW_SIZE];
-		raw[1] = BigInteger.valueOf(123L);          // id
-		raw[2] = rawHash;                           // raw hash
-		raw[3] = 1;                                 // version
-		raw[4] = BigInteger.valueOf(234L);          // fee
-		raw[5] = 345;                               // timestamp
-		raw[6] = 456;                               // deadline
-		raw[7] = BigInteger.valueOf(567L);          // sender id
-		raw[8] = senderProof;                       // sender proof
+		raw[1] = BigInteger.valueOf(123L); // id
+		raw[2] = rawHash; // raw hash
+		raw[3] = 1; // version
+		raw[4] = BigInteger.valueOf(234L); // fee
+		raw[5] = 345; // timestamp
+		raw[6] = 456; // deadline
+		raw[7] = BigInteger.valueOf(567L); // sender id
+		raw[8] = senderProof; // sender proof
 
 		final DbAccount dbAccount = new DbAccount(567);
 		final IMapper mapper = Mockito.mock(IMapper.class);

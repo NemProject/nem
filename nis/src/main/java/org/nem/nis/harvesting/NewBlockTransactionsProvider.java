@@ -19,8 +19,5 @@ public interface NewBlockTransactionsProvider {
 	 * @param blockHeight The block height.
 	 * @return The transactions.
 	 */
-	List<Transaction> getBlockTransactions(
-			Address harvesterAddress,
-			TimeInstant blockTime,
-			BlockHeight blockHeight);
+	List<Transaction> getBlockTransactions(Address harvesterAddress, TimeInstant blockTime, BlockHeight blockHeight);
 }

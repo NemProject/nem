@@ -20,7 +20,7 @@ import java.util.Collection;
 @RunWith(Enclosed.class)
 public class MultisigTransactionRawToDbModelMappingTest {
 
-	//region General
+	// region General
 
 	public static class General extends AbstractTransferRawToDbModelMappingTest<DbMultisigTransaction> {
 
@@ -30,9 +30,9 @@ public class MultisigTransactionRawToDbModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -103,7 +103,7 @@ public class MultisigTransactionRawToDbModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -118,23 +118,23 @@ public class MultisigTransactionRawToDbModelMappingTest {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[17];
-			raw[0] = BigInteger.valueOf(123L);                              // block id
-			raw[1] = BigInteger.valueOf(234L);                              // id
-			raw[2] = rawHash;                                               // raw hash
-			raw[3] = 1;                                                     // version
-			raw[4] = BigInteger.valueOf(345L);                              // fee
-			raw[5] = 456;                                                   // timestamp
-			raw[6] = 567;                                                   // deadline
-			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
-			raw[8] = senderProof;                                           // sender proof
-			raw[9] = 432;                                                   // block index
-			raw[10] = BigInteger.valueOf(654L);                             // referenced transaction
-			raw[11] = null;                                                 // db transfer id
-			raw[12] = null;                                                 // db importance transfer id
-			raw[13] = null;                                                 // db modification transaction id
-			raw[14] = null;                                                 // db provision namespace transaction id
-			raw[15] = null;                                                 // db mosaic definition creation transaction id
-			raw[16] = null;                                                 // db mosaic supply change transaction id
+			raw[0] = BigInteger.valueOf(123L); // block id
+			raw[1] = BigInteger.valueOf(234L); // id
+			raw[2] = rawHash; // raw hash
+			raw[3] = 1; // version
+			raw[4] = BigInteger.valueOf(345L); // fee
+			raw[5] = 456; // timestamp
+			raw[6] = 567; // deadline
+			raw[7] = BigInteger.valueOf(this.senderId); // sender id
+			raw[8] = senderProof; // sender proof
+			raw[9] = 432; // block index
+			raw[10] = BigInteger.valueOf(654L); // referenced transaction
+			raw[11] = null; // db transfer id
+			raw[12] = null; // db importance transfer id
+			raw[13] = null; // db modification transaction id
+			raw[14] = null; // db provision namespace transaction id
+			raw[15] = null; // db mosaic definition creation transaction id
+			raw[16] = null; // db mosaic supply change transaction id
 			return raw;
 		}
 	}

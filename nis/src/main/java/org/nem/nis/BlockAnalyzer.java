@@ -44,11 +44,8 @@ public class BlockAnalyzer {
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
 	 */
 	@Autowired(required = true)
-	public BlockAnalyzer(
-			final BlockDao blockDao,
-			final BlockChainScoreManager blockChainScoreManager,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final NisMapperFactory mapperFactory,
+	public BlockAnalyzer(final BlockDao blockDao, final BlockChainScoreManager blockChainScoreManager,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer, final NisMapperFactory mapperFactory,
 			final int estimatedBlocksPerYear) {
 		this.blockDao = blockDao;
 		this.blockChainScoreManager = blockChainScoreManager;
@@ -135,8 +132,8 @@ public class BlockAnalyzer {
 
 	private void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
 		final BlockTransactionObserver recalculateObserver = new RecalculateImportancesObserver(nisCache);
-		recalculateObserver.notify(
-				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, new Account(this.nemesisBlockInfo.getAddress()), Amount.ZERO),
+		recalculateObserver.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest,
+				new Account(this.nemesisBlockInfo.getAddress()), Amount.ZERO),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 	}
 
@@ -158,7 +155,8 @@ public class BlockAnalyzer {
 			}
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
-				this.iterator = this.blockDao.getBlocksAfterAndUpdateCache(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE).iterator();
+				this.iterator = this.blockDao.getBlocksAfterAndUpdateCache(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE)
+						.iterator();
 				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;
@@ -171,7 +169,8 @@ public class BlockAnalyzer {
 
 			final DbBlock dbBlock = this.iterator.next();
 			if (!dbBlock.getHeight().equals(height)) {
-				throw new IllegalStateException("inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
+				throw new IllegalStateException(
+						"inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
 			}
 
 			this.curHeight = dbBlock.getHeight();

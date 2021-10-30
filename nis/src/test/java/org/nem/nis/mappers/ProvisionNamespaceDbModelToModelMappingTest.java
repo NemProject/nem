@@ -10,7 +10,9 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbProvisionNamespaceTransaction, ProvisionNamespaceTransaction> {
+public class ProvisionNamespaceDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbProvisionNamespaceTransaction, ProvisionNamespaceTransaction> {
 
 	@Test
 	public void dbTransactionCanBeMappedToModel() {

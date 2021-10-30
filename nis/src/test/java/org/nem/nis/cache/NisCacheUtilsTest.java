@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 public class NisCacheUtilsTest {
 
-	//region createValidationState
+	// region createValidationState
 
 	@Test
 	public void validationStateDelegatesToCacheForCanDebitXem() {
@@ -66,14 +66,14 @@ public class NisCacheUtilsTest {
 		MatcherAssert.assertThat(validationState.canDebit(account, new Mosaic(mosaicId, new Quantity(445))), IsEqual.equalTo(false));
 	}
 
-
 	@Test
 	public void validationStateDelegatesToCacheForTransactionExecutionState() {
 		// Assert:
-		AssertTransactionExecutionStateDelegatesToCache(nisCache -> NisCacheUtils.createValidationState(nisCache).transactionExecutionState());
+		AssertTransactionExecutionStateDelegatesToCache(
+				nisCache -> NisCacheUtils.createValidationState(nisCache).transactionExecutionState());
 	}
 
-	//endregion
+	// endregion
 
 	// region createTransactionExecutionState
 
@@ -98,12 +98,8 @@ public class NisCacheUtilsTest {
 
 		final MosaicId mosaicId = new MosaicId(namespaceId, "tokens");
 		final MosaicLevy mosaicLevy = Utils.createMosaicLevy();
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-				namespaceOwner,
-				mosaicId,
-				new MosaicDescriptor("awesome mosaic"),
-				Utils.createMosaicProperties(),
-				mosaicLevy);
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(namespaceOwner, mosaicId, new MosaicDescriptor("awesome mosaic"),
+				Utils.createMosaicProperties(), mosaicLevy);
 		final MosaicEntry entry = nisCache.getNamespaceCache().get(namespaceId).getMosaics().add(mosaicDefinition);
 		entry.getBalances().incrementBalance(account.getAddress(), new Quantity(444));
 		nisCache.commit();

@@ -47,9 +47,7 @@ public class ValidationStateTest {
 		// Arrange:
 		final TransactionExecutionState originalTransactionExecutionState = new TransactionExecutionState(
 				Mockito.mock(MosaicTransferFeeCalculator.class));
-		final ValidationState validationState = new ValidationState(
-				DebitPredicates.XemThrow,
-				DebitPredicates.MosaicThrow,
+		final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow,
 				originalTransactionExecutionState);
 
 		// Act:
@@ -69,7 +67,9 @@ public class ValidationStateTest {
 		return createMockDebitPredicate(canDebit);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	private static DebitPredicate createMockDebitPredicate(final boolean canDebit) {
 		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
 		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(canDebit);

@@ -18,28 +18,20 @@ import java.util.stream.*;
 public class TransactionRegistryTest {
 
 	public static class All {
-		private static final Collection<Class<?>> EXPECTED_MODEL_CLASSES = Arrays.asList(
-				TransferTransaction.class,
-				ImportanceTransferTransaction.class,
-				MultisigAggregateModificationTransaction.class,
-				MultisigTransaction.class,
-				ProvisionNamespaceTransaction.class,
-				MosaicDefinitionCreationTransaction.class,
-				MosaicSupplyChangeTransaction.class);
+		private static final Collection<Class<?>> EXPECTED_MODEL_CLASSES = Arrays.asList(TransferTransaction.class,
+				ImportanceTransferTransaction.class, MultisigAggregateModificationTransaction.class, MultisigTransaction.class,
+				ProvisionNamespaceTransaction.class, MosaicDefinitionCreationTransaction.class, MosaicSupplyChangeTransaction.class);
 
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			MatcherAssert.assertThat(
-					TransactionRegistry.size(),
-					IsEqual.equalTo(TransactionTypes.getBlockEmbeddableTypes().size()));
+			MatcherAssert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(TransactionTypes.getBlockEmbeddableTypes().size()));
 		}
 
 		@Test
 		public void allExpectedMultisigEmbeddableTypesAreSupported() {
 			// Assert:
-			MatcherAssert.assertThat(
-					TransactionRegistry.multisigEmbeddableSize(),
+			MatcherAssert.assertThat(TransactionRegistry.multisigEmbeddableSize(),
 					IsEqual.equalTo(TransactionTypes.getMultisigEmbeddableTypes().size()));
 		}
 
@@ -47,8 +39,7 @@ public class TransactionRegistryTest {
 		public void allExpectedEntriesAreReturnedViaIterator() {
 			// Act:
 			final Collection<Class<?>> modelClasses = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
-					.map(e -> e.modelClass)
-					.collect(Collectors.toList());
+					.map(e -> e.modelClass).collect(Collectors.toList());
 
 			// Assert:
 			MatcherAssert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
@@ -58,9 +49,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void allExpectedEntriesAreReturnedViaStream() {
 			// Act:
-			final Collection<Class<?>> modelClasses = TransactionRegistry.stream()
-					.map(e -> e.modelClass)
-					.collect(Collectors.toList());
+			final Collection<Class<?>> modelClasses = TransactionRegistry.stream().map(e -> e.modelClass).collect(Collectors.toList());
 
 			// Assert:
 			MatcherAssert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
@@ -98,13 +87,9 @@ public class TransactionRegistryTest {
 		@SuppressWarnings("rawtypes")
 		public void findByDbModelClassCanReturnAllRegisteredTypes() {
 			// Arrange:
-			final List<Class<? extends AbstractBlockTransfer>> expectedRegisteredClasses = Arrays.asList(
-					DbTransferTransaction.class,
-					DbImportanceTransferTransaction.class,
-					DbMultisigAggregateModificationTransaction.class,
-					DbMultisigTransaction.class,
-					DbProvisionNamespaceTransaction.class,
-					DbMosaicDefinitionCreationTransaction.class,
+			final List<Class<? extends AbstractBlockTransfer>> expectedRegisteredClasses = Arrays.asList(DbTransferTransaction.class,
+					DbImportanceTransferTransaction.class, DbMultisigAggregateModificationTransaction.class, DbMultisigTransaction.class,
+					DbProvisionNamespaceTransaction.class, DbMosaicDefinitionCreationTransaction.class,
 					DbMosaicSupplyChangeTransaction.class);
 
 			// Act:
@@ -133,11 +118,10 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	//region SingleTransactionTest
 	@SuppressWarnings("rawtypes")
 	private static abstract class SingleTransactionTest<TDbModel extends AbstractBlockTransfer> {
 
-		//region full tests
+		// region full tests
 
 		@Test
 		public void getTransactionRetrieverGetsRetrieverOfCorrectType() {
@@ -149,29 +133,30 @@ public class TransactionRegistryTest {
 			MatcherAssert.assertThat(entry.getTransactionRetriever.get(), IsInstanceOf.instanceOf(this.getRetrieverType()));
 		}
 
-		//endregion
+		// endregion
 
-		//region abstract functions
+		// region abstract functions
 
 		protected abstract int getType();
 
 		protected abstract Class getRetrieverType();
 
-		//endregion
+		// endregion
 
-		//region helpers
+		// region helpers
 
 		@SuppressWarnings("unchecked")
 		protected TransactionRegistry.Entry<TDbModel, ?> getEntry() {
-			return (TransactionRegistry.Entry<TDbModel, ?>)TransactionRegistry.findByType(this.getType());
+			return (TransactionRegistry.Entry<TDbModel, ?>) TransactionRegistry.findByType(this.getType());
 		}
 
-		//endregion
+		// endregion
 	}
 
-	//endregion
 	@SuppressWarnings("rawtypes")
-	private static abstract class NonMultisigSingleTransactionTest<TDbModel extends AbstractBlockTransfer> extends SingleTransactionTest<TDbModel> {
+	private static abstract class NonMultisigSingleTransactionTest<TDbModel extends AbstractBlockTransfer>
+			extends
+				SingleTransactionTest<TDbModel> {
 
 		@Test
 		public void getTransactionCountReturnsOne() {
@@ -308,7 +293,9 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	public static class MultisigAggregateModificationTransactionTest extends NonMultisigSingleTransactionTest<DbMultisigAggregateModificationTransaction> {
+	public static class MultisigAggregateModificationTransactionTest
+			extends
+				NonMultisigSingleTransactionTest<DbMultisigAggregateModificationTransaction> {
 
 		@Override
 		protected int getType() {
@@ -407,7 +394,9 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	public static class MosaicDefinitionCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicDefinitionCreationTransaction> {
+	public static class MosaicDefinitionCreationTransactionTest
+			extends
+				NonMultisigSingleTransactionTest<DbMosaicDefinitionCreationTransaction> {
 
 		@Override
 		protected int getType() {
@@ -472,7 +461,8 @@ public class TransactionRegistryTest {
 			MatcherAssert.assertThat(accounts, IsEqual.equalTo(Arrays.asList(new DbAccount(2), new DbAccount(3))));
 		}
 
-		private DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount creator, final DbAccount sink, final DbAccount feeRecipient) {
+		private DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount creator, final DbAccount sink,
+				final DbAccount feeRecipient) {
 			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
 			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 			dbMosaicDefinition.setCreator(creator);

@@ -32,7 +32,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		return this.createPoxFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyDoesNotRecalculateImportancesForSameBlock() {
@@ -68,9 +68,9 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		MatcherAssert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
-	//endregion
+	// endregion
 
-	//region shallowCopyTo
+	// region shallowCopyTo
 
 	@Test
 	public void shallowCopyDoesNotRecalculateImportancesForSameBlock() {
@@ -107,16 +107,16 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		MatcherAssert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
-	//endregion
+	// endregion
 
-	//region recalculateImportances
+	// region recalculateImportances
 
 	/**
-	 * The grouping calculation is always based on the previous block height:
-	 * - GroupedHeight.fromHeight(359 * N + 1) == 359 * N
-	 * - GroupedHeight.fromHeight(359 * N) == 359 * (N - 1)
-	 * X == GroupedHeight.fromHeight(X) is only true when X == 1.
-	 * createAccountStatesForRecalculateTests creates account using GROUPING * X * 10,
+	 * The grouping calculation is always based on the previous block height:<br>
+	 * - GroupedHeight.fromHeight(359 * N + 1) == 359 * N<br>
+	 * - GroupedHeight.fromHeight(359 * N) == 359 * (N - 1)<br>
+	 * X == GroupedHeight.fromHeight(X) is only true when X == 1.<br>
+	 * createAccountStatesForRecalculateTests creates account using GROUPING * X * 10,<br>
 	 * which is equal to the grouped height of (GROUPING * X * 10 + 1).
 	 */
 
@@ -159,7 +159,8 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_20.prev()), argument.capture());
-		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2)));
+		MatcherAssert.assertThat(this.heightsAsList(argument.getValue()),
+				IsEquivalent.equivalentTo(Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2)));
 	}
 
 	@Test
@@ -257,15 +258,15 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 	}
 
 	private List<BlockHeight> heightsAsList(final Collection<AccountState> accountStates) {
-		return accountStates.stream()
-				.map(AccountState::getHeight)
-				.collect(Collectors.toList());
+		return accountStates.stream().map(AccountState::getHeight).collect(Collectors.toList());
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	private static ArgumentCaptor<Collection<AccountState>> createAccountStateCollectionArgumentCaptor() {
-		return ArgumentCaptor.forClass((Class)Collection.class);
+		return ArgumentCaptor.forClass((Class) Collection.class);
 	}
 
-	//endregion
+	// endregion
 }

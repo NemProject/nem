@@ -72,13 +72,13 @@ public class BlockDaoTest {
 			Utils.resetGlobals();
 		}
 
-		//region helpers
+		// region helpers
 
 		protected AccountDaoLookup prepareMapping(final Object... accounts) {
 			// Arrange:
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			for (final Object o : accounts) {
-				final Account a = (Account)o;
+				final Account a = (Account) o;
 				final Address address = a.getAddress();
 				final DbAccount dbA = new DbAccount(address);
 				mockAccountDao.addMapping(a, dbA);
@@ -88,21 +88,18 @@ public class BlockDaoTest {
 
 		protected org.nem.core.model.Block createTestEmptyBlock(final Account signer, final long height, final int i) {
 			final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getAddress().getPublicKey());
-			final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer,
-					Hash.ZERO,
-					generationHash,
-					new TimeInstant(123 + i),
-					new BlockHeight(height));
+			final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash,
+					new TimeInstant(123 + i), new BlockHeight(height));
 			emptyBlock.sign();
 			return emptyBlock;
 		}
 
-		//endregion
+		// endregion
 	}
 
 	public static class General extends Base {
 
-		//region save
+		// region save
 
 		@Test
 		public void savingBlockSavesAccounts() {
@@ -155,9 +152,7 @@ public class BlockDaoTest {
 			final int numBlocks = 3;
 			final List<DbBlock> blocks = new ArrayList<>();
 			for (int i = 2; i < 2 + numBlocks; i++) {
-				final Block dummyBlock = this.createBlockWithTransactions(
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final Block dummyBlock = this.createBlockWithTransactions(new TimeInstant(i * 123), new BlockHeight(i));
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
@@ -176,7 +171,7 @@ public class BlockDaoTest {
 			}
 		}
 
-		//endregion
+		// endregion
 
 		// region retrieve
 
@@ -259,7 +254,7 @@ public class BlockDaoTest {
 
 			// Assert:
 			// - 25 is expected because getBlocksForAccount returns both blocks harvested directly (15)
-			//   and blocks harvested remotely (15) up to the limit (25)
+			// and blocks harvested remotely (15) up to the limit (25)
 			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
 		}
 
@@ -321,9 +316,11 @@ public class BlockDaoTest {
 			assertCollectionContainsBlocksStartingAtHeight.accept(entities2, 456L + 28);
 			MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 		}
-		//endregion
 
-		//region delete/modify
+		// endregion
+
+		// region delete/modify
+
 		@Test
 		public void deleteBlockDoesNotRemoveAccounts() {
 			// Arrange:
@@ -346,9 +343,7 @@ public class BlockDaoTest {
 		@Test
 		public void deleteBlockRemovesTransactions() {
 			// Arrange:
-			final Collection<String> transactionTables = TestTransactionRegistry.stream()
-					.map(e -> e.tableName)
-					.filter(tn -> null != tn)
+			final Collection<String> transactionTables = TestTransactionRegistry.stream().map(e -> e.tableName).filter(tn -> null != tn)
 					.collect(Collectors.toList());
 
 			// Assert: preconditions
@@ -382,14 +377,8 @@ public class BlockDaoTest {
 		public void deleteBlockRemovesEntriesFromNonTransactionTables() {
 			// Assert: preconditions
 			final String[] nonTransactionTables = {
-					"MultisigSends",
-					"MultisigReceives",
-					"MultisigModifications",
-					"MinCosignatoriesModifications",
-					"Namespaces",
-					"MosaicDefinitions",
-					"MosaicProperties",
-					"TransferredMosaics"
+					"MultisigSends", "MultisigReceives", "MultisigModifications", "MinCosignatoriesModifications", "Namespaces",
+					"MosaicDefinitions", "MosaicProperties", "TransferredMosaics"
 			};
 
 			for (final String table : nonTransactionTables) {
@@ -403,7 +392,8 @@ public class BlockDaoTest {
 			final Account cosignatoryToAdd = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, cosignatoryToAdd);
 			final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
-			block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
+			block.addTransaction(
+					this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
 			block.addTransaction(sign(RandomTransactionFactory.createMosaicDefinitionCreationTransaction()));
 			block.addTransaction(sign(this.prepareTransferTransactionWithAttachment()));
@@ -425,18 +415,18 @@ public class BlockDaoTest {
 
 		private long getScanCount(final String tableName) {
 			final Session session = this.sessionFactory.openSession();
-			final Long count = (Long)session.createSQLQuery("SELECT COUNT(*) as count FROM " + tableName)
-					.addScalar("count", LongType.INSTANCE)
-					.uniqueResult();
+			final Long count = (Long) session.createSQLQuery("SELECT COUNT(*) as count FROM " + tableName)
+					.addScalar("count", LongType.INSTANCE).uniqueResult();
 			session.flush();
 			session.clear();
 			session.close();
 			return count;
 		}
 
-		//endregion
+		// endregion
 
-		//region getters
+		// region getters
+
 		@Test
 		public void getHashesFromReturnsProperHashes() {
 			// Arrange:
@@ -685,9 +675,9 @@ public class BlockDaoTest {
 			}
 		}
 
-		//endregion
+		// endregion
 
-		//mosaicIdCache
+		// mosaicIdCache
 
 		@Test
 		public void saveBlockUpdatesMosaicIdCache() {
@@ -767,9 +757,9 @@ public class BlockDaoTest {
 			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 		}
 
-		//endregion
+		// endregion
 
-		//region helpers
+		// region helpers
 
 		private static Transaction sign(final Transaction transaction) {
 			transaction.sign();
@@ -786,32 +776,19 @@ public class BlockDaoTest {
 			return RandomTransactionFactory.createTransferWithAttachment(attachment);
 		}
 
-		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(
-				final Account issuer,
-				final Account multisig,
-				final Account cosignatory,
-				final Account cosignatoryToAdd) {
+		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(final Account issuer, final Account multisig,
+				final Account cosignatory, final Account cosignatoryToAdd) {
 			final MultisigCosignatoryModification cosignatoryModification = new MultisigCosignatoryModification(
-					MultisigModificationType.AddCosignatory,
-					cosignatoryToAdd);
-			final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					Collections.singletonList(cosignatoryModification),
-					new MultisigMinCosignatoriesModification(1));
+					MultisigModificationType.AddCosignatory, cosignatoryToAdd);
+			final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO,
+					multisig, Collections.singletonList(cosignatoryModification), new MultisigMinCosignatoriesModification(1));
 			return this.prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
 		}
 
-		private MultisigTransaction prepareMultisigTransaction(
-				final Transaction transaction,
-				final Account issuer,
-				final Account multisig,
+		private MultisigTransaction prepareMultisigTransaction(final Transaction transaction, final Account issuer, final Account multisig,
 				final Account cosignatory) {
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					cosignatory,
-					multisig,
-					transaction);
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosignatory,
+					multisig, transaction);
 			signatureTransaction.sign();
 			final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 			multisigTransaction.sign();
@@ -826,12 +803,8 @@ public class BlockDaoTest {
 			this.addMapping(mockAccountDao, sender);
 
 			for (int i = startHeight; i <= endHeight; i++) {
-				final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
-						sender,
-						Hash.ZERO,
-						Hash.ZERO,
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(sender, Hash.ZERO, Hash.ZERO,
+						new TimeInstant(i * 123), new BlockHeight(i));
 				final Account recipient = Utils.generateRandomAccount();
 				this.addMapping(mockAccountDao, recipient);
 				dummyBlock.sign();
@@ -882,9 +855,7 @@ public class BlockDaoTest {
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 			for (int i = startHeight; i <= endHeight; i++) {
-				final Block dummyBlock = this.createBlockWithTransactions(
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final Block dummyBlock = this.createBlockWithTransactions(new TimeInstant(i * 123), new BlockHeight(i));
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
@@ -901,7 +872,7 @@ public class BlockDaoTest {
 			mockAccountDao.addMapping(account);
 		}
 
-		//endregion
+		// endregion
 	}
 
 	@RunWith(Parameterized.class)
@@ -930,19 +901,15 @@ public class BlockDaoTest {
 			return ParameterizedUtils.wrap(TransactionTypes.getMultisigEmbeddableTypes());
 		}
 
-		//region assertSavingBlockSavesTransaction
+		// region assertSavingBlockSavesTransaction
 
 		@Test
 		public void savingBlockSavesTransactions() {
 			// Assert:
-			this.assertSavingBlockSavesTransaction(
-					this.entry.type,
-					this::prepareTransaction);
+			this.assertSavingBlockSavesTransaction(this.entry.type, this::prepareTransaction);
 		}
 
-		private void assertSavingBlockSavesTransaction(
-				final int transactionType,
-				final Supplier<Transaction> createTransaction) {
+		private void assertSavingBlockSavesTransaction(final int transactionType, final Supplier<Transaction> createTransaction) {
 			// Arrange:
 			final Transaction transaction = createTransaction.get();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(transaction.getAccounts().toArray());
@@ -977,31 +944,24 @@ public class BlockDaoTest {
 			MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(1));
 		}
 
-		//endregion
+		// endregion
 
-		//region assertSavingBlockDoesNotChangeTransferBlockIndex
+		// region assertSavingBlockDoesNotChangeTransferBlockIndex
 
 		@Test
 		public void savingDoesNotChangeTransferBlockIndex() {
 			// Assert:
-			this.assertSavingBlockDoesNotChangeTransferBlockIndex(
-					this.entry.getFromBlock::apply,
-					this::prepareTransaction,
-					false);
+			this.assertSavingBlockDoesNotChangeTransferBlockIndex(this.entry.getFromBlock::apply, this::prepareTransaction, false);
 		}
 
 		@Test
 		public void reloadAfterSavingDoesNotChangeTransferBlockIndex() {
 			// Assert:
-			this.assertSavingBlockDoesNotChangeTransferBlockIndex(
-					this.entry.getFromBlock::apply,
-					this::prepareTransaction,
-					true);
+			this.assertSavingBlockDoesNotChangeTransferBlockIndex(this.entry.getFromBlock::apply, this::prepareTransaction, true);
 		}
 
 		private void assertSavingBlockDoesNotChangeTransferBlockIndex(
-				final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
-				final Supplier<Transaction> createTransaction,
+				final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers, final Supplier<Transaction> createTransaction,
 				final boolean reload) {
 			// Arrange:
 			final Transaction transfer1 = createTransaction.get();
@@ -1041,7 +1001,7 @@ public class BlockDaoTest {
 			MatcherAssert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
 		}
 
-		//endregion
+		// endregion
 
 		private Transaction prepareTransaction() {
 			final Transaction transaction = this.createModel.get();

@@ -44,11 +44,11 @@ public class NamespaceRawToDbModelMappingTest {
 
 		private Object[] createRaw() {
 			final Object[] raw = new Object[5];
-			raw[0] = BigInteger.valueOf(123L);           // id
-			raw[1] = "foo.bar";                          // full name
-			raw[2] = BigInteger.valueOf(this.ownerId);   // owner id
-			raw[3] = BigInteger.valueOf(321L);           // expiry height
-			raw[4] = 2;                                  // level
+			raw[0] = BigInteger.valueOf(123L); // id
+			raw[1] = "foo.bar"; // full name
+			raw[2] = BigInteger.valueOf(this.ownerId); // owner id
+			raw[3] = BigInteger.valueOf(321L); // expiry height
+			raw[4] = 2; // level
 
 			return raw;
 		}

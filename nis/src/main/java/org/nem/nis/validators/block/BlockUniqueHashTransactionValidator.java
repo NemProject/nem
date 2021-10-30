@@ -29,9 +29,7 @@ public class BlockUniqueHashTransactionValidator implements BlockValidator {
 			return ValidationResult.SUCCESS;
 		}
 
-		final List<Hash> hashes = block.getTransactions().stream()
-				.map(HashUtils::calculateHash)
-				.collect(Collectors.toList());
+		final List<Hash> hashes = block.getTransactions().stream().map(HashUtils::calculateHash).collect(Collectors.toList());
 		return this.transactionHashCache.anyHashExists(hashes) ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 	}
 }

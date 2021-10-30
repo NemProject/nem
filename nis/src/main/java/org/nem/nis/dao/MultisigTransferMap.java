@@ -8,8 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Helper class used by the block loader that contains maps of ids to (inner)
- * multisig transactions.
+ * Helper class used by the block loader that contains maps of ids to (inner) multisig transactions.
  */
 @SuppressWarnings("rawtypes")
 public class MultisigTransferMap {
@@ -19,8 +18,7 @@ public class MultisigTransferMap {
 	 * Creates a transfer id map.
 	 */
 	public MultisigTransferMap() {
-		this.typeEntryMap = TransactionRegistry.stream()
-				.filter(e -> TransactionTypes.getMultisigEmbeddableTypes().contains(e.type))
+		this.typeEntryMap = TransactionRegistry.stream().filter(e -> TransactionTypes.getMultisigEmbeddableTypes().contains(e.type))
 				.collect(Collectors.toMap(e -> e.type, e -> new Entry(e.type)));
 	}
 

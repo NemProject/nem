@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class LocalHostDetectorTest {
 
-	//region default local address detection
+	// region default local address detection
 
 	@Test
 	public void localhostIsDetectedAsLocal() {
@@ -38,14 +38,16 @@ public class LocalHostDetectorTest {
 		assertAddressIsLocal("0:0:0:0:0:0:0:10", false);
 	}
 
-	//endregion
+	// endregion
 
-	//region custom local address support
+	// region custom local address support
 
 	@Test
 	public void detectorCanBeCreatedWithHostNames() {
 		// Arrange:
-		final LocalHostDetector detector = new LocalHostDetector(new String[] { "bob.nem.ninja" });
+		final LocalHostDetector detector = new LocalHostDetector(new String[]{
+				"bob.nem.ninja"
+		});
 
 		// Assert:
 		assertAddressIsLocal(detector, "bob.nem.ninja", true);
@@ -55,7 +57,9 @@ public class LocalHostDetectorTest {
 	@Test
 	public void detectorCanBeCreatedWithAdditionalLocalIpAddresses() {
 		// Arrange:
-		final LocalHostDetector detector = new LocalHostDetector(new String[] { "194.66.82.11", "0:0:0:0:0:0:0:10" });
+		final LocalHostDetector detector = new LocalHostDetector(new String[]{
+				"194.66.82.11", "0:0:0:0:0:0:0:10"
+		});
 
 		// Assert:
 		assertAddressIsLocal(detector, "194.66.82.11", true);
@@ -66,7 +70,9 @@ public class LocalHostDetectorTest {
 	@Test
 	public void detectorCanBeCreatedWithAdditionalLocalIpv4WildcardAddresses() {
 		// Arrange:
-		final LocalHostDetector detector = new LocalHostDetector(new String[] { "194.*.82.11", "*.12.82.*" });
+		final LocalHostDetector detector = new LocalHostDetector(new String[]{
+				"194.*.82.11", "*.12.82.*"
+		});
 
 		// Assert:
 		assertAddressIsLocal(detector, "194.66.82.11", true);
@@ -83,7 +89,9 @@ public class LocalHostDetectorTest {
 	@Test
 	public void detectorCanBeCreatedWithAdditionalLocalIpv6WildcardAddresses() {
 		// Arrange:
-		final LocalHostDetector detector = new LocalHostDetector(new String[] { "*:0:0:0:0:0:0:10", "0:0:0:0:0:*:*:10" });
+		final LocalHostDetector detector = new LocalHostDetector(new String[]{
+				"*:0:0:0:0:0:0:10", "0:0:0:0:0:*:*:10"
+		});
 
 		// Assert:
 		assertAddressIsLocal(detector, "11:0:0:0:0:0:0:10", true);
@@ -107,7 +115,7 @@ public class LocalHostDetectorTest {
 		assertInvalidAddress("*"); // invalid wildcard
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertAddressIsLocal(final String remoteAddress, final boolean isLocal) {
 		// Assert:
@@ -128,8 +136,8 @@ public class LocalHostDetectorTest {
 
 	private static void assertInvalidAddress(final String address) {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new LocalHostDetector(new String[] { address }),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new LocalHostDetector(new String[]{
+				address
+		}), IllegalArgumentException.class);
 	}
 }

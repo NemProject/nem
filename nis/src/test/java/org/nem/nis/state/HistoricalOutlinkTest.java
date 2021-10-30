@@ -19,7 +19,8 @@ public class HistoricalOutlinkTest {
 		MatcherAssert.assertThat(historicalOutlink.size(), IsEqual.equalTo(0));
 	}
 
-	//region add
+	// region add
+
 	@Test
 	public void canAddOutlinkToHistoricalOutlink() {
 		// Arrange:
@@ -48,9 +49,11 @@ public class HistoricalOutlinkTest {
 		MatcherAssert.assertThat(historicalOutlink.getHeight(), IsEqual.equalTo(blockHeight));
 		MatcherAssert.assertThat(historicalOutlink.size(), IsEqual.equalTo(2));
 	}
-	//endregion
 
-	//region remove
+	// endregion
+
+	// region remove
+
 	@Test
 	public void canRemoveAddedOutlinksToHistoricalOutlink() {
 		// Arrange:
@@ -103,9 +106,10 @@ public class HistoricalOutlinkTest {
 		MatcherAssert.assertThat(historicalOutlink.getHeight(), IsEqual.equalTo(blockHeight));
 		MatcherAssert.assertThat(historicalOutlink.size(), IsEqual.equalTo(0));
 	}
-	//endregion
 
-	//region copy
+	// endregion
+
+	// region copy
 
 	@Test
 	public void copyCopiesHeightAndOutlinks() {
@@ -142,5 +146,5 @@ public class HistoricalOutlinkTest {
 		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(3));
 	}
 
-	//endregion
+	// endregion
 }

@@ -37,17 +37,10 @@ public class TransactionController {
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
-	TransactionController(
-			final AccountLookup accountLookup,
-			final PushService pushService,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
-			final SingleTransactionValidator validator,
-			final NisPeerNetworkHost host,
-			final ValidationState validationState,
-			final Supplier<BlockHeight> blockHeightSupplier,
-			final TransactionIo transactionIo,
-			final ReadOnlyHashCache transactionHashCache,
-			final NisConfiguration nisConfiguration) {
+	TransactionController(final AccountLookup accountLookup, final PushService pushService,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions, final SingleTransactionValidator validator,
+			final NisPeerNetworkHost host, final ValidationState validationState, final Supplier<BlockHeight> blockHeightSupplier,
+			final TransactionIo transactionIo, final ReadOnlyHashCache transactionHashCache, final NisConfiguration nisConfiguration) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
@@ -61,8 +54,7 @@ public class TransactionController {
 	}
 
 	/**
-	 * A request for NIS to serialize unsigned transaction data into binary for signing by the client.
-	 * <br>
+	 * A request for NIS to serialize unsigned transaction data into binary for signing by the client. <br>
 	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client.
 	 *
 	 * @param deserializer The deserializer that is expected to contain transaction data.
@@ -76,10 +68,7 @@ public class TransactionController {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
 		final BlockHeight currentHeight = this.blockHeightSupplier.get();
-		final ValidationContext context = new ValidationContext(
-				currentHeight.next(),
-				currentHeight,
-				this.validationState);
+		final ValidationContext context = new ValidationContext(currentHeight.next(), currentHeight, this.validationState);
 
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
@@ -91,10 +80,9 @@ public class TransactionController {
 	}
 
 	/**
-	 * A request for NIS to sign unsigned transaction data and announce it given a private key.
-	 * <br>
-	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client
-	 * (not to mention it exposes the private key).
+	 * A request for NIS to sign unsigned transaction data and announce it given a private key. <br>
+	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client (not to mention it exposes the private
+	 * key).
 	 *
 	 * @param request The request, which contains the transaction data and a private key.
 	 * @return The result of the operation.
@@ -127,7 +115,7 @@ public class TransactionController {
 		final ValidationResult result = this.pushService.pushTransaction(transaction, null);
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		final Hash innerTransactionHash = TransactionTypes.MULTISIG == transaction.getType()
-				? ((MultisigTransaction)transaction).getOtherTransactionHash()
+				? ((MultisigTransaction) transaction).getOtherTransactionHash()
 				: null;
 
 		return new NemAnnounceResult(result, transactionHash, innerTransactionHash);
@@ -142,7 +130,8 @@ public class TransactionController {
 	@RequestMapping(value = "/transactions/unconfirmed", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final AuthenticatedUnconfirmedTransactionsRequest request) {
+	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(
+			@RequestBody final AuthenticatedUnconfirmedTransactionsRequest request) {
 		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions(request.getEntity()));
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), request.getChallenge());

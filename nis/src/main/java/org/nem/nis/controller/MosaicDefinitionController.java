@@ -27,16 +27,14 @@ public class MosaicDefinitionController {
 	private final MosaicInfoFactory mosaicInfoFactory;
 
 	@Autowired(required = true)
-	MosaicDefinitionController(
-			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
-			final NisDbModelToModelMapper mapper,
+	MosaicDefinitionController(final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao, final NisDbModelToModelMapper mapper,
 			final MosaicInfoFactory mosaicInfoFactory) {
 		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.mapper = mapper;
 		this.mosaicInfoFactory = mosaicInfoFactory;
 	}
 
-	//region getMosaicDefinition
+	// region getMosaicDefinition
 
 	/**
 	 * Gets the mosaic definition for a given mosaic id.
@@ -65,9 +63,9 @@ public class MosaicDefinitionController {
 		return this.map(dbMosaicDefinition);
 	}
 
-	//endregion
+	// endregion
 
-	//region getMosaicDefinitions
+	// region getMosaicDefinitions
 
 	/**
 	 * Gets all known mosaic definitions.
@@ -80,14 +78,13 @@ public class MosaicDefinitionController {
 	public SerializableList<MosaicDefinitionMetaDataPair> getMosaicDefinitions(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
 		final Collection<MosaicDefinitionMetaDataPair> pairs = recursivelyGetMosaicDefinitions(
-				this.mosaicDefinitionDao::getMosaicDefinitions,
-				page);
+				this.mosaicDefinitionDao::getMosaicDefinitions, page);
 		return new SerializableList<>(pairs);
 	}
 
-	//endregion
+	// endregion
 
-	//region getNamespaceMosaicDefinitions
+	// region getNamespaceMosaicDefinitions
 
 	/**
 	 * Gets all known mosaic definitions for a namespace.
@@ -98,8 +95,7 @@ public class MosaicDefinitionController {
 	 */
 	@RequestMapping(value = "/namespace/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(
-			final NamespaceIdBuilder idBuilder,
+	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(final NamespaceIdBuilder idBuilder,
 			final DefaultPageBuilder pageBuilder) {
 		final NamespaceId namespaceId = idBuilder.build();
 		if (!this.mosaicInfoFactory.isNamespaceActive(namespaceId)) {
@@ -107,19 +103,16 @@ public class MosaicDefinitionController {
 		}
 
 		final DefaultPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(
-				idBuilder.build(),
-				page.getId(),
-				page.getPageSize());
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao
+				.getMosaicDefinitionsForNamespace(idBuilder.build(), page.getId(), page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(md -> new MosaicDefinitionMetaDataPair(this.map(md), new DefaultMetaData(md.getId())))
-				.collect(Collectors.toList());
+				.map(md -> new MosaicDefinitionMetaDataPair(this.map(md), new DefaultMetaData(md.getId()))).collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
 
-	//endregion
+	// endregion
 
-	//region accountMosaicDefinitions
+	// region accountMosaicDefinitions
 
 	/**
 	 * Gets information about an account's mosaic definitions.
@@ -130,32 +123,29 @@ public class MosaicDefinitionController {
 	 */
 	@RequestMapping(value = "/account/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
-			final AccountNamespaceBuilder idBuilder,
+	public SerializableList<MosaicDefinition> accountMosaicDefinitions(final AccountNamespaceBuilder idBuilder,
 			final DefaultPageBuilder pageBuilder) {
 		final AccountNamespace accountNamespace = idBuilder.build();
 		final DefaultPage page = pageBuilder.build();
 		final BiFunction<Long, Integer, Collection<DbMosaicDefinition>> retriever = (id, pageSize) -> {
-			return this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-					accountNamespace.getAddress(),
-					accountNamespace.getParent(),
-					id,
+			return this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(accountNamespace.getAddress(), accountNamespace.getParent(), id,
 					pageSize);
 		};
 		final Collection<MosaicDefinitionMetaDataPair> pairs = recursivelyGetMosaicDefinitions(retriever, page);
 		return new SerializableList<>(pairs.stream().map(MosaicDefinitionMetaDataPair::getEntity).collect(Collectors.toList()));
 	}
 
-	//endregion
+	// endregion
 
 	private MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
 		return this.mapper.map(dbMosaicDefinition, MosaicDefinition.class);
 	}
 
 	private Collection<MosaicDefinitionMetaDataPair> recursivelyGetMosaicDefinitions(
-			final BiFunction<Long, Integer, Collection<DbMosaicDefinition>> retriever,
-			final DefaultPage page) {
-		Long[] curDbId = { page.getId() };
+			final BiFunction<Long, Integer, Collection<DbMosaicDefinition>> retriever, final DefaultPage page) {
+		Long[] curDbId = {
+				page.getId()
+		};
 		final Collection<MosaicDefinitionMetaDataPair> pairs = new ArrayList<>();
 		while (pairs.size() < page.getPageSize()) {
 			final Collection<DbMosaicDefinition> dbMosaicDefinitions = retriever.apply(curDbId[0], page.getPageSize());
@@ -163,11 +153,8 @@ public class MosaicDefinitionController {
 				break;
 			}
 
-			dbMosaicDefinitions.stream()
-					.map(dbMosaicDefinition -> new MosaicDefinitionMetaDataPair(
-							this.map(dbMosaicDefinition),
-							new DefaultMetaData(dbMosaicDefinition.getId())))
-					.forEach(pair -> {
+			dbMosaicDefinitions.stream().map(dbMosaicDefinition -> new MosaicDefinitionMetaDataPair(this.map(dbMosaicDefinition),
+					new DefaultMetaData(dbMosaicDefinition.getId()))).forEach(pair -> {
 						curDbId[0] = pair.getMetaData().getId();
 						final NamespaceId namespaceId = pair.getEntity().getId().getNamespaceId();
 						boolean test = this.mosaicInfoFactory.isNamespaceActive(namespaceId);

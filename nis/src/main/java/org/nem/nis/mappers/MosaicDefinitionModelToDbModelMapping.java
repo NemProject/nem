@@ -24,8 +24,7 @@ public class MosaicDefinitionModelToDbModelMapping implements IMapping<MosaicDef
 	@Override
 	public DbMosaicDefinition map(final MosaicDefinition mosaicDefinition) {
 		final Set<DbMosaicProperty> mosaicProperties = mosaicDefinition.getProperties().asCollection().stream()
-				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
-				.collect(Collectors.toSet());
+				.map(p -> this.mapper.map(p, DbMosaicProperty.class)).collect(Collectors.toSet());
 
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		mosaicProperties.forEach(p -> p.setMosaicDefinition(dbMosaicDefinition));
@@ -39,7 +38,7 @@ public class MosaicDefinitionModelToDbModelMapping implements IMapping<MosaicDef
 			final MosaicLevy levy = mosaicDefinition.getMosaicLevy();
 
 			// note: the mosaic id could be equal to the fee mosaic id (referencing itself as fee).
-			//       in this case there is no db mosaic id available in the cache yet. We use -1 to indicate this.
+			// in this case there is no db mosaic id available in the cache yet. We use -1 to indicate this.
 			final DbMosaicId dbMosaicId = mosaicDefinition.getId().equals(levy.getMosaicId())
 					? new DbMosaicId(-1L)
 					: this.mapper.map(levy.getMosaicId(), DbMosaicId.class);

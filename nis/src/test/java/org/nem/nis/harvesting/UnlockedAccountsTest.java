@@ -81,7 +81,8 @@ public class UnlockedAccountsTest {
 	public void cannotUnlockBlockedHarvestingAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = new Account(new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2")));
+		final Account account = new Account(
+				new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2")));
 		context.setKnownAddress(account, true);
 		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, true);
 
@@ -94,9 +95,9 @@ public class UnlockedAccountsTest {
 		MatcherAssert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeUnlockedAccount
+	// region removeUnlockedAccount
 
 	@Test
 	public void canLockUnlockedAccount() {
@@ -133,9 +134,10 @@ public class UnlockedAccountsTest {
 		MatcherAssert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region iterator
+	// region iterator
+
 	@Test
 	public void canIterateOverAllUnlockedAccounts() {
 		// Arrange:
@@ -150,14 +152,13 @@ public class UnlockedAccountsTest {
 
 		// Assert:
 		MatcherAssert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(2));
-		MatcherAssert.assertThat(
-				StreamSupport.stream(context.unlockedAccounts.spliterator(), false).collect(Collectors.toList()),
+		MatcherAssert.assertThat(StreamSupport.stream(context.unlockedAccounts.spliterator(), false).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(Arrays.asList(accounts.get(0), accounts.get(2))));
 	}
 
-	//endregion
+	// endregion
 
-	//region unlockedLimit
+	// region unlockedLimit
 
 	@Test
 	public void canUnlockExactlyMaxUnlockedAccounts() {
@@ -217,9 +218,9 @@ public class UnlockedAccountsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region maxSize
+	// region maxSize
 
 	@Test
 	public void maxSizeIsEqualToMaxUnlockedAccounts() {
@@ -233,9 +234,9 @@ public class UnlockedAccountsTest {
 		MatcherAssert.assertThat(maxSize, IsEqual.equalTo(MAX_UNLOCKED_ACCOUNTS));
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void pruneRemovesNoAccountIfAllAccountsAreEligibleToHarvest() {
@@ -308,19 +309,15 @@ public class UnlockedAccountsTest {
 		assertPruning(10);
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final CanHarvestPredicate canHarvestPredicate = Mockito.mock(CanHarvestPredicate.class);
-		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(
-				this.accountLookup,
-				this.accountStateCache,
-				this.lastBlockLayer,
-				this.canHarvestPredicate,
-				MAX_UNLOCKED_ACCOUNTS);
+		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(this.accountLookup, this.accountStateCache,
+				this.lastBlockLayer, this.canHarvestPredicate, MAX_UNLOCKED_ACCOUNTS);
 
 		private void setKnownAddress(final Account account, final boolean isKnown) {
 			Mockito.when(this.accountLookup.isKnownAddress(account.getAddress())).thenReturn(isKnown);

@@ -57,13 +57,11 @@ public class TSingleTransactionValidatorAdapterTest {
 		@SuppressWarnings("unchecked")
 		private final TSingleTransactionValidator<TransferTransaction> innerValidator = Mockito.mock(TSingleTransactionValidator.class);
 
-		private final SingleTransactionValidator validator = new TSingleTransactionValidatorAdapter<>(
-				TransactionTypes.TRANSFER,
+		private final SingleTransactionValidator validator = new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER,
 				this.innerValidator);
 
 		public TestContext() {
-			Mockito.when(this.innerValidator.validate(Mockito.any(), Mockito.any()))
-					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
+			Mockito.when(this.innerValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 
 		public ValidationResult validate(final Transaction transaction) {

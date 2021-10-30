@@ -53,7 +53,7 @@ public class BlockScorer {
 	public BigInteger calculateHit(final Block block) {
 		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
 		final double tmp = Math.abs(Math.log(val.doubleValue() / TWO_TO_THE_POWER_OF_256));
-		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
+		val = BigInteger.valueOf((long) (TWO_TO_THE_POWER_OF_54 * tmp));
 		return val;
 	}
 
@@ -71,20 +71,18 @@ public class BlockScorer {
 		}
 
 		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
-		return BigInteger.valueOf(timeStampDifference)
-				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
-				.multiply(this.getMultiplierAt(timeStampDifference))
-				.divide(block.getDifficulty().asBigInteger());
+		return BigInteger.valueOf(timeStampDifference).multiply(BigInteger.valueOf(harvesterEffectiveImportance))
+				.multiply(this.getMultiplierAt(timeStampDifference)).divide(block.getDifficulty().asBigInteger());
 	}
 
 	// TODO 20150928 J-B: should add tests for this (1. STABLIZE enabled; 2. non-default generation target time)
 	private BigInteger getMultiplierAt(final int timeDiff) {
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double targetTime = (double) configuration.getBlockGenerationTargetTime();
 		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
 				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
 				: 1.0;
-		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
+		return BigInteger.valueOf((long) (BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	/**
@@ -99,9 +97,8 @@ public class BlockScorer {
 		final long multiplier = nemesisAmount.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
-				.findForwardedStateByAddress(signerAddress, block.getHeight())
-				.getImportanceInfo();
-		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);
+				.findForwardedStateByAddress(signerAddress, block.getHeight()).getImportanceInfo();
+		return (long) (accountImportance.getImportance(groupedHeight) * multiplier);
 	}
 
 	/**

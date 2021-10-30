@@ -11,7 +11,7 @@ import java.util.*;
 
 public class MosaicBalancesTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void mapIsInitiallyEmpty() {
@@ -22,9 +22,9 @@ public class MosaicBalancesTest {
 		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region get
+	// region get
 
 	@Test
 	public void getReturnsZeroForUnknownAddress() {
@@ -54,9 +54,9 @@ public class MosaicBalancesTest {
 		MatcherAssert.assertThat(quantity, IsEqual.equalTo(new Quantity(221)));
 	}
 
-	//endregion
+	// endregion
 
-	//region getOwners
+	// region getOwners
 
 	@Test
 	public void getOwnersReturnsEmptyCollectionIfMosaicHasNoOwners() {
@@ -88,9 +88,9 @@ public class MosaicBalancesTest {
 		MatcherAssert.assertThat(owners, IsEquivalent.equivalentTo(expectedOwners));
 	}
 
-	//endregion
+	// endregion
 
-	//region add
+	// region add
 
 	@Test
 	public void canIncrementBalanceForSingleAccount() {
@@ -157,9 +157,9 @@ public class MosaicBalancesTest {
 		MatcherAssert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
 	}
 
-	//endregion
+	// endregion
 
-	//region decrementBalance
+	// region decrementBalance
 
 	@Test
 	public void canDecrementBalanceToNonZero() {
@@ -202,18 +202,16 @@ public class MosaicBalancesTest {
 
 		// Act:
 		balances.incrementBalance(address, new Quantity(221));
-		ExceptionAssert.assertThrows(
-				v -> balances.decrementBalance(address, new Quantity(222)),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> balances.decrementBalance(address, new Quantity(222)), IllegalArgumentException.class);
 
 		// Assert:
 		MatcherAssert.assertThat(balances.size(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(balances.getBalance(address), IsEqual.equalTo(new Quantity(221)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void canCreateBalancesCopy() {
@@ -236,5 +234,5 @@ public class MosaicBalancesTest {
 		MatcherAssert.assertThat(copy.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
 	}
 
-	//endregion
+	// endregion
 }

@@ -46,8 +46,7 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 			return;
 		}
 
-		accountStates = accountStates.stream()
-				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
+		accountStates = accountStates.stream().filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
 				.collect(Collectors.toList());
 
 		this.lastVectorSize = accountStates.size();
@@ -57,8 +56,7 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 
 	private static boolean shouldIncludeInImportanceCalculation(final AccountState accountState, final BlockHeight blockHeight) {
 		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
-		return null != accountState.getHeight()
-				&& accountState.getHeight().compareTo(blockHeight) <= 0
+		return null != accountState.getHeight() && accountState.getHeight().compareTo(blockHeight) <= 0
 				&& !accountState.getAddress().equals(nemesisAddress);
 	}
 

@@ -12,7 +12,7 @@ import java.util.stream.*;
 
 public class NodeNeighborsTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateEmptyNodeNeighbors() {
@@ -38,9 +38,9 @@ public class NodeNeighborsTest {
 		new NodeNeighbors(NisUtils.toNodeIdArray(2, 12, 3));
 	}
 
-	//endregion
+	// endregion
 
-	//region addNeighbor
+	// region addNeighbor
 
 	@Test
 	public void canAddNeighborsInAscendingNodeIdOrder() {
@@ -65,9 +65,9 @@ public class NodeNeighborsTest {
 		neighbors.addNeighbor(new NodeId(3));
 	}
 
-	//endregion
+	// endregion
 
-	//region size
+	// region size
 
 	@Test
 	public void sizeReturnsTotalNumberOfNeighbors() {
@@ -78,9 +78,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(neighbors.size(), IsEqual.equalTo(3));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeAll
+	// region removeAll
 
 	@Test
 	public void canRemoveAllNeighbors() {
@@ -108,9 +108,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(neighbors.toList(), IsEqual.equalTo(NisUtils.toNodeIdList(0, 7)));
 	}
 
-	//endregion
+	// endregion
 
-	//region contains
+	// region contains
 
 	@Test
 	public void containsReturnsTrueIfNodeIdIsContained() {
@@ -134,9 +134,9 @@ public class NodeNeighborsTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region commonNeighborsSize
+	// region commonNeighborsSize
 
 	@Test
 	public void commonNeighborsSizeReturnsNumberOfNeighborsCommonToTwoNeighborhoods() {
@@ -149,9 +149,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(otherNeighbors.commonNeighborsSize(neighbors), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region union
+	// region union
 
 	@Test
 	public void unionCanBeCalledWithZeroNodeNeighbors() {
@@ -190,9 +190,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(NisUtils.createNeighbors(1, 2, 3, 6, 11, 29, 30)));
 	}
 
-	//endregion
+	// endregion
 
-	//region difference
+	// region difference
 
 	@Test
 	public void differenceWithOtherNodeNeighborsReturnsCorrectResult() {
@@ -205,9 +205,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(otherNeighbors.difference(neighbors), IsEqual.equalTo(NisUtils.createNeighbors(11)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toList
+	// region toList
 
 	@Test
 	public void toListReturnsListOfNodeIds() {
@@ -221,9 +221,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(NisUtils.toNodeIdList(2, 3, 6)));
 	}
 
-	//endregion
+	// endregion
 
-	//region iterator
+	// region iterator
 
 	@Test
 	public void iteratorHasNextReturnsTrueIfMoreNodeIdsAreAvailable() {
@@ -272,14 +272,14 @@ public class NodeNeighborsTest {
 		final NodeNeighbors neighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				StreamSupport.stream(neighbors.spliterator(), false).collect(Collectors.toList()),
+		MatcherAssert.assertThat(StreamSupport.stream(neighbors.spliterator(), false).collect(Collectors.toList()),
 				IsEqual.equalTo(NisUtils.toNodeIdList(2, 3, 6)));
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode/equals
+	// region hashCode/equals
+
 	@SuppressWarnings("serial")
 	private static final Map<String, NodeNeighbors> DESC_TO_NEIGHBORS_MAP = new HashMap<String, NodeNeighbors>() {
 		{
@@ -303,7 +303,7 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(DESC_TO_NEIGHBORS_MAP.get("diff-more-member-ids"), IsNot.not(IsEqual.equalTo(neighbors)));
 		MatcherAssert.assertThat(DESC_TO_NEIGHBORS_MAP.get("diff-empty"), IsNot.not(IsEqual.equalTo(neighbors)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(neighbors)));
-		MatcherAssert.assertThat(NisUtils.toNodeIdList(2, 3, 6), IsNot.not(IsEqual.equalTo((Object)neighbors)));
+		MatcherAssert.assertThat(NisUtils.toNodeIdList(2, 3, 6), IsNot.not(IsEqual.equalTo((Object) neighbors)));
 	}
 
 	@Test
@@ -320,9 +320,9 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(DESC_TO_NEIGHBORS_MAP.get("diff-empty").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsCorrectRepresentation() {
@@ -333,5 +333,5 @@ public class NodeNeighborsTest {
 		MatcherAssert.assertThat(neighbors.toString(), IsEqual.equalTo("{2,3,6}"));
 	}
 
-	//endregion
+	// endregion
 }

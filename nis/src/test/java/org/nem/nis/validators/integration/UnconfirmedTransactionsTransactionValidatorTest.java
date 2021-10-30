@@ -14,19 +14,12 @@ import java.util.*;
 public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTransactionValidationTest {
 
 	@Override
-	protected void assertTransactions(
-			final BlockHeight chainHeight,
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			List<Transaction> expectedFiltered,
-			final ValidationResult expectedResult) {
+	protected void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
+			List<Transaction> expectedFiltered, final ValidationResult expectedResult) {
 		// Arrange:
-		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
-				NisUtils.createTransactionValidatorFactory(),
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(),
 				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> chainHeight,
-				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);

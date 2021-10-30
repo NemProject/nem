@@ -7,7 +7,7 @@ import org.nem.core.test.ExceptionAssert;
 
 public class DbProvisionNamespaceTransactionTest {
 
-	//region setNamespace
+	// region setNamespace
 
 	@Test
 	public void canSetNamespaceOnce() {
@@ -32,9 +32,9 @@ public class DbProvisionNamespaceTransactionTest {
 		ExceptionAssert.assertThrows(v -> transaction.setNamespace(new DbNamespace()), IllegalStateException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region setSender
+	// region setSender
 
 	@Test
 	public void setSenderSetsOwnerInNamespace() {
@@ -61,9 +61,9 @@ public class DbProvisionNamespaceTransactionTest {
 		ExceptionAssert.assertThrows(v -> transaction.setSender(sender), IllegalStateException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region setBlock
+	// region setBlock
 
 	@Test
 	public void setBlockSetsHeightInNamespace() {
@@ -110,5 +110,5 @@ public class DbProvisionNamespaceTransactionTest {
 		MatcherAssert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
 
-	//endregion
+	// endregion
 }

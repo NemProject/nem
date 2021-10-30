@@ -21,11 +21,7 @@ public class AuditEntry implements SerializableEntity {
 	 * @param path The path.
 	 * @param timeProvider The time provider.
 	 */
-	public AuditEntry(
-			final int id,
-			final String host,
-			final String path,
-			final TimeProvider timeProvider) {
+	public AuditEntry(final int id, final String host, final String path, final TimeProvider timeProvider) {
 		this.id = id;
 		this.host = host;
 		this.path = path;
@@ -98,7 +94,7 @@ public class AuditEntry implements SerializableEntity {
 			return false;
 		}
 
-		final AuditEntry rhs = (AuditEntry)obj;
+		final AuditEntry rhs = (AuditEntry) obj;
 		return this.host.equals(rhs.host) && this.path.equals(rhs.path);
 	}
 

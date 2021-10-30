@@ -56,7 +56,8 @@ public class BlockChainTest {
 		context.addTransactions(child, 1);
 
 		// Assert:
-		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child),
+				IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
 	}
 
 	@Test
@@ -68,7 +69,8 @@ public class BlockChainTest {
 		child.setPrevious(nodeContext.getChain().get(0));
 
 		// Assert:
-		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child),
+				IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC));
 	}
 
 	@Test

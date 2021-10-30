@@ -12,7 +12,9 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class MosaicSupplyChangeModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MosaicSupplyChangeTransaction, DbMosaicSupplyChangeTransaction> {
+public class MosaicSupplyChangeModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<MosaicSupplyChangeTransaction, DbMosaicSupplyChangeTransaction> {
 
 	@Test
 	public void transactionCanBeMappedToDbModel() {
@@ -55,11 +57,7 @@ public class MosaicSupplyChangeModelToDbModelMappingTest extends AbstractTransfe
 		}
 
 		public MosaicSupplyChangeTransaction createModel() {
-			return new MosaicSupplyChangeTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					this.mosaicId,
-					MosaicSupplyType.Create,
+			return new MosaicSupplyChangeTransaction(TimeInstant.ZERO, this.signer, this.mosaicId, MosaicSupplyType.Create,
 					Supply.fromValue(123));
 		}
 	}

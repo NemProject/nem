@@ -5,8 +5,8 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.validators.*;
 
 /**
- * A TransactionValidator implementation that applies to all transactions and validates that:
- * - higher versioned transactions do not appear before the respective fork heights
+ * A TransactionValidator implementation that applies to all transactions and validates that higher versioned transactions do not appear
+ * before the respective fork heights
  */
 public class VersionTransactionValidator implements SingleTransactionValidator {
 

@@ -47,8 +47,8 @@ public class BlockChainContext {
 		this.random = new SecureRandom();
 		this.accountMap = new HashMap<>();
 		this.options = options;
-		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
-				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) -> accountStates.stream()
+				.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
 		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
 		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
@@ -60,62 +60,36 @@ public class BlockChainContext {
 
 		for (int i = 0; i < this.options.numNodes(); i++) {
 			final Node node = this.createNode(i + 1);
-			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache)commonNisCache).deepCopy());
+			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache) commonNisCache).deepCopy());
 			final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
 			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao);
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
-					transactionValidatorFactory,
-					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-					new SystemTimeProvider(),
-					blockChainLastBlockLayer::getLastBlockHeight,
-					MAX_TRANSACTIONS_PER_BLOCK);
-			final UnconfirmedTransactions unconfirmedTransactions = Mockito.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
+			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(transactionValidatorFactory,
+					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver, new SystemTimeProvider(),
+					blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK);
+			final UnconfirmedTransactions unconfirmedTransactions = Mockito
+					.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
 			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
-			final BlockChainServices services = Mockito.spy(new BlockChainServices(
-					blockDao,
-					blockTransactionObserverFactory,
-					blockValidatorFactory,
-					transactionValidatorFactory,
-					nisMapperFactory));
-			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
-					nisCache,
-					blockChainLastBlockLayer,
-					blockDao,
-					services,
-					unconfirmedTransactions));
-			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
-					nisCache,
-					blockChainLastBlockLayer,
-					blockDao,
-					contextFactory,
-					unconfirmedTransactions,
-					new NisConfiguration());
-			final BlockChain blockChain = new BlockChain(
-					blockChainLastBlockLayer,
-					blockChainUpdater);
-			final NodeContext nodeContext = new NodeContext(
-					node,
-					blockChain,
-					blockChainUpdater,
-					services,
-					blockChainLastBlockLayer,
-					commonChain,
-					blockDao,
-					nisCache);
+			final BlockChainServices services = Mockito.spy(new BlockChainServices(blockDao, blockTransactionObserverFactory,
+					blockValidatorFactory, transactionValidatorFactory, nisMapperFactory));
+			final BlockChainContextFactory contextFactory = Mockito
+					.spy(new BlockChainContextFactory(nisCache, blockChainLastBlockLayer, blockDao, services, unconfirmedTransactions));
+			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(nisCache, blockChainLastBlockLayer, blockDao, contextFactory,
+					unconfirmedTransactions, new NisConfiguration());
+			final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, blockChainUpdater);
+			final NodeContext nodeContext = new NodeContext(node, blockChain, blockChainUpdater, services, blockChainLastBlockLayer,
+					commonChain, blockDao, nisCache);
 			this.nodeContexts.add(nodeContext);
 		}
 	}
 
 	private Node createNode(final int i) {
-		return new Node(
-				new WeakNodeIdentity(String.format("Node %d", i)),
-				new NodeEndpoint("ftp", String.format("10.8.8.%d", i), 12));
+		return new Node(new WeakNodeIdentity(String.format("Node %d", i)), new NodeEndpoint("ftp", String.format("10.8.8.%d", i), 12));
 	}
 
 	// nemesis accounts
@@ -146,20 +120,14 @@ public class BlockChainContext {
 
 	// not really a nemesis block but rather the starting block
 	private Block createNemesisBlock(final Account nemesisAccount) {
-		final Block block = new Block(
-				nemesisAccount,
-				Hash.ZERO,
-				DUMMY_GENERATION_HASH,
-				TimeInstant.ZERO,
-				new BlockHeight(1));
+		final Block block = new Block(nemesisAccount, Hash.ZERO, DUMMY_GENERATION_HASH, TimeInstant.ZERO, new BlockHeight(1));
 		block.sign();
 		return block;
 	}
 
 	private Account getRandomKnownAccount() {
-		return this.accountMap.values().stream()
-				.filter(a -> !a.equals(this.nemesisAccount))
-				.toArray(Account[]::new)[this.random.nextInt(this.options.numAccounts())];
+		return this.accountMap.values().stream().filter(a -> !a.equals(this.nemesisAccount)).toArray(Account[]::new)[this.random
+				.nextInt(this.options.numAccounts())];
 	}
 
 	private List<BlockDifficulty> historicalDifficulties(final List<Block> blocks) {
@@ -177,13 +145,8 @@ public class BlockChainContext {
 			signer = this.getRandomKnownAccount();
 		}
 		final Account recipient = new Account(Utils.generateRandomAddress());
-		final TransferTransaction transaction = new TransferTransaction(
-				TRANSFER_TRANSACTION_VERSION,
-				timeInstant,
-				signer,
-				recipient,
-				Amount.fromNem(100),
-				null);
+		final TransferTransaction transaction = new TransferTransaction(TRANSFER_TRANSACTION_VERSION, timeInstant, signer, recipient,
+				Amount.fromNem(100), null);
 		transaction.setDeadline(timeInstant.addHours(20));
 		transaction.sign();
 		return transaction;
@@ -199,22 +162,18 @@ public class BlockChainContext {
 		final Account harvester = this.getRandomKnownAccount();
 		final Block parent = chain.get(chain.size() - 1);
 		Block block = new Block(harvester, parent, new TimeInstant(parent.getTimeStamp().getRawTime() + 1));
-		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), chain.size());
-		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer().calculateDifficulty(
-				this.historicalDifficulties(historicalBlocks),
-				this.historicalTimestamps(historicalBlocks));
+		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION),
+				chain.size());
+		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer()
+				.calculateDifficulty(this.historicalDifficulties(historicalBlocks), this.historicalTimestamps(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = this.scorer.calculateHit(block);
 
 		// add 10 seconds to be able to create superior siblings
 		// (the block generation is delayed a bit so that we can construct a better sibling by subtracting a few seconds)
 		final Amount nemesisAmount = NetworkInfos.getDefault().getNemesisBlockInfo().getAmount();
-		final int seconds = hit
-				.multiply(block.getDifficulty().asBigInteger())
-				.multiply(BigInteger.valueOf(this.options.numAccounts() + 1))
-				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BigInteger.valueOf(nemesisAmount.getNumNem()))
-				.intValue() + 10;
+		final int seconds = hit.multiply(block.getDifficulty().asBigInteger()).multiply(BigInteger.valueOf(this.options.numAccounts() + 1))
+				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64).divide(BigInteger.valueOf(nemesisAmount.getNumNem())).intValue() + 10;
 
 		final TimeInstant blockTime = new TimeInstant(parent.getTimeStamp().getRawTime() + seconds);
 		block = new Block(harvester, parent, blockTime);

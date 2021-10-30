@@ -22,13 +22,9 @@ public class BlockDbModelToExplorerViewModelMapping implements IMapping<DbBlock,
 	@Override
 	public ExplorerBlockViewModel map(final DbBlock dbBlock) {
 		final Block block = this.mapper.map(dbBlock, Block.class);
-		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
-				block,
-				dbBlock.getBlockHash());
+		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(block, dbBlock.getBlockHash());
 
-		block.getTransactions().stream()
-				.map(this::toExplorerViewModel)
-				.forEach(viewModel::addTransaction);
+		block.getTransactions().stream().map(this::toExplorerViewModel).forEach(viewModel::addTransaction);
 		return viewModel;
 	}
 

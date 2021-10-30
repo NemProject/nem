@@ -24,11 +24,11 @@ public abstract class ScanGraphClusteringTest {
 	 */
 	protected abstract GraphClusteringStrategy createClusteringStrategy();
 
-	//region unit tests with node similarity explicitly specified
+	// region unit tests with node similarity explicitly specified
 
 	/**
 	 * <pre>
-	 *     0 - 1
+	 * 0 - 1
 	 * </pre>
 	 */
 	@Test
@@ -43,9 +43,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedOutliers = Arrays.asList(
-				new Cluster(new NodeId(0)),
-				new Cluster(new NodeId(1)));
+		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(0)), new Cluster(new NodeId(1)));
 
 		MatcherAssert.assertThat(result.getClusters().isEmpty(), IsEqual.equalTo(true));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -54,7 +52,7 @@ public abstract class ScanGraphClusteringTest {
 
 	/**
 	 * <pre>
-	 *     0 - 1
+	 * 0 - 1
 	 * </pre>
 	 */
 	@Test
@@ -68,9 +66,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedOutliers = Arrays.asList(
-				new Cluster(new NodeId(0)),
-				new Cluster(new NodeId(1)));
+		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(0)), new Cluster(new NodeId(1)));
 
 		MatcherAssert.assertThat(result.getClusters().isEmpty(), IsEqual.equalTo(true));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -102,8 +98,8 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
+		final List<Cluster> expectedClusters = Collections
+				.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -119,8 +115,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
 				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5, 7)));
 		final List<Cluster> expectedHubs = Collections.singletonList(new Cluster(new NodeId(8)));
 
@@ -138,8 +133,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6, 8)),
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6, 8)),
 				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5, 7)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -156,8 +150,8 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
+		final List<Cluster> expectedClusters = Collections
+				.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -220,8 +214,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
 				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5, 7)));
 		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(8)));
 
@@ -253,8 +246,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+		final List<Cluster> expectedClusters = Collections.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(4)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -286,8 +278,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+		final List<Cluster> expectedClusters = Collections.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(4)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -327,11 +318,8 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-		final List<Cluster> expectedOutliers = Arrays.asList(
-				new Cluster(new NodeId(4)),
-				new Cluster(new NodeId(5)));
+		final List<Cluster> expectedClusters = Collections.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(4)), new Cluster(new NodeId(5)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -340,6 +328,7 @@ public abstract class ScanGraphClusteringTest {
 
 	/**
 	 * This test is designed to require a cluster merge when clustering with FastScanClusteringStrategy.
+	 *
 	 * <pre>
 	 *    1 -- 0 -- 8 -- 4 -- 5
 	 *    | \/ |     <\  | \/ |
@@ -349,7 +338,8 @@ public abstract class ScanGraphClusteringTest {
 	 */
 	@Test
 	public void complexGraphIsMergedAsExpected() {
-		// Arrange: { 0, 1, 2, 3, 4, 5, 6, 7, 8 } form a single cluster (this requires a merge of two clusters in the FastScanClusteringStrategy)
+		// Arrange: { 0, 1, 2, 3, 4, 5, 6, 7, 8 } form a single cluster (this requires a merge of two clusters in the
+		// FastScanClusteringStrategy)
 		// Cluster pivoted at [0] and cluster pivoted at [4] are merged
 		final TestContext context = new TestContext(this.createClusteringStrategy(), 9);
 
@@ -371,8 +361,8 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
+		final List<Cluster> expectedClusters = Collections
+				.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		MatcherAssert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -405,8 +395,8 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Collections.singletonList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+		final List<Cluster> expectedClusters = Collections
+				.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
 		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(5)));
 
 		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -414,11 +404,9 @@ public abstract class ScanGraphClusteringTest {
 		MatcherAssert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-	//endregion
+	// endregion
 
-	//region tests with real similarity calculations
-
-	//region epsilon any
+	// region real similarity - epsilon any
 
 	@Test
 	public void graphSingleNodeIsClusteredAsExpected() {
@@ -486,9 +474,9 @@ public abstract class ScanGraphClusteringTest {
 		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_DISCONNECTED_BOX_WITH_DIAGONAL_AND_CROSS);
 	}
 
-	//endregion
+	// endregion
 
-	//region epsilon default (0.40)
+	// region real similarity - epsilon default (0.40)
 
 	@Test
 	public void graphTwoClustersNoHubsNoOutliersIsClusteredAsExpected() {
@@ -508,9 +496,9 @@ public abstract class ScanGraphClusteringTest {
 		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 	}
 
-	//endregion
+	// endregion
 
-	//region epsilon custom (0.65)
+	// region real similarity - epsilon custom (0.65)
 
 	@Test
 	public void graphCustomEpsilonOneClusterNoHubOneOutlierIsClusteredAsExpected() {
@@ -542,38 +530,25 @@ public abstract class ScanGraphClusteringTest {
 		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 
 	private void assertGraphIsClusteredCorrectly(final GraphType graphType) {
 		// Assert:
-		this.assertGraphIsClusteredCorrectly(
-				OutlinkMatrixFactory.create(graphType),
-				IdealizedClusterFactory.create(graphType),
+		this.assertGraphIsClusteredCorrectly(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType),
 				DEFAULT_OPTIONS.getEpsilonClusteringValue());
 	}
 
 	private void assertGraphIsClusteredCorrectly(final GraphTypeEpsilon040 graphType) {
 		// Assert:
-		this.assertGraphIsClusteredCorrectly(
-				OutlinkMatrixFactory.create(graphType),
-				IdealizedClusterFactory.create(graphType),
-				0.4);
+		this.assertGraphIsClusteredCorrectly(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType), 0.4);
 	}
 
 	private void assertGraphIsClusteredCorrectly(final GraphTypeEpsilon065 graphType) {
 		// Assert:
-		this.assertGraphIsClusteredCorrectly(
-				OutlinkMatrixFactory.create(graphType),
-				IdealizedClusterFactory.create(graphType),
-				0.65);
+		this.assertGraphIsClusteredCorrectly(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType), 0.65);
 	}
 
-	private void assertGraphIsClusteredCorrectly(
-			final Matrix outlinkMatrix,
-			final ClusteringResult expectedResult,
-			final double epsilon) {
+	private void assertGraphIsClusteredCorrectly(final Matrix outlinkMatrix, final ClusteringResult expectedResult, final double epsilon) {
 		// Act:
 		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix, epsilon);
 		this.logClusteringResult(result);
@@ -584,9 +559,7 @@ public abstract class ScanGraphClusteringTest {
 		MatcherAssert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
-	private ClusteringResult calculateClusteringResult(
-			final GraphClusteringStrategy graphClusteringStrategy,
-			final Matrix outlinkMatrix,
+	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix,
 			final double epsilon) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(nodeNeighborMap);

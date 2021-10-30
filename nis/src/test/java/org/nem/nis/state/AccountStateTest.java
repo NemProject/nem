@@ -10,7 +10,7 @@ import org.nem.nis.test.RemoteLinkFactory;
 
 public class AccountStateTest {
 
-	//region creation
+	// region creation
 
 	@Test
 	public void accountStateCanBeCreated() {
@@ -29,9 +29,9 @@ public class AccountStateTest {
 		MatcherAssert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesAddress() {
@@ -65,8 +65,7 @@ public class AccountStateTest {
 		MatcherAssert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
 		MatcherAssert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));
 		MatcherAssert.assertThat(copyImportance.getOutlinksSize(height), IsEqual.equalTo(1));
-		MatcherAssert.assertThat(
-				copyImportance.getOutlinksIterator(height, height).next(),
+		MatcherAssert.assertThat(copyImportance.getOutlinksIterator(height, height).next(),
 				IsEqual.equalTo(importance.getOutlinksIterator(height, height).next()));
 	}
 
@@ -179,9 +178,9 @@ public class AccountStateTest {
 		MatcherAssert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
-	//endregion
+	// endregion
 
-	//region height
+	// region height
 
 	@Test
 	public void accountHeightCanBeSetIfNull() {
@@ -208,5 +207,5 @@ public class AccountStateTest {
 		MatcherAssert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
 	}
 
-	//endregion
+	// endregion
 }

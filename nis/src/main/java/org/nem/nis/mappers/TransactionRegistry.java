@@ -87,22 +87,15 @@ public class TransactionRegistry {
 		private final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper;
 		private final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
 
-		private Entry(
-				final int type,
-				final Function<DbBlock, List<TDbModel>> getFromBlock,
-				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
-				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
+		private Entry(final int type, final Function<DbBlock, List<TDbModel>> getFromBlock,
+				final BiConsumer<DbBlock, List<TDbModel>> setInBlock, final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
 				final BiConsumer<DbMultisigTransaction, AbstractBlockTransfer> setInMultisig,
-				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction,
-				final Function<TDbModel, Integer> getTransactionCount,
-				final Function<TDbModel, DbAccount> getRecipient,
-				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
+				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction, final Function<TDbModel, Integer> getTransactionCount,
+				final Function<TDbModel, DbAccount> getRecipient, final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
 				final Supplier<TransactionRetriever> getTransactionRetriever,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
-				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
-				final Class<TDbModel> dbModelClass,
-				final Class<TModel> modelClass,
-				final String multisigJoinField) {
+				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper, final Class<TDbModel> dbModelClass,
+				final Class<TModel> modelClass, final String multisigJoinField) {
 			this.type = type;
 
 			this.getFromBlock = getFromBlock;
@@ -148,101 +141,49 @@ public class TransactionRegistry {
 	@SuppressWarnings("serial")
 	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(
-					TransactionTypes.TRANSFER,
-					DbBlock::getBlockTransferTransactions,
-					DbBlock::setBlockTransferTransactions,
+			this.add(new Entry<>(TransactionTypes.TRANSFER, DbBlock::getBlockTransferTransactions, DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
-					(multisig, t) -> multisig.setTransferTransaction((DbTransferTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					DbTransferTransaction::getRecipient,
-					transfer -> new ArrayList<>(),
-					TransferRetriever::new,
-					TransferModelToDbModelMapping::new,
-					TransferDbModelToModelMapping::new,
-					DbTransferTransaction.class,
-					TransferTransaction.class,
-					"transferTransaction"));
+					(multisig, t) -> multisig.setTransferTransaction((DbTransferTransaction) t), transfer -> null, transfer -> 1,
+					DbTransferTransaction::getRecipient, transfer -> new ArrayList<>(), TransferRetriever::new,
+					TransferModelToDbModelMapping::new, TransferDbModelToModelMapping::new, DbTransferTransaction.class,
+					TransferTransaction.class, "transferTransaction"));
 
-			this.add(new Entry<>(
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					DbBlock::getBlockImportanceTransferTransactions,
-					DbBlock::setBlockImportanceTransferTransactions,
-					DbMultisigTransaction::getImportanceTransferTransaction,
-					(multisig, t) -> multisig.setImportanceTransferTransaction((DbImportanceTransferTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					DbImportanceTransferTransaction::getRemote,
-					transfer -> new ArrayList<>(),
-					ImportanceTransferRetriever::new,
-					ImportanceTransferModelToDbModelMapping::new,
-					ImportanceTransferDbModelToModelMapping::new,
-					DbImportanceTransferTransaction.class,
-					ImportanceTransferTransaction.class,
-					"importanceTransferTransaction"));
+			this.add(new Entry<>(TransactionTypes.IMPORTANCE_TRANSFER, DbBlock::getBlockImportanceTransferTransactions,
+					DbBlock::setBlockImportanceTransferTransactions, DbMultisigTransaction::getImportanceTransferTransaction,
+					(multisig, t) -> multisig.setImportanceTransferTransaction((DbImportanceTransferTransaction) t), transfer -> null,
+					transfer -> 1, DbImportanceTransferTransaction::getRemote, transfer -> new ArrayList<>(),
+					ImportanceTransferRetriever::new, ImportanceTransferModelToDbModelMapping::new,
+					ImportanceTransferDbModelToModelMapping::new, DbImportanceTransferTransaction.class,
+					ImportanceTransferTransaction.class, "importanceTransferTransaction"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					DbBlock::getBlockMultisigAggregateModificationTransactions,
-					DbBlock::setBlockMultisigAggregateModificationTransactions,
+			this.add(new Entry<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+					DbBlock::getBlockMultisigAggregateModificationTransactions, DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
-					(multisig, t) -> multisig.setMultisigAggregateModificationTransaction((DbMultisigAggregateModificationTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					transfer -> null,
-					DbMultisigAggregateModificationTransaction::getOtherAccounts,
-					MultisigModificationRetriever::new,
-					MultisigAggregateModificationModelToDbModelMapping::new,
-					MultisigAggregateModificationDbModelToModelMapping::new,
-					DbMultisigAggregateModificationTransaction.class,
-					MultisigAggregateModificationTransaction.class,
-					"multisigAggregateModificationTransaction"));
+					(multisig, t) -> multisig.setMultisigAggregateModificationTransaction((DbMultisigAggregateModificationTransaction) t),
+					transfer -> null, transfer -> 1, transfer -> null, DbMultisigAggregateModificationTransaction::getOtherAccounts,
+					MultisigModificationRetriever::new, MultisigAggregateModificationModelToDbModelMapping::new,
+					MultisigAggregateModificationDbModelToModelMapping::new, DbMultisigAggregateModificationTransaction.class,
+					MultisigAggregateModificationTransaction.class, "multisigAggregateModificationTransaction"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MULTISIG,
-					DbBlock::getBlockMultisigTransactions,
-					DbBlock::setBlockMultisigTransactions,
-					multisig -> null,
-					null,
-					DbModelUtils::getInnerTransaction,
-					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(),
-					multisig -> null,
-					DbMultisigTransaction::getOtherAccounts,
-					MultisigTransactionRetriever::new,
-					MultisigTransactionModelToDbModelMapping::new,
-					MultisigTransactionDbModelToModelMapping::new,
-					DbMultisigTransaction.class,
-					org.nem.core.model.MultisigTransaction.class,
-					null));
+			this.add(new Entry<>(TransactionTypes.MULTISIG, DbBlock::getBlockMultisigTransactions, DbBlock::setBlockMultisigTransactions,
+					multisig -> null, null, DbModelUtils::getInnerTransaction,
+					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(), multisig -> null,
+					DbMultisigTransaction::getOtherAccounts, MultisigTransactionRetriever::new,
+					MultisigTransactionModelToDbModelMapping::new, MultisigTransactionDbModelToModelMapping::new,
+					DbMultisigTransaction.class, org.nem.core.model.MultisigTransaction.class, null));
 
-			this.add(new Entry<>(
-					TransactionTypes.PROVISION_NAMESPACE,
-					DbBlock::getBlockProvisionNamespaceTransactions,
-					DbBlock::setBlockProvisionNamespaceTransactions,
-					DbMultisigTransaction::getProvisionNamespaceTransaction,
-					(multisig, t) -> multisig.setProvisionNamespaceTransaction((DbProvisionNamespaceTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					transfer -> null,
-					transfer -> Collections.singletonList(transfer.getRentalFeeSink()),
-					ProvisionNamespaceRetriever::new,
-					ProvisionNamespaceModelToDbModelMapping::new,
-					ProvisionNamespaceDbModelToModelMapping::new,
-					DbProvisionNamespaceTransaction.class,
-					ProvisionNamespaceTransaction.class,
-					"provisionNamespaceTransaction"));
+			this.add(new Entry<>(TransactionTypes.PROVISION_NAMESPACE, DbBlock::getBlockProvisionNamespaceTransactions,
+					DbBlock::setBlockProvisionNamespaceTransactions, DbMultisigTransaction::getProvisionNamespaceTransaction,
+					(multisig, t) -> multisig.setProvisionNamespaceTransaction((DbProvisionNamespaceTransaction) t), transfer -> null,
+					transfer -> 1, transfer -> null, transfer -> Collections.singletonList(transfer.getRentalFeeSink()),
+					ProvisionNamespaceRetriever::new, ProvisionNamespaceModelToDbModelMapping::new,
+					ProvisionNamespaceDbModelToModelMapping::new, DbProvisionNamespaceTransaction.class,
+					ProvisionNamespaceTransaction.class, "provisionNamespaceTransaction"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_DEFINITION_CREATION,
-					DbBlock::getBlockMosaicDefinitionCreationTransactions,
-					DbBlock::setBlockMosaicDefinitionCreationTransactions,
-					DbMultisigTransaction::getMosaicDefinitionCreationTransaction,
-					(multisig, t) -> multisig.setMosaicDefinitionCreationTransaction((DbMosaicDefinitionCreationTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					transfer -> null,
-					transfer -> {
+			this.add(new Entry<>(TransactionTypes.MOSAIC_DEFINITION_CREATION, DbBlock::getBlockMosaicDefinitionCreationTransactions,
+					DbBlock::setBlockMosaicDefinitionCreationTransactions, DbMultisigTransaction::getMosaicDefinitionCreationTransaction,
+					(multisig, t) -> multisig.setMosaicDefinitionCreationTransaction((DbMosaicDefinitionCreationTransaction) t),
+					transfer -> null, transfer -> 1, transfer -> null, transfer -> {
 						final Collection<DbAccount> otherAccounts = new ArrayList<>();
 						otherAccounts.add(transfer.getCreationFeeSink());
 
@@ -252,30 +193,16 @@ public class TransactionRegistry {
 						}
 
 						return otherAccounts;
-					},
-					MosaicDefinitionCreationRetriever::new,
-					MosaicDefinitionCreationModelToDbModelMapping::new,
-					MosaicDefinitionCreationDbModelToModelMapping::new,
-					DbMosaicDefinitionCreationTransaction.class,
-					MosaicDefinitionCreationTransaction.class,
-					"mosaicDefinitionCreationTransaction"));
+					}, MosaicDefinitionCreationRetriever::new, MosaicDefinitionCreationModelToDbModelMapping::new,
+					MosaicDefinitionCreationDbModelToModelMapping::new, DbMosaicDefinitionCreationTransaction.class,
+					MosaicDefinitionCreationTransaction.class, "mosaicDefinitionCreationTransaction"));
 
-			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
-					DbBlock::getBlockMosaicSupplyChangeTransactions,
-					DbBlock::setBlockMosaicSupplyChangeTransactions,
-					DbMultisigTransaction::getMosaicSupplyChangeTransaction,
-					(multisig, t) -> multisig.setMosaicSupplyChangeTransaction((DbMosaicSupplyChangeTransaction)t),
-					transfer -> null,
-					transfer -> 1,
-					transfer -> null,
-					transfer -> Collections.emptyList(),
-					MosaicSupplyChangeRetriever::new,
-					MosaicSupplyChangeModelToDbModelMapping::new,
-					MosaicSupplyChangeDbModelToModelMapping::new,
-					DbMosaicSupplyChangeTransaction.class,
-					MosaicSupplyChangeTransaction.class,
-					"mosaicSupplyChangeTransaction"));
+			this.add(new Entry<>(TransactionTypes.MOSAIC_SUPPLY_CHANGE, DbBlock::getBlockMosaicSupplyChangeTransactions,
+					DbBlock::setBlockMosaicSupplyChangeTransactions, DbMultisigTransaction::getMosaicSupplyChangeTransaction,
+					(multisig, t) -> multisig.setMosaicSupplyChangeTransaction((DbMosaicSupplyChangeTransaction) t), transfer -> null,
+					transfer -> 1, transfer -> null, transfer -> Collections.emptyList(), MosaicSupplyChangeRetriever::new,
+					MosaicSupplyChangeModelToDbModelMapping::new, MosaicSupplyChangeDbModelToModelMapping::new,
+					DbMosaicSupplyChangeTransaction.class, MosaicSupplyChangeTransaction.class, "mosaicSupplyChangeTransaction"));
 		}
 	};
 
@@ -304,7 +231,7 @@ public class TransactionRegistry {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Iterable<Entry<AbstractBlockTransfer, Transaction>> iterate() {
-		return () -> ENTRIES.stream().map(e -> (Entry<AbstractBlockTransfer, Transaction>)e).iterator();
+		return () -> ENTRIES.stream().map(e -> (Entry<AbstractBlockTransfer, Transaction>) e).iterator();
 	}
 
 	/**
@@ -343,7 +270,7 @@ public class TransactionRegistry {
 	public static <TDbModel extends AbstractBlockTransfer> Entry<TDbModel, ?> findByDbModelClass(final Class<? extends TDbModel> clazz) {
 		for (final Entry<?, ?> entry : ENTRIES) {
 			if (entry.dbModelClass.equals(clazz)) {
-				return (Entry<TDbModel, ?>)entry;
+				return (Entry<TDbModel, ?>) entry;
 			}
 		}
 

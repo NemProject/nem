@@ -10,17 +10,13 @@ import org.nem.nis.test.NisUtils;
 
 public class NodeNeighborMapTest {
 
-	//region basic
+	// region basic
 
 	@Test
 	public void mapCannotBeCreatedAroundNonSquareMatrix() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new NodeNeighborMap(new DenseMatrix(7, 8)),
-				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new NodeNeighborMap(new DenseMatrix(8, 7)),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NodeNeighborMap(new DenseMatrix(7, 8)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NodeNeighborMap(new DenseMatrix(8, 7)), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -38,14 +34,12 @@ public class NodeNeighborMapTest {
 		final NodeNeighborMap neighborMap = new NodeNeighborMap(new DenseMatrix(7, 7));
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> neighborMap.getNeighbors(new NodeId(7)),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> neighborMap.getNeighbors(new NodeId(7)), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region map contents
+	// region map contents
 
 	@Test
 	public void nodeAlwaysReportsSelfAsNeighbor() {
@@ -81,7 +75,8 @@ public class NodeNeighborMapTest {
 		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
-		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2, 3)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2, 3)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
 	}
 
@@ -105,7 +100,8 @@ public class NodeNeighborMapTest {
 		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 2)));
-		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
 	}
 
@@ -128,12 +124,15 @@ public class NodeNeighborMapTest {
 		MatcherAssert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1)));
-		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4, 6)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4, 6)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5)));
 		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(4)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 4)));
-		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(5)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5, 6)));
-		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(6)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 6)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(5)).toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 5, 6)));
+		MatcherAssert.assertThat(neighborMap.getNeighbors(new NodeId(6)).toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 6)));
 	}
 
-	//endregion
+	// endregion
 }

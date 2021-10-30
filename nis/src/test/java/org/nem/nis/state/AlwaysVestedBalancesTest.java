@@ -57,12 +57,7 @@ public class AlwaysVestedBalancesTest {
 	}
 
 	private static Collection<BlockHeight> getBlockHeights() {
-		return Arrays.asList(
-				BlockHeight.ONE,
-				new BlockHeight(123),
-				new BlockHeight(12345),
-				new BlockHeight(511000),
-				BlockHeight.MAX);
+		return Arrays.asList(BlockHeight.ONE, new BlockHeight(123), new BlockHeight(12345), new BlockHeight(511000), BlockHeight.MAX);
 	}
 
 	// endregion
@@ -104,7 +99,8 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.addSend(BlockHeight.ONE, Amount.fromNem(111));
 		MatcherAssert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123 + 345 + 567 - 456 - 111)));
 		weightedBalances.undoSend(BlockHeight.ONE, Amount.fromNem(222));
-		MatcherAssert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123 + 345 + 567 - 456 - 111 + 222)));
+		MatcherAssert.assertThat(weightedBalances.getVested(BlockHeight.ONE),
+				IsEqual.equalTo(Amount.fromNem(123 + 345 + 567 - 456 - 111 + 222)));
 	}
 
 	@Test

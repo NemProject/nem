@@ -39,10 +39,7 @@ public class BlockRawToDbModelMappingTest {
 		this.assertDbModelFields(context, dbModel, context.dbLessor);
 	}
 
-	private void assertDbModelFields(
-			final TestContext context,
-			final DbBlock dbModel,
-			final DbAccount lessor) {
+	private void assertDbModelFields(final TestContext context, final DbBlock dbModel, final DbAccount lessor) {
 		// Assert:
 		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
 		MatcherAssert.assertThat(dbModel.getBlockTransferTransactions(), IsNull.notNullValue());
@@ -85,18 +82,18 @@ public class BlockRawToDbModelMappingTest {
 
 		private Object[] createRaw(final boolean useLessor) {
 			final Object[] raw = new Object[12];
-			raw[0] = BigInteger.valueOf(123L);                              // id
-			raw[1] = 1;                                                     // version
-			raw[2] = this.previousBlockHash.getRaw();                       // raw previous block hash
-			raw[3] = this.blockHash.getRaw();                               // raw block hash
-			raw[4] = this.generationHash.getRaw();                          // raw generation hash
-			raw[5] = 345;                                                   // timestamp
-			raw[6] = BigInteger.valueOf(this.harvesterId);                  // harvester id
-			raw[7] = this.harvesterProof;                                   // harvester proof
-			raw[8] = useLessor ? BigInteger.valueOf(this.lessorId) : null;  // lessor id
-			raw[9] = BigInteger.valueOf(456L);                             // height
-			raw[10] = BigInteger.valueOf(567L);                             // total fee
-			raw[11] = BigInteger.valueOf(678L);                             // difficulty
+			raw[0] = BigInteger.valueOf(123L); // id
+			raw[1] = 1; // version
+			raw[2] = this.previousBlockHash.getRaw(); // raw previous block hash
+			raw[3] = this.blockHash.getRaw(); // raw block hash
+			raw[4] = this.generationHash.getRaw(); // raw generation hash
+			raw[5] = 345; // timestamp
+			raw[6] = BigInteger.valueOf(this.harvesterId); // harvester id
+			raw[7] = this.harvesterProof; // harvester proof
+			raw[8] = useLessor ? BigInteger.valueOf(this.lessorId) : null; // lessor id
+			raw[9] = BigInteger.valueOf(456L); // height
+			raw[10] = BigInteger.valueOf(567L); // total fee
+			raw[11] = BigInteger.valueOf(678L); // difficulty
 
 			return raw;
 		}

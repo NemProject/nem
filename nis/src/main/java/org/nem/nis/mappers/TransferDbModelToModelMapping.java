@@ -30,28 +30,19 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		final Account recipient = this.mapper.map(source.getRecipient(), Account.class);
 
-		final Message message = messagePayloadToModel(
-				source.getMessagePayload(),
-				source.getMessageType(),
-				sender,
-				recipient);
+		final Message message = messagePayloadToModel(source.getMessagePayload(), source.getMessageType(), sender, recipient);
 
-		final Collection<Mosaic> mosaics = source.getMosaics().stream()
-				.map(st -> this.mapper.map(st, Mosaic.class))
+		final Collection<Mosaic> mosaics = source.getMosaics().stream().map(st -> this.mapper.map(st, Mosaic.class))
 				.collect(Collectors.toList());
 
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 		mosaics.forEach(attachment::addMosaic);
-		return new TransferTransaction(
-				source.getVersion() & 0x00FFFFFF,
-				new TimeInstant(source.getTimeStamp()),
-				sender,
-				recipient,
-				new Amount(source.getAmount()),
-				attachment);
+		return new TransferTransaction(source.getVersion() & 0x00FFFFFF, new TimeInstant(source.getTimeStamp()), sender, recipient,
+				new Amount(source.getAmount()), attachment);
 	}
 
-	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {
+	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender,
+			final Account recipient) {
 		if (null == payload) {
 			return null;
 		}

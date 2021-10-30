@@ -43,15 +43,15 @@ public class MultisigSignatureRawToDbModelMappingTest extends AbstractTransferRa
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[9];
-			raw[0] = BigInteger.valueOf(123L);                              // block id
-			raw[1] = BigInteger.valueOf(234L);                              // id
-			raw[2] = rawHash;                                               // raw hash
-			raw[3] = 1;                                                     // version
-			raw[4] = BigInteger.valueOf(345L);                              // fee
-			raw[5] = 456;                                                   // timestamp
-			raw[6] = 567;                                                   // deadline
-			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
-			raw[8] = senderProof;                                           // sender proof
+			raw[0] = BigInteger.valueOf(123L); // block id
+			raw[1] = BigInteger.valueOf(234L); // id
+			raw[2] = rawHash; // raw hash
+			raw[3] = 1; // version
+			raw[4] = BigInteger.valueOf(345L); // fee
+			raw[5] = 456; // timestamp
+			raw[6] = 567; // deadline
+			raw[7] = BigInteger.valueOf(this.senderId); // sender id
+			raw[8] = senderProof; // sender proof
 
 			return raw;
 		}

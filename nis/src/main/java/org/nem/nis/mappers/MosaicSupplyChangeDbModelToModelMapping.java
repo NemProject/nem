@@ -9,7 +9,9 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a db mosaic supply change transaction to a model mosaic supply change transaction.
  */
-public class MosaicSupplyChangeDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMosaicSupplyChangeTransaction, MosaicSupplyChangeTransaction> {
+public class MosaicSupplyChangeDbModelToModelMapping
+		extends
+			AbstractTransferDbModelToModelMapping<DbMosaicSupplyChangeTransaction, MosaicSupplyChangeTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -26,11 +28,7 @@ public class MosaicSupplyChangeDbModelToModelMapping extends AbstractTransferDbM
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		final MosaicId mosaicId = this.mapper.map(new DbMosaicId(source.getDbMosaicId()), MosaicId.class);
 
-		return new MosaicSupplyChangeTransaction(
-				new TimeInstant(source.getTimeStamp()),
-				sender,
-				mosaicId,
-				MosaicSupplyType.fromValueOrDefault(source.getSupplyType()),
-				Supply.fromValue(source.getQuantity()));
+		return new MosaicSupplyChangeTransaction(new TimeInstant(source.getTimeStamp()), sender, mosaicId,
+				MosaicSupplyType.fromValueOrDefault(source.getSupplyType()), Supply.fromValue(source.getQuantity()));
 	}
 }

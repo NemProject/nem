@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class SkipListDeltaMap<TKey extends Comparable<?>, TValue> {
 	private final DefaultSkipListMap<TKey, TValue> originalValues;
-	private final DefaultSkipListMap<TKey,TValue> addedValues;
+	private final DefaultSkipListMap<TKey, TValue> addedValues;
 	private final DefaultSkipListMap<TKey, TValue> removedValues;
 
 	/**
@@ -63,8 +63,8 @@ public class SkipListDeltaMap<TKey extends Comparable<?>, TValue> {
 	 * @return true if the key/value pair is contained in the map, false otherwise.
 	 */
 	public boolean contains(final TKey key, final TValue value) {
-		return !this.removedValues.contains(key, value) &&
-				(this.originalValues.contains(key, value) || this.addedValues.contains(key, value));
+		return !this.removedValues.contains(key, value)
+				&& (this.originalValues.contains(key, value) || this.addedValues.contains(key, value));
 	}
 
 	/**

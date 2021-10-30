@@ -3,9 +3,8 @@ package org.nem.nis.pox.poi.graph;
 import org.nem.core.model.primitive.NodeId;
 
 /**
- * A <code>Community</code> is centered around a pivot. <i>Epsilon</i> neighbors are
- * connected to each other with a structural similarity greater than a given
- * <code>epsilon</code>.
+ * A <code>Community</code> is centered around a pivot. <i>Epsilon</i> neighbors are connected to each other with a structural similarity
+ * greater than a given <code>epsilon</code>.
  */
 public class Community {
 	private final NodeId pivotId;
@@ -21,11 +20,7 @@ public class Community {
 	 * @param dissimilarNeighbors The dissimilar node neighbors.
 	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
 	 */
-	public Community(
-			final NodeId pivotId,
-			final NodeNeighbors similarNeighbors,
-			final NodeNeighbors dissimilarNeighbors,
-			final int mu) {
+	public Community(final NodeId pivotId, final NodeNeighbors similarNeighbors, final NodeNeighbors dissimilarNeighbors, final int mu) {
 		if (null == similarNeighbors || null == dissimilarNeighbors) {
 			throw new IllegalArgumentException("neighbors cannot be null");
 		}
@@ -104,7 +99,7 @@ public class Community {
 		return this.similarNeighbors.size() + this.dissimilarNeighbors.size();
 	}
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -119,18 +114,15 @@ public class Community {
 
 		// since the pivot is guaranteed to be one of the similar neighbors, and there's nothing special about
 		// the chosen "pivot", don't check the pivot for equality
-		final Community rhs = (Community)obj;
-		return this.similarNeighbors.equals(rhs.similarNeighbors) &&
-				this.dissimilarNeighbors.equals(rhs.dissimilarNeighbors);
+		final Community rhs = (Community) obj;
+		return this.similarNeighbors.equals(rhs.similarNeighbors) && this.dissimilarNeighbors.equals(rhs.dissimilarNeighbors);
 	}
 
 	// endregion
 
 	@Override
 	public String toString() {
-		return String.format("Pivot Id: %d; Similar Neighbor Ids: %s; Dissimilar Neighbor Ids: %s",
-				this.pivotId.getRaw(),
-				this.similarNeighbors.toString(),
-				this.dissimilarNeighbors.toString());
+		return String.format("Pivot Id: %d; Similar Neighbor Ids: %s; Dissimilar Neighbor Ids: %s", this.pivotId.getRaw(),
+				this.similarNeighbors.toString(), this.dissimilarNeighbors.toString());
 	}
 }

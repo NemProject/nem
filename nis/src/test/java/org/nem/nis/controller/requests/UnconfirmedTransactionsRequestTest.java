@@ -64,21 +64,15 @@ public class UnconfirmedTransactionsRequestTest {
 	private static MultisigTransaction createMultisigTransactionWithSignatures(final List<HashShortId> hashShortIds) {
 		{
 			final Account multisig = Utils.generateRandomAccount();
-			final TransferTransaction otherTransaction = new TransferTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(123),
-					null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), otherTransaction);
+			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, Utils.generateRandomAccount(),
+					Amount.fromNem(123), null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+					otherTransaction);
 			transaction.sign();
 			hashShortIds.add(new HashShortId(HashUtils.calculateHash(transaction).getShortId()));
 			IntStream.range(0, 3).forEach(i -> {
-				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-						TimeInstant.ZERO,
-						Utils.generateRandomAccount(),
-						multisig,
-						transaction.getOtherTransaction());
+				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(TimeInstant.ZERO,
+						Utils.generateRandomAccount(), multisig, transaction.getOtherTransaction());
 				transaction.addSignature(signature);
 				hashShortIds.add(new HashShortId(HashUtils.calculateHash(signature).getShortId()));
 			});
@@ -89,7 +83,7 @@ public class UnconfirmedTransactionsRequestTest {
 
 	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void requestCanBeRoundTripped() {
@@ -114,8 +108,7 @@ public class UnconfirmedTransactionsRequestTest {
 		private TestContext(final int count) {
 			this.transactions = this.createTransactions(count);
 			this.request = new UnconfirmedTransactionsRequest(this.transactions);
-			this.hashShortIds = this.transactions.stream()
-					.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+			this.hashShortIds = this.transactions.stream().map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 					.collect(Collectors.toList());
 		}
 

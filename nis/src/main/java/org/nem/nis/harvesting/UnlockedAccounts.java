@@ -24,11 +24,8 @@ public class UnlockedAccounts implements Iterable<Account> {
 	private final Set<Account> unlocked;
 
 	@Autowired(required = true)
-	public UnlockedAccounts(
-			final AccountLookup accountLookup,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final CanHarvestPredicate canHarvestPredicate,
+	public UnlockedAccounts(final AccountLookup accountLookup, final ReadOnlyAccountStateCache accountStateCache,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer, final CanHarvestPredicate canHarvestPredicate,
 			final int maxUnlockedAccounts) {
 		this.accountLookup = accountLookup;
 		this.accountStateCache = accountStateCache;
@@ -98,15 +95,14 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Prunes all accounts that are not eligible for harvesting at the specified height. This can happen if an account is
-	 * unlocked and then the balance of the account or the importance changes.
+	 * Prunes all accounts that are not eligible for harvesting at the specified height. This can happen if an account is unlocked and then
+	 * the balance of the account or the importance changes.
 	 *
 	 * @param height The height at which to check the accounts.
 	 */
 	public void prune(final BlockHeight height) {
 		final Set<Account> accountsToRemove = this.unlocked.stream()
-				.filter(account -> UnlockResult.SUCCESS != this.checkAccount(account, height))
-				.collect(Collectors.toSet());
+				.filter(account -> UnlockResult.SUCCESS != this.checkAccount(account, height)).collect(Collectors.toSet());
 		this.unlocked.removeAll(accountsToRemove);
 	}
 

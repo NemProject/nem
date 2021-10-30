@@ -5,7 +5,7 @@ import org.nem.nis.cache.*;
 
 public class NisCacheFactory {
 
-	//region createReal
+	// region createReal
 
 	/**
 	 * Creates a real NIS cache.
@@ -23,17 +23,14 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade) {
-		return new DefaultNisCache(
-				new SynchronizedAccountCache(new DefaultAccountCache()),
-				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-				new SynchronizedPoxFacade(poxFacade),
-				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
+		return new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()),
+				new SynchronizedAccountStateCache(new DefaultAccountStateCache()), new SynchronizedPoxFacade(poxFacade),
+				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 	}
 
-	//endregion
+	// endregion
 
-	//region create
+	// region create
 
 	/**
 	 * Creates a NIS cache around an account cache and an account state cache.
@@ -67,12 +64,8 @@ public class NisCacheFactory {
 		return create(null, accountStateCache, poxFacade, null, null);
 	}
 
-	private static NisCache create(
-			final AccountCache accountCache,
-			final AccountStateCache accountStateCache,
-			final DefaultPoxFacade poxFacade,
-			final DefaultHashCache hashCache,
-			final DefaultNamespaceCache namespaceCache) {
+	private static NisCache create(final AccountCache accountCache, final AccountStateCache accountStateCache,
+			final DefaultPoxFacade poxFacade, final DefaultHashCache hashCache, final DefaultNamespaceCache namespaceCache) {
 		return new NisCache() {
 			@Override
 			public AccountCache getAccountCache() {
@@ -110,9 +103,9 @@ public class NisCacheFactory {
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region createReadOnly
+	// region createReadOnly
 
 	/**
 	 * Creates a NIS cache around an account cache and an account state cache.
@@ -125,12 +118,8 @@ public class NisCacheFactory {
 		return createReadOnly(accountCache, accountStateCache, null, null, null);
 	}
 
-	private static ReadOnlyNisCache createReadOnly(
-			final AccountCache accountCache,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache,
-			final ReadOnlyPoxFacade poxFacade,
-			final ReadOnlyNamespaceCache namespaceCache) {
+	private static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache,
+			final DefaultHashCache hashCache, final ReadOnlyPoxFacade poxFacade, final ReadOnlyNamespaceCache namespaceCache) {
 		return new ReadOnlyNisCache() {
 			@Override
 			public AccountCache getAccountCache() {
@@ -164,5 +153,5 @@ public class NisCacheFactory {
 		};
 	}
 
-	//endregion
+	// endregion
 }

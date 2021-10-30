@@ -53,7 +53,7 @@ public class IdealizedClusterFactory {
 				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7, 8)));
 				break;
 
-			default: {
+			default : {
 				throw new IllegalArgumentException("unknown graph");
 			}
 		}
@@ -103,7 +103,7 @@ public class IdealizedClusterFactory {
 				outliers.add(new Cluster(new NodeId(11)));
 				break;
 
-			default: {
+			default : {
 				throw new IllegalArgumentException("unknown graph");
 			}
 		}
@@ -147,7 +147,7 @@ public class IdealizedClusterFactory {
 				outliers.add(new Cluster(new NodeId(19)));
 				break;
 
-			default: {
+			default : {
 				throw new IllegalArgumentException("unknown graph");
 			}
 		}

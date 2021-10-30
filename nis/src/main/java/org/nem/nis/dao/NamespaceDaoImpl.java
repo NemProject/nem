@@ -49,11 +49,7 @@ public class NamespaceDaoImpl implements ReadOnlyNamespaceDao {
 			return Collections.emptyList();
 		}
 
-		return this.retriever.getNamespacesForAccount(
-				this.getCurrentSession(),
-				accountId,
-				parent,
-				limit);
+		return this.retriever.getNamespacesForAccount(this.getCurrentSession(), accountId, parent, limit);
 	}
 
 	@Override

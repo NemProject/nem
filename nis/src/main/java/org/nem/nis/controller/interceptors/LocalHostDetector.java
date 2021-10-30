@@ -47,22 +47,18 @@ public class LocalHostDetector {
 	}
 
 	private static InetAddress parseAddress(final String address) {
-		return ExceptionUtils.propagate(
-				() -> InetAddress.getByName(address),
-				IllegalArgumentException::new);
+		return ExceptionUtils.propagate(() -> InetAddress.getByName(address), IllegalArgumentException::new);
 	}
 
 	private static AddressMatcher createMatcher(final String ipAddress) {
 		if (ipAddress.contains("*")) {
-			return ipAddress.contains(".")
-					? new Ipv4WildcardAddressMatcher(ipAddress)
-					: new Ipv6WildcardAddressMatcher(ipAddress);
+			return ipAddress.contains(".") ? new Ipv4WildcardAddressMatcher(ipAddress) : new Ipv6WildcardAddressMatcher(ipAddress);
 		}
 
 		return new DefaultAddressMatcher(parseAddress(ipAddress));
 	}
 
-	//region AddressMatcher
+	// region AddressMatcher
 
 	private interface AddressMatcher {
 		boolean match(final InetAddress address);
@@ -87,10 +83,7 @@ public class LocalHostDetector {
 		private final Class<? extends InetAddress> addressClass;
 		private final String[] parts;
 
-		public WildCardAddressMapper(
-				final String partSeparator,
-				final int numParts,
-				final Class<? extends InetAddress> addressClass,
+		public WildCardAddressMapper(final String partSeparator, final int numParts, final Class<? extends InetAddress> addressClass,
 				final String address) {
 			this.partSeparator = partSeparator;
 			this.numParts = numParts;
@@ -100,8 +93,7 @@ public class LocalHostDetector {
 
 		@Override
 		public boolean match(final InetAddress address) {
-			return this.addressClass.isAssignableFrom(address.getClass())
-					&& this.match(this.getParts(address.getHostAddress()));
+			return this.addressClass.isAssignableFrom(address.getClass()) && this.match(this.getParts(address.getHostAddress()));
 		}
 
 		private boolean match(final String[] parts) {
@@ -139,5 +131,5 @@ public class LocalHostDetector {
 		}
 	}
 
-	//endregion
+	// endregion
 }

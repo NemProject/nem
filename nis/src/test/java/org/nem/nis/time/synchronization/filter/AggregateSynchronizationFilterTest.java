@@ -65,9 +65,7 @@ public class AggregateSynchronizationFilterTest {
 	}
 
 	private static List<SynchronizationFilter> createFilters() {
-		return Arrays.asList(
-				Mockito.mock(ResponseDelayDetectionFilter.class),
-				Mockito.mock(ClampingFilter.class),
+		return Arrays.asList(Mockito.mock(ResponseDelayDetectionFilter.class), Mockito.mock(ClampingFilter.class),
 				Mockito.mock(AlphaTrimmedMeanFilter.class));
 	}
 }

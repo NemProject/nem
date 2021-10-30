@@ -80,8 +80,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 	public void mosaicTransfersInLaterBlocksAreAllowed() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Block parentBlock = NisUtils.createParentBlock(
-				Utils.generateRandomAccount(),
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(),
 				BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion()));
 		parentBlock.sign();
 
@@ -89,35 +88,22 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 
 		// - add a namespace creation transaction to block index 0
 		final Account mosaicOwner = context.addAccount(Amount.fromNem(200000));
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				mosaicOwner,
-				Utils.createMosaicId("alice", "tokens"),
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicOwner, Utils.createMosaicId("alice", "tokens"),
 				Utils.createMosaicProperties(100000L, 1, null, null));
-		final ProvisionNamespaceTransaction namespaceTransaction = new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				mosaicOwner,
-				MosaicConstants.NAMESPACE_OWNER_NEM,
-				Amount.fromNem(50000),
-				mosaicDefinition.getId().getNamespaceId().getLastPart(),
-				null);
+		final ProvisionNamespaceTransaction namespaceTransaction = new ProvisionNamespaceTransaction(TimeInstant.ZERO, mosaicOwner,
+				MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), mosaicDefinition.getId().getNamespaceId().getLastPart(), null);
 		blocks.get(0).addTransaction(fixUp(namespaceTransaction));
 
 		// - add a mosaic definition creation transaction to block index 1
-		final MosaicDefinitionCreationTransaction creationTransaction = new MosaicDefinitionCreationTransaction(
-				TimeInstant.ZERO,
-				mosaicOwner,
-				mosaicDefinition);
+		final MosaicDefinitionCreationTransaction creationTransaction = new MosaicDefinitionCreationTransaction(TimeInstant.ZERO,
+				mosaicOwner, mosaicDefinition);
 		blocks.get(1).addTransaction(fixUp(creationTransaction));
 
 		// - add a mosaic transfer transaction to block index 2
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicDefinition.getId(), new Quantity(1000));
-		final Transaction transferTransaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				mosaicOwner,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
-				attachment);
+		final Transaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, mosaicOwner, Utils.generateRandomAccount(),
+				Amount.fromNem(1), attachment);
 		blocks.get(2).addTransaction(fixUp(transferTransaction));
 		NisUtils.signAllBlocks(blocks);
 

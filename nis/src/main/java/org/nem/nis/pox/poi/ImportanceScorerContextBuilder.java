@@ -11,7 +11,7 @@ public class ImportanceScorerContextBuilder {
 	private ColumnVector vestedBalanceVector;
 	private ColumnVector graphWeightVector;
 
-	//region setters
+	// region setters
 
 	/**
 	 * Sets the importance vector.
@@ -49,7 +49,7 @@ public class ImportanceScorerContextBuilder {
 		this.graphWeightVector = graphWeightVector;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a new importance scorer context.

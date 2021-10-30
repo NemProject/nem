@@ -26,7 +26,7 @@ import java.util.function.Function;
 public class NodeControllerTest {
 	private static int MAX_EXPERIENCES = 100;
 
-	//region getInfo / getExtendedInfo
+	// region getInfo / getExtendedInfo
 
 	@Test
 	public void getInfoReturnsNetworkLocalNode() {
@@ -45,17 +45,12 @@ public class NodeControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runInfoTest(
-				context,
-				c -> c.controller.getInfo(challenge),
+		final AuthenticatedResponse<?> response = runInfoTest(context, c -> c.controller.getInfo(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runInfoTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
-			final Function<T, Node> getNode) {
+	private static <T> T runInfoTest(final TestContext context, final Function<TestContext, T> action, final Function<T, Node> getNode) {
 		// Act:
 		final T response = action.apply(context);
 		final Node node = getNode.apply(response);
@@ -89,9 +84,9 @@ public class NodeControllerTest {
 		MatcherAssert.assertThat(appMetaData, IsSame.sameInstance(CommonStarter.META_DATA));
 	}
 
-	//endregion
+	// endregion
 
-	//region getPeerList / getReachablePeerList / getActivePeerList
+	// region getPeerList / getReachablePeerList / getActivePeerList
 
 	@Test
 	public void getPeerListReturnsNetworkNodes() {
@@ -121,9 +116,7 @@ public class NodeControllerTest {
 		final SerializableList<Node> nodes = context.controller.getReachablePeerList();
 
 		// Assert:
-		final List<Node> expectedNodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.4"),
-				NodeUtils.createNodeWithHost("10.0.0.7"));
+		final List<Node> expectedNodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.4"), NodeUtils.createNodeWithHost("10.0.0.7"));
 		MatcherAssert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
 	}
 
@@ -144,21 +137,15 @@ public class NodeControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runActivePeerListTest(
-				context,
-				c -> c.controller.getActivePeerList(challenge),
+		final AuthenticatedResponse<?> response = runActivePeerListTest(context, c -> c.controller.getActivePeerList(challenge),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runActivePeerListTest(
-			final TestContext context,
-			final Function<TestContext, T> action,
+	private static <T> T runActivePeerListTest(final TestContext context, final Function<TestContext, T> action,
 			final Function<T, SerializableList<Node>> getActivePeerList) {
 		// Arrange:
-		final List<Node> selectedNodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.4"),
-				NodeUtils.createNodeWithHost("10.0.0.7"));
+		final List<Node> selectedNodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.4"), NodeUtils.createNodeWithHost("10.0.0.7"));
 		Mockito.when(context.network.getPartnerNodes()).thenReturn(selectedNodes);
 
 		// Act:
@@ -170,20 +157,18 @@ public class NodeControllerTest {
 		return response;
 	}
 
-	//endregion
+	// endregion
 
-	//region getExperiences
+	// region getExperiences
 
 	@Test
 	public void getExperiencesReturnsExtendedLocalNodeExperiences() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final PeerNetwork network = context.network;
-		Mockito.when(network.getLocalNodeAndExperiences()).thenReturn(
-				new NodeExperiencesPair(
-						NodeUtils.createNodeWithName("l"),
-						Arrays.asList(
-								new NodeExperiencePair(NodeUtils.createNodeWithName("n"), new NodeExperience(0, 1)),
+		Mockito.when(network.getLocalNodeAndExperiences())
+				.thenReturn(new NodeExperiencesPair(NodeUtils.createNodeWithName("l"),
+						Arrays.asList(new NodeExperiencePair(NodeUtils.createNodeWithName("n"), new NodeExperience(0, 1)),
 								new NodeExperiencePair(NodeUtils.createNodeWithName("e"), new NodeExperience(1, 0)),
 								new NodeExperiencePair(NodeUtils.createNodeWithName("m"), new NodeExperience(1, 0)))));
 
@@ -202,9 +187,9 @@ public class NodeControllerTest {
 		MatcherAssert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
-	//endregion
+	// endregion
 
-	//region getAuthenticatedExperiences
+	// region getAuthenticatedExperiences
 
 	@Test
 	public void getAuthenticatedExperiencesCanReturnZeroLocalNodeExperiences() {
@@ -233,7 +218,7 @@ public class NodeControllerTest {
 		final TestContext context = new TestContext();
 		final PeerNetwork network = context.network;
 		final List<NodeExperiencePair> experiencePairs = new ArrayList<>();
-		int i=0;
+		int i = 0;
 		while (numExperiencePairs > experiencePairs.size()) {
 			experiencePairs.add(createPair(++i));
 		}
@@ -253,14 +238,13 @@ public class NodeControllerTest {
 	}
 
 	static private NodeExperiencePair createPair(final int successfulCalls) {
-		return new NodeExperiencePair(
-				NodeUtils.createNodeWithName(String.valueOf(successfulCalls)),
+		return new NodeExperiencePair(NodeUtils.createNodeWithName(String.valueOf(successfulCalls)),
 				new NodeExperience(successfulCalls, 0));
 	}
 
-	//endregion
+	// endregion
 
-	//region sign of life
+	// region sign of life
 
 	@Test
 	public void signOfLifeActivatesSourceNodeIfSourceNodeStatusIsUnknown() {
@@ -316,10 +300,8 @@ public class NodeControllerTest {
 
 		// Assert:
 		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
-		Mockito.verify(context.compatibilityChecker, Mockito.only())
-				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
-		Mockito.verify(context.host, Mockito.never())
-				.getNodeInfo(remoteNode);
+		Mockito.verify(context.compatibilityChecker, Mockito.only()).check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.never()).getNodeInfo(remoteNode);
 	}
 
 	@Test
@@ -338,10 +320,8 @@ public class NodeControllerTest {
 
 		// Assert:
 		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
-		Mockito.verify(context.compatibilityChecker, Mockito.only())
-				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
-		Mockito.verify(context.host, Mockito.never())
-				.getNodeInfo(remoteNode);
+		Mockito.verify(context.compatibilityChecker, Mockito.only()).check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.never()).getNodeInfo(remoteNode);
 	}
 
 	@Test
@@ -362,13 +342,11 @@ public class NodeControllerTest {
 
 		// Assert:
 		MatcherAssert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
-		Mockito.verify(context.compatibilityChecker, Mockito.only())
-				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
-		Mockito.verify(context.host, Mockito.times(1))
-				.getNodeInfo(remoteNode);
+		Mockito.verify(context.compatibilityChecker, Mockito.only()).check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.times(1)).getNodeInfo(remoteNode);
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void canYouSeeMeReturnsTheRemoteAddress() {

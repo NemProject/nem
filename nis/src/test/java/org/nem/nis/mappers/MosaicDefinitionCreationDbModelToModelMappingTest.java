@@ -10,7 +10,9 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-public class MosaicDefinitionCreationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMosaicDefinitionCreationTransaction, MosaicDefinitionCreationTransaction> {
+public class MosaicDefinitionCreationDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbMosaicDefinitionCreationTransaction, MosaicDefinitionCreationTransaction> {
 
 	@Test
 	public void dbTransactionCanBeMappedToModel() {
@@ -54,14 +56,13 @@ public class MosaicDefinitionCreationDbModelToModelMappingTest extends AbstractT
 	@Override
 	protected IMapping<DbMosaicDefinitionCreationTransaction, MosaicDefinitionCreationTransaction> createMapping(final IMapper mapper) {
 		// map the db mosaic to a non-null model mosaic with the same creator as the db mosaic
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(MosaicDefinition.class)))
-				.thenAnswer(invocationOnMock -> {
-					final DbMosaicDefinition dbMosaicDefinition = ((DbMosaicDefinition)invocationOnMock.getArguments()[0]);
-					final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
-					final Account creator = mapper.map(dbMosaicDefinition.getCreator(), Account.class);
-					Mockito.when(mosaicDefinition.getCreator()).thenReturn(creator);
-					return mosaicDefinition;
-				});
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(MosaicDefinition.class))).thenAnswer(invocationOnMock -> {
+			final DbMosaicDefinition dbMosaicDefinition = ((DbMosaicDefinition) invocationOnMock.getArguments()[0]);
+			final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
+			final Account creator = mapper.map(dbMosaicDefinition.getCreator(), Account.class);
+			Mockito.when(mosaicDefinition.getCreator()).thenReturn(creator);
+			return mosaicDefinition;
+		});
 		return new MosaicDefinitionCreationDbModelToModelMapping(mapper);
 	}
 
@@ -73,7 +74,8 @@ public class MosaicDefinitionCreationDbModelToModelMappingTest extends AbstractT
 		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		private final Account creationFeeSink = Utils.generateRandomAccount();
 		private final DbAccount dbCreationFeeSink = Mockito.mock(DbAccount.class);
-		private final MosaicDefinitionCreationDbModelToModelMapping mapping = new MosaicDefinitionCreationDbModelToModelMapping(this.mapper);
+		private final MosaicDefinitionCreationDbModelToModelMapping mapping = new MosaicDefinitionCreationDbModelToModelMapping(
+				this.mapper);
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.dbMosaicDefinition, MosaicDefinition.class)).thenReturn(this.mosaicDefinition);

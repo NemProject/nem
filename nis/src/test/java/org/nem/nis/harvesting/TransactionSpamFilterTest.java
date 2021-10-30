@@ -74,7 +74,7 @@ public class TransactionSpamFilterTest {
 			// Arrange:
 			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(0.0);
-			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
+			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all have zero fee
 
 			// Act:
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
@@ -97,8 +97,12 @@ public class TransactionSpamFilterTest {
 			// Arrange:
 			// - different accounts fill the cache
 			// - rounded solutions for equation: importance * e^(-3 * y / 1200) * 100 * (1200 - y) = 1
-			final double[] importanceArray = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
-			final int[] expectedCacheSizeDifferentAccounts = {1200, 1199, 1181, 1059, 669, 120};
+			final double[] importanceArray = {
+					1, 0.1, 0.01, 0.001, 0.0001, 0.00001
+			};
+			final int[] expectedCacheSizeDifferentAccounts = {
+					1200, 1199, 1181, 1059, 669, 120
+			};
 			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 			for (int i = 0; i < importanceArray.length; i++) {
@@ -113,9 +117,12 @@ public class TransactionSpamFilterTest {
 			// - single account fills the cache
 			// - rounded solutions for equation: importance * e^(-3 * y / 2000) * 100 * (2000 - y) = y
 			// - for importance <= 0.001, only max transactions per block (200) are allowed when cache is initially empty
-			final double[] importanceArray = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
-			//final int[] expectedCacheSizeSingleAccount = { 1756, 1227, 587, 200, 200, 200 };
-			final int[] expectedCacheSizeSingleAccount = {1054, 736, 352, 120, 120, 120};
+			final double[] importanceArray = {
+					1, 0.1, 0.01, 0.001, 0.0001, 0.00001
+			};
+			final int[] expectedCacheSizeSingleAccount = {
+					1054, 736, 352, 120, 120, 120
+			};
 			final Collection<Transaction> transactions = this.createTransactions(USE_SINGLE_ACCOUNT, 2100);
 
 			for (int i = 0; i < importanceArray.length; i++) {
@@ -128,50 +135,48 @@ public class TransactionSpamFilterTest {
 		public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighFillLevel() {
 			// Assert: boolean parameter says whether transaction is filtered or not.
 			final int cacheSize = 1000;
-			this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
-			this.assertFilterResult(cacheSize, 0.0, 100000, true);     // no importance, fee not high enough
-			this.assertFilterResult(cacheSize, 0.0, 1000000, false);  // no importance, high fee
+			this.assertFilterResult(cacheSize, 0.0, 0, true); // no importance and fee
+			this.assertFilterResult(cacheSize, 0.0, 100000, true); // no importance, fee not high enough
+			this.assertFilterResult(cacheSize, 0.0, 1000000, false); // no importance, high fee
 
-			this.assertFilterResult(cacheSize, 0.0001, 0, true);   // medium importance, no fee
-			this.assertFilterResult(cacheSize, 0.0001, 100000, true);  // medium importance, medium fee
+			this.assertFilterResult(cacheSize, 0.0001, 0, true); // medium importance, no fee
+			this.assertFilterResult(cacheSize, 0.0001, 100000, true); // medium importance, medium fee
 
-			this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
-			this.assertFilterResult(cacheSize, 0.01, 1000000, false);  // high importance and fee
+			this.assertFilterResult(cacheSize, 0.01, 0, false); // high importance and no fee
+			this.assertFilterResult(cacheSize, 0.01, 1000000, false); // high importance and fee
 		}
 
 		@Test
 		public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighMediumLevel() {
 			// Assert: boolean parameter says whether transaction is filtered or not.
 			final int cacheSize = 250;
-			this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
-			this.assertFilterResult(cacheSize, 0.0, 100000, false);    // no importance, fee not high enough
-			this.assertFilterResult(cacheSize, 0.0, 1000000, false);   // no importance, high fee
+			this.assertFilterResult(cacheSize, 0.0, 0, true); // no importance and fee
+			this.assertFilterResult(cacheSize, 0.0, 100000, false); // no importance, fee not high enough
+			this.assertFilterResult(cacheSize, 0.0, 1000000, false); // no importance, high fee
 
-			this.assertFilterResult(cacheSize, 0.0001, 0, false);  // medium importance, no fee
+			this.assertFilterResult(cacheSize, 0.0001, 0, false); // medium importance, no fee
 			this.assertFilterResult(cacheSize, 0.0001, 100000, false); // medium importance, medium fee
 
-			this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
-			this.assertFilterResult(cacheSize, 0.01, 1000000, false);  // high importance and fee
+			this.assertFilterResult(cacheSize, 0.01, 0, false); // high importance and no fee
+			this.assertFilterResult(cacheSize, 0.01, 1000000, false); // high importance and fee
 		}
 
 		@Test
 		public void filterResultDependsOnImportanceAndFeeWhenCacheHasLowFillLevel() {
 			// Assert: boolean parameter says whether transaction is filtered or not.
 			final int cacheSize = 100;
-			this.assertFilterResult(cacheSize, 0.0, 0, false);     // no importance and fee
-			this.assertFilterResult(cacheSize, 0.0, 100000, false);    // no importance, fee not high enough
-			this.assertFilterResult(cacheSize, 0.0, 1000000, false);   // no importance, high fee
+			this.assertFilterResult(cacheSize, 0.0, 0, false); // no importance and fee
+			this.assertFilterResult(cacheSize, 0.0, 100000, false); // no importance, fee not high enough
+			this.assertFilterResult(cacheSize, 0.0, 1000000, false); // no importance, high fee
 
-			this.assertFilterResult(cacheSize, 0.0001, 0, false);  // medium importance, no fee
+			this.assertFilterResult(cacheSize, 0.0001, 0, false); // medium importance, no fee
 			this.assertFilterResult(cacheSize, 0.0001, 100000, false); // medium importance, medium fee
 
-			this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
-			this.assertFilterResult(cacheSize, 0.01, 1000000, false);  // high importance and fee
+			this.assertFilterResult(cacheSize, 0.01, 0, false); // high importance and no fee
+			this.assertFilterResult(cacheSize, 0.01, 1000000, false); // high importance and fee
 		}
 
-		private void assertFilteredTransactionsSize(
-				final Collection<Transaction> transactions,
-				final double importance,
+		private void assertFilteredTransactionsSize(final Collection<Transaction> transactions, final double importance,
 				final int expectedFilteredTransactionsSize) {
 			// Arrange:
 			final TestContext context = new TestContext(0, BlockHeight.ONE, this.useMultisig());
@@ -184,11 +189,7 @@ public class TransactionSpamFilterTest {
 			MatcherAssert.assertThat(filteredTransactions.size(), IsEqual.equalTo(expectedFilteredTransactionsSize));
 		}
 
-		private void assertFilterResult(
-				final int currentCacheSize,
-				final double importance,
-				final long fee,
-				final boolean isFiltered) {
+		private void assertFilterResult(final int currentCacheSize, final double importance, final long fee, final boolean isFiltered) {
 			// Arrange:
 			final TestContext context = new TestContext(currentCacheSize, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(importance);
@@ -288,30 +289,28 @@ public class TransactionSpamFilterTest {
 
 	private static Collection<Transaction> createNonMultisigTransactions(final boolean useSingleAccount, final int count) {
 		final Account account = Utils.generateRandomAccount();
-		return IntStream.range(0, count)
-				.mapToObj(i -> {
-					final Transaction transaction = new MockTransaction(useSingleAccount ? account : Utils.generateRandomAccount());
-					transaction.setFee(Amount.ZERO);
-					return transaction;
-				})
-				.collect(Collectors.toList());
+		return IntStream.range(0, count).mapToObj(i -> {
+			final Transaction transaction = new MockTransaction(useSingleAccount ? account : Utils.generateRandomAccount());
+			transaction.setFee(Amount.ZERO);
+			return transaction;
+		}).collect(Collectors.toList());
 	}
 
 	private static Collection<Transaction> createMultisigTransactions(final boolean useSingleAccount, final int count) {
 		final Account account = Utils.generateRandomAccount();
-		return IntStream.range(0, count)
-				.mapToObj(i -> {
-					final Transaction transaction = new MockTransaction(TransactionTypes.MULTISIG, useSingleAccount ? account : Utils.generateRandomAccount());
-					transaction.setFee(Amount.ZERO);
-					return transaction;
-				})
-				.collect(Collectors.toList());
+		return IntStream.range(0, count).mapToObj(i -> {
+			final Transaction transaction = new MockTransaction(TransactionTypes.MULTISIG,
+					useSingleAccount ? account : Utils.generateRandomAccount());
+			transaction.setFee(Amount.ZERO);
+			return transaction;
+		}).collect(Collectors.toList());
 	}
 
 	private static class TestContext {
 		private final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		private final UnconfirmedTransactionsCache transactions = Mockito.spy(new UnconfirmedTransactionsCache());
-		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions, MAX_TRANSACTIONS_PER_BLOCK);
+		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions,
+				MAX_TRANSACTIONS_PER_BLOCK);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 		private final boolean useMultisig;
 

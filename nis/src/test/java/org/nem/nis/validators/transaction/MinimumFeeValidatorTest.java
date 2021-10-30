@@ -22,17 +22,14 @@ public class MinimumFeeValidatorTest {
 	@Test
 	public void transactionWithInvalidFeeFailsValidation() {
 		// Assert:
-		assertValidationResultForMockTransactionFee(
-				MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)),
+		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)),
 				ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}
 
 	@Test
 	public void transactionWithValidFeePassesValidation() {
 		// Assert:
-		assertValidationResultForMockTransactionFee(
-				MockTransaction.DEFAULT_FEE,
-				ValidationResult.SUCCESS);
+		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE, ValidationResult.SUCCESS);
 	}
 
 	private static void assertValidationResultForMockTransactionFee(final Amount fee, final ValidationResult expectedResult) {
@@ -72,13 +69,11 @@ public class MinimumFeeValidatorTest {
 	private static void assertValidationPassesForFee(final Amount fee) {
 		// Arrange:
 		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache(), true);
-		final Collection<Transaction> transactions = TestTransactionRegistry.stream()
-				.map(entry -> {
-					final Transaction transaction = entry.createModel.get();
-					transaction.setFee(fee);
-					return transaction;
-				})
-				.collect(Collectors.toList());
+		final Collection<Transaction> transactions = TestTransactionRegistry.stream().map(entry -> {
+			final Transaction transaction = entry.createModel.get();
+			transaction.setFee(fee);
+			return transaction;
+		}).collect(Collectors.toList());
 
 		// Test a transaction with mosaics and message too
 		final Message message = new PlainMessage("Hi there".getBytes());
@@ -89,8 +84,7 @@ public class MinimumFeeValidatorTest {
 		transactions.add(transaction);
 
 		// Assert:
-		transactions.forEach(t -> MatcherAssert.assertThat(
-				validator.validate(t, new ValidationContext(ValidationStates.Throw)),
+		transactions.forEach(t -> MatcherAssert.assertThat(validator.validate(t, new ValidationContext(ValidationStates.Throw)),
 				IsEqual.equalTo(ValidationResult.SUCCESS)));
 	}
 
@@ -98,26 +92,24 @@ public class MinimumFeeValidatorTest {
 		// Arrange:
 		final Account namespaceOwner = Utils.generateRandomAccount();
 		final MosaicId mosaicId = Utils.createMosaicId(1);
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, mosaicId, Utils.createMosaicProperties(10000L, 0, null, null));
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, mosaicId,
+				Utils.createMosaicProperties(10000L, 0, null, null));
 		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		namespaceCache.add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
 		namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().add(mosaicDefinition);
 
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, new Quantity(1000));
-		final TransferTransaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
-				attachment);
+		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(), Amount.fromNem(1), attachment);
 		transaction.setFee(fee);
 		transaction.setDeadline(new TimeInstant(1));
 
 		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache, false);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
+		final ValidationResult result = validator.validate(transaction,
+				new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));

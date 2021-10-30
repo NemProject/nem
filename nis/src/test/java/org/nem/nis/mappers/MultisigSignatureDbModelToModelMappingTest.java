@@ -9,7 +9,9 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
-public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
+public class MultisigSignatureDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
 
 	@Test
 	public void signatureCanBeMappedToModelWhenLinkedMultisigTransactionHasInnerTransaction() {
@@ -32,9 +34,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		dbSignature.getMultisigTransaction().setTransferTransaction(null);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(dbSignature),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.mapping.map(dbSignature), IllegalArgumentException.class);
 	}
 
 	@Override

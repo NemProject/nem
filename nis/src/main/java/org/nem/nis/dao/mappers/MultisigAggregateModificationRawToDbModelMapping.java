@@ -8,7 +8,9 @@ import java.util.HashSet;
 /**
  * A mapping that is able to map raw multisig signer modification transaction data to a db multisig signer modification transfer.
  */
-public class MultisigAggregateModificationRawToDbModelMapping extends AbstractTransferRawToDbModelMapping<DbMultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationRawToDbModelMapping
+		extends
+			AbstractTransferRawToDbModelMapping<DbMultisigAggregateModificationTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -23,7 +25,7 @@ public class MultisigAggregateModificationRawToDbModelMapping extends AbstractTr
 	protected DbMultisigAggregateModificationTransaction mapImpl(final Object[] source) {
 		final DbMultisigAggregateModificationTransaction dbModificationTransaction = new DbMultisigAggregateModificationTransaction();
 		dbModificationTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbModificationTransaction.setBlkIndex((Integer)source[9]);
+		dbModificationTransaction.setBlkIndex((Integer) source[9]);
 		dbModificationTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
 		dbModificationTransaction.setMultisigModifications(new HashSet<>());
 

@@ -42,16 +42,14 @@ public class DbTransferIoAdapterTest {
 		final TestContext context = new TestContext();
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.transactionIo.getTransactionUsingHash(Utils.generateRandomHash(), new BlockHeight(8)),
+		ExceptionAssert.assertThrows(v -> context.transactionIo.getTransactionUsingHash(Utils.generateRandomHash(), new BlockHeight(8)),
 				MissingResourceException.class);
 	}
 
 	private static class TestContext {
 		private final TransferBlockPair pair = createTransferBlockPair();
 		private final ReadOnlyTransferDao transferDao = Mockito.mock(ReadOnlyTransferDao.class);
-		private final TransactionIo transactionIo = new DbTransferIoAdapter(
-				this.transferDao,
+		private final TransactionIo transactionIo = new DbTransferIoAdapter(this.transferDao,
 				MapperUtils.createDbModelToModelNisMapper(new MockAccountLookup()));
 
 		TransferBlockPair createTransferBlockPair() {

@@ -33,18 +33,9 @@ public class PeerNetworkSchedulerTest {
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
-			final List<String> expectedTaskNames = Arrays.asList(
-					"BROADCAST",
-					"FORAGING",
-					"PRUNING INACTIVE NODES",
-					"REFRESH",
-					"SYNC",
-					"AUTO IP DETECTION",
-					"TIME SYNCHRONIZATION",
-					"CHECKING CHAIN SYNCHRONIZATION",
-					"BROADCAST BUFFERED ENTITIES",
-					"UPDATE NODE EXPERIENCES",
-					"PRUNE NODE EXPERIENCES");
+			final List<String> expectedTaskNames = Arrays.asList("BROADCAST", "FORAGING", "PRUNING INACTIVE NODES", "REFRESH", "SYNC",
+					"AUTO IP DETECTION", "TIME SYNCHRONIZATION", "CHECKING CHAIN SYNCHRONIZATION", "BROADCAST BUFFERED ENTITIES",
+					"UPDATE NODE EXPERIENCES", "PRUNE NODE EXPERIENCES");
 			MatcherAssert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
@@ -84,35 +75,22 @@ public class PeerNetworkSchedulerTest {
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
-			final List<String> expectedTaskNames = Arrays.asList(
-					"BROADCAST",
-					"FORAGING",
-					"PRUNING INACTIVE NODES",
-					"REFRESH",
-					"SYNC",
-					"CHECKING CHAIN SYNCHRONIZATION",
-					"BROADCAST BUFFERED ENTITIES",
-					"UPDATE NODE EXPERIENCES",
-					"PRUNE NODE EXPERIENCES");
+			final List<String> expectedTaskNames = Arrays.asList("BROADCAST", "FORAGING", "PRUNING INACTIVE NODES", "REFRESH", "SYNC",
+					"CHECKING CHAIN SYNCHRONIZATION", "BROADCAST BUFFERED ENTITIES", "UPDATE NODE EXPERIENCES", "PRUNE NODE EXPERIENCES");
 			MatcherAssert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
 
 	private static List<String> getTaskNames(final PeerNetworkScheduler scheduler) {
-		return scheduler.getVisitors().stream()
-				.map(NemAsyncTimerVisitor::getTimerName)
-				.collect(Collectors.toList());
+		return scheduler.getVisitors().stream().map(NemAsyncTimerVisitor::getTimerName).collect(Collectors.toList());
 	}
 
 	private static PeerNetworkScheduler createScheduler() {
-		return new PeerNetworkScheduler(
-				Mockito.mock(TimeProvider.class),
-				Mockito.mock(HarvestingTask.class));
+		return new PeerNetworkScheduler(Mockito.mock(TimeProvider.class), Mockito.mock(HarvestingTask.class));
 	}
 
-	private static void addTasks(final PeerNetworkScheduler scheduler,
-			final boolean useNetworkTime,
-			final boolean enableAutoIpDetection) {
-		scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(PeerNetworkBroadcastBuffer.class), useNetworkTime, enableAutoIpDetection);
+	private static void addTasks(final PeerNetworkScheduler scheduler, final boolean useNetworkTime, final boolean enableAutoIpDetection) {
+		scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(PeerNetworkBroadcastBuffer.class), useNetworkTime,
+				enableAutoIpDetection);
 	}
 }

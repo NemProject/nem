@@ -13,7 +13,7 @@ import java.text.ParseException;
 
 public class TransactionDebugInfoTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void constructorParametersAreApplied() {
@@ -27,7 +27,8 @@ public class TransactionDebugInfoTest {
 		final String message = "Test message";
 
 		// Act:
-		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee, message);
+		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee,
+				message);
 
 		// Assert:
 		MatcherAssert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
@@ -39,9 +40,9 @@ public class TransactionDebugInfoTest {
 		MatcherAssert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void canRoundtripTransactionDebugInfo() throws ParseException {
@@ -53,7 +54,8 @@ public class TransactionDebugInfoTest {
 		final Amount amount = Amount.fromNem(100);
 		final Amount fee = Amount.fromNem(10);
 		final String message = "Test message";
-		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee, message);
+		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount,
+				fee, message);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransactionDebugInfo, null);
@@ -69,5 +71,5 @@ public class TransactionDebugInfoTest {
 		MatcherAssert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
 
-	//endregion
+	// endregion
 }

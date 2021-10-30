@@ -31,8 +31,7 @@ public abstract class AbstractTransactionValidationTest {
 				this.add(Utils.createMosaicId("foo", "mosaic"));
 			}
 		};
-		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(
-				id -> knownMosaicIds.contains(id) ? feeInfo : null));
+		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(id -> knownMosaicIds.contains(id) ? feeInfo : null));
 	}
 
 	@After
@@ -40,9 +39,7 @@ public abstract class AbstractTransactionValidationTest {
 		Utils.resetGlobals();
 	}
 
-	//region ported from DefaultNewBlockTransactionsProviderTest
-
-	//region transfers
+	// region transfers
 
 	@Test
 	public void getBlockTransactionsAllowsEarlierBlockTransfersToBeSpentLater() {
@@ -63,11 +60,7 @@ public abstract class AbstractTransactionValidationTest {
 		t2.sign();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Arrays.asList(t1, t2),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Arrays.asList(t1, t2), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -89,16 +82,13 @@ public abstract class AbstractTransactionValidationTest {
 		t2.sign();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t2),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t2),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	//endregion
+	// endregion
 
-	//region importance transfer
+	// region importance transfer
 
 	@Test
 	public void getBlockTransactionsDoesNotAllowConflictingImportanceTransfersToBeInSingleBlock() {
@@ -112,16 +102,13 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(sender, remote2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig modification
+	// region multisig modification
 
 	@Test
 	public void getBlockTransactionsDoesNotAllowMultipleMultisigModificationsForSameAccountToBeInSingleBlock() {
@@ -141,18 +128,13 @@ public abstract class AbstractTransactionValidationTest {
 		final ValidationResult expectedResult = this.isSingleBlockUsed()
 				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
 				: ValidationResult.SUCCESS;
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2), expectedResult);
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig
-
-	//region default min signatures (all)
+	// region multisig - default min signatures (all)
 
 	@Test
 	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
@@ -171,9 +153,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1),
 				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
@@ -196,16 +176,12 @@ public abstract class AbstractTransactionValidationTest {
 		mt1.addSignature(createSignature(cosigner2, multisig, t1));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.singletonList(mt1), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region custom min signatures
+	// region multisig - custom min signatures
 
 	@Test
 	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfLessThanMinCosignatoriesMultisigSignaturesArePresent() {
@@ -227,9 +203,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1),
 				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
@@ -255,11 +229,7 @@ public abstract class AbstractTransactionValidationTest {
 		mt1.addSignature(createSignature(cosigner2, multisig, t1));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.singletonList(mt1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -280,30 +250,18 @@ public abstract class AbstractTransactionValidationTest {
 		context.setMinCosignatories(multisig, 2);
 
 		// create a transaction with two signatures (cosigner1 and cosigner2)
-		final MultisigTransaction mt1 = createMultisigModification(
-				multisig,
-				cosigner1,
+		final MultisigTransaction mt1 = createMultisigModification(multisig, cosigner1,
 				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner4)));
 		mt1.getOtherTransaction().setSignature(null);
 		mt1.addSignature(createSignature(cosigner2, multisig, mt1.getOtherTransaction()));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.singletonList(mt1), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//endregion
-
-	//region ported from BlockChainValidatorIntegrationTest
-
-	//region general
+	// region general
 
 	@Test
 	public void allTransactionsInChainMustNotBePastDeadline() {
@@ -339,8 +297,7 @@ public abstract class AbstractTransactionValidationTest {
 		}, ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}
 
-	private void assertSingleBadTransactionIsFilteredOut(
-			final Function<TestContext, Transaction> getBadTransaction,
+	private void assertSingleBadTransactionIsFilteredOut(final Function<TestContext, Transaction> getBadTransaction,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -350,11 +307,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t3 = context.createValidSignedTransaction();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t3),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t3), expectedResult);
 	}
 
 	@Test
@@ -371,11 +324,7 @@ public abstract class AbstractTransactionValidationTest {
 		copyCache.commit();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t3),
-				ValidationResult.NEUTRAL);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t3), ValidationResult.NEUTRAL);
 	}
 
 	@Test
@@ -386,11 +335,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = context.createValidSignedTransaction();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t1),
-				Arrays.asList(t1, t2),
-				this.getHashConflictResult());
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t1), Arrays.asList(t1, t2), this.getHashConflictResult());
 	}
 
 	@Test
@@ -402,16 +347,12 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t3 = context.createValidSignedTransaction();
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t2, t3),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t2, t3), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region importance transfer
+	// region importance transfer
 
 	@Test
 	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
@@ -423,10 +364,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createActivateImportanceTransfer(account1, account2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
@@ -441,10 +379,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(account1, account2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t1),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
@@ -460,10 +395,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(account2, accountX);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -492,9 +424,9 @@ public abstract class AbstractTransactionValidationTest {
 		}, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 	}
 
-	//endregion
+	// endregion
 
-	//region transfer
+	// region transfer
 
 	@Test
 	public void chainIsValidIfAccountSpendsAmountReceivedEarlier() {
@@ -508,11 +440,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t3 = createTransferTransaction(account1, account2, Amount.fromNem(1700));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t2, t3),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t2, t3), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -523,10 +451,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(20));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
@@ -538,11 +463,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(20));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -555,12 +476,11 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t3 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(14));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t2),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t2),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
+
+	// endregion
 
 	// region without additional mosaic transfer fee
 
@@ -626,10 +546,7 @@ public abstract class AbstractTransactionValidationTest {
 	// endregion
 
 	private static MosaicLevy createMosaicLevy() {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				Utils.generateRandomAccount(),
-				Utils.createMosaicId(1),
+		return new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), Utils.createMosaicId(1),
 				Quantity.fromValue(123));
 	}
 
@@ -643,10 +560,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertMosaicBalanceValidationForSingleTransaction(levy, supply, quantity, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	private void assertMosaicBalanceValidationForSingleTransaction(
-			final MosaicLevy levy,
-			final long supply,
-			final long quantity,
+	private void assertMosaicBalanceValidationForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		// - due to the way the globals are setup, mosaic 1 has a transfer fee but mosaic 2 does not
@@ -654,79 +568,49 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(500));
 		context.prepareMosaic(signer, Utils.createMosaicId(id), Supply.fromValue(supply), levy);
-		final Transaction t1 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(1),
 				Utils.createMosaic(id, quantity));
 		prepareWithMinimumFee(t1, context.nisCache);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				expectedResult.isSuccess() ? Collections.singletonList(t1) : Collections.emptyList(),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1),
+				expectedResult.isSuccess() ? Collections.singletonList(t1) : Collections.emptyList(), expectedResult);
 	}
 
-	private void assertSufficientMosaicBalanceForMultipleTransactions(
-			final MosaicLevy levy,
-			final long supply,
-			final long quantity1,
-			final long quantity2,
-			final long quantity3) {
+	private void assertSufficientMosaicBalanceForMultipleTransactions(final MosaicLevy levy, final long supply, final long quantity1,
+			final long quantity2, final long quantity3) {
 		this.assertMosaicBalanceValidationForMultipleTransactions(levy, supply, quantity1, quantity2, quantity3, ValidationResult.SUCCESS);
 	}
 
-	private void assertInsufficientMosaicBalanceForMultipleTransactions(
-			final MosaicLevy levy,
-			final long supply,
-			final long quantity1,
-			final long quantity2,
-			final long quantity3) {
-		this.assertMosaicBalanceValidationForMultipleTransactions(levy, supply, quantity1, quantity2, quantity3, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	private void assertInsufficientMosaicBalanceForMultipleTransactions(final MosaicLevy levy, final long supply, final long quantity1,
+			final long quantity2, final long quantity3) {
+		this.assertMosaicBalanceValidationForMultipleTransactions(levy, supply, quantity1, quantity2, quantity3,
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	private void assertMosaicBalanceValidationForMultipleTransactions(
-			final MosaicLevy levy,
-			final long supply,
-			final long quantity1,
-			final long quantity2,
-			final long quantity3,
-			final ValidationResult expectedResult) {
+	private void assertMosaicBalanceValidationForMultipleTransactions(final MosaicLevy levy, final long supply, final long quantity1,
+			final long quantity2, final long quantity3, final ValidationResult expectedResult) {
 		// Arrange:
 		// - due to the way the globals are setup, mosaic 1 has a transfer fee but mosaic 2 does not
 		final int id = null == levy ? 2 : 1;
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(800));
 		context.prepareMosaic(signer, Utils.createMosaicId(id), Supply.fromValue(supply), levy);
-		final Transaction t1 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(1),
 				Utils.createMosaic(id, quantity1));
 		prepareWithMinimumFee(t1, context.nisCache);
 
-		final Transaction t2 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
+		final Transaction t2 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(1),
 				Utils.createMosaic(id, quantity2));
 		prepareWithMinimumFee(t2, context.nisCache);
 
-		final Transaction t3 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
+		final Transaction t3 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(1),
 				Utils.createMosaic(id, quantity3));
 		prepareWithMinimumFee(t3, context.nisCache);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				expectedResult.isSuccess() ? Arrays.asList(t1, t2, t3) : Arrays.asList(t1, t2),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3),
+				expectedResult.isSuccess() ? Arrays.asList(t1, t2, t3) : Arrays.asList(t1, t2), expectedResult);
 	}
 
 	private static void prepareWithMinimumFee(final Transaction transaction, final ReadOnlyNisCache nisCache) {
@@ -736,9 +620,7 @@ public abstract class AbstractTransactionValidationTest {
 		transaction.sign();
 	}
 
-	//endregion
-
-	//region bag validation
+	// region bag validation
 
 	@Test
 	public void cannotValidateFractionalMosaicTransfers() {
@@ -746,18 +628,12 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(500));
 		context.prepareMosaic(signer, Utils.createMosaicId(1), Supply.fromValue(1000), null);
-		final Transaction t1 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(2).add(Amount.fromMicroNem(1)),
-				Utils.createMosaic(1, 1000));
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(),
+				Amount.fromNem(2).add(Amount.fromMicroNem(1)), Utils.createMosaic(1, 1000));
 		prepareWithMinimumFee(t1, context.nisCache);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED);
 	}
 
@@ -767,38 +643,24 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account creator = context.addAccount(Amount.fromNem(500));
 		final Account intermediary = context.addAccount(Amount.fromNem(500));
-		context.prepareMosaic(
-				creator,
-				Utils.createMosaicId(1),
-				Supply.fromValue(100),
-				Utils.createMosaicProperties(0L, 3, true, false),
+		context.prepareMosaic(creator, Utils.createMosaicId(1), Supply.fromValue(100), Utils.createMosaicProperties(0L, 3, true, false),
 				null);
 
-		final Transaction t1 = createTransferTransaction(
-				creator,
-				intermediary,
-				Amount.fromNem(2),
-				Utils.createMosaic(1, 1000));
+		final Transaction t1 = createTransferTransaction(creator, intermediary, Amount.fromNem(2), Utils.createMosaic(1, 1000));
 		prepareWithMinimumFee(t1, context.nisCache);
 
-		final Transaction t2 = createTransferTransaction(
-				intermediary,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(2),
+		final Transaction t2 = createTransferTransaction(intermediary, Utils.generateRandomAccount(), Amount.fromNem(2),
 				Utils.createMosaic(1, 500));
 		prepareWithMinimumFee(t2, context.nisCache);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t1),
 				ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig modification tests
+	// region multisig modification tests
 
 	@Test
 	public void blockCanContainMultipleMultisigModificationsForDifferentAccounts() {
@@ -816,11 +678,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createMultisigModification(multisig2, cosigner2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Arrays.asList(t1, t2),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Arrays.asList(t1, t2), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -845,11 +703,8 @@ public abstract class AbstractTransactionValidationTest {
 		final ValidationResult expectedResult = this.isSingleBlockUsed()
 				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
 				: ValidationResult.SUCCESS;
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2), expectedResult);
 	}
 
 	@Test
@@ -874,11 +729,8 @@ public abstract class AbstractTransactionValidationTest {
 		final ValidationResult expectedResult = this.isSingleBlockUsed()
 				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
 				: ValidationResult.SUCCESS;
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
-				expectedResult);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2), expectedResult);
 	}
 
 	@Test
@@ -901,10 +753,7 @@ public abstract class AbstractTransactionValidationTest {
 
 		// Act / Assert:
 		// - unconfirmed transactions does not validate multiple delete modifications
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES);
 	}
 
@@ -918,17 +767,13 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2));
+		final List<MultisigCosignatoryModification> modifications = Collections
+				.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -949,16 +794,12 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig tests
+	// region multisig tests
 
 	@Test
 	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
@@ -970,11 +811,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, recipient);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -989,32 +826,16 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
-	protected static MultisigTransaction createMultisigWithSignatures(
-			final TestContext context,
-			final Account multisig,
-			final Account cosigner,
-			final Account recipient) {
-		return createMultisigWithSignatures(
-				context,
-				multisig,
-				cosigner,
-				Collections.emptyList(),
-				recipient);
+	protected static MultisigTransaction createMultisigWithSignatures(final TestContext context, final Account multisig,
+			final Account cosigner, final Account recipient) {
+		return createMultisigWithSignatures(context, multisig, cosigner, Collections.emptyList(), recipient);
 	}
 
-	protected static MultisigTransaction createMultisigWithSignatures(
-			final TestContext context,
-			final Account multisig,
-			final Account cosigner,
-			final List<Account> otherCosigners,
-			final Account recipient) {
+	protected static MultisigTransaction createMultisigWithSignatures(final TestContext context, final Account multisig,
+			final Account cosigner, final List<Account> otherCosigners, final Account recipient) {
 		// Arrange:
 		context.setCosigner(multisig, cosigner);
 		for (final Account otherCosigner : otherCosigners) {
@@ -1030,7 +851,8 @@ public abstract class AbstractTransactionValidationTest {
 		msTransaction.setFee(Amount.fromNem(200));
 
 		for (final Account otherCosigner : otherCosigners) {
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig, transfer);
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig,
+					transfer);
 			signatureTransaction.setFee(Amount.fromNem(6));
 			msTransaction.addSignature(prepareTransaction(signatureTransaction));
 		}
@@ -1048,23 +870,15 @@ public abstract class AbstractTransactionValidationTest {
 		final Account cosigner = context.addAccount(Amount.fromNem(10000));
 
 		// - make the account multisig
-		Transaction t1 = new MultisigAggregateModificationTransaction(
-				currentTime,
-				multisig,
+		Transaction t1 = new MultisigAggregateModificationTransaction(currentTime, multisig,
 				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		t1 = prepareTransaction(t1);
 
 		// - create a transfer transaction from the multisig account
-		final Transaction t2 = createTransferTransaction(
-				multisig,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(100));
+		final Transaction t2 = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(100));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2), Collections.singletonList(t1),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -1075,11 +889,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction mt1 = createMultisigTransactionForFeeTests(context, 0);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.singletonList(mt1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -1089,10 +899,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction mt1 = createMultisigTransactionForFeeTests(context, -1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.emptyList(),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
@@ -1104,10 +911,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 
 		// - a transfer transaction from the multisig account
-		final Transaction t1 = createTransferTransaction(
-				multisig,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(100));
+		final Transaction t1 = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(100));
 		t1.setSignature(null);
 		t1.setFee(Amount.fromNem(10));
 
@@ -1120,9 +924,9 @@ public abstract class AbstractTransactionValidationTest {
 		return mt1;
 	}
 
-	//endregion
+	// endregion
 
-	//region provision namespace transaction
+	// region provision namespace transaction
 
 	@Test
 	public void canValidateValidProvisionNamespaceTransaction() {
@@ -1132,10 +936,7 @@ public abstract class AbstractTransactionValidationTest {
 		final ProvisionNamespaceTransaction transaction = createProvisionNamespaceTransaction(sender, null, "foo", 108);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.singletonList(transaction),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.singletonList(transaction),
 				ValidationResult.SUCCESS);
 	}
 
@@ -1149,11 +950,7 @@ public abstract class AbstractTransactionValidationTest {
 		final ProvisionNamespaceTransaction t3 = createProvisionNamespaceTransaction(sender, "foo.bar", "baz", 108);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t2, t3),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(t1, t2, t3), Arrays.asList(t1, t2, t3), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -1166,30 +963,21 @@ public abstract class AbstractTransactionValidationTest {
 		final ProvisionNamespaceTransaction t3 = createProvisionNamespaceTransaction(sender, "foo.bar", "baz", 108);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(t3, t2, t1),
-				Collections.singletonList(t1),
+		this.assertTransactions(context.nisCache, Arrays.asList(t3, t2, t1), Collections.singletonList(t1),
 				ValidationResult.FAILURE_NAMESPACE_UNKNOWN);
 	}
 
-	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(
-			final Account sender,
-			final String parent,
-			final String newPart,
-			final long fee) {
-		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
-				CURRENT_TIME,
-				sender,
-				new NamespaceIdPart(newPart),
-				null == parent ? null : new NamespaceId(parent));
+	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(final Account sender, final String parent,
+			final String newPart, final long fee) {
+		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(CURRENT_TIME, sender,
+				new NamespaceIdPart(newPart), null == parent ? null : new NamespaceId(parent));
 		transaction.setFee(Amount.fromNem(fee));
 		return prepareTransaction(transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//region MosaicDefinitionCreationTransaction
+	// region MosaicDefinitionCreationTransaction
 
 	@Test
 	public void canValidateValidMosaicDefinitionCreationTransactionThatCreatesNewDefinition() {
@@ -1200,10 +988,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.singletonList(transaction),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.singletonList(transaction),
 				ValidationResult.SUCCESS);
 	}
 
@@ -1213,13 +998,11 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(100_000));
 		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
-		context.prepareMosaic(sender, transaction.getMosaicDefinition().getId(), Supply.fromValue(1234), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		context.prepareMosaic(sender, transaction.getMosaicDefinition().getId(), Supply.fromValue(1234),
+				Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.singletonList(transaction),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.singletonList(transaction),
 				ValidationResult.SUCCESS);
 	}
 
@@ -1232,10 +1015,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.emptyList(),
 				ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT);
 	}
 
@@ -1250,10 +1030,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction transaction2 = createMosaicDefinitionCreationTransaction(sender, "foo", "d2");
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(transaction1, transaction2),
-				Arrays.asList(transaction1, transaction2),
+		this.assertTransactions(context.nisCache, Arrays.asList(transaction1, transaction2), Arrays.asList(transaction1, transaction2),
 				ValidationResult.SUCCESS);
 	}
 
@@ -1278,10 +1055,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.prepareNamespace(sender, new NamespaceId("foo"));
 		final MosaicId mosaicId = Utils.createMosaicId("foo", "mosaic");
 		final Transaction transaction1 = createMosaicDefinitionCreationTransaction(sender, "foo", "d1");
-		final Transaction transaction2 = createTransferTransaction(
-				sender,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(10),
+		final Transaction transaction2 = createTransferTransaction(sender, Utils.generateRandomAccount(), Amount.fromNem(10),
 				new Mosaic(mosaicId, new Quantity(9)));
 
 		// Act / Assert:
@@ -1300,53 +1074,39 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertConflictingMosaicCreation(context.nisCache, transaction1, transaction2);
 	}
 
-	private void assertConflictingMosaicCreation(final ReadOnlyNisCache cache, final Transaction transaction1, final Transaction transaction2) {
-		this.assertTransactions(
-				cache,
-				Arrays.asList(transaction1, transaction2),
+	private void assertConflictingMosaicCreation(final ReadOnlyNisCache cache, final Transaction transaction1,
+			final Transaction transaction2) {
+		this.assertTransactions(cache, Arrays.asList(transaction1, transaction2),
 				this.isSingleBlockUsed() ? Collections.singletonList(transaction1) : Arrays.asList(transaction1, transaction2),
 				this.isSingleBlockUsed() ? ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION : ValidationResult.SUCCESS);
 	}
 
-	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender, final String namespaceId) {
+	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender,
+			final String namespaceId) {
 		return createMosaicDefinitionCreationTransaction(sender, namespaceId, "desc");
 	}
 
-	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(
-			final Account sender,
-			final String namespaceId,
-			final String description) {
+	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender,
+			final String namespaceId, final String description) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, "mosaic");
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-				sender,
-				mosaicId,
-				new MosaicDescriptor(description),
-				Utils.createMosaicProperties(1_000_000L, 3, true, true),
-				Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
-		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(
-				CURRENT_TIME,
-				sender,
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(sender, mosaicId, new MosaicDescriptor(description),
+				Utils.createMosaicProperties(1_000_000L, 3, true, true), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(CURRENT_TIME, sender,
 				mosaicDefinition);
 		transaction.setFee(Amount.fromNem(108));
 		return prepareTransaction(transaction);
 	}
 
-	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(
-			final Account sender,
-			final NamespaceIdPart part,
+	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(final Account sender, final NamespaceIdPart part,
 			NamespaceId parent) {
-		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
-				CURRENT_TIME,
-				sender,
-				part,
-				parent);
+		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(CURRENT_TIME, sender, part, parent);
 		transaction.setFee(Amount.fromNem(108));
 		return prepareTransaction(transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//region MosaicSupplyChangeTransaction
+	// region MosaicSupplyChangeTransaction
 
 	@Test
 	public void canValidateValidMosaicSupplyChangeTransaction() {
@@ -1358,10 +1118,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.singletonList(transaction),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.singletonList(transaction),
 				ValidationResult.SUCCESS);
 	}
 
@@ -1371,14 +1128,12 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(100_000));
 		final MosaicId mosaicId = Utils.createMosaicId(5);
-		context.prepareMosaic(Utils.generateRandomAccount(), mosaicId, Supply.fromValue(100), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		context.prepareMosaic(Utils.generateRandomAccount(), mosaicId, Supply.fromValue(100),
+				Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
 		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.emptyList(),
 				ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
 	}
 
@@ -1388,40 +1143,24 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(100_000));
 		final MosaicId mosaicId = Utils.createMosaicId(5);
-		context.prepareMosaic(
-				sender,
-				mosaicId,
-				Supply.fromValue(100),
-				Utils.createMosaicProperties(0L, 3, false, true),
-				null);
+		context.prepareMosaic(sender, mosaicId, Supply.fromValue(100), Utils.createMosaicProperties(0L, 3, false, true), null);
 		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(transaction),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(transaction), Collections.emptyList(),
 				ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE);
 	}
 
 	private static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final Account sender, final MosaicId mosaicId) {
-		final MosaicSupplyChangeTransaction transaction = new MosaicSupplyChangeTransaction(
-				CURRENT_TIME,
-				sender,
-				mosaicId,
-				MosaicSupplyType.Create,
-				Supply.fromValue(345));
+		final MosaicSupplyChangeTransaction transaction = new MosaicSupplyChangeTransaction(CURRENT_TIME, sender, mosaicId,
+				MosaicSupplyType.Create, Supply.fromValue(345));
 		transaction.setFee(Amount.fromNem(108));
 		return prepareTransaction(transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region ported from BlockChainServicesTest
-
-	//region basic multisig
+	// region basic multisig
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNonCosignatoryIsInvalid() {
@@ -1433,10 +1172,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
 	}
 
@@ -1452,11 +1188,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(mt1), Collections.singletonList(mt1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -1470,10 +1202,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -1494,24 +1223,18 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt2 = createMultisig(cosigner1, t2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(mt1, mt2),
-				Arrays.asList(mt1, mt2),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Arrays.asList(mt1, mt2), Arrays.asList(mt1, mt2), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region inner transaction hash check
+	// region inner transaction hash check
 
 	/**
-	 * A inner transaction should not be "reusable" in different multisig transactions.
-	 * This is important because not checking this would leave us prone to bit more sophisticated version of "replay" attack:
-	 * > I'm one of cosigners I generate MT with inner Transfer to my account
-	 * > after everyone signed it, I reuse inner transfer but I change outer MT
-	 * (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
-	 * but such thing shouldn't be feasible in first place)
+	 * A inner transaction should not be "reusable" in different multisig transactions. This is important because not checking this would
+	 * leave us prone to bit more sophisticated version of "replay" attack: > I'm one of cosigners I generate MT with inner Transfer to my
+	 * account > after everyone signed it, I reuse inner transfer but I change outer MT (ofc I'd probably have limited amount of time
+	 * (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME) but such thing shouldn't be feasible in first place)
 	 */
 
 	@Test
@@ -1529,11 +1252,7 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt2 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(mt1, mt2),
-				Collections.singletonList(mt1),
-				this.getHashConflictResult());
+		this.assertTransactions(context.nisCache, Arrays.asList(mt1, mt2), Collections.singletonList(mt1), this.getHashConflictResult());
 	}
 
 	@Test
@@ -1551,18 +1270,12 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Arrays.asList(mt1, t2),
-				Collections.singletonList(mt1),
-				this.getHashConflictResult());
+		this.assertTransactions(context.nisCache, Arrays.asList(mt1, t2), Collections.singletonList(mt1), this.getHashConflictResult());
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region multisig conversion
+	// region multisig conversion
 
 	@Test
 	public void canConvertAccountToMultisig() {
@@ -1574,11 +1287,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigConversion(multisig1, cosigner1);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -1589,22 +1298,16 @@ public abstract class AbstractTransactionValidationTest {
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		context.setCosigner(multisig1, cosigner1);
 
-		final Transaction t1 = createMultisigModification(
-				multisig1,
-				cosigner1,
+		final Transaction t1 = createMultisigModification(multisig1, cosigner1,
 				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner1)));
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig cosigner is not allowed
+	// region multisig cosigner is not allowed
 
 	@Test
 	public void multisigAccountCannotBeAddedAsCosigner() {
@@ -1620,10 +1323,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigModification(multisig1, cosigner1, multisig2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
 	}
 
@@ -1640,16 +1340,13 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigConversion(cosigner1, cosigner2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
 	}
 
-	//endregion
+	// endregion
 
-	//region version check
+	// region version check
 
 	@Test
 	public void cannotAllowV2MultisigModificationBeforeForkHeight() {
@@ -1663,11 +1360,8 @@ public abstract class AbstractTransactionValidationTest {
 
 		// Act / Assert:
 		// (use FORK - 2 so that the next block is FORK - 1)
-		this.assertTransactions(
-				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 2),
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 2), context.nisCache,
+				Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 	}
 
@@ -1683,12 +1377,8 @@ public abstract class AbstractTransactionValidationTest {
 
 		// Act / Assert:
 		// (use FORK - 1 so that the next block is FORK)
-		this.assertTransactions(
-				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 1),
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		this.assertTransactions(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 1), context.nisCache,
+				Collections.singletonList(t1), Collections.singletonList(t1), ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -1698,11 +1388,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = changeTransactionVersion(RandomTransactionFactory.createImportanceTransfer(), 2);
 
 		// Act / Assert:
-		this.assertTransactions(
-				new BlockHeight(10000),
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
+		this.assertTransactions(new BlockHeight(10000), context.nisCache, Collections.singletonList(t1), Collections.emptyList(),
 				ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
 	}
 
@@ -1715,29 +1401,17 @@ public abstract class AbstractTransactionValidationTest {
 		return transaction;
 	}
 
-	//endregion
+	// endregion
 
-	//region assertTransactions and protected functions
+	// region assertTransactions and protected functions
 
-	private void assertTransactions(
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			final List<Transaction> expectedFiltered,
+	private void assertTransactions(final ReadOnlyNisCache nisCache, final List<Transaction> all, final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
-		this.assertTransactions(
-				new BlockHeight(511000),
-				nisCache,
-				all,
-				expectedFiltered,
-				expectedResult);
+		this.assertTransactions(new BlockHeight(511000), nisCache, all, expectedFiltered, expectedResult);
 	}
 
-	protected abstract void assertTransactions(
-			final BlockHeight chainHeight,
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			final List<Transaction> expectedFiltered,
-			final ValidationResult expectedResult);
+	protected abstract void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
+			final List<Transaction> expectedFiltered, final ValidationResult expectedResult);
 
 	protected boolean isSingleBlockUsed() {
 		return true;
@@ -1751,24 +1425,17 @@ public abstract class AbstractTransactionValidationTest {
 		return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction factory functions
+	// region transaction factory functions
 
-	private static TransferTransaction createTransferTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
-			final TransferTransactionAttachment attachment) {
+	private static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient,
+			final Amount amount, final TransferTransactionAttachment attachment) {
 		final TransferTransaction transaction = new TransferTransaction(timeStamp, sender, recipient, amount, attachment);
 		return prepareTransaction(transaction);
 	}
 
-	private static TransferTransaction createTransferTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
+	private static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient,
 			final Amount amount) {
 		return createTransferTransaction(timeStamp, sender, recipient, amount, null);
 	}
@@ -1777,10 +1444,7 @@ public abstract class AbstractTransactionValidationTest {
 		return createTransferTransaction(CURRENT_TIME, sender, recipient, amount, null);
 	}
 
-	private static TransferTransaction createTransferTransaction(
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
+	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount,
 			final Mosaic mosaic) {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaic);
@@ -1793,24 +1457,22 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	private static Transaction createMultisigConversion(final Account multisig, final Account cosigner) {
-		final Transaction transaction = new MultisigAggregateModificationTransaction(
-				CURRENT_TIME,
-				multisig,
+		final Transaction transaction = new MultisigAggregateModificationTransaction(CURRENT_TIME, multisig,
 				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		return prepareTransaction(transaction);
 	}
 
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigCosignatoryModification> modifications) {
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner,
+			final List<MultisigCosignatoryModification> modifications) {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(CURRENT_TIME, multisig, modifications);
 		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.setSignature(null);
 		return createMultisig(cosigner, transaction);
 	}
 
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final Account newCosigner) {
-		return createMultisigModification(
-				multisig,
-				cosigner,
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner,
+			final Account newCosigner) {
+		return createMultisigModification(multisig, cosigner,
 				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, newCosigner)));
 	}
 
@@ -1823,12 +1485,14 @@ public abstract class AbstractTransactionValidationTest {
 		return prepareTransaction(transaction);
 	}
 
-	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(CURRENT_TIME, cosigner, multisig, innerTransaction);
+	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig,
+			final Transaction innerTransaction) {
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(CURRENT_TIME, cosigner, multisig,
+				innerTransaction);
 		return prepareTransaction(transaction);
 	}
 
-	//endregion
+	// endregion
 
 	private static <T extends Transaction> T prepareTransaction(final T transaction) {
 		// set the deadline appropriately and sign
@@ -1851,16 +1515,9 @@ public abstract class AbstractTransactionValidationTest {
 			copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
 
 			final MosaicLevy mosaicLevy = Utils.createMosaicLevy();
-			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-					namespaceOwner,
-					mosaicId,
-					new MosaicDescriptor("awesome mosaic"),
-					Utils.createMosaicProperties(),
-					mosaicLevy);
-			copyCache.getNamespaceCache()
-					.get(mosaicId.getNamespaceId())
-					.getMosaics()
-					.add(mosaicDefinition);
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(namespaceOwner, mosaicId, new MosaicDescriptor("awesome mosaic"),
+					Utils.createMosaicProperties(), mosaicLevy);
+			copyCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics().add(mosaicDefinition);
 			copyCache.commit();
 		}
 
@@ -1883,20 +1540,12 @@ public abstract class AbstractTransactionValidationTest {
 			this.prepareMosaic(account, mosaicId, supply, properties, levy);
 		}
 
-		public void prepareMosaic(
-				final Account account,
-				final MosaicId mosaicId,
-				final Supply supply,
-				final MosaicProperties properties,
+		public void prepareMosaic(final Account account, final MosaicId mosaicId, final Supply supply, final MosaicProperties properties,
 				final MosaicLevy levy) {
 			final NisCache copyCache = this.nisCache.copy();
 			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(511000));
-			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-					account,
-					mosaicId,
-					new MosaicDescriptor("description"),
-					properties,
-					levy);
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(account, mosaicId, new MosaicDescriptor("description"),
+					properties, levy);
 			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
 			namespaceCache.add(namespace);
 			final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
@@ -1915,8 +1564,7 @@ public abstract class AbstractTransactionValidationTest {
 		public void makeRemote(final Account account) {
 			final NisCache copyCache = this.nisCache.copy();
 			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
-			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
-					.getRemoteLinks()
+			copyCache.getAccountStateCache().findStateByAddress(account.getAddress()).getRemoteLinks()
 					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
 			copyCache.commit();
 		}

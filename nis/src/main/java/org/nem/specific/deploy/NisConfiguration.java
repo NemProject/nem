@@ -8,8 +8,7 @@ import org.nem.deploy.CommonConfiguration;
 import java.util.*;
 
 /**
- * Class responsible for holding all NIS configuration settings.
- * A NIS reboot is required for configuration changes to take effect.
+ * Class responsible for holding all NIS configuration settings. A NIS reboot is required for configuration changes to take effect.
  */
 public class NisConfiguration extends CommonConfiguration {
 	private final boolean shouldAutoBoot;
@@ -63,8 +62,7 @@ public class NisConfiguration extends CommonConfiguration {
 
 		this.shouldAutoHarvestOnBoot = properties.getOptionalBoolean("nis.shouldAutoHarvestOnBoot", true);
 		this.additionalHarvesterPrivateKeys = Arrays.stream(properties.getOptionalStringArray("nis.additionalHarvesterPrivateKeys", ""))
-				.map(PrivateKey::fromHexString)
-				.toArray(PrivateKey[]::new);
+				.map(PrivateKey::fromHexString).toArray(PrivateKey[]::new);
 
 		this.nodeLimit = properties.getOptionalInteger("nis.nodeLimit", 5);
 		this.timeSyncNodeLimit = properties.getOptionalInteger("nis.timeSyncNodeLimit", 20);
@@ -73,9 +71,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.ignoreFees = properties.getOptionalBoolean("nis.ignoreFees", false);
 
 		final String ipDetectionMode = properties.getOptionalString("nis.ipDetectionMode", null);
-		this.ipDetectionMode = null == ipDetectionMode
-				? IpDetectionMode.AutoRequired
-				: IpDetectionMode.valueOf(ipDetectionMode);
+		this.ipDetectionMode = null == ipDetectionMode ? IpDetectionMode.AutoRequired : IpDetectionMode.valueOf(ipDetectionMode);
 
 		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 4);
 
@@ -83,12 +79,10 @@ public class NisConfiguration extends CommonConfiguration {
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
-				.map(NodeFeature::fromString)
-				.toArray(NodeFeature[]::new);
+				.map(NodeFeature::fromString).toArray(NodeFeature[]::new);
 
 		this.allowedHarvesterAddresses = Arrays.stream(properties.getOptionalStringArray("nis.allowedHarvesterAddresses", ""))
-				.map(Address::fromEncoded)
-				.toArray(Address[]::new);
+				.map(Address::fromEncoded).toArray(Address[]::new);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
@@ -97,23 +91,21 @@ public class NisConfiguration extends CommonConfiguration {
 
 	private static BlockChainConfiguration parseBlockChainConfiguration(final NemProperties properties) {
 		final String defaultBlockChainFeatures = "PROOF_OF_IMPORTANCE|WB_TIME_BASED_VESTING";
-		final BlockChainFeature[] blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", defaultBlockChainFeatures))
-				.map(BlockChainFeature::fromString)
-				.toArray(BlockChainFeature[]::new);
+		final BlockChainFeature[] blockChainFeatures = Arrays
+				.stream(properties.getOptionalStringArray("nis.blockChainFeatures", defaultBlockChainFeatures))
+				.map(BlockChainFeature::fromString).toArray(BlockChainFeature[]::new);
 		return new BlockChainConfigurationBuilder()
 				.setMaxTransactionsPerSyncAttempt(properties.getOptionalInteger("nis.maxTransactions", 10000))
 				.setMaxTransactionsPerBlock(properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120))
 				.setBlockGenerationTargetTime(properties.getOptionalInteger("nis.blockGenerationTargetTime", 60))
 				.setBlockChainRewriteLimit(properties.getOptionalInteger("nis.blockChainRewriteLimit", 360))
-				.setBlockChainFeatures(blockChainFeatures)
-				.build();
+				.setBlockChainFeatures(blockChainFeatures).build();
 	}
 
-	//region boot / harvest
+	// region boot / harvest
 
 	/**
-	 * Gets a value indicating whether or not this node should automatically boot
-	 *  even if no key and boot name is specified.
+	 * Gets a value indicating whether or not this node should automatically boot even if no key and boot name is specified.
 	 *
 	 * @return true if booting should automatically take place.
 	 */
@@ -122,8 +114,7 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets the private key of the auto-boot node.
-	 * If null, the node shouldn't auto-boot.
+	 * Gets the private key of the auto-boot node. If null, the node shouldn't auto-boot.
 	 *
 	 * @return The private key of the auto-boot node.
 	 */
@@ -158,9 +149,9 @@ public class NisConfiguration extends CommonConfiguration {
 		return this.additionalHarvesterPrivateKeys;
 	}
 
-	//endregion
+	// endregion
 
-	//region network communication
+	// region network communication
 
 	/**
 	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
@@ -190,8 +181,8 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not this node should use the network time for time stamps in NIS entities
-	 * (e.g. blocks, transactions, ...).
+	 * Gets a value indicating whether or not this node should use the network time for time stamps in NIS entities (e.g. blocks,
+	 * transactions, ...).
 	 *
 	 * @return true if this node should use the network time.
 	 */
@@ -217,7 +208,7 @@ public class NisConfiguration extends CommonConfiguration {
 		return this.ipDetectionMode;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the maximum number of accounts that can simultaneously harvest.

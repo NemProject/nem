@@ -31,9 +31,7 @@ public class AuthenticatedBlockHeightRequestTest {
 		final BlockHeight height = new BlockHeight(14);
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedRequest<>(height, challenge),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new AuthenticatedRequest<>(height, challenge), null);
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(deserializer);
 
 		// Assert:

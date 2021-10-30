@@ -28,16 +28,14 @@ public class AccountTransfersController {
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
-	AccountTransfersController(
-			final AccountIo accountIo,
-			final ReadOnlyHashCache transactionHashCache,
+	AccountTransfersController(final AccountIo accountIo, final ReadOnlyHashCache transactionHashCache,
 			final NisConfiguration nisConfiguration) {
 		this.accountIo = accountIo;
 		this.transactionHashCache = transactionHashCache;
 		this.nisConfiguration = nisConfiguration;
 	}
 
-	//region /account/transfers/*
+	// region /account/transfers/*
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
@@ -48,8 +46,7 @@ public class AccountTransfersController {
 	 */
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersAll(
-			final AccountTransactionsIdBuilder idBuilder,
+	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsIdBuilder idBuilder,
 			final DefaultPageBuilder pageBuilder) {
 		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.ALL);
 	}
@@ -63,8 +60,7 @@ public class AccountTransfersController {
 	 */
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(
-			final AccountTransactionsIdBuilder idBuilder,
+	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsIdBuilder idBuilder,
 			final DefaultPageBuilder pageBuilder) {
 		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.INCOMING);
 	}
@@ -78,19 +74,18 @@ public class AccountTransfersController {
 	 */
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(
-			final AccountTransactionsIdBuilder idBuilder,
+	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsIdBuilder idBuilder,
 			final DefaultPageBuilder pageBuilder) {
 		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
-	//endregion
+	// endregion
 
-	//region /local/account/transfers/*
+	// region /local/account/transfers/*
 
 	/**
-	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id). Transaction messages
+	 * are decrypted with the supplied private key.
 	 *
 	 * @param page The page.
 	 * @return Information about the matching transactions.
@@ -103,8 +98,8 @@ public class AccountTransfersController {
 	}
 
 	/**
-	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id). Transaction
+	 * messages are decrypted with the supplied private key.
 	 *
 	 * @param page The page.
 	 * @return Information about the matching transactions.
@@ -112,13 +107,14 @@ public class AccountTransfersController {
 	@RequestMapping(value = "/local/account/transfers/incoming", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(@RequestBody final AccountPrivateKeyTransactionsPage page) {
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(
+			@RequestBody final AccountPrivateKeyTransactionsPage page) {
 		return this.transformPairs(this.accountTransfersIncoming(page.createIdBuilder(), page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	/**
-	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id). Transaction
+	 * messages are decrypted with the supplied private key.
 	 *
 	 * @param page The page.
 	 * @return Information about the matching transactions.
@@ -126,23 +122,22 @@ public class AccountTransfersController {
 	@RequestMapping(value = "/local/account/transfers/outgoing", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(@RequestBody final AccountPrivateKeyTransactionsPage page) {
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(
+			@RequestBody final AccountPrivateKeyTransactionsPage page) {
 		return this.transformPairs(this.accountTransfersOutgoing(page.createIdBuilder(), page.createPageBuilder()), page.getPrivateKey());
 	}
 
-	private SerializableList<TransactionMetaDataPair> transformPairs(
-			final SerializableList<TransactionMetaDataPair> originalPairs,
+	private SerializableList<TransactionMetaDataPair> transformPairs(final SerializableList<TransactionMetaDataPair> originalPairs,
 			final PrivateKey privateKey) {
 		final Collection<TransactionMetaDataPair> pairs = originalPairs.asCollection().stream()
-				.map(p -> this.tryCreateDecodedPair(p, privateKey))
-				.collect(Collectors.toList());
+				.map(p -> this.tryCreateDecodedPair(p, privateKey)).collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
 
 	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair, final PrivateKey privateKey) {
 		final Transaction transaction = pair.getEntity();
 		if (TransactionTypes.TRANSFER == transaction.getType()) {
-			final TransferTransaction t = (TransferTransaction)transaction;
+			final TransferTransaction t = (TransferTransaction) transaction;
 			if (null != t.getMessage() && MessageTypes.SECURE == t.getMessage().getType()) {
 				final Account account = new Account(new KeyPair(privateKey));
 				final SecureMessage message = t.getSigner().equals(account)
@@ -155,12 +150,8 @@ public class AccountTransfersController {
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransactionAttachment attachment = new TransferTransactionAttachment(plainMessage);
 				t.getAttachment().getMosaics().forEach(attachment::addMosaic);
-				final TransferTransaction decodedTransaction = new TransferTransaction(
-						t.getTimeStamp(),
-						t.getSigner(),
-						t.getRecipient(),
-						t.getAmount(),
-						attachment);
+				final TransferTransaction decodedTransaction = new TransferTransaction(t.getTimeStamp(), t.getSigner(), t.getRecipient(),
+						t.getAmount(), attachment);
 				decodedTransaction.setFee(t.getFee());
 				decodedTransaction.setDeadline(t.getDeadline());
 				decodedTransaction.setSignature(t.getSignature());
@@ -171,9 +162,7 @@ public class AccountTransfersController {
 		return pair;
 	}
 
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
-			final AccountTransactionsId id,
-			final DefaultPage page,
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(final AccountTransactionsId id, final DefaultPage page,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (null != page.getId()) {
 			return this.accountIo.getAccountTransfersUsingId(id.getAddress(), page.getId(), transferType, page.getPageSize());
@@ -191,11 +180,7 @@ public class AccountTransfersController {
 
 		final HashMetaData metaData = this.transactionHashCache.get(hash);
 		if (null != metaData) {
-			return this.accountIo.getAccountTransfersUsingHash(
-					id.getAddress(),
-					hash,
-					metaData.getHeight(),
-					transferType,
+			return this.accountIo.getAccountTransfersUsingHash(id.getAddress(), hash, metaData.getHeight(), transferType,
 					page.getPageSize());
 		} else {
 			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
@@ -206,5 +191,5 @@ public class AccountTransfersController {
 		return Arrays.stream(this.nisConfiguration.getOptionalFeatures()).anyMatch(f -> f == NodeFeature.TRANSACTION_HASH_LOOKUP);
 	}
 
-	//endregion
+	// endregion
 }

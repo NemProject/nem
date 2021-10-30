@@ -31,7 +31,7 @@ public class MosaicSupplyChangeObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((MosaicSupplyChangeNotification)notification, context);
+		this.notify((MosaicSupplyChangeNotification) notification, context);
 	}
 
 	private void notify(final MosaicSupplyChangeNotification notification, final BlockNotificationContext context) {

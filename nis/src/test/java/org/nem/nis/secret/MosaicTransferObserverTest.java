@@ -16,7 +16,7 @@ import org.nem.nis.test.NisUtils;
 public class MosaicTransferObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
-	//region supply change
+	// region supply change
 
 	@Test
 	public void notifyExecuteTransfersFromSenderToRecipient() {
@@ -44,9 +44,9 @@ public class MosaicTransferObserverTest {
 		context.assertBalances(new Quantity(9750 - 111), new Quantity(250 + 111));
 	}
 
-	//endregion
+	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -55,26 +55,22 @@ public class MosaicTransferObserverTest {
 		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		context.assertBalances(new Quantity(10000), Quantity.ZERO);
 	}
 
-	//endregion
+	// endregion
 
-	private static void notifyMosaicTransfer(
-			final TestContext context,
-			final Quantity quantity,
+	private static void notifyMosaicTransfer(final TestContext context, final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
+		observer.notify(new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 

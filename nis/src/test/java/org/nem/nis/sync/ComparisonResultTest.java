@@ -10,7 +10,7 @@ import java.util.*;
 
 public class ComparisonResultTest {
 
-	//region Code
+	// region Code
 
 	@Test
 	public void codeGetValueReturnsUnderlyingValue() {
@@ -29,16 +29,12 @@ public class ComparisonResultTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void comparisonResultExposesAllConstructorParameters() {
 		// Act:
-		final ComparisonResult result = new ComparisonResult(
-				ComparisonResult.Code.REMOTE_IS_NOT_SYNCED,
-				33,
-				true,
-				new BlockHeight(66));
+		final ComparisonResult result = new ComparisonResult(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED, 33, true, new BlockHeight(66));
 
 		// Assert:
 		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
@@ -81,11 +77,8 @@ public class ComparisonResultTest {
 	@Test
 	public void canConvertComparisonResultToNodeInteractionResult() {
 		// Arrange:
-		final Set<ComparisonResult.Code> neutralCodes = new HashSet<>(Arrays.asList(
-				ComparisonResult.Code.REMOTE_IS_SYNCED,
-				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE,
-				ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE
-		));
+		final Set<ComparisonResult.Code> neutralCodes = new HashSet<>(Arrays.asList(ComparisonResult.Code.REMOTE_IS_SYNCED,
+				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE, ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE));
 
 		for (final ComparisonResult.Code code : ComparisonResult.Code.values()) {
 			// Act:

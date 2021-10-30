@@ -15,7 +15,7 @@ import org.nem.peer.PeerNetwork;
 
 public class LocalControllerTest {
 
-	//region shutdown
+	// region shutdown
 
 	@Test
 	public void shutdownDelegatesToCommonStarter() {
@@ -29,9 +29,9 @@ public class LocalControllerTest {
 		Mockito.verify(context.starter, Mockito.only()).stopServerAsync();
 	}
 
-	//endregion
+	// endregion
 
-	//region heartbeat
+	// region heartbeat
 
 	@Test
 	public void heartbeatReturnsCorrectResult() {
@@ -47,9 +47,9 @@ public class LocalControllerTest {
 		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("ok"));
 	}
 
-	//endregion
+	// endregion
 
-	//region status
+	// region status
 
 	@Test
 	public void statusReturnsStatusRunningWhenNetworkIsNotBootedAndNotBooting() {
@@ -141,7 +141,7 @@ public class LocalControllerTest {
 		MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
 	}
 
-	//endregion
+	// endregion
 
 	private class TestContext {
 		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);

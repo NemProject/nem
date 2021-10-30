@@ -40,29 +40,17 @@ public class BlockChainDelegationContext {
 	private DbBlock dbBlock;
 	private final Account blockHarvester = Utils.generateRandomAccount();
 	private final Account parentHarvester = Utils.generateRandomAccount();
-	private final Collection<Address> harvesterAddresses = Arrays.asList(this.blockHarvester.getAddress(), this.parentHarvester.getAddress());
+	private final Collection<Address> harvesterAddresses = Arrays.asList(this.blockHarvester.getAddress(),
+			this.parentHarvester.getAddress());
 
 	public BlockChainDelegationContext() {
 		final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
-		this.blockChainUpdater = Mockito.spy(new BlockChainUpdater(
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.contextFactory,
-				this.unconfirmedTransactions,
-				nisConfiguration));
+		this.blockChainUpdater = Mockito.spy(new BlockChainUpdater(this.nisCache, this.blockChainLastBlockLayer, this.blockDao,
+				this.contextFactory, this.unconfirmedTransactions, nisConfiguration));
 
-		this.parent = new Block(
-				this.parentHarvester,
-				Hash.ZERO,
-				DUMMY_GENERATION_HASH,
-				TimeInstant.ZERO,
-				new BlockHeight(1));
+		this.parent = new Block(this.parentHarvester, Hash.ZERO, DUMMY_GENERATION_HASH, TimeInstant.ZERO, new BlockHeight(1));
 		this.parent.sign();
-		this.block = new Block(
-				this.blockHarvester,
-				this.parent,
-				new TimeInstant(this.parent.getTimeStamp().getRawTime() + 100000));
+		this.block = new Block(this.blockHarvester, this.parent, new TimeInstant(this.parent.getTimeStamp().getRawTime() + 100000));
 		this.block.sign();
 
 		this.prepareMockCalls();
@@ -91,8 +79,7 @@ public class BlockChainDelegationContext {
 
 	private void prepareAccountDao() {
 		for (final Address address : this.harvesterAddresses) {
-			Mockito.when(this.accountDao.getAccountByPrintableAddress(address.getEncoded()))
-					.thenReturn(new DbAccount(address));
+			Mockito.when(this.accountDao.getAccountByPrintableAddress(address.getEncoded())).thenReturn(new DbAccount(address));
 		}
 	}
 
@@ -115,7 +102,8 @@ public class BlockChainDelegationContext {
 			Mockito.when(this.accountCache.findByAddress(Mockito.eq(address), Mockito.any())).thenReturn(new Account(address));
 		}
 
-		Mockito.when(this.accountCache.findByAddress(Mockito.any())).then(invocationOnMock -> new Account((Address)invocationOnMock.getArguments()[0]));
+		Mockito.when(this.accountCache.findByAddress(Mockito.any()))
+				.then(invocationOnMock -> new Account((Address) invocationOnMock.getArguments()[0]));
 	}
 
 	private void prepareAccountStateCache() {
@@ -140,38 +128,27 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareBlockChainServices() {
-		Mockito.when(this.blockChainServices.isPeerChainValid(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(this.blockChainServices.isPeerChainValid(Mockito.any(), Mockito.any(), Mockito.any()))
+				.thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(this.blockChainServices.createMapper(Mockito.any()))
-				.thenAnswer(invocation -> MapperUtils.createDbModelToModelNisMapper((AccountLookup)invocation.getArguments()[0]));
+				.thenAnswer(invocation -> MapperUtils.createDbModelToModelNisMapper((AccountLookup) invocation.getArguments()[0]));
 	}
 
 	private void prepareBlockChainContextFactory() {
 		final BlockChainSyncContext syncContext = Mockito.mock(BlockChainSyncContext.class);
 		Mockito.when(syncContext.undoTxesAndGetScore(Mockito.any())).thenReturn(BlockChainScore.ZERO);
 		Mockito.when(syncContext.nisCache()).thenReturn(this.nisCache);
-		Mockito.when(this.contextFactory.createSyncContext(Mockito.any(BlockChainScore.class)))
-				.thenReturn(syncContext);
-		Mockito.when(this.contextFactory.createUpdateContext(
-						Mockito.any(),
-						Mockito.any(),
-						Mockito.any(),
-						Mockito.any(),
-						Mockito.anyBoolean())
-		).thenAnswer(invocation -> new BlockChainUpdateContext(
-				((BlockChainSyncContext)invocation.getArguments()[0]).nisCache(),
-				this.nisCache,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.blockChainServices,
-				this.unconfirmedTransactions,
-				(DbBlock)invocation.getArguments()[1],
-				castToBlockCollection(invocation.getArguments()[2]),
-				(BlockChainScore)invocation.getArguments()[3],
-				(Boolean)invocation.getArguments()[4]));
+		Mockito.when(this.contextFactory.createSyncContext(Mockito.any(BlockChainScore.class))).thenReturn(syncContext);
+		Mockito.when(
+				this.contextFactory.createUpdateContext(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
+				.thenAnswer(invocation -> new BlockChainUpdateContext(((BlockChainSyncContext) invocation.getArguments()[0]).nisCache(),
+						this.nisCache, this.blockChainLastBlockLayer, this.blockDao, this.blockChainServices, this.unconfirmedTransactions,
+						(DbBlock) invocation.getArguments()[1], castToBlockCollection(invocation.getArguments()[2]),
+						(BlockChainScore) invocation.getArguments()[3], (Boolean) invocation.getArguments()[4]));
 	}
 
 	@SuppressWarnings("unchecked")
 	private static Collection<Block> castToBlockCollection(final Object obj) {
-		return (Collection<Block>)obj;
+		return (Collection<Block>) obj;
 	}
 }

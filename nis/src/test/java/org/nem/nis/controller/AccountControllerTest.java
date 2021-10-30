@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class AccountControllerTest {
 
-	//region accountUnlock
+	// region accountUnlock
 
 	@Test
 	public void unlockDelegatesToUnlockedAccounts() {
@@ -51,14 +51,12 @@ public class AccountControllerTest {
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.FAILURE_UNKNOWN_ACCOUNT);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.controller.accountUnlock(keyPair.getPrivateKey()),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.accountUnlock(keyPair.getPrivateKey()), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region accountLock
+	// region accountLock
 
 	@Test
 	public void lockDelegatesToUnlockedAccounts() {
@@ -84,9 +82,9 @@ public class AccountControllerTest {
 		return context;
 	}
 
-	//endregion
+	// endregion
 
-	//region isAccountUnlocked
+	// region isAccountUnlocked
 
 	@Test
 	public void accountIsUnlockedReturnsOkWhenAccountFromAddressIsUnlocked() {
@@ -100,7 +98,8 @@ public class AccountControllerTest {
 		assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
 	}
 
-	private static void assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
+	private static void assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(
+			final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
 		// Arrange:
 		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
 		context.setIsUnlocked(true);
@@ -124,7 +123,8 @@ public class AccountControllerTest {
 		assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
 	}
 
-	private static void assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
+	private static void assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(
+			final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
 		// Arrange:
 		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
 		context.setIsUnlocked(false);
@@ -154,9 +154,9 @@ public class AccountControllerTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region unlockedInfo
+	// region unlockedInfo
 
 	@Test
 	public void unlockedInfoReturnsUnlockedAccountInformation() {
@@ -175,9 +175,9 @@ public class AccountControllerTest {
 		MatcherAssert.assertThat(jsonObject.get("max-unlocked"), IsEqual.equalTo(8));
 	}
 
-	//endregion
+	// endregion
 
-	//region transactionsUnconfirmed
+	// region transactionsUnconfirmed
 
 	@Test
 	public void transactionsUnconfirmedDelegatesToUnconfirmedTransactions() {
@@ -186,21 +186,18 @@ public class AccountControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 
-		final List<Transaction> originalTransactions = Arrays.asList(
-				new MockTransaction(7, new TimeInstant(1)),
-				new MockTransaction(11, new TimeInstant(2)),
-				new MockTransaction(5, new TimeInstant(3)));
+		final List<Transaction> originalTransactions = Arrays.asList(new MockTransaction(7, new TimeInstant(1)),
+				new MockTransaction(11, new TimeInstant(2)), new MockTransaction(5, new TimeInstant(3)));
 		final TestContext context = new TestContext();
 
-		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25))
-				.thenReturn(originalTransactions);
+		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25)).thenReturn(originalTransactions);
 
 		// Act:
 		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
 		MatcherAssert.assertThat(
-				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getEntity())).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction) (p.getEntity())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
 	}
@@ -212,32 +209,29 @@ public class AccountControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 
-		final List<Transaction> originalTransactions = Arrays.asList(
-				RandomTransactionFactory.createTransfer(),
-				RandomTransactionFactory.createMultisigTransfer(),
-				RandomTransactionFactory.createTransfer(),
-				RandomTransactionFactory.createMultisigTransfer(),
-				RandomTransactionFactory.createMultisigTransfer());
+		final List<Transaction> originalTransactions = Arrays.asList(RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(), RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(), RandomTransactionFactory.createMultisigTransfer());
 		final List<Hash> expectedHashes = originalTransactions.stream()
-				.map(t -> TransactionTypes.MULTISIG == t.getType() ? ((MultisigTransaction)t).getOtherTransactionHash() : null)
+				.map(t -> TransactionTypes.MULTISIG == t.getType() ? ((MultisigTransaction) t).getOtherTransactionHash() : null)
 				.collect(Collectors.toList());
 		final TestContext context = new TestContext();
 
-		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25))
-				.thenReturn(originalTransactions);
+		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25)).thenReturn(originalTransactions);
 
 		// Act:
 		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
-		final Collection<Hash> innerHashes = pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList());
+		final Collection<Hash> innerHashes = pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash())
+				.collect(Collectors.toList());
 		MatcherAssert.assertThat(innerHashes.stream().filter(h -> null != h).count(), IsEqual.equalTo(3L));
 		MatcherAssert.assertThat(innerHashes, IsEqual.equalTo(expectedHashes));
 	}
 
-	//endregion
+	// endregion
 
-	//region accountHarvests
+	// region accountHarvests
 
 	@Test
 	public void accountHarvestsDelegatesToAccountIo() {
@@ -263,16 +257,14 @@ public class AccountControllerTest {
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L, 12);
 	}
 
-	//endregion
+	// endregion
 
-	//region getImportances
+	// region getImportances
 
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
-		final List<AccountState> accountStates = Arrays.asList(
-				createAccountState("alpha", 12, 45),
-				createAccountState("gamma", 0, 0),
+		final List<AccountState> accountStates = Arrays.asList(createAccountState("alpha", 12, 45), createAccountState("gamma", 0, 0),
 				createAccountState("sigma", 4, 88));
 
 		final TestContext context = new TestContext();
@@ -282,17 +274,12 @@ public class AccountControllerTest {
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
 
 		// Assert:
-		final List<AccountImportanceViewModel> expectedViewModels = Arrays.asList(
-				createAccountImportanceViewModel("alpha", 12, 45),
-				createAccountImportanceViewModel("gamma", 0, 0),
-				createAccountImportanceViewModel("sigma", 4, 88));
+		final List<AccountImportanceViewModel> expectedViewModels = Arrays.asList(createAccountImportanceViewModel("alpha", 12, 45),
+				createAccountImportanceViewModel("gamma", 0, 0), createAccountImportanceViewModel("sigma", 4, 88));
 		MatcherAssert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
-	private static AccountState createAccountState(
-			final String encodedAddress,
-			final int blockHeight,
-			final int importance) {
+	private static AccountState createAccountState(final String encodedAddress, final int blockHeight, final int importance) {
 		final AccountState state = new AccountState(Address.fromEncoded(encodedAddress));
 		if (blockHeight > 0) {
 			state.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
@@ -301,9 +288,7 @@ public class AccountControllerTest {
 		return state;
 	}
 
-	private static AccountImportanceViewModel createAccountImportanceViewModel(
-			final String encodedAddress,
-			final int blockHeight,
+	private static AccountImportanceViewModel createAccountImportanceViewModel(final String encodedAddress, final int blockHeight,
 			final int importance) {
 		final AccountImportance ai = new AccountImportance();
 		if (blockHeight > 0) {
@@ -313,9 +298,9 @@ public class AccountControllerTest {
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), ai);
 	}
 
-	//endregion
+	// endregion
 
-	//region generateAccount
+	// region generateAccount
 
 	@Test
 	public void generateAccountReturnsKeyPairViewModelWithDefaultNetworkVersion() {
@@ -330,7 +315,7 @@ public class AccountControllerTest {
 		MatcherAssert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final AccountController controller;
@@ -343,10 +328,7 @@ public class AccountControllerTest {
 		}
 
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
-			this.controller = new AccountController(
-					this.unconfirmedTransactions,
-					this.unlockedAccounts,
-					accountIoAdapter,
+			this.controller = new AccountController(this.unconfirmedTransactions, this.unlockedAccounts, accountIoAdapter,
 					this.accountStateCache);
 		}
 

@@ -25,12 +25,8 @@ public class Harvester {
 	 * @param mapper The mapper.
 	 * @param generator The block generator.
 	 */
-	public Harvester(
-			final TimeProvider timeProvider,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final UnlockedAccounts unlockedAccounts,
-			final NisDbModelToModelMapper mapper,
-			final BlockGenerator generator) {
+	public Harvester(final TimeProvider timeProvider, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final UnlockedAccounts unlockedAccounts, final NisDbModelToModelMapper mapper, final BlockGenerator generator) {
 		this.timeProvider = timeProvider;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.unlockedAccounts = unlockedAccounts;
@@ -56,10 +52,7 @@ public class Harvester {
 		LOGGER.info(String.format("%d harvesters are attempting to harvest a new block.", this.unlockedAccounts.size()));
 		GeneratedBlock bestGeneratedBlock = null;
 		for (final Account harvester : this.unlockedAccounts) {
-			final GeneratedBlock generatedBlock = this.generator.generateNextBlock(
-					lastBlock,
-					harvester,
-					blockTime);
+			final GeneratedBlock generatedBlock = this.generator.generateNextBlock(lastBlock, harvester, blockTime);
 
 			if (null != generatedBlock && (null == bestGeneratedBlock || generatedBlock.getScore() > bestGeneratedBlock.getScore())) {
 				bestGeneratedBlock = generatedBlock;

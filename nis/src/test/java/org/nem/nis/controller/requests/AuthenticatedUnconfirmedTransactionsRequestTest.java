@@ -21,7 +21,8 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(Collections.singletonList(new MockTransaction()));
 
 		// Act:
-		final AuthenticatedUnconfirmedTransactionsRequest authenticatedRequest = new AuthenticatedUnconfirmedTransactionsRequest(request, challenge);
+		final AuthenticatedUnconfirmedTransactionsRequest authenticatedRequest = new AuthenticatedUnconfirmedTransactionsRequest(request,
+				challenge);
 
 		// Assert:
 		MatcherAssert.assertThat(authenticatedRequest.getChallenge(), IsEqual.equalTo(challenge));
@@ -49,12 +50,12 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 	public void requestCanBeRoundTripped() {
 		// Arrange:
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
-		final UnconfirmedTransactionsRequest original = new UnconfirmedTransactionsRequest(Collections.singletonList(new MockTransaction()));
+		final UnconfirmedTransactionsRequest original = new UnconfirmedTransactionsRequest(
+				Collections.singletonList(new MockTransaction()));
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntityWithBinarySerializer(
-				new AuthenticatedRequest<>(original, challenge),
-				null);
+		final Deserializer deserializer = Utils
+				.roundtripSerializableEntityWithBinarySerializer(new AuthenticatedRequest<>(original, challenge), null);
 		final AuthenticatedUnconfirmedTransactionsRequest request = new AuthenticatedUnconfirmedTransactionsRequest(deserializer);
 
 		// Assert:

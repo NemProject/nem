@@ -10,7 +10,7 @@ import org.nem.nis.test.NisTestConstants;
 public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTest {
 	private static final long NAMESPACE_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_DAY * (365 + 30 + 1);
 
-	//region overrides
+	// region overrides
 
 	@Override
 	protected BlockTransactionObserver createObserver(final NisCache nisCache) {
@@ -27,7 +27,7 @@ public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTe
 		Mockito.verify(nisCache.getNamespaceCache(), Mockito.never()).prune(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
@@ -48,8 +48,6 @@ public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTe
 	@Test
 	public void blockBasedPruningIsTriggeredWhenBlockHeightIsMuchGreaterThanHistory() {
 		// Assert:
-		this.assertBlockBasedPruning(
-				100 * NAMESPACE_BLOCK_HISTORY + 1,
-				99 * NAMESPACE_BLOCK_HISTORY + 1);
+		this.assertBlockBasedPruning(100 * NAMESPACE_BLOCK_HISTORY + 1, 99 * NAMESPACE_BLOCK_HISTORY + 1);
 	}
 }

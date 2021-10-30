@@ -13,11 +13,8 @@ public class AlphaTrimmedMeanFilter implements SynchronizationFilter {
 
 	@Override
 	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age) {
-		final int samplesToDiscardAtBothEnds = (int)(samples.size() * FilterConstants.ALPHA / 2);
-		return samples.stream()
-				.sorted()
-				.skip(samplesToDiscardAtBothEnds)
-				.limit(samples.size() - 2 * samplesToDiscardAtBothEnds)
+		final int samplesToDiscardAtBothEnds = (int) (samples.size() * FilterConstants.ALPHA / 2);
+		return samples.stream().sorted().skip(samplesToDiscardAtBothEnds).limit(samples.size() - 2 * samplesToDiscardAtBothEnds)
 				.collect(Collectors.toList());
 	}
 }

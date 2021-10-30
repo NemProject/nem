@@ -25,7 +25,7 @@ public class PushServiceTest {
 		NetworkInfos.setDefault(null);
 	}
 
-	//region pushTransaction
+	// region pushTransaction
 
 	@Test
 	public void pushTransactionValidSuccessAcceptedFailureIncrementsFailedExperience() {
@@ -47,12 +47,12 @@ public class PushServiceTest {
 		final TestContext context = assertPushTransactionExperienceChange(ValidationResult.SUCCESS);
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
-		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1))
-				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS), broadcastEntityArgument.capture());
+		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1)).queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS),
+				broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		MatcherAssert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(((MockTransaction) secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	private static TestContext assertPushTransactionExperienceChange(final ValidationResult result) {
@@ -71,9 +71,9 @@ public class PushServiceTest {
 		return context;
 	}
 
-	//endregion
+	// endregion
 
-	//region pushBlock
+	// region pushBlock
 
 	@Test
 	public void pushBlockValidFailureIncrementsFailedExperience() {
@@ -150,23 +150,20 @@ public class PushServiceTest {
 		assertPushBlockAcceptedSuccessIncrementsSuccessExperienceAndBroadcasts(ValidationResult.SUCCESS);
 	}
 
-	private static void assertPushBlockAcceptedSuccessIncrementsSuccessExperienceAndBroadcasts(
-			final ValidationResult validResult) {
+	private static void assertPushBlockAcceptedSuccessIncrementsSuccessExperienceAndBroadcasts(final ValidationResult validResult) {
 		// Assert:
 		final TestContext context = assertPushBlockExperienceChange(validResult, ValidationResult.SUCCESS);
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
-		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_BLOCK), broadcastEntityArgument.capture());
+		Mockito.verify(context.network, Mockito.times(1)).broadcast(Mockito.eq(NisPeerId.REST_PUSH_BLOCK),
+				broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		MatcherAssert.assertThat(((Block)secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
+		MatcherAssert.assertThat(((Block) secureEntity.getEntity()).getHeight(), IsEqual.equalTo(new BlockHeight(14)));
 	}
 
-	private static TestContext assertPushBlockExperienceChange(
-			final ValidationResult validResult,
-			final ValidationResult acceptedResult) {
+	private static TestContext assertPushBlockExperienceChange(final ValidationResult validResult, final ValidationResult acceptedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block block = NisUtils.createRandomBlockWithHeight(14);
@@ -183,9 +180,9 @@ public class PushServiceTest {
 		return context;
 	}
 
-	//endregion
+	// endregion
 
-	//region other
+	// region other
 
 	@Test
 	public void pushCanFailForUnidentifiedNode() {
@@ -218,35 +215,27 @@ public class PushServiceTest {
 		context.assertNoUpdateExperience();
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
-		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1))
-				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS), broadcastEntityArgument.capture());
+		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1)).queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTIONS),
+				broadcastEntityArgument.capture());
 
-		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
+		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>) (broadcastEntityArgument.getValue());
 		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
-		MatcherAssert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(((MockTransaction) secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
 	@Test
 	public void pushTransactionCachesTransactionIfValidationSucceeds() {
-		assertPushServiceTransactionCaching(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
-				1);
+		assertPushServiceTransactionCaching(ValidationResult.SUCCESS, ValidationResult.NEUTRAL, 1);
 	}
 
 	@Test
 	public void pushTransactionCachesTransactionIfValidationFails() {
 		// Assert:
-		assertPushServiceTransactionCaching(
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				1);
+		assertPushServiceTransactionCaching(ValidationResult.FAILURE_CHAIN_INVALID, ValidationResult.FAILURE_CHAIN_INVALID, 1);
 	}
 
-	private static void assertPushServiceTransactionCaching(
-			final ValidationResult transactionValidationResult,
-			final ValidationResult expectedValidationResult,
-			final int expectedNumberOfInvocations) {
+	private static void assertPushServiceTransactionCaching(final ValidationResult transactionValidationResult,
+			final ValidationResult expectedValidationResult, final int expectedNumberOfInvocations) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
@@ -304,21 +293,15 @@ public class PushServiceTest {
 
 	@Test
 	public void pushBlockCachesBlockIfValidationSucceeds() {
-		assertPushServiceBlockCaching(
-				ValidationResult.SUCCESS,
-				1);
+		assertPushServiceBlockCaching(ValidationResult.SUCCESS, 1);
 	}
 
 	@Test
 	public void pushBlockCachesBlockIfValidationFails() {
-		assertPushServiceBlockCaching(
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				1);
+		assertPushServiceBlockCaching(ValidationResult.FAILURE_CHAIN_INVALID, 1);
 	}
 
-	private static void assertPushServiceBlockCaching(
-			final ValidationResult blockValidationResult,
-			final int expectedNumberOfInvocations) {
+	private static void assertPushServiceBlockCaching(final ValidationResult blockValidationResult, final int expectedNumberOfInvocations) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block block = NisUtils.createRandomBlockWithHeight(12);
@@ -367,29 +350,25 @@ public class PushServiceTest {
 		Mockito.verify(context.blockChain, Mockito.times(2)).checkPushedBlock(block);
 	}
 
-	//endregion
+	// endregion
 
-	//region reject entities from different network
+	// region reject entities from different network
 
 	@Test
 	public void pushTransactionRejectsTransactionsFromDifferentNetwork() {
 		// Assert:
-		assertTransactionNetworkCheck(
-				NetworkInfos.getTestNetworkInfo(),
-				NetworkInfos.getMainNetworkInfo(),
+		assertTransactionNetworkCheck(NetworkInfos.getTestNetworkInfo(), NetworkInfos.getMainNetworkInfo(),
 				ValidationResult.FAILURE_WRONG_NETWORK);
 	}
 
 	@Test
 	public void pushTransactionAcceptsTransactionsFromSameNetwork() {
 		// Assert:
-		assertTransactionNetworkCheck(
-				NetworkInfos.getTestNetworkInfo(),
-				NetworkInfos.getTestNetworkInfo(),
-				ValidationResult.SUCCESS);
+		assertTransactionNetworkCheck(NetworkInfos.getTestNetworkInfo(), NetworkInfos.getTestNetworkInfo(), ValidationResult.SUCCESS);
 	}
 
-	private static void assertTransactionNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
+	private static void assertTransactionNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		setNetworkInfo(remoteNetwork);
@@ -409,22 +388,18 @@ public class PushServiceTest {
 	@Test
 	public void pushBlockRejectsBlocksFromDifferentNetwork() {
 		// Assert:
-		assertBlockNetworkCheck(
-				NetworkInfos.getTestNetworkInfo(),
-				NetworkInfos.getMainNetworkInfo(),
+		assertBlockNetworkCheck(NetworkInfos.getTestNetworkInfo(), NetworkInfos.getMainNetworkInfo(),
 				ValidationResult.FAILURE_WRONG_NETWORK);
 	}
 
 	@Test
 	public void pushBlockAcceptsBlocksFromSameNetwork() {
 		// Assert:
-		assertBlockNetworkCheck(
-				NetworkInfos.getTestNetworkInfo(),
-				NetworkInfos.getTestNetworkInfo(),
-				ValidationResult.SUCCESS);
+		assertBlockNetworkCheck(NetworkInfos.getTestNetworkInfo(), NetworkInfos.getTestNetworkInfo(), ValidationResult.SUCCESS);
 	}
 
-	private static void assertBlockNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
+	private static void assertBlockNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		setNetworkInfo(remoteNetwork);
@@ -442,7 +417,7 @@ public class PushServiceTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
 	private static void setNetworkInfo(final NetworkInfo info) {
 		NetworkInfos.setDefault(null);
@@ -485,21 +460,12 @@ public class PushServiceTest {
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
 			Mockito.when(host.getNetworkBroadcastBuffer()).thenReturn(this.networkBroadcastBuffer);
 
-			this.service = new PushService(
-					this.unconfirmedTransactions,
-					this.blockChain,
-					host,
-					this.timeProvider);
+			this.service = new PushService(this.unconfirmedTransactions, this.blockChain, host, this.timeProvider);
 		}
 
 		public void setAddTimeStamps(final int delta1, final int delta2) {
-			Mockito.when(this.timeProvider.getCurrentTime())
-					.thenReturn(
-							new TimeInstant(BASE_TIME),
-							new TimeInstant(BASE_TIME),
-							new TimeInstant(BASE_TIME + delta1),
-							new TimeInstant(BASE_TIME + delta1),
-							new TimeInstant(BASE_TIME + delta2));
+			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(BASE_TIME), new TimeInstant(BASE_TIME),
+					new TimeInstant(BASE_TIME + delta1), new TimeInstant(BASE_TIME + delta1), new TimeInstant(BASE_TIME + delta2));
 		}
 
 		public void assertNoUpdateExperience() {
@@ -507,10 +473,9 @@ public class PushServiceTest {
 		}
 
 		public void assertSingleUpdateExperience(final ValidationResult expectedResult) {
-			Mockito.verify(this.network, Mockito.times(1))
-					.updateExperience(this.remoteNode, NodeInteractionResult.fromValidationResult(expectedResult));
-			Mockito.verify(this.network, Mockito.times(1))
-					.updateExperience(Mockito.eq(this.remoteNode), Mockito.any());
+			Mockito.verify(this.network, Mockito.times(1)).updateExperience(this.remoteNode,
+					NodeInteractionResult.fromValidationResult(expectedResult));
+			Mockito.verify(this.network, Mockito.times(1)).updateExperience(Mockito.eq(this.remoteNode), Mockito.any());
 		}
 	}
 }

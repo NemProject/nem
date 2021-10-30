@@ -6,9 +6,9 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 
 /**
- * A transaction validator that checks transactions made from a multisig account and checks signature presence:
- * a) transaction from a multisig account with a signature is not allowed
- * b) transaction from a multisig account without a signature is allowed (child transaction)
+ * A transaction validator that checks transactions made from a multisig account and checks signature presence:<br>
+ * 1. transaction from a multisig account with a signature is not allowed<br>
+ * 2. transaction from a multisig account without a signature is allowed (child transaction)
  */
 public class MultisigNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
@@ -32,9 +32,7 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 		}
 
 		// once an account is multisig, it should not be allowed to make any other transactions
-		return isChildTransaction(transaction)
-				? ValidationResult.SUCCESS
-				: ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
+		return isChildTransaction(transaction) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
 	}
 
 	private static boolean isChildTransaction(final Transaction transaction) {

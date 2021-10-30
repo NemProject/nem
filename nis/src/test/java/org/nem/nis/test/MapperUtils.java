@@ -13,7 +13,7 @@ import org.nem.nis.mappers.*;
  */
 public class MapperUtils {
 
-	//region create mapper factories
+	// region create mapper factories
 
 	/**
 	 * Creates a NIS mapper factory.
@@ -24,9 +24,9 @@ public class MapperUtils {
 		return new NisMapperFactory(createMapperFactory());
 	}
 
-	//endregion
+	// endregion
 
-	//region create mappers
+	// region create mappers
 
 	/**
 	 * Creates a NIS mapper facade for mapping model types to db model types.
@@ -52,9 +52,9 @@ public class MapperUtils {
 		return createNisMapperFactory().createDbModelToModelNisMapper(accountLookup);
 	}
 
-	//endregion
+	// endregion
 
-	//region mapping functions
+	// region mapping functions
 
 	/**
 	 * Maps a model block to a db model block.
@@ -90,8 +90,8 @@ public class MapperUtils {
 	 */
 	public static DbBlock toDbModelWithHack(final Block block, final AccountDaoLookup accountDaoLookup) {
 		// - hack: the problem is that the tests do something which cannot happen in a real environment
-		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
-		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		// A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
+		// To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 
@@ -124,7 +124,7 @@ public class MapperUtils {
 		return mapper.map(dbBlock);
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a default mapper factory.

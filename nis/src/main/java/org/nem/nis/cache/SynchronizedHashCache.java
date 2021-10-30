@@ -99,7 +99,7 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 		}
 	}
 
-	//region SynchronizedHashCache
+	// region SynchronizedHashCache
 
 	@Override
 	public void shallowCopyTo(final SynchronizedHashCache rhs) {
@@ -115,7 +115,9 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 		}
 	}
 
-	//region CommitableCache
+	// endregion
+
+	// region CommitableCache
 
 	@Override
 	public void commit() {
@@ -124,7 +126,7 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 		}
 	}
 
-	//endregion
+	// endregion
 
 	public SynchronizedHashCache deepCopy() {
 		synchronized (this.lock) {

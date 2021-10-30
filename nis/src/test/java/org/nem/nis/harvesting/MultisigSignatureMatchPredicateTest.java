@@ -33,7 +33,8 @@ public class MultisigSignatureMatchPredicateTest {
 	public void isNotMatchIfSignatureAndMultisigTransactionsHaveDifferentOtherTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1, Utils.generateRandomHash());
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1,
+				Utils.generateRandomHash());
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
 
 		// Act:
@@ -47,8 +48,7 @@ public class MultisigSignatureMatchPredicateTest {
 	public void isNotMatchIfSignatureAndMultisigTransactionsHaveDifferentMultisigAccounts() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransactionWithMultisig(
-				context.cosigner1,
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransactionWithMultisig(context.cosigner1,
 				Utils.generateRandomAccount());
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
 
@@ -99,7 +99,7 @@ public class MultisigSignatureMatchPredicateTest {
 
 		public TestContext() {
 			Mockito.when(this.accountStateCache.findStateByAddress(Mockito.any()))
-					.thenAnswer(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
+					.thenAnswer(invocationOnMock -> new AccountState((Address) invocationOnMock.getArguments()[0]));
 			for (final Account cosigner : Arrays.asList(this.cosigner1, this.cosigner2)) {
 				final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 				cosignerAccountState.getMultisigLinks().addCosignatoryOf(this.multisig.getAddress());

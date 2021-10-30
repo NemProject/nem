@@ -8,7 +8,7 @@ import org.nem.specific.deploy.appconfig.NisAppConfig;
 
 public class NisConfigurationPolicyTest {
 
-	//region get class
+	// region get class
 
 	@Test
 	public void canGetNisAppConfigClass() {
@@ -37,9 +37,9 @@ public class NisConfigurationPolicyTest {
 		MatcherAssert.assertThat(policy.getWebAppWebsockInitializerClass(), IsEqual.equalTo(NisWebAppWebsocketInitializer.class));
 	}
 
-	//endregion
+	// endregion
 
-	//region get raises exception
+	// region get raises exception
 
 	@Test(expected = NisConfigurationException.class)
 	public void getJarFileServletClassRaisesException() {
@@ -59,7 +59,7 @@ public class NisConfigurationPolicyTest {
 		policy.getRootServletClass();
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void loadConfigReturnsValidConfiguration() {
@@ -67,7 +67,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		final CommonConfiguration configuration = policy.loadConfig(new String[] {});
+		final CommonConfiguration configuration = policy.loadConfig(new String[]{});
 
 		// Assert:
 		MatcherAssert.assertThat(configuration, IsNull.notNullValue());

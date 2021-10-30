@@ -11,7 +11,9 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ProvisionNamespaceTransaction, DbProvisionNamespaceTransaction> {
+public class ProvisionNamespaceModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<ProvisionNamespaceTransaction, DbProvisionNamespaceTransaction> {
 
 	@Test
 	public void transactionCanBeMappedToDbModel() {
@@ -73,13 +75,8 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 
 	@Override
 	protected ProvisionNamespaceTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new ProvisionNamespaceTransaction(
-				timeStamp,
-				sender,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(25000),
-				new NamespaceIdPart("baz"),
-				new NamespaceId("foo.bar"));
+		return new ProvisionNamespaceTransaction(timeStamp, sender, Utils.generateRandomAccount(), Amount.fromNem(25000),
+				new NamespaceIdPart("baz"), new NamespaceId("foo.bar"));
 	}
 
 	@Override
@@ -103,13 +100,8 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		}
 
 		private ProvisionNamespaceTransaction createModel() {
-			return new ProvisionNamespaceTransaction(
-					TimeInstant.ZERO,
-					this.sender,
-					this.rentalFeeSink,
-					Amount.fromNem(25),
-					this.namespace.getId().getLastPart(),
-					this.namespace.getId().getParent());
+			return new ProvisionNamespaceTransaction(TimeInstant.ZERO, this.sender, this.rentalFeeSink, Amount.fromNem(25),
+					this.namespace.getId().getLastPart(), this.namespace.getId().getParent());
 		}
 	}
 }

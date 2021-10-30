@@ -44,7 +44,7 @@ public class NamespaceRetrieverTest {
 		this.session.close();
 	}
 
-	//region getNamespacesForAccount
+	// region getNamespacesForAccount
 
 	@Test
 	public void getNamespacesForAccountRetrievesAllNamespacesForSpecificAccount() {
@@ -68,8 +68,7 @@ public class NamespaceRetrieverTest {
 
 		// Assert:
 		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(110));
-		dbNamespaces.stream()
-				.map(n -> new NamespaceId(n.getFullName()).getRoot())
+		dbNamespaces.stream().map(n -> new NamespaceId(n.getFullName()).getRoot())
 				.forEach(root -> MatcherAssert.assertThat(root, IsEqual.equalTo(new NamespaceId("aa"))));
 	}
 
@@ -93,7 +92,8 @@ public class NamespaceRetrieverTest {
 		// Act:
 		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
 		// only namespace "aaa.b" should be found
-		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 3, new NamespaceId("aaa"), 300));
+		final List<DbNamespace> dbNamespaces = new ArrayList<>(
+				retriever.getNamespacesForAccount(this.session, 3, new NamespaceId("aaa"), 300));
 
 		// Assert:
 		MatcherAssert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
@@ -108,7 +108,8 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		// originally "aaaaaaa" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("aaaaaaa"), 300));
+		final List<DbNamespace> dbNamespaces = new ArrayList<>(
+				retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("aaaaaaa"), 300));
 
 		// Assert:
 		dbNamespaces.stream().forEach(n -> {
@@ -117,9 +118,9 @@ public class NamespaceRetrieverTest {
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//region getNamespace
+	// region getNamespace
 
 	@Test
 	public void getNamespaceRetrievesSpecifiedNamespace() {
@@ -213,9 +214,9 @@ public class NamespaceRetrieverTest {
 		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
-	//endregion
+	// endregion
 
-	//region getRootNamespaces
+	// region getRootNamespaces
 
 	@Test
 	public void getRootNamespacesRetrievesAllRootNamespaces() {
@@ -224,17 +225,8 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		final Collection<String> dbFullNames = getNames(retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100));
-		final Collection<String> expectedFullNames = Arrays.asList(
-				"a",
-				"aa",
-				"aaa",
-				"aaaa",
-				"aaaaa",
-				"aaaaaa",
-				"aaaaaaa",
-				"aaaaaaaa",
-				"aaaaaaaaa",
-				"aaaaaaaaaa");
+		final Collection<String> expectedFullNames = Arrays.asList("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa",
+				"aaaaaaaaa", "aaaaaaaaaa");
 
 		// Assert:
 		MatcherAssert.assertThat(dbFullNames.size(), IsEqual.equalTo(10));
@@ -276,9 +268,7 @@ public class NamespaceRetrieverTest {
 	}
 
 	private static Collection<String> getNames(final Collection<DbNamespace> dbNamespaces) {
-		return dbNamespaces.stream()
-				.map(DbNamespace::getFullName)
-				.collect(Collectors.toList());
+		return dbNamespaces.stream().map(DbNamespace::getFullName).collect(Collectors.toList());
 	}
 
 	@Test
@@ -318,7 +308,7 @@ public class NamespaceRetrieverTest {
 		return dbNamespaces.stream().filter(ns -> name.equals(ns.getFullName())).findFirst().get();
 	}
 
-	//endregion
+	// endregion
 
 	private void setupNamespaces() {
 		// Adds the following namespaces to the namespace table:
@@ -330,12 +320,17 @@ public class NamespaceRetrieverTest {
 		// ...
 		// aaaaaaaaaa.bbbbbbbbbb.cccccccccc
 		//
-		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and aaaa,...)
+		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and
+		// aaaa,...)
 		// Expiry heights for the root namespaces are 1, 101, 201, ...
 		// The namespace "aaaaaaa" has 2 entries, the first one has height 1, the second one height 5000
-		// The namespace "aaa" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
-		// The namespace "aaa.b" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
-		final String[] levels = { "", "", "" };
+		// The namespace "aaa" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and
+		// height 2000
+		// The namespace "aaa.b" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and
+		// height 2000
+		final String[] levels = {
+				"", "", ""
+		};
 		String fullName;
 		String statement;
 		long expiryHeight;
@@ -376,19 +371,15 @@ public class NamespaceRetrieverTest {
 	}
 
 	private static String createSQLStatement(final String fullName, final long ownerId, final long height, final int level) {
-		return String.format("Insert into namespaces (fullName, ownerId, height, level) values('%s', %d, %d, %d)",
-				fullName,
-				ownerId,
-				height,
-				level);
+		return String.format("Insert into namespaces (fullName, ownerId, height, level) values('%s', %d, %d, %d)", fullName, ownerId,
+				height, level);
 	}
 
 	private void createAccounts(final int count) {
 		for (int i = 0; i < count; i++) {
 			final PublicKey publicKey = new KeyPair().getPublicKey();
 			final Address address = Address.fromPublicKey(publicKey);
-			final String statement = String.format("Insert into accounts (printableKey, publicKey) values('%s', '%s')",
-					address.toString(),
+			final String statement = String.format("Insert into accounts (printableKey, publicKey) values('%s', '%s')", address.toString(),
 					publicKey.toString());
 			this.session.createSQLQuery(statement).executeUpdate();
 		}

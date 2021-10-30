@@ -11,7 +11,7 @@ import java.util.*;
 public class MosaicBalances implements ReadOnlyMosaicBalances {
 	private final Map<Address, Quantity> balances = new HashMap<>();
 
-	//region ReadOnlyMosaicBalances
+	// region ReadOnlyMosaicBalances
 
 	@Override
 	public int size() {
@@ -28,7 +28,7 @@ public class MosaicBalances implements ReadOnlyMosaicBalances {
 		return Collections.unmodifiableCollection(this.balances.keySet());
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Increments the balance of the specified account.

@@ -29,11 +29,8 @@ public class WebsocketInitController {
 	private final TimeProvider timeProvider;
 
 	@Autowired(required = true)
-	public WebsocketInitController(
-			final AccountIo accountIo,
-			final MessagingService messagingService,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final NisDbModelToModelMapper mapper,
+	public WebsocketInitController(final AccountIo accountIo, final MessagingService messagingService,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer, final NisDbModelToModelMapper mapper,
 			final TimeProvider timeProvider) {
 		this.accountIo = accountIo;
 		this.messagingService = messagingService;
@@ -70,9 +67,7 @@ public class WebsocketInitController {
 	public void transfersAll(@Payload final AccountId accountId) {
 		final Address address = accountId.getAddress();
 		this.messagingService.pushTransactions(address, this.getAccountTransfersUsingId(
-				new AccountTransactionsId(address.getEncoded(), null),
-				new DefaultPage(null, null),
-				ReadOnlyTransferDao.TransferType.ALL));
+				new AccountTransactionsId(address.getEncoded(), null), new DefaultPage(null, null), ReadOnlyTransferDao.TransferType.ALL));
 
 		this.messagingService.pushUnconfirmed(address);
 	}
@@ -108,9 +103,7 @@ public class WebsocketInitController {
 		return new ErrorResponse(timeProvider.getCurrentTime(), exception.getMessage(), 400);
 	}
 
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
-			final AccountTransactionsId id,
-			final DefaultPage page,
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(final AccountTransactionsId id, final DefaultPage page,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (null != page.getId()) {
 			return this.accountIo.getAccountTransfersUsingId(id.getAddress(), page.getId(), transferType, page.getPageSize());
