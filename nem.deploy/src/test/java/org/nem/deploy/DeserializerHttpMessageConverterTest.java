@@ -66,9 +66,9 @@ public class DeserializerHttpMessageConverterTest {
 		MatcherAssert.assertThat(mc.canWrite(Deserializer.class, supportedType), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region read
+	// region read
 
 	@Test
 	public void readDeserializerIsCorrectlyCreatedAroundInput() throws Exception {
@@ -77,8 +77,7 @@ public class DeserializerHttpMessageConverterTest {
 		final DeserializerHttpMessageConverter mc = createMessageConverter();
 
 		// Act:
-		final Deserializer deserializer = mc.read(
-				JsonDeserializer.class,
+		final Deserializer deserializer = mc.read(JsonDeserializer.class,
 				new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity)));
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
@@ -105,9 +104,9 @@ public class DeserializerHttpMessageConverterTest {
 		Mockito.verify(policy, Mockito.times(1)).fromStream(message.getBody());
 	}
 
-	//endregion
+	// endregion
 
-	//region write
+	// region write
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void writeIsUnsupported() throws Exception {
@@ -120,7 +119,7 @@ public class DeserializerHttpMessageConverterTest {
 		mc.write(deserializer, supportedType, new MockHttpOutputMessage());
 	}
 
-	//endregion
+	// endregion
 
 	private static DeserializerHttpMessageConverter createMessageConverter() {
 		return new DeserializerHttpMessageConverter(new JsonSerializationPolicy(null));

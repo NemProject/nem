@@ -43,8 +43,7 @@ public interface NemConfigurationPolicy {
 	Class<? extends HttpServlet> getRootServletClass();
 
 	/**
-	 * Loads the common configuration and replaces default with values
-	 * supplied in args if available.
+	 * Loads the common configuration and replaces default with values supplied in args if available.
 	 *
 	 * @param args The optional array of string parameters.
 	 * @return The common configuration.

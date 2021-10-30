@@ -11,8 +11,7 @@ public class PropertiesExtensions {
 	private static final Logger LOGGER = Logger.getLogger(PropertiesExtensions.class.getName());
 
 	/**
-	 * Merges multiple properties objects.
-	 * In the case of conflict, values in later properties objects take precedence.
+	 * Merges multiple properties objects. In the case of conflict, values in later properties objects take precedence.
 	 *
 	 * @return The merged properties.
 	 */

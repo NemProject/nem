@@ -119,7 +119,7 @@ public class JsonErrorHandlerTest {
 		MatcherAssert.assertThat(response.getMessage(), IsNull.nullValue());
 	}
 
-	//region MockServletOutputStream
+	// region MockServletOutputStream
 
 	private static class MockServletOutputStream extends ServletOutputStream {
 
@@ -144,9 +144,9 @@ public class JsonErrorHandlerTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private static class TestContext {
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
@@ -194,10 +194,10 @@ public class JsonErrorHandlerTest {
 
 		public ErrorResponse getErrorResponse() {
 			final String jsonString = this.outputStream.getContent();
-			final Deserializer deserializer = new JsonDeserializer((JSONObject)JSONValue.parse(jsonString), null);
+			final Deserializer deserializer = new JsonDeserializer((JSONObject) JSONValue.parse(jsonString), null);
 			return new ErrorResponse(deserializer);
 		}
 	}
 
-	//endregion
+	// endregion
 }

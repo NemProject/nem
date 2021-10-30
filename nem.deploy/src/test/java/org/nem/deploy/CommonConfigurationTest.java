@@ -13,26 +13,13 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class CommonConfigurationTest {
-	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
-			"nem.shortServerName",
-			"nem.httpPort",
-			"nem.httpsPort",
-			"nem.webContext",
-			"nem.apiContext",
-			"nem.homePath",
-			"nem.maxThreads");
+	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",
+			"nem.webContext", "nem.apiContext", "nem.homePath", "nem.maxThreads");
 
-	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
-			"nem.websocketPort",
-			"nem.folder",
-			"nem.protocol",
-			"nem.host",
-			"nem.shutdownPath",
-			"nem.useDosFilter",
-			"nem.nonAuditedApiPaths",
-			"nem.network");
+	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList("nem.websocketPort", "nem.folder", "nem.protocol", "nem.host",
+			"nem.shutdownPath", "nem.useDosFilter", "nem.nonAuditedApiPaths", "nem.network");
 
-	//region basic construction
+	// region basic construction
 
 	@Test
 	public void canReadDefaultConfigurationFromResources() {
@@ -77,14 +64,14 @@ public class CommonConfigurationTest {
 		assertCustomOptionalConfiguration(config, false);
 
 		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("foobar"));
-		MatcherAssert.assertThat(config.getNetworkInfo().getVersion(), IsEqual.equalTo((byte)111));
+		MatcherAssert.assertThat(config.getNetworkInfo().getVersion(), IsEqual.equalTo((byte) 111));
 		MatcherAssert.assertThat(config.getNetworkInfo().getAddressStartChar(), IsEqual.equalTo('Z'));
 
 		final NemesisBlockInfo nemesisBlockInfo = config.getNetworkInfo().getNemesisBlockInfo();
-		MatcherAssert.assertThat(
-				nemesisBlockInfo.getGenerationHash(),
+		MatcherAssert.assertThat(nemesisBlockInfo.getGenerationHash(),
 				IsEqual.equalTo(Hash.fromHexString("0D35091344727AD5E175D7CE4DE7A6DAFD08EE135E09774DDCA2C55626264F45")));
-		MatcherAssert.assertThat(nemesisBlockInfo.getAddress(), IsEqual.equalTo(Address.fromEncoded("ZAAFEBANNRXGOEIHNIRR5DDYYNN6IEKKO75O64RR")));
+		MatcherAssert.assertThat(nemesisBlockInfo.getAddress(),
+				IsEqual.equalTo(Address.fromEncoded("ZAAFEBANNRXGOEIHNIRR5DDYYNN6IEKKO75O64RR")));
 		MatcherAssert.assertThat(nemesisBlockInfo.getAmount(), IsEqual.equalTo(Amount.fromNem(888888888)));
 		MatcherAssert.assertThat(nemesisBlockInfo.getDataFileName(), IsEqual.equalTo("path/to/file.bin"));
 	}
@@ -123,14 +110,8 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
 		MatcherAssert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
 
-		final String[] expectedNonAuditedApiPaths = new String[] {
-				"/heartbeat",
-				"/status",
-				"/chain/height",
-				"/push/transaction",
-				"/node/info",
-				"/node/extended-info",
-				"/account/get",
+		final String[] expectedNonAuditedApiPaths = new String[]{
+				"/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info", "/node/extended-info", "/account/get",
 				"/account/status"
 		};
 		MatcherAssert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(expectedNonAuditedApiPaths));
@@ -158,9 +139,9 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
 		MatcherAssert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
 		MatcherAssert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
-		MatcherAssert.assertThat(
-				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
+		MatcherAssert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(new String[]{
+				"/status", "/whatever"
+		}));
 
 		if (checkNetwork) {
 			MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
@@ -168,9 +149,9 @@ public class CommonConfigurationTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region property required status
+	// region property required status
 
 	@Test
 	public void requiredPropertiesAreDetectedCorrectly() {
@@ -196,9 +177,9 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
 	}
 
-	//endregion
+	// endregion
 
-	//region derivative information
+	// region derivative information
 
 	@Test
 	public void additionalInformationCanBeRetrieved() {
@@ -261,7 +242,7 @@ public class CommonConfigurationTest {
 		MatcherAssert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
 	}
 
-	//endregion
+	// endregion
 
 	private static Properties getCommonProperties() {
 		final Properties properties = new Properties();

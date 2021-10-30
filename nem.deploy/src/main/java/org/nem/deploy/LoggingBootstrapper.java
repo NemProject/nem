@@ -19,7 +19,7 @@ public class LoggingBootstrapper {
 	 */
 	public static void bootstrap(final String nemFolder) {
 		try (final InputStream inputStream = LoggingBootstrapper.class.getClassLoader().getResourceAsStream("logalpha.properties");
-			 final InputStream inputStringStream = adaptFileLocation(inputStream, nemFolder)) {
+				final InputStream inputStringStream = adaptFileLocation(inputStream, nemFolder)) {
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);
 			final File logFile = new File(logManager.getProperty("java.util.logging.FileHandler.pattern"));
@@ -36,11 +36,11 @@ public class LoggingBootstrapper {
 	}
 
 	/**
-	 * log configuration may include a placeholder for the nem folder The method replaces the pattern ${nem.folder} with the value defined within the
-	 * NisConfiguration Only for "java.util.logging.FileHandler.pattern" value
+	 * log configuration may include a placeholder for the nem folder The method replaces the pattern ${nem.folder} with the value defined
+	 * within the NisConfiguration Only for "java.util.logging.FileHandler.pattern" value
 	 *
-	 * @param inputStream stream of the logging properties
-	 * * @param nemFolder The NEM folder location.
+	 * @param inputStream stream of the logging properties.
+	 * @param nemFolder The NEM folder location.
 	 * @return new stream which contains the replaced FileHandler.pattern
 	 * @throws IOException
 	 */

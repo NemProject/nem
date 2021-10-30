@@ -13,7 +13,7 @@ import java.io.*;
 
 public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 
-	//region getMediaType
+	// region getMediaType
 
 	@Test
 	public void policySupportsApplicationJsonMediaType() {
@@ -29,9 +29,9 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		MatcherAssert.assertThat(mediaType.getCharset(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region toBytes
+	// region toBytes
 
 	@Test
 	public void toBytesCreatesJsonStringWithTerminatingNewline() {
@@ -65,16 +65,16 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 
 		// Act:
 		final String jsonString = StringEncoder.getString(policy.toBytes(originalEntity));
-		final JsonDeserializer deserializer = new JsonDeserializer((JSONObject)JSONValue.parse(jsonString), null);
+		final JsonDeserializer deserializer = new JsonDeserializer((JSONObject) JSONValue.parse(jsonString), null);
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
 		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
-	//endregion
+	// endregion
 
-	//region fromStream
+	// region fromStream
 
 	@Test(expected = IllegalArgumentException.class)
 	public void fromStreamFailsIfInputStringIsNotJsonObject() {
@@ -85,7 +85,7 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		policy.fromStream(new ByteArrayInputStream("7".getBytes()));
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	protected SerializationPolicy createPolicy(final AccountLookup accountLookup) {

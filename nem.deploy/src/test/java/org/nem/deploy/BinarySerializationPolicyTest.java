@@ -11,7 +11,7 @@ import java.io.*;
 
 public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 
-	//region getMediaType
+	// region getMediaType
 
 	@Test
 	public void policySupportsApplicationBinaryMediaType() {
@@ -27,9 +27,9 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		MatcherAssert.assertThat(mediaType.getCharset(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region toBytes
+	// region toBytes
 
 	@Test
 	public void toBytesDelegatesToBinarySerializer() {
@@ -41,12 +41,10 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		final byte[] bytes = policy.toBytes(originalEntity);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				bytes,
-				IsEqual.equalTo(BinarySerializer.serializeToBytes(originalEntity)));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(BinarySerializer.serializeToBytes(originalEntity)));
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	protected SerializationPolicy createPolicy(final AccountLookup accountLookup) {

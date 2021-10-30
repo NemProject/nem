@@ -24,16 +24,14 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 	 * @param webAppInitializerClass The web initializer class.
 	 * @param useDosFilter true if a DOS filter should be used, false otherwise.
 	 */
-	public AbstractNemServletContextListener(
-			final AnnotationConfigApplicationContext appCtx,
-			final Class<?> webAppInitializerClass,
+	public AbstractNemServletContextListener(final AnnotationConfigApplicationContext appCtx, final Class<?> webAppInitializerClass,
 			final boolean useDosFilter) {
 		this.appCtx = appCtx;
 		this.webAppInitializerClass = webAppInitializerClass;
 		this.useDosFilter = useDosFilter;
 	}
 
-	//region ServletContextListener
+	// region ServletContextListener
 
 	@Override
 	public void contextInitialized(final ServletContextEvent event) {
@@ -59,7 +57,7 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 		}
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Allows the derived class to customize the server in a custom way.
@@ -73,26 +71,26 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 	public void contextDestroyed(final ServletContextEvent event) {
 	}
 
-	//region add servlet
+	// region add servlet
 
 	/**
-	 * Adds a file serving servlet.
-	 * TODO 20150918 J-J: this should be moved to the derived class when NIS no longer is serving files.
+	 * Adds a file serving servlet. TODO 20150918 J-J: this should be moved to the derived class when NIS no longer is serving files.
 	 *
 	 * @param context The servlet context.
 	 * @param fileServletClass The file servlet class.
 	 * @param mappings The file mappings.
 	 */
-	protected static void addFileServlet(final ServletContext context, final Class<? extends HttpServlet> fileServletClass, final String... mappings) {
+	protected static void addFileServlet(final ServletContext context, final Class<? extends HttpServlet> fileServletClass,
+			final String... mappings) {
 		final ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", fileServletClass);
 		servlet.setInitParameter("maxCacheSize", "0");
 		servlet.addMapping(mappings);
 		servlet.setLoadOnStartup(1);
 	}
 
-	//endregion
+	// endregion
 
-	//region add filter
+	// region add filter
 
 	private static void addDosFilter(final ServletContext context) {
 		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
@@ -117,8 +115,9 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 			}
 
 			@Override
-			public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-				final HttpServletResponse httpResponse = (HttpServletResponse)response;
+			public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+					throws IOException, ServletException {
+				final HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
 				httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
 				chain.doFilter(request, httpResponse);
@@ -132,5 +131,5 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 
-	//endregion
+	// endregion
 }

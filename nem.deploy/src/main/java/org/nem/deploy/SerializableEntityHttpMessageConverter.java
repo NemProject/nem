@@ -35,16 +35,14 @@ public class SerializableEntityHttpMessageConverter extends AbstractHttpMessageC
 	}
 
 	@Override
-	protected SerializableEntity readInternal(
-			final Class<? extends SerializableEntity> aClass,
-			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+	protected SerializableEntity readInternal(final Class<? extends SerializableEntity> aClass, final HttpInputMessage httpInputMessage)
+			throws IOException, HttpMessageNotReadableException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	protected void writeInternal(
-			final SerializableEntity serializableEntity,
-			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+	protected void writeInternal(final SerializableEntity serializableEntity, final HttpOutputMessage httpOutputMessage)
+			throws IOException, HttpMessageNotWritableException {
 
 		httpOutputMessage.getBody().write(this.policy.toBytes(serializableEntity));
 	}

@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CommonStarterTest {
 
-	//region stopServerAsync
+	// region stopServerAsync
 
 	@Test
 	public void stopServerAsyncDoesNotImmediatelyStopServer() {
@@ -55,5 +55,5 @@ public class CommonStarterTest {
 		Mockito.verify(starter, Mockito.times(1)).stopServer();
 	}
 
-	//endregion
+	// endregion
 }

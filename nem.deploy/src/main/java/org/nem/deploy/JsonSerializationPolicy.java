@@ -43,7 +43,7 @@ public class JsonSerializationPolicy implements SerializationPolicy {
 
 		final Object result = JSONValue.parse(readAllAsString(stream));
 		if (result instanceof JSONObject) {
-			return new JsonDeserializer((JSONObject)result, context);
+			return new JsonDeserializer((JSONObject) result, context);
 		}
 
 		throw new IllegalArgumentException("JSON Object was expected");

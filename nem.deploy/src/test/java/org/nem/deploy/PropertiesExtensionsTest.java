@@ -9,7 +9,7 @@ import java.util.*;
 
 public class PropertiesExtensionsTest {
 
-	//region merge
+	// region merge
 
 	@Test
 	public void canMergeZeroProperties() {
@@ -92,9 +92,9 @@ public class PropertiesExtensionsTest {
 		MatcherAssert.assertThat(mergedProps.getProperty("two"), IsEqual.equalTo("2"));
 	}
 
-	//endregion
+	// endregion
 
-	//region loadFromResource
+	// region loadFromResource
 
 	@Test
 	public void loadFromResourceCanLoadRequiredProperties() {
@@ -108,9 +108,7 @@ public class PropertiesExtensionsTest {
 	@Test
 	public void loadFromResourceThrowsExceptionWhenCannotLoadRequiredResources() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> loadFromResource("imaginary.properties", true),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> loadFromResource("imaginary.properties", true), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -135,5 +133,5 @@ public class PropertiesExtensionsTest {
 		return PropertiesExtensions.loadFromResource(PropertiesExtensionsTest.class, name, isRequired);
 	}
 
-	//endregion
+	// endregion
 }

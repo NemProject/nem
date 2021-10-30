@@ -65,9 +65,9 @@ public class SerializableEntityHttpMessageConverterTest {
 		MatcherAssert.assertThat(mc.canWrite(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region read
+	// region read
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void readIsUnsupported() throws Exception {
@@ -78,9 +78,9 @@ public class SerializableEntityHttpMessageConverterTest {
 		mc.read(MockSerializableEntity.class, new MockHttpInputMessage(new JSONObject()));
 	}
 
-	//endregion
+	// endregion
 
-	//region write
+	// region write
 
 	@Test
 	public void writeCreatesJsonStringWithTerminatingNewline() throws Exception {
@@ -114,7 +114,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		// Act:
 		mc.write(originalEntity, supportedType, outputMessage);
 		final String jsonString = outputMessage.getBodyAsString();
-		final JsonDeserializer deserializer = new JsonDeserializer((JSONObject)JSONValue.parse(jsonString), null);
+		final JsonDeserializer deserializer = new JsonDeserializer((JSONObject) JSONValue.parse(jsonString), null);
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
@@ -140,7 +140,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		Mockito.verify(policy, Mockito.times(1)).toBytes(originalEntity);
 	}
 
-	//endregion
+	// endregion
 
 	private static SerializableEntityHttpMessageConverter createMessageConverter() {
 		return createMessageConverter(new JsonSerializationPolicy(null));

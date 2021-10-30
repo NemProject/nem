@@ -65,12 +65,9 @@ public abstract class AbstractServerBootstrapper {
 
 		if (this.configuration.isNcc()) {
 			final Configuration.ClassList classList = Configuration.ClassList.setServerDefault(server);
-			classList.addAfter(
-					"org.eclipse.jetty.webapp.FragmentConfiguration",
-					"org.eclipse.jetty.plus.webapp.EnvConfiguration",
+			classList.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration", "org.eclipse.jetty.plus.webapp.EnvConfiguration",
 					"org.eclipse.jetty.plus.webapp.PlusConfiguration");
-			classList.addBefore(
-					"org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+			classList.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
 					"org.eclipse.jetty.annotations.AnnotationConfiguration");
 		}
 
@@ -86,7 +83,9 @@ public abstract class AbstractServerBootstrapper {
 		servletContext.setErrorHandler(new JsonErrorHandler(CommonStarter.TIME_PROVIDER));
 
 		final HandlerCollection handlers = new HandlerCollection();
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[]{
+				servletContext
+		});
 		return handlers;
 	}
 
