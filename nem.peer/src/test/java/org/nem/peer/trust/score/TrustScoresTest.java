@@ -8,8 +8,6 @@ import org.nem.core.test.NodeUtils;
 
 public class TrustScoresTest {
 
-	//region basic operations
-
 	@Test
 	public void previouslyUnknownWeightCanBeRetrieved() {
 		// Arrange:

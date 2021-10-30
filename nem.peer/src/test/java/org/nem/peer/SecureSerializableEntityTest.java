@@ -34,9 +34,7 @@ public class SecureSerializableEntityTest {
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SecureSerializableEntity<>(entity, identity),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new SecureSerializableEntity<>(entity, identity), null);
 		final SecureSerializableEntity<?> secureEntity = new SecureSerializableEntity<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
@@ -57,8 +55,7 @@ public class SecureSerializableEntityTest {
 		secureEntity.serialize(serializer);
 		serializer.getObject().put("identity", JsonSerializer.serializeToJson(identity2));
 		final SecureSerializableEntity<?> insecureEntity = new SecureSerializableEntity<>(
-				new JsonDeserializer(serializer.getObject(), null),
-				MockSerializableEntity::new);
+				new JsonDeserializer(serializer.getObject(), null), MockSerializableEntity::new);
 
 		// Act:
 		insecureEntity.getEntity();

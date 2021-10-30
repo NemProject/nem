@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
 
-	//region PeerNetworkState delegation
+	// region PeerNetworkState delegation
 
 	@Test
 	public void isChainSynchronizedDelegatesToState() {
@@ -67,9 +67,7 @@ public class PeerNetworkTest {
 	public void getPartnerNodesDelegatesToSelector() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Node> nodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.4"),
-				NodeUtils.createNodeWithHost("10.0.0.7"));
+		final List<Node> nodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.4"), NodeUtils.createNodeWithHost("10.0.0.7"));
 		Mockito.when(context.updateSelector.selectNodes()).thenReturn(nodes);
 
 		// Act:
@@ -120,9 +118,9 @@ public class PeerNetworkTest {
 		Mockito.verify(context.state, Mockito.only()).pruneNodeExperiences(new TimeInstant(123));
 	}
 
-	//endregion
+	// endregion
 
-	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation
+	// region PeerNetworkServicesFactory / NodeSelectorFactory delegation
 
 	@Test
 	public void constructorCreatesNodeSelector() {
@@ -159,9 +157,7 @@ public class PeerNetworkTest {
 
 		// Arrange: change the selector returned by createUpdateNodeSelector
 		final NodeSelector updateSelector = Mockito.mock(NodeSelector.class);
-		final List<Node> nodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.4"),
-				NodeUtils.createNodeWithHost("10.0.0.7"));
+		final List<Node> nodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.4"), NodeUtils.createNodeWithHost("10.0.0.7"));
 		Mockito.when(updateSelector.selectNodes()).thenReturn(nodes);
 		Mockito.when(context.selectorFactory.createUpdateNodeSelector()).thenReturn(updateSelector);
 
@@ -170,7 +166,8 @@ public class PeerNetworkTest {
 		final Collection<Node> selectedNodes = context.network.getPartnerNodes();
 
 		// Assert:
-		Mockito.verify(context.selectorFactory, Mockito.times(2)).createUpdateNodeSelector(); // called once in construction and once in refresh
+		Mockito.verify(context.selectorFactory, Mockito.times(2)).createUpdateNodeSelector(); // called once in construction and once in
+																								// refresh
 		Mockito.verify(updateSelector, Mockito.only()).selectNodes(); // called in getPartnerNodes
 		MatcherAssert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
@@ -277,8 +274,7 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final ChainServices services = Mockito.mock(ChainServices.class);
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
-		Mockito.when(services.isChainSynchronized(context.network.getPartnerNodes()))
-				.thenReturn(CompletableFuture.completedFuture(true));
+		Mockito.when(services.isChainSynchronized(context.network.getPartnerNodes())).thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
 		context.network.checkChainSynchronization().join();
@@ -321,7 +317,7 @@ public class PeerNetworkTest {
 		Mockito.verify(updater, Mockito.only()).updateAny(context.updateNodes);
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);

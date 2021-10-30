@@ -32,13 +32,10 @@ public class NodeBroadcaster {
 	 * @param entity The serializable entity to broadcast.
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> broadcast(
-			final Collection<Node> partnerNodes,
-			final NisPeerId broadcastId,
+	public CompletableFuture<Void> broadcast(final Collection<Node> partnerNodes, final NisPeerId broadcastId,
 			final SerializableEntity entity) {
 
-		final List<CompletableFuture<?>> futures = partnerNodes.stream()
-				.map(node -> this.connector.announce(node, broadcastId, entity))
+		final List<CompletableFuture<?>> futures = partnerNodes.stream().map(node -> this.connector.announce(node, broadcastId, entity))
 				.collect(Collectors.toList());
 
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));

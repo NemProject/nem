@@ -19,13 +19,10 @@ public abstract class NodeSelectorTest {
 	/**
 	 * Creates the node selector to test.
 	 */
-	protected abstract NodeSelector createSelector(
-			final int maxNodes,
-			final ColumnVector trustVector,
-			final TrustContext context,
+	protected abstract NodeSelector createSelector(final int maxNodes, final ColumnVector trustVector, final TrustContext context,
 			final Random random);
 
-	//region selectNode
+	// region selectNode
 
 	@Test
 	public void selectNodeReturnsNullWhenAllNodesHaveZeroTrustValues() {
@@ -55,9 +52,9 @@ public abstract class NodeSelectorTest {
 		MatcherAssert.assertThat(node, IsEqual.equalTo(context.nodes[1]));
 	}
 
-	//endregion
+	// endregion
 
-	//region selectNodes
+	// region selectNodes
 
 	@Test
 	public void selectNodesReturnsEmptyListWhenAllNodesHaveZeroTrustValues() {
@@ -84,9 +81,7 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		MatcherAssert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
+		MatcherAssert.assertThat(nodes, IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
 	@Test
@@ -100,9 +95,7 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		MatcherAssert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
+		MatcherAssert.assertThat(nodes, IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
 	@Test
@@ -116,9 +109,7 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		MatcherAssert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
+		MatcherAssert.assertThat(nodes, IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
 	@Test
@@ -132,9 +123,7 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		MatcherAssert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
+		MatcherAssert.assertThat(nodes, IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2])));
 	}
 
 	@Test
@@ -148,9 +137,7 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		MatcherAssert.assertThat(
-				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes)));
+		MatcherAssert.assertThat(nodes, IsEqual.equalTo(Arrays.asList(context.nodes)));
 
 		// - assert that it took the shortcut
 		Mockito.verify(random, Mockito.never()).nextDouble();

@@ -32,10 +32,7 @@ public class CachedTrustProvider implements TrustProvider {
 	 * @param cacheTime The amount of time to cache trust values
 	 * @param timeProvider The time provider.
 	 */
-	public CachedTrustProvider(
-			final TrustProvider trustProvider,
-			final int cacheTime,
-			final TimeProvider timeProvider) {
+	public CachedTrustProvider(final TrustProvider trustProvider, final int cacheTime, final TimeProvider timeProvider) {
 		this.trustProvider = trustProvider;
 		this.cacheTime = cacheTime;
 		this.timeProvider = timeProvider;
@@ -56,9 +53,7 @@ public class CachedTrustProvider implements TrustProvider {
 			}
 
 			// return a copy of the trust values
-			return new TrustResult(
-					this.lastTrustResult.getTrustContext(),
-					this.lastTrustResult.getTrustValues().add(0));
+			return new TrustResult(this.lastTrustResult.getTrustContext(), this.lastTrustResult.getTrustValues().add(0));
 		}
 	}
 
@@ -77,12 +72,8 @@ public class CachedTrustProvider implements TrustProvider {
 		if (null != this.lastTrustResult) {
 			final Node[] nodesFromLastResult = this.lastTrustResult.getTrustContext().getNodes();
 			final List<Tuple> lastResultTuples = this.mapNodesToTuples(Arrays.asList(nodesFromLastResult));
-			final List<Node> topTrustedNodes = lastResultTuples.stream()
-					.sorted((l, r) -> -1 * Double.compare(l.trust, r.trust))
-					.map(t -> t.node)
-					.limit(TOP_TRUSTED_NODES_TO_KEEP)
-					.filter(currentNodes::contains)
-					.collect(Collectors.toList());
+			final List<Node> topTrustedNodes = lastResultTuples.stream().sorted((l, r) -> -1 * Double.compare(l.trust, r.trust))
+					.map(t -> t.node).limit(TOP_TRUSTED_NODES_TO_KEEP).filter(currentNodes::contains).collect(Collectors.toList());
 
 			truncatedNodes.addAll(topTrustedNodes);
 			currentNodes.removeAll(truncatedNodes);
@@ -91,22 +82,15 @@ public class CachedTrustProvider implements TrustProvider {
 
 		// select random nodes from the full population
 		final int numRemainingNodes = MAX_MATRIX_SIZE - truncatedNodes.size() - 1; // subtract 1 for local node
-		final List<Node> randomNodes = tuples.stream()
-				.sorted((l, r) -> Double.compare(l.random, r.random))
-				.map(t -> t.node)
-				.limit(numRemainingNodes)
-				.collect(Collectors.toList());
+		final List<Node> randomNodes = tuples.stream().sorted((l, r) -> Double.compare(l.random, r.random)).map(t -> t.node)
+				.limit(numRemainingNodes).collect(Collectors.toList());
 		truncatedNodes.addAll(randomNodes);
 
 		// always add the local node
 		truncatedNodes.add(context.getLocalNode());
 
-		return new TrustContext(
-				truncatedNodes.toArray(new Node[truncatedNodes.size()]),
-				context.getLocalNode(),
-				context.getNodeExperiences(),
-				context.getPreTrustedNodes(),
-				context.getParams());
+		return new TrustContext(truncatedNodes.toArray(new Node[truncatedNodes.size()]), context.getLocalNode(),
+				context.getNodeExperiences(), context.getPreTrustedNodes(), context.getParams());
 	}
 
 	private List<Tuple> mapNodesToTuples(final Collection<Node> nodes) {
@@ -123,9 +107,7 @@ public class CachedTrustProvider implements TrustProvider {
 	}
 
 	private double findCachedTrust(final Node node) {
-		final Node[] originalNodes = null == this.lastTrustResult
-				? new Node[] {}
-				: this.lastTrustResult.getTrustContext().getNodes();
+		final Node[] originalNodes = null == this.lastTrustResult ? new Node[]{} : this.lastTrustResult.getTrustContext().getNodes();
 		for (int i = 0; i < originalNodes.length - 1; ++i) {
 			if (originalNodes[i].equals(node)) {
 				return this.lastTrustResult.getTrustValues().getAt(i);

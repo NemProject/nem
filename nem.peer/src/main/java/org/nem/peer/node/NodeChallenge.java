@@ -55,7 +55,7 @@ public class NodeChallenge implements SerializableEntity {
 			return false;
 		}
 
-		final NodeChallenge rhs = (NodeChallenge)obj;
+		final NodeChallenge rhs = (NodeChallenge) obj;
 		return Arrays.equals(this.data, rhs.data);
 	}
 

@@ -61,8 +61,7 @@ public class NodeSynchronizerTest {
 	private static void assertExperienceUpdated(final NodeInteractionResult interactionResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockSynchronizer.synchronizeNode(Mockito.any(), Mockito.any()))
-				.thenReturn(interactionResult);
+		Mockito.when(context.blockSynchronizer.synchronizeNode(Mockito.any(), Mockito.any())).thenReturn(interactionResult);
 		final Node remoteNode = context.makeSelectorReturnRemoteNode();
 
 		// Act:
@@ -78,10 +77,7 @@ public class NodeSynchronizerTest {
 		private final BlockSynchronizer blockSynchronizer = Mockito.mock(BlockSynchronizer.class);
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
-		private final NodeSynchronizer synchronizer = new NodeSynchronizer(
-				this.syncConnectorPool,
-				this.blockSynchronizer,
-				this.state);
+		private final NodeSynchronizer synchronizer = new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
 
 		public Node makeSelectorReturnRemoteNode() {
 			final Node remoteNode = NodeUtils.createNodeWithName("p");

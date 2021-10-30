@@ -11,3 +11,7 @@ install:
   - git checkout dev
   - mvn install -DskipTests=true
   - popd
+
+script:
+  - mvn spotless:check -B
+  - mvn test -B

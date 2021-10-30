@@ -16,7 +16,7 @@ import java.util.*;
 
 public class PeerNetworkStateTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void ctorAddsAllWellKnownPeersAsActive() {
@@ -25,12 +25,14 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { "a", "b", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[]{
+				"a", "b", "c"
+		}, new String[]{});
 	}
 
-	//endregion
+	// endregion
 
-	//region getters
+	// region getters
 
 	@Test
 	public void getConfigurationReturnsConstructorParameter() {
@@ -85,13 +87,9 @@ public class PeerNetworkStateTest {
 		final TrustContext context = state.getTrustContext();
 
 		// Assert:
-		final Node[] expectedNodes = new Node[] {
-				NodeUtils.createNodeWithName("a1"),
-				NodeUtils.createNodeWithName("a2"),
-				NodeUtils.createNodeWithName("a3"),
-				NodeUtils.createNodeWithName("b2"),
-				NodeUtils.createNodeWithName("b1"),
-				NodeUtils.createNodeWithName("l"),
+		final Node[] expectedNodes = new Node[]{
+				NodeUtils.createNodeWithName("a1"), NodeUtils.createNodeWithName("a2"), NodeUtils.createNodeWithName("a3"),
+				NodeUtils.createNodeWithName("b2"), NodeUtils.createNodeWithName("b1"), NodeUtils.createNodeWithName("l"),
 		};
 		MatcherAssert.assertThat(context.getNodes(), IsEqual.equalTo(expectedNodes));
 		MatcherAssert.assertThat(context.getLocalNode(), IsSame.sameInstance(state.getLocalNode()));
@@ -143,9 +141,9 @@ public class PeerNetworkStateTest {
 		MatcherAssert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateExperience
+	// region updateExperience
 
 	@Test
 	public void updateExperienceUpdatesPartnerExperienceOnSuccess() {
@@ -218,9 +216,9 @@ public class PeerNetworkStateTest {
 		return nodeExperiences.getNodeExperience(state.getLocalNode(), remoteNode);
 	}
 
-	//endregion
+	// endregion
 
-	//region getLocalNodeAndExperiences / setRemoteNodeExperiences
+	// region getLocalNodeAndExperiences / setRemoteNodeExperiences
 
 	@Test
 	public void getLocalNodeAndExperiencesIncludesLocalNode() {
@@ -289,8 +287,7 @@ public class PeerNetworkStateTest {
 		final Node otherNode1 = NodeUtils.createNodeWithPort(81);
 		final Node otherNode2 = NodeUtils.createNodeWithPort(83);
 
-		final List<NodeExperiencePair> pairs = Arrays.asList(
-				new NodeExperiencePair(otherNode1, PeerUtils.createNodeExperience(14)),
+		final List<NodeExperiencePair> pairs = Arrays.asList(new NodeExperiencePair(otherNode1, PeerUtils.createNodeExperience(14)),
 				new NodeExperiencePair(otherNode2, PeerUtils.createNodeExperience(44)));
 
 		// Act:
@@ -305,18 +302,15 @@ public class PeerNetworkStateTest {
 		MatcherAssert.assertThat(experience2.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
-	//endregion
+	// endregion
 
-	//region prune node experiences
+	// region prune node experiences
 
 	@Test
 	public void prunePrunesNodeExperiences() {
 		// Arrange:
 		final NodeExperiences nodeExperiences = Mockito.mock(NodeExperiences.class);
-		final PeerNetworkState state = new PeerNetworkState(
-				createTestConfig(),
-				nodeExperiences,
-				new NodeCollection());
+		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), nodeExperiences, new NodeCollection());
 
 		// Act:
 		state.pruneNodeExperiences(new TimeInstant(123));
@@ -325,9 +319,9 @@ public class PeerNetworkStateTest {
 		Mockito.verify(nodeExperiences, Mockito.only()).prune(new TimeInstant(123));
 	}
 
-	//endregion
+	// endregion
 
-	//region node age
+	// region node age
 
 	@Test
 	public void nodeAgeInitiallyIsZero() {
@@ -338,9 +332,9 @@ public class PeerNetworkStateTest {
 		MatcherAssert.assertThat(state.getNodeAge(), IsEqual.equalTo(new NodeAge(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateTimeSynchronizationResults
+	// region updateTimeSynchronizationResults
 
 	@Test
 	public void updateTimeSynchronizationResultsAddsOneToNodeAge() {
@@ -370,20 +364,17 @@ public class PeerNetworkStateTest {
 		MatcherAssert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
 	}
 
-	//endregion
+	// endregion
 
 	private static Config createTestConfig() {
 		final Config config = Mockito.mock(Config.class);
 		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
-		Mockito.when(config.getPreTrustedNodes()).
-				thenReturn(new PreTrustedNodes(new HashSet<>(PeerUtils.createNodesWithNames("a", "b", "c"))));
+		Mockito.when(config.getPreTrustedNodes())
+				.thenReturn(new PreTrustedNodes(new HashSet<>(PeerUtils.createNodesWithNames("a", "b", "c"))));
 		return config;
 	}
 
 	private static PeerNetworkState createDefaultState() {
-		return new PeerNetworkState(
-				createTestConfig(),
-				new NodeExperiences(),
-				new NodeCollection());
+		return new PeerNetworkState(createTestConfig(), new NodeExperiences(), new NodeCollection());
 	}
 }

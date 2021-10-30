@@ -45,8 +45,7 @@ public class NisPeerIdAndEntityListPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
@@ -61,8 +60,7 @@ public class NisPeerIdAndEntityListPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {
-			MatcherAssert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -73,7 +71,8 @@ public class NisPeerIdAndEntityListPairTest {
 			{
 				this.put("default", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
 				this.put("diff-api-id", new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_SCORE, createList(new BlockHeight(123))));
-				this.put("diff-entity-type", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(NodeUtils.createNodeWithName("Alice"))));
+				this.put("diff-entity-type",
+						new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(NodeUtils.createNodeWithName("Alice"))));
 				this.put("diff-entity-values", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(234))));
 			}
 		};

@@ -5,8 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
 /**
- * Request that specifies parameters when pulling data from the db.
- * It gives NIS some flexibility to pull more or less blocks from the db.
+ * Request that specifies parameters when pulling data from the db. It gives NIS some flexibility to pull more or less blocks from the db.
  */
 public class ChainRequest implements SerializableEntity {
 	private final BlockHeight height;
@@ -14,17 +13,11 @@ public class ChainRequest implements SerializableEntity {
 	private final int maxTransactions;
 	private final int numBlocks;
 
-	private ChainRequest(
-			final BlockHeight height,
-			final Integer minBlocks,
-			final Integer maxTransactions) {
+	private ChainRequest(final BlockHeight height, final Integer minBlocks, final Integer maxTransactions) {
 		this(height, minBlocks, maxTransactions, NemGlobals.getBlockChainConfiguration());
 	}
 
-	private ChainRequest(
-			final BlockHeight height,
-			final Integer minBlocks,
-			final Integer maxTransactions,
+	private ChainRequest(final BlockHeight height, final Integer minBlocks, final Integer maxTransactions,
 			final BlockChainConfiguration configuration) {
 		this.height = height;
 		this.minBlocks = clampMinBlocks(configuration, minBlocks);
@@ -39,10 +32,7 @@ public class ChainRequest implements SerializableEntity {
 	 * @param minBlocks The minimum number of blocks to pull.
 	 * @param maxTransactions The maximum number of transactions inside the blocks.
 	 */
-	public ChainRequest(
-			final BlockHeight height,
-			final int minBlocks,
-			final int maxTransactions) {
+	public ChainRequest(final BlockHeight height, final int minBlocks, final int maxTransactions) {
 		this(height, Integer.valueOf(minBlocks), Integer.valueOf(maxTransactions));
 	}
 
@@ -90,7 +80,8 @@ public class ChainRequest implements SerializableEntity {
 	private static int clampMinTransactions(final BlockChainConfiguration configuration, final Integer value) {
 		return null == value
 				? configuration.getDefaultTransactionsPerSyncAttempt()
-				: Math.min(configuration.getMaxTransactionsPerSyncAttempt(), Math.max(configuration.getMinTransactionsPerSyncAttempt(), value));
+				: Math.min(configuration.getMaxTransactionsPerSyncAttempt(),
+						Math.max(configuration.getMinTransactionsPerSyncAttempt(), value));
 	}
 
 	private static int clampNumBlocks(final BlockChainConfiguration configuration, final Integer value) {

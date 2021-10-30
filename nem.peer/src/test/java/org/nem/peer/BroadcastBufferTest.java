@@ -58,8 +58,8 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
 
 		// Assert:
-		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
-				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections
+				.singletonList(new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
 		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
@@ -76,8 +76,8 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(234));
 
 		// Assert:
-		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
-				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(new NisPeerIdAndEntityListPair(
+				NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
 		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
 		MatcherAssert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));

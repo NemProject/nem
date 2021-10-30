@@ -52,8 +52,7 @@ public class LocalNodeEndpointUpdater {
 		while (iterator.hasNext()) {
 			final int j = i++;
 			final Node node = iterator.next();
-			final CompletableFuture<?> future = this.getLocalEndpoint(node)
-					.thenAccept(endpoint -> endpoints[j] = endpoint);
+			final CompletableFuture<?> future = this.getLocalEndpoint(node).thenAccept(endpoint -> endpoints[j] = endpoint);
 
 			futures.add(future);
 		}
@@ -92,23 +91,19 @@ public class LocalNodeEndpointUpdater {
 	 */
 	public CompletableFuture<Boolean> updateAny(final Collection<Node> nodes) {
 		final CompletableFuture<Boolean> aggregateFuture = new CompletableFuture<>();
-		final List<CompletableFuture<?>> futures = nodes.stream()
-				.map(node -> this.getLocalEndpoint(node).thenAccept(endpoint -> {
-					if (!aggregateFuture.isDone() && this.setLocalEndpoint(endpoint)) {
-						aggregateFuture.complete(true);
-					}
-				}))
-				.collect(Collectors.toList());
+		final List<CompletableFuture<?>> futures = nodes.stream().map(node -> this.getLocalEndpoint(node).thenAccept(endpoint -> {
+			if (!aggregateFuture.isDone() && this.setLocalEndpoint(endpoint)) {
+				aggregateFuture.complete(true);
+			}
+		})).collect(Collectors.toList());
 
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]))
-				.thenAccept(b -> aggregateFuture.complete(false));
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()])).thenAccept(b -> aggregateFuture.complete(false));
 
 		return aggregateFuture;
 	}
 
 	private CompletableFuture<NodeEndpoint> getLocalEndpoint(final Node node) {
-		return this.connector.getLocalNodeInfo(node, this.localNode.getEndpoint())
-				.handle((endpoint, e) -> endpoint);
+		return this.connector.getLocalNodeInfo(node, this.localNode.getEndpoint()).handle((endpoint, e) -> endpoint);
 	}
 
 	private Boolean setLocalEndpoint(final NodeEndpoint endpoint) {
@@ -120,9 +115,7 @@ public class LocalNodeEndpointUpdater {
 			return true;
 		}
 
-		LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
-				this.localNode.getEndpoint(),
-				endpoint));
+		LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>", this.localNode.getEndpoint(), endpoint));
 		this.localNode.setEndpoint(endpoint);
 		return true;
 	}

@@ -20,9 +20,7 @@ public class PeerNetworkBroadcastBuffer {
 	 * @param network The network.
 	 * @param buffer The buffer.
 	 */
-	public PeerNetworkBroadcastBuffer(
-			final PeerNetwork network,
-			final BroadcastBuffer buffer) {
+	public PeerNetworkBroadcastBuffer(final PeerNetwork network, final BroadcastBuffer buffer) {
 		this.network = network;
 		this.buffer = buffer;
 	}
@@ -44,8 +42,7 @@ public class PeerNetworkBroadcastBuffer {
 	 */
 	public CompletableFuture<Void> broadcastAll() {
 		final List<CompletableFuture<?>> futures = this.buffer.getAllPairsAndClearMap().stream()
-				.map(p -> this.network.broadcast(p.getApiId(), p.getEntities()))
-				.collect(Collectors.toList());
+				.map(p -> this.network.broadcast(p.getApiId(), p.getEntities())).collect(Collectors.toList());
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
 	}
 }

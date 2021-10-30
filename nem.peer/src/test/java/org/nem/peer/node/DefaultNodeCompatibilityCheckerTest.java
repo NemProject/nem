@@ -10,7 +10,7 @@ public class DefaultNodeCompatibilityCheckerTest {
 	private static final NodeMetaData ZERO_VERSION_WITH_TAG = createMetaDataForNetwork(new NodeVersion(0, 0, 0, "tag"), 4);
 	private static final NodeMetaData DEFAULT_VERSION = createMetaDataForNetwork(new NodeVersion(7, 12, 10), 4);
 
-	//region network ids
+	// region network ids
 
 	@Test
 	public void zeroLocalVersionFailsCheckWhenNetworkIdsDoNotMatch() {
@@ -57,9 +57,9 @@ public class DefaultNodeCompatibilityCheckerTest {
 		MatcherAssert.assertThat(result2, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region version
+	// region version
 
 	@Test
 	public void zeroLocalVersionAlwaysPassesCheckWhenNetworkIdsMatch() {
@@ -121,9 +121,10 @@ public class DefaultNodeCompatibilityCheckerTest {
 		assertVersionCompatibility(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 10, "tag"), true);
 	}
 
-	//endregion
+	// endregion
 
-	private static void assertVersionCompatibility(final NodeVersion version1, final NodeVersion version2, final boolean expectedIsCompatible) {
+	private static void assertVersionCompatibility(final NodeVersion version1, final NodeVersion version2,
+			final boolean expectedIsCompatible) {
 		// Arrange:
 		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 

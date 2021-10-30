@@ -9,7 +9,7 @@ import org.nem.core.test.NodeUtils;
 
 public class NodeExperiencePairTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void pairCanBeCreated() {
@@ -42,9 +42,9 @@ public class NodeExperiencePairTest {
 		MatcherAssert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -57,7 +57,7 @@ public class NodeExperiencePairTest {
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7), IsNot.not(IsEqual.equalTo(pair)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object) pair)));
 	}
 
 	@Test
@@ -73,9 +73,9 @@ public class NodeExperiencePairTest {
 		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -83,17 +83,12 @@ public class NodeExperiencePairTest {
 		final NodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1);
 
 		// Assert:
-		MatcherAssert.assertThat(
-				pair.toString(),
-				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) 10.0.0.1] @ [10.0.0.1]]"));
+		MatcherAssert.assertThat(pair.toString(), IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) 10.0.0.1] @ [10.0.0.1]]"));
 	}
 
-	//endregion
+	// endregion
 
-	private static NodeExperiencePair createNodeExperiencePair(
-			final String host,
-			final int numSuccess,
-			final int numFailures) {
+	private static NodeExperiencePair createNodeExperiencePair(final String host, final int numSuccess, final int numFailures) {
 		return new NodeExperiencePair(NodeUtils.createNodeWithHost(host), new NodeExperience(numSuccess, numFailures));
 	}
 }

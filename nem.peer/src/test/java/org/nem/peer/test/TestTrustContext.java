@@ -22,12 +22,9 @@ public class TestTrustContext {
 	 */
 	public TestTrustContext() {
 		this.localNode = NodeUtils.createNodeWithName("local");
-		this.nodes = new Node[] {
-				NodeUtils.createNodeWithName("bob"),
-				NodeUtils.createNodeWithName("alice"),
-				NodeUtils.createNodeWithName("trudy"),
-				NodeUtils.createNodeWithName("peggy"),
-				this.localNode
+		this.nodes = new Node[]{
+				NodeUtils.createNodeWithName("bob"), NodeUtils.createNodeWithName("alice"), NodeUtils.createNodeWithName("trudy"),
+				NodeUtils.createNodeWithName("peggy"), this.localNode
 		};
 
 		this.nodeExperiences = new NodeExperiences();
@@ -44,17 +41,11 @@ public class TestTrustContext {
 	 * @return The trust context.
 	 */
 	public TrustContext getContext() {
-		return new TrustContext(
-				this.nodes,
-				this.localNode,
-				this.nodeExperiences,
-				this.preTrustedNodes,
-				new TrustParameters());
+		return new TrustContext(this.nodes, this.localNode, this.nodeExperiences, this.preTrustedNodes, new TrustParameters());
 	}
 
 	/**
-	 * Sets the number of successful and failed calls that the local node has had with
-	 * the node at the specified index.
+	 * Sets the number of successful and failed calls that the local node has had with the node at the specified index.
 	 *
 	 * @param nodeIndex The node index.
 	 * @param numSuccessfulCalls The number of successful calls.

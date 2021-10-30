@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 
 public class NodeExperienceTest {
 
-	//region basic operation
+	// region basic operation
 
 	@Test
 	public void nodeExperienceCanBeCreatedWithDefaultValues() {
@@ -74,9 +74,9 @@ public class NodeExperienceTest {
 		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(3L));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -89,7 +89,7 @@ public class NodeExperienceTest {
 		MatcherAssert.assertThat(createNodeExperience(3, 14), IsNot.not(IsEqual.equalTo(experience)));
 		MatcherAssert.assertThat(createNodeExperience(4, 15), IsNot.not(IsEqual.equalTo(experience)));
 		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(experience)));
-		MatcherAssert.assertThat(3L, IsNot.not(IsEqual.equalTo((Object)experience)));
+		MatcherAssert.assertThat(3L, IsNot.not(IsEqual.equalTo((Object) experience)));
 	}
 
 	@Test
@@ -105,9 +105,9 @@ public class NodeExperienceTest {
 		MatcherAssert.assertThat(createNodeExperience(4, 15).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -118,7 +118,7 @@ public class NodeExperienceTest {
 		MatcherAssert.assertThat(experience.toString(), IsEqual.equalTo("success: 3, failure: 15"));
 	}
 
-	//endregion
+	// endregion
 
 	private static NodeExperience createNodeExperience(final int numSuccesses, final int numFailures) {
 		return new NodeExperience(numSuccesses, numFailures);

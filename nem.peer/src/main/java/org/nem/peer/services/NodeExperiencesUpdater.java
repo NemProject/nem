@@ -27,10 +27,7 @@ public class NodeExperiencesUpdater {
 	 * @param connector The peer connector to use.
 	 * @param state The network state.
 	 */
-	public NodeExperiencesUpdater(
-			final PeerConnector connector,
-			final TimeProvider timeProvider,
-			final PeerNetworkState state) {
+	public NodeExperiencesUpdater(final PeerConnector connector, final TimeProvider timeProvider, final PeerNetworkState state) {
 		this.connector = connector;
 		this.timeProvider = timeProvider;
 		this.state = state;
@@ -47,9 +44,7 @@ public class NodeExperiencesUpdater {
 		final CompletableFuture<NodeExperiencesPair> future = this.connector.getNodeExperiences(partnerNode);
 		return future.thenApply(pair -> {
 			if (pair.getExperiences().size() > MAX_EXPERIENCES) {
-				LOGGER.info(String.format("node %s supplied too many experiences (%d)",
-						partnerNode,
-						pair.getExperiences().size()));
+				LOGGER.info(String.format("node %s supplied too many experiences (%d)", partnerNode, pair.getExperiences().size()));
 				return false;
 			}
 

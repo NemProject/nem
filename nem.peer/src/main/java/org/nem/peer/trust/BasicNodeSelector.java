@@ -23,10 +23,7 @@ public class BasicNodeSelector implements NodeSelector {
 	 * @param trustVector The trust vector.
 	 * @param nodes All known nodes.
 	 */
-	public BasicNodeSelector(
-			final int maxNodes,
-			final ColumnVector trustVector,
-			final Node[] nodes) {
+	public BasicNodeSelector(final int maxNodes, final ColumnVector trustVector, final Node[] nodes) {
 		this(maxNodes, trustVector, nodes, new SecureRandom());
 	}
 
@@ -38,11 +35,7 @@ public class BasicNodeSelector implements NodeSelector {
 	 * @param nodes All known nodes.
 	 * @param random The random number generator.
 	 */
-	public BasicNodeSelector(
-			final int maxNodes,
-			final ColumnVector trustVector,
-			final Node[] nodes,
-			final Random random) {
+	public BasicNodeSelector(final int maxNodes, final ColumnVector trustVector, final Node[] nodes, final Random random) {
 		this.maxNodes = maxNodes;
 		this.nodes = nodes;
 		this.trustVector = trustVector;
@@ -102,11 +95,8 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	private List<NodeTrustPair> filterNodes(final Node[] nodes, final ColumnVector trustVector) {
-		return IntStream.range(0, nodes.length)
-				.filter(i -> 0.0 != trustVector.getAt(i))
-				.filter(i -> this.isCandidate(nodes[i]))
-				.mapToObj(i -> new NodeTrustPair(nodes[i], trustVector.getAt(i)))
-				.collect(Collectors.toList());
+		return IntStream.range(0, nodes.length).filter(i -> 0.0 != trustVector.getAt(i)).filter(i -> this.isCandidate(nodes[i]))
+				.mapToObj(i -> new NodeTrustPair(nodes[i], trustVector.getAt(i))).collect(Collectors.toList());
 	}
 
 	protected boolean isCandidate(final Node node) {

@@ -10,7 +10,7 @@ import org.nem.peer.trust.score.*;
 
 public class EigenTrustTest {
 
-	//region score provider
+	// region score provider
 
 	@Test
 	public void scoreProviderReturnsDifferenceOfSuccessfulAndFailureCallsAsTrustScore() {
@@ -39,9 +39,9 @@ public class EigenTrustTest {
 		MatcherAssert.assertThat(context.calculateCredibilityScore(1, 2, 1, 1), IsEqual.equalTo(0.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateLocalTrust
+	// region updateLocalTrust
 
 	@Test
 	public void localTrustIsSetToCorrectDefaultsWhenNoCallsAreMadeBetweenNodes() {
@@ -96,9 +96,9 @@ public class EigenTrustTest {
 		MatcherAssert.assertThat(vector.getAt(4), IsEqual.equalTo(1.0 / 32)); // self
 	}
 
-	//endregion
+	// endregion
 
-	//region getTrustMatrix
+	// region getTrustMatrix
 
 	@Test
 	public void localTrustMatrixIsSetToCorrectValues() {
@@ -128,7 +128,7 @@ public class EigenTrustTest {
 		MatcherAssert.assertThat(matrix.getAt(4, 4), IsEqual.equalTo(1.0 / 32)); // self
 	}
 
-	//endregion
+	// endregion
 
 	private static class MockScoreProvider implements ScoreProvider {
 		@Override

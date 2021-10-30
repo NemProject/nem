@@ -29,9 +29,7 @@ public class AuthenticatedRequestTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(1, "blah", 44);
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedRequest<>(entity, challenge),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new AuthenticatedRequest<>(entity, challenge), null);
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:

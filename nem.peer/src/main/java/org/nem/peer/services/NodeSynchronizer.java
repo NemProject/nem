@@ -24,9 +24,7 @@ public class NodeSynchronizer {
 	 * @param blockSynchronizer The block synchronizer to use.
 	 * @param state The network state.
 	 */
-	public NodeSynchronizer(
-			final SyncConnectorPool syncConnectorPool,
-			final BlockSynchronizer blockSynchronizer,
+	public NodeSynchronizer(final SyncConnectorPool syncConnectorPool, final BlockSynchronizer blockSynchronizer,
 			final PeerNetworkState state) {
 		this.syncConnectorPool = syncConnectorPool;
 		this.blockSynchronizer = blockSynchronizer;

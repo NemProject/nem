@@ -42,16 +42,14 @@ public class NodeBroadcasterTest {
 				}));
 
 		// Act:
-		final CompletableFuture<?> future = context.broadcaster.broadcast(
-				context.broadcastNodes,
-				NisPeerId.REST_PUSH_TRANSACTION,
+		final CompletableFuture<?> future = context.broadcaster.broadcast(context.broadcastNodes, NisPeerId.REST_PUSH_TRANSACTION,
 				new MockSerializableEntity());
 
 		// Assert:
 		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static PeerConnector mockPeerConnector() {
 		final PeerConnector connector = Mockito.mock(PeerConnector.class);

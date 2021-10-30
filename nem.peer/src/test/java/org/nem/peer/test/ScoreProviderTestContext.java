@@ -59,10 +59,7 @@ public class ScoreProviderTestContext {
 	 * @param localTrustSum2 The local trust sum of the second node.
 	 * @return The credibility score.
 	 */
-	public double calculateCredibilityScore(
-			final double localTrust1,
-			final double localTrustSum1,
-			final double localTrust2,
+	public double calculateCredibilityScore(final double localTrust1, final double localTrustSum1, final double localTrust2,
 			final double localTrustSum2) {
 		// Arrange:
 		final Node node1 = NodeUtils.createNodeWithName("a");

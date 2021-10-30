@@ -33,9 +33,7 @@ public class TrustResultTest {
 		final Node[] nodes = PeerUtils.createNodeArray(3);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new TrustResult(createTrustContext(nodes), trustValues),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new TrustResult(createTrustContext(nodes), trustValues), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -45,9 +43,7 @@ public class TrustResultTest {
 		final Node[] nodes = PeerUtils.createNodeArray(3);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new TrustResult(createTrustContext(nodes), trustValues),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new TrustResult(createTrustContext(nodes), trustValues), IllegalArgumentException.class);
 	}
 
 	private static TrustContext createTrustContext(final Node[] nodes) {

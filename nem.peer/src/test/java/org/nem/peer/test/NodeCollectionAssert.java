@@ -19,9 +19,7 @@ public class NodeCollectionAssert {
 	 * @param expectedActiveNames The expected active names.
 	 * @param expectedBusyNames The expected busy names.
 	 */
-	public static void areNamesEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActiveNames,
+	public static void areNamesEquivalent(final NodeCollection nodes, final String[] expectedActiveNames,
 			final String[] expectedBusyNames) {
 		// Assert:
 		MatcherAssert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
@@ -37,12 +35,8 @@ public class NodeCollectionAssert {
 	 * @param expectedInactiveNames The expected inactive names.
 	 * @param expectedFailureNames The expected failure names.
 	 */
-	public static void areNamesEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActiveNames,
-			final String[] expectedBusyNames,
-			final String[] expectedInactiveNames,
-			final String[] expectedFailureNames) {
+	public static void areNamesEquivalent(final NodeCollection nodes, final String[] expectedActiveNames, final String[] expectedBusyNames,
+			final String[] expectedInactiveNames, final String[] expectedFailureNames) {
 		// Assert:
 		MatcherAssert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
 		MatcherAssert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
@@ -51,8 +45,6 @@ public class NodeCollectionAssert {
 	}
 
 	private static List<String> getNames(final Collection<Node> nodes) {
-		return nodes.stream()
-				.map(node -> node.getIdentity().getName())
-				.collect(Collectors.toList());
+		return nodes.stream().map(node -> node.getIdentity().getName()).collect(Collectors.toList());
 	}
 }

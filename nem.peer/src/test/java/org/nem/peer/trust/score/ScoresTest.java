@@ -10,7 +10,7 @@ import org.nem.peer.test.*;
 
 public class ScoresTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void previouslyUnknownScoreCanBeRetrieved() {
@@ -50,9 +50,9 @@ public class ScoresTest {
 		MatcherAssert.assertThat(score2, IsNot.not(IsSame.sameInstance(score1)));
 	}
 
-	//endregion
+	// endregion
 
-	//region score vectors
+	// region score vectors
 
 	@Test
 	public void scoreVectorCanBeRetrieved() {
@@ -115,9 +115,9 @@ public class ScoresTest {
 		MatcherAssert.assertThat(vector.getAt(2), IsEqual.equalTo(4.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region score matrix
+	// region score matrix
 
 	@Test
 	public void scoreMatrixCanBeCalculated() {
@@ -148,9 +148,9 @@ public class ScoresTest {
 		MatcherAssert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region normalizeLocalTrust
+	// region normalizeLocalTrust
 
 	@Test
 	public void localTrustValuesCanBeNormalized() {
@@ -182,7 +182,7 @@ public class ScoresTest {
 		MatcherAssert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 

@@ -11,7 +11,7 @@ import java.util.*;
 
 public class PreTrustedNodesTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void numberOfPreTrustedNodesCanBeReturned() {
@@ -28,10 +28,8 @@ public class PreTrustedNodesTest {
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
 
 		// Assert:
-		final Node[] expectedPreTrustedNodes = new Node[] {
-				NodeUtils.createNodeWithName("n"),
-				NodeUtils.createNodeWithName("e"),
-				NodeUtils.createNodeWithName("m")
+		final Node[] expectedPreTrustedNodes = new Node[]{
+				NodeUtils.createNodeWithName("n"), NodeUtils.createNodeWithName("e"), NodeUtils.createNodeWithName("m")
 		};
 		MatcherAssert.assertThat(preTrustedNodes.getNodes(), IsEquivalent.equivalentTo(expectedPreTrustedNodes));
 	}
@@ -58,18 +56,16 @@ public class PreTrustedNodesTest {
 		MatcherAssert.assertThat(preTrustedNodes.isPreTrusted(NodeUtils.createNodeWithName("z")), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region getPreTrustVector
+	// region getPreTrustVector
 
 	@Test
 	public void preTrustVectorCorrectWhenThereAreNoPreTrustedNodes() {
 		// Arrange:
 		final PreTrustedNodes preTrustedNodes = new PreTrustedNodes(new HashSet<>());
-		final Node[] nodes = new Node[] {
-				NodeUtils.createNodeWithName("a"),
-				NodeUtils.createNodeWithName("e"),
-				NodeUtils.createNodeWithName("m"),
+		final Node[] nodes = new Node[]{
+				NodeUtils.createNodeWithName("a"), NodeUtils.createNodeWithName("e"), NodeUtils.createNodeWithName("m"),
 				NodeUtils.createNodeWithName("z")
 		};
 
@@ -88,10 +84,8 @@ public class PreTrustedNodesTest {
 	public void preTrustVectorIsCorrectWhenThereArePreTrustedNodes() {
 		// Arrange:
 		final PreTrustedNodes preTrustedNodes = createTestPreTrustedNodes();
-		final Node[] nodes = new Node[] {
-				NodeUtils.createNodeWithName("a"),
-				NodeUtils.createNodeWithName("e"),
-				NodeUtils.createNodeWithName("m"),
+		final Node[] nodes = new Node[]{
+				NodeUtils.createNodeWithName("a"), NodeUtils.createNodeWithName("e"), NodeUtils.createNodeWithName("m"),
 				NodeUtils.createNodeWithName("z")
 		};
 
@@ -106,7 +100,7 @@ public class PreTrustedNodesTest {
 		MatcherAssert.assertThat(preTrustVector.getAt(3), IsEqual.equalTo(0.00));
 	}
 
-	//endregion
+	// endregion
 
 	private static PreTrustedNodes createTestPreTrustedNodes() {
 		// Arrange:

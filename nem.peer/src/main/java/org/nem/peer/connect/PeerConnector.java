@@ -28,17 +28,14 @@ public interface PeerConnector {
 	CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node);
 
 	/**
-	 * Requests information about the local (requesting) node.
-	 * Can be used to determine remote IP address and refresh local node information.
-	 * This enables a kind of auto-magical configuration.
+	 * Requests information about the local (requesting) node. Can be used to determine remote IP address and refresh local node
+	 * information. This enables a kind of auto-magical configuration.
 	 *
 	 * @param node The remote node.
 	 * @param localEndpoint The local endpoint (what the local node knows about itself).
 	 * @return Information about the requesting node.
 	 */
-	CompletableFuture<NodeEndpoint> getLocalNodeInfo(
-			final Node node,
-			final NodeEndpoint localEndpoint);
+	CompletableFuture<NodeEndpoint> getLocalNodeInfo(final Node node, final NodeEndpoint localEndpoint);
 
 	/**
 	 * Gets information about the specified node.
@@ -56,8 +53,5 @@ public interface PeerConnector {
 	 * @param entity The entity to announce.
 	 * @return Void future.
 	 */
-	CompletableFuture<?> announce(
-			final Node node,
-			final NisPeerId announceId,
-			final SerializableEntity entity);
+	CompletableFuture<?> announce(final Node node, final NisPeerId announceId, final SerializableEntity entity);
 }

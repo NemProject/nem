@@ -23,13 +23,8 @@ public class LowComTrustProviderTest {
 		// Act:
 		final ColumnVector vector = getAdjustedTrustVector(0, 5, 40);
 
-		// Assert:
-		final ColumnVector expectedVector = new ColumnVector(
-				0.2 / 1.4,
-				0.4 / 1.4, // this node should be boosted by 0.4/2
-				0.2 / 1.4,
-				0.4 / 1.4, // this node should be boosted by 0.4/2
-				0.2 / 1.4);
+		// Assert: { 1, 3 } should be boosted by 0.4/2
+		final ColumnVector expectedVector = new ColumnVector(0.2 / 1.4, 0.4 / 1.4, 0.2 / 1.4, 0.4 / 1.4, 0.2 / 1.4);
 		MatcherAssert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 
@@ -38,13 +33,8 @@ public class LowComTrustProviderTest {
 		// Act:
 		final ColumnVector vector = getAdjustedTrustVector(9, 100, 10);
 
-		// Assert:
-		final ColumnVector expectedVector = new ColumnVector(
-				0.2 / 1.1,
-				0.3 / 1.1, // this node should be boosted by 1/10
-				0.2 / 1.1,
-				0.2 / 1.1,
-				0.2 / 1.1);
+		// Assert: { 1 } should be boosted by 1/10
+		final ColumnVector expectedVector = new ColumnVector(0.2 / 1.1, 0.3 / 1.1, 0.2 / 1.1, 0.2 / 1.1, 0.2 / 1.1);
 		MatcherAssert.assertThat(vector.roundTo(10), IsEqual.equalTo(expectedVector.roundTo(10)));
 	}
 

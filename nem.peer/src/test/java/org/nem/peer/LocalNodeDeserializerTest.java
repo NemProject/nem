@@ -101,9 +101,7 @@ public class LocalNodeDeserializerTest {
 		}
 
 		private void writeMetaDataApplicationOnly(final String application) {
-			this.serializer.writeObject(
-					"metaData",
-					childSerializer -> childSerializer.writeString("application", application));
+			this.serializer.writeObject("metaData", childSerializer -> childSerializer.writeString("application", application));
 		}
 
 		private Deserializer getDeserializer() {

@@ -10,7 +10,7 @@ import org.nem.peer.trust.score.*;
 
 public class EigenTrustPlusPlusTest {
 
-	//region score provider
+	// region score provider
 
 	@Test
 	public void scoreProviderProviderReturnsNumberOfSuccessfulCallsAsTrustScore() {
@@ -40,9 +40,9 @@ public class EigenTrustPlusPlusTest {
 		MatcherAssert.assertThat(context.calculateCredibilityScore(1, 2, 1, 1), IsEqual.equalTo(1.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region feedback credibility vector
+	// region feedback credibility vector
 
 	@Test
 	public void nodeIsCompletelyCredibleToItself() {
@@ -98,9 +98,9 @@ public class EigenTrustPlusPlusTest {
 		Assert.assertEquals(21002.73, vector.getAt(3), 0.1);
 	}
 
-	//endregion
+	// endregion
 
-	//region trust matrix
+	// region trust matrix
 
 	@Test
 	public void trustMatrixCanBeCalculatedWithCustomCredibility() {
@@ -128,7 +128,7 @@ public class EigenTrustPlusPlusTest {
 		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
 	}
 
-	//endregion
+	// endregion
 
 	private static class MockScoreProvider implements ScoreProvider {
 

@@ -28,12 +28,8 @@ public class EigenTrustConvergencePolicy {
 	 * @param epsilon The convergence epsilon value.
 	 * @param alpha The weight for the pretrusted nodes.
 	 */
-	public EigenTrustConvergencePolicy(
-			final ColumnVector preTrustVector,
-			final Matrix trustMatrix,
-			final int maxIterations,
-			final double epsilon,
-			final double alpha) {
+	public EigenTrustConvergencePolicy(final ColumnVector preTrustVector, final Matrix trustMatrix, final int maxIterations,
+			final double epsilon, final double alpha) {
 		this.preTrustVector = preTrustVector;
 		this.trustMatrix = trustMatrix;
 		this.maxIterations = maxIterations;
@@ -52,8 +48,7 @@ public class EigenTrustConvergencePolicy {
 	}
 
 	/**
-	 * Runs the convergence algorithm until convergence is reached
-	 * or the maximum number of iterations have occurred.
+	 * Runs the convergence algorithm until convergence is reached or the maximum number of iterations have occurred.
 	 */
 	public void converge() {
 		int numIterations = 0;

@@ -33,9 +33,7 @@ public class AuthenticatedResponseTest {
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new AuthenticatedResponse<>(entity, identity, challenge),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new AuthenticatedResponse<>(entity, identity, challenge), null);
 		final AuthenticatedResponse<?> response = new AuthenticatedResponse<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:

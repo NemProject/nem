@@ -40,8 +40,7 @@ public class NodeExperiences {
 	}
 
 	/**
-	 * Gets a shared experience matrix.
-	 * Matrix(r, c) contains 1 if node and node(r) have both interacted with node(c).
+	 * Gets a shared experience matrix. Matrix(r, c) contains 1 if node and node(r) have both interacted with node(c).
 	 *
 	 * @param node The node.
 	 * @param nodes The other nodes.
@@ -80,10 +79,8 @@ public class NodeExperiences {
 	public List<NodeExperiencePair> getNodeExperiences(final Node node) {
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
 		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(node);
-		pairs.addAll(
-				experiences.entrySet().stream()
-						.map(entry -> new NodeExperiencePair(entry.getKey(), entry.getValue()))
-						.collect(Collectors.toList()));
+		pairs.addAll(experiences.entrySet().stream().map(entry -> new NodeExperiencePair(entry.getKey(), entry.getValue()))
+				.collect(Collectors.toList()));
 
 		return pairs;
 	}
@@ -95,10 +92,7 @@ public class NodeExperiences {
 	 * @param pairs The experience information for node.
 	 * @param timeStamp The timestamp.
 	 */
-	public void setNodeExperiences(
-			final Node node,
-			final List<NodeExperiencePair> pairs,
-			final TimeInstant timeStamp) {
+	public void setNodeExperiences(final Node node, final List<NodeExperiencePair> pairs, final TimeInstant timeStamp) {
 		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(this.getNodeFromCache(node));
 		for (final NodeExperiencePair pair : pairs) {
 			pair.getExperience().setLastUpdateTime(timeStamp);

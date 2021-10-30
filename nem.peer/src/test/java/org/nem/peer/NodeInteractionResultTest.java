@@ -27,9 +27,7 @@ public class NodeInteractionResultTest {
 			final NodeInteractionResult result = NodeInteractionResult.fromValidationResult(validationResult);
 
 			// Assert:
-			final NodeInteractionResult expectedResult = expectedMappings.getOrDefault(
-					validationResult,
-					NodeInteractionResult.FAILURE);
+			final NodeInteractionResult expectedResult = expectedMappings.getOrDefault(validationResult, NodeInteractionResult.FAILURE);
 			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}

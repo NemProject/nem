@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class TrustProviderMaskDecoratorTest {
 
-	//region default mask
+	// region default mask
 
 	@Test
 	public void activeNodesAreNotFilteredOut() {
@@ -146,9 +146,9 @@ public class TrustProviderMaskDecoratorTest {
 		return nodeCollection;
 	}
 
-	//endregion
+	// endregion
 
-	//region predicate context values
+	// region predicate context values
 
 	@Test
 	public void correctNodesArePassedToCustomPredicate() {
@@ -172,12 +172,8 @@ public class TrustProviderMaskDecoratorTest {
 		final Collection<TrustProviderMaskDecorator.PredicateContext> predicateContexts = getPredicateContextTests(context);
 
 		// Assert:
-		final Collection<NodeStatus> expectedNodeStatuses = Arrays.asList(
-				NodeStatus.BUSY,
-				NodeStatus.INACTIVE,
-				NodeStatus.FAILURE,
-				NodeStatus.ACTIVE,
-				NodeStatus.ACTIVE);
+		final Collection<NodeStatus> expectedNodeStatuses = Arrays.asList(NodeStatus.BUSY, NodeStatus.INACTIVE, NodeStatus.FAILURE,
+				NodeStatus.ACTIVE, NodeStatus.ACTIVE);
 		MatcherAssert.assertThat(context.getNodes().length, IsEqual.equalTo(5));
 		MatcherAssert.assertThat(
 				predicateContexts.stream().map(TrustProviderMaskDecorator.PredicateContext::getNodeStatus).collect(Collectors.toList()),
@@ -208,20 +204,17 @@ public class TrustProviderMaskDecoratorTest {
 		nodeCollection.update(context.getNodes()[3], NodeStatus.ACTIVE);
 
 		final List<TrustProviderMaskDecorator.PredicateContext> predicateContexts = new ArrayList<>();
-		final TrustProvider provider = new TrustProviderMaskDecorator(
-				new MockTrustProvider(context, inputVector),
-				nodeCollection,
-				pc -> {
-					predicateContexts.add(pc);
-					return true;
-				});
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection, pc -> {
+			predicateContexts.add(pc);
+			return true;
+		});
 
 		// Act:
 		computeTrust(provider);
 		return predicateContexts;
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void innerProviderContextIsUsedAndPropagated() {

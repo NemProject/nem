@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class LocalNodeEndpointUpdaterTest {
 
-	//region update
+	// region update
 
 	@Test
 	public void updateDoesNotUpdateEndpointWhenGetLocalInfoFailsWithInactiveException() {
@@ -32,7 +32,9 @@ public class LocalNodeEndpointUpdaterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getLocalNodeInfo(Mockito.any(), Mockito.eq(context.localNode.getEndpoint())))
-				.thenReturn(CompletableFuture.supplyAsync(() -> { throw ex; }));
+				.thenReturn(CompletableFuture.supplyAsync(() -> {
+					throw ex;
+				}));
 
 		// Act:
 		final boolean result = context.updater.update(context.remoteNode).join();
@@ -55,9 +57,7 @@ public class LocalNodeEndpointUpdaterTest {
 		assertEndpointIsNotUpdatedByReturnedEndpoint(NodeEndpoint.fromHost("127.0.0.1"), true);
 	}
 
-	private static void assertEndpointIsNotUpdatedByReturnedEndpoint(
-			final NodeEndpoint endpoint,
-			final boolean expectedResult) {
+	private static void assertEndpointIsNotUpdatedByReturnedEndpoint(final NodeEndpoint endpoint, final boolean expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getLocalNodeInfo(Mockito.any(), Mockito.eq(context.localNode.getEndpoint())))
@@ -88,9 +88,9 @@ public class LocalNodeEndpointUpdaterTest {
 		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.101"));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateAny
+	// region updateAny
 
 	@Test
 	public void updateAnyUpdatesEndpointWithOneSuccessfulResult() {
@@ -98,9 +98,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAny(
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.20"),
+		final boolean result = context.runUpdateAny(createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.20"),
 				createEndpointFuture("127.0.0.30"));
 
 		// Assert:
@@ -115,9 +113,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAny(
-				createExceptionalFuture(),
-				createEndpointFuture("127.0.0.20"),
+		final boolean result = context.runUpdateAny(createExceptionalFuture(), createEndpointFuture("127.0.0.20"),
 				createExceptionalFuture());
 
 		// Assert:
@@ -132,10 +128,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAny(
-				createExceptionalFuture(),
-				createExceptionalFuture(),
-				createExceptionalFuture());
+		final boolean result = context.runUpdateAny(createExceptionalFuture(), createExceptionalFuture(), createExceptionalFuture());
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
@@ -143,9 +136,9 @@ public class LocalNodeEndpointUpdaterTest {
 		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
-	//endregion
+	// endregion
 
-	//region updatePlurality
+	// region updatePlurality
 
 	@Test
 	public void updatePluralityPicksAnyEndpointWhenAllEndpointsHaveSameAgreement() {
@@ -153,9 +146,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePlurality(
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.20"),
+		final boolean result = context.runUpdatePlurality(createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.20"),
 				createEndpointFuture("127.0.0.30"));
 
 		// Assert:
@@ -170,14 +161,9 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePlurality(
-				createEndpointFuture("127.0.0.30"),
-				createEndpointFuture("127.0.0.20"),
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.20"),
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.40"));
+		final boolean result = context.runUpdatePlurality(createEndpointFuture("127.0.0.30"), createEndpointFuture("127.0.0.20"),
+				createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.20"),
+				createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.40"));
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(7)).getLocalNodeInfo(Mockito.any(), Mockito.any());
@@ -191,12 +177,8 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePlurality(
-				createEndpointFuture("127.0.0.30"),
-				createExceptionalFuture(),
-				createEndpointFuture("127.0.0.10"),
-				createEndpointFuture("127.0.0.10"),
-				createExceptionalFuture(),
+		final boolean result = context.runUpdatePlurality(createEndpointFuture("127.0.0.30"), createExceptionalFuture(),
+				createEndpointFuture("127.0.0.10"), createEndpointFuture("127.0.0.10"), createExceptionalFuture(),
 				createExceptionalFuture());
 
 		// Assert:
@@ -211,10 +193,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePlurality(
-				createExceptionalFuture(),
-				createExceptionalFuture(),
-				createExceptionalFuture());
+		final boolean result = context.runUpdatePlurality(createExceptionalFuture(), createExceptionalFuture(), createExceptionalFuture());
 
 		// Assert:
 		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
@@ -222,7 +201,7 @@ public class LocalNodeEndpointUpdaterTest {
 		MatcherAssert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 	}
 
-	//endregion
+	// endregion
 
 	private static CompletableFuture<NodeEndpoint> createExceptionalFuture() {
 		return CompletableFuture.supplyAsync(() -> {
@@ -262,8 +241,7 @@ public class LocalNodeEndpointUpdaterTest {
 			int i = 0;
 			for (final CompletableFuture<NodeEndpoint> future : nodeFutures) {
 				nodes.add(NodeUtils.createNodeWithName("n" + i));
-				Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(i)), Mockito.any()))
-						.thenReturn(future);
+				Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(i)), Mockito.any())).thenReturn(future);
 				++i;
 			}
 

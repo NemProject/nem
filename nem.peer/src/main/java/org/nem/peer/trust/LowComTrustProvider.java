@@ -5,8 +5,7 @@ import org.nem.core.node.Node;
 import org.nem.peer.trust.score.NodeExperience;
 
 /**
- * TrustProvider decorator that boosts the trust values of nodes that have
- * low communication.
+ * TrustProvider decorator that boosts the trust values of nodes that have low communication.
  */
 public class LowComTrustProvider implements TrustProvider {
 

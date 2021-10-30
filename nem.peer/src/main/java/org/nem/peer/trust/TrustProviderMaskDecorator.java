@@ -30,9 +30,7 @@ public class TrustProviderMaskDecorator implements TrustProvider {
 	 * @param nodeCollection The node collection.
 	 * @param includePredicate A predicate that should return true to include a specified node.
 	 */
-	public TrustProviderMaskDecorator(
-			final TrustProvider trustProvider,
-			final NodeCollection nodeCollection,
+	public TrustProviderMaskDecorator(final TrustProvider trustProvider, final NodeCollection nodeCollection,
 			final Predicate<PredicateContext> includePredicate) {
 		this.trustProvider = trustProvider;
 		this.nodeCollection = nodeCollection;
@@ -71,10 +69,7 @@ public class TrustProviderMaskDecorator implements TrustProvider {
 	private boolean[] getFilteredArray(final Node[] nodes, final Node localNode) {
 		final boolean[] result = new boolean[nodes.length];
 		for (int i = 0; i < nodes.length; ++i) {
-			final PredicateContext pc = new PredicateContext(
-					nodes[i],
-					this.nodeCollection.getNodeStatus(nodes[i]),
-					localNode);
+			final PredicateContext pc = new PredicateContext(nodes[i], this.nodeCollection.getNodeStatus(nodes[i]), localNode);
 
 			if (this.includePredicate.test(pc)) {
 				result[i] = true;
@@ -84,7 +79,7 @@ public class TrustProviderMaskDecorator implements TrustProvider {
 		return result;
 	}
 
-	//region PredicateContext
+	// region PredicateContext
 
 	/**
 	 * The context passed to the include predicate.
@@ -128,5 +123,5 @@ public class TrustProviderMaskDecorator implements TrustProvider {
 		}
 	}
 
-	//endregion
+	// endregion
 }

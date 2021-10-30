@@ -14,7 +14,7 @@ import java.util.*;
 public class NodeExperiencesTest {
 	private static final int RETENTION_TIME = 24;
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void previouslyUnknownNodeExperienceCanBeRetrieved() {
@@ -57,9 +57,9 @@ public class NodeExperiencesTest {
 		MatcherAssert.assertThat(experience2, IsNot.not(IsSame.sameInstance(experience1)));
 	}
 
-	//endregion
+	// endregion
 
-	//region shared experiences matrix
+	// region shared experiences matrix
 
 	@Test
 	public void sharedExperiencesMatrixHasZeroRowForLocalNode() {
@@ -173,9 +173,9 @@ public class NodeExperiencesTest {
 		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNodeExperiences / setNodeExperiences
+	// region getNodeExperiences / setNodeExperiences
 
 	@Test
 	public void getExperiencesReturnsAllNodeExperiences() {
@@ -255,15 +255,12 @@ public class NodeExperiencesTest {
 	}
 
 	private static Node createCopy(final Node node) {
-		return new Node(
-				node.getIdentity(),
-				node.getEndpoint(),
-				node.getMetaData());
+		return new Node(node.getIdentity(), node.getEndpoint(), node.getMetaData());
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void prunePreservesAllExperiencesWithTimeStampAtLeastAsOldAsGivenTimeStampMinusRetentionTime() {
@@ -276,7 +273,7 @@ public class NodeExperiencesTest {
 		experiences.prune(currentTime);
 
 		// Assert:
-		for (int i = 0; i <= 5 ; ++i) {
+		for (int i = 0; i <= 5; ++i) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
 			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
 			MatcherAssert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(1));
@@ -298,7 +295,7 @@ public class NodeExperiencesTest {
 		experiences.prune(currentTime);
 
 		// Assert:
-		for (int i = -5; i < 0 ; ++i) {
+		for (int i = -5; i < 0; ++i) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
 			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
 			MatcherAssert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(0));
@@ -307,19 +304,15 @@ public class NodeExperiencesTest {
 
 	private NodeExperiences createNodeExperiences(final int timeOffsetSecs) {
 		final NodeExperiences experiences = new NodeExperiences();
-		for (int delta = -5; delta <= 5 ; ++delta) {
+		for (int delta = -5; delta <= 5; ++delta) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(delta));
-			final NodeExperiencePair pair = new NodeExperiencePair(
-					NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
+			final NodeExperiencePair pair = new NodeExperiencePair(NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
 					PeerUtils.createNodeExperience(10 + delta));
-			experiences.setNodeExperiences(
-					node,
-					Collections.singletonList(pair),
-					new TimeInstant(timeOffsetSecs + delta));
+			experiences.setNodeExperiences(node, Collections.singletonList(pair), new TimeInstant(timeOffsetSecs + delta));
 		}
 
 		return experiences;
 	}
 
-	//endregion
+	// endregion
 }

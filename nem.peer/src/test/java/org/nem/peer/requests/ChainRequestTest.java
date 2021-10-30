@@ -108,7 +108,7 @@ public class ChainRequestTest {
 
 	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void requestCanBeRoundTripped() {
@@ -229,5 +229,5 @@ public class ChainRequestTest {
 		return request.getNumBlocks();
 	}
 
-	//endregion
+	// endregion
 }
