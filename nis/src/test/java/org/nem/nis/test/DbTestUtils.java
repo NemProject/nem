@@ -17,7 +17,9 @@ public class DbTestUtils {
 	 * @param <T> The transfer db model type.
 	 * @return The created transfer db model.
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({
+			"deprecation", "rawtypes"
+	})
 	public static <T extends AbstractBlockTransfer> T createTransferDbModel(final Class<T> dbModelClass) {
 		final T dbTransfer = ExceptionUtils.propagate(dbModelClass::newInstance);
 
