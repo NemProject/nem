@@ -81,7 +81,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(),
-				BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion()));
+				BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion() << 24));
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);

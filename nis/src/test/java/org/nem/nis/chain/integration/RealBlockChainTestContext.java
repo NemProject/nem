@@ -73,7 +73,7 @@ public class RealBlockChainTestContext {
 		this.harvester = this.createHarvester();
 
 		// create a harvesting-eligible account
-		this.initialBlockHeight = new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion()));
+		this.initialBlockHeight = new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion() << 24));
 		this.harvesterAccount = this.createAccount(Amount.fromNem(1_000_000));
 		this.unlockedAccounts.addUnlockedAccount(this.harvesterAccount);
 

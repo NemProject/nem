@@ -15,8 +15,8 @@ public class BlockMarkerConstants {
 	public static long MULTISIG_M_OF_N_FORK(final int version) {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
-				? 199800 // 156600 + 1440 * 30
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 90000);
+				? 199_800 // 156600 + 1440 * 30
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 90_000 : 1);
 	}
 
 	/**
@@ -28,7 +28,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 440_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 180000);
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 180_000 : 1);
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 875_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 572_500);
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 572_500 : 1);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 1_025_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 830_000);
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 830_000 : 1);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 1_110_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 871_500);
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 871_500 : 1);
 	}
 
 	/**
@@ -73,6 +73,6 @@ public class BlockMarkerConstants {
 		final byte network = (byte) (version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 1_250_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 975_000);
+				: (network == NetworkInfos.getTestNetworkInfo().getVersion() ? 975_000 : 1);
 	}
 }
