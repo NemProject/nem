@@ -1,6 +1,11 @@
 language: java
 
-jdk: openjdk8
+jdk:
+  - openjdk8
+  - openjdk11
+
+before_instal:
+  - bash ./travis_prepare.sh
 
 install:
   - pushd .
@@ -9,6 +14,7 @@ install:
   - git clone https://github.com/NemProject/nem.core.git
   - cd nem.core
   - git checkout dev
+  - bash ./travis_prepare.sh
   - mvn install -DskipTests=true
   - popd
 
