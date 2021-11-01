@@ -10,7 +10,7 @@ import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.ForkConfiguration;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,10 +74,11 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime,
 			final BlockHeight blockHeight) {
 		if (this.forkConfiguration.getTreasuryReissuanceForkHeight().equals(blockHeight)) {
-			return this.unconfirmedTransactions.getAll().stream()
-					.filter(tx -> this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes().contains(HashUtils.calculateHash(tx)))
-					.sorted((tx1, tx2) -> Integer.compare(tx1.getTimeStamp().getRawTime(), tx2.getTimeStamp().getRawTime()))
-					.collect(Collectors.toList());
+			final List<Transaction> candidateTransactions = this
+					.selectTransactionsByHash(this.forkConfiguration.getTreasuryReissuanceForkFallbackTransactionHashes());
+			return !candidateTransactions.isEmpty()
+					? candidateTransactions
+					: this.selectTransactionsByHash(this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes());
 		}
 
 		// in order for a transaction to be eligible for inclusion in a block, it must
@@ -133,5 +134,11 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		}
 
 		return tempBlock.getTransactions();
+	}
+
+	private List<Transaction> selectTransactionsByHash(Collection<Hash> transactionHashes) {
+		return this.unconfirmedTransactions.getAll().stream().filter(tx -> transactionHashes.contains(HashUtils.calculateHash(tx)))
+				.sorted((tx1, tx2) -> Integer.compare(tx1.getTimeStamp().getRawTime(), tx2.getTimeStamp().getRawTime()))
+				.collect(Collectors.toList());
 	}
 }

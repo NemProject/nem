@@ -250,7 +250,8 @@ public class BlockChainValidatorTest {
 	@Test
 	public void transactionsAtTreasuryReissuanceForkHeightDoNotNeedToVerify() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator(new ForkConfiguration(new BlockHeight(100), new ArrayList<Hash>()));
+		final BlockChainValidator validator = createValidator(
+				new ForkConfiguration(new BlockHeight(100), new ArrayList<Hash>(), new ArrayList<Hash>()));
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 98);
 		parentBlock.sign();
 

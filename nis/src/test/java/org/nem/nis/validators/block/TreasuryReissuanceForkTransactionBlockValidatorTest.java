@@ -16,17 +16,23 @@ import java.util.*;
 
 public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 
+	private static List<Hash> generateRandomHashes(int count) {
+		final List<Hash> hashes = new ArrayList<Hash>();
+		for (int i = 0; i < count; ++i)
+			hashes.add(Utils.generateRandomHash());
+
+		return hashes;
+	}
+
 	@Test
 	public void successWhenNotForkBlock() {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithHeight(1233);
 
-		final List<Hash> hashes = new ArrayList<Hash>();
-		hashes.add(Utils.generateRandomHash());
-		hashes.add(Utils.generateRandomHash());
-		hashes.add(Utils.generateRandomHash());
+		final List<Hash> hashes = generateRandomHashes(3);
+		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes);
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes);
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -43,12 +49,10 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		block.addTransaction(new MockTransaction(new TimeInstant(12)));
 		block.addTransaction(new MockTransaction(new TimeInstant(24)));
 
-		final List<Hash> hashes = new ArrayList<Hash>();
-		hashes.add(Utils.generateRandomHash());
-		hashes.add(Utils.generateRandomHash());
-		hashes.add(Utils.generateRandomHash());
+		final List<Hash> hashes = generateRandomHashes(3);
+		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes);
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes);
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -71,7 +75,9 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		hashes.add(HashUtils.calculateHash(block.getTransactions().get(2)));
 		hashes.add(HashUtils.calculateHash(block.getTransactions().get(1)));
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes);
+		final List<Hash> fallbackHashes = generateRandomHashes(4);
+
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes);
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -82,7 +88,7 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 	}
 
 	@Test
-	public void failureWhenForkBlockContainsExpectedTransactionsInOrder() {
+	public void successWhenForkBlockContainsExpectedTransactionsInOrder() {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithHeight(1234);
 		block.addTransaction(new MockTransaction(new TimeInstant(12)));
@@ -94,7 +100,34 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		hashes.add(HashUtils.calculateHash(block.getTransactions().get(1)));
 		hashes.add(HashUtils.calculateHash(block.getTransactions().get(2)));
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes);
+		final List<Hash> fallbackHashes = generateRandomHashes(4);
+
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes);
+		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
+
+		// Act:
+		final ValidationResult result = validator.validate(block);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void successWhenForkBlockContainsExpectedFallbackTransactionsInOrder() {
+		// Arrange:
+		final Block block = NisUtils.createRandomBlockWithHeight(1234);
+		block.addTransaction(new MockTransaction(new TimeInstant(12)));
+		block.addTransaction(new MockTransaction(new TimeInstant(24)));
+		block.addTransaction(new MockTransaction(new TimeInstant(36)));
+
+		final List<Hash> hashes = generateRandomHashes(4);
+
+		final List<Hash> fallbackHashes = new ArrayList<Hash>();
+		fallbackHashes.add(HashUtils.calculateHash(block.getTransactions().get(0)));
+		fallbackHashes.add(HashUtils.calculateHash(block.getTransactions().get(1)));
+		fallbackHashes.add(HashUtils.calculateHash(block.getTransactions().get(2)));
+
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes);
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:

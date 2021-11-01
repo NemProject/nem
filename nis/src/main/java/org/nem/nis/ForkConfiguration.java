@@ -13,23 +13,30 @@ import java.util.stream.Collectors;
 public class ForkConfiguration {
 	private final BlockHeight treasuryReissuanceForkHeight;
 	private final List<Hash> treasuryReissuanceForkTransactionHashes;
+	private final List<Hash> treasuryReissuanceForkFallbackTransactionHashes;
 
 	/**
 	 * Creates a new default configuration object.
 	 */
 	public ForkConfiguration() {
-		this(new BlockHeight(1), new ArrayList<Hash>());
+		this(new BlockHeight(1), new ArrayList<Hash>(), new ArrayList<Hash>());
 	}
 
 	/**
 	 * Creates a new configuration object around the specified properties.
 	 *
 	 * @param treasuryReissuanceForkHeight The height of the fork at which to reissue the treasury.
-	 * @param treasuryReissuanceForkTransactionHashes The hashes of transactions that are allowed in the treasury reissuance fork block.
+	 * @param treasuryReissuanceForkTransactionHashes The hashes of transactions that are allowed in the treasury reissuance fork block
+	 *            (preferred).
+	 * @param treasuryReissuanceForkFallbackTransactionHashes The hashes of transactions that are allowed in the treasury reissuance fork
+	 *            block (fallback).
 	 */
-	public ForkConfiguration(final BlockHeight treasuryReissuanceForkHeight, final List<Hash> treasuryReissuanceForkTransactionHashes) {
+	public ForkConfiguration(final BlockHeight treasuryReissuanceForkHeight, final List<Hash> treasuryReissuanceForkTransactionHashes,
+			final List<Hash> treasuryReissuanceForkFallbackTransactionHashes) {
 		this.treasuryReissuanceForkHeight = treasuryReissuanceForkHeight;
 		this.treasuryReissuanceForkTransactionHashes = Collections.unmodifiableList(treasuryReissuanceForkTransactionHashes);
+		this.treasuryReissuanceForkFallbackTransactionHashes = Collections
+				.unmodifiableList(treasuryReissuanceForkFallbackTransactionHashes);
 	}
 
 	/**
@@ -41,6 +48,8 @@ public class ForkConfiguration {
 		this.treasuryReissuanceForkHeight = new BlockHeight(properties.getOptionalInteger("nis.treasuryReissuanceForkHeight", 1));
 		this.treasuryReissuanceForkTransactionHashes = Collections
 				.unmodifiableList(ForkConfiguration.parseHashes(properties, "nis.treasuryReissuanceForkTransactionHashes"));
+		this.treasuryReissuanceForkFallbackTransactionHashes = Collections
+				.unmodifiableList(ForkConfiguration.parseHashes(properties, "nis.treasuryReissuanceForkFallbackTransactionHashes"));
 	}
 
 	private static List<Hash> parseHashes(final NemProperties properties, final String propertyName) {
@@ -58,11 +67,20 @@ public class ForkConfiguration {
 	}
 
 	/**
-	 * Gets the hashes of transactions that are allowed in the treasury reissuance fork block.
+	 * Gets the hashes of transactions that are allowed in the treasury reissuance fork block (preferred).
 	 *
 	 * @return The hashes.
 	 */
 	public Collection<Hash> getTreasuryReissuanceForkTransactionHashes() {
 		return this.treasuryReissuanceForkTransactionHashes;
+	}
+
+	/**
+	 * Gets the hashes of transactions that are allowed in the treasury reissuance fork block (fallback).
+	 *
+	 * @return The hashes.
+	 */
+	public Collection<Hash> getTreasuryReissuanceForkFallbackTransactionHashes() {
+		return this.treasuryReissuanceForkFallbackTransactionHashes;
 	}
 }

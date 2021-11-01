@@ -26,7 +26,7 @@ public class NisConfigurationTest {
 			"nis.maxTransactions", "nis.maxTransactionsPerBlock", "nis.blockGenerationTargetTime", "nis.blockChainRewriteLimit",
 			"nis.transactionHashRetentionTime", "nis.additionalLocalIps", "nis.optionalFeatures", "nis.blockChainFeatures",
 			"nis.allowedHarvesterAddresses", "nis.delayBlockLoading", "nis.treasuryReissuanceForkHeight",
-			"nis.treasuryReissuanceForkTransactionHashes");
+			"nis.treasuryReissuanceForkTransactionHashes", "nis.treasuryReissuanceForkFallbackTransactionHashes");
 
 	@Test
 	public void canReadDefaultConfiguration() {

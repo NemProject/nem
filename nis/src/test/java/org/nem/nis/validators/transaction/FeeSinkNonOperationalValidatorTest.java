@@ -22,7 +22,8 @@ public class FeeSinkNonOperationalValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext(multisigAccount);
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), new ArrayList<Hash>());
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), new ArrayList<Hash>(),
+				new ArrayList<Hash>());
 		final FeeSinkNonOperationalValidator validator = new FeeSinkNonOperationalValidator(forkConfiguration);
 
 		// Act:

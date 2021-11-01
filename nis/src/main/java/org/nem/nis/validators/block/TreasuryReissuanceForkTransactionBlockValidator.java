@@ -36,6 +36,12 @@ public class TreasuryReissuanceForkTransactionBlockValidator implements BlockVal
 				.collect(Collectors.toList());
 
 		if (this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes().equals(blockTransactionHashes)) {
+			LOGGER.info(String.format("Fork block at %s had expected preferred transactions", block.getHeight()));
+			return ValidationResult.SUCCESS;
+		}
+
+		if (this.forkConfiguration.getTreasuryReissuanceForkFallbackTransactionHashes().equals(blockTransactionHashes)) {
+			LOGGER.info(String.format("Fork block at %s had expected fallback transactions", block.getHeight()));
 			return ValidationResult.SUCCESS;
 		}
 

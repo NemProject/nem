@@ -115,8 +115,12 @@ public class DefaultNewBlockTransactionsProviderTest {
 		MatcherAssert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(2), new TimeInstant(3))));
 	}
 
+	// endregion
+
+	// region candidate filtering - treasury reissuance
+
 	@Test
-	public void getBlockTransactionsReturnsTreasuryReissuanceTransactionsAtForkHeight() {
+	public void getBlockTransactionsReturnsTreasuryReissuanceTransactionsAtForkHeight_SomePreferred() {
 		// Arrange: create transactions
 		final Account senderAccount = Utils.generateRandomAccount();
 		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(senderAccount, 1, new TimeInstant(6)),
@@ -133,7 +137,79 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration(new BlockHeight(1234), hashes));
+				new ForkConfiguration(new BlockHeight(1234), hashes, new ArrayList<Hash>()));
+		context.addTransactions(transactions);
+
+		// - create accounts
+		context.prepareAccount(senderAccount, Amount.fromNem(100));
+		final Account harvesterAccount = context.addAccount(Amount.fromNem(5));
+
+		// Act:
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(harvesterAccount, new BlockHeight(1234));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
+
+		// Assert: ordered by timestamp
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(9, 1, 16)));
+	}
+
+	@Test
+	public void getBlockTransactionsReturnsTreasuryReissuanceTransactionsAtForkHeight_SomeFallback() {
+		// Arrange: create transactions
+		final Account senderAccount = Utils.generateRandomAccount();
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(senderAccount, 1, new TimeInstant(6)),
+				new MockTransaction(senderAccount, 4, new TimeInstant(4)), new MockTransaction(senderAccount, 9, new TimeInstant(2)),
+				new MockTransaction(senderAccount, 16, new TimeInstant(8)), new MockTransaction(senderAccount, 25, new TimeInstant(0)));
+
+		// - add three matching hashes
+		final ArrayList<Hash> fallbackHashes = new ArrayList<Hash>();
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(0)));
+		fallbackHashes.add(Utils.generateRandomHash());
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(2)));
+		fallbackHashes.add(Utils.generateRandomHash());
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(3)));
+
+		// - create test context and add account
+		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
+				new ForkConfiguration(new BlockHeight(1234), new ArrayList<Hash>(), fallbackHashes));
+		context.addTransactions(transactions);
+
+		// - create accounts
+		context.prepareAccount(senderAccount, Amount.fromNem(100));
+		final Account harvesterAccount = context.addAccount(Amount.fromNem(5));
+
+		// Act:
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(harvesterAccount, new BlockHeight(1234));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
+
+		// Assert: ordered by timestamp
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(9, 1, 16)));
+	}
+
+	@Test
+	public void getBlockTransactionsReturnsTreasuryReissuanceTransactionsAtForkHeight_SomePreferredAndSomeFallbackChoosesFallback() {
+		// Arrange: create transactions
+		final Account senderAccount = Utils.generateRandomAccount();
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(senderAccount, 1, new TimeInstant(6)),
+				new MockTransaction(senderAccount, 4, new TimeInstant(4)), new MockTransaction(senderAccount, 9, new TimeInstant(2)),
+				new MockTransaction(senderAccount, 16, new TimeInstant(8)), new MockTransaction(senderAccount, 25, new TimeInstant(0)));
+
+		// - add two matching hashes (preferred)
+		final ArrayList<Hash> hashes = new ArrayList<Hash>();
+		hashes.add(HashUtils.calculateHash(transactions.get(1)));
+		hashes.add(Utils.generateRandomHash());
+		hashes.add(HashUtils.calculateHash(transactions.get(4)));
+
+		// - add three matching hashes (fallback)
+		final ArrayList<Hash> fallbackHashes = new ArrayList<Hash>();
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(0)));
+		fallbackHashes.add(Utils.generateRandomHash());
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(2)));
+		fallbackHashes.add(Utils.generateRandomHash());
+		fallbackHashes.add(HashUtils.calculateHash(transactions.get(3)));
+
+		// - create test context and add account
+		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
+				new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes));
 		context.addTransactions(transactions);
 
 		// - create accounts

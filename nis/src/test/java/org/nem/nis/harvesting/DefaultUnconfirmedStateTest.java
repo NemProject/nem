@@ -167,7 +167,7 @@ public class DefaultUnconfirmedStateTest {
 			hashes.add(Utils.generateRandomHash());
 
 			// - create test context and add account
-			final TestContext context = new TestContext(new ForkConfiguration(new BlockHeight(1234), hashes));
+			final TestContext context = new TestContext(new ForkConfiguration(new BlockHeight(1234), hashes, new ArrayList<Hash>()));
 			context.prepareAccount(senderAccount, Amount.fromNem(1_000));
 
 			// Act:
