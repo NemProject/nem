@@ -1,5 +1,7 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.logging.Logger;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
@@ -11,16 +13,21 @@ import org.nem.nis.validators.*;
  * minimum fee
  */
 public class MinimumFeeValidator implements SingleTransactionValidator {
+	private static final Logger LOGGER = Logger.getLogger(MinimumFeeValidator.class.getName());
+
+	private final NetworkInfo networkInfo;
 	private final ReadOnlyNamespaceCache namespaceCache;
 	private final boolean ignoreFees;
 
 	/**
 	 * Creates a validator.
 	 *
+	 * @param networkInfo The network info.
 	 * @param namespaceCache The namespace cache.
 	 * @param ignoreFees Flag indicating if transaction fees should be ignored.
 	 */
-	public MinimumFeeValidator(final ReadOnlyNamespaceCache namespaceCache, final boolean ignoreFees) {
+	public MinimumFeeValidator(final NetworkInfo networkInfo, final ReadOnlyNamespaceCache namespaceCache, final boolean ignoreFees) {
+		this.networkInfo = networkInfo;
 		this.namespaceCache = namespaceCache;
 		this.ignoreFees = ignoreFees;
 	}
@@ -28,6 +35,12 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (this.ignoreFees) {
+			return ValidationResult.SUCCESS;
+		}
+
+		if (this.networkInfo.getNemesisBlockInfo().getAddress().equals(transaction.getSigner().getAddress())) {
+			LOGGER.info(String.format("Skipping fees for transaction (%s) originating from nemesis signer account %s",
+					HashUtils.calculateHash(transaction), transaction.getSigner()));
 			return ValidationResult.SUCCESS;
 		}
 

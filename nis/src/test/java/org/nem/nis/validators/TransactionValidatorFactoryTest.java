@@ -3,6 +3,7 @@ package org.nem.nis.validators;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
@@ -118,6 +119,6 @@ public class TransactionValidatorFactoryTest {
 	}
 
 	private static TransactionValidatorFactory createFactory() {
-		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), new ForkConfiguration(), false);
+		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), NetworkInfos.getDefault(), new ForkConfiguration(), false);
 	}
 }

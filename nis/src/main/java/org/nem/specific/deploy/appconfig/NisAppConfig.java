@@ -181,8 +181,8 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), this.nisConfiguration().getForkConfiguration(),
-				this.nisConfiguration().ignoreFees());
+		return new TransactionValidatorFactory(this.timeProvider(), this.nisConfiguration().getNetworkInfo(),
+				this.nisConfiguration().getForkConfiguration(), this.nisConfiguration().ignoreFees());
 	}
 
 	@Bean

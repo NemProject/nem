@@ -3,6 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
@@ -19,26 +20,41 @@ import java.util.stream.Collectors;
 
 public class MinimumFeeValidatorTest {
 
-	@Test
-	public void transactionWithInvalidFeeFailsValidation() {
-		// Assert:
-		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)),
-				ValidationResult.FAILURE_INSUFFICIENT_FEE);
+	final static NetworkInfo createNetworkInfo(final Address nemesisSignerAddress) {
+		return new NetworkInfo(NetworkInfos.getTestNetworkInfo().getVersion(), NetworkInfos.getTestNetworkInfo().getAddressStartChar(),
+				new NemesisBlockInfo(Hash.ZERO, nemesisSignerAddress, Amount.ZERO, ""));
 	}
 
 	@Test
 	public void transactionWithValidFeePassesValidation() {
-		// Assert:
-		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE, ValidationResult.SUCCESS);
+		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE, false, ValidationResult.SUCCESS);
 	}
 
-	private static void assertValidationResultForMockTransactionFee(final Amount fee, final ValidationResult expectedResult) {
+	@Test
+	public void transactionWithInvalidFeeFailsValidation_NotNemesis() {
+		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)), false,
+				ValidationResult.FAILURE_INSUFFICIENT_FEE);
+	}
+
+	@Test
+	public void transactionWithInvalidFeePassesValidation_Nemesis() {
+		assertValidationResultForMockTransactionFee(MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)), true,
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertValidationResultForMockTransactionFee(final Amount fee, final boolean isSignerNemesisAccount,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setFee(fee);
 
+		final Address signerAddress = isSignerNemesisAccount ? transaction.getSigner().getAddress() : Utils.generateRandomAddress();
+		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(signerAddress), new DefaultNamespaceCache(),
+				false);
+
 		// Act:
-		final ValidationResult result = validate(transaction);
+		final ValidationResult result = validator.validate(transaction,
+				new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
@@ -46,46 +62,12 @@ public class MinimumFeeValidatorTest {
 
 	@Test
 	public void transferTransactionIncludingMosaicsWithInvalidFeeFailsValidation() {
-		// Assert:
 		assertValidationResultForTransferTransactionWithMosaicFee(Amount.fromNem(192), ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}
 
 	@Test
 	public void transferTransactionIncludingMosaicsWithValidFeePassesValidation() {
-		// Assert:
 		assertValidationResultForTransferTransactionWithMosaicFee(Amount.fromNem(193), ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void transactionValidationWithNonZeroFeesPassesValidationIfIgnoreFeesIsSet() {
-		assertValidationPassesForFee(Amount.fromNem(1234));
-	}
-
-	@Test
-	public void transactionValidationWithZeroFeesPassesValidationIfIgnoreFeesIsSet() {
-		assertValidationPassesForFee(Amount.ZERO);
-	}
-
-	private static void assertValidationPassesForFee(final Amount fee) {
-		// Arrange:
-		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache(), true);
-		final Collection<Transaction> transactions = TestTransactionRegistry.stream().map(entry -> {
-			final Transaction transaction = entry.createModel.get();
-			transaction.setFee(fee);
-			return transaction;
-		}).collect(Collectors.toList());
-
-		// Test a transaction with mosaics and message too
-		final Message message = new PlainMessage("Hi there".getBytes());
-		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
-		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(12));
-		final TransferTransaction transaction = RandomTransactionFactory.createTransferWithAttachment(attachment);
-		transaction.setFee(fee);
-		transactions.add(transaction);
-
-		// Assert:
-		transactions.forEach(t -> MatcherAssert.assertThat(validator.validate(t, new ValidationContext(ValidationStates.Throw)),
-				IsEqual.equalTo(ValidationResult.SUCCESS)));
 	}
 
 	private static void assertValidationResultForTransferTransactionWithMosaicFee(final Amount fee, final ValidationResult expectedResult) {
@@ -105,7 +87,8 @@ public class MinimumFeeValidatorTest {
 		transaction.setFee(fee);
 		transaction.setDeadline(new TimeInstant(1));
 
-		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache, false);
+		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(Utils.generateRandomAddress()),
+				namespaceCache, false);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction,
@@ -115,11 +98,36 @@ public class MinimumFeeValidatorTest {
 		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	private static ValidationResult validate(final Transaction transaction) {
-		// Arrange:
-		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache(), false);
+	@Test
+	public void transactionValidationWithNonZeroFeesPassesValidationIfIgnoreFeesIsSet() {
+		assertValidationPassesForFeeWhenIgnoreFeesSet(Amount.fromNem(1234));
+	}
 
-		// Act:
-		return validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
+	@Test
+	public void transactionValidationWithZeroFeesPassesValidationIfIgnoreFeesIsSet() {
+		assertValidationPassesForFeeWhenIgnoreFeesSet(Amount.ZERO);
+	}
+
+	private static void assertValidationPassesForFeeWhenIgnoreFeesSet(final Amount fee) {
+		// Arrange:
+		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(Utils.generateRandomAddress()),
+				new DefaultNamespaceCache(), true);
+		final Collection<Transaction> transactions = TestTransactionRegistry.stream().map(entry -> {
+			final Transaction transaction = entry.createModel.get();
+			transaction.setFee(fee);
+			return transaction;
+		}).collect(Collectors.toList());
+
+		// Test a transaction with mosaics and message too
+		final Message message = new PlainMessage("Hi there".getBytes());
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(12));
+		final TransferTransaction transaction = RandomTransactionFactory.createTransferWithAttachment(attachment);
+		transaction.setFee(fee);
+		transactions.add(transaction);
+
+		// Assert:
+		transactions.forEach(t -> MatcherAssert.assertThat(validator.validate(t, new ValidationContext(ValidationStates.Throw)),
+				IsEqual.equalTo(ValidationResult.SUCCESS)));
 	}
 }
