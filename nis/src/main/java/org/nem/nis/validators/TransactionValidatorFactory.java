@@ -71,7 +71,7 @@ public class TransactionValidatorFactory {
 		builder.add(new MinimumFeeValidator(this.networkInfo, nisCache.getNamespaceCache(), ignoreFees));
 		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
-		builder.add(new NemesisSinkValidator());
+		builder.add(new NemesisSinkValidator(this.forkConfiguration.getTreasuryReissuanceForkHeight()));
 		builder.add(new BalanceValidator());
 		builder.add(new TransactionNetworkValidator());
 
