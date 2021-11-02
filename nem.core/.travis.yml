@@ -4,8 +4,8 @@ jdk:
   - openjdk8
   - openjdk11
 
-before_instal:
-  - bash ./travis_prepare.sh
+before_install:
+  - bash ./setup_java9.sh
 
 script:
   - mvn spotless:check -B
