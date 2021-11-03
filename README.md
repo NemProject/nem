@@ -1,6 +1,6 @@
 # NIS client
 
-This Java package provides a wrapper project for the [NIS repository](https://github.com/NemProject/nis) and all its dependencies. It is the simplest way to quickly build and launch a [NIS node](https://nemproject.github.io/nem-docs).
+This Java package provides a wrapper project for the [NIS repository](https://github.com/NemProject/nis) and all its dependencies. It is the simplest way to quickly build and launch a [NEM node](https://nemproject.github.io/nem-docs).
 
 ## Package Organization
 
@@ -15,18 +15,17 @@ The main folders are:
 
 ## Building the package
 
-The package uses [Apache Maven](https://maven.apache.org/) but before building it the Git submodules need to be prepared:
+The package uses [Apache Maven](https://maven.apache.org/), but, before building it, the Git submodules need to be prepared:
 
 ```bash
 git submodule init
 git submodule update
-git submodule foreach 'git checkout dev'
 ```
 
 Then, if you are using a version of Java higher than 8:
 
 ```bash
-git submodule foreach './travis_prepare.sh'
+git submodule foreach './setup_java9.sh'
 ```
 
 Build the package as usual:
@@ -34,6 +33,18 @@ Build the package as usual:
 ```bash
 mvn package
 ```
+
+Then check that unit tests are passing by running:
+
+```bash
+mvn test
+```
+
+Optionally, check if the slower integration tests are passing by running:
+
+```bash
+mvn failsafe:integration-test
+````
 
 ## Running the package
 
@@ -53,8 +64,8 @@ Before contributing please [read the CONTRIBUTING instructions](CONTRIBUTING.md)
 
 ## Getting Help
 
-- [NIS Developer Documentation](https://nemproject.github.io/nem-docs).
-- [NIS Technical Reference](https://nemproject.github.io/nem-docs/pages/Whitepapers/NEM_techRef.pdf).
+- [NEM Developer Documentation](https://nemproject.github.io/nem-docs).
+- [NEM Technical Reference](https://nemproject.github.io/nem-docs/pages/Whitepapers/NEM_techRef.pdf).
 - Join the community [Discord server](https://discord.gg/xymcity).
 - If you found a bug, [open a new issue](https://github.com/NemProject/nem.core/issues).
 
