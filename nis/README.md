@@ -1,59 +1,93 @@
-# NEM
+# NIS: NEM INFRASTRUCTURE SERVER
 
-NEM is a movement centered around NEM crypto-currency. Basis for NEM is **first** Proof-of-Importance / Proof-of-Stake system.
+This Java package provides everything needed to launch a [NEM](https://nemproject.github.io/nem-docs) node.
 
-As other crypto-coins, NEM secures transactions in the blockchain.
+It depends on the packages [nem.core](https://github.com/NemProject/nem.core), [nem.peer](https://github.com/NemProject/nem.peer) and [nem.deploy](https://github.com/NemProject/nem.deploy).
 
-Blockchain is actually distributed transaction database, shared by all peers participating in NEM network.
+For easier handling of these dependencies, please use the [nis-client repository](https://github.com/NemProject/nis-client), which takes care of downloading and building them in a single Maven project.
 
-[more Blockchain](Blockchain)
+## Package Organization
 
-## Basics
+The main folders are:
 
-### Addresses
+| Folder                   | Content                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `org.nem.nis.audit`      | Provides auditing of HTTP calls.                                               |
+| `org.nem.nis.boot`       | Boots a node.                                                                  |
+| `org.nem.nis.cache`      | Copy on write cache implementations that store the blockchain state in memory. |
+| `org.nem.nis.chain`      | Processes blocks for commit and rollback.                                      |
+| `org.nem.nis.connect`    | Manages HTTP connections to peer nodes.                                        |
+| `org.nem.nis.controller` | NEM REST api implementation.                                                   |
+| `org.nem.nis.dao`        | (H2) data access layer.                                                        |
+| `org.nem.nis.dbmodel`    | Entity models stored in database.                                              |
+| `org.nem.nis.pox`        | Proof of Importance calculations.                                              |
+| `org.nem.nis.secret`     | Observers that change the blockchain state.                                    |
+| `org.nem.nis.service`    | Commons services that are injected in the various places to decouple the code. |
+| `org.nem.nis.state`      | Entity models stored in the caches.                                            |
+| `org.nem.nis.sync`       | Syncs the chain with peers and resolves forks.                                 |
+| `org.nem.nis.time`       | P2P Time synchronization algorithm.                                            |
+| `org.nem.nis.validators` | Validators that validate the blockchain state.                                 |
+| `org.nem.nis.visitors`   | Block by block visitors that allow block by block processing.                  |
+| `org.nem.nis.websocket`  | NEM websocket implementation.                                                  |
 
-To identify accounts, NEM uses addresses. Addresses are 40 characters long, consist of characters (A-Z, 2-7) and always begin with an **N**. (e.g. `NBERUJIKSAPW54YISFOJZ2PLG3E7CACCNN2Z6SOW`) or **T** in test network (`TBERUJIKSAPW54YISFOJZ2PLG3E7CACCNP3PP3P6`)
+## Building the package
 
-You can think of an address as of bank account number.
+> **NOTE:**
+> It is far more convenient to use the [nis-client repository](https://github.com/NemProject/nis-client) to build and run this package.
 
-[more Addresses](Addresses)
+The package uses [Apache Maven](https://maven.apache.org/) and the ``pom.xml`` file is initially configured to work with **Java 8**. To work on more recent versions of Java run the ``setup_java9.sh`` script first.
 
-### Confirmations and harvesting.
+First build and install (with ``mvn install -DskipTests=true``) all the dependency packages [nem.core](https://github.com/NemProject/nem.core), [nem.peer](https://github.com/NemProject/nem.peer) and [nem.deploy](https://github.com/NemProject/nem.deploy). Make sure they are all accessible through the ``CLASSPATH`` environment variable.
 
-Every transaction is confirmed by the network. Multiple transactions are packed together in blocks.
-Creating a block is called **harvesting**. In contrast with Proof-of-Work (PoW) coins like bitcoin, litecoin, etc., harvesting is **NOT calculation-heavy** process.
+Then build and install the package as usual:
 
-Every transaction have associated fee. **Harvester** is rewarded with the fees from a block.
+```bash
+mvn install
+```
 
-### Zero-inflation
+Optionally, check if the slower integration tests are passing by running:
 
-As in NXT there is no inflation in NEM. The rewards for *harvesters* come ONLY from fees.
+```bash
+mvn failsafe:integration-test
+````
 
-## Security
+## Coding style
 
-### Signing transactions
+If you want your changes to be considered for inclusion in the repository (see [CONTRIBUTING.md](CONTRIBUTING.md)), they must addhere to the coding style. You can check that the coding style and format are correct by running:
 
-Security of NEM relies on [public key cryptography](http://en.wikipedia.org/wiki/Public-key_cryptography).
-More specifically on [Elliptic Curve Digital Signature Algorithm](https://en.wikipedia.org/wiki/Elliptic_Curve_DSA) (ECDSA).
+```bash
+mvn spotless:check
+```
 
-The curve that NEM uses {secp256k1 | ed25519}
+If there is any problem, you can try to fix it automatically using:
 
-### Transaction Malleability
+```bash
+mvn spotless:apply
+```
 
-To deal with signature malleability NEM uses **canonical signatures**
+## Running a node
 
-### Secure addresses
+If all dependencies are accessible through the ``CLASSPATH``, the command to launch the node is:
 
-NXT has been criticized many times, for it's "short" addresses, which are only 2^64 long.
-Due to due to [Birthday attack](http://en.wikipedia.org/wiki/Birthday_attack)
-probability of hitting random "unconfirmed" address is bigger than 50% with as few as **2^33** trials. 
+```bash
+java -Xms6G -Xmx6G org.nem.deploy.CommonStarter
+```
 
-As stated earlier NEM uses addresses which are much longer 40 characters (36 bytes).
+Otherwise you will need to use the ``-cp`` parameter and point to each individual dependency JAR file.
 
-## advanced topics
+For more information on how to run a node see the [NEM documentation](https://nemproject.github.io/nem-docs/pages/Guides/node-operation/docs.en.html).
 
-### Timestamp service
+## Contributing
 
-Every transaction can contain 1024-byte "message". This means, that you can easily timestamp your data and have verifiable PROOF.
+Before contributing please [read the CONTRIBUTING instructions](CONTRIBUTING.md).
 
-Let's assume you have created document, that you don't want publish yet. You can calculate it's hash (i.e. SHA-3-512) and include the hash as a message in some transaction. Once the transaction will be included in the blockchain, you have a proof, that the hash - and therefore document itself - was created before timestamp of block including it.
+## Getting Help
+
+- [NEM Developer Documentation](https://nemproject.github.io/nem-docs).
+- [NEM Technical Reference](https://nemproject.github.io/nem-docs/pages/Whitepapers/NEM_techRef.pdf).
+- Join the community [Discord server](https://discord.gg/xymcity).
+- If you found a bug, [open a new issue](https://github.com/NemProject/nem.core/issues).
+
+## License
+
+Copyright (c) 2014-2021 NEM Contributors, licensed under the [MIT license](LICENSE).

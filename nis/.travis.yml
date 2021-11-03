@@ -4,8 +4,8 @@ jdk:
   - openjdk8
   - openjdk11
 
-before_instal:
-  - bash ./travis_prepare.sh
+before_install:
+  - bash ./setup_java9.sh
 
 install:
   - pushd .
@@ -15,21 +15,21 @@ install:
   - git clone https://github.com/NemProject/nem.core.git
   - cd nem.core
   - git checkout dev
-  - bash ./travis_prepare.sh
+  - bash ./setup_java9.sh
   - mvn install -DskipTests=true
   - cd ..
 
   - git clone https://github.com/NemProject/nem.deploy.git
   - cd nem.deploy
   - git checkout dev
-  - bash ./travis_prepare.sh
+  - bash ./setup_java9.sh
   - mvn install -DskipTests=true
   - cd ..
 
   - git clone git@github.com:NemProject/nem.peer.git
   - cd nem.peer
   - git checkout dev
-  - bash ./travis_prepare.sh
+  - bash ./setup_java9.sh
   - mvn install -DskipTests=true
   - cd ..
 
