@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"  "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" version="XHTML+RDFa 1.0" dir="ltr">
+
+<head profile="http://www.w3.org/1999/xhtml/vocab">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(t,n,e){function r(e){if(!n[e]){var o=n[e]={exports:{}};t[e][0].call(o.exports,function(n){var o=t[e][1][n];return r(o?o:n)},o,o.exports)}return n[e].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<e.length;o++)r(e[o]);return r}({D5DuLP:[function(t,n){function e(t,n){var e=r[t];return e?e.apply(this,n):(o[t]||(o[t]=[]),void o[t].push(n))}var r={},o={};n.exports=e,e.queues=o,e.handlers=r},{}],handle:[function(t,n){n.exports=t("D5DuLP")},{}],G9z0Bl:[function(t,n){function e(){var t=l.info=NREUM.info;if(t&&t.agent&&t.licenseKey&&t.applicationID&&p&&p.body){l.proto="https"===f.split(":")[0]||t.sslForHttp?"https://":"http://",i("mark",["onload",a()]);var n=p.createElement("script");n.src=l.proto+t.agent,p.body.appendChild(n)}}function r(){"complete"===p.readyState&&o()}function o(){i("mark",["domContent",a()])}function a(){return(new Date).getTime()}var i=t("handle"),u=window,p=u.document,s="addEventListener",c="attachEvent",f=(""+location).split("?")[0],l=n.exports={offset:a(),origin:f,features:[]};p[s]?(p[s]("DOMContentLoaded",o,!1),u[s]("load",e,!1)):(p[c]("onreadystatechange",r),u[c]("onload",e)),i("mark",["firstbyte",a()])},{handle:"D5DuLP"}],loader:[function(t,n){n.exports=t("G9z0Bl")},{}]},{},["G9z0Bl"]);</script>
+<link rel="shortcut icon" href="http://opensource.org/files/garland_favicon.png" type="image/png" />
+<link rel="shortlink" href="/node/150" />
+<link rel="canonical" href="/licenses/cpl1.0.txt" />
+<meta name="Generator" content="Drupal 7 (http://drupal.org)" />
+  <title>Common Public License Version 1.0 | Open Source Initiative</title>
+  <link type="text/css" rel="stylesheet" href="http://opensource.org/files/css/css_pbm0lsQQJ7A7WCCIMgxLho6mI_kBNgznNUWmTWcnfoE.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://opensource.org/files/css/css_2ATB4XKGEvmoUk_p62PwI-o2aW47EqqS0nD2dmPZoV4.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://opensource.org/files/css/css_2wI77kyP-rJKVpFW5M3KFcj7Cb99lZalmubKIwWwsmU.css" media="all" />
+<link type="text/css" rel="stylesheet" href="http://opensource.org/files/css/css_k3snrbsthqot7V7ccRZHS9OkCZkwBv4adtNieIVlbEU.css" media="print" />
+
+<!--[if lt IE 7]>
+<link type="text/css" rel="stylesheet" href="http://opensource.org/themes/garland/fix-ie.css?n59km7" media="all" />
+<![endif]-->
+  <script type="text/javascript" src="http://opensource.org/files/js/js_xAPl0qIk9eowy_iS9tNkCWXLUVoat94SQT48UBCFkyQ.js"></script>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"garland","theme_token":"ABgYOt8mdKHzpDSLZ0YHHoFbAxArN8-Y_woJx6Duwvc","js":{"misc\/jquery.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1},"css":{"modules\/system\/system.base.css":1,"modules\/system\/system.menus.css":1,"modules\/system\/system.messages.css":1,"modules\/system\/system.theme.css":1,"modules\/aggregator\/aggregator.css":1,"modules\/comment\/comment.css":1,"modules\/field\/theme\/field.css":1,"sites\/all\/modules\/mollom\/mollom.css":1,"modules\/node\/node.css":1,"modules\/search\/search.css":1,"modules\/user\/user.css":1,"themes\/garland\/style.css":1,"themes\/garland\/print.css":1,"themes\/garland\/fix-ie.css":1}}});
+//--><!]]>
+</script>
+</head>
+<body class="html not-front not-logged-in one-sidebar sidebar-first page-node page-node- page-node-150 node-type-page fluid-width" >
+  <div id="skip-link">
+    <a href="#main-content" class="element-invisible element-focusable">Skip to main content</a>
+  </div>
+      
+  <div id="wrapper">
+    <div id="container" class="clearfix">
+
+      <div id="header">
+        <div id="logo-floater">
+                              <div id="branding"><strong><a href="/">
+                          <img src="http://opensource.org/files/garland_logo.png" alt="Open Source Initiative " title="Open Source Initiative " id="logo" />
+                        <span>Open Source Initiative</span>            </a></strong></div>
+                          </div>
+
+                      </div> <!-- /#header -->
+
+              <div id="sidebar-first" class="sidebar">
+            <div class="region region-sidebar-first">
+    <div id="block-search-form" class="block block-search clearfix">
+
+    <h2 class="title">Search this site:</h2>
+  
+  <div class="content">
+    <form action="/licenses/cpl1.0.txt" method="post" id="search-block-form" accept-charset="UTF-8"><div><div class="container-inline">
+    <div class="form-item form-type-textfield form-item-search-block-form">
+  <label class="element-invisible" for="edit-search-block-form--2">Search </label>
+ <input title="Enter the terms you wish to search for." type="text" id="edit-search-block-form--2" name="search_block_form" value="" size="15" maxlength="128" class="form-text" />
+</div>
+<div class="form-actions form-wrapper" id="edit-actions"><input type="submit" id="edit-submit" name="op" value="Search" class="form-submit" /></div><input type="hidden" name="form_build_id" value="form-8a1MbGieQBkLw_rIeOp0giTBWJV0nRL3KjTvNe5xfCs" />
+<input type="hidden" name="form_id" value="search_block_form" />
+</div>
+</div></form>  </div>
+</div>
+<div id="block-system-navigation" class="block block-system block-menu clearfix">
+
+    <h2 class="title">Navigation</h2>
+  
+  <div class="content">
+    <ul class="menu"><li class="first collapsed"><a href="/about" title="About the Open Source Initiative">About the OSI</a></li>
+<li class="collapsed"><a href="/osd" title="The actual OSD defining what constitutes an Open Source licence">The Open Source Definition</a></li>
+<li class="collapsed"><a href="/licenses">Open Source Licenses</a></li>
+<li class="leaf"><a href="/working_groups">Working Groups</a></li>
+<li class="leaf"><a href="/faq" title="Frequently Asked Questions about open source and about the OSI.">FAQ</a></li>
+<li class="collapsed"><a href="/trademark" title="Information about trademark and logo usage">Trademark and Logo Usage</a></li>
+<li class="collapsed"><a href="/osr-intro" title="Open Standards Requirement for Software">Open Standards</a></li>
+<li class="leaf"><a href="/osi-open-source-education" title="OSI&#039;s Open Source Education Initiative and Activities">Open Source Education</a></li>
+<li class="collapsed"><a href="/lists" title="The virtual committees where the OSI&#039;s work gets done">Mailing lists</a></li>
+<li class="collapsed"><a href="/help" title="Resources for questions and further exploration">Getting Help</a></li>
+<li class="collapsed"><a href="http://opensource.org/donate" title="">Donate to the OSI</a></li>
+<li class="leaf"><a href="/members">OSI Individual Membership</a></li>
+<li class="leaf"><a href="/store">OSI Store</a></li>
+<li class="collapsed"><a href="/affiliates" title="Home page for OSI&#039;s membership scheme for non-profits and not-for-profits">OSI Affiliate Membership</a></li>
+<li class="leaf"><a href="/contact" title="">Contact OSI</a></li>
+<li class="leaf"><a href="/ToS" title="Rules for posting content on this site">Terms of Service</a></li>
+<li class="last leaf"><a href="/sponsors">OSI Corporate Sponsors</a></li>
+</ul>  </div>
+</div>
+  </div>
+        </div>
+      
+      <div id="center"><div id="squeeze"><div class="right-corner"><div class="left-corner">
+          <h2 class="element-invisible">You are here</h2><div class="breadcrumb"><a href="/">Home</a></div>                    <a id="main-content"></a>
+          <div id="tabs-wrapper" class="clearfix">                                <h1 class="with-tabs">Common Public License Version 1.0</h1>
+                              </div>                                                  <div class="clearfix">
+              <div class="region region-content">
+    <div id="block-system-main" class="block block-system clearfix">
+
+    
+  <div class="content">
+    <div id="node-150" class="node node-page">
+
+  
+      
+  
+  <div class="content clearfix">
+        <img style="float: right; margin: 1em;" width="100" height="137" alt="[OSI Approved License]" src="/trademarks/opensource/OSI-Appro
+ved-License-100x137.png"/>
+        <div class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item even"><p>THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS COMMON PUBLIC<br />
+LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM<br />
+CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.</p>
+<p>1. DEFINITIONS</p>
+<p>"Contribution" means:</p>
+<p>    a) in the case of the initial Contributor, the initial code and<br />
+documentation distributed under this Agreement, and</p>
+<p>    b) in the case of each subsequent Contributor:</p>
+<p>    i) changes to the Program, and</p>
+<p>    ii) additions to the Program;</p>
+<p>    where such changes and/or additions to the Program originate from and are<br />
+distributed by that particular Contributor. A Contribution 'originates' from a<br />
+Contributor if it was added to the Program by such Contributor itself or anyone<br />
+acting on such Contributor's behalf. Contributions do not include additions to<br />
+the Program which: (i) are separate modules of software distributed in<br />
+conjunction with the Program under their own license agreement, and (ii) are not<br />
+derivative works of the Program.</p>
+<p>"Contributor" means any person or entity that distributes the Program.</p>
+<p>"Licensed Patents " mean patent claims licensable by a Contributor which are<br />
+necessarily infringed by the use or sale of its Contribution alone or when<br />
+combined with the Program.</p>
+<p>"Program" means the Contributions distributed in accordance with this Agreement.</p>
+<p>"Recipient" means anyone who receives the Program under this Agreement,<br />
+including all Contributors.</p>
+<p>2. GRANT OF RIGHTS</p>
+<p>    a) Subject to the terms of this Agreement, each Contributor hereby grants<br />
+Recipient a non-exclusive, worldwide, royalty-free copyright license to<br />
+reproduce, prepare derivative works of, publicly display, publicly perform,<br />
+distribute and sublicense the Contribution of such Contributor, if any, and such<br />
+derivative works, in source code and object code form.</p>
+<p>    b) Subject to the terms of this Agreement, each Contributor hereby grants<br />
+Recipient a non-exclusive, worldwide, royalty-free patent license under Licensed<br />
+Patents to make, use, sell, offer to sell, import and otherwise transfer the<br />
+Contribution of such Contributor, if any, in source code and object code form.<br />
+This patent license shall apply to the combination of the Contribution and the<br />
+Program if, at the time the Contribution is added by the Contributor, such<br />
+addition of the Contribution causes such combination to be covered by the<br />
+Licensed Patents. The patent license shall not apply to any other combinations<br />
+which include the Contribution. No hardware per se is licensed hereunder.</p>
+<p>    c) Recipient understands that although each Contributor grants the licenses<br />
+to its Contributions set forth herein, no assurances are provided by any<br />
+Contributor that the Program does not infringe the patent or other intellectual<br />
+property rights of any other entity. Each Contributor disclaims any liability to<br />
+Recipient for claims brought by any other entity based on infringement of<br />
+intellectual property rights or otherwise. As a condition to exercising the<br />
+rights and licenses granted hereunder, each Recipient hereby assumes sole<br />
+responsibility to secure any other intellectual property rights needed, if any.<br />
+For example, if a third party patent license is required to allow Recipient to<br />
+distribute the Program, it is Recipient's responsibility to acquire that license<br />
+before distributing the Program.</p>
+<p>    d) Each Contributor represents that to its knowledge it has sufficient<br />
+copyright rights in its Contribution, if any, to grant the copyright license set<br />
+forth in this Agreement.</p>
+<p>3. REQUIREMENTS</p>
+<p>A Contributor may choose to distribute the Program in object code form under its<br />
+own license agreement, provided that:</p>
+<p>    a) it complies with the terms and conditions of this Agreement; and</p>
+<p>    b) its license agreement:</p>
+<p>    i) effectively disclaims on behalf of all Contributors all warranties and<br />
+conditions, express and implied, including warranties or conditions of title and<br />
+non-infringement, and implied warranties or conditions of merchantability and<br />
+fitness for a particular purpose;</p>
+<p>    ii) effectively excludes on behalf of all Contributors all liability for<br />
+damages, including direct, indirect, special, incidental and consequential<br />
+damages, such as lost profits;</p>
+<p>    iii) states that any provisions which differ from this Agreement are offered<br />
+by that Contributor alone and not by any other party; and</p>
+<p>    iv) states that source code for the Program is available from such<br />
+Contributor, and informs licensees how to obtain it in a reasonable manner on or<br />
+through a medium customarily used for software exchange. </p>
+<p>When the Program is made available in source code form:</p>
+<p>    a) it must be made available under this Agreement; and</p>
+<p>    b) a copy of this Agreement must be included with each copy of the Program. </p>
+<p>Contributors may not remove or alter any copyright notices contained within the<br />
+Program.</p>
+<p>Each Contributor must identify itself as the originator of its Contribution, if<br />
+any, in a manner that reasonably allows subsequent Recipients to identify the<br />
+originator of the Contribution.</p>
+<p>4. COMMERCIAL DISTRIBUTION</p>
+<p>Commercial distributors of software may accept certain responsibilities with<br />
+respect to end users, business partners and the like. While this license is<br />
+intended to facilitate the commercial use of the Program, the Contributor who<br />
+includes the Program in a commercial product offering should do so in a manner<br />
+which does not create potential liability for other Contributors. Therefore, if<br />
+a Contributor includes the Program in a commercial product offering, such<br />
+Contributor ("Commercial Contributor") hereby agrees to defend and indemnify<br />
+every other Contributor ("Indemnified Contributor") against any losses, damages<br />
+and costs (collectively "Losses") arising from claims, lawsuits and other legal<br />
+actions brought by a third party against the Indemnified Contributor to the<br />
+extent caused by the acts or omissions of such Commercial Contributor in<br />
+connection with its distribution of the Program in a commercial product<br />
+offering. The obligations in this section do not apply to any claims or Losses<br />
+relating to any actual or alleged intellectual property infringement. In order<br />
+to qualify, an Indemnified Contributor must: a) promptly notify the Commercial<br />
+Contributor in writing of such claim, and b) allow the Commercial Contributor to<br />
+control, and cooperate with the Commercial Contributor in, the defense and any<br />
+related settlement negotiations. The Indemnified Contributor may participate in<br />
+any such claim at its own expense.</p>
+<p>For example, a Contributor might include the Program in a commercial product<br />
+offering, Product X. That Contributor is then a Commercial Contributor. If that<br />
+Commercial Contributor then makes performance claims, or offers warranties<br />
+related to Product X, those performance claims and warranties are such<br />
+Commercial Contributor's responsibility alone. Under this section, the<br />
+Commercial Contributor would have to defend claims against the other<br />
+Contributors related to those performance claims and warranties, and if a court<br />
+requires any other Contributor to pay any damages as a result, the Commercial<br />
+Contributor must pay those damages.</p>
+<p>5. NO WARRANTY</p>
+<p>EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED ON AN<br />
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR<br />
+IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE,<br />
+NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each<br />
+Recipient is solely responsible for determining the appropriateness of using and<br />
+distributing the Program and assumes all risks associated with its exercise of<br />
+rights under this Agreement, including but not limited to the risks and costs of<br />
+program errors, compliance with applicable laws, damage to or loss of data,<br />
+programs or equipment, and unavailability or interruption of operations.</p>
+<p>6. DISCLAIMER OF LIABILITY</p>
+<p>EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR ANY<br />
+CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT, INCIDENTAL,<br />
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING WITHOUT LIMITATION LOST<br />
+PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,<br />
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY<br />
+OUT OF THE USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS<br />
+GRANTED HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+<p>7. GENERAL</p>
+<p>If any provision of this Agreement is invalid or unenforceable under applicable<br />
+law, it shall not affect the validity or enforceability of the remainder of the<br />
+terms of this Agreement, and without further action by the parties hereto, such<br />
+provision shall be reformed to the minimum extent necessary to make such<br />
+provision valid and enforceable.</p>
+<p>If Recipient institutes patent litigation against a Contributor with respect to<br />
+a patent applicable to software (including a cross-claim or counterclaim in a<br />
+lawsuit), then any patent licenses granted by that Contributor to such Recipient<br />
+under this Agreement shall terminate as of the date such litigation is filed. In<br />
+addition, if Recipient institutes patent litigation against any entity<br />
+(including a cross-claim or counterclaim in a lawsuit) alleging that the Program<br />
+itself (excluding combinations of the Program with other software or hardware)<br />
+infringes such Recipient's patent(s), then such Recipient's rights granted under<br />
+Section 2(b) shall terminate as of the date such litigation is filed.</p>
+<p>All Recipient's rights under this Agreement shall terminate if it fails to<br />
+comply with any of the material terms or conditions of this Agreement and does<br />
+not cure such failure in a reasonable period of time after becoming aware of<br />
+such noncompliance. If all Recipient's rights under this Agreement terminate,<br />
+Recipient agrees to cease use and distribution of the Program as soon as<br />
+reasonably practicable. However, Recipient's obligations under this Agreement<br />
+and any licenses granted by Recipient relating to the Program shall continue and<br />
+survive.</p>
+<p>Everyone is permitted to copy and distribute copies of this Agreement, but in<br />
+order to avoid inconsistency the Agreement is copyrighted and may only be<br />
+modified in the following manner. The Agreement Steward reserves the right to<br />
+publish new versions (including revisions) of this Agreement from time to time.<br />
+No one other than the Agreement Steward has the right to modify this Agreement.<br />
+IBM is the initial Agreement Steward. IBM may assign the responsibility to serve<br />
+as the Agreement Steward to a suitable separate entity. Each new version of the<br />
+Agreement will be given a distinguishing version number. The Program (including<br />
+Contributions) may always be distributed subject to the version of the Agreement<br />
+under which it was received. In addition, after a new version of the Agreement<br />
+is published, Contributor may elect to distribute the Program (including its<br />
+Contributions) under the new version. Except as expressly stated in Sections<br />
+2(a) and 2(b) above, Recipient receives no rights or licenses to the<br />
+intellectual property of any Contributor under this Agreement, whether<br />
+expressly, by implication, estoppel or otherwise. All rights in the Program not<br />
+expressly granted under this Agreement are reserved.</p>
+<p>This Agreement is governed by the laws of the State of New York and the<br />
+intellectual property laws of the United States of America. No party to this<br />
+Agreement will bring a legal action under this Agreement more than one year<br />
+after the cause of action arose. Each party waives its rights to a jury trial in<br />
+any resulting litigation.</p>
+</div></div></div>  </div>
+
+  <div class="clearfix">
+          <div class="links"></div>
+    
+      </div>
+
+</div>
+  </div>
+</div>
+  </div>
+          </div>
+                      <div class="region region-footer">
+    <div id="block-block-11" class="block block-block clearfix">
+
+    
+  <div class="content">
+    <p style="text-align:center">Help shape the future of the Open Source Initiative...<br /><a href="http://osi.xwiki.com">visit and participate in the OSI wiki</a>.
+</p>
+
+<div>
+<a href="https://twitter.com/OpenSourceOrg" class="twitter-follow-button" data-show-count="false" data-lang="en">Follow @OpenSourceOrg</a>
+<script>
+<!--//--><![CDATA[// ><!--
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+//--><!]]>
+</script></div>
+
+<p>
+<!-- Creative Commons License --><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width: 0" src="http://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />Opensource.org site content is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.<!-- /Creative Commons License -->
+
+<!-- <rdf:RDF xmlns="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+	<Work rdf:about="">
+		<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+	</Work>
+	<License rdf:about="http://creativecommons.org/licenses/by/3.0/"><permits rdf:resource="http://web.resource.org/cc/Reproduction"/><permits rdf:resource="http://web.resource.org/cc/Distribution"/><requires rdf:resource="http://web.resource.org/cc/Notice"/><requires rdf:resource="http://web.resource.org/cc/Attribution"/><permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/></License></rdf:RDF>
+-->
+
+| <a href="../ToS">Terms of Service</a>
+
+</p>
+  </div>
+</div>
+<div id="block-block-7" class="block block-block clearfix">
+
+    
+  <div class="content">
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+<!--//--><![CDATA[// ><!--
+
+
+//--><!]]>
+</script><script type="text/javascript">
+<!--//--><![CDATA[// ><!--
+
+_uacct = "UA-3916956-1";
+urchinTracker();
+
+//--><!]]>
+</script>  </div>
+</div>
+  </div>
+      </div></div></div></div> <!-- /.left-corner, /.right-corner, /#squeeze, /#center -->
+
+      
+    </div> <!-- /#container -->
+  </div> <!-- /#wrapper -->
+  <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"beacon-1.newrelic.com","licenseKey":"53c69192ac","applicationID":"224050","transactionName":"b1dRZkQCXEEHAEVRXFYdZkBfTFtcAgZJFkNQQg==","queueTime":0,"applicationTime":29,"ttGuid":"","agentToken":"","atts":"QxBSEAwYT08=","errorBeacon":"bam.nr-data.net","agent":"js-agent.newrelic.com\/nr-411.min.js"}</script></body>
+</html>
