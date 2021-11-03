@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as builder
 
 # install dependencies (install tzdata first to prevent 'geographic area' prompt)
 RUN apt-get update \
@@ -8,7 +8,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # add github to ssh known hosts
-RUN mkdir -p ~/.ssh && ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+# remove this once all repos become public
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
 # clone repositories into /build
 RUN --mount=type=ssh mkdir -p /build \
@@ -20,9 +21,25 @@ RUN --mount=type=ssh mkdir -p /build \
 # actually build
 RUN cd /build/nis-client && mvn clean package -DskipTests=true
 
-RUN mkdir -p /app
+WORKDIR /build/nis-client/nis/target
+
+## runner
+FROM ubuntu:20.04
+
+ENV NODE_CONFIG="./config.properties"
+ENV DB_CONFIG="./db.properties"
+ENV INITIAL_HEAP_SIZE=-Xms2G
+ENV MAX_HEAP_SIZE=-Xmx4G
+
+RUN apt-get update \
+  && apt-get install -y tzdata \
+  && apt-get install -y openjdk-8-jdk-headless libssl-dev maven ca-certificates \
+  && update-ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+COPY --from=builder /build/nis-client/nis/target/obfuscationLibs/ ./libs/
+COPY --from=builder /build/nis-client/nis/target/*.jar ./
+COPY ${NODE_CONFIG} ${DB_CONFIG} ./
 
-#CMD ["/usr/bin/java", "-Xms6G", "-Xmx6G", "-cp", "/app/testnet/:package/nis/*:package/libs/*", "foo" ]
-CMD ["echo", "foo bar"]
+CMD ["sh", "-c", "java ${INITIAL_HEAP_SIZE} ${MAX_HEAP_SIZE} -cp './libs/*:./*' org.nem.deploy.CommonStarter" ]
