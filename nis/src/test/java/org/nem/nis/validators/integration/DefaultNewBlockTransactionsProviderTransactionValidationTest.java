@@ -9,6 +9,7 @@ import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -37,11 +38,13 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, maxTransactionsPerBlock);
+					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, maxTransactionsPerBlock,
+					new ForkConfiguration());
 			this.transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(nisCache, NisUtils.createTransactionValidatorFactory(),
-					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(), this.transactions.asFilter());
+					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(), this.transactions.asFilter(),
+					new ForkConfiguration());
 		}
 
 		public List<Transaction> getBlockTransactions() {

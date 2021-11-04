@@ -5,12 +5,15 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NisConfigurationTest {
 	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",
@@ -22,7 +25,8 @@ public class NisConfigurationTest {
 			"nis.useBinaryTransport", "nis.useNetworkTime", "nis.ignoreFees", "nis.ipDetectionMode", "nis.unlockedLimit",
 			"nis.maxTransactions", "nis.maxTransactionsPerBlock", "nis.blockGenerationTargetTime", "nis.blockChainRewriteLimit",
 			"nis.transactionHashRetentionTime", "nis.additionalLocalIps", "nis.optionalFeatures", "nis.blockChainFeatures",
-			"nis.allowedHarvesterAddresses", "nis.delayBlockLoading");
+			"nis.allowedHarvesterAddresses", "nis.delayBlockLoading", "nis.treasuryReissuanceForkHeight",
+			"nis.treasuryReissuanceForkTransactionHashes", "nis.treasuryReissuanceForkFallbackTransactionHashes");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -246,13 +250,13 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration();
 
 		// Act:
-		final BlockChainConfiguration configuration = config.getBlockChainConfiguration();
+		final BlockChainConfiguration blockChainConfig = config.getBlockChainConfiguration();
 
 		// Assert:
-		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(10_000));
-		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
-		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
-		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
+		MatcherAssert.assertThat(blockChainConfig.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(10_000));
+		MatcherAssert.assertThat(blockChainConfig.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
+		MatcherAssert.assertThat(blockChainConfig.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
+		MatcherAssert.assertThat(blockChainConfig.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
 	}
 
 	@Test
@@ -266,13 +270,58 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Act:
-		final BlockChainConfiguration configuration = config.getBlockChainConfiguration();
+		final BlockChainConfiguration blockChainConfig = config.getBlockChainConfiguration();
 
 		// Assert:
-		MatcherAssert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(2345));
-		MatcherAssert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
-		MatcherAssert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(30));
-		MatcherAssert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
+		MatcherAssert.assertThat(blockChainConfig.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(2345));
+		MatcherAssert.assertThat(blockChainConfig.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
+		MatcherAssert.assertThat(blockChainConfig.getBlockGenerationTargetTime(), IsEqual.equalTo(30));
+		MatcherAssert.assertThat(blockChainConfig.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
+	}
+
+	@Test
+	public void getForkConfigurationReturnsExpectedDefaultConfiguration() {
+		// Arrange:
+		final NisConfiguration config = new NisConfiguration();
+
+		// Act:
+		final ForkConfiguration forkConfig = config.getForkConfiguration();
+
+		// Assert:
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3464800)));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(53));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes().size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void getForkConfigurationReturnsExpectedCustomConfiguration() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.treasuryReissuanceForkHeight", "2345");
+
+		final String[] hashStrings = new String[]{
+				"19E0E3B991FAD3D24312A9E99D04F25C04BA3806A4F1F827B52BE403B1F6ADB9",
+				"B9741D02EADFCBD714EE36B727F09F08FBA2A3744AFB3805B13E5CCE4D434AA1",
+				"2F89C4126DD94C7FA29874EE12B1E9F1E51B5F89DA0445551AEE0C7BCEAD0B63"
+		};
+		properties.setProperty("nis.treasuryReissuanceForkTransactionHashes", String.join("|", hashStrings));
+
+		final String[] fallbackHashStrings = new String[]{
+				"2F89C4126DD94C7FA29874EE12B1E9F1E51B5F89DA0445551AEE0C7BCEAD0B63"
+		};
+		properties.setProperty("nis.treasuryReissuanceForkFallbackTransactionHashes", String.join("|", fallbackHashStrings));
+
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Act:
+		final ForkConfiguration forkConfig = config.getForkConfiguration();
+
+		// Assert:
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(2345)));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes(),
+				IsEqual.equalTo(Arrays.stream(hashStrings).map(Hash::fromHexString).collect(Collectors.toList())));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes(),
+				IsEqual.equalTo(Arrays.stream(fallbackHashStrings).map(Hash::fromHexString).collect(Collectors.toList())));
 	}
 
 	// endregion

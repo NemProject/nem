@@ -127,7 +127,7 @@ public class NisAppConfig {
 	@Bean
 	public BlockChainServices blockChainServices() {
 		return new BlockChainServices(this.blockDao, this.blockTransactionObserverFactory(), this.blockValidatorFactory(),
-				this.transactionValidatorFactory(), this.nisMapperFactory());
+				this.transactionValidatorFactory(), this.nisMapperFactory(), this.nisConfiguration().getForkConfiguration());
 	}
 
 	@Bean
@@ -176,12 +176,13 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockValidatorFactory blockValidatorFactory() {
-		return new BlockValidatorFactory(this.timeProvider());
+		return new BlockValidatorFactory(this.timeProvider(), this.nisConfiguration().getForkConfiguration());
 	}
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), nisConfiguration().ignoreFees());
+		return new TransactionValidatorFactory(this.timeProvider(), this.nisConfiguration().getNetworkInfo(),
+				this.nisConfiguration().getForkConfiguration(), this.nisConfiguration().ignoreFees());
 	}
 
 	@Bean
@@ -197,7 +198,7 @@ public class NisAppConfig {
 	public Harvester harvester() {
 		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(this.nisCache(),
 				this.transactionValidatorFactory(), this.blockValidatorFactory(), this.blockTransactionObserverFactory(),
-				this.unconfirmedTransactionsFilter());
+				this.unconfirmedTransactionsFilter(), this.nisConfiguration().getForkConfiguration());
 
 		final BlockGenerator generator = new BlockGenerator(this.nisCache(), transactionsProvider, this.blockDao,
 				new BlockScorer(this.accountStateCache()), this.blockValidatorFactory().create(this.nisCache()));
@@ -280,7 +281,7 @@ public class NisAppConfig {
 		final BlockChainConfiguration blockChainConfiguration = this.nisConfiguration().getBlockChainConfiguration();
 		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(this.transactionValidatorFactory(),
 				this.blockTransactionObserverFactory()::createExecuteCommitObserver, this.timeProvider(), this.lastBlockHeight(),
-				blockChainConfiguration.getMaxTransactionsPerBlock());
+				blockChainConfiguration.getMaxTransactionsPerBlock(), this.nisConfiguration().getForkConfiguration());
 		final UnconfirmedTransactions unconfirmedTransactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory,
 				this.nisCache());
 		return new SynchronizedUnconfirmedTransactions(unconfirmedTransactions);

@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
@@ -10,6 +11,7 @@ import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -26,6 +28,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final Supplier<BlockHeight> blockHeightSupplier;
+	private final ForkConfiguration forkConfiguration;
 	private final SingleTransactionValidator singleValidator;
 	private final BatchTransactionValidator batchValidator;
 	private final Supplier<BlockNotificationContext> notificationContextSupplier;
@@ -41,15 +44,17 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	 * @param nisCache The (unconfirmed) nis cache.
 	 * @param timeProvider The time provider.
 	 * @param blockHeightSupplier The block height supplier.
+	 * @param forkConfiguration The fork configuration.
 	 */
 	public DefaultUnconfirmedState(final UnconfirmedTransactionsCache transactions, final TransactionValidatorFactory validatorFactory,
 			final BlockTransactionObserver transferObserver, final TransactionSpamFilter spamFilter, final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider, final Supplier<BlockHeight> blockHeightSupplier) {
+			final TimeProvider timeProvider, final Supplier<BlockHeight> blockHeightSupplier, final ForkConfiguration forkConfiguration) {
 		this.transactions = transactions;
 		this.transferObserver = transferObserver;
 		this.spamFilter = spamFilter;
 		this.nisCache = nisCache;
 		this.blockHeightSupplier = blockHeightSupplier;
+		this.forkConfiguration = forkConfiguration;
 
 		final AggregateSingleTransactionValidatorBuilder singleValidatorBuilder = validatorFactory.createIncompleteSingleBuilder(nisCache);
 		singleValidatorBuilder.add(new TransactionDeadlineValidator(timeProvider));
@@ -122,7 +127,12 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
-			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
+			if (!this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes().contains(transactionHash)) {
+				return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+			}
+
+			LOGGER.info(String.format("Treasury reissuance transaction %s allowed", transactionHash));
 		}
 
 		final ValidationResult validationResult = this.validateSingle(transaction);

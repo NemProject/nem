@@ -4,6 +4,7 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.deploy.CommonConfiguration;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -29,6 +30,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
 	private final BlockChainConfiguration blockChainConfiguration;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -87,6 +89,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
 		this.blockChainConfiguration = parseBlockChainConfiguration(properties);
+		this.forkConfiguration = new ForkConfiguration(properties);
 	}
 
 	private static BlockChainConfiguration parseBlockChainConfiguration(final NemProperties properties) {
@@ -235,6 +238,15 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public BlockChainConfiguration getBlockChainConfiguration() {
 		return this.blockChainConfiguration;
+	}
+
+	/**
+	 * Gets the fork configuration.
+	 *
+	 * @return The fork configuration.
+	 */
+	public ForkConfiguration getForkConfiguration() {
+		return this.forkConfiguration;
 	}
 
 	/**

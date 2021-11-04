@@ -8,6 +8,7 @@ import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -19,7 +20,8 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 		// Arrange:
 		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(),
 				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK,
+				new ForkConfiguration());
 		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);

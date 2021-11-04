@@ -13,6 +13,7 @@ import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainServices;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 			final BlockHeight parentHeight = chainHeight.prev(); // chainHeight is for block one (P -> [1] -> 2 -> 3)
 			final BlockChainServices blockChainServices = new BlockChainServices(Mockito.mock(BlockDao.class),
 					new BlockTransactionObserverFactory(), NisUtils.createBlockValidatorFactory(),
-					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory());
+					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory(), new ForkConfiguration());
 
 			final NisCache copyCache = nisCache.copy();
 			final Account blockSigner = createBlockSigner(copyCache, parentHeight);

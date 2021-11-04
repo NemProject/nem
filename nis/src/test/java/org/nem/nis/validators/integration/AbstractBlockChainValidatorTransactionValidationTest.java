@@ -16,6 +16,7 @@ import org.nem.nis.chain.BlockExecuteProcessor;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -153,7 +154,8 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(block -> new BlockExecuteProcessor(nisCache, block, observer), this.scorer, this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
-					NisUtils.createTransactionValidatorFactory().createSingle(nisCache), NisCacheUtils.createValidationState(nisCache));
+					NisUtils.createTransactionValidatorFactory().createSingle(nisCache), NisCacheUtils.createValidationState(nisCache),
+					new ForkConfiguration());
 		}
 	}
 }

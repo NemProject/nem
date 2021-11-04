@@ -8,8 +8,9 @@ import org.nem.nis.cache.*;
 import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +47,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final BlockTransactionObserverFactory observerFactory;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new transactions provider.
@@ -55,20 +57,30 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	 * @param blockValidatorFactory The block validator factory.
 	 * @param observerFactory The observer factory.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
+	 * @param forkConfiguration The fork configuration.
 	 */
 	public DefaultNewBlockTransactionsProvider(final ReadOnlyNisCache nisCache, final TransactionValidatorFactory validatorFactory,
 			final BlockValidatorFactory blockValidatorFactory, final BlockTransactionObserverFactory observerFactory,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions) {
+			final UnconfirmedTransactionsFilter unconfirmedTransactions, final ForkConfiguration forkConfiguration) {
 		this.nisCache = nisCache;
 		this.validatorFactory = validatorFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.observerFactory = observerFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	@Override
 	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime,
 			final BlockHeight blockHeight) {
+		if (this.forkConfiguration.getTreasuryReissuanceForkHeight().equals(blockHeight)) {
+			final List<Transaction> candidateTransactions = this
+					.selectTransactionsByHash(this.forkConfiguration.getTreasuryReissuanceForkFallbackTransactionHashes());
+			return !candidateTransactions.isEmpty()
+					? candidateTransactions
+					: this.selectTransactionsByHash(this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes());
+		}
+
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
@@ -122,5 +134,11 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		}
 
 		return tempBlock.getTransactions();
+	}
+
+	private List<Transaction> selectTransactionsByHash(Collection<Hash> transactionHashes) {
+		return this.unconfirmedTransactions.getAll().stream().filter(tx -> transactionHashes.contains(HashUtils.calculateHash(tx)))
+				.sorted((tx1, tx2) -> Integer.compare(tx1.getTimeStamp().getRawTime(), tx2.getTimeStamp().getRawTime()))
+				.collect(Collectors.toList());
 	}
 }

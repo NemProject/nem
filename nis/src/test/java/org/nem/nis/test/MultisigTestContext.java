@@ -26,14 +26,19 @@ public class MultisigTestContext {
 	private final List<Transaction> transactionList = new ArrayList<>();
 
 	public final Account signer = Utils.generateRandomAccount();
-	public final Account multisig = Utils.generateRandomAccount();
+	public final Account multisig;
 	private final Account recipient = Utils.generateRandomAccount();
 	public final Account dummy = Utils.generateRandomAccount();
 
 	public MultisigTestContext() {
+		this(Utils.generateRandomAccount());
+	}
+
+	public MultisigTestContext(final Account multisigAccount) {
 		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountStateCache);
-		this.addState(this.signer);
+		this.multisig = multisigAccount;
 		this.addState(this.multisig);
+		this.addState(this.signer);
 		this.addState(this.dummy);
 	}
 
