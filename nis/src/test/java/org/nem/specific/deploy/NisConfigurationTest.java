@@ -288,8 +288,9 @@ public class NisConfigurationTest {
 		final ForkConfiguration forkConfig = config.getForkConfiguration();
 
 		// Assert:
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(1)));
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes(), IsEqual.equalTo(new ArrayList<Hash>()));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3464800)));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(53));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes().size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -305,6 +306,11 @@ public class NisConfigurationTest {
 		};
 		properties.setProperty("nis.treasuryReissuanceForkTransactionHashes", String.join("|", hashStrings));
 
+		final String[] fallbackHashStrings = new String[]{
+				"2F89C4126DD94C7FA29874EE12B1E9F1E51B5F89DA0445551AEE0C7BCEAD0B63"
+		};
+		properties.setProperty("nis.treasuryReissuanceForkFallbackTransactionHashes", String.join("|", fallbackHashStrings));
+
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Act:
@@ -314,6 +320,8 @@ public class NisConfigurationTest {
 		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(2345)));
 		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes(),
 				IsEqual.equalTo(Arrays.stream(hashStrings).map(Hash::fromHexString).collect(Collectors.toList())));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes(),
+				IsEqual.equalTo(Arrays.stream(fallbackHashStrings).map(Hash::fromHexString).collect(Collectors.toList())));
 	}
 
 	// endregion
