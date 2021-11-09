@@ -3,6 +3,7 @@ package org.nem.deploy;
 import net.minidev.json.*;
 import org.eclipse.jetty.server.*;
 import org.hamcrest.core.*;
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.ErrorResponse;
@@ -80,7 +81,7 @@ public class JsonErrorHandlerTest {
 		context.handle();
 
 		// Assert:
-		Assert.assertThat(context.getOutputStreamContent().endsWith("\r\n"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.getOutputStreamContent().endsWith("\r\n"), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -97,9 +98,9 @@ public class JsonErrorHandlerTest {
 		final ErrorResponse response = context.getErrorResponse();
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(123));
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
 	}
 
 	@Test
@@ -113,12 +114,12 @@ public class JsonErrorHandlerTest {
 		final ErrorResponse response = context.getErrorResponse();
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(123));
-		Assert.assertThat(response.getMessage(), IsNull.nullValue());
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(response.getMessage(), IsNull.nullValue());
 	}
 
-	//region MockServletOutputStream
+	// region MockServletOutputStream
 
 	private static class MockServletOutputStream extends ServletOutputStream {
 
@@ -143,9 +144,9 @@ public class JsonErrorHandlerTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private static class TestContext {
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
@@ -193,10 +194,10 @@ public class JsonErrorHandlerTest {
 
 		public ErrorResponse getErrorResponse() {
 			final String jsonString = this.outputStream.getContent();
-			final Deserializer deserializer = new JsonDeserializer((JSONObject)JSONValue.parse(jsonString), null);
+			final Deserializer deserializer = new JsonDeserializer((JSONObject) JSONValue.parse(jsonString), null);
 			return new ErrorResponse(deserializer);
 		}
 	}
 
-	//endregion
+	// endregion
 }

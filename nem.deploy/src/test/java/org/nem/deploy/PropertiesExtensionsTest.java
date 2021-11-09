@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
@@ -8,7 +9,7 @@ import java.util.*;
 
 public class PropertiesExtensionsTest {
 
-	//region merge
+	// region merge
 
 	@Test
 	public void canMergeZeroProperties() {
@@ -16,7 +17,7 @@ public class PropertiesExtensionsTest {
 		final Properties mergedProps = PropertiesExtensions.merge(Collections.emptyList());
 
 		// Assert:
-		Assert.assertThat(mergedProps.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(mergedProps.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -34,10 +35,10 @@ public class PropertiesExtensionsTest {
 		// - baseProps was not modified
 		// - baseProps was copied to mergedProps modified
 		for (final Properties props : Arrays.asList(baseProps, mergedProps)) {
-			Assert.assertThat(props.size(), IsEqual.equalTo(3));
-			Assert.assertThat(props.getProperty("alpha"), IsEqual.equalTo("one"));
-			Assert.assertThat(props.getProperty("beta"), IsEqual.equalTo("two"));
-			Assert.assertThat(props.getProperty("gamma"), IsEqual.equalTo("three"));
+			MatcherAssert.assertThat(props.size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(props.getProperty("alpha"), IsEqual.equalTo("one"));
+			MatcherAssert.assertThat(props.getProperty("beta"), IsEqual.equalTo("two"));
+			MatcherAssert.assertThat(props.getProperty("gamma"), IsEqual.equalTo("three"));
 		}
 	}
 
@@ -64,36 +65,36 @@ public class PropertiesExtensionsTest {
 
 		// Assert:
 		// - baseProps was not modified
-		Assert.assertThat(baseProps.size(), IsEqual.equalTo(3));
-		Assert.assertThat(baseProps.getProperty("alpha"), IsEqual.equalTo("one"));
-		Assert.assertThat(baseProps.getProperty("beta"), IsEqual.equalTo("two"));
-		Assert.assertThat(baseProps.getProperty("gamma"), IsEqual.equalTo("three"));
+		MatcherAssert.assertThat(baseProps.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(baseProps.getProperty("alpha"), IsEqual.equalTo("one"));
+		MatcherAssert.assertThat(baseProps.getProperty("beta"), IsEqual.equalTo("two"));
+		MatcherAssert.assertThat(baseProps.getProperty("gamma"), IsEqual.equalTo("three"));
 
 		// - overrideProps1 was not modified
-		Assert.assertThat(overrideProps1.size(), IsEqual.equalTo(3));
-		Assert.assertThat(overrideProps1.getProperty("beta"), IsEqual.equalTo(":/"));
-		Assert.assertThat(overrideProps1.getProperty("radiation"), IsEqual.equalTo("bad"));
-		Assert.assertThat(overrideProps1.getProperty("one"), IsEqual.equalTo("z"));
+		MatcherAssert.assertThat(overrideProps1.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(overrideProps1.getProperty("beta"), IsEqual.equalTo(":/"));
+		MatcherAssert.assertThat(overrideProps1.getProperty("radiation"), IsEqual.equalTo("bad"));
+		MatcherAssert.assertThat(overrideProps1.getProperty("one"), IsEqual.equalTo("z"));
 
 		// - overrideProps2 was not modified
-		Assert.assertThat(overrideProps2.size(), IsEqual.equalTo(3));
-		Assert.assertThat(overrideProps2.getProperty("alpha"), IsEqual.equalTo("zero"));
-		Assert.assertThat(overrideProps2.getProperty("two"), IsEqual.equalTo("2"));
-		Assert.assertThat(overrideProps2.getProperty("one"), IsEqual.equalTo("1"));
+		MatcherAssert.assertThat(overrideProps2.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(overrideProps2.getProperty("alpha"), IsEqual.equalTo("zero"));
+		MatcherAssert.assertThat(overrideProps2.getProperty("two"), IsEqual.equalTo("2"));
+		MatcherAssert.assertThat(overrideProps2.getProperty("one"), IsEqual.equalTo("1"));
 
 		// - mergedProps contains baseProps > overrideProps1 > overrideProps2 and precedence is right to left
-		Assert.assertThat(mergedProps.size(), IsEqual.equalTo(6));
-		Assert.assertThat(mergedProps.getProperty("alpha"), IsEqual.equalTo("zero"));
-		Assert.assertThat(mergedProps.getProperty("beta"), IsEqual.equalTo(":/"));
-		Assert.assertThat(mergedProps.getProperty("gamma"), IsEqual.equalTo("three"));
-		Assert.assertThat(mergedProps.getProperty("radiation"), IsEqual.equalTo("bad"));
-		Assert.assertThat(mergedProps.getProperty("one"), IsEqual.equalTo("1"));
-		Assert.assertThat(mergedProps.getProperty("two"), IsEqual.equalTo("2"));
+		MatcherAssert.assertThat(mergedProps.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(mergedProps.getProperty("alpha"), IsEqual.equalTo("zero"));
+		MatcherAssert.assertThat(mergedProps.getProperty("beta"), IsEqual.equalTo(":/"));
+		MatcherAssert.assertThat(mergedProps.getProperty("gamma"), IsEqual.equalTo("three"));
+		MatcherAssert.assertThat(mergedProps.getProperty("radiation"), IsEqual.equalTo("bad"));
+		MatcherAssert.assertThat(mergedProps.getProperty("one"), IsEqual.equalTo("1"));
+		MatcherAssert.assertThat(mergedProps.getProperty("two"), IsEqual.equalTo("2"));
 	}
 
-	//endregion
+	// endregion
 
-	//region loadFromResource
+	// region loadFromResource
 
 	@Test
 	public void loadFromResourceCanLoadRequiredProperties() {
@@ -101,15 +102,13 @@ public class PropertiesExtensionsTest {
 		final Properties properties = loadFromResource("test.properties", true);
 
 		// Assert:
-		Assert.assertThat(properties.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(properties.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
 	public void loadFromResourceThrowsExceptionWhenCannotLoadRequiredResources() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> loadFromResource("imaginary.properties", true),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> loadFromResource("imaginary.properties", true), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -118,7 +117,7 @@ public class PropertiesExtensionsTest {
 		final Properties properties = loadFromResource("test.properties", false);
 
 		// Assert:
-		Assert.assertThat(properties.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(properties.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -127,12 +126,12 @@ public class PropertiesExtensionsTest {
 		final Properties properties = loadFromResource("imaginary.properties", false);
 
 		// Assert:
-		Assert.assertThat(properties.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(properties.size(), IsEqual.equalTo(0));
 	}
 
 	private static Properties loadFromResource(final String name, final boolean isRequired) {
 		return PropertiesExtensions.loadFromResource(PropertiesExtensionsTest.class, name, isRequired);
 	}
 
-	//endregion
+	// endregion
 }

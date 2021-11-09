@@ -1,13 +1,14 @@
 package org.nem.deploy;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 
 import java.util.*;
 
 /**
- * Class responsible for holding all common configuration settings.
- * A reboot is required for configuration changes to take effect.
+ * Class responsible for holding all common configuration settings. A reboot is required for configuration changes to take effect.
  */
 public class CommonConfiguration {
 	private final String shortServerName;
@@ -35,9 +36,8 @@ public class CommonConfiguration {
 	}
 
 	protected static Properties loadDefaultProperties() {
-		final Class clazz = CommonConfiguration.class;
-		final Collection<Properties> propertyBags = Arrays.asList(
-				PropertiesExtensions.loadFromResource(clazz, "config.properties", true),
+		final Class<?> clazz = CommonConfiguration.class;
+		final Collection<Properties> propertyBags = Arrays.asList(PropertiesExtensions.loadFromResource(clazz, "config.properties", true),
 				PropertiesExtensions.loadFromResource(clazz, "config-user.properties", false));
 		return PropertiesExtensions.merge(propertyBags);
 	}
@@ -61,8 +61,7 @@ public class CommonConfiguration {
 
 		// use '/' as the path separator in the default value in order to match the value in the resources file
 		// otherwise, the default value (from resources) and the default value (in code) will not match on all OSs
-		this.nemFolder = properties.getOptionalString("nem.folder", "%h/nem")
-				.replace("/", System.getProperty("file.separator"))
+		this.nemFolder = properties.getOptionalString("nem.folder", "%h/nem").replace("/", System.getProperty("file.separator"))
 				.replace("%h", this.getDefaultFolder());
 
 		this.maxThreads = properties.getInteger("nem.maxThreads");
@@ -76,15 +75,24 @@ public class CommonConfiguration {
 		this.home = properties.getString("nem.homePath");
 		this.shutdown = properties.getOptionalString("nem.shutdownPath", "/shutdown");
 		this.useDosFilter = properties.getOptionalBoolean("nem.useDosFilter", true);
-		this.nonAuditedApiPaths = properties.getOptionalStringArray(
-				"nem.nonAuditedApiPaths",
+		this.nonAuditedApiPaths = properties.getOptionalStringArray("nem.nonAuditedApiPaths",
 				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info|/account/get|/account/status");
 
 		this.networkName = properties.getOptionalString("nem.network", "mainnet");
-		this.networkInfo = NetworkInfos.fromFriendlyName(this.networkName);
+
+		if (NetworkInfos.isKnownNetworkFriendlyName(this.networkName)) {
+			this.networkInfo = NetworkInfos.fromFriendlyName(this.networkName);
+		} else {
+			this.networkInfo = new NetworkInfo((byte) properties.getInteger("nem.network.version"),
+					properties.getString("nem.network.addressStartChar").charAt(0),
+					new NemesisBlockInfo(Hash.fromHexString(properties.getString("nem.network.generationHash")),
+							Address.fromEncoded(properties.getString("nem.network.nemesisSignerAddress")),
+							Amount.fromNem(properties.getLong("nem.network.totalAmount")),
+							properties.getString("nem.network.nemesisFilePath")));
+		}
 	}
 
-	//region basic settings
+	// region basic settings
 
 	/**
 	 * Get the default folder for database and log files.
@@ -131,9 +139,9 @@ public class CommonConfiguration {
 		return this.maxThreads;
 	}
 
-	//endregion
+	// endregion
 
-	//region endpoint settings
+	// region endpoint settings
 
 	/**
 	 * Gets the protocol used for communication.
@@ -180,7 +188,6 @@ public class CommonConfiguration {
 		return websocketPort;
 	}
 
-
 	/**
 	 * Gets the port used for communication.
 	 *
@@ -196,10 +203,7 @@ public class CommonConfiguration {
 	 * @return The base url as string.
 	 */
 	public String getBaseUrl() {
-		return String.format("%s://%s:%d",
-				this.getProtocol(),
-				this.getHost(),
-				this.getPort());
+		return String.format("%s://%s:%d", this.getProtocol(), this.getHost(), this.getPort());
 	}
 
 	/**
@@ -211,9 +215,9 @@ public class CommonConfiguration {
 		return new NodeEndpoint(this.getProtocol(), this.getHost(), this.getPort());
 	}
 
-	//endregion
+	// endregion
 
-	//region web servlet settings
+	// region web servlet settings
 
 	/**
 	 * Gets the base path for web site paths.
@@ -266,10 +270,7 @@ public class CommonConfiguration {
 	 * @return The shutdown url as string.
 	 */
 	public String getShutdownUrl() {
-		return String.format("%s%s%s",
-				this.getBaseUrl(),
-				this.getApiContext(),
-				this.getShutdownPath());
+		return String.format("%s%s%s", this.getBaseUrl(), this.getApiContext(), this.getShutdownPath());
 	}
 
 	/**
@@ -278,15 +279,12 @@ public class CommonConfiguration {
 	 * @return The home url as string.
 	 */
 	public String getHomeUrl() {
-		return String.format("%s%s%s",
-				this.getBaseUrl(),
-				this.getWebContext(),
-				this.getHomePath());
+		return String.format("%s%s%s", this.getBaseUrl(), this.getWebContext(), this.getHomePath());
 	}
 
-	//endregion
+	// endregion
 
-	//region audit settings
+	// region audit settings
 
 	/**
 	 * Gets the APIs that shouldn't be audited.
@@ -297,9 +295,9 @@ public class CommonConfiguration {
 		return this.nonAuditedApiPaths;
 	}
 
-	//endregion
+	// endregion
 
-	//region network settings
+	// region network settings
 
 	/**
 	 * Gets the network name.
@@ -319,5 +317,5 @@ public class CommonConfiguration {
 		return this.networkInfo;
 	}
 
-	//endregion
+	// endregion
 }

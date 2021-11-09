@@ -36,17 +36,15 @@ public class DeserializerHttpMessageConverter extends AbstractHttpMessageConvert
 	}
 
 	@Override
-	protected Deserializer readInternal(
-			final Class<? extends Deserializer> aClass,
-			final HttpInputMessage httpInputMessage) throws IOException, HttpMessageNotReadableException {
+	protected Deserializer readInternal(final Class<? extends Deserializer> aClass, final HttpInputMessage httpInputMessage)
+			throws IOException, HttpMessageNotReadableException {
 
 		return this.policy.fromStream(httpInputMessage.getBody());
 	}
 
 	@Override
-	protected void writeInternal(
-			final Deserializer serializableEntity,
-			final HttpOutputMessage httpOutputMessage) throws IOException, HttpMessageNotWritableException {
+	protected void writeInternal(final Deserializer serializableEntity, final HttpOutputMessage httpOutputMessage)
+			throws IOException, HttpMessageNotWritableException {
 
 		throw new UnsupportedOperationException();
 	}

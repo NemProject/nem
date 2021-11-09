@@ -27,9 +27,7 @@ public class NemServerBootstrapper extends AbstractServerBootstrapper {
 	 * @param configuration The configuration.
 	 * @param configurationPolicy The configuration policy.
 	 */
-	public NemServerBootstrapper(
-			final AnnotationConfigApplicationContext appCtx,
-			final CommonConfiguration configuration,
+	public NemServerBootstrapper(final AnnotationConfigApplicationContext appCtx, final CommonConfiguration configuration,
 			final NemConfigurationPolicy configurationPolicy) {
 		super(configuration);
 		this.appCtx = appCtx;
@@ -62,9 +60,7 @@ public class NemServerBootstrapper extends AbstractServerBootstrapper {
 		private final CommonConfiguration configuration;
 		private final NemConfigurationPolicy configurationPolicy;
 
-		public ServiceContextListener(
-				final AnnotationConfigApplicationContext appCtx,
-				final CommonConfiguration configuration,
+		public ServiceContextListener(final AnnotationConfigApplicationContext appCtx, final CommonConfiguration configuration,
 				final NemConfigurationPolicy configurationPolicy) {
 			super(appCtx, configurationPolicy.getWebAppInitializerClass(), configuration.useDosFilter());
 			this.configuration = configuration;
@@ -73,7 +69,8 @@ public class NemServerBootstrapper extends AbstractServerBootstrapper {
 
 		@Override
 		protected void initialize(final AnnotationConfigWebApplicationContext webCtx, final ServletContext context) {
-			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet",
+					new DispatcherServlet(webCtx));
 			dispatcher.setLoadOnStartup(1);
 			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
 

@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -8,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CommonStarterTest {
 
-	//region stopServerAsync
+	// region stopServerAsync
 
 	@Test
 	public void stopServerAsyncDoesNotImmediatelyStopServer() {
@@ -19,7 +20,7 @@ public class CommonStarterTest {
 		final CompletableFuture<?> future = starter.stopServerAsync();
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 
 		// Cleanup:
 		future.join();
@@ -35,7 +36,7 @@ public class CommonStarterTest {
 		final boolean result = future.join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(starter, Mockito.times(1)).stopServer();
 	}
 
@@ -50,9 +51,9 @@ public class CommonStarterTest {
 		final boolean result = future.join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 		Mockito.verify(starter, Mockito.times(1)).stopServer();
 	}
 
-	//endregion
+	// endregion
 }

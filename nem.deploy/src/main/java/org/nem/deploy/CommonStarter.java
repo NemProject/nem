@@ -53,9 +53,7 @@ public class CommonStarter {
 		final CommonConfiguration configuration = new CommonConfiguration();
 		LoggingBootstrapper.bootstrap(configuration.getNemFolder());
 
-		final File lockFile = Paths.get(
-				configuration.getNemFolder(),
-				configuration.getShortServerName().toLowerCase() + ".lock").toFile();
+		final File lockFile = Paths.get(configuration.getNemFolder(), configuration.getShortServerName().toLowerCase() + ".lock").toFile();
 		FILE_LOCK_HANDLE = tryAcquireLock(lockFile);
 		if (null == FILE_LOCK_HANDLE) {
 			LOGGER.warning("Could not acquire exclusive lock to lock file");

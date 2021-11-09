@@ -23,9 +23,7 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 	 * @param configuration The configuration.
 	 * @param configurationPolicy The configuration policy.
 	 */
-	public NemWebsockServerBootstrapper(
-			final AnnotationConfigApplicationContext appCtx,
-			final CommonConfiguration configuration,
+	public NemWebsockServerBootstrapper(final AnnotationConfigApplicationContext appCtx, final CommonConfiguration configuration,
 			final NemConfigurationPolicy configurationPolicy) {
 		super(configuration);
 		this.appCtx = appCtx;
@@ -48,9 +46,7 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 	private static class WebsocketContextListener extends AbstractNemServletContextListener {
 		private final NemConfigurationPolicy configurationPolicy;
 
-		public WebsocketContextListener(
-				final AnnotationConfigApplicationContext appCtx,
-				final CommonConfiguration configuration,
+		public WebsocketContextListener(final AnnotationConfigApplicationContext appCtx, final CommonConfiguration configuration,
 				final NemConfigurationPolicy configurationPolicy) {
 			super(appCtx, configurationPolicy.getWebAppWebsockInitializerClass(), configuration.useDosFilter());
 			this.configurationPolicy = configurationPolicy;
@@ -58,7 +54,8 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 
 		@Override
 		protected void initialize(final AnnotationConfigWebApplicationContext webCtx, final ServletContext context) {
-			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring Websocket Dispatcher Servlet", new DispatcherServlet(webCtx));
+			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring Websocket Dispatcher Servlet",
+					new DispatcherServlet(webCtx));
 			dispatcher.addMapping(String.format("%s%s", "/w", "/*"));
 			dispatcher.setLoadOnStartup(1);
 		}

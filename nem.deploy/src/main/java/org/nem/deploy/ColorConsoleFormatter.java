@@ -33,6 +33,7 @@ public class ColorConsoleFormatter extends NemFormatter {
 
 	private static class NixMessageFormatter implements MessageFormatter {
 		private static final String POSTFIX = "\u001b[0m";
+		@SuppressWarnings("serial")
 		private static final Map<Level, String> LEVEL_TO_PREFIX_MAP = new HashMap<Level, String>() {
 			{
 				this.put(Level.SEVERE, "\u001b[0;31m");

@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -10,7 +11,7 @@ import java.io.*;
 
 public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 
-	//region getMediaType
+	// region getMediaType
 
 	@Test
 	public void policySupportsApplicationBinaryMediaType() {
@@ -21,14 +22,14 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		final MediaType mediaType = policy.getMediaType();
 
 		// Assert:
-		Assert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
-		Assert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("binary"));
-		Assert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
+		MatcherAssert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
+		MatcherAssert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("binary"));
+		MatcherAssert.assertThat(mediaType.getCharset(), IsNull.nullValue());
 	}
 
-	//endregion
+	// endregion
 
-	//region toBytes
+	// region toBytes
 
 	@Test
 	public void toBytesDelegatesToBinarySerializer() {
@@ -40,12 +41,10 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		final byte[] bytes = policy.toBytes(originalEntity);
 
 		// Assert:
-		Assert.assertThat(
-				bytes,
-				IsEqual.equalTo(BinarySerializer.serializeToBytes(originalEntity)));
+		MatcherAssert.assertThat(bytes, IsEqual.equalTo(BinarySerializer.serializeToBytes(originalEntity)));
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	protected SerializationPolicy createPolicy(final AccountLookup accountLookup) {

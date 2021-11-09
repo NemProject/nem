@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -28,8 +29,8 @@ public class DeserializableEntityMessageConverterTest {
 		final List<MediaType> mediaTypes = mc.getSupportedMediaTypes();
 
 		// Assert:
-		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
+		MatcherAssert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
 		Mockito.verify(policy, Mockito.times(2)).getMediaType();
 	}
 
@@ -39,15 +40,14 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
-				MockSerializableEntity.class,
-				ObjectWithConstructorThatThrowsCheckedException.class,
+		final Class<?>[] types = new Class<?>[]{
+				MockSerializableEntity.class, ObjectWithConstructorThatThrowsCheckedException.class,
 				ObjectWithConstructorThatThrowsUncheckedException.class
 		};
 
 		// Assert:
-		for (final Class type : types) {
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
+		for (final Class<?> type : types) {
+			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(true));
 		}
 	}
 
@@ -57,16 +57,13 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "json");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
-				SerializableEntity.class,
-				ObjectWithoutDeserializerConstructor.class,
-				MediaType.class,
-				Object.class
+		final Class<?>[] types = new Class<?>[]{
+				SerializableEntity.class, ObjectWithoutDeserializerConstructor.class, MediaType.class, Object.class
 		};
 
 		// Assert:
-		for (final Class type : types) {
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
+		for (final Class<?> type : types) {
+			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
 		}
 	}
 
@@ -76,15 +73,14 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType supportedType = new MediaType("application", "binary");
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
-		final Class[] types = new Class[] {
-				MockSerializableEntity.class,
-				ObjectWithConstructorThatThrowsCheckedException.class,
+		final Class<?>[] types = new Class<?>[]{
+				MockSerializableEntity.class, ObjectWithConstructorThatThrowsCheckedException.class,
 				ObjectWithConstructorThatThrowsUncheckedException.class
 		};
 
 		// Assert:
-		for (final Class type : types) {
-			Assert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
+		for (final Class<?> type : types) {
+			MatcherAssert.assertThat(mc.canRead(type, supportedType), IsEqual.equalTo(false));
 		}
 	}
 
@@ -95,12 +91,12 @@ public class DeserializableEntityMessageConverterTest {
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
 		// Assert:
-		Assert.assertThat(mc.canWrite(MockSerializableEntity.class, supportedType), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mc.canWrite(MockSerializableEntity.class, supportedType), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region read
+	// region read
 
 	@Test
 	public void readIsSupportedForCompatibleTypeWithDeserializerConstructor() throws Exception {
@@ -109,12 +105,11 @@ public class DeserializableEntityMessageConverterTest {
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
 		// Act:
-		final MockSerializableEntity entity = (MockSerializableEntity)mc.read(
-				MockSerializableEntity.class,
+		final MockSerializableEntity entity = (MockSerializableEntity) mc.read(MockSerializableEntity.class,
 				new MockHttpInputMessage(JsonSerializer.serializeToJson(originalEntity)));
 
 		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test
@@ -145,9 +140,7 @@ public class DeserializableEntityMessageConverterTest {
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
 		// Act:
-		mc.read(
-				ObjectWithConstructorThatThrowsCheckedException.class,
-				new MockHttpInputMessage(new JSONObject()));
+		mc.read(ObjectWithConstructorThatThrowsCheckedException.class, new MockHttpInputMessage(new JSONObject()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -156,9 +149,7 @@ public class DeserializableEntityMessageConverterTest {
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
 		// Act:
-		mc.read(
-				ObjectWithConstructorThatThrowsUncheckedException.class,
-				new MockHttpInputMessage(new JSONObject()));
+		mc.read(ObjectWithConstructorThatThrowsUncheckedException.class, new MockHttpInputMessage(new JSONObject()));
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -167,14 +158,12 @@ public class DeserializableEntityMessageConverterTest {
 		final DeserializableEntityMessageConverter mc = createMessageConverter();
 
 		// Act:
-		mc.read(
-				ObjectWithoutDeserializerConstructor.class,
-				new MockHttpInputMessage(new JSONObject()));
+		mc.read(ObjectWithoutDeserializerConstructor.class, new MockHttpInputMessage(new JSONObject()));
 	}
 
-	//endregion
+	// endregion
 
-	//region write
+	// region write
 
 	@Test(expected = UnsupportedOperationException.class)
 	public void writeIsUnsupported() throws Exception {
@@ -187,9 +176,9 @@ public class DeserializableEntityMessageConverterTest {
 		mc.write(deserializer, supportedType, new MockHttpOutputMessage());
 	}
 
-	//endregion
+	// endregion
 
-	//region test classes
+	// region test classes
 
 	private static class ObjectWithoutDeserializerConstructor {
 
@@ -211,7 +200,7 @@ public class DeserializableEntityMessageConverterTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static DeserializableEntityMessageConverter createMessageConverter() {
 		return new DeserializableEntityMessageConverter(new JsonSerializationPolicy(null));
