@@ -39,7 +39,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
 	}
 
-	//region Setters and Getters
+	// region Setters and Getters
 
 	/**
 	 * Gets the fee.
@@ -96,14 +96,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		return accounts;
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public int compareTo(final Transaction rhs) {
 		// first sort by fees (lowest first) and then timestamps (newest first)
-		final int[] comparisonResults = new int[] {
-				this.getFee().compareTo(rhs.getFee()),
-				-1 * this.getTimeStamp().compareTo(rhs.getTimeStamp()),
+		final int[] comparisonResults = new int[]{
+				this.getFee().compareTo(rhs.getFee()), -1 * this.getTimeStamp().compareTo(rhs.getTimeStamp()),
 		};
 
 		for (final int result : comparisonResults) {
@@ -144,8 +143,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	/**
-	 * Gets all transactions that are children of this transaction.
-	 * In other words, this transaction is an aggregate of the child transactions.
+	 * Gets all transactions that are children of this transaction. In other words, this transaction is an aggregate of the child
+	 * transactions.
 	 *
 	 * @return The child transactions.
 	 */
@@ -154,8 +153,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	/**
-	 * Executes all transfers using the specified observer and state.
-	 * The Transaction class implementation executes all default transfers.
+	 * Executes all transfers using the specified observer and state. The Transaction class implementation executes all default transfers.
 	 *
 	 * @param observer The transfer observer.
 	 * @param state The execution state to use.

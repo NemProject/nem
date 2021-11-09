@@ -51,8 +51,8 @@ public enum HttpStatus {
 	/**
 	 * {@code 103 Checkpoint}.
 	 *
-	 * @see <a href="http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal">A proposal for supporting
-	 * resumable POST/PUT HTTP requests in HTTP/1.0</a>
+	 * @see <a href="http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal">A proposal for supporting resumable POST/PUT HTTP
+	 *      requests in HTTP/1.0</a>
 	 */
 	CHECKPOINT(103, "Checkpoint"),
 
@@ -315,17 +315,20 @@ public enum HttpStatus {
 	 */
 	I_AM_A_TEAPOT(418, "I'm a teapot"),
 	/**
-	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft Changes</a>
+	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft
+	 *             Changes</a>
 	 */
 	@Deprecated
 	INSUFFICIENT_SPACE_ON_RESOURCE(419, "Insufficient Space On Resource"),
 	/**
-	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft Changes</a>
+	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft
+	 *             Changes</a>
 	 */
 	@Deprecated
 	METHOD_FAILURE(420, "Method Failure"),
 	/**
-	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft Changes</a>
+	 * @deprecated See <a href="http://tools.ietf.org/rfcdiff?difftype=--hwdiff&url2=draft-ietf-webdav-protocol-06.txt">WebDAV Draft
+	 *             Changes</a>
 	 */
 	@Deprecated
 	DESTINATION_LOCKED(421, "Destination Locked"),

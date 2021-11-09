@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicTransferFeeCalculator;
@@ -15,6 +16,6 @@ public class TransactionExecutionStateTest {
 		final TransactionExecutionState state = new TransactionExecutionState(calculator);
 
 		// Assert:
-		Assert.assertThat(state.getMosaicTransferFeeCalculator(), IsSame.sameInstance(calculator));
+		MatcherAssert.assertThat(state.getMosaicTransferFeeCalculator(), IsSame.sameInstance(calculator));
 	}
 }

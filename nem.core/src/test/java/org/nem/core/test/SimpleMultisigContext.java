@@ -82,11 +82,7 @@ public class SimpleMultisigContext {
 	}
 
 	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Hash hash) {
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				cosigner,
-				multisig,
-				hash);
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, hash);
 		transaction.sign();
 		return transaction;
 	}

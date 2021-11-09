@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -62,43 +63,30 @@ public class MosaicSupplyChangeTransactionTest {
 	@Test
 	public void cannotCreateTransactionWithOutOfRangeQuantity() {
 		// Assert:
-		assertCannotCreateTransaction(
-				MOSAIC_ID,
-				MosaicSupplyType.Create,
-				Supply.fromValue(MAX_QUANTITY + 1));
+		assertCannotCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(MAX_QUANTITY + 1));
 	}
 
-	private static void assertCanCreateTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
-			final Supply delta) {
+	private static void assertCanCreateTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType, final Supply delta) {
 		// Act:
 		final MosaicSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, delta);
 
 		// Assert:
 		assertSuperClassValues(transaction);
-		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(mosaicId));
-		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(supplyType));
-		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(delta));
+		MatcherAssert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(mosaicId));
+		MatcherAssert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(supplyType));
+		MatcherAssert.assertThat(transaction.getDelta(), IsEqual.equalTo(delta));
 	}
 
-	private static void assertCannotCreateTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
-			final Supply delta) {
+	private static void assertCannotCreateTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType, final Supply delta) {
 		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, delta), IllegalArgumentException.class);
 	}
 
 	private static void assertTransactionCannotBeCreatedWithNull(final String parameterName) {
 		ExceptionAssert.assertThrows(
-				v -> new MosaicSupplyChangeTransaction(
-						TIME_INSTANT,
-						SIGNER,
-						parameterName.equals("mosaicId") ? null : MOSAIC_ID,
+				v -> new MosaicSupplyChangeTransaction(TIME_INSTANT, SIGNER, parameterName.equals("mosaicId") ? null : MOSAIC_ID,
 						parameterName.equals("supplyType") ? null : MosaicSupplyType.Create,
 						parameterName.equals("quantity") ? null : Supply.fromValue(123L)),
-				IllegalArgumentException.class,
-				ex -> ex.getMessage().contains(parameterName));
+				IllegalArgumentException.class, ex -> ex.getMessage().contains(parameterName));
 	}
 
 	// endregion
@@ -114,7 +102,7 @@ public class MosaicSupplyChangeTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
+		MatcherAssert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
 	}
 
 	// endregion
@@ -130,7 +118,7 @@ public class MosaicSupplyChangeTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Collections.singletonList(SIGNER)));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(Collections.singletonList(SIGNER)));
 	}
 
 	// endregion
@@ -146,9 +134,9 @@ public class MosaicSupplyChangeTransactionTest {
 		final MosaicSupplyChangeTransaction transaction = createRoundTrippedTransaction(original);
 
 		assertSuperClassValues(transaction);
-		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(MOSAIC_ID));
-		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
-		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(MOSAIC_ID));
+		MatcherAssert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
+		MatcherAssert.assertThat(transaction.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -194,7 +182,7 @@ public class MosaicSupplyChangeTransactionTest {
 
 	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -210,11 +198,7 @@ public class MosaicSupplyChangeTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		NotificationUtils.assertMosaicSupplyChangeNotification(
-				values.get(0),
-				transaction.getSigner(),
-				MOSAIC_ID,
-				Supply.fromValue(123),
+		NotificationUtils.assertMosaicSupplyChangeNotification(values.get(0), transaction.getSigner(), MOSAIC_ID, Supply.fromValue(123),
 				MosaicSupplyType.Create);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -234,11 +218,7 @@ public class MosaicSupplyChangeTransactionTest {
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
-		NotificationUtils.assertMosaicSupplyChangeNotification(
-				values.get(1),
-				transaction.getSigner(),
-				MOSAIC_ID,
-				Supply.fromValue(123),
+		NotificationUtils.assertMosaicSupplyChangeNotification(values.get(1), transaction.getSigner(), MOSAIC_ID, Supply.fromValue(123),
 				MosaicSupplyType.Create);
 	}
 
@@ -246,26 +226,19 @@ public class MosaicSupplyChangeTransactionTest {
 
 	private static void assertSuperClassValues(final Transaction transaction) {
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_SUPPLY_CHANGE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_SUPPLY_CHANGE));
+		MatcherAssert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 	}
 
 	private static MosaicSupplyChangeTransaction createTransaction() {
 		return createTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(123));
 	}
 
-	private static MosaicSupplyChangeTransaction createTransaction(
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
+	private static MosaicSupplyChangeTransaction createTransaction(final MosaicId mosaicId, final MosaicSupplyType supplyType,
 			final Supply delta) {
-		return new MosaicSupplyChangeTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				mosaicId,
-				supplyType,
-				delta);
+		return new MosaicSupplyChangeTransaction(TIME_INSTANT, SIGNER, mosaicId, supplyType, delta);
 	}
 }

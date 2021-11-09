@@ -48,14 +48,12 @@ public class ColumnVector {
 
 	private ColumnVector(final Matrix matrix) {
 		// since this is only being called internally, matrix should be a DenseMatrix
-		this.matrix = (DenseMatrix)matrix;
+		this.matrix = (DenseMatrix) matrix;
 		this.vector = this.matrix.getRaw();
 		this.size = this.vector.length;
 	}
 
-	//region matrix delegation
-
-	//region size / {get|set|increment}At
+	// region size / {get|set|increment}At
 
 	/**
 	 * Gets the size of the vector.
@@ -96,16 +94,13 @@ public class ColumnVector {
 		this.matrix.incrementAt(index, 0, val);
 	}
 
-	//endregion
+	// endregion
 
-	//region mutation functions
+	// region mutation functions
 
 	/**
-	 * Normalizes this vector's elements so that the absolute value of all
-	 * elements sums to 1.0.
-	 * <br>
-	 * This method has the side effect of modifying the implicit context
-	 * object, so be careful.
+	 * Normalizes this vector's elements so that the absolute value of all elements sums to 1.0. <br>
+	 * This method has the side effect of modifying the implicit context object, so be careful.
 	 */
 	public void normalize() {
 		this.matrix.normalizeColumns();
@@ -120,13 +115,12 @@ public class ColumnVector {
 		this.matrix.scale(scale);
 	}
 
-	//endregion
+	// endregion
 
-	//region element-wise operations
+	// region element-wise operations
 
 	/**
-	 * Creates a new ColumnVector by multiplying this vector element-wise with
-	 * another vector.
+	 * Creates a new ColumnVector by multiplying this vector element-wise with another vector.
 	 *
 	 * @param vector The vector.
 	 * @return The new vector.
@@ -145,9 +139,9 @@ public class ColumnVector {
 		return this.transform(() -> ColumnVector.this.matrix.addElementWise(vector.matrix));
 	}
 
-	//endregion
+	// endregion
 
-	//region aggregation functions
+	// region aggregation functions
 
 	/**
 	 * Gets the sum of the absolute value of all the vector's elements.
@@ -167,9 +161,9 @@ public class ColumnVector {
 		return this.matrix.sum();
 	}
 
-	//endregion
+	// endregion
 
-	//region transforms
+	// region transforms
 
 	/**
 	 * Creates a new ColumnVector by rounding this vector to the specified number of decimal places.
@@ -224,9 +218,9 @@ public class ColumnVector {
 		return new ColumnVector(matrix);
 	}
 
-	//endregion
+	// endregion
 
-	//region predicates
+	// region predicates
 
 	/**
 	 * Determines if this vector is a zero vector.
@@ -237,11 +231,9 @@ public class ColumnVector {
 		return this.matrix.isZeroMatrix();
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region getRaw / setAll
+	// region getRaw / setAll
 
 	/**
 	 * Gets the underlying, raw array.
@@ -263,14 +255,13 @@ public class ColumnVector {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region align
+	// region align
 
 	/**
-	 * Scales this vector so that v[0] is equal to 1.
-	 * This can help PowerIteration converge faster.
-	 * Alignment will fail if the vector's first element is 0.
+	 * Scales this vector so that v[0] is equal to 1. This can help PowerIteration converge faster. Alignment will fail if the vector's
+	 * first element is 0.
 	 *
 	 * @return true if the alignment was successful; false otherwise.
 	 */
@@ -283,9 +274,9 @@ public class ColumnVector {
 		return true;
 	}
 
-	//endregion
+	// endregion
 
-	//region max / median
+	// region max / median
 
 	/**
 	 * Gets the maximum value for an individual element in this vector.
@@ -311,9 +302,9 @@ public class ColumnVector {
 		return median.evaluate(this.vector);
 	}
 
-	//endregion
+	// endregion
 
-	//region magnitude / distance / correlation
+	// region magnitude / distance / correlation
 
 	/**
 	 * Gets the magnitude of this vector.
@@ -385,9 +376,9 @@ public class ColumnVector {
 		return this.add(-mean);
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Override
 	public String toString() {
@@ -405,9 +396,9 @@ public class ColumnVector {
 		return builder.toString();
 	}
 
-	//endregion
+	// endregion
 
-	//region setNegativesToZero
+	// region setNegativesToZero
 
 	/**
 	 * Sets all negative values to zero.
@@ -416,9 +407,9 @@ public class ColumnVector {
 		this.matrix.removeNegatives();
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -431,9 +422,9 @@ public class ColumnVector {
 			return false;
 		}
 
-		final ColumnVector rhs = (ColumnVector)obj;
+		final ColumnVector rhs = (ColumnVector) obj;
 		return Arrays.equals(this.vector, rhs.vector);
 	}
 
-	//endregion
+	// endregion
 }

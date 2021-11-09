@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -22,14 +23,14 @@ public class BlockedHarvesterPublicKeysTest {
 	@Test
 	public void setSizesMatchExpectedValue() {
 		// Assert:
-		Assert.assertThat(BlockedHarvesterPublicKeys.getAll().size(), IsEqual.equalTo(EXPECTED_SET_SIZE));
+		MatcherAssert.assertThat(BlockedHarvesterPublicKeys.getAll().size(), IsEqual.equalTo(EXPECTED_SET_SIZE));
 	}
 
 	@Test
 	public void existingFundsAtLaunchAreBlockedFromHarvesting() {
 		// Assert:
 		for (final PublicKey coreFundPublicKey : CORE_FUNDS) {
-			Assert.assertThat(BlockedHarvesterPublicKeys.contains(coreFundPublicKey), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(BlockedHarvesterPublicKeys.contains(coreFundPublicKey), IsEqual.equalTo(true));
 		}
 	}
 
@@ -39,21 +40,20 @@ public class BlockedHarvesterPublicKeysTest {
 		final String firstAddressChar = Character.toString(NetworkInfos.getDefault().getAddressStartChar());
 		final List<String> expectedPrefixes = new ArrayList<>();
 		for (int c = 65; c < 65 + 26; c++) {
-			expectedPrefixes.add(firstAddressChar + "AFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "BFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "CFUND" + Character.toString((char)c));
-			expectedPrefixes.add(firstAddressChar + "DFUND" + Character.toString((char)c));
+			expectedPrefixes.add(firstAddressChar + "AFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "BFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "CFUND" + Character.toString((char) c));
+			expectedPrefixes.add(firstAddressChar + "DFUND" + Character.toString((char) c));
 		}
 
 		// Act:
 		final Set<String> addressPrefixes = BlockedHarvesterPublicKeys.getAll().stream()
 				.filter(publicKey -> !CORE_FUNDS.contains(publicKey))
-				.map(publicKey -> Address.fromPublicKey(publicKey).getEncoded().substring(0, 7))
-				.collect(Collectors.toSet());
+				.map(publicKey -> Address.fromPublicKey(publicKey).getEncoded().substring(0, 7)).collect(Collectors.toSet());
 
 		// Assert:
-		Assert.assertThat(addressPrefixes.size(), IsEqual.equalTo(expectedPrefixes.size()));
-		Assert.assertThat(addressPrefixes, IsEquivalent.equivalentTo(expectedPrefixes));
+		MatcherAssert.assertThat(addressPrefixes.size(), IsEqual.equalTo(expectedPrefixes.size()));
+		MatcherAssert.assertThat(addressPrefixes, IsEquivalent.equivalentTo(expectedPrefixes));
 	}
 
 	@Test
@@ -62,6 +62,6 @@ public class BlockedHarvesterPublicKeysTest {
 		final boolean isContained = BlockedHarvesterPublicKeys.contains(new KeyPair().getPublicKey());
 
 		// Assert:
-		Assert.assertThat(isContained, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isContained, IsEqual.equalTo(false));
 	}
 }

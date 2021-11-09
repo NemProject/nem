@@ -46,9 +46,8 @@ public class ArrayUtils {
 	 *
 	 * @param bytes The input array.
 	 * @param splitIndex The index at which the array should be split.
-	 * @return Two arrays split at the splitIndex.
-	 * The first array will contain the first splitIndex elements.
-	 * The second array will contain all trailing elements.
+	 * @return Two arrays split at the splitIndex. The first array will contain the first splitIndex elements. The second array will contain
+	 *         all trailing elements.
 	 */
 	public static byte[][] split(final byte[] bytes, final int splitIndex) {
 		if (splitIndex < 0 || bytes.length < splitIndex) {
@@ -60,7 +59,9 @@ public class ArrayUtils {
 
 		System.arraycopy(bytes, 0, lhs, 0, lhs.length);
 		System.arraycopy(bytes, splitIndex, rhs, 0, rhs.length);
-		return new byte[][] { lhs, rhs };
+		return new byte[][]{
+				lhs, rhs
+		};
 	}
 
 	/**

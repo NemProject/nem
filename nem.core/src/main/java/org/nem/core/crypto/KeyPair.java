@@ -16,8 +16,7 @@ public class KeyPair {
 	}
 
 	/**
-	 * Creates a key pair around a private key.
-	 * The public key is calculated from the private key.
+	 * Creates a key pair around a private key. The public key is calculated from the private key.
 	 *
 	 * @param privateKey The private key.
 	 */
@@ -26,8 +25,7 @@ public class KeyPair {
 	}
 
 	/**
-	 * Creates a key pair around a private key.
-	 * The public key is calculated from the private key.
+	 * Creates a key pair around a private key. The public key is calculated from the private key.
 	 *
 	 * @param privateKey The private key.
 	 * @param engine The crypto engine.
@@ -37,8 +35,7 @@ public class KeyPair {
 	}
 
 	/**
-	 * Creates a key pair around a public key.
-	 * The private key is empty.
+	 * Creates a key pair around a public key. The private key is empty.
 	 *
 	 * @param publicKey The public key.
 	 */
@@ -47,8 +44,7 @@ public class KeyPair {
 	}
 
 	/**
-	 * Creates a key pair around a public key.
-	 * The private key is empty.
+	 * Creates a key pair around a public key. The private key is empty.
 	 *
 	 * @param publicKey The public key.
 	 * @param engine The crypto engine.

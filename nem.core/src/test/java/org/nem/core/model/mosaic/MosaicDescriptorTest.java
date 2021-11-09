@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -12,7 +13,7 @@ import java.util.*;
 public class MosaicDescriptorTest {
 	private static final String MAX_LENGTH_DESCRIPTION = StringUtils.repeat("abcd", 128);
 
-	//region ctor
+	// region ctor
 
 	@Test
 	public void canCreateMosaicDescriptor() {
@@ -20,7 +21,7 @@ public class MosaicDescriptorTest {
 		final MosaicDescriptor descriptor = new MosaicDescriptor("Alice's vouchers");
 
 		// Assert:
-		Assert.assertThat(descriptor.toString(), IsEqual.equalTo("Alice's vouchers"));
+		MatcherAssert.assertThat(descriptor.toString(), IsEqual.equalTo("Alice's vouchers"));
 	}
 
 	@Test
@@ -38,9 +39,9 @@ public class MosaicDescriptorTest {
 		return Arrays.asList(null, "", "  ", "\t  \t");
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteToSerializer() {
@@ -53,8 +54,8 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("description"), IsEqual.equalTo("Alice's vouchers"));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("description"), IsEqual.equalTo("Alice's vouchers"));
 	}
 
 	@Test
@@ -63,7 +64,7 @@ public class MosaicDescriptorTest {
 		final MosaicDescriptor descriptor = readFrom("Alice's vouchers");
 
 		// Assert:
-		Assert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor("Alice's vouchers")));
+		MatcherAssert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor("Alice's vouchers")));
 	}
 
 	@Test
@@ -79,7 +80,7 @@ public class MosaicDescriptorTest {
 		final MosaicDescriptor descriptor = readFrom(MAX_LENGTH_DESCRIPTION + "!");
 
 		// Assert:
-		Assert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor(MAX_LENGTH_DESCRIPTION)));
+		MatcherAssert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor(MAX_LENGTH_DESCRIPTION)));
 	}
 
 	private static MosaicDescriptor readFrom(final String description) {
@@ -115,12 +116,12 @@ public class MosaicDescriptorTest {
 		final MosaicDescriptor descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 
 		// Assert:
-		Assert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor(description)));
+		MatcherAssert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor(description)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsDescription() {
@@ -128,13 +129,14 @@ public class MosaicDescriptorTest {
 		final MosaicDescriptor descriptor = new MosaicDescriptor("Bob's vouchers");
 
 		// Assert:
-		Assert.assertThat(descriptor.toString(), IsEqual.equalTo("Bob's vouchers"));
+		MatcherAssert.assertThat(descriptor.toString(), IsEqual.equalTo("Bob's vouchers"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static Map<String, MosaicDescriptor> createMosaicDescriptorsForEqualityTests() {
 		return new HashMap<String, MosaicDescriptor>() {
 			{
@@ -155,13 +157,12 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDescriptor> entry : createMosaicDescriptorsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(descriptor)) : IsEqual.equalTo(descriptor));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(descriptor)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(descriptor)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(descriptor)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(descriptor)));
 	}
 
 	@Test
@@ -171,8 +172,7 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDescriptor> entry : createMosaicDescriptorsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -181,5 +181,5 @@ public class MosaicDescriptorTest {
 		return !propertyName.equals("default");
 	}
 
-	//endregion
+	// endregion
 }

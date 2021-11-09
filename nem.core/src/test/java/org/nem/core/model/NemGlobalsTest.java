@@ -1,8 +1,8 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.mosaic.*;
 import org.nem.core.test.Utils;
 
 public class NemGlobalsTest {
@@ -12,13 +12,12 @@ public class NemGlobalsTest {
 		Utils.resetGlobals();
 	}
 
-	//region transaction fee calculator
+	// region transaction fee calculator
 
 	@Test
 	public void defaultTransactionFeeCalculatorIsNotNull() {
 		// Assert:
-		Assert.assertThat(
-				NemGlobals.getTransactionFeeCalculator(),
+		MatcherAssert.assertThat(NemGlobals.getTransactionFeeCalculator(),
 				IsInstanceOf.instanceOf(TransactionFeeCalculatorBeforeFork.class));
 	}
 
@@ -31,21 +30,17 @@ public class NemGlobalsTest {
 		NemGlobals.setTransactionFeeCalculator(calculator);
 
 		// Assert:
-		Assert.assertThat(
-				NemGlobals.getTransactionFeeCalculator(),
-				IsEqual.equalTo(calculator));
+		MatcherAssert.assertThat(NemGlobals.getTransactionFeeCalculator(), IsEqual.equalTo(calculator));
 	}
 
-	//endregion
+	// endregion
 
-	//region block chain configuration
+	// region block chain configuration
 
 	@Test
 	public void defaultBlockChainConfigurationIsNotNull() {
 		// Assert:
-		Assert.assertThat(
-				NemGlobals.getBlockChainConfiguration(),
-				IsInstanceOf.instanceOf(BlockChainConfiguration.class));
+		MatcherAssert.assertThat(NemGlobals.getBlockChainConfiguration(), IsInstanceOf.instanceOf(BlockChainConfiguration.class));
 	}
 
 	@Test
@@ -57,10 +52,8 @@ public class NemGlobalsTest {
 		NemGlobals.setBlockChainConfiguration(configuration);
 
 		// Assert:
-		Assert.assertThat(
-				NemGlobals.getBlockChainConfiguration(),
-				IsEqual.equalTo(configuration));
+		MatcherAssert.assertThat(NemGlobals.getBlockChainConfiguration(), IsEqual.equalTo(configuration));
 	}
 
-	//endregion
+	// endregion
 }

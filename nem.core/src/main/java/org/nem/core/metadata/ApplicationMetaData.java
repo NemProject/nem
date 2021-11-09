@@ -25,10 +25,7 @@ public class ApplicationMetaData implements SerializableEntity {
 	 * @param certificate The application certificate.
 	 * @param timeProvider The time provider.
 	 */
-	public ApplicationMetaData(
-			final String appName,
-			final String version,
-			final X509Certificate certificate,
+	public ApplicationMetaData(final String appName, final String version, final X509Certificate certificate,
 			final TimeProvider timeProvider) {
 		this.appName = appName;
 		this.version = version;
@@ -108,9 +105,7 @@ public class ApplicationMetaData implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.appName.hashCode() ^
-				this.version.hashCode() ^
-				(this.certificateSigner == null ? 0 : this.certificateSigner.hashCode());
+		return this.appName.hashCode() ^ this.version.hashCode() ^ (this.certificateSigner == null ? 0 : this.certificateSigner.hashCode());
 	}
 
 	@Override
@@ -119,9 +114,8 @@ public class ApplicationMetaData implements SerializableEntity {
 			return false;
 		}
 
-		final ApplicationMetaData rhs = (ApplicationMetaData)obj;
-		return this.appName.equals(rhs.appName) &&
-				this.version.equals(rhs.version) &&
-				Objects.equals(this.certificateSigner, rhs.certificateSigner);
+		final ApplicationMetaData rhs = (ApplicationMetaData) obj;
+		return this.appName.equals(rhs.appName) && this.version.equals(rhs.version)
+				&& Objects.equals(this.certificateSigner, rhs.certificateSigner);
 	}
 }

@@ -1,6 +1,7 @@
 package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,16 +14,14 @@ public class ErrorResponseTest {
 	@Test
 	public void canBeCreatedAroundException() {
 		// Arrange:
-		final ErrorResponse response = new ErrorResponse(
-				new TimeInstant(18),
-				new RuntimeException("exception message"),
+		final ErrorResponse response = new ErrorResponse(new TimeInstant(18), new RuntimeException("exception message"),
 				HttpStatus.NOT_FOUND);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
-		Assert.assertThat(response.getError(), IsEqual.equalTo("Not Found"));
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(404));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
+		MatcherAssert.assertThat(response.getError(), IsEqual.equalTo("Not Found"));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(404));
 	}
 
 	@Test
@@ -31,10 +30,10 @@ public class ErrorResponseTest {
 		final ErrorResponse response = new ErrorResponse(new TimeInstant(29), "badness", 500);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(29)));
-		Assert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(29)));
+		MatcherAssert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(500));
 	}
 
 	@Test
@@ -43,10 +42,10 @@ public class ErrorResponseTest {
 		final ErrorResponse response = new ErrorResponse(new TimeInstant(18), "exception message", -123);
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
-		Assert.assertThat(response.getError(), IsNull.nullValue());
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(-123));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
+		MatcherAssert.assertThat(response.getError(), IsNull.nullValue());
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("exception message"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(-123));
 	}
 
 	@Test
@@ -60,10 +59,10 @@ public class ErrorResponseTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(18));
-		Assert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
-		Assert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
-		Assert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(18));
+		MatcherAssert.assertThat(jsonObject.get("error"), IsEqual.equalTo("Internal Server Error"));
+		MatcherAssert.assertThat(jsonObject.get("message"), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(jsonObject.get("status"), IsEqual.equalTo(500));
 	}
 
 	@Test
@@ -72,10 +71,10 @@ public class ErrorResponseTest {
 		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(new TimeInstant(18), "badness", 500));
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
-		Assert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
-		Assert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(18)));
+		MatcherAssert.assertThat(response.getError(), IsEqual.equalTo("Internal Server Error"));
+		MatcherAssert.assertThat(response.getMessage(), IsEqual.equalTo("badness"));
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(500));
 	}
 
 	@Test
@@ -84,10 +83,10 @@ public class ErrorResponseTest {
 		final ErrorResponse response = createRoundTrippedResponse(new ErrorResponse(new TimeInstant(54), null, 890));
 
 		// Assert:
-		Assert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(54)));
-		Assert.assertThat(response.getError(), IsNull.nullValue());
-		Assert.assertThat(response.getMessage(), IsNull.nullValue());
-		Assert.assertThat(response.getStatus(), IsEqual.equalTo(890));
+		MatcherAssert.assertThat(response.getTimeStamp(), IsEqual.equalTo(new TimeInstant(54)));
+		MatcherAssert.assertThat(response.getError(), IsNull.nullValue());
+		MatcherAssert.assertThat(response.getMessage(), IsNull.nullValue());
+		MatcherAssert.assertThat(response.getStatus(), IsEqual.equalTo(890));
 	}
 
 	private static ErrorResponse createRoundTrippedResponse(final ErrorResponse originalResponse) {
@@ -99,22 +98,17 @@ public class ErrorResponseTest {
 	@Test
 	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsKnown() {
 		// Assert:
-		Assert.assertThat(
-				"Http Status Code 404: badness",
+		MatcherAssert.assertThat("Http Status Code 404: badness",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", 404).toString()));
-		Assert.assertThat(
-				"Http Status Code 404: Not Found",
+		MatcherAssert.assertThat("Http Status Code 404: Not Found",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, 404).toString()));
 	}
 
 	@Test
 	public void toStringReturnsCorrectRepresentationWhenStatusCodeIsUnknown() {
 		// Assert:
-		Assert.assertThat(
-				"Http Status Code -123: badness",
+		MatcherAssert.assertThat("Http Status Code -123: badness",
 				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), "badness", -123).toString()));
-		Assert.assertThat(
-				"Http Status Code -123",
-				IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, -123).toString()));
+		MatcherAssert.assertThat("Http Status Code -123", IsEqual.equalTo(new ErrorResponse(new TimeInstant(4), null, -123).toString()));
 	}
 }

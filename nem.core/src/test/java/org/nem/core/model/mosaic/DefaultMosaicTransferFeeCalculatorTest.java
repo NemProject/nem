@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -22,7 +23,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -48,7 +49,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -74,8 +75,10 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
+
+	// endregion
 
 	// region percentile xem fees
 
@@ -83,10 +86,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	public void levyCanBeOneXemForTenMosaicsWhenFeeTypeIsPercentile() {
 		// Arrange:
 		// - peg a fee of 1 XEM to 10 PEG
-		final MosaicLevyLookup lookup = id -> new MosaicLevy(
-				MosaicTransferFeeType.Percentile,
-				RECIPIENT,
-				MosaicConstants.MOSAIC_ID_XEM,
+		final MosaicLevyLookup lookup = id -> new MosaicLevy(MosaicTransferFeeType.Percentile, RECIPIENT, MosaicConstants.MOSAIC_ID_XEM,
 				new Quantity(10000L * Amount.MICRONEMS_IN_NEM / 10L));
 		final MosaicTransferFeeCalculator calculator = new DefaultMosaicTransferFeeCalculator(lookup);
 
@@ -105,10 +105,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	public void levyCanBeTenXemForOneMosaicWhenFeeTypeIsPercentile() {
 		// Arrange:
 		// - peg a fee of 10 XEM to 1 PEG
-		final MosaicLevyLookup lookup = id -> new MosaicLevy(
-				MosaicTransferFeeType.Percentile,
-				RECIPIENT,
-				MosaicConstants.MOSAIC_ID_XEM,
+		final MosaicLevyLookup lookup = id -> new MosaicLevy(MosaicTransferFeeType.Percentile, RECIPIENT, MosaicConstants.MOSAIC_ID_XEM,
 				new Quantity(10000L * Amount.MICRONEMS_IN_NEM * 10));
 		final MosaicTransferFeeCalculator calculator = new DefaultMosaicTransferFeeCalculator(lookup);
 
@@ -125,13 +122,11 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 	private static void assertMosaicXemLevy(final MosaicLevy levy, final Amount expectedFee) {
 		// Assert:
-		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(RECIPIENT));
-		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
-		Assert.assertThat(Amount.fromMicroNem(levy.getFee().getRaw()), IsEqual.equalTo(expectedFee));
+		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(RECIPIENT));
+		MatcherAssert.assertThat(levy.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
+		MatcherAssert.assertThat(Amount.fromMicroNem(levy.getFee().getRaw()), IsEqual.equalTo(expectedFee));
 	}
-
-	// endregion
 
 	// endregion
 
@@ -140,12 +135,13 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		return new Mosaic(mosaicId, Quantity.fromValue(quantity));
 	}
 
-	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId, final int expectedFee) {
+	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId,
+			final int expectedFee) {
 		// Assert:
-		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));
-		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(expectedMosaicId)));
-		Assert.assertThat(levy.getFee(), IsEqual.equalTo(new Quantity(expectedFee)));
+		MatcherAssert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		MatcherAssert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));
+		MatcherAssert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(expectedMosaicId)));
+		MatcherAssert.assertThat(levy.getFee(), IsEqual.equalTo(new Quantity(expectedFee)));
 	}
 
 	private static MosaicTransferFeeCalculator createCalculator() {

@@ -29,7 +29,7 @@ public class CodeSourceFacade {
 			return;
 		}
 
-		this.firstCertificate = (X509Certificate)certificates[0];
+		this.firstCertificate = (X509Certificate) certificates[0];
 	}
 
 	/**

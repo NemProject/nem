@@ -1,5 +1,6 @@
 package org.nem.core.serialization.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -7,7 +8,9 @@ import org.nem.core.test.MockSerializableEntity;
 
 import java.util.*;
 
-public abstract class AbstractObjectArraySerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, List<MockSerializableEntity>> {
+public abstract class AbstractObjectArraySerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, List<MockSerializableEntity>> {
 	public AbstractObjectArraySerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}
@@ -22,7 +25,7 @@ public abstract class AbstractObjectArraySerializationTest<TSerializer extends S
 		this.assertCanRoundtrip(objects);
 
 		// Sanity:
-		Assert.assertThat(objects.get(1), IsNull.nullValue());
+		MatcherAssert.assertThat(objects.get(1), IsNull.nullValue());
 	}
 
 	@Test

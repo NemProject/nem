@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -23,9 +24,7 @@ public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 15000;
 
-	private static <T> HttpMethodClient.AsyncToken<T> sendPost(
-			final HttpMethodClient<T> client,
-			final URL url,
+	private static <T> HttpMethodClient.AsyncToken<T> sendPost(final HttpMethodClient<T> client, final URL url,
 			final HttpResponseStrategy<T> responseStrategy) {
 		return client.post(url, new HttpJsonPostRequest(new MockSerializableEntity()), responseStrategy);
 	}
@@ -52,9 +51,7 @@ public class HttpMethodClientTest {
 		private static final String HOST_LESS_URI = "file:///~/calendar";
 
 		public interface SendAsyncStrategy {
-			<T> HttpMethodClient.AsyncToken<T> send(
-					final HttpMethodClient<T> client,
-					final URL url,
+			<T> HttpMethodClient.AsyncToken<T> send(final HttpMethodClient<T> client, final URL url,
 					final HttpResponseStrategy<T> responseStrategy);
 		}
 
@@ -75,8 +72,7 @@ public class HttpMethodClientTest {
 			client.close();
 
 			// Assert: this should fail because the underlying client is closed
-			ExceptionAssert.assertThrows(
-					v -> this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get(),
+			ExceptionAssert.assertThrows(v -> this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get(),
 					IllegalStateException.class);
 		}
 
@@ -89,9 +85,9 @@ public class HttpMethodClientTest {
 			final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get();
 
 			// Assert:
-			Assert.assertThat(deserializer, IsNull.notNullValue());
-			Assert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
-			Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
+			MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
+			MatcherAssert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
+			MatcherAssert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 		}
 
 		@Test
@@ -117,9 +113,9 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
 
 			// Assert:
-			Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
-			Assert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
-			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
+			MatcherAssert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
+			MatcherAssert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
+			MatcherAssert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
 		@Test(expected = InactivePeerException.class)
@@ -165,8 +161,7 @@ public class HttpMethodClientTest {
 		}
 
 		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
-			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(
-					WireMock.aResponse().withStatus(200));
+			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(WireMock.aResponse().withStatus(200));
 		}
 
 		@Test(expected = CancellationException.class)
@@ -175,9 +170,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Deserializer> client = createClient(1);
 
 			// Act:
-			final HttpMethodClient.AsyncToken<Deserializer> token = this.strategy.send(
-					client,
-					this.stringToUrl(GOOD_URL),
+			final HttpMethodClient.AsyncToken<Deserializer> token = this.strategy.send(client, this.stringToUrl(GOOD_URL),
 					DEFAULT_STRATEGY);
 			token.abort();
 			token.get();
@@ -204,10 +197,7 @@ public class HttpMethodClientTest {
 		@Test(expected = CancellationException.class)
 		public void sendIsCancelledIfOperationTakesTooLong() {
 			// Arrange:
-			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(
-					100 * GOOD_TIMEOUT,
-					100 * GOOD_TIMEOUT,
-					GOOD_TIMEOUT / 20);
+			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(100 * GOOD_TIMEOUT, 100 * GOOD_TIMEOUT, GOOD_TIMEOUT / 20);
 
 			// Act:
 			this.strategy.send(client, this.stringToUrl("http://10.255.255.1"), DEFAULT_STRATEGY).get();

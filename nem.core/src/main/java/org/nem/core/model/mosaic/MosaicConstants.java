@@ -12,8 +12,10 @@ import java.util.Properties;
  */
 public class MosaicConstants {
 	// TODO 20150813 J-*: we need to make these accounts multisig before moving to mainnet
-	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
-	private static final PublicKey MOSAIC_CREATION_FEE_SINK_KEY = PublicKey.fromHexString("53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3");
+	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey
+			.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey MOSAIC_CREATION_FEE_SINK_KEY = PublicKey
+			.fromHexString("53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3");
 
 	/**
 	 * The maximum allowable quantity of a mosaic.
@@ -62,12 +64,7 @@ public class MosaicConstants {
 		properties.put("initialSupply", "8999999999");
 		properties.put("mutableSupply", "false");
 		properties.put("transferable", "true");
-		return new MosaicDefinition(
-				NAMESPACE_OWNER_NEM,
-				MOSAIC_ID_XEM,
-				descriptor,
-				new DefaultMosaicProperties(properties),
-				null);
+		return new MosaicDefinition(NAMESPACE_OWNER_NEM, MOSAIC_ID_XEM, descriptor, new DefaultMosaicProperties(properties), null);
 	}
 
 	public static void setAccounts() {

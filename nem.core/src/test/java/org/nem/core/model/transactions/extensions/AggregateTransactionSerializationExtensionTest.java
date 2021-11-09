@@ -10,15 +10,15 @@ import java.util.*;
 
 public class AggregateTransactionSerializationExtensionTest {
 
-	//region serialize
+	// region serialize
 
 	@Test
 	public void serializeCallsApplicableChildExtension() {
 		// Arrange:
 		final Serializer serializer = Mockito.mock(Serializer.class);
 		final TransactionSerializationExtension<Object> extension = createMockExtension(true);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -34,8 +34,8 @@ public class AggregateTransactionSerializationExtensionTest {
 		// Arrange:
 		final Serializer serializer = Mockito.mock(Serializer.class);
 		final TransactionSerializationExtension<Object> extension = createMockExtension(false);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -53,8 +53,8 @@ public class AggregateTransactionSerializationExtensionTest {
 		final TransactionSerializationExtension<Object> extension1 = createMockExtension(true);
 		final TransactionSerializationExtension<Object> extension2 = createMockExtension(false);
 		final TransactionSerializationExtension<Object> extension3 = createMockExtension(true);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Arrays.asList(extension1, extension2, extension3));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Arrays.asList(extension1, extension2, extension3));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -66,17 +66,17 @@ public class AggregateTransactionSerializationExtensionTest {
 		Mockito.verify(extension3, Mockito.times(1)).serialize(serializer, transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//region deserialize
+	// region deserialize
 
 	@Test
 	public void deserializeCallsApplicableChildExtension() {
 		// Arrange:
 		final Deserializer deserializer = Mockito.mock(Deserializer.class);
 		final TransactionSerializationExtension<Object> extension = createMockExtension(true);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -92,8 +92,8 @@ public class AggregateTransactionSerializationExtensionTest {
 		// Arrange:
 		final Deserializer deserializer = Mockito.mock(Deserializer.class);
 		final TransactionSerializationExtension<Object> extension = createMockExtension(false);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Collections.singletonList(extension));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Collections.singletonList(extension));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -111,8 +111,8 @@ public class AggregateTransactionSerializationExtensionTest {
 		final TransactionSerializationExtension<Object> extension1 = createMockExtension(true);
 		final TransactionSerializationExtension<Object> extension2 = createMockExtension(false);
 		final TransactionSerializationExtension<Object> extension3 = createMockExtension(true);
-		final AggregateTransactionSerializationExtension<Object> aggregate =
-				new AggregateTransactionSerializationExtension<>(Arrays.asList(extension1, extension2, extension3));
+		final AggregateTransactionSerializationExtension<Object> aggregate = new AggregateTransactionSerializationExtension<>(
+				Arrays.asList(extension1, extension2, extension3));
 
 		// Act:
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
@@ -124,7 +124,7 @@ public class AggregateTransactionSerializationExtensionTest {
 		Mockito.verify(extension3, Mockito.times(1)).deserialize(deserializer, transaction);
 	}
 
-	//endregion
+	// endregion
 
 	@SuppressWarnings("unchecked")
 	private static TransactionSerializationExtension<Object> createMockExtension(final boolean isApplicable) {

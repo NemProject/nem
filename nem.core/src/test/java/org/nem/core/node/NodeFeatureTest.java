@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -8,9 +9,10 @@ import java.util.*;
 
 public class NodeFeatureTest {
 
-	//region fromString
+	// region fromString
 
 	@Test
+	@SuppressWarnings("serial")
 	public void fromStringCanParseValidNodeFeaturesStringRepresentation() {
 		// Arrange:
 		final Map<String, NodeFeature> expectedMappings = new HashMap<String, NodeFeature>() {
@@ -26,24 +28,22 @@ public class NodeFeatureTest {
 			final NodeFeature feature = NodeFeature.fromString(entry.getKey());
 
 			// Assert:
-			Assert.assertThat(feature, IsEqual.equalTo(entry.getValue()));
+			MatcherAssert.assertThat(feature, IsEqual.equalTo(entry.getValue()));
 		}
 
 		// Assert:
-		Assert.assertThat(expectedMappings.size(), IsEqual.equalTo(NodeFeature.values().length));
+		MatcherAssert.assertThat(expectedMappings.size(), IsEqual.equalTo(NodeFeature.values().length));
 	}
 
 	@Test
 	public void fromStringCannotParseInvalidNodeFeaturesStringRepresentation() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> NodeFeature.fromString("BLAH"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> NodeFeature.fromString("BLAH"), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region value / or / explode
+	// region value / or / explode
 
 	@Test
 	public void valueReturnsUnderlyingValue() {
@@ -51,7 +51,7 @@ public class NodeFeatureTest {
 		final NodeFeature feature = NodeFeature.TRANSACTION_HASH_LOOKUP;
 
 		// Assert:
-		Assert.assertThat(feature.value(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(feature.value(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class NodeFeatureTest {
 		final int value = NodeFeature.or();
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(0));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -69,7 +69,7 @@ public class NodeFeatureTest {
 		final int value = NodeFeature.or(NodeFeature.HISTORICAL_ACCOUNT_DATA);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(2));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class NodeFeatureTest {
 		final int value = NodeFeature.or(NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(5));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(5));
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(0);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] {}));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{}));
 	}
 
 	@Test
@@ -96,7 +96,9 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(2);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.HISTORICAL_ACCOUNT_DATA
+		}));
 	}
 
 	@Test
@@ -105,8 +107,10 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(5);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2 }));
+		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{
+				NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2
+		}));
 	}
 
-	//endregion
+	// endregion
 }

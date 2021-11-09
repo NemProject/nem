@@ -81,7 +81,7 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements
 		serializer.writeLong("height", this.getRaw());
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a block height object.
@@ -105,5 +105,5 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements
 		return new BlockHeight(deserializer.readLong(label));
 	}
 
-	//endregion
+	// endregion
 }

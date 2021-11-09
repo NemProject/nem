@@ -1,11 +1,12 @@
 package org.nem.core.model.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
 public class ClusterIdTest {
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeId() {
@@ -19,7 +20,7 @@ public class ClusterIdTest {
 		final ClusterId id = new ClusterId(0);
 
 		// Assert:
-		Assert.assertThat(id.getValue(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -28,7 +29,7 @@ public class ClusterIdTest {
 		final ClusterId id = new ClusterId(1);
 
 		// Assert:
-		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -37,8 +38,8 @@ public class ClusterIdTest {
 		final ClusterId id = new ClusterId(new NodeId(1));
 
 		// Assert:
-		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 }

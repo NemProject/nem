@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -8,7 +9,7 @@ import org.nem.core.test.Utils;
 
 public class HashShortIdTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canBeCreated() {
@@ -16,12 +17,12 @@ public class HashShortIdTest {
 		final HashShortId shortId = new HashShortId(1234L);
 
 		// Assert:
-		Assert.assertThat(shortId.getValue(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(shortId.getValue(), IsEqual.equalTo(1234L));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void hashShortIdCanBeSerialized() {
@@ -34,7 +35,7 @@ public class HashShortIdTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.get("hashShortId"), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(jsonObject.get("hashShortId"), IsEqual.equalTo(123L));
 	}
 
 	@Test
@@ -43,7 +44,7 @@ public class HashShortIdTest {
 		final HashShortId height = createRoundTrippedHashShortId(new HashShortId(123L));
 
 		// Assert:
-		Assert.assertThat(height.getRaw(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(height.getRaw(), IsEqual.equalTo(123L));
 	}
 
 	private static HashShortId createRoundTrippedHashShortId(final HashShortId originalHasShortId) {
@@ -52,5 +53,5 @@ public class HashShortIdTest {
 		return new HashShortId(deserializer);
 	}
 
-	//endregion
+	// endregion
 }

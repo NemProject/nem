@@ -26,12 +26,8 @@ public class MosaicSupplyChangeTransaction extends Transaction {
 	 * @param supplyType The supply type.
 	 * @param delta The delta.
 	 */
-	public MosaicSupplyChangeTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final MosaicId mosaicId,
-			final MosaicSupplyType supplyType,
-			final Supply delta) {
+	public MosaicSupplyChangeTransaction(final TimeInstant timeStamp, final Account sender, final MosaicId mosaicId,
+			final MosaicSupplyType supplyType, final Supply delta) {
 		super(TransactionTypes.MOSAIC_SUPPLY_CHANGE, 1, timeStamp, sender);
 		this.mosaicId = mosaicId;
 		this.supplyType = supplyType;

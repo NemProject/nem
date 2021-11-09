@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,7 +16,7 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(null);
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
+		MatcherAssert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/json"));
 	}
 
 	@Test(expected = FatalPeerException.class)
@@ -24,13 +25,12 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 
 		// Act:
-		coerceDeserializer(new byte[] {}, accountLookup);
+		coerceDeserializer(new byte[]{}, accountLookup);
 	}
 
 	@Override
-	protected Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException {
+	protected Deserializer coerceDeserializer(final SerializableEntity originalEntity, final AccountLookup accountLookup)
+			throws IOException {
 		// Arrange:
 		final byte[] serializedBytes = JsonSerializer.serializeToBytes(originalEntity);
 
@@ -38,9 +38,7 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		return coerceDeserializer(serializedBytes, accountLookup);
 	}
 
-	private static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
+	private static Deserializer coerceDeserializer(final byte[] serializedBytes, final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final HttpDeserializerResponseStrategy strategy = new HttpJsonResponseStrategy(context);

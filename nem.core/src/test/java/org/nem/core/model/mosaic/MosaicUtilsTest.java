@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -10,7 +11,7 @@ import org.nem.core.test.ExceptionAssert;
 @RunWith(Enclosed.class)
 public class MosaicUtilsTest {
 
-	//region add / tryAdd
+	// region add / tryAdd
 
 	private static abstract class AddBaseTest {
 
@@ -57,8 +58,7 @@ public class MosaicUtilsTest {
 		@Override
 		protected void assertCannotAdd(final int divisibility, final long s1, final long s2) {
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2)),
+			ExceptionAssert.assertThrows(v -> MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2)),
 					IllegalArgumentException.class);
 		}
 
@@ -68,7 +68,7 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.add(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
+			MatcherAssert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
 		}
 	}
 
@@ -80,7 +80,7 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.tryAdd(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsNull.nullValue());
+			MatcherAssert.assertThat(sum, IsNull.nullValue());
 		}
 
 		@Override
@@ -89,17 +89,15 @@ public class MosaicUtilsTest {
 			final Supply sum = MosaicUtils.tryAdd(divisibility, new Supply(s1), new Supply(s2));
 
 			// Assert:
-			Assert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
+			MatcherAssert.assertThat(sum, IsEqual.equalTo(new Supply(expectedSum)));
 		}
 	}
 
-	//endregion
-
-	//region conversions
+	// endregion
 
 	public static class ConversionTest {
 
-		//region toSupply
+		// region toSupply
 
 		@Test
 		public void canConvertQuantityToSupplyWhenDivisibilityIsZero() {
@@ -127,12 +125,12 @@ public class MosaicUtilsTest {
 			final Supply supply = MosaicUtils.toSupply(quantity, divisibility);
 
 			// Assert:
-			Assert.assertThat(supply, IsEqual.equalTo(expectedSupply));
+			MatcherAssert.assertThat(supply, IsEqual.equalTo(expectedSupply));
 		}
 
-		//endregion
+		// endregion
 
-		//region toQuantity
+		// region toQuantity
 
 		@Test
 		public void canConvertSupplyToQuantityWhenDivisibilityIsZero() {
@@ -153,11 +151,9 @@ public class MosaicUtilsTest {
 			final Quantity quantity = MosaicUtils.toQuantity(supply, divisibility);
 
 			// Assert:
-			Assert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
+			MatcherAssert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
 		}
 
-		//endregion
+		// endregion
 	}
-
-	//endregion
 }

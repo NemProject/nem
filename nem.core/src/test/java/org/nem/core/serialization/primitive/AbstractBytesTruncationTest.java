@@ -5,7 +5,9 @@ import org.nem.core.test.Utils;
 
 import java.util.Arrays;
 
-public abstract class AbstractBytesTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveTruncationTest<TSerializer, TDeserializer, byte[]> {
+public abstract class AbstractBytesTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveTruncationTest<TSerializer, TDeserializer, byte[]> {
 
 	public AbstractBytesTruncationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);

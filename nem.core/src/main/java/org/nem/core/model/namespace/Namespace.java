@@ -5,8 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
 /**
- * Represents a namespace that is owned by an account (immutable).
- * The ownership is temporary and therefore associated with a block height.
+ * Represents a namespace that is owned by an account (immutable). The ownership is temporary and therefore associated with a block height.
  */
 public class Namespace implements SerializableEntity {
 	private final NamespaceId id;
@@ -20,10 +19,7 @@ public class Namespace implements SerializableEntity {
 	 * @param owner The owner address.
 	 * @param height The block height at which the ownership begins.
 	 */
-	public Namespace(
-			final NamespaceId id,
-			final Account owner,
-			final BlockHeight height) {
+	public Namespace(final NamespaceId id, final Account owner, final BlockHeight height) {
 		this.id = id;
 		this.owner = owner;
 		this.height = height;
@@ -102,7 +98,7 @@ public class Namespace implements SerializableEntity {
 			return false;
 		}
 
-		final Namespace rhs = (Namespace)obj;
+		final Namespace rhs = (Namespace) obj;
 		return this.id.equals(rhs.id);
 	}
 }

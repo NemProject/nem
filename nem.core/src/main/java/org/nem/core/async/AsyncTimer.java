@@ -72,20 +72,15 @@ public class AsyncTimer implements Closeable {
 
 		try {
 			this.visitor.notifyOperationStart();
-			return this.recurringFutureSupplier.get()
-					.thenAccept(v -> this.visitor.notifyOperationComplete())
-					.exceptionally(e -> {
-						this.visitor.notifyOperationCompleteExceptionally(e);
-						return null;
-					})
-					.thenAccept(v -> {
-						this.firstRecurrenceFuture.complete(null);
-						this.chain(this.delay.next());
-					});
+			return this.recurringFutureSupplier.get().thenAccept(v -> this.visitor.notifyOperationComplete()).exceptionally(e -> {
+				this.visitor.notifyOperationCompleteExceptionally(e);
+				return null;
+			}).thenAccept(v -> {
+				this.firstRecurrenceFuture.complete(null);
+				this.chain(this.delay.next());
+			});
 		} catch (Exception e) {
-			LOGGER.warning(String.format("Timer %s raised exception during start: %s",
-					this.visitor.getTimerName(),
-					e.toString()));
+			LOGGER.warning(String.format("Timer %s raised exception during start: %s", this.visitor.getTimerName(), e.toString()));
 			this.chain(this.delay.next());
 			return CompletableFuture.completedFuture(null);
 		}

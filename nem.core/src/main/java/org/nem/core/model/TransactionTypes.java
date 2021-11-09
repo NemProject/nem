@@ -103,12 +103,7 @@ public class TransactionTypes {
 	 * @return The types.
 	 */
 	public static Collection<Integer> getMultisigEmbeddableTypes() {
-		return Arrays.asList(
-				TRANSFER,
-				IMPORTANCE_TRANSFER,
-				MULTISIG_AGGREGATE_MODIFICATION,
-				PROVISION_NAMESPACE,
-				MOSAIC_DEFINITION_CREATION,
-				MOSAIC_SUPPLY_CHANGE);
+		return Arrays.asList(TRANSFER, IMPORTANCE_TRANSFER, MULTISIG_AGGREGATE_MODIFICATION, PROVISION_NAMESPACE,
+				MOSAIC_DEFINITION_CREATION, MOSAIC_SUPPLY_CHANGE);
 	}
 }

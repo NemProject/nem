@@ -22,9 +22,7 @@ public abstract class HttpDeserializerResponseStrategy implements HttpResponseSt
 				final byte[] responseBytes = IOUtils.toByteArray(responseStream);
 
 				if (statusCode != HttpStatus.OK.value()) {
-					final String message = String.format(
-							"Peer returned %s with error: <%s>",
-							statusCode,
+					final String message = String.format("Peer returned %s with error: <%s>", statusCode,
 							StringEncoder.getString(responseBytes));
 					throw new FatalPeerException(message);
 				}

@@ -1,6 +1,7 @@
 package org.nem.core.model.namespace;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -41,16 +42,14 @@ public class NamespaceIdTest {
 		final NamespaceId namespaceId = new NamespaceId(s);
 
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo(s));
+		MatcherAssert.assertThat(namespaceId.toString(), IsEqual.equalTo(s));
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdWithUppercaseCharacters() {
 		// Assert:
 		final String[] invalid = {
-				"Foo.bar.baz",
-				"foo.BAR.baz",
-				"foo.bar.baZ"
+				"Foo.bar.baz", "foo.BAR.baz", "foo.bar.baZ"
 		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class, s));
 	}
@@ -59,16 +58,7 @@ public class NamespaceIdTest {
 	public void cannotCreateNamespaceIdFromInvalidString() {
 		// Assert:
 		final String[] invalid = {
-				"",
-				".",
-				"..",
-				"foo.",
-				".foo",
-				"foo..foo",
-				"fooä",
-				"foo bar",
-				"foo. .bar",
-				"0123456789abcdefg",
+				"", ".", "..", "foo.", ".foo", "foo..foo", "fooä", "foo bar", "foo. .bar", "0123456789abcdefg",
 				"foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"
 		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class));
@@ -76,15 +66,13 @@ public class NamespaceIdTest {
 
 	// endregion
 
-	// region getRoot / getParent
-
 	// region isRoot
 
 	@Test
 	public void isRootReturnsTrueForRootNamespaceIds() {
 		// Assert:
 		for (final String name : Arrays.asList("foo", "bar", "baz")) {
-			Assert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -92,11 +80,13 @@ public class NamespaceIdTest {
 	public void isRootReturnsFalseForNonRootNamespaceIds() {
 		// Assert:
 		for (final String name : Arrays.asList("foo.bar", "bar.baz", "baz.foo.bar")) {
-			Assert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(false));
 		}
 	}
 
 	// endregion
+
+	// region getRoot / getParent
 
 	@Test
 	public void getRootReturnsExpectedRoot() {
@@ -107,7 +97,7 @@ public class NamespaceIdTest {
 		final NamespaceId root = namespaceId.getRoot();
 
 		// Assert:
-		Assert.assertThat(root, IsEqual.equalTo(new NamespaceId("foo")));
+		MatcherAssert.assertThat(root, IsEqual.equalTo(new NamespaceId("foo")));
 	}
 
 	@Test
@@ -119,7 +109,7 @@ public class NamespaceIdTest {
 		final NamespaceId parent = namespaceId.getParent();
 
 		// Assert:
-		Assert.assertThat(parent, IsNull.nullValue());
+		MatcherAssert.assertThat(parent, IsNull.nullValue());
 	}
 
 	@Test
@@ -131,7 +121,7 @@ public class NamespaceIdTest {
 		final NamespaceId parent = namespaceId.getParent();
 
 		// Assert:
-		Assert.assertThat(parent, IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(parent, IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
 	// endregion
@@ -147,7 +137,7 @@ public class NamespaceIdTest {
 		final NamespaceIdPart part = namespaceId.getLastPart();
 
 		// Assert:
-		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("baz")));
+		MatcherAssert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("baz")));
 	}
 
 	// endregion
@@ -161,8 +151,8 @@ public class NamespaceIdTest {
 		final NamespaceId sublevelId = new NamespaceId("foo.bar.baz");
 
 		// Assert:
-		Assert.assertThat(rootId.getLevel(), IsEqual.equalTo(0));
-		Assert.assertThat(sublevelId.getLevel(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(rootId.getLevel(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(sublevelId.getLevel(), IsEqual.equalTo(2));
 	}
 
 	// endregion
@@ -179,12 +169,12 @@ public class NamespaceIdTest {
 		final NamespaceId result = namespaceId.concat(part);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
 	}
 
 	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteToSerializer() {
@@ -197,8 +187,8 @@ public class NamespaceIdTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("id"), IsEqual.equalTo("foo.bar"));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("id"), IsEqual.equalTo("foo.bar"));
 	}
 
 	@Test
@@ -212,7 +202,7 @@ public class NamespaceIdTest {
 		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "id");
 
 		// Assert:
-		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
 	@Test
@@ -227,10 +217,10 @@ public class NamespaceIdTest {
 		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "id");
 
 		// Assert:
-		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
-	//endregion
+	// endregion
 
 	// region toString
 
@@ -243,13 +233,14 @@ public class NamespaceIdTest {
 		final String name = namespaceId.toString();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("foo.bar.baz"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("foo.bar.baz"));
 	}
 
 	// endregion
 
 	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static Map<String, NamespaceId> createNamespaceIdsForEqualityTests() {
 		return new HashMap<String, NamespaceId>() {
 			{
@@ -270,13 +261,12 @@ public class NamespaceIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(id)) : IsEqual.equalTo(id));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(id)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(id)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(id)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(id)));
 	}
 
 	@Test
@@ -286,8 +276,7 @@ public class NamespaceIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}

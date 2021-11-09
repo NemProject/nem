@@ -101,8 +101,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	/**
-	 * Creates a mock transaction.
-	 * This overload is intended to be used for comparison tests.
+	 * Creates a mock transaction. This overload is intended to be used for comparison tests.
 	 *
 	 * @param type The transaction type.
 	 * @param customField The initial custom field value.
@@ -115,8 +114,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	/**
-	 * Creates a mock transaction.
-	 * This overload is intended to be used for comparison tests.
+	 * Creates a mock transaction. This overload is intended to be used for comparison tests.
 	 *
 	 * @param type The transaction type.
 	 * @param version The transaction version.

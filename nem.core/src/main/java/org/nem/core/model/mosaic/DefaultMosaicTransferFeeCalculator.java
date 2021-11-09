@@ -41,12 +41,9 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 				return levy;
 			case Percentile:
 				// fee is percentile based (10000 is 100%) of the minimum divisible part of the other asset
-				return new MosaicLevy(
-						MosaicTransferFeeType.Absolute,
-						levy.getRecipient(),
-						levy.getMosaicId(),
+				return new MosaicLevy(MosaicTransferFeeType.Absolute, levy.getRecipient(), levy.getMosaicId(),
 						Quantity.fromValue((mosaic.getQuantity().getRaw() * levy.getFee().getRaw()) / 10_000L));
-			default:
+			default :
 				throw new UnsupportedOperationException("cannot calculate fee from unknown fee type");
 		}
 	}

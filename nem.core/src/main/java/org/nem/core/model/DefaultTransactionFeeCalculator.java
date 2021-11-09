@@ -15,23 +15,16 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	private final BlockHeight[] forkHeights;
 	private final TransactionFeeCalculator[] calculators;
 
-	public DefaultTransactionFeeCalculator(
-			final MosaicFeeInformationLookup mosaicFeeInformationLookup,
-			final Supplier<BlockHeight> heightSupplier,
-			final BlockHeight[] forkHeights) {
-		this(
-				heightSupplier,
-				forkHeights,
-				new TransactionFeeCalculator[] {
-						new TransactionFeeCalculatorBeforeFork(mosaicFeeInformationLookup),
-						new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup),
-						new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)
-				});
+	public DefaultTransactionFeeCalculator(final MosaicFeeInformationLookup mosaicFeeInformationLookup,
+			final Supplier<BlockHeight> heightSupplier, final BlockHeight[] forkHeights) {
+		this(heightSupplier, forkHeights, new TransactionFeeCalculator[]{
+				new TransactionFeeCalculatorBeforeFork(mosaicFeeInformationLookup),
+				new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup),
+				new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)
+		});
 	}
 
-	public DefaultTransactionFeeCalculator(
-			final Supplier<BlockHeight> heightSupplier,
-			final BlockHeight[] forkHeights,
+	public DefaultTransactionFeeCalculator(final Supplier<BlockHeight> heightSupplier, final BlockHeight[] forkHeights,
 			final TransactionFeeCalculator[] calculators) {
 		if (forkHeights.length + 1 != calculators.length) {
 			throw new RuntimeException("number of fee forks mismatch number of fee calculators");

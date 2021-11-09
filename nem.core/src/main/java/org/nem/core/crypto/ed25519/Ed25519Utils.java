@@ -12,8 +12,8 @@ import java.util.Arrays;
 public class Ed25519Utils {
 
 	/**
-	 * Prepares a private key's raw value for scalar multiplication.
-	 * The hashing is for achieving better randomness and the clamping prevents small subgroup attacks.
+	 * Prepares a private key's raw value for scalar multiplication. The hashing is for achieving better randomness and the clamping
+	 * prevents small subgroup attacks.
 	 *
 	 * @param key The private key.
 	 * @return The prepared encoded field element.

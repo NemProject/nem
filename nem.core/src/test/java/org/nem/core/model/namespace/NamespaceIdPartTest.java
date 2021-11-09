@@ -1,5 +1,6 @@
 package org.nem.core.model.namespace;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -14,9 +15,7 @@ public class NamespaceIdPartTest {
 	public void canCreateNamespaceIdPartFromValidString() {
 		// Arrange:
 		final String[] validNames = {
-				"foo",
-				"foo-bar",
-				"f_"
+				"foo", "foo-bar", "f_"
 		};
 
 		// Act:
@@ -24,39 +23,39 @@ public class NamespaceIdPartTest {
 			final NamespaceIdPart part = new NamespaceIdPart(name);
 
 			// Assert:
-			Assert.assertThat(part.toString(), IsEqual.equalTo(name));
+			MatcherAssert.assertThat(part.toString(), IsEqual.equalTo(name));
 		});
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartWithUppercaseCharacters() {
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new NamespaceIdPart("FoO"),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NamespaceIdPart("FoO"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartFromEmptyString() {
 		// Assert:
 		for (final String name : Arrays.asList(null, "", " \t ")) {
-			ExceptionAssert.assertThrows(
-					v -> new NamespaceIdPart(name),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new NamespaceIdPart(name), IllegalArgumentException.class);
 		}
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartStartingWithSymbols() {
 		// Assert:
-		final String[] invalid = { "_", "-", "-foo", "_bar" };
+		final String[] invalid = {
+				"_", "-", "-foo", "_bar"
+		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartFromStringContainingDisallowedCharacters() {
 		// Assert:
-		final String[] invalid = { ".", "foo.", "fooä", "foo ", "foo bar" };
+		final String[] invalid = {
+				".", "foo.", "fooä", "foo ", "foo bar"
+		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
@@ -73,13 +72,14 @@ public class NamespaceIdPartTest {
 		final String name = part.toString();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("foo"));
 	}
 
 	// endregion
 
 	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static Map<String, NamespaceIdPart> createPartsForEqualityTests() {
 		return new HashMap<String, NamespaceIdPart>() {
 			{
@@ -96,13 +96,12 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(part)) : IsEqual.equalTo(part));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(part)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(part)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(part)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(part)));
 	}
 
 	@Test
@@ -112,8 +111,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -124,4 +122,3 @@ public class NamespaceIdPartTest {
 
 	// endregion
 }
-

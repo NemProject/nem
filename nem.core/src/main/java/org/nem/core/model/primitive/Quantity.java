@@ -35,7 +35,7 @@ public class Quantity extends AbstractQuantity<Quantity> {
 		return new Quantity(quantity);
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a Quantity object.
@@ -59,5 +59,5 @@ public class Quantity extends AbstractQuantity<Quantity> {
 		return new Quantity(deserializer.readLong(label));
 	}
 
-	//endregion
+	// endregion
 }

@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -14,16 +15,14 @@ import java.util.Collection;
 @RunWith(Enclosed.class)
 public class TransactionFactoryTest {
 
-	//region General
-
 	public static class General {
 
-		//region size / isSupported
+		// region size / isSupported
 
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(TransactionTypes.getActiveTypes().size()));
+			MatcherAssert.assertThat(TransactionFactory.size(), IsEqual.equalTo(TransactionTypes.getActiveTypes().size()));
 		}
 
 		@Test
@@ -37,22 +36,22 @@ public class TransactionFactoryTest {
 				final boolean isSupported = TransactionFactory.isSupported(type);
 
 				// Assert:
-				Assert.assertThat(isSupported, IsEqual.equalTo(true));
+				MatcherAssert.assertThat(isSupported, IsEqual.equalTo(true));
 			}
 
-			Assert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionFactory.size()));
+			MatcherAssert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionFactory.size()));
 		}
 
 		@Test
 		public void isSupportedReturnsFalseForUnsupportedTypes() {
 			// Assert:
-			Assert.assertThat(TransactionFactory.isSupported(9999), IsEqual.equalTo(false));
-			Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(TransactionFactory.isSupported(9999), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
 		}
 
-		//endregion
+		// endregion
 
-		//region Unknown Transaction Type
+		// region Unknown Transaction Type
 
 		@Test(expected = IllegalArgumentException.class)
 		public void cannotDeserializeUnknownTransaction() {
@@ -65,12 +64,10 @@ public class TransactionFactoryTest {
 			TransactionFactory.VERIFIABLE.deserialize(deserializer);
 		}
 
-		//endregion
+		// endregion
 	}
 
-	//endregion
-
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -103,34 +100,31 @@ public class TransactionFactoryTest {
 			assertCanDeserializeNonVerifiable(originalTransaction, this.entry.modelClass, this.entry.type);
 		}
 
-		private static void assertCanDeserializeVerifiable(
-				final Transaction originalTransaction,
-				final Class expectedClass,
+		private static void assertCanDeserializeVerifiable(final Transaction originalTransaction, final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
 			final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
 			final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
 			// Assert:
-			Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
-			Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+			MatcherAssert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
+			MatcherAssert.assertThat(transaction.getSignature(), IsNull.notNullValue());
 		}
 
-		private static void assertCanDeserializeNonVerifiable(
-				final Transaction originalTransaction,
-				final Class expectedClass,
+		private static void assertCanDeserializeNonVerifiable(final Transaction originalTransaction, final Class<?> expectedClass,
 				final int expectedType) {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(),
+					new MockAccountLookup());
 			final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
 			// Assert:
-			Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
-			Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
-			Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
+			MatcherAssert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+			MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
+			MatcherAssert.assertThat(transaction.getSignature(), IsNull.nullValue());
 		}
 	}
 
-	//endregion
+	// endregion
 }

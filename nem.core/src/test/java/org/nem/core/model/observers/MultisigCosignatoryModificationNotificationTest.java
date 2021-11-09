@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -12,12 +13,14 @@ public class MultisigCosignatoryModificationNotificationTest {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosigner = Utils.generateRandomAccount();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner);
-		final MultisigCosignatoryModificationNotification notification = new MultisigCosignatoryModificationNotification(multisig, modification);
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory,
+				cosigner);
+		final MultisigCosignatoryModificationNotification notification = new MultisigCosignatoryModificationNotification(multisig,
+				modification);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
-		Assert.assertThat(notification.getMultisigAccount(), IsEqual.equalTo(multisig));
-		Assert.assertThat(notification.getModification(), IsEqual.equalTo(modification));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
+		MatcherAssert.assertThat(notification.getMultisigAccount(), IsEqual.equalTo(multisig));
+		MatcherAssert.assertThat(notification.getModification(), IsEqual.equalTo(modification));
 	}
 }

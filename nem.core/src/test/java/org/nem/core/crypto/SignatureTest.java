@@ -1,6 +1,7 @@
 package org.nem.core.crypto;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -10,7 +11,7 @@ import java.math.BigInteger;
 
 public class SignatureTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void bigIntegerCtorInitializesFields() {
@@ -22,8 +23,8 @@ public class SignatureTest {
 		final Signature signature = new Signature(r, s);
 
 		// Assert:
-		Assert.assertThat(signature.getR(), IsEqual.equalTo(r));
-		Assert.assertThat(signature.getS(), IsEqual.equalTo(s));
+		MatcherAssert.assertThat(signature.getR(), IsEqual.equalTo(r));
+		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(s));
 	}
 
 	@Test
@@ -35,8 +36,8 @@ public class SignatureTest {
 		final Signature signature = new Signature(originalSignature.getBytes());
 
 		// Assert:
-		Assert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
-		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
+		MatcherAssert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
+		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
 	}
 
 	@Test
@@ -48,8 +49,8 @@ public class SignatureTest {
 		final Signature signature = new Signature(originalSignature.getBinaryR(), originalSignature.getBinaryS());
 
 		// Assert:
-		Assert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
-		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
+		MatcherAssert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
+		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -102,8 +103,8 @@ public class SignatureTest {
 		final Signature signature = new Signature(new byte[64]);
 
 		// Assert:
-		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
-		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -112,19 +113,19 @@ public class SignatureTest {
 		final Signature signature = new Signature(new byte[32], new byte[32]);
 
 		// Assert:
-		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
-		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
-	//endregion
+	// endregion
 
-	//region getBytes
+	// region getBytes
 
 	@Test
 	public void getBytesReturns64Bytes() {
 		// Assert:
 		for (final Signature signature : this.createRoundtripTestSignatures()) {
-			Assert.assertThat(signature.getBytes().length, IsEqual.equalTo(64));
+			MatcherAssert.assertThat(signature.getBytes().length, IsEqual.equalTo(64));
 		}
 	}
 
@@ -132,21 +133,20 @@ public class SignatureTest {
 	public void canRoundtripBinarySignature() {
 		// Assert:
 		for (final Signature signature : this.createRoundtripTestSignatures()) {
-			Assert.assertThat(new Signature(signature.getBytes()), IsEqual.equalTo(signature));
+			MatcherAssert.assertThat(new Signature(signature.getBytes()), IsEqual.equalTo(signature));
 		}
 	}
 
 	private Signature[] createRoundtripTestSignatures() {
-		return new Signature[] {
+		return new Signature[]{
 				createSignature(Utils.createString('F', 64), Utils.createString('0', 64)),
-				createSignature(Utils.createString('0', 64), Utils.createString('F', 64)),
-				createSignature("99512345", "12351234")
+				createSignature(Utils.createString('0', 64), Utils.createString('F', 64)), createSignature("99512345", "12351234")
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region getBinaryR / getBinaryS
+	// region getBinaryR / getBinaryS
 
 	@Test
 	public void getBinaryRReturnsRAsByteArray() {
@@ -160,7 +160,7 @@ public class SignatureTest {
 		final byte[] r = signature.getBinaryR();
 
 		// Assert:
-		Assert.assertThat(r, IsEqual.equalTo(originalR));
+		MatcherAssert.assertThat(r, IsEqual.equalTo(originalR));
 	}
 
 	@Test
@@ -175,12 +175,12 @@ public class SignatureTest {
 		final byte[] s = signature.getBinaryS();
 
 		// Assert:
-		Assert.assertThat(s, IsEqual.equalTo(originalS));
+		MatcherAssert.assertThat(s, IsEqual.equalTo(originalS));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -188,11 +188,11 @@ public class SignatureTest {
 		final Signature signature = createSignature(1235, 7789);
 
 		// Assert:
-		Assert.assertThat(createSignature(1235, 7789), IsEqual.equalTo(signature));
-		Assert.assertThat(createSignature(1234, 7789), IsNot.not(IsEqual.equalTo(signature)));
-		Assert.assertThat(createSignature(1235, 7790), IsNot.not(IsEqual.equalTo(signature)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(signature)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)signature)));
+		MatcherAssert.assertThat(createSignature(1235, 7789), IsEqual.equalTo(signature));
+		MatcherAssert.assertThat(createSignature(1234, 7789), IsNot.not(IsEqual.equalTo(signature)));
+		MatcherAssert.assertThat(createSignature(1235, 7790), IsNot.not(IsEqual.equalTo(signature)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(signature)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) signature)));
 	}
 
 	@Test
@@ -202,14 +202,14 @@ public class SignatureTest {
 		final int hashCode = signature.hashCode();
 
 		// Assert:
-		Assert.assertThat(createSignature(1235, 7789).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(createSignature(1234, 7789).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createSignature(1235, 7790).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createSignature(1235, 7789).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(createSignature(1234, 7789).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createSignature(1235, 7790).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteSignature() {
@@ -222,8 +222,8 @@ public class SignatureTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Signature"), IsEqual.equalTo(signature.toString()));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Signature"), IsEqual.equalTo(signature.toString()));
 	}
 
 	@Test
@@ -239,10 +239,10 @@ public class SignatureTest {
 		final Signature signature = Signature.readFrom(deserializer, "Signature");
 
 		// Assert:
-		Assert.assertThat(signature, IsEqual.equalTo(originalSignature));
+		MatcherAssert.assertThat(signature, IsEqual.equalTo(originalSignature));
 	}
 
-	//endregion
+	// endregion
 
 	// region toString
 
@@ -252,13 +252,12 @@ public class SignatureTest {
 		final Signature signature = createSignature(12, 513);
 
 		// Assert:
-		final String expectedSignature =
-				"0c00000000000000000000000000000000000000000000000000000000000000" +
-						"0102000000000000000000000000000000000000000000000000000000000000";
-		Assert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
+		final String expectedSignature = "0c00000000000000000000000000000000000000000000000000000000000000"
+				+ "0102000000000000000000000000000000000000000000000000000000000000";
+		MatcherAssert.assertThat(signature.toString(), IsEqual.equalTo(expectedSignature));
 	}
 
-	//endregion
+	// endregion
 
 	private static Signature createSignature(final String r, final String s) {
 		return new Signature(new BigInteger(r, 16), new BigInteger(s, 16));

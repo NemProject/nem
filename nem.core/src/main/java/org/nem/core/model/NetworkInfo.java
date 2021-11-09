@@ -15,10 +15,7 @@ public class NetworkInfo {
 	 * @param addressStartChar The character with which all network addresses should start.
 	 * @param nemesisBlockInfo Information about the network nemesis block.
 	 */
-	public NetworkInfo(
-			final byte version,
-			final char addressStartChar,
-			final NemesisBlockInfo nemesisBlockInfo) {
+	public NetworkInfo(final byte version, final char addressStartChar, final NemesisBlockInfo nemesisBlockInfo) {
 		this.version = version;
 		this.addressStartChar = addressStartChar;
 		this.nemesisBlockInfo = nemesisBlockInfo;

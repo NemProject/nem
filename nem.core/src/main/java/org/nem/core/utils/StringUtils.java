@@ -36,8 +36,8 @@ public class StringUtils {
 	}
 
 	/**
-	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}.
-	 * This pattern is replaced by the given value.
+	 * Replaces a variable contained in a string with a value. A variable is defined as ${variable}. This pattern is replaced by the given
+	 * value.
 	 *
 	 * @param string String that contains variables.
 	 * @param name Name of the variable to be replaced with its value.

@@ -3,6 +3,7 @@ package org.nem.core.model.primitive;
 /**
  * An exception that is thrown when an Amount is attempted to be created around a negative amount.
  */
+@SuppressWarnings("serial")
 public class NegativeBalanceException extends IllegalArgumentException {
 
 	/**

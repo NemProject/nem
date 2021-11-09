@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.PrivateKey;
@@ -9,7 +10,7 @@ import java.math.BigInteger;
 
 public class Ed25519UtilsTest {
 
-	//region prepareForScalarMultiply
+	// region prepareForScalarMultiply
 
 	@Test
 	public void prepareForScalarMultiplyReturnsClampedValue() {
@@ -20,10 +21,10 @@ public class Ed25519UtilsTest {
 		final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw();
 
 		// Assert:
-		Assert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
-		Assert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
-		Assert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
+		MatcherAssert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
+		MatcherAssert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
+		MatcherAssert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
 	}
 
-	//endregion
+	// endregion
 }

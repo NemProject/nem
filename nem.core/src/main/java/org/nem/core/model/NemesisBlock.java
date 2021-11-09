@@ -35,7 +35,8 @@ public class NemesisBlock {
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
-	public static Block fromJsonObject(final NemesisBlockInfo nemesisBlockInfo, final JSONObject jsonObject, final DeserializationContext context) {
+	public static Block fromJsonObject(final NemesisBlockInfo nemesisBlockInfo, final JSONObject jsonObject,
+			final DeserializationContext context) {
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, context);
 		return deserialize(nemesisBlockInfo, deserializer);
 	}

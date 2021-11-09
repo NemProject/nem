@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -18,8 +19,8 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(createMosaicId(), Quantity.fromValue(123));
 
 		// Assert:
-		Assert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
-		Assert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		MatcherAssert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
+		MatcherAssert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	@Test
@@ -29,10 +30,8 @@ public class MosaicTest {
 	}
 
 	private static void assertCannotCreateWithNullParameter(final String parameterName) {
-		ExceptionAssert.assertThrows(v -> new Mosaic(
-						parameterName.equals("mosaicId") ? null : createMosaicId(),
-						parameterName.equals("quantity") ? null : Quantity.fromValue(123)),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(parameterName.equals("mosaicId") ? null : createMosaicId(),
+				parameterName.equals("quantity") ? null : Quantity.fromValue(123)), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -48,13 +47,13 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(Utils.roundtripSerializableEntity(original, null));
 
 		// Assert:
-		Assert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
-		Assert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		MatcherAssert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(createMosaicId()));
+		MatcherAssert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsExpectedString() {
@@ -63,13 +62,14 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(mosaicId, Quantity.fromValue(123));
 
 		// Assert:
-		Assert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
+		MatcherAssert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, Mosaic> DESC_TO_MOSAIC_MAP = new HashMap<String, Mosaic>() {
 		{
 			this.put("default", new Mosaic(createMosaicId(), Quantity.fromValue(123)));
@@ -85,8 +85,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			Assert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaic)) : IsEqual.equalTo(mosaic));
 		}
 	}
@@ -98,8 +97,7 @@ public class MosaicTest {
 
 		// Assert:
 		for (final Map.Entry<String, Mosaic> entry : DESC_TO_MOSAIC_MAP.entrySet()) {
-			Assert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
@@ -108,7 +106,7 @@ public class MosaicTest {
 		return !propertyName.equals("default");
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicId createMosaicId() {
 		return new MosaicId(new NamespaceId("foo.bar"), "baz");

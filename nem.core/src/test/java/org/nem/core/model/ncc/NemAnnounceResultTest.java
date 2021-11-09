@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -21,29 +22,27 @@ public class NemAnnounceResultTest {
 
 			// Assert:
 			assertNemRequestResult(result);
-			Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
-			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
+			MatcherAssert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			MatcherAssert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
 		}
 
 		@Test
 		public void canRoundtripResult() {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(
-					this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
 					null);
 			final NemAnnounceResult result = new NemAnnounceResult(deserializer);
 
 			// Assert:
 			assertNemRequestResult(result);
-			Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
-			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
+			MatcherAssert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			MatcherAssert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
 		}
 
 		@Test
 		public void canRoundtripResultAsNemRequestResult() {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(
-					this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(this.createResult(ValidationResult.FAILURE_CHAIN_INVALID),
 					null);
 			final NemRequestResult result = new NemRequestResult(deserializer);
 
@@ -52,9 +51,9 @@ public class NemAnnounceResultTest {
 		}
 
 		private static void assertNemRequestResult(final NemRequestResult result) {
-			Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
-			Assert.assertThat(result.getCode(), IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID.getValue()));
-			Assert.assertThat(result.getMessage(), IsEqual.equalTo("FAILURE_CHAIN_INVALID"));
+			MatcherAssert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+			MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID.getValue()));
+			MatcherAssert.assertThat(result.getMessage(), IsEqual.equalTo("FAILURE_CHAIN_INVALID"));
 		}
 
 		protected abstract NemAnnounceResult createResult(final ValidationResult result);

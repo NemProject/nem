@@ -3,6 +3,7 @@ package org.nem.core.serialization;
 /**
  * Exception that is thrown to indicate a serialization failure caused by a missing required property.
  */
+@SuppressWarnings("serial")
 public class MissingRequiredPropertyException extends InvalidPropertyException {
 
 	/**

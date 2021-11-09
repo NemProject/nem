@@ -20,11 +20,7 @@ public class NemesisBlockInfo {
 	 * @param amount The amount.
 	 * @param dataFileName The data file name.
 	 */
-	public NemesisBlockInfo(
-			final Hash generationHash,
-			final Address address,
-			final Amount amount,
-			final String dataFileName) {
+	public NemesisBlockInfo(final Hash generationHash, final Address address, final Amount amount, final String dataFileName) {
 		this.generationHash = generationHash;
 		this.address = address;
 		this.amount = amount;

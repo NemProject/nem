@@ -1,5 +1,6 @@
 package org.nem.core.messages;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -9,21 +10,23 @@ import org.nem.core.test.*;
 
 public class SecureMessageTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void canCreateMessageAroundDecodedPayload() {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -31,15 +34,15 @@ public class SecureMessageTest {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] {};
+		final byte[] input = new byte[]{};
 		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
-		Assert.assertThat(message.getEncodedPayload().length, IsEqual.equalTo(64));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getEncodedPayload().length, IsEqual.equalTo(64));
 	}
 
 	@Test
@@ -47,20 +50,20 @@ public class SecureMessageTest {
 		// Act:
 		final KeyPair senderKeyPair = new KeyPair();
 		final KeyPair recipientKeyPair = new KeyPair();
-		final byte[] decodedBytes = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] decodedBytes = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final Cipher cipher = new Cipher(senderKeyPair, recipientKeyPair);
 		final byte[] encodedBytes = cipher.encrypt(decodedBytes);
 
-		final SecureMessage message = SecureMessage.fromEncodedPayload(
-				new Account(senderKeyPair),
-				new Account(recipientKeyPair),
+		final SecureMessage message = SecureMessage.fromEncodedPayload(new Account(senderKeyPair), new Account(recipientKeyPair),
 				encodedBytes);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(decodedBytes));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(encodedBytes));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -68,7 +71,9 @@ public class SecureMessageTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 
 		// Act:
 		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
@@ -80,36 +85,40 @@ public class SecureMessageTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 
 		// Act:
 		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
 		final Message message = SecureMessage.fromEncodedPayload(senderPublicKeyOnly, recipient, input);
 
 		// Assert:
-		Assert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsEqual.equalTo(input));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void messageCanBeRoundTripped() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Act:
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipient);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
@@ -117,7 +126,9 @@ public class SecureMessageTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage originalMessage = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		final JsonSerializer serializer = new JsonSerializer();
@@ -128,51 +139,59 @@ public class SecureMessageTest {
 		final byte[] payload = deserializer.readBytes("payload");
 
 		// Assert:
-		Assert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(payload, IsNot.not(IsEqual.equalTo(input)));
 	}
 
-	//endregion
+	// endregion
 
-	//region private key requirement
+	// region private key requirement
 
 	@Test
 	public void secureMessageCanBeDecodedWithOnlyRecipientPrivateKey() {
 		// Act:
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage message = createRoundTrippedMessage(input, false, true);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
 	public void secureMessageCanBeDecodedWithOnlySenderPrivateKey() {
 		// Act:
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage message = createRoundTrippedMessage(input, true, false);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
-		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
 	}
 
 	@Test
 	public void secureMessageCannotBeDecodedWithNeitherSenderNorRecipientPrivateKey() {
 		// Act:
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final SecureMessage message = createRoundTrippedMessage(input, false, false);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
 	public void secureMessageCannotBeDecodedWithNullSenderKeyPair() {
 		// Arrange:
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Account senderWithoutKeyPair = new Account(Address.fromEncoded(sender.getAddress().getEncoded()));
@@ -182,15 +201,17 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, senderWithoutKeyPair, recipient);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
 	@Test
 	public void secureMessageCannotBeDecodedWithNullRecipientKeyPair() {
 		// Arrange:
-		final byte[] input = new byte[] { 12, 46, 7, 43, 22, 15 };
+		final byte[] input = new byte[]{
+				12, 46, 7, 43, 22, 15
+		};
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Account recipientWithoutKeyPair = new Account(Address.fromEncoded(recipient.getAddress().getEncoded()));
@@ -200,14 +221,12 @@ public class SecureMessageTest {
 		final SecureMessage message = createRoundTrippedMessage(originalMessage, sender, recipientWithoutKeyPair);
 
 		// Assert:
-		Assert.assertThat(message.canDecode(), IsEqual.equalTo(false));
-		Assert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
-		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		MatcherAssert.assertThat(message.canDecode(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(message.getDecodedPayload(), IsNull.nullValue());
+		MatcherAssert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
 	}
 
-	private static SecureMessage createRoundTrippedMessage(
-			final byte[] input,
-			final boolean useSenderPrivateKey,
+	private static SecureMessage createRoundTrippedMessage(final byte[] input, final boolean useSenderPrivateKey,
 			final boolean useRecipientPrivateKey) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
@@ -217,15 +236,13 @@ public class SecureMessageTest {
 		// Act:
 		final Account senderPublicKeyOnly = Utils.createPublicOnlyKeyAccount(sender);
 		final Account recipientPublicKeyOnly = Utils.createPublicOnlyKeyAccount(recipient);
-		return createRoundTrippedMessage(
-				originalMessage,
-				useSenderPrivateKey ? sender : senderPublicKeyOnly,
+		return createRoundTrippedMessage(originalMessage, useSenderPrivateKey ? sender : senderPublicKeyOnly,
 				useRecipientPrivateKey ? recipient : recipientPublicKeyOnly);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -233,23 +250,27 @@ public class SecureMessageTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Account other = Utils.generateRandomAccount();
-		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 });
+		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77, 56
+		});
 
 		// Assert:
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }),
-				IsEqual.equalTo(message));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }),
-				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }),
-				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }),
-				IsNot.not(IsEqual.equalTo(message)));
-		Assert.assertThat(new PlainMessage(new byte[] { 12, 77, 56 }), IsNot.not((Object)IsEqual.equalTo(message)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77, 56
+		}), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(other, recipient, new byte[]{
+				12, 77, 56
+		}), IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, other, new byte[]{
+				12, 77, 56
+		}), IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77
+		}), IsNot.not(IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(new PlainMessage(new byte[]{
+				12, 77, 56
+		}), IsNot.not((Object) IsEqual.equalTo(message)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(message)));
 	}
 
 	@Test
@@ -258,29 +279,29 @@ public class SecureMessageTest {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final Account other = Utils.generateRandomAccount();
-		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 });
+		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77, 56
+		});
 		final int hashCode = message.hashCode();
 
 		// Assert:
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77, 56 }).hashCode(),
-				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(other, recipient, new byte[] { 12, 77, 56 }).hashCode(),
-				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, other, new byte[] { 12, 77, 56 }).hashCode(),
-				IsEqual.equalTo(hashCode));
-		Assert.assertThat(
-				SecureMessage.fromEncodedPayload(sender, recipient, new byte[] { 12, 77 }).hashCode(),
-				IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77, 56
+		}).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(other, recipient, new byte[]{
+				12, 77, 56
+		}).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, other, new byte[]{
+				12, 77, 56
+		}).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(SecureMessage.fromEncodedPayload(sender, recipient, new byte[]{
+				12, 77
+		}).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	private static SecureMessage createRoundTrippedMessage(
-			final SecureMessage originalMessage,
-			final Account sender,
+	private static SecureMessage createRoundTrippedMessage(final SecureMessage originalMessage, final Account sender,
 			final Account recipient) {
 		// Arrange:
 		final MockAccountLookup accountLookup = new MockAccountLookup();

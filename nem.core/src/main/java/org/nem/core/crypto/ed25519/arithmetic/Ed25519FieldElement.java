@@ -46,8 +46,8 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Adds the given field element to this and returns the result.
-	 * <b>h = this + g</b>
+	 * Adds the given field element to this and returns the result. <b>h = this + g</b>
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
@@ -70,8 +70,8 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Subtract the given field element from this and returns the result.
-	 * <b>h = this - g</b>
+	 * Subtract the given field element from this and returns the result. <b>h = this - g</b>
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
@@ -94,8 +94,8 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Negates this field element and return the result.
-	 * <b>h = -this</b>
+	 * Negates this field element and return the result. <b>h = -this</b>
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
@@ -115,31 +115,23 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Multiplies this field element with the given field element and returns the result.
-	 * <b>h = this * g</b>
-	 * Preconditions:
+	 * Multiplies this field element with the given field element and returns the result. <b>h = this * g</b>
+	 *
 	 * <pre>
+	 * Preconditions:
 	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 *        |g| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
 	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 	 * </pre>
-	 * Notes on implementation strategy:
-	 * <br>
-	 * Using schoolbook multiplication. Karatsuba would save a little in some
-	 * cost models.
-	 * <br>
-	 * Most multiplications by 2 and 19 are 32-bit precomputations; cheaper than
-	 * 64-bit postcomputations.
-	 * <br>
-	 * There is one remaining multiplication by 19 in the carry chain; one *19
-	 * precomputation can be merged into this, but the resulting data flow is
-	 * considerably less clean.
-	 * <br>
-	 * There are 12 carries below. 10 of them are 2-way parallelizable and
-	 * vectorizable. Can get away with 11 carries, but then data flow is much
-	 * deeper.
-	 * <br>
+	 *
+	 * Notes on implementation strategy: <br>
+	 * Using schoolbook multiplication. Karatsuba would save a little in some cost models. <br>
+	 * Most multiplications by 2 and 19 are 32-bit precomputations; cheaper than 64-bit postcomputations. <br>
+	 * There is one remaining multiplication by 19 in the carry chain; one *19 precomputation can be merged into this, but the resulting
+	 * data flow is considerably less clean. <br>
+	 * There are 12 carries below. 10 of them are 2-way parallelizable and vectorizable. Can get away with 11 carries, but then data flow is
+	 * much deeper. <br>
 	 * With tighter constraints on inputs can squeeze carries into int32.
 	 *
 	 * @param g The field element to multiply.
@@ -181,116 +173,116 @@ public class Ed25519FieldElement {
 		final int f5_2 = 2 * f5;
 		final int f7_2 = 2 * f7;
 		final int f9_2 = 2 * f9;
-		final long f0g0 = f0 * (long)g0;
-		final long f0g1 = f0 * (long)g1;
-		final long f0g2 = f0 * (long)g2;
-		final long f0g3 = f0 * (long)g3;
-		final long f0g4 = f0 * (long)g4;
-		final long f0g5 = f0 * (long)g5;
-		final long f0g6 = f0 * (long)g6;
-		final long f0g7 = f0 * (long)g7;
-		final long f0g8 = f0 * (long)g8;
-		final long f0g9 = f0 * (long)g9;
-		final long f1g0 = f1 * (long)g0;
-		final long f1g1_2 = f1_2 * (long)g1;
-		final long f1g2 = f1 * (long)g2;
-		final long f1g3_2 = f1_2 * (long)g3;
-		final long f1g4 = f1 * (long)g4;
-		final long f1g5_2 = f1_2 * (long)g5;
-		final long f1g6 = f1 * (long)g6;
-		final long f1g7_2 = f1_2 * (long)g7;
-		final long f1g8 = f1 * (long)g8;
-		final long f1g9_38 = f1_2 * (long)g9_19;
-		final long f2g0 = f2 * (long)g0;
-		final long f2g1 = f2 * (long)g1;
-		final long f2g2 = f2 * (long)g2;
-		final long f2g3 = f2 * (long)g3;
-		final long f2g4 = f2 * (long)g4;
-		final long f2g5 = f2 * (long)g5;
-		final long f2g6 = f2 * (long)g6;
-		final long f2g7 = f2 * (long)g7;
-		final long f2g8_19 = f2 * (long)g8_19;
-		final long f2g9_19 = f2 * (long)g9_19;
-		final long f3g0 = f3 * (long)g0;
-		final long f3g1_2 = f3_2 * (long)g1;
-		final long f3g2 = f3 * (long)g2;
-		final long f3g3_2 = f3_2 * (long)g3;
-		final long f3g4 = f3 * (long)g4;
-		final long f3g5_2 = f3_2 * (long)g5;
-		final long f3g6 = f3 * (long)g6;
-		final long f3g7_38 = f3_2 * (long)g7_19;
-		final long f3g8_19 = f3 * (long)g8_19;
-		final long f3g9_38 = f3_2 * (long)g9_19;
-		final long f4g0 = f4 * (long)g0;
-		final long f4g1 = f4 * (long)g1;
-		final long f4g2 = f4 * (long)g2;
-		final long f4g3 = f4 * (long)g3;
-		final long f4g4 = f4 * (long)g4;
-		final long f4g5 = f4 * (long)g5;
-		final long f4g6_19 = f4 * (long)g6_19;
-		final long f4g7_19 = f4 * (long)g7_19;
-		final long f4g8_19 = f4 * (long)g8_19;
-		final long f4g9_19 = f4 * (long)g9_19;
-		final long f5g0 = f5 * (long)g0;
-		final long f5g1_2 = f5_2 * (long)g1;
-		final long f5g2 = f5 * (long)g2;
-		final long f5g3_2 = f5_2 * (long)g3;
-		final long f5g4 = f5 * (long)g4;
-		final long f5g5_38 = f5_2 * (long)g5_19;
-		final long f5g6_19 = f5 * (long)g6_19;
-		final long f5g7_38 = f5_2 * (long)g7_19;
-		final long f5g8_19 = f5 * (long)g8_19;
-		final long f5g9_38 = f5_2 * (long)g9_19;
-		final long f6g0 = f6 * (long)g0;
-		final long f6g1 = f6 * (long)g1;
-		final long f6g2 = f6 * (long)g2;
-		final long f6g3 = f6 * (long)g3;
-		final long f6g4_19 = f6 * (long)g4_19;
-		final long f6g5_19 = f6 * (long)g5_19;
-		final long f6g6_19 = f6 * (long)g6_19;
-		final long f6g7_19 = f6 * (long)g7_19;
-		final long f6g8_19 = f6 * (long)g8_19;
-		final long f6g9_19 = f6 * (long)g9_19;
-		final long f7g0 = f7 * (long)g0;
-		final long f7g1_2 = f7_2 * (long)g1;
-		final long f7g2 = f7 * (long)g2;
-		final long f7g3_38 = f7_2 * (long)g3_19;
-		final long f7g4_19 = f7 * (long)g4_19;
-		final long f7g5_38 = f7_2 * (long)g5_19;
-		final long f7g6_19 = f7 * (long)g6_19;
-		final long f7g7_38 = f7_2 * (long)g7_19;
-		final long f7g8_19 = f7 * (long)g8_19;
-		final long f7g9_38 = f7_2 * (long)g9_19;
-		final long f8g0 = f8 * (long)g0;
-		final long f8g1 = f8 * (long)g1;
-		final long f8g2_19 = f8 * (long)g2_19;
-		final long f8g3_19 = f8 * (long)g3_19;
-		final long f8g4_19 = f8 * (long)g4_19;
-		final long f8g5_19 = f8 * (long)g5_19;
-		final long f8g6_19 = f8 * (long)g6_19;
-		final long f8g7_19 = f8 * (long)g7_19;
-		final long f8g8_19 = f8 * (long)g8_19;
-		final long f8g9_19 = f8 * (long)g9_19;
-		final long f9g0 = f9 * (long)g0;
-		final long f9g1_38 = f9_2 * (long)g1_19;
-		final long f9g2_19 = f9 * (long)g2_19;
-		final long f9g3_38 = f9_2 * (long)g3_19;
-		final long f9g4_19 = f9 * (long)g4_19;
-		final long f9g5_38 = f9_2 * (long)g5_19;
-		final long f9g6_19 = f9 * (long)g6_19;
-		final long f9g7_38 = f9_2 * (long)g7_19;
-		final long f9g8_19 = f9 * (long)g8_19;
-		final long f9g9_38 = f9_2 * (long)g9_19;
+		final long f0g0 = f0 * (long) g0;
+		final long f0g1 = f0 * (long) g1;
+		final long f0g2 = f0 * (long) g2;
+		final long f0g3 = f0 * (long) g3;
+		final long f0g4 = f0 * (long) g4;
+		final long f0g5 = f0 * (long) g5;
+		final long f0g6 = f0 * (long) g6;
+		final long f0g7 = f0 * (long) g7;
+		final long f0g8 = f0 * (long) g8;
+		final long f0g9 = f0 * (long) g9;
+		final long f1g0 = f1 * (long) g0;
+		final long f1g1_2 = f1_2 * (long) g1;
+		final long f1g2 = f1 * (long) g2;
+		final long f1g3_2 = f1_2 * (long) g3;
+		final long f1g4 = f1 * (long) g4;
+		final long f1g5_2 = f1_2 * (long) g5;
+		final long f1g6 = f1 * (long) g6;
+		final long f1g7_2 = f1_2 * (long) g7;
+		final long f1g8 = f1 * (long) g8;
+		final long f1g9_38 = f1_2 * (long) g9_19;
+		final long f2g0 = f2 * (long) g0;
+		final long f2g1 = f2 * (long) g1;
+		final long f2g2 = f2 * (long) g2;
+		final long f2g3 = f2 * (long) g3;
+		final long f2g4 = f2 * (long) g4;
+		final long f2g5 = f2 * (long) g5;
+		final long f2g6 = f2 * (long) g6;
+		final long f2g7 = f2 * (long) g7;
+		final long f2g8_19 = f2 * (long) g8_19;
+		final long f2g9_19 = f2 * (long) g9_19;
+		final long f3g0 = f3 * (long) g0;
+		final long f3g1_2 = f3_2 * (long) g1;
+		final long f3g2 = f3 * (long) g2;
+		final long f3g3_2 = f3_2 * (long) g3;
+		final long f3g4 = f3 * (long) g4;
+		final long f3g5_2 = f3_2 * (long) g5;
+		final long f3g6 = f3 * (long) g6;
+		final long f3g7_38 = f3_2 * (long) g7_19;
+		final long f3g8_19 = f3 * (long) g8_19;
+		final long f3g9_38 = f3_2 * (long) g9_19;
+		final long f4g0 = f4 * (long) g0;
+		final long f4g1 = f4 * (long) g1;
+		final long f4g2 = f4 * (long) g2;
+		final long f4g3 = f4 * (long) g3;
+		final long f4g4 = f4 * (long) g4;
+		final long f4g5 = f4 * (long) g5;
+		final long f4g6_19 = f4 * (long) g6_19;
+		final long f4g7_19 = f4 * (long) g7_19;
+		final long f4g8_19 = f4 * (long) g8_19;
+		final long f4g9_19 = f4 * (long) g9_19;
+		final long f5g0 = f5 * (long) g0;
+		final long f5g1_2 = f5_2 * (long) g1;
+		final long f5g2 = f5 * (long) g2;
+		final long f5g3_2 = f5_2 * (long) g3;
+		final long f5g4 = f5 * (long) g4;
+		final long f5g5_38 = f5_2 * (long) g5_19;
+		final long f5g6_19 = f5 * (long) g6_19;
+		final long f5g7_38 = f5_2 * (long) g7_19;
+		final long f5g8_19 = f5 * (long) g8_19;
+		final long f5g9_38 = f5_2 * (long) g9_19;
+		final long f6g0 = f6 * (long) g0;
+		final long f6g1 = f6 * (long) g1;
+		final long f6g2 = f6 * (long) g2;
+		final long f6g3 = f6 * (long) g3;
+		final long f6g4_19 = f6 * (long) g4_19;
+		final long f6g5_19 = f6 * (long) g5_19;
+		final long f6g6_19 = f6 * (long) g6_19;
+		final long f6g7_19 = f6 * (long) g7_19;
+		final long f6g8_19 = f6 * (long) g8_19;
+		final long f6g9_19 = f6 * (long) g9_19;
+		final long f7g0 = f7 * (long) g0;
+		final long f7g1_2 = f7_2 * (long) g1;
+		final long f7g2 = f7 * (long) g2;
+		final long f7g3_38 = f7_2 * (long) g3_19;
+		final long f7g4_19 = f7 * (long) g4_19;
+		final long f7g5_38 = f7_2 * (long) g5_19;
+		final long f7g6_19 = f7 * (long) g6_19;
+		final long f7g7_38 = f7_2 * (long) g7_19;
+		final long f7g8_19 = f7 * (long) g8_19;
+		final long f7g9_38 = f7_2 * (long) g9_19;
+		final long f8g0 = f8 * (long) g0;
+		final long f8g1 = f8 * (long) g1;
+		final long f8g2_19 = f8 * (long) g2_19;
+		final long f8g3_19 = f8 * (long) g3_19;
+		final long f8g4_19 = f8 * (long) g4_19;
+		final long f8g5_19 = f8 * (long) g5_19;
+		final long f8g6_19 = f8 * (long) g6_19;
+		final long f8g7_19 = f8 * (long) g7_19;
+		final long f8g8_19 = f8 * (long) g8_19;
+		final long f8g9_19 = f8 * (long) g9_19;
+		final long f9g0 = f9 * (long) g0;
+		final long f9g1_38 = f9_2 * (long) g1_19;
+		final long f9g2_19 = f9 * (long) g2_19;
+		final long f9g3_38 = f9_2 * (long) g3_19;
+		final long f9g4_19 = f9 * (long) g4_19;
+		final long f9g5_38 = f9_2 * (long) g5_19;
+		final long f9g6_19 = f9 * (long) g6_19;
+		final long f9g7_38 = f9_2 * (long) g7_19;
+		final long f9g8_19 = f9 * (long) g8_19;
+		final long f9g9_38 = f9_2 * (long) g9_19;
 
 		/**
-		 * Remember: 2^255 congruent 19 modulo p.
-		 * h = h0 * 2^0 + h1 * 2^26 + h2 * 2^(26+25) + h3 * 2^(26+25+26) + ... + h9 * 2^(5*26+5*25).
-		 * So to get the real number we would have to multiply the coefficients with the corresponding powers of 2.
-		 * To get an idea what is going on below, look at the calculation of h0:
-		 * h0 is the coefficient to the power 2^0 so it collects (sums) all products that have the power 2^0.
-		 * f0 * g0 really is f0 * 2^0 * g0 * 2^0 = (f0 * g0) * 2^0.
-		 * f1 * g9 really is f1 * 2^26 * g9 * 2^230 = f1 * g9 * 2^256 = 2 * f1 * g9 * 2^255 congruent 2 * 19 * f1 * g9 * 2^0 modulo p.
-		 * f2 * g8 really is f2 * 2^51 * g8 * 2^204 = f2 * g8 * 2^255 congruent 19 * f2 * g8 * 2^0 modulo p.
+		 * Remember: 2^255 congruent 19 modulo p. <br>
+		 * h = h0 * 2^0 + h1 * 2^26 + h2 * 2^(26+25) + h3 * 2^(26+25+26) + ... + h9 * 2^(5*26+5*25). <br>
+		 * So to get the real number we would have to multiply the coefficients with the corresponding powers of 2. <br>
+		 * To get an idea what is going on below, look at the calculation of h0: <br>
+		 * h0 is the coefficient to the power 2^0 so it collects (sums) all products that have the power 2^0. <br>
+		 * f0 * g0 really is f0 * 2^0 * g0 * 2^0 = (f0 * g0) * 2^0. <br>
+		 * f1 * g9 really is f1 * 2^26 * g9 * 2^230 = f1 * g9 * 2^256 = 2 * f1 * g9 * 2^255 congruent 2 * 19 * f1 * g9 * 2^0 modulo p. <br>
+		 * f2 * g8 really is f2 * 2^51 * g8 * 2^204 = f2 * g8 * 2^255 congruent 19 * f2 * g8 * 2^0 modulo p. <br>
 		 * and so on...
 		 */
 		long h0 = f0g0 + f1g9_38 + f2g8_19 + f3g7_38 + f4g6_19 + f5g5_38 + f6g4_19 + f7g3_38 + f8g2_19 + f9g1_38;
@@ -315,16 +307,16 @@ public class Ed25519FieldElement {
 		final long carry9;
 
 		/**
-		 * |h0| <= (1.65*1.65*2^52*(1+19+19+19+19)+1.65*1.65*2^50*(38+38+38+38+38))
-		 * i.e. |h0| <= 1.4*2^60; narrower ranges for h2, h4, h6, h8
-		 * |h1| <= (1.65*1.65*2^51*(1+1+19+19+19+19+19+19+19+19))
+		 * |h0| <= (1.65*1.65*2^52*(1+19+19+19+19)+1.65*1.65*2^50*(38+38+38+38+38)) <br>
+		 * i.e. |h0| <= 1.4*2^60; narrower ranges for h2, h4, h6, h8 <br>
+		 * |h1| <= (1.65*1.65*2^51*(1+1+19+19+19+19+19+19+19+19)) <br>
 		 * i.e. |h1| <= 1.7*2^59; narrower ranges for h3, h5, h7, h9
 		 */
 
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
+		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
+		carry4 = (h4 + (long) (1 << 25)) >> 26;
 		h5 += carry4;
 		h4 -= carry4 << 26;
 		/* |h0| <= 2^25 */
@@ -332,10 +324,10 @@ public class Ed25519FieldElement {
 		/* |h1| <= 1.71*2^59 */
 		/* |h5| <= 1.71*2^59 */
 
-		carry1 = (h1 + (long)(1 << 24)) >> 25;
+		carry1 = (h1 + (long) (1 << 24)) >> 25;
 		h2 += carry1;
 		h1 -= carry1 << 25;
-		carry5 = (h5 + (long)(1 << 24)) >> 25;
+		carry5 = (h5 + (long) (1 << 24)) >> 25;
 		h6 += carry5;
 		h5 -= carry5 << 25;
 		/* |h1| <= 2^24; from now on fits into int32 */
@@ -343,10 +335,10 @@ public class Ed25519FieldElement {
 		/* |h2| <= 1.41*2^60 */
 		/* |h6| <= 1.41*2^60 */
 
-		carry2 = (h2 + (long)(1 << 25)) >> 26;
+		carry2 = (h2 + (long) (1 << 25)) >> 26;
 		h3 += carry2;
 		h2 -= carry2 << 26;
-		carry6 = (h6 + (long)(1 << 25)) >> 26;
+		carry6 = (h6 + (long) (1 << 25)) >> 26;
 		h7 += carry6;
 		h6 -= carry6 << 26;
 		/* |h2| <= 2^25; from now on fits into int32 unchanged */
@@ -354,10 +346,10 @@ public class Ed25519FieldElement {
 		/* |h3| <= 1.71*2^59 */
 		/* |h7| <= 1.71*2^59 */
 
-		carry3 = (h3 + (long)(1 << 24)) >> 25;
+		carry3 = (h3 + (long) (1 << 24)) >> 25;
 		h4 += carry3;
 		h3 -= carry3 << 25;
-		carry7 = (h7 + (long)(1 << 24)) >> 25;
+		carry7 = (h7 + (long) (1 << 24)) >> 25;
 		h8 += carry7;
 		h7 -= carry7 << 25;
 		/* |h3| <= 2^24; from now on fits into int32 unchanged */
@@ -365,10 +357,10 @@ public class Ed25519FieldElement {
 		/* |h4| <= 1.72*2^34 */
 		/* |h8| <= 1.41*2^60 */
 
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
+		carry4 = (h4 + (long) (1 << 25)) >> 26;
 		h5 += carry4;
 		h4 -= carry4 << 26;
-		carry8 = (h8 + (long)(1 << 25)) >> 26;
+		carry8 = (h8 + (long) (1 << 25)) >> 26;
 		h9 += carry8;
 		h8 -= carry8 << 26;
 		/* |h4| <= 2^25; from now on fits into int32 unchanged */
@@ -376,42 +368,43 @@ public class Ed25519FieldElement {
 		/* |h5| <= 1.01*2^24 */
 		/* |h9| <= 1.71*2^59 */
 
-		carry9 = (h9 + (long)(1 << 24)) >> 25;
+		carry9 = (h9 + (long) (1 << 24)) >> 25;
 		h0 += carry9 * 19;
 		h9 -= carry9 << 25;
 		/* |h9| <= 2^24; from now on fits into int32 unchanged */
 		/* |h0| <= 1.1*2^39 */
 
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
+		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
 		/* |h0| <= 2^25; from now on fits into int32 unchanged */
 		/* |h1| <= 1.01*2^24 */
 
 		final int[] h = new int[10];
-		h[0] = (int)h0;
-		h[1] = (int)h1;
-		h[2] = (int)h2;
-		h[3] = (int)h3;
-		h[4] = (int)h4;
-		h[5] = (int)h5;
-		h[6] = (int)h6;
-		h[7] = (int)h7;
-		h[8] = (int)h8;
-		h[9] = (int)h9;
+		h[0] = (int) h0;
+		h[1] = (int) h1;
+		h[2] = (int) h2;
+		h[3] = (int) h3;
+		h[4] = (int) h4;
+		h[5] = (int) h5;
+		h[6] = (int) h6;
+		h[7] = (int) h7;
+		h[8] = (int) h8;
+		h[9] = (int) h9;
 
 		return new Ed25519FieldElement(h);
 	}
 
 	/**
-	 * Squares this field element and returns the result.
-	 * <b>h = this * this</b>
+	 * Squares this field element and returns the result. <b>h = this * this</b>
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
 	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 	 * </pre>
+	 *
 	 * See multiply for discussion of implementation strategy.
 	 *
 	 * @return The square of this field element.
@@ -421,14 +414,15 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Squares this field element, multiplies by two and returns the result.
-	 * <b>h = 2 * this * this</b>
+	 * Squares this field element, multiplies by two and returns the result. <b>h = 2 * this * this</b>
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
 	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 	 * </pre>
+	 *
 	 * See multiply for discussion of implementation strategy.
 	 *
 	 * @return The square of this field element times 2.
@@ -438,15 +432,18 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Squares this field element, optionally multiplies by two and returns the result.
-	 * <b>h = 2 * this * this</b> if dbl is true or
+	 * Squares this field element, optionally multiplies by two and returns the result. <br>
+	 * <b>h = 2 * this * this</b> if dbl is true <br>
+	 * or <br>
 	 * <b>h = this * this</b> if dbl is false.
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
 	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 	 * </pre>
+	 *
 	 * See multiply for discussion of implementation strategy.
 	 *
 	 * @return The square of this field element times 2.
@@ -475,61 +472,61 @@ public class Ed25519FieldElement {
 		final int f7_38 = 38 * f7; /* 1.959375*2^30 */
 		final int f8_19 = 19 * f8; /* 1.959375*2^30 */
 		final int f9_38 = 38 * f9; /* 1.959375*2^30 */
-		final long f0f0 = f0 * (long)f0;
-		final long f0f1_2 = f0_2 * (long)f1;
-		final long f0f2_2 = f0_2 * (long)f2;
-		final long f0f3_2 = f0_2 * (long)f3;
-		final long f0f4_2 = f0_2 * (long)f4;
-		final long f0f5_2 = f0_2 * (long)f5;
-		final long f0f6_2 = f0_2 * (long)f6;
-		final long f0f7_2 = f0_2 * (long)f7;
-		final long f0f8_2 = f0_2 * (long)f8;
-		final long f0f9_2 = f0_2 * (long)f9;
-		final long f1f1_2 = f1_2 * (long)f1;
-		final long f1f2_2 = f1_2 * (long)f2;
-		final long f1f3_4 = f1_2 * (long)f3_2;
-		final long f1f4_2 = f1_2 * (long)f4;
-		final long f1f5_4 = f1_2 * (long)f5_2;
-		final long f1f6_2 = f1_2 * (long)f6;
-		final long f1f7_4 = f1_2 * (long)f7_2;
-		final long f1f8_2 = f1_2 * (long)f8;
-		final long f1f9_76 = f1_2 * (long)f9_38;
-		final long f2f2 = f2 * (long)f2;
-		final long f2f3_2 = f2_2 * (long)f3;
-		final long f2f4_2 = f2_2 * (long)f4;
-		final long f2f5_2 = f2_2 * (long)f5;
-		final long f2f6_2 = f2_2 * (long)f6;
-		final long f2f7_2 = f2_2 * (long)f7;
-		final long f2f8_38 = f2_2 * (long)f8_19;
-		final long f2f9_38 = f2 * (long)f9_38;
-		final long f3f3_2 = f3_2 * (long)f3;
-		final long f3f4_2 = f3_2 * (long)f4;
-		final long f3f5_4 = f3_2 * (long)f5_2;
-		final long f3f6_2 = f3_2 * (long)f6;
-		final long f3f7_76 = f3_2 * (long)f7_38;
-		final long f3f8_38 = f3_2 * (long)f8_19;
-		final long f3f9_76 = f3_2 * (long)f9_38;
-		final long f4f4 = f4 * (long)f4;
-		final long f4f5_2 = f4_2 * (long)f5;
-		final long f4f6_38 = f4_2 * (long)f6_19;
-		final long f4f7_38 = f4 * (long)f7_38;
-		final long f4f8_38 = f4_2 * (long)f8_19;
-		final long f4f9_38 = f4 * (long)f9_38;
-		final long f5f5_38 = f5 * (long)f5_38;
-		final long f5f6_38 = f5_2 * (long)f6_19;
-		final long f5f7_76 = f5_2 * (long)f7_38;
-		final long f5f8_38 = f5_2 * (long)f8_19;
-		final long f5f9_76 = f5_2 * (long)f9_38;
-		final long f6f6_19 = f6 * (long)f6_19;
-		final long f6f7_38 = f6 * (long)f7_38;
-		final long f6f8_38 = f6_2 * (long)f8_19;
-		final long f6f9_38 = f6 * (long)f9_38;
-		final long f7f7_38 = f7 * (long)f7_38;
-		final long f7f8_38 = f7_2 * (long)f8_19;
-		final long f7f9_76 = f7_2 * (long)f9_38;
-		final long f8f8_19 = f8 * (long)f8_19;
-		final long f8f9_38 = f8 * (long)f9_38;
-		final long f9f9_38 = f9 * (long)f9_38;
+		final long f0f0 = f0 * (long) f0;
+		final long f0f1_2 = f0_2 * (long) f1;
+		final long f0f2_2 = f0_2 * (long) f2;
+		final long f0f3_2 = f0_2 * (long) f3;
+		final long f0f4_2 = f0_2 * (long) f4;
+		final long f0f5_2 = f0_2 * (long) f5;
+		final long f0f6_2 = f0_2 * (long) f6;
+		final long f0f7_2 = f0_2 * (long) f7;
+		final long f0f8_2 = f0_2 * (long) f8;
+		final long f0f9_2 = f0_2 * (long) f9;
+		final long f1f1_2 = f1_2 * (long) f1;
+		final long f1f2_2 = f1_2 * (long) f2;
+		final long f1f3_4 = f1_2 * (long) f3_2;
+		final long f1f4_2 = f1_2 * (long) f4;
+		final long f1f5_4 = f1_2 * (long) f5_2;
+		final long f1f6_2 = f1_2 * (long) f6;
+		final long f1f7_4 = f1_2 * (long) f7_2;
+		final long f1f8_2 = f1_2 * (long) f8;
+		final long f1f9_76 = f1_2 * (long) f9_38;
+		final long f2f2 = f2 * (long) f2;
+		final long f2f3_2 = f2_2 * (long) f3;
+		final long f2f4_2 = f2_2 * (long) f4;
+		final long f2f5_2 = f2_2 * (long) f5;
+		final long f2f6_2 = f2_2 * (long) f6;
+		final long f2f7_2 = f2_2 * (long) f7;
+		final long f2f8_38 = f2_2 * (long) f8_19;
+		final long f2f9_38 = f2 * (long) f9_38;
+		final long f3f3_2 = f3_2 * (long) f3;
+		final long f3f4_2 = f3_2 * (long) f4;
+		final long f3f5_4 = f3_2 * (long) f5_2;
+		final long f3f6_2 = f3_2 * (long) f6;
+		final long f3f7_76 = f3_2 * (long) f7_38;
+		final long f3f8_38 = f3_2 * (long) f8_19;
+		final long f3f9_76 = f3_2 * (long) f9_38;
+		final long f4f4 = f4 * (long) f4;
+		final long f4f5_2 = f4_2 * (long) f5;
+		final long f4f6_38 = f4_2 * (long) f6_19;
+		final long f4f7_38 = f4 * (long) f7_38;
+		final long f4f8_38 = f4_2 * (long) f8_19;
+		final long f4f9_38 = f4 * (long) f9_38;
+		final long f5f5_38 = f5 * (long) f5_38;
+		final long f5f6_38 = f5_2 * (long) f6_19;
+		final long f5f7_76 = f5_2 * (long) f7_38;
+		final long f5f8_38 = f5_2 * (long) f8_19;
+		final long f5f9_76 = f5_2 * (long) f9_38;
+		final long f6f6_19 = f6 * (long) f6_19;
+		final long f6f7_38 = f6 * (long) f7_38;
+		final long f6f8_38 = f6_2 * (long) f8_19;
+		final long f6f9_38 = f6 * (long) f9_38;
+		final long f7f7_38 = f7 * (long) f7_38;
+		final long f7f8_38 = f7_2 * (long) f8_19;
+		final long f7f9_76 = f7_2 * (long) f9_38;
+		final long f8f8_19 = f8 * (long) f8_19;
+		final long f8f9_38 = f8 * (long) f9_38;
+		final long f9f9_38 = f9 * (long) f9_38;
 		long h0 = f0f0 + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38;
 		long h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
 		long h2 = f0f2_2 + f1f1_2 + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
@@ -564,67 +561,66 @@ public class Ed25519FieldElement {
 			h9 += h9;
 		}
 
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
+		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
+		carry4 = (h4 + (long) (1 << 25)) >> 26;
 		h5 += carry4;
 		h4 -= carry4 << 26;
 
-		carry1 = (h1 + (long)(1 << 24)) >> 25;
+		carry1 = (h1 + (long) (1 << 24)) >> 25;
 		h2 += carry1;
 		h1 -= carry1 << 25;
-		carry5 = (h5 + (long)(1 << 24)) >> 25;
+		carry5 = (h5 + (long) (1 << 24)) >> 25;
 		h6 += carry5;
 		h5 -= carry5 << 25;
 
-		carry2 = (h2 + (long)(1 << 25)) >> 26;
+		carry2 = (h2 + (long) (1 << 25)) >> 26;
 		h3 += carry2;
 		h2 -= carry2 << 26;
-		carry6 = (h6 + (long)(1 << 25)) >> 26;
+		carry6 = (h6 + (long) (1 << 25)) >> 26;
 		h7 += carry6;
 		h6 -= carry6 << 26;
 
-		carry3 = (h3 + (long)(1 << 24)) >> 25;
+		carry3 = (h3 + (long) (1 << 24)) >> 25;
 		h4 += carry3;
 		h3 -= carry3 << 25;
-		carry7 = (h7 + (long)(1 << 24)) >> 25;
+		carry7 = (h7 + (long) (1 << 24)) >> 25;
 		h8 += carry7;
 		h7 -= carry7 << 25;
 
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
+		carry4 = (h4 + (long) (1 << 25)) >> 26;
 		h5 += carry4;
 		h4 -= carry4 << 26;
-		carry8 = (h8 + (long)(1 << 25)) >> 26;
+		carry8 = (h8 + (long) (1 << 25)) >> 26;
 		h9 += carry8;
 		h8 -= carry8 << 26;
 
-		carry9 = (h9 + (long)(1 << 24)) >> 25;
+		carry9 = (h9 + (long) (1 << 24)) >> 25;
 		h0 += carry9 * 19;
 		h9 -= carry9 << 25;
 
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
+		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
 
 		final int[] h = new int[10];
-		h[0] = (int)h0;
-		h[1] = (int)h1;
-		h[2] = (int)h2;
-		h[3] = (int)h3;
-		h[4] = (int)h4;
-		h[5] = (int)h5;
-		h[6] = (int)h6;
-		h[7] = (int)h7;
-		h[8] = (int)h8;
-		h[9] = (int)h9;
+		h[0] = (int) h0;
+		h[1] = (int) h1;
+		h[2] = (int) h2;
+		h[3] = (int) h3;
+		h[4] = (int) h4;
+		h[5] = (int) h5;
+		h[6] = (int) h6;
+		h[7] = (int) h7;
+		h[8] = (int) h8;
+		h[9] = (int) h9;
 		return new Ed25519FieldElement(h);
 	}
 
 	/**
-	 * Invert this field element and return the result.
-	 * The inverse is found via Fermat's little theorem:
-	 * a^p congruent a mod p and therefore a^(p-2) congruent a^-1 mod p
+	 * Invert this field element and return the result. The inverse is found via Fermat's little theorem: a^p congruent a mod p and
+	 * therefore a^(p-2) congruent a^-1 mod p
 	 *
 	 * @return The inverse of this field element.
 	 */
@@ -676,8 +672,8 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Computes this field element to the power of (2^252 - 4) and returns the result.
-	 * This is a helper function for calculating the square root.
+	 * Computes this field element to the power of (2^252 - 4) and returns the result. This is a helper function for calculating the square
+	 * root.
 	 *
 	 * @return This field element to the power of (2^252 - 4).
 	 */
@@ -785,9 +781,13 @@ public class Ed25519FieldElement {
 
 	/**
 	 * Calculates and returns one of the square roots of u / v.
-	 * <pre>{@code
+	 *
+	 * <pre>
+	 * {@code
 	 * x = (u * v^3) * (u * v^7)^((p - 5) / 8) ==> x^2 = +-(u / v).
-	 * }</pre>
+	 * }
+	 * </pre>
+	 *
 	 * Note that this means x can be sqrt(u / v), -sqrt(u / v), +i * sqrt(u / v), -i * sqrt(u / v).
 	 *
 	 * @param u The nominator of the fraction.
@@ -804,7 +804,7 @@ public class Ed25519FieldElement {
 		// x = (v3^2) * v * u = u * v^7
 		x = v3.square().multiply(v).multiply(u);
 
-		//  x = (u * v^7)^((q - 5) / 8)
+		// x = (u * v^7)^((q - 5) / 8)
 		x = x.pow2to252sub4().multiply(x); // 2^252 - 3
 
 		// x = u * v^3 * (u * v^7)^((q - 5) / 8)
@@ -814,8 +814,9 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Reduce this field element modulo field size p = 2^255 - 19 and return the result.
-	 * The idea for the modulo p reduction algorithm is as follows:
+	 * Reduce this field element modulo field size p = 2^255 - 19 and return the result. The idea for the modulo p reduction algorithm is as
+	 * follows:
+	 *
 	 * <pre>
 	 * {@code
 	 * Assumption:
@@ -931,8 +932,8 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Encodes a given field element in its 32 byte 2^8 bit representation. This is done in two steps.
-	 * Step 1: Reduce the value of the field element modulo p.
+	 * Encodes a given field element in its 32 byte 2^8 bit representation. This is done in two steps. <br>
+	 * Step 1: Reduce the value of the field element modulo p. <br>
 	 * Step 2: Convert the field element to the 32 byte representation.
 	 *
 	 * @return Encoded field element (32 bytes).
@@ -954,45 +955,45 @@ public class Ed25519FieldElement {
 
 		// Step 2:
 		final byte[] s = new byte[32];
-		s[0] = (byte)(h0);
-		s[1] = (byte)(h0 >> 8);
-		s[2] = (byte)(h0 >> 16);
-		s[3] = (byte)((h0 >> 24) | (h1 << 2));
-		s[4] = (byte)(h1 >> 6);
-		s[5] = (byte)(h1 >> 14);
-		s[6] = (byte)((h1 >> 22) | (h2 << 3));
-		s[7] = (byte)(h2 >> 5);
-		s[8] = (byte)(h2 >> 13);
-		s[9] = (byte)((h2 >> 21) | (h3 << 5));
-		s[10] = (byte)(h3 >> 3);
-		s[11] = (byte)(h3 >> 11);
-		s[12] = (byte)((h3 >> 19) | (h4 << 6));
-		s[13] = (byte)(h4 >> 2);
-		s[14] = (byte)(h4 >> 10);
-		s[15] = (byte)(h4 >> 18);
-		s[16] = (byte)(h5);
-		s[17] = (byte)(h5 >> 8);
-		s[18] = (byte)(h5 >> 16);
-		s[19] = (byte)((h5 >> 24) | (h6 << 1));
-		s[20] = (byte)(h6 >> 7);
-		s[21] = (byte)(h6 >> 15);
-		s[22] = (byte)((h6 >> 23) | (h7 << 3));
-		s[23] = (byte)(h7 >> 5);
-		s[24] = (byte)(h7 >> 13);
-		s[25] = (byte)((h7 >> 21) | (h8 << 4));
-		s[26] = (byte)(h8 >> 4);
-		s[27] = (byte)(h8 >> 12);
-		s[28] = (byte)((h8 >> 20) | (h9 << 6));
-		s[29] = (byte)(h9 >> 2);
-		s[30] = (byte)(h9 >> 10);
-		s[31] = (byte)(h9 >> 18);
+		s[0] = (byte) (h0);
+		s[1] = (byte) (h0 >> 8);
+		s[2] = (byte) (h0 >> 16);
+		s[3] = (byte) ((h0 >> 24) | (h1 << 2));
+		s[4] = (byte) (h1 >> 6);
+		s[5] = (byte) (h1 >> 14);
+		s[6] = (byte) ((h1 >> 22) | (h2 << 3));
+		s[7] = (byte) (h2 >> 5);
+		s[8] = (byte) (h2 >> 13);
+		s[9] = (byte) ((h2 >> 21) | (h3 << 5));
+		s[10] = (byte) (h3 >> 3);
+		s[11] = (byte) (h3 >> 11);
+		s[12] = (byte) ((h3 >> 19) | (h4 << 6));
+		s[13] = (byte) (h4 >> 2);
+		s[14] = (byte) (h4 >> 10);
+		s[15] = (byte) (h4 >> 18);
+		s[16] = (byte) (h5);
+		s[17] = (byte) (h5 >> 8);
+		s[18] = (byte) (h5 >> 16);
+		s[19] = (byte) ((h5 >> 24) | (h6 << 1));
+		s[20] = (byte) (h6 >> 7);
+		s[21] = (byte) (h6 >> 15);
+		s[22] = (byte) ((h6 >> 23) | (h7 << 3));
+		s[23] = (byte) (h7 >> 5);
+		s[24] = (byte) (h7 >> 13);
+		s[25] = (byte) ((h7 >> 21) | (h8 << 4));
+		s[26] = (byte) (h8 >> 4);
+		s[27] = (byte) (h8 >> 12);
+		s[28] = (byte) ((h8 >> 20) | (h9 << 6));
+		s[29] = (byte) (h9 >> 2);
+		s[30] = (byte) (h9 >> 10);
+		s[31] = (byte) (h9 >> 18);
 
 		return new Ed25519EncodedFieldElement(s);
 	}
 
 	/**
-	 * Return true if this is in {1,3,5,...,q-2}
-	 * Return false if this is in {0,2,4,...,q-1}
+	 * Return true if this is in {1,3,5,...,q-2}; return false if this is in {0,2,4,...,q-1}
+	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
@@ -1015,7 +1016,7 @@ public class Ed25519FieldElement {
 			return false;
 		}
 
-		final Ed25519FieldElement f = (Ed25519FieldElement)obj;
+		final Ed25519FieldElement f = (Ed25519FieldElement) obj;
 		return this.encode().equals(f.encode());
 	}
 

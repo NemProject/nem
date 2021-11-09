@@ -1,11 +1,12 @@
 package org.nem.core.model.primitive;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
 public class ReferenceCountTest {
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeReferenceCount() {
@@ -19,7 +20,7 @@ public class ReferenceCountTest {
 		final ReferenceCount refCount = new ReferenceCount(0);
 
 		// Assert:
-		Assert.assertThat(refCount.getRaw(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(refCount.getRaw(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -28,12 +29,12 @@ public class ReferenceCountTest {
 		final ReferenceCount refCount = new ReferenceCount(1);
 
 		// Assert:
-		Assert.assertThat(refCount.getRaw(), IsEqual.equalTo(1L));
+		MatcherAssert.assertThat(refCount.getRaw(), IsEqual.equalTo(1L));
 	}
 
-	//endregion
+	// endregion
 
-	//region increment/decrement
+	// region increment/decrement
 
 	@Test
 	public void referenceCountCanBeIncremented() {
@@ -44,7 +45,7 @@ public class ReferenceCountTest {
 		final ReferenceCount result = refCount.increment();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(18)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new ReferenceCount(18)));
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class ReferenceCountTest {
 		final ReferenceCount result = refCount.decrement();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(16)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new ReferenceCount(16)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -68,5 +69,5 @@ public class ReferenceCountTest {
 		refCount.decrement();
 	}
 
-	//endregion
+	// endregion
 }

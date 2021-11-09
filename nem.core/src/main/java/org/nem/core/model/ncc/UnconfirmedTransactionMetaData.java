@@ -4,8 +4,8 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.serialization.*;
 
 /**
- * Class for holding additional information about an unconfirmed transaction required by clients.
- * The inner transaction hash is allowed to be null.
+ * Class for holding additional information about an unconfirmed transaction required by clients. The inner transaction hash is allowed to
+ * be null.
  */
 public class UnconfirmedTransactionMetaData implements SerializableEntity {
 

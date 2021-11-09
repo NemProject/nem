@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -11,7 +12,7 @@ import java.util.Properties;
 @RunWith(Enclosed.class)
 public class NemPropertiesTest {
 
-	//region StringPropertyTest
+	// region StringPropertyTest
 
 	public static class StringPropertyTest {
 
@@ -24,7 +25,7 @@ public class NemPropertiesTest {
 			final String value = properties.getString("s");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("nem"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("nem"));
 		}
 
 		@Test
@@ -33,9 +34,7 @@ public class NemPropertiesTest {
 			final NemProperties properties = createNemProperties();
 
 			// Assert:
-			ExceptionAssert.assertThrows(
-					v -> properties.getString("x"),
-					RuntimeException.class);
+			ExceptionAssert.assertThrows(v -> properties.getString("x"), RuntimeException.class);
 		}
 
 		@Test
@@ -47,7 +46,7 @@ public class NemPropertiesTest {
 			final String value = properties.getOptionalString("s", "abc");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("nem"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("nem"));
 		}
 
 		@Test
@@ -59,13 +58,13 @@ public class NemPropertiesTest {
 			final String value = properties.getOptionalString("x", "abc");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo("abc"));
+			MatcherAssert.assertThat(value, IsEqual.equalTo("abc"));
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region AbstractParsablePropertyTest (Integer, Long, Boolean)
+	// region AbstractParsablePropertyTest (Integer, Long, Boolean)
 
 	private abstract static class AbstractParsablePropertyTest<T> {
 		private final String key;
@@ -93,7 +92,7 @@ public class NemPropertiesTest {
 			final T value = this.getValue(properties, this.key);
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.parsedValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.parsedValue));
 		}
 
 		@Test
@@ -102,9 +101,7 @@ public class NemPropertiesTest {
 			final NemProperties properties = createNemProperties();
 
 			// Assert:
-			ExceptionAssert.assertThrows(
-					v -> this.getValue(properties, "s"),
-					RuntimeException.class);
+			ExceptionAssert.assertThrows(v -> this.getValue(properties, "s"), RuntimeException.class);
 		}
 
 		@Test
@@ -113,14 +110,12 @@ public class NemPropertiesTest {
 			final NemProperties properties = createNemProperties();
 
 			// Assert:
-			ExceptionAssert.assertThrows(
-					v -> this.getValue(properties, "x"),
-					RuntimeException.class);
+			ExceptionAssert.assertThrows(v -> this.getValue(properties, "x"), RuntimeException.class);
 		}
 
-		//endregion
+		// endregion
 
-		//region optional
+		// region optional
 
 		@Test
 		public void canReadOptionalParsableProperty() {
@@ -131,7 +126,7 @@ public class NemPropertiesTest {
 			final T value = this.getOptionalValue(properties, this.key);
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.parsedValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.parsedValue));
 		}
 
 		@Test
@@ -140,9 +135,7 @@ public class NemPropertiesTest {
 			final NemProperties properties = createNemProperties();
 
 			// Assert:
-			ExceptionAssert.assertThrows(
-					v -> this.getOptionalValue(properties, "s"),
-					RuntimeException.class);
+			ExceptionAssert.assertThrows(v -> this.getOptionalValue(properties, "s"), RuntimeException.class);
 		}
 
 		@Test
@@ -154,10 +147,10 @@ public class NemPropertiesTest {
 			final T value = this.getOptionalValue(properties, "x");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(this.defaultValue));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(this.defaultValue));
 		}
 
-		//endregion
+		// endregion
 	}
 
 	public static class IntegerPropertyTest extends AbstractParsablePropertyTest<Integer> {
@@ -211,9 +204,9 @@ public class NemPropertiesTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region StringArrayPropertyTest
+	// region StringArrayPropertyTest
 
 	public static class StringArrayPropertyTest {
 
@@ -226,37 +219,39 @@ public class NemPropertiesTest {
 			final String[] value = properties.getOptionalStringArray("x", "abc|xyz");
 
 			// Assert:
-			Assert.assertThat(
-					value,
-					IsEqual.equalTo(new String[] { "abc", "xyz" }));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(new String[]{
+					"abc", "xyz"
+			}));
 		}
 
 		@Test
 		public void canReadOptionalStringArrayWithNoValues() {
 			// Assert:
-			this.assertCanReadStringArray(" \t \t", new String[] {});
+			this.assertCanReadStringArray(" \t \t", new String[]{});
 		}
 
 		@Test
 		public void canReadOptionalStringArrayWithSingleValue() {
 			// Assert:
-			this.assertCanReadStringArray("10.0.0.10", new String[] { "10.0.0.10" });
+			this.assertCanReadStringArray("10.0.0.10", new String[]{
+					"10.0.0.10"
+			});
 		}
 
 		@Test
 		public void canReadOptionalStringArrayWithMultipleValues() {
 			// Assert:
-			this.assertCanReadStringArray(
-					"10.0.0.10|10.0.0.20|10.0.0.30",
-					new String[] { "10.0.0.10", "10.0.0.20", "10.0.0.30" });
+			this.assertCanReadStringArray("10.0.0.10|10.0.0.20|10.0.0.30", new String[]{
+					"10.0.0.10", "10.0.0.20", "10.0.0.30"
+			});
 		}
 
 		@Test
 		public void canReadOptionalStringArrayWithBlankValues() {
 			// Assert:
-			this.assertCanReadStringArray(
-					"10.0.0.10|| |10.0.0.30",
-					new String[] { "10.0.0.10", "", " ", "10.0.0.30" });
+			this.assertCanReadStringArray("10.0.0.10|| |10.0.0.30", new String[]{
+					"10.0.0.10", "", " ", "10.0.0.30"
+			});
 		}
 
 		private void assertCanReadStringArray(final String rawValue, final String[] expectedValues) {
@@ -269,11 +264,11 @@ public class NemPropertiesTest {
 			final String[] value = nemProperties.getOptionalStringArray("sa", "");
 
 			// Assert:
-			Assert.assertThat(value, IsEqual.equalTo(expectedValues));
+			MatcherAssert.assertThat(value, IsEqual.equalTo(expectedValues));
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static NemProperties createNemProperties() {
 		// Arrange:

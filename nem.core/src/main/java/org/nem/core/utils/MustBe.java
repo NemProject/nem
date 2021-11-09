@@ -30,7 +30,8 @@ public class MustBe {
 	 */
 	public static void notWhitespace(final String str, final String name, final int maxLength) {
 		if (StringUtils.isNullOrWhitespace(str) || str.length() > maxLength) {
-			final String message = String.format("%s cannot be null, empty, or whitespace, or have length greater than %d", name, maxLength);
+			final String message = String.format("%s cannot be null, empty, or whitespace, or have length greater than %d", name,
+					maxLength);
 			throw new IllegalArgumentException(message);
 		}
 	}
@@ -59,7 +60,7 @@ public class MustBe {
 	 * @param maxInclusive The max allowed value (inclusive).
 	 */
 	public static void inRange(final int value, final String name, final int minInclusive, final int maxInclusive) {
-		inRange((long)value, name, minInclusive, maxInclusive);
+		inRange((long) value, name, minInclusive, maxInclusive);
 	}
 
 	/**

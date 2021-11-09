@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -30,8 +31,7 @@ public class ReverseTransactionObserverTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
-		Assert.assertThat(
-				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+		MatcherAssert.assertThat(notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.Account, NotificationType.BalanceTransfer)));
 	}
 
@@ -52,11 +52,11 @@ public class ReverseTransactionObserverTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final BalanceTransferNotification notification = (BalanceTransferNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
-		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
-		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
-		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		final BalanceTransferNotification notification = (BalanceTransferNotification) notificationCaptor.getValue();
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceTransfer));
+		MatcherAssert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
+		MatcherAssert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
+		MatcherAssert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
 	}
 
 	@Test
@@ -75,12 +75,12 @@ public class ReverseTransactionObserverTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final MosaicTransferNotification notification = (MosaicTransferNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
-		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
-		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
-		Assert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));
-		Assert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(45)));
+		final MosaicTransferNotification notification = (MosaicTransferNotification) notificationCaptor.getValue();
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
+		MatcherAssert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
+		MatcherAssert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
+		MatcherAssert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));
+		MatcherAssert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(45)));
 	}
 
 	@Test
@@ -110,10 +110,10 @@ public class ReverseTransactionObserverTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final BalanceAdjustmentNotification notification = (BalanceAdjustmentNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(retypedType));
-		Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
-		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+		final BalanceAdjustmentNotification notification = (BalanceAdjustmentNotification) notificationCaptor.getValue();
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(retypedType));
+		MatcherAssert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
 	}
 
 	@Test
@@ -131,8 +131,8 @@ public class ReverseTransactionObserverTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final AccountNotification notification = (AccountNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.Account));
-		Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
+		final AccountNotification notification = (AccountNotification) notificationCaptor.getValue();
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.Account));
+		MatcherAssert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
 	}
 }

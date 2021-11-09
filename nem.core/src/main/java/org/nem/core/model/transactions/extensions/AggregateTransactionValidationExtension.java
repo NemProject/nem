@@ -27,8 +27,6 @@ public class AggregateTransactionValidationExtension<TTransaction extends Transa
 	 * @param transaction The transaction.
 	 */
 	public void validate(final TTransaction transaction) {
-		this.extensions.stream()
-				.filter(e -> e.isApplicable(transaction.getEntityVersion()))
-				.forEach(e -> e.validate(transaction));
+		this.extensions.stream().filter(e -> e.isApplicable(transaction.getEntityVersion())).forEach(e -> e.validate(transaction));
 	}
 }

@@ -5,9 +5,8 @@ import org.nem.core.utils.*;
 import java.util.Arrays;
 
 /**
- * Represents a field element of the finite field with p=2^255-19 elements.
- * The value of the field element is held in 2^8 bit representation, i.e. in a byte array.
- * The length of the array must be 32 or 64.
+ * Represents a field element of the finite field with p=2^255-19 elements. The value of the field element is held in 2^8 bit
+ * representation, i.e. in a byte array. The length of the array must be 32 or 64.
  */
 public class Ed25519EncodedFieldElement {
 	private final byte[] zero;
@@ -26,7 +25,7 @@ public class Ed25519EncodedFieldElement {
 			case 64:
 				this.zero = Ed25519Field.ZERO_LONG;
 				break;
-			default:
+			default :
 				throw new IllegalArgumentException("Invalid 2^8 bit representation.");
 		}
 
@@ -43,11 +42,8 @@ public class Ed25519EncodedFieldElement {
 	}
 
 	/**
-	 * Return true if this is in {1,3,5,...,q-2}
-	 * Return false if this is in {0,2,4,...,q-1}
-	 * <br>
-	 * Preconditions:
-	 * |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 * Return true if this is in {1,3,5,...,q-2}; return false if this is in {0,2,4,...,q-1} <br>
+	 * Preconditions: |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 	 *
 	 * @return true if this is in {1,3,5,...,q-2}, false otherwise.
 	 */
@@ -65,8 +61,8 @@ public class Ed25519EncodedFieldElement {
 	}
 
 	/**
-	 * Decodes this encoded (32 byte) representation to a field element in its 10 byte 2^25.5 representation.
-	 * The most significant bit is discarded.
+	 * Decodes this encoded (32 byte) representation to a field element in its 10 byte 2^25.5 representation. The most significant bit is
+	 * discarded.
 	 *
 	 * @return The field element in its 2^25.5 bit representation.
 	 */
@@ -93,49 +89,49 @@ public class Ed25519EncodedFieldElement {
 		final long carry9;
 
 		// Remember: 2^255 congruent 19 modulo p
-		carry9 = (h9 + (long)(1 << 24)) >> 25;
+		carry9 = (h9 + (long) (1 << 24)) >> 25;
 		h0 += carry9 * 19;
 		h9 -= carry9 << 25;
-		carry1 = (h1 + (long)(1 << 24)) >> 25;
+		carry1 = (h1 + (long) (1 << 24)) >> 25;
 		h2 += carry1;
 		h1 -= carry1 << 25;
-		carry3 = (h3 + (long)(1 << 24)) >> 25;
+		carry3 = (h3 + (long) (1 << 24)) >> 25;
 		h4 += carry3;
 		h3 -= carry3 << 25;
-		carry5 = (h5 + (long)(1 << 24)) >> 25;
+		carry5 = (h5 + (long) (1 << 24)) >> 25;
 		h6 += carry5;
 		h5 -= carry5 << 25;
-		carry7 = (h7 + (long)(1 << 24)) >> 25;
+		carry7 = (h7 + (long) (1 << 24)) >> 25;
 		h8 += carry7;
 		h7 -= carry7 << 25;
 
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
+		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
-		carry2 = (h2 + (long)(1 << 25)) >> 26;
+		carry2 = (h2 + (long) (1 << 25)) >> 26;
 		h3 += carry2;
 		h2 -= carry2 << 26;
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
+		carry4 = (h4 + (long) (1 << 25)) >> 26;
 		h5 += carry4;
 		h4 -= carry4 << 26;
-		carry6 = (h6 + (long)(1 << 25)) >> 26;
+		carry6 = (h6 + (long) (1 << 25)) >> 26;
 		h7 += carry6;
 		h6 -= carry6 << 26;
-		carry8 = (h8 + (long)(1 << 25)) >> 26;
+		carry8 = (h8 + (long) (1 << 25)) >> 26;
 		h9 += carry8;
 		h8 -= carry8 << 26;
 
 		final int[] h = new int[10];
-		h[0] = (int)h0;
-		h[1] = (int)h1;
-		h[2] = (int)h2;
-		h[3] = (int)h3;
-		h[4] = (int)h4;
-		h[5] = (int)h5;
-		h[6] = (int)h6;
-		h[7] = (int)h7;
-		h[8] = (int)h8;
-		h[9] = (int)h9;
+		h[0] = (int) h0;
+		h[1] = (int) h1;
+		h[2] = (int) h2;
+		h[3] = (int) h3;
+		h[4] = (int) h4;
+		h[5] = (int) h5;
+		h[6] = (int) h6;
+		h[7] = (int) h7;
+		h[8] = (int) h8;
+		h[9] = (int) h9;
 
 		return new Ed25519FieldElement(h);
 	}
@@ -190,18 +186,20 @@ public class Ed25519EncodedFieldElement {
 		final long carry16;
 
 		/**
-		 * Lots of magic numbers :)
-		 * To understand what's going on below, note that
+		 * Lots of magic numbers :) <br>
+		 * To understand what's going on below, note that <br>
 		 *
-		 * (1) q = 2^252 + q0 where q0 = 27742317777372353535851937790883648493.
-		 * (2) s11 is the coefficient of 2^(11*21), s23 is the coefficient of 2^(^23*21) and 2^252 = 2^((23-11) * 21)).
-		 * (3) 2^252 congruent -q0 modulo q.
-		 * (4) -q0 = 666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21)
+		 * (1) q = 2^252 + q0 where q0 = 27742317777372353535851937790883648493. <br>
+		 * (2) s11 is the coefficient of 2^(11*21), s23 is the coefficient of 2^(^23*21) and 2^252 = 2^((23-11) * 21)). <br>
+		 * (3) 2^252 congruent -q0 modulo q. <br>
+		 * (4) -q0 = 666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21) <br>
 		 *
-		 * Thus
-		 * s23 * 2^(23*11) = s23 * 2^(12*21) * 2^(11*21) = s3 * 2^252 * 2^(11*21) congruent
-		 * s23 * (666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21)) * 2^(11*21) modulo q =
-		 * s23 * (666643 * 2^(11*21) + 470296 * 2^(12*21) + 654183 * 2^(13*21) - 997805 * 2^(14*21) + 136657 * 2^(15*21) - 683901 * 2^(16*21)).
+		 * Thus <br>
+		 * s23 * 2^(23*11) = s23 * 2^(12*21) * 2^(11*21) = s3 * 2^252 * 2^(11*21) congruent <br>
+		 * s23 * (666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21)) * 2^(11*21)
+		 * modulo q = <br>
+		 * s23 * (666643 * 2^(11*21) + 470296 * 2^(12*21) + 654183 * 2^(13*21) - 997805 * 2^(14*21) + 136657 * 2^(15*21) - 683901 *
+		 * 2^(16*21)). <br>
 		 *
 		 * The same procedure is then applied for s22,...,s18.
 		 */
@@ -460,46 +458,44 @@ public class Ed25519EncodedFieldElement {
 
 		// s0, ..., s11 got 21 bits each.
 		final byte[] result = new byte[32];
-		result[0] = (byte)(s0);
-		result[1] = (byte)(s0 >> 8);
-		result[2] = (byte)((s0 >> 16) | (s1 << 5));
-		result[3] = (byte)(s1 >> 3);
-		result[4] = (byte)(s1 >> 11);
-		result[5] = (byte)((s1 >> 19) | (s2 << 2));
-		result[6] = (byte)(s2 >> 6);
-		result[7] = (byte)((s2 >> 14) | (s3 << 7));
-		result[8] = (byte)(s3 >> 1);
-		result[9] = (byte)(s3 >> 9);
-		result[10] = (byte)((s3 >> 17) | (s4 << 4));
-		result[11] = (byte)(s4 >> 4);
-		result[12] = (byte)(s4 >> 12);
-		result[13] = (byte)((s4 >> 20) | (s5 << 1));
-		result[14] = (byte)(s5 >> 7);
-		result[15] = (byte)((s5 >> 15) | (s6 << 6));
-		result[16] = (byte)(s6 >> 2);
-		result[17] = (byte)(s6 >> 10);
-		result[18] = (byte)((s6 >> 18) | (s7 << 3));
-		result[19] = (byte)(s7 >> 5);
-		result[20] = (byte)(s7 >> 13);
-		result[21] = (byte)(s8);
-		result[22] = (byte)(s8 >> 8);
-		result[23] = (byte)((s8 >> 16) | (s9 << 5));
-		result[24] = (byte)(s9 >> 3);
-		result[25] = (byte)(s9 >> 11);
-		result[26] = (byte)((s9 >> 19) | (s10 << 2));
-		result[27] = (byte)(s10 >> 6);
-		result[28] = (byte)((s10 >> 14) | (s11 << 7));
-		result[29] = (byte)(s11 >> 1);
-		result[30] = (byte)(s11 >> 9);
-		result[31] = (byte)(s11 >> 17);
+		result[0] = (byte) (s0);
+		result[1] = (byte) (s0 >> 8);
+		result[2] = (byte) ((s0 >> 16) | (s1 << 5));
+		result[3] = (byte) (s1 >> 3);
+		result[4] = (byte) (s1 >> 11);
+		result[5] = (byte) ((s1 >> 19) | (s2 << 2));
+		result[6] = (byte) (s2 >> 6);
+		result[7] = (byte) ((s2 >> 14) | (s3 << 7));
+		result[8] = (byte) (s3 >> 1);
+		result[9] = (byte) (s3 >> 9);
+		result[10] = (byte) ((s3 >> 17) | (s4 << 4));
+		result[11] = (byte) (s4 >> 4);
+		result[12] = (byte) (s4 >> 12);
+		result[13] = (byte) ((s4 >> 20) | (s5 << 1));
+		result[14] = (byte) (s5 >> 7);
+		result[15] = (byte) ((s5 >> 15) | (s6 << 6));
+		result[16] = (byte) (s6 >> 2);
+		result[17] = (byte) (s6 >> 10);
+		result[18] = (byte) ((s6 >> 18) | (s7 << 3));
+		result[19] = (byte) (s7 >> 5);
+		result[20] = (byte) (s7 >> 13);
+		result[21] = (byte) (s8);
+		result[22] = (byte) (s8 >> 8);
+		result[23] = (byte) ((s8 >> 16) | (s9 << 5));
+		result[24] = (byte) (s9 >> 3);
+		result[25] = (byte) (s9 >> 11);
+		result[26] = (byte) ((s9 >> 19) | (s10 << 2));
+		result[27] = (byte) (s10 >> 6);
+		result[28] = (byte) ((s10 >> 14) | (s11 << 7));
+		result[29] = (byte) (s11 >> 1);
+		result[30] = (byte) (s11 >> 9);
+		result[31] = (byte) (s11 >> 17);
 
 		return new Ed25519EncodedFieldElement(result);
 	}
 
 	/**
-	 * Multiplies this encoded field element with another and adds a third.
-	 * The result is reduced modulo the group order.
-	 * <br>
+	 * Multiplies this encoded field element with another and adds a third. The result is reduced modulo the group order. <br>
 	 * See the comments in the method modQ() for an explanation of the algorithm.
 	 *
 	 * @param b The encoded field element which is multiplied with this.
@@ -602,7 +598,8 @@ public class Ed25519EncodedFieldElement {
 		s8 = c8 + a0 * b8 + a1 * b7 + a2 * b6 + a3 * b5 + a4 * b4 + a5 * b3 + a6 * b2 + a7 * b1 + a8 * b0;
 		s9 = c9 + a0 * b9 + a1 * b8 + a2 * b7 + a3 * b6 + a4 * b5 + a5 * b4 + a6 * b3 + a7 * b2 + a8 * b1 + a9 * b0;
 		s10 = c10 + a0 * b10 + a1 * b9 + a2 * b8 + a3 * b7 + a4 * b6 + a5 * b5 + a6 * b4 + a7 * b3 + a8 * b2 + a9 * b1 + a10 * b0;
-		s11 = c11 + a0 * b11 + a1 * b10 + a2 * b9 + a3 * b8 + a4 * b7 + a5 * b6 + a6 * b5 + a7 * b4 + a8 * b3 + a9 * b2 + a10 * b1 + a11 * b0;
+		s11 = c11 + a0 * b11 + a1 * b10 + a2 * b9 + a3 * b8 + a4 * b7 + a5 * b6 + a6 * b5 + a7 * b4 + a8 * b3 + a9 * b2 + a10 * b1
+				+ a11 * b0;
 		s12 = a1 * b11 + a2 * b10 + a3 * b9 + a4 * b8 + a5 * b7 + a6 * b6 + a7 * b5 + a8 * b4 + a9 * b3 + a10 * b2 + a11 * b1;
 		s13 = a2 * b11 + a3 * b10 + a4 * b9 + a5 * b8 + a6 * b7 + a7 * b6 + a8 * b5 + a9 * b4 + a10 * b3 + a11 * b2;
 		s14 = a3 * b11 + a4 * b10 + a5 * b9 + a6 * b8 + a7 * b7 + a8 * b6 + a9 * b5 + a10 * b4 + a11 * b3;
@@ -932,38 +929,38 @@ public class Ed25519EncodedFieldElement {
 		s10 -= carry10 << 21;
 
 		final byte[] result = new byte[32];
-		result[0] = (byte)(s0);
-		result[1] = (byte)(s0 >> 8);
-		result[2] = (byte)((s0 >> 16) | (s1 << 5));
-		result[3] = (byte)(s1 >> 3);
-		result[4] = (byte)(s1 >> 11);
-		result[5] = (byte)((s1 >> 19) | (s2 << 2));
-		result[6] = (byte)(s2 >> 6);
-		result[7] = (byte)((s2 >> 14) | (s3 << 7));
-		result[8] = (byte)(s3 >> 1);
-		result[9] = (byte)(s3 >> 9);
-		result[10] = (byte)((s3 >> 17) | (s4 << 4));
-		result[11] = (byte)(s4 >> 4);
-		result[12] = (byte)(s4 >> 12);
-		result[13] = (byte)((s4 >> 20) | (s5 << 1));
-		result[14] = (byte)(s5 >> 7);
-		result[15] = (byte)((s5 >> 15) | (s6 << 6));
-		result[16] = (byte)(s6 >> 2);
-		result[17] = (byte)(s6 >> 10);
-		result[18] = (byte)((s6 >> 18) | (s7 << 3));
-		result[19] = (byte)(s7 >> 5);
-		result[20] = (byte)(s7 >> 13);
-		result[21] = (byte)(s8);
-		result[22] = (byte)(s8 >> 8);
-		result[23] = (byte)((s8 >> 16) | (s9 << 5));
-		result[24] = (byte)(s9 >> 3);
-		result[25] = (byte)(s9 >> 11);
-		result[26] = (byte)((s9 >> 19) | (s10 << 2));
-		result[27] = (byte)(s10 >> 6);
-		result[28] = (byte)((s10 >> 14) | (s11 << 7));
-		result[29] = (byte)(s11 >> 1);
-		result[30] = (byte)(s11 >> 9);
-		result[31] = (byte)(s11 >> 17);
+		result[0] = (byte) (s0);
+		result[1] = (byte) (s0 >> 8);
+		result[2] = (byte) ((s0 >> 16) | (s1 << 5));
+		result[3] = (byte) (s1 >> 3);
+		result[4] = (byte) (s1 >> 11);
+		result[5] = (byte) ((s1 >> 19) | (s2 << 2));
+		result[6] = (byte) (s2 >> 6);
+		result[7] = (byte) ((s2 >> 14) | (s3 << 7));
+		result[8] = (byte) (s3 >> 1);
+		result[9] = (byte) (s3 >> 9);
+		result[10] = (byte) ((s3 >> 17) | (s4 << 4));
+		result[11] = (byte) (s4 >> 4);
+		result[12] = (byte) (s4 >> 12);
+		result[13] = (byte) ((s4 >> 20) | (s5 << 1));
+		result[14] = (byte) (s5 >> 7);
+		result[15] = (byte) ((s5 >> 15) | (s6 << 6));
+		result[16] = (byte) (s6 >> 2);
+		result[17] = (byte) (s6 >> 10);
+		result[18] = (byte) ((s6 >> 18) | (s7 << 3));
+		result[19] = (byte) (s7 >> 5);
+		result[20] = (byte) (s7 >> 13);
+		result[21] = (byte) (s8);
+		result[22] = (byte) (s8 >> 8);
+		result[23] = (byte) ((s8 >> 16) | (s9 << 5));
+		result[24] = (byte) (s9 >> 3);
+		result[25] = (byte) (s9 >> 11);
+		result[26] = (byte) ((s9 >> 19) | (s10 << 2));
+		result[27] = (byte) (s10 >> 6);
+		result[28] = (byte) ((s10 >> 14) | (s11 << 7));
+		result[29] = (byte) (s11 >> 1);
+		result[30] = (byte) (s11 >> 9);
+		result[31] = (byte) (s11 >> 17);
 
 		return new Ed25519EncodedFieldElement(result);
 	}
@@ -980,7 +977,7 @@ public class Ed25519EncodedFieldElement {
 		result |= (in[offset++] & 0xff) << 8;
 		result |= (in[offset++] & 0xff) << 16;
 		result |= in[offset] << 24;
-		return ((long)result) & 0xffffffffL;
+		return ((long) result) & 0xffffffffL;
 	}
 
 	@Override
@@ -994,7 +991,7 @@ public class Ed25519EncodedFieldElement {
 			return false;
 		}
 
-		final Ed25519EncodedFieldElement encoded = (Ed25519EncodedFieldElement)obj;
+		final Ed25519EncodedFieldElement encoded = (Ed25519EncodedFieldElement) obj;
 		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 

@@ -14,8 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A transaction that represents the exchange of funds/mosaics and/or a message
- * between a sender and a recipient.
+ * A transaction that represents the exchange of funds/mosaics and/or a message between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
 	private static final int MOSAICS_VERSION = 2;
@@ -24,53 +23,48 @@ public class TransferTransaction extends Transaction {
 	private final Account recipient;
 	private final TransferTransactionAttachment attachment;
 
-	//region VALIDATION_EXTENSIONS
+	// region VALIDATION_EXTENSIONS
 
 	private static final AggregateTransactionValidationExtension<TransferTransaction> VALIDATION_EXTENSIONS = new AggregateTransactionValidationExtension<>(
-			Collections.singletonList(
-					new TransactionValidationExtension<TransferTransaction>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return version < MOSAICS_VERSION;
-						}
+			Collections.singletonList(new TransactionValidationExtension<TransferTransaction>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return version < MOSAICS_VERSION;
+				}
 
-						@Override
-						public void validate(final TransferTransaction transaction) {
-							if (!transaction.attachment.getMosaics().isEmpty()) {
-								final String message = String.format(
-										"mosaics cannot be attached to transaction with version %d",
-										transaction.getEntityVersion());
-								throw new IllegalArgumentException(message);
-							}
-						}
+				@Override
+				public void validate(final TransferTransaction transaction) {
+					if (!transaction.attachment.getMosaics().isEmpty()) {
+						final String message = String.format("mosaics cannot be attached to transaction with version %d",
+								transaction.getEntityVersion());
+						throw new IllegalArgumentException(message);
 					}
-			));
+				}
+			}));
 
-	//endregion
+	// endregion
 
-	//region SERIALIZATION_EXTENSIONS
+	// region SERIALIZATION_EXTENSIONS
 
 	private static final AggregateTransactionSerializationExtension<ExtendedData> SERIALIZATION_EXTENSIONS = new AggregateTransactionSerializationExtension<>(
-			Collections.singletonList(
-					new TransactionSerializationExtension<ExtendedData>() {
-						@Override
-						public boolean isApplicable(final int version) {
-							return version >= MOSAICS_VERSION;
-						}
+			Collections.singletonList(new TransactionSerializationExtension<ExtendedData>() {
+				@Override
+				public boolean isApplicable(final int version) {
+					return version >= MOSAICS_VERSION;
+				}
 
-						@Override
-						public void serialize(final Serializer serializer, final ExtendedData extendedData) {
-							serializer.writeObjectArray("mosaics", extendedData.mosaics);
-						}
+				@Override
+				public void serialize(final Serializer serializer, final ExtendedData extendedData) {
+					serializer.writeObjectArray("mosaics", extendedData.mosaics);
+				}
 
-						@Override
-						public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
-							extendedData.mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
-						}
-					}
-			));
+				@Override
+				public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
+					extendedData.mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
+				}
+			}));
 
-	//endregion
+	// endregion
 
 	/**
 	 * Creates a transfer transaction.
@@ -81,11 +75,7 @@ public class TransferTransaction extends Transaction {
 	 * @param amount The transaction amount.
 	 * @param attachment The transaction attachment.
 	 */
-	public TransferTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
+	public TransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount,
 			final TransferTransactionAttachment attachment) {
 		this(CURRENT_VERSION, timeStamp, sender, recipient, amount, attachment);
 	}
@@ -100,13 +90,8 @@ public class TransferTransaction extends Transaction {
 	 * @param amount The transaction amount.
 	 * @param attachment The transaction attachment.
 	 */
-	public TransferTransaction(
-			final int version,
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
-			final TransferTransactionAttachment attachment) {
+	public TransferTransaction(final int version, final TimeInstant timeStamp, final Account sender, final Account recipient,
+			final Amount amount, final TransferTransactionAttachment attachment) {
 		super(TransactionTypes.TRANSFER, version, timeStamp, sender);
 		MustBe.notNull(recipient, "recipient");
 
@@ -129,8 +114,7 @@ public class TransferTransaction extends Transaction {
 		this.amount = Amount.readFrom(deserializer, "amount");
 
 		this.attachment = new TransferTransactionAttachment();
-		final Message message = deserializer.readOptionalObject(
-				"message",
+		final Message message = deserializer.readOptionalObject("message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 		this.attachment.setMessage(normalizeMessage(message));
 
@@ -197,8 +181,7 @@ public class TransferTransaction extends Transaction {
 	 * @return The mosaics.
 	 */
 	public Collection<Mosaic> getMosaics() {
-		return this.getAttachment().getMosaics().stream()
-				.filter(p -> !isMosaicXem(p))
+		return this.getAttachment().getMosaics().stream().filter(p -> !isMosaicXem(p))
 				.map(p -> new Mosaic(p.getMosaicId(), Quantity.fromValue(this.getRawQuantity(p.getQuantity()))))
 				.collect(Collectors.toList());
 	}
@@ -213,18 +196,13 @@ public class TransferTransaction extends Transaction {
 			return this.amount;
 		}
 
-		return this.getAttachment().getMosaics().stream()
-				.filter(TransferTransaction::isMosaicXem)
-				.map(p -> Amount.fromMicroNem(this.getRawQuantity(p.getQuantity())))
-				.findFirst()
-				.orElse(null);
+		return this.getAttachment().getMosaics().stream().filter(TransferTransaction::isMosaicXem)
+				.map(p -> Amount.fromMicroNem(this.getRawQuantity(p.getQuantity()))).findFirst().orElse(null);
 	}
 
 	private long getRawQuantity(final Quantity quantity) {
-		return BigInteger.valueOf(this.amount.getNumMicroNem())
-				.multiply(BigInteger.valueOf(quantity.getRaw()))
-				.divide(BigInteger.valueOf(Amount.MICRONEMS_IN_NEM))
-				.longValueExact();
+		return BigInteger.valueOf(this.amount.getNumMicroNem()).multiply(BigInteger.valueOf(quantity.getRaw()))
+				.divide(BigInteger.valueOf(Amount.MICRONEMS_IN_NEM)).longValueExact();
 	}
 
 	private static boolean isMosaicXem(final Mosaic mosaic) {
@@ -258,7 +236,8 @@ public class TransferTransaction extends Transaction {
 
 		final MosaicTransferFeeCalculator calculator = state.getMosaicTransferFeeCalculator();
 		for (final Mosaic mosaic : this.getMosaics()) {
-			notifications.add(new MosaicTransferNotification(this.getSigner(), this.getRecipient(), mosaic.getMosaicId(), mosaic.getQuantity()));
+			notifications
+					.add(new MosaicTransferNotification(this.getSigner(), this.getRecipient(), mosaic.getMosaicId(), mosaic.getQuantity()));
 
 			final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 			if (null == levy) {

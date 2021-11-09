@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
 
-public abstract class AbstractStringSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, String> {
+public abstract class AbstractStringSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, String> {
 	public AbstractStringSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}
@@ -35,9 +37,7 @@ public abstract class AbstractStringSerializationTest<TSerializer extends Serial
 		serializer.writeString("String", s);
 
 		final Deserializer deserializer = this.createDeserializer(serializer);
-		ExceptionAssert.assertThrowsMissingPropertyException(
-				() -> deserializer.readString("String"),
-				"String");
+		ExceptionAssert.assertThrowsMissingPropertyException(() -> deserializer.readString("String"), "String");
 	}
 
 	@Override

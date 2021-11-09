@@ -7,8 +7,8 @@ import org.nem.core.node.ApiId;
  */
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
-	
-	//region account/*
+
+	// region account/*
 
 	/**
 	 * The /account/unlock API
@@ -49,7 +49,7 @@ public enum NisApiId implements ApiId {
 	 * The /account/mosaic/owned/definition/batch API
 	 */
 	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
-	
+
 	/**
 	 * The /account/status API
 	 */
@@ -80,24 +80,23 @@ public enum NisApiId implements ApiId {
 	 */
 	NIS_REST_ACCOUNT_UNCONFIRMED("/account/unconfirmedTransactions"),
 
-	//endregion
+	// endregion
 
-	//region block/*
+	// region block/*
 
 	/**
 	 * The /block/at/public API
 	 */
 	NIS_REST_BLOCK_AT_PUBLIC("/block/at/public"),
 
-
 	/**
 	 * The /local/chain/blocks-after API
 	 */
 	NIS_REST_BLOCK_AFTER_LOCAL("/local/chain/blocks-after"),
 
-	//endregion
+	// endregion
 
-	//region chain/*
+	// region chain/*
 
 	/**
 	 * The /chain/last-block API.
@@ -108,15 +107,15 @@ public enum NisApiId implements ApiId {
 	 * The /chain/height API.
 	 */
 	NIS_REST_CHAIN_HEIGHT("/chain/height"),
-	
+
 	/**
 	 * The /chain/score API.
 	 */
 	NIS_REST_CHAIN_SCORE("/chain/score"),
 
-	//endregion
+	// endregion
 
-	//region node/*
+	// region node/*
 
 	/**
 	 * The node/extended-info API.
@@ -148,9 +147,9 @@ public enum NisApiId implements ApiId {
 	 */
 	NIS_REST_ACTIVE_PEERS_MAX_CHAIN_HEIGHT("/node/active-peers/max-chain-height"),
 
-	//endregion
+	// endregion
 
-	//region transaction/*
+	// region transaction/*
 
 	/**
 	 * The /transaction/announce API.
@@ -162,7 +161,7 @@ public enum NisApiId implements ApiId {
 	 */
 	NIS_REST_TRANSACTION_GET("/transaction/get"),
 
-	//endregion
+	// endregion
 
 	// region /*
 
@@ -181,17 +180,17 @@ public enum NisApiId implements ApiId {
 	 */
 	NIS_REST_STATUS("/status"),
 
-	//endregion
+	// endregion
 
-	//region time-sync/*
+	// region time-sync/*
 
 	/**
 	 * The time-sync/network-time API
 	 */
 	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
-	//endregion
-	
+	// endregion
+
 	private final String value;
 
 	/**

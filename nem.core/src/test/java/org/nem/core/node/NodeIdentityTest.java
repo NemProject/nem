@@ -1,6 +1,7 @@
 package org.nem.core.node;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class NodeIdentityTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void identityCanBeCreatedAroundPublicKey() {
@@ -23,10 +24,10 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:
-		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
-		Assert.assertThat(identity.getName(), IsNull.nullValue());
+		MatcherAssert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(identity.getName(), IsNull.nullValue());
 	}
 
 	@Test
@@ -38,10 +39,10 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:
-		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
-		Assert.assertThat(identity.getName(), IsNull.nullValue());
+		MatcherAssert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(identity.getName(), IsNull.nullValue());
 	}
 
 	@Test
@@ -53,15 +54,15 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
 
 		// Assert:
-		Assert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
+		MatcherAssert.assertThat(identity.getKeyPair(), IsSame.sameInstance(keyPair));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
 	}
 
-	//endregion
+	// endregion
 
-	//region setName
+	// region setName
 
 	@Test
 	public void canChangeNodeIdentityFriendlyName() {
@@ -73,12 +74,12 @@ public class NodeIdentityTest {
 		identity.setName("bbb");
 
 		// Assert:
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("bbb"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bbb"));
 	}
 
-	//endregion
+	// endregion
 
-	//region sign
+	// region sign
 
 	@Test
 	public void equalIdentitiesProduceSameSignatures() {
@@ -93,7 +94,7 @@ public class NodeIdentityTest {
 		final Signature signature2 = identity2.sign(salt);
 
 		// Assert:
-		Assert.assertThat(signature2, IsEqual.equalTo(signature1));
+		MatcherAssert.assertThat(signature2, IsEqual.equalTo(signature1));
 	}
 
 	@Test
@@ -108,7 +109,7 @@ public class NodeIdentityTest {
 		final Signature signature2 = identity2.sign(Utils.generateRandomBytes());
 
 		// Assert:
-		Assert.assertThat(signature2, IsNot.not(IsEqual.equalTo(signature1)));
+		MatcherAssert.assertThat(signature2, IsNot.not(IsEqual.equalTo(signature1)));
 	}
 
 	@Test
@@ -123,7 +124,7 @@ public class NodeIdentityTest {
 		final Signature signature2 = identity2.sign(salt);
 
 		// Assert:
-		Assert.assertThat(signature2, IsNot.not(IsEqual.equalTo(signature1)));
+		MatcherAssert.assertThat(signature2, IsNot.not(IsEqual.equalTo(signature1)));
 	}
 
 	@Test(expected = CryptoException.class)
@@ -136,9 +137,9 @@ public class NodeIdentityTest {
 		identity.sign(salt);
 	}
 
-	//endregion
+	// endregion
 
-	//region verify
+	// region verify
 
 	@Test
 	public void signatureCanBeVerifiedByEqualIdentityWithoutPrivateKey() {
@@ -153,7 +154,7 @@ public class NodeIdentityTest {
 		final boolean isVerified = identity2.verify(salt, signature);
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -168,7 +169,7 @@ public class NodeIdentityTest {
 		final boolean isVerified = identity2.verify(Utils.generateRandomBytes(), signature);
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -183,7 +184,7 @@ public class NodeIdentityTest {
 		final boolean isVerified = identity2.verify(salt, signature);
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -202,13 +203,13 @@ public class NodeIdentityTest {
 		final Signature signedDataWithoutPrefix = signer.sign(payload);
 
 		// Assert:
-		Assert.assertThat(identity.verify(payload, signedDataWithPrefix), IsEqual.equalTo(true));
-		Assert.assertThat(identity.verify(payload, signedDataWithoutPrefix), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(identity.verify(payload, signedDataWithPrefix), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(identity.verify(payload, signedDataWithoutPrefix), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void identityWithPublicKeyCanBeRoundTripped() {
@@ -219,10 +220,10 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(new KeyPair(publicKey), "alice"));
 
 		// Assert:
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("alice"));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("alice"));
 	}
 
 	@Test
@@ -234,10 +235,10 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = createRoundTrippedIdentity(new NodeIdentity(keyPair, "bob"));
 
 		// Assert:
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		MatcherAssert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
 	}
 
 	@Test
@@ -252,9 +253,9 @@ public class NodeIdentityTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		Assert.assertThat(jsonObject.containsKey("public-key"), IsEqual.equalTo(true));
-		Assert.assertThat(jsonObject.containsKey("name"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.containsKey("public-key"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(jsonObject.containsKey("name"), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -270,20 +271,21 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = NodeIdentity.deserializeWithPrivateKey(deserializer);
 
 		// Assert:
-		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("trudy"));
+		MatcherAssert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		MatcherAssert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		MatcherAssert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("trudy"));
 	}
 
 	private static NodeIdentity createRoundTrippedIdentity(final NodeIdentity originalIdentity) {
 		return NodeIdentity.deserializeWithPublicKey(Utils.roundtripSerializableEntity(originalIdentity, null));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, NodeIdentity> DESC_TO_IDENTITY_MAP = new HashMap<String, NodeIdentity>() {
 		{
 			final KeyPair keyPair = new KeyPair();
@@ -304,14 +306,14 @@ public class NodeIdentityTest {
 		// Assert:
 		for (final Map.Entry<String, NodeIdentity> entry : DESC_TO_IDENTITY_MAP.entrySet()) {
 			if (entry.getKey().equals("DEFAULT") || entry.getKey().startsWith("SAME_")) {
-				Assert.assertThat(entry.getValue(), IsEqual.equalTo(identity));
+				MatcherAssert.assertThat(entry.getValue(), IsEqual.equalTo(identity));
 			} else {
-				Assert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(identity)));
+				MatcherAssert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(identity)));
 			}
 		}
 
-		Assert.assertThat(identity, IsNot.not(IsEqual.equalTo(identity.getKeyPair())));
-		Assert.assertThat(identity, IsNot.not(IsEqual.equalTo(null)));
+		MatcherAssert.assertThat(identity, IsNot.not(IsEqual.equalTo(identity.getKeyPair())));
+		MatcherAssert.assertThat(identity, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
@@ -322,19 +324,19 @@ public class NodeIdentityTest {
 		// Assert:
 		for (final Map.Entry<String, NodeIdentity> entry : DESC_TO_IDENTITY_MAP.entrySet()) {
 			if (entry.getKey().equals("DEFAULT") || entry.getKey().startsWith("SAME_")) {
-				Assert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
+				MatcherAssert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
 			} else {
-				Assert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+				MatcherAssert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 			}
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
-	private static final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS =
-			PublicKey.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
+	private static final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS = PublicKey
+			.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
 
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsPresent() {
@@ -343,7 +345,7 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
 
 		// Assert:
-		Assert.assertThat(identity.toString(), IsEqual.equalTo("bob <TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
+		MatcherAssert.assertThat(identity.toString(), IsEqual.equalTo("bob <TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
 	}
 
 	@Test
@@ -353,8 +355,8 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:
-		Assert.assertThat(identity.toString(), IsEqual.equalTo("<TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
+		MatcherAssert.assertThat(identity.toString(), IsEqual.equalTo("<TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
 	}
 
-	//endregion
+	// endregion
 }

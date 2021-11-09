@@ -12,8 +12,7 @@ import java.util.regex.*;
 public class MosaicId implements SerializableEntity {
 	private static final String NAME_PATTERN_STRING = "[a-z0-9][a-z0-9'_-]*( [a-z0-9'_-]+)*";
 	private static final Pattern NAME_PATTERN = Pattern.compile(String.format("^%s$", NAME_PATTERN_STRING));
-	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
-			String.format("([a-z0-9._-]+):(%s)", NAME_PATTERN_STRING));
+	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(String.format("([a-z0-9._-]+):(%s)", NAME_PATTERN_STRING));
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -104,8 +103,7 @@ public class MosaicId implements SerializableEntity {
 			return false;
 		}
 
-		final MosaicId rhs = (MosaicId)obj;
-		return this.namespaceId.equals(rhs.namespaceId) &&
-				this.name.equals(rhs.name);
+		final MosaicId rhs = (MosaicId) obj;
+		return this.namespaceId.equals(rhs.namespaceId) && this.name.equals(rhs.name);
 	}
 }

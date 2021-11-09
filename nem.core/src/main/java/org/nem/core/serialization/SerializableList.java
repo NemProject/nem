@@ -7,7 +7,7 @@ import java.util.Collection;
  */
 public class SerializableList<T extends SerializableEntity> extends DeserializableList<T> implements SerializableEntity {
 
-	//region constructors
+	// region constructors
 
 	/**
 	 * Creates a new list with the specified capacity.
@@ -64,14 +64,11 @@ public class SerializableList<T extends SerializableEntity> extends Deserializab
 	 * @param elementDeserializer The element deserializer.
 	 * @param label The custom label.
 	 */
-	public SerializableList(
-			final Deserializer deserializer,
-			final ObjectDeserializer<T> elementDeserializer,
-			final String label) {
+	public SerializableList(final Deserializer deserializer, final ObjectDeserializer<T> elementDeserializer, final String label) {
 		super(deserializer, elementDeserializer, label);
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public void serialize(final Serializer serializer) {

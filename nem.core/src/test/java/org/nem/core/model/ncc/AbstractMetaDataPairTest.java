@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -8,9 +9,7 @@ import org.nem.core.test.*;
 
 import java.util.function.*;
 
-public abstract class AbstractMetaDataPairTest<
-		TEntity extends SerializableEntity,
-		TMetaData extends SerializableEntity> {
+public abstract class AbstractMetaDataPairTest<TEntity extends SerializableEntity, TMetaData extends SerializableEntity> {
 	private final Function<Account, TEntity> createEntity;
 	private final Function<Integer, TMetaData> createMetaData;
 	private final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair;
@@ -18,13 +17,10 @@ public abstract class AbstractMetaDataPairTest<
 	private final Function<TEntity, Address> getAddress;
 	private final Function<TMetaData, Integer> getId;
 
-	protected AbstractMetaDataPairTest(
-			final Function<Account, TEntity> createEntity,
-			final Function<Integer, TMetaData> createMetaData,
+	protected AbstractMetaDataPairTest(final Function<Account, TEntity> createEntity, final Function<Integer, TMetaData> createMetaData,
 			final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair,
 			final Function<Deserializer, AbstractMetaDataPair<TEntity, TMetaData>> deserializePair,
-			final Function<TEntity, Address> getAddress,
-			final Function<TMetaData, Integer> getId) {
+			final Function<TEntity, Address> getAddress, final Function<TMetaData, Integer> getId) {
 		this.createEntity = createEntity;
 		this.createMetaData = createMetaData;
 		this.createPair = createPair;
@@ -43,8 +39,8 @@ public abstract class AbstractMetaDataPairTest<
 		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createPair.apply(entity, metaData);
 
 		// Assert:
-		Assert.assertThat(pair.getEntity(), IsSame.sameInstance(entity));
-		Assert.assertThat(pair.getMetaData(), IsSame.sameInstance(metaData));
+		MatcherAssert.assertThat(pair.getEntity(), IsSame.sameInstance(entity));
+		MatcherAssert.assertThat(pair.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test
@@ -56,8 +52,8 @@ public abstract class AbstractMetaDataPairTest<
 		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createRoundTrippedPair(account, 5678);
 
 		// Assert:
-		Assert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(account.getAddress()));
-		Assert.assertThat(this.getId.apply(pair.getMetaData()), IsEqual.equalTo(5678));
+		MatcherAssert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(account.getAddress()));
+		MatcherAssert.assertThat(this.getId.apply(pair.getMetaData()), IsEqual.equalTo(5678));
 	}
 
 	private AbstractMetaDataPair<TEntity, TMetaData> createRoundTrippedPair(final Account account, final int id) {

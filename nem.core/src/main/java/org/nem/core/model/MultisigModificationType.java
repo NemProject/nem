@@ -15,11 +15,10 @@ public enum MultisigModificationType {
 	AddCosignatory(1),
 
 	/**
-	 * Removal summary:
-	 * 1. Removal will only be allowed in multisig transactions
-	 * 2. There can be only one Del per MultisigAggregateModificationTransaction
-	 * 3. There will be N-2 signatures required
-	 * (1 that gets removed, and 1 for person issuing MultisigTransaction)
+	 * Removal summary: <br>
+	 * 1. Removal will only be allowed in multisig transactions <br>
+	 * 2. There can be only one Del per MultisigAggregateModificationTransaction <br>
+	 * 3. There will be N-2 signatures required (1 that gets removed, and 1 for person issuing MultisigTransaction)
 	 */
 	DelCosignatory(2),
 
@@ -45,6 +44,10 @@ public enum MultisigModificationType {
 			case DelCosignatory:
 			case MinCosignatories:
 				return true;
+			case Unknown:
+				break;
+			default :
+				break;
 		}
 
 		return false;

@@ -3,8 +3,7 @@ package org.nem.core.serialization;
 import java.util.*;
 
 /**
- * Helper class for deserializing lists of serializable entities.
- * <br>
+ * Helper class for deserializing lists of serializable entities. <br>
  * This class is tested indirectly by the tests for SerializableList.
  */
 public class DeserializableList<T> {
@@ -13,7 +12,7 @@ public class DeserializableList<T> {
 	protected final List<T> list;
 	protected final String label;
 
-	//region constructors
+	// region constructors
 
 	/**
 	 * Creates a new list with the specified capacity.
@@ -72,15 +71,12 @@ public class DeserializableList<T> {
 	 * @param elementDeserializer The element deserializer.
 	 * @param label The custom label.
 	 */
-	protected DeserializableList(
-			final Deserializer deserializer,
-			final ObjectDeserializer<T> elementDeserializer,
-			final String label) {
+	protected DeserializableList(final Deserializer deserializer, final ObjectDeserializer<T> elementDeserializer, final String label) {
 		this.list = deserializer.readObjectArray(label, elementDeserializer);
 		this.label = label;
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Adds a new item to this list.
@@ -124,8 +120,7 @@ public class DeserializableList<T> {
 	}
 
 	/**
-	 * Compares this list with another list (that might have a different size)
-	 * and finds the first non-equal element.
+	 * Compares this list with another list (that might have a different size) and finds the first non-equal element.
 	 *
 	 * @param rhs The other list.
 	 * @return The index of the first difference.
@@ -166,7 +161,7 @@ public class DeserializableList<T> {
 			return false;
 		}
 
-		final DeserializableList<?> rhs = (DeserializableList<?>)obj;
+		final DeserializableList<?> rhs = (DeserializableList<?>) obj;
 		return this.size() == rhs.size() && this.size() == this.findFirstDifferenceInternal(rhs);
 	}
 }

@@ -28,10 +28,7 @@ public class NodeVersion {
 	 * @param minorVersion The minor version.
 	 * @param buildVersion The build version.
 	 */
-	public NodeVersion(
-			final int majorVersion,
-			final int minorVersion,
-			final int buildVersion) {
+	public NodeVersion(final int majorVersion, final int minorVersion, final int buildVersion) {
 		this(majorVersion, minorVersion, buildVersion, null);
 	}
 
@@ -43,11 +40,7 @@ public class NodeVersion {
 	 * @param buildVersion The build version.
 	 * @param tag The optional version tag.
 	 */
-	public NodeVersion(
-			final int majorVersion,
-			final int minorVersion,
-			final int buildVersion,
-			final String tag) {
+	public NodeVersion(final int majorVersion, final int minorVersion, final int buildVersion, final String tag) {
 		this.majorVersion = majorVersion;
 		this.minorVersion = minorVersion;
 		this.buildVersion = buildVersion;
@@ -66,10 +59,7 @@ public class NodeVersion {
 			throw new IllegalArgumentException(String.format("pattern '%s' could not be parsed", s));
 		}
 
-		return new NodeVersion(
-				Integer.parseInt(matcher.group(1)),
-				Integer.parseInt(matcher.group(2)),
-				Integer.parseInt(matcher.group(3)),
+		return new NodeVersion(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)),
 				matcher.group(5));
 	}
 
@@ -120,11 +110,9 @@ public class NodeVersion {
 			return false;
 		}
 
-		final NodeVersion rhs = (NodeVersion)obj;
-		return this.majorVersion == rhs.majorVersion &&
-				this.minorVersion == rhs.minorVersion &&
-				this.buildVersion == rhs.buildVersion &&
-				Objects.equals(this.tag, rhs.tag);
+		final NodeVersion rhs = (NodeVersion) obj;
+		return this.majorVersion == rhs.majorVersion && this.minorVersion == rhs.minorVersion && this.buildVersion == rhs.buildVersion
+				&& Objects.equals(this.tag, rhs.tag);
 	}
 
 	@Override

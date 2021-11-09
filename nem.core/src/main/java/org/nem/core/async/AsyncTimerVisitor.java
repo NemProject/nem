@@ -23,8 +23,7 @@ public interface AsyncTimerVisitor {
 	void notifyOperationCompleteExceptionally(final Throwable ex);
 
 	/**
-	 * Called to indicate that the timer will delay for the specified interval before starting
-	 * the next operation.
+	 * Called to indicate that the timer will delay for the specified interval before starting the next operation.
 	 *
 	 * @param delay The delay in milliseconds.
 	 */

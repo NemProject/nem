@@ -18,7 +18,7 @@ public class HttpDeserializerResponseStrategyTest {
 		ConnectUtils.mockStatusCode(response, 500);
 
 		final HttpEntity entity = Mockito.mock(HttpEntity.class);
-		final ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[] {});
+		final ByteArrayInputStream inputStream = new ByteArrayInputStream(new byte[]{});
 		Mockito.when(response.getEntity()).thenReturn(entity);
 		Mockito.when(entity.getContent()).thenReturn(inputStream);
 

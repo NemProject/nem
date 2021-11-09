@@ -7,8 +7,11 @@ import java.util.stream.Collectors;
  * Class that filters namespaces that users are not allowed to claim.
  */
 public class ReservedNamespaceFilter {
-	private static final String[] RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
-	private static final Set<NamespaceIdPart> NAMESPACE_ID_PARTS = Arrays.stream(RESERVED_ROOTS).map(NamespaceIdPart::new).collect(Collectors.toSet());
+	private static final String[] RESERVED_ROOTS = {
+			"nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info"
+	};
+	private static final Set<NamespaceIdPart> NAMESPACE_ID_PARTS = Arrays.stream(RESERVED_ROOTS).map(NamespaceIdPart::new)
+			.collect(Collectors.toSet());
 
 	/**
 	 * Gets a value indicating whether or not the given namespace id is claimable.

@@ -92,11 +92,11 @@ public class SecureMessage extends Message {
 			return false;
 		}
 
-		final SecureMessage rhs = (SecureMessage)obj;
+		final SecureMessage rhs = (SecureMessage) obj;
 		return this.payload.equals(rhs.payload);
 	}
 
-	//region SecureMessagePayload
+	// region SecureMessagePayload
 
 	private static abstract class SecureMessagePayload {
 		private final Address senderAddress;
@@ -142,9 +142,8 @@ public class SecureMessage extends Message {
 				return false;
 			}
 
-			final SecureMessagePayload rhs = (SecureMessagePayload)obj;
-			return Arrays.equals(this.payload, rhs.payload)
-					&& this.senderAddress.equals(rhs.senderAddress)
+			final SecureMessagePayload rhs = (SecureMessagePayload) obj;
+			return Arrays.equals(this.payload, rhs.payload) && this.senderAddress.equals(rhs.senderAddress)
 					&& this.recipientAddress.equals(rhs.recipientAddress);
 		}
 	}
@@ -170,6 +169,5 @@ public class SecureMessage extends Message {
 		}
 	}
 
-	//endregion
+	// endregion
 }
-

@@ -1,13 +1,14 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
 public class TimeOffsetTest {
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canBeCreatedFromLongValue() {
@@ -15,7 +16,7 @@ public class TimeOffsetTest {
 		final TimeOffset offset = new TimeOffset(1234);
 
 		// Assert:
-		Assert.assertThat(offset.getRaw(), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(offset.getRaw(), IsEqual.equalTo(1234L));
 	}
 
 	@Test
@@ -24,12 +25,12 @@ public class TimeOffsetTest {
 		final TimeOffset offset = new TimeOffset(-1234);
 
 		// Assert:
-		Assert.assertThat(offset.getRaw(), IsEqual.equalTo(-1234L));
+		MatcherAssert.assertThat(offset.getRaw(), IsEqual.equalTo(-1234L));
 	}
 
-	//endregion
+	// endregion
 
-	//region add/subtract
+	// region add/subtract
 
 	@Test
 	public void timeOffsetsCanBeAdded() {
@@ -38,8 +39,8 @@ public class TimeOffsetTest {
 		final TimeOffset offset2 = new TimeOffset(579);
 
 		// Act + Assert:
-		Assert.assertThat(offset1.add(offset2), IsEqual.equalTo(new TimeOffset(1813L)));
-		Assert.assertThat(offset2.add(offset1), IsEqual.equalTo(new TimeOffset(1813L)));
+		MatcherAssert.assertThat(offset1.add(offset2), IsEqual.equalTo(new TimeOffset(1813L)));
+		MatcherAssert.assertThat(offset2.add(offset1), IsEqual.equalTo(new TimeOffset(1813L)));
 	}
 
 	@Test
@@ -49,13 +50,13 @@ public class TimeOffsetTest {
 		final TimeOffset offset2 = new TimeOffset(579);
 
 		// Act + Assert:
-		Assert.assertThat(offset1.subtract(offset2), IsEqual.equalTo(new TimeOffset(655L)));
-		Assert.assertThat(offset2.subtract(offset1), IsEqual.equalTo(new TimeOffset(-655L)));
+		MatcherAssert.assertThat(offset1.subtract(offset2), IsEqual.equalTo(new TimeOffset(655L)));
+		MatcherAssert.assertThat(offset2.subtract(offset1), IsEqual.equalTo(new TimeOffset(-655L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteTimeOffset() {
@@ -68,8 +69,8 @@ public class TimeOffsetTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("timeOffset"), IsEqual.equalTo(1234L));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("timeOffset"), IsEqual.equalTo(1234L));
 	}
 
 	@Test
@@ -85,8 +86,8 @@ public class TimeOffsetTest {
 		final TimeOffset timeOffset = TimeOffset.readFrom(deserializer, "timeOffset");
 
 		// Assert:
-		Assert.assertThat(timeOffset, IsEqual.equalTo(originalTimeOffset));
+		MatcherAssert.assertThat(timeOffset, IsEqual.equalTo(originalTimeOffset));
 	}
 
-	//endregion
+	// endregion
 }

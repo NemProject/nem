@@ -24,7 +24,7 @@ public class JsonDeserializer extends Deserializer {
 	public JsonDeserializer(final JSONObject object, final DeserializationContext context) {
 		super(context);
 		this.object = object;
-		this.propertyOrderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		this.propertyOrderArray = (JSONArray) object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 		this.propertyOrderArrayIndex = 0;
 	}
 
@@ -38,11 +38,11 @@ public class JsonDeserializer extends Deserializer {
 		}
 
 		if (object instanceof Integer) {
-			return (Integer)object;
+			return (Integer) object;
 		}
 
 		if (object instanceof Long) {
-			return ((Long)object).intValue();
+			return ((Long) object).intValue();
 		}
 
 		throw new TypeMismatchException(label);
@@ -58,11 +58,11 @@ public class JsonDeserializer extends Deserializer {
 		}
 
 		if (object instanceof Integer) {
-			return ((Integer)object).longValue();
+			return ((Integer) object).longValue();
 		}
 
 		if (object instanceof Long) {
-			return (Long)object;
+			return (Long) object;
 		}
 
 		throw new TypeMismatchException(label);
@@ -78,11 +78,11 @@ public class JsonDeserializer extends Deserializer {
 		}
 
 		if (object instanceof BigDecimal) {
-			return ((BigDecimal)object).doubleValue();
+			return ((BigDecimal) object).doubleValue();
 		}
 
 		if (object instanceof Double) {
-			return (Double)object;
+			return (Double) object;
 		}
 
 		throw new TypeMismatchException(label);
@@ -101,7 +101,7 @@ public class JsonDeserializer extends Deserializer {
 			return null;
 		}
 
-		return s.isEmpty() ? new byte[] {} : HexEncoder.getBytes(s);
+		return s.isEmpty() ? new byte[]{} : HexEncoder.getBytes(s);
 	}
 
 	@Override
@@ -111,13 +111,13 @@ public class JsonDeserializer extends Deserializer {
 
 	private String readOptionalStringUnchecked(final String label) {
 		this.checkLabel(label);
-		return (String)this.object.get(label);
+		return (String) this.object.get(label);
 	}
 
 	@Override
 	public <T> T readOptionalObject(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
-		final JSONObject childObject = (JSONObject)this.object.get(label);
+		final JSONObject childObject = (JSONObject) this.object.get(label);
 		if (null == childObject) {
 			return null;
 		}
@@ -128,7 +128,7 @@ public class JsonDeserializer extends Deserializer {
 	@Override
 	public <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator) {
 		this.checkLabel(label);
-		final JSONArray jsonArray = (JSONArray)this.object.get(label);
+		final JSONArray jsonArray = (JSONArray) this.object.get(label);
 
 		if (null == jsonArray) {
 			return null;
@@ -136,7 +136,7 @@ public class JsonDeserializer extends Deserializer {
 
 		final List<T> objects = new ArrayList<>();
 		for (final Object jsonObject : jsonArray) {
-			objects.add(this.deserializeObject((JSONObject)jsonObject, activator));
+			objects.add(this.deserializeObject((JSONObject) jsonObject, activator));
 		}
 
 		return objects;
@@ -154,15 +154,12 @@ public class JsonDeserializer extends Deserializer {
 
 		final String expectedLabel = this.propertyOrderArrayIndex >= this.propertyOrderArray.size()
 				? null
-				: (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
+				: (String) this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
 		if (label.equals(expectedLabel)) {
 			return;
 		}
 
-		final String message = String.format(
-				"expected property '%s' but request was for property '%s'",
-				expectedLabel,
-				label);
+		final String message = String.format("expected property '%s' but request was for property '%s'", expectedLabel, label);
 		throw new IllegalArgumentException(message);
 	}
 }

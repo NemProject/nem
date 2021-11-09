@@ -108,7 +108,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 			return false;
 		}
 
-		final TimeInstant rhs = (TimeInstant)obj;
+		final TimeInstant rhs = (TimeInstant) obj;
 		return this.time == rhs.time;
 	}
 
@@ -117,7 +117,7 @@ public class TimeInstant implements Comparable<TimeInstant> {
 		return String.format("%d", this.time);
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a time instant object.
@@ -141,5 +141,5 @@ public class TimeInstant implements Comparable<TimeInstant> {
 		return new TimeInstant(deserializer.readInt(label));
 	}
 
-	//endregion
+	// endregion
 }

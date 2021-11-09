@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * A multisig signature transaction.
  */
-public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
+public class MultisigSignatureTransaction extends Transaction {
 	private final Hash otherTransactionHash;
 	private final Account multisig;
 
@@ -21,10 +21,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 * @param multisig The multisig account.
 	 * @param otherTransactionHash The hash of the other transaction.
 	 */
-	public MultisigSignatureTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account multisig,
+	public MultisigSignatureTransaction(final TimeInstant timeStamp, final Account sender, final Account multisig,
 			final Hash otherTransactionHash) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
 		this.otherTransactionHash = otherTransactionHash;
@@ -39,10 +36,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 * @param multisig The multisig account.
 	 * @param otherTransaction The other transaction.
 	 */
-	public MultisigSignatureTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account multisig,
+	public MultisigSignatureTransaction(final TimeInstant timeStamp, final Account sender, final Account multisig,
 			final Transaction otherTransaction) {
 		this(timeStamp, sender, multisig, HashUtils.calculateHash(otherTransaction));
 	}

@@ -1,8 +1,7 @@
 package org.nem.core.async;
 
 /**
- * DelayStrategy that linearly increases a delay from a minimum value
- * to a maximum value.
+ * DelayStrategy that linearly increases a delay from a minimum value to a maximum value.
  */
 public class LinearDelayStrategy extends AbstractDelayStrategy {
 
@@ -19,12 +18,12 @@ public class LinearDelayStrategy extends AbstractDelayStrategy {
 	public LinearDelayStrategy(final int minDelay, final int maxDelay, final int iterations) {
 		super(iterations);
 		this.minDelay = minDelay;
-		this.delayStep = (float)(maxDelay - minDelay) / (iterations - 1);
+		this.delayStep = (float) (maxDelay - minDelay) / (iterations - 1);
 	}
 
 	@Override
 	protected int nextInternal(final int iteration) {
-		return this.minDelay + (int)(this.delayStep * (iteration - 1));
+		return this.minDelay + (int) (this.delayStep * (iteration - 1));
 	}
 
 	/**

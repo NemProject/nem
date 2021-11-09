@@ -6,16 +6,16 @@ package org.nem.core.node;
 @SuppressWarnings("unused")
 public enum NisPeerId implements ApiId {
 
-	//region block/*
+	// region block/*
 
 	/**
 	 * The block/at API.
 	 */
 	REST_BLOCK_AT("/block/at"),
 
-	//endregion
+	// endregion
 
-	//region chain/*
+	// region chain/*
 
 	/**
 	 * The chain/blocks-after API.
@@ -42,9 +42,9 @@ public enum NisPeerId implements ApiId {
 	 */
 	REST_CHAIN_HEIGHT("/chain/height"),
 
-	//endregion
+	// endregion
 
-	//region node/*
+	// region node/*
 
 	/**
 	 * The node/cysm API.
@@ -86,9 +86,9 @@ public enum NisPeerId implements ApiId {
 	 */
 	REST_NODE_EXPERIENCES("/node/experiences"),
 
-	//endregion
+	// endregion
 
-	//region push/*
+	// region push/*
 
 	/**
 	 * The push/block API.
@@ -105,25 +105,25 @@ public enum NisPeerId implements ApiId {
 	 */
 	REST_PUSH_TRANSACTIONS("/push/transactions"),
 
-	//endregion
+	// endregion
 
-	//region transactions/*
+	// region transactions/*
 
 	/**
 	 * The transactions/unconfirmed API.
 	 */
 	REST_TRANSACTIONS_UNCONFIRMED("/transactions/unconfirmed"),
 
-	//endregion
+	// endregion
 
-	//region time sync/*
+	// region time sync/*
 
 	/**
 	 * The time-sync/network-time API
 	 */
 	REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
-	//endregion
+	// endregion
 
 	private final String value;
 

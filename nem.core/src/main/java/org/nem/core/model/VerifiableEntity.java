@@ -5,8 +5,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
 /**
- * Base class for all entities that need to be verified
- * (e.g. blocks and transactions).
+ * Base class for all entities that need to be verified (e.g. blocks and transactions).
  */
 public abstract class VerifiableEntity implements SerializableEntity {
 
@@ -31,7 +30,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	private final TimeInstant timeStamp;
 	private Signature signature;
 
-	//region Constructors
+	// region Constructors
 
 	/**
 	 * Creates a new verifiable entity.
@@ -74,9 +73,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region Getters and Setters
+	// region Getters and Setters
 
 	/**
 	 * Gets the version.
@@ -141,7 +140,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.signature = signature;
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public void serialize(final Serializer serializer) {

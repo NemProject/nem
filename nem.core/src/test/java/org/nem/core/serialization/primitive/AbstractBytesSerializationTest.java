@@ -3,7 +3,9 @@ package org.nem.core.serialization.primitive;
 import org.junit.Test;
 import org.nem.core.serialization.*;
 
-public abstract class AbstractBytesSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, byte[]> {
+public abstract class AbstractBytesSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, byte[]> {
 	public AbstractBytesSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}
@@ -11,12 +13,14 @@ public abstract class AbstractBytesSerializationTest<TSerializer extends Seriali
 	@Test
 	public void canRoundtripEmptyBytes() {
 		// Assert:
-		this.assertCanRoundtrip(new byte[] {});
+		this.assertCanRoundtrip(new byte[]{});
 	}
 
 	@Override
 	protected byte[] getValue() {
-		return new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
+		return new byte[]{
+				0x50, (byte) 0xFF, 0x00, 0x7C, 0x21
+		};
 	}
 
 	@Override

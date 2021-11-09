@@ -70,7 +70,7 @@ public class NemProperty implements SerializableEntity {
 			return false;
 		}
 
-		final NemProperty rhs = (NemProperty)obj;
+		final NemProperty rhs = (NemProperty) obj;
 		return this.name.equals(rhs.name) && this.value.equals(rhs.value);
 	}
 }

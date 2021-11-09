@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -13,7 +14,7 @@ public class HttpVoidResponseStrategyTest {
 		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsNull.nullValue());
+		MatcherAssert.assertThat(strategy.getSupportedContentType(), IsNull.nullValue());
 	}
 
 	@Test
@@ -22,10 +23,10 @@ public class HttpVoidResponseStrategyTest {
 		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
 
 		// Act:
-		final Deserializer deserializer = ConnectUtils.coerceDeserializer(new byte[] {}, strategy);
+		final Deserializer deserializer = ConnectUtils.coerceDeserializer(new byte[]{}, strategy);
 
 		// Assert:
-		Assert.assertThat(deserializer, IsNull.nullValue());
+		MatcherAssert.assertThat(deserializer, IsNull.nullValue());
 	}
 
 	@Test(expected = FatalPeerException.class)

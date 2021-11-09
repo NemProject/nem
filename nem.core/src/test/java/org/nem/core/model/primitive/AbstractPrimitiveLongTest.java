@@ -1,9 +1,8 @@
 package org.nem.core.model.primitive;
 
-public class AbstractPrimitiveLongTest extends AbstractPrimitiveTest<
-		AbstractPrimitiveLongTest.FooPrimitive,
-		AbstractPrimitiveLongTest.BarPrimitive,
-		Long> {
+public class AbstractPrimitiveLongTest
+		extends
+			AbstractPrimitiveTest<AbstractPrimitiveLongTest.FooPrimitive, AbstractPrimitiveLongTest.BarPrimitive, Long> {
 
 	@Override
 	protected FooPrimitive createFoo(final long value) {

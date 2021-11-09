@@ -17,9 +17,7 @@ public class MockTransactionUtils {
 	 * @return The custom fields.
 	 */
 	public static List<Integer> getCustomFields(final Stream<Transaction> stream) {
-		return stream
-				.map(t -> ((MockTransaction)t).getCustomField())
-				.collect(Collectors.toList());
+		return stream.map(t -> ((MockTransaction) t).getCustomField()).collect(Collectors.toList());
 	}
 
 	/**
@@ -33,11 +31,10 @@ public class MockTransactionUtils {
 	}
 
 	/**
-	 * Creates a mock transaction with nested children.
-	 * Root - seed
-	 * Level 1 - seed + 10, seed + 20, seed + 30
-	 * Level 2 - seed + 11, seed + 12, seed + 31, seed + 32
-	 * .
+	 * Creates a mock transaction with nested children. <br>
+	 * Root - seed <br>
+	 * Level 1 - seed + 10, seed + 20, seed + 30 <br>
+	 * Level 2 - seed + 11, seed + 12, seed + 31, seed + 32 .
 	 *
 	 * @param seed The seed custom field.
 	 * @return The transaction

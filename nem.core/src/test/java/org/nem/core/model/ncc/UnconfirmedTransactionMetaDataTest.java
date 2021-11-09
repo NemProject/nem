@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -13,7 +14,7 @@ public class UnconfirmedTransactionMetaDataTest {
 		final UnconfirmedTransactionMetaData metaData = createUnconfirmedTransactionMetaData(null);
 
 		// Assert:
-		Assert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -23,7 +24,7 @@ public class UnconfirmedTransactionMetaDataTest {
 		final UnconfirmedTransactionMetaData metaData = createUnconfirmedTransactionMetaData(hash);
 
 		// Assert:
-		Assert.assertThat(metaData.getInnerTransactionHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class UnconfirmedTransactionMetaDataTest {
 		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(null);
 
 		// Assert:
-		Assert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -42,7 +43,7 @@ public class UnconfirmedTransactionMetaDataTest {
 		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(hash);
 
 		// Assert:
-		Assert.assertThat(metaData.getInnerTransactionHash(), IsEqual.equalTo(hash));
+		MatcherAssert.assertThat(metaData.getInnerTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	private static UnconfirmedTransactionMetaData createUnconfirmedTransactionMetaData(final Hash innerTransactionHash) {

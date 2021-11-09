@@ -5,8 +5,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * An abstract class for forward-only serialization of primitive data types.
- * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
+ * An abstract class for forward-only serialization of primitive data types. Implementations may use or ignore label parameters but
+ * label-based lookup is not guaranteed.
  */
 public abstract class Serializer {
 	private static final Logger LOGGER = Logger.getLogger(Serializer.class.getName());

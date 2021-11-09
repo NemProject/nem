@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
@@ -8,7 +9,7 @@ import java.util.*;
 
 public abstract class MatrixTest<TMatrix extends Matrix> {
 
-	//region createMatrix
+	// region createMatrix
 
 	/**
 	 * Creates a new matrix of the specified size.
@@ -41,9 +42,9 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		return matrix;
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void matrixIsInitializedToZero() {
@@ -51,20 +52,20 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(2, 3);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getElementCount(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getAt / setAt / incrementAt
+	// region getAt / setAt / incrementAt
 
 	@Test
 	public void matrixValuesCanBeSet() {
@@ -80,12 +81,12 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.setAt(2, 1, 9);
 
 		// Assert:
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(7.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(3.0));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(5.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(11.0));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(9.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(7.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(3.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(5.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(11.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(9.0));
 	}
 
 	@Test
@@ -130,7 +131,9 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	@Test
 	public void matrixValuesCanBeIncremented() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 1, 4, 5, 7, 2, 11 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{
+				1, 4, 5, 7, 2, 11
+		});
 
 		// Act:
 		// Increment values
@@ -145,49 +148,55 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.incrementAt(0, 2, 7);
 
 		// Assert:
-		Assert.assertThat(
-				matrix,
-				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 5, 6, 15, 11, 7, 17 })));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[]{
+				5, 6, 15, 11, 7, 17
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region rowSum / columnSum
+	// region rowSum / columnSum
 
 	@Test
 	public void matrixRowSumsCanBeCalculated() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 6 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 11, 3, 1, 5, 6
+		});
 
 		// Assert:
-		Assert.assertThat(matrix.getRowSumVector(), IsEqual.equalTo(new ColumnVector(13.0, 4.0, 11.0)));
+		MatcherAssert.assertThat(matrix.getRowSumVector(), IsEqual.equalTo(new ColumnVector(13.0, 4.0, 11.0)));
 	}
 
 	@Test
 	public void matrixColumnSumsCanBeCalculated() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 6 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 11, 3, 1, 5, 6
+		});
 
 		// Assert:
-		Assert.assertThat(matrix.getColumnSumVector(), IsEqual.equalTo(new ColumnVector(10.0, 18.0)));
+		MatcherAssert.assertThat(matrix.getColumnSumVector(), IsEqual.equalTo(new ColumnVector(10.0, 18.0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region transpose
+	// region transpose
 
 	@Test
 	public void denseMatrixCanBeTransposed() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 7, 5, 1, 3, 11, 9 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				7, 5, 1, 3, 11, 9
+		});
 
 		// Act:
 		final Matrix transposedMatrix = matrix.transpose();
 
 		// Assert:
-		Assert.assertThat(
-				transposedMatrix,
-				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 7, 1, 11, 5, 3, 9 })));
+		MatcherAssert.assertThat(transposedMatrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[]{
+				7, 1, 11, 5, 3, 9
+		})));
 	}
 
 	@Test
@@ -201,26 +210,30 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix transposedMatrix = matrix.transpose();
 
 		// Assert:
-		Assert.assertThat(
-				transposedMatrix,
-				IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 0, 7, 0, 0, 0, 5 })));
+		MatcherAssert.assertThat(transposedMatrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[]{
+				0, 7, 0, 0, 0, 5
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region normalizeColumns
+	// region normalizeColumns
 
 	@Test
 	public void allDenseMatrixColumnsCanBeNormalized() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 11, 3, 1, 5, 8
+		});
 
 		// Act:
 		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.55, 0.3, 0.05, 0.5, 0.4 })));
-		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.emptyList()));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0.2, 0.55, 0.3, 0.05, 0.5, 0.4
+		})));
+		MatcherAssert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.emptyList()));
 	}
 
 	@Test
@@ -232,21 +245,27 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 0, 0, 0, 0, 0, 0 })));
-		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0, 1, 2)));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[]{
+				0, 0, 0, 0, 0, 0
+		})));
+		MatcherAssert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 	}
 
 	@Test
 	public void matrixWithZeroSumColumnsCanBeNormalized() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 2, 0, 0, 0, -2, 0 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{
+				2, 0, 0, 0, -2, 0
+		});
 
 		// Act:
 		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 1, 0, 0, 0, -1, 0 })));
-		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.singletonList(2)));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[]{
+				1, 0, 0, 0, -1, 0
+		})));
+		MatcherAssert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.singletonList(2)));
 	}
 
 	@Test
@@ -260,23 +279,25 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
-		Assert.assertThat(
-				matrix,
-				IsEqual.equalTo(this.createMatrix(4, 2, new double[] { 0, 0.25, 0, 0, 0, 0.75, 0, 0 })));
-		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.singletonList(0)));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(4, 2, new double[]{
+				0, 0.25, 0, 0, 0, 0.75, 0, 0
+		})));
+		MatcherAssert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Collections.singletonList(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region absSum / sum
+	// region absSum / sum
 
 	@Test
 	public void matrixAbsSumCanBeCalculatedForDenseMatrix() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 11, -1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, -3, -5, 11, -1, 8
+		});
 
 		// Assert:
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(30.0));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(30.0));
 	}
 
 	@Test
@@ -287,16 +308,18 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.setAt(2, 1, -5);
 
 		// Assert:
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(12.0));
 	}
 
 	@Test
 	public void matrixSumCanBeCalculatedForDenseMatrix() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 11, -1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, -3, -5, 11, -1, 8
+		});
 
 		// Assert:
-		Assert.assertThat(matrix.sum(), IsEqual.equalTo(12.0));
+		MatcherAssert.assertThat(matrix.sum(), IsEqual.equalTo(12.0));
 	}
 
 	@Test
@@ -307,23 +330,27 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.setAt(2, 1, -5);
 
 		// Assert:
-		Assert.assertThat(matrix.sum(), IsEqual.equalTo(2.0));
+		MatcherAssert.assertThat(matrix.sum(), IsEqual.equalTo(2.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region scale
+	// region scale
 
 	@Test
 	public void denseMatrixCanBeScaled() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Act:
 		matrix.scale(10);
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.3, 0.5, 1.1, 0.1, 0.8 })));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0.2, 0.3, 0.5, 1.1, 0.1, 0.8
+		})));
 	}
 
 	@Test
@@ -337,25 +364,29 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.scale(5);
 
 		// Assert:
-		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.0, 0.0, 0.0, 1.0, 0.6, 0.0 })));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0.0, 0.0, 0.0, 1.0, 0.6, 0.0
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region roundTo
+	// region roundTo
 
 	@Test
 	public void denseMatrixCanBeRounded() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2.1234, 11.1234, 3.2345, 1, 5012.0126, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2.1234, 11.1234, 3.2345, 1, 5012.0126, 8
+		});
 
 		// Act:
 		final Matrix roundedMatrix = matrix.roundTo(2);
 
 		// Assert:
-		Assert.assertThat(
-				roundedMatrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2.12, 11.12, 3.23, 1, 5012.01, 8 })));
+		MatcherAssert.assertThat(roundedMatrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				2.12, 11.12, 3.23, 1, 5012.01, 8
+		})));
 	}
 
 	@Test
@@ -369,14 +400,14 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix roundedMatrix = matrix.roundTo(1);
 
 		// Assert:
-		Assert.assertThat(
-				roundedMatrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 0, 11.1, 5012.0, 0 })));
+		MatcherAssert.assertThat(roundedMatrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0, 0, 0, 11.1, 5012.0, 0
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region addElementWise
+	// region addElementWise
 
 	@Test
 	public void matrixCannotBeAddedWithDifferentSizeMatrix() {
@@ -392,20 +423,28 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	@Test
 	public void denseMatrixCanBeAddedWithSameSizeMatrix() {
 		// Arrange:
-		final Matrix matrix1 = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
-		final Matrix matrix2 = this.createMatrix(3, 2, new double[] { 7, 3, 1, 5, 11, 9 });
+		final Matrix matrix1 = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
+		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{
+				7, 3, 1, 5, 11, 9
+		});
 
 		// Act:
 		final Matrix result = matrix1.addElementWise(matrix2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 9, 6, 6, 16, 12, 17 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				9, 6, 6, 16, 12, 17
+		})));
 	}
 
 	@Test
 	public void sparseMatrixCanBeAddedWithSameSizeMatrix() {
 		// Arrange:
-		final Matrix matrix1 = this.createMatrix(3, 2, new double[] { 1, 0, 2, 3, 0, 5 });
+		final Matrix matrix1 = this.createMatrix(3, 2, new double[]{
+				1, 0, 2, 3, 0, 5
+		});
 
 		final Matrix matrix2 = this.createMatrix(3, 2);
 		matrix2.setAt(2, 0, 7);
@@ -415,30 +454,34 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix result = matrix1.addElementWise(matrix2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 1, 0, 2, 8, 7, 5 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				1, 0, 2, 8, 7, 5
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region add
+	// region add
 
 	@Test
 	public void matrixCanBeAddedToByScalar() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Act:
 		final Matrix result = matrix.add(0.1);
 
 		// Assert:
-		Assert.assertThat(
-				result.roundTo(5),
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2.1, 3.1, 5.1, 11.1, 1.1, 8.1 })));
+		MatcherAssert.assertThat(result.roundTo(5), IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				2.1, 3.1, 5.1, 11.1, 1.1, 8.1
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region multiplyElementWise
+	// region multiplyElementWise
 
 	@Test
 	public void matrixCannotBeMultipliedElementWiseWithDifferentSizeMatrix() {
@@ -454,14 +497,20 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	@Test
 	public void denseMatrixCanBeMultipliedElementWiseWithSameSizeMatrix() {
 		// Arrange:
-		final Matrix matrix1 = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
-		final Matrix matrix2 = this.createMatrix(3, 2, new double[] { 7, 3, 1, 5, 11, 9 });
+		final Matrix matrix1 = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
+		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{
+				7, 3, 1, 5, 11, 9
+		});
 
 		// Act:
 		final Matrix result = matrix1.multiplyElementWise(matrix2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 14, 9, 5, 55, 11, 72 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				14, 9, 5, 55, 11, 72
+		})));
 	}
 
 	@Test
@@ -479,25 +528,29 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix result = matrix1.multiplyElementWise(matrix2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 0, 15, 0, 0 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0, 0, 0, 15, 0, 0
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region multiply
+	// region multiply
 
 	@Test
 	public void denseMatrixCanBeMultipliedByScalar() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 11, 1, 8
+		});
 
 		// Act:
 		final Matrix result = matrix.multiply(0.1);
 
 		// Assert:
-		Assert.assertThat(
-				result.roundTo(5),
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.3, 0.5, 1.1, 0.1, 0.8 })));
+		MatcherAssert.assertThat(result.roundTo(5), IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0.2, 0.3, 0.5, 1.1, 0.1, 0.8
+		})));
 	}
 
 	@Test
@@ -511,15 +564,17 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix result = matrix.multiply(0.2);
 
 		// Assert:
-		Assert.assertThat(
-				result.roundTo(5),
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.0, 0.0, 0.0, 1.0, 0.6, 0.0 })));
+		MatcherAssert.assertThat(result.roundTo(5), IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0.0, 0.0, 0.0, 1.0, 0.6, 0.0
+		})));
 	}
 
 	@Test
 	public void matrixCannotBeMultipliedByVectorOfDifferentSize() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 11, -1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, -3, -5, 11, -1, 8
+		});
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> matrix.multiply(new ColumnVector(1)), IllegalArgumentException.class);
@@ -529,100 +584,112 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	@Test
 	public void matrixCanBeMultipliedByVectorOfSameSize() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, -3, -1, -5, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 11, -3, -1, -5, 8
+		});
 		final ColumnVector vector = new ColumnVector(2, 3);
 
 		// Act:
 		final ColumnVector result = matrix.multiply(vector);
 
 		// Assert:
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-9.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(14.0));
+		MatcherAssert.assertThat(result.getAt(0), IsEqual.equalTo(37.0));
+		MatcherAssert.assertThat(result.getAt(1), IsEqual.equalTo(-9.0));
+		MatcherAssert.assertThat(result.getAt(2), IsEqual.equalTo(14.0));
 	}
 
 	@Test
 	public void sparseMatrixCanBeMultipliedByVectorOfSameSize() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, -1, -5, 0 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, 0, 0, -1, -5, 0
+		});
 		final ColumnVector vector = new ColumnVector(2, 3);
 
 		// Act:
 		final ColumnVector result = matrix.multiply(vector);
 
 		// Assert:
-		Assert.assertThat(result.getAt(0), IsEqual.equalTo(4.0));
-		Assert.assertThat(result.getAt(1), IsEqual.equalTo(-3.0));
-		Assert.assertThat(result.getAt(2), IsEqual.equalTo(-10.0));
+		MatcherAssert.assertThat(result.getAt(0), IsEqual.equalTo(4.0));
+		MatcherAssert.assertThat(result.getAt(1), IsEqual.equalTo(-3.0));
+		MatcherAssert.assertThat(result.getAt(2), IsEqual.equalTo(-10.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region abs / sqrt
+	// region abs / sqrt
 
 	@Test
 	public void absoluteValueOfMatrixCanBeTaken() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, -3, -5, 0, -1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				2, -3, -5, 0, -1, 8
+		});
 
 		// Act:
 		final Matrix result = matrix.abs();
 
 		// Assert:
-		Assert.assertThat(
-				result,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2, 3, 5, 0, 1, 8 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				2, 3, 5, 0, 1, 8
+		})));
 	}
 
 	@Test
 	public void squareRootOfMatrixCanBeTaken() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { 625, 4, 0, 36, 49, 121 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				625, 4, 0, 36, 49, 121
+		});
 
 		// Act:
 		final Matrix result = matrix.sqrt();
 
 		// Assert:
-		Assert.assertThat(
-				result,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 25, 2, 0, 6, 7, 11 })));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				25, 2, 0, 6, 7, 11
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeNegatives / removeLessThan
+	// region removeNegatives / removeLessThan
 
 	@Test
 	public void removeNegativesZerosOutAllElementsWithNegativeValues() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { -3, 2, -5, 0, -1, 8 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				-3, 2, -5, 0, -1, 8
+		});
 
 		// Act:
 		matrix.removeNegatives();
 
 		// Assert:
-		Assert.assertThat(
-				matrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 2, 0, 0, 0, 8 })));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0, 2, 0, 0, 0, 8
+		})));
 	}
 
 	@Test
 	public void removeLessThanZerosOutAllElementsLessThanSpecifiedValue() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2, new double[] { -3, 1.4, 1.6, 1.5, -1, 1 });
+		final Matrix matrix = this.createMatrix(3, 2, new double[]{
+				-3, 1.4, 1.6, 1.5, -1, 1
+		});
 
 		// Act:
 		matrix.removeLessThan(1.5);
 
 		// Assert:
-		Assert.assertThat(
-				matrix,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 1.6, 1.5, 0, 0 })));
+		MatcherAssert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[]{
+				0, 0, 1.6, 1.5, 0, 0
+		})));
 	}
 
-	//endregion
+	// endregion
 
-	//region isSameSize
+	// region isSameSize
 
 	@Test
 	public void isSameSizeReturnsTrueWhenMatriciesHaveSameSize() {
@@ -630,40 +697,40 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(3, 2);
 
 		// Assert:
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 2)), IsEqual.equalTo(true));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(2, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(4, 2)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 1)), IsEqual.equalTo(false));
-		Assert.assertThat(matrix.isSameSize(this.createMatrix(3, 3)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(matrix.isSameSize(this.createMatrix(3, 2)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(matrix.isSameSize(this.createMatrix(2, 2)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(matrix.isSameSize(this.createMatrix(4, 2)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(matrix.isSameSize(this.createMatrix(3, 1)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(matrix.isSameSize(this.createMatrix(3, 3)), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region isZeroMatrix
+	// region isZeroMatrix
 
 	@Test
 	public void isZeroMatrixReturnsTrueIfAndOnlyIfAllElementsAreZero() {
 		// Assert:
-		Assert.assertThat(
-				this.createMatrix(3, 2, new double[] { -3, 2, -5, 7, -1, 8 }).isZeroMatrix(),
-				IsEqual.equalTo(false));
-		Assert.assertThat(
-				this.createMatrix(3, 2, new double[] { -3, 2, -5, 0, -1, 8 }).isZeroMatrix(),
-				IsEqual.equalTo(false));
-		Assert.assertThat(
-				this.createMatrix(3, 2, new double[] { 0, 0, -1, 1, 0, 0 }).isZeroMatrix(),
-				IsEqual.equalTo(false));
-		Assert.assertThat(
-				this.createMatrix(3, 2, new double[] { 0, 0, -1, 0, 0, 0 }).isZeroMatrix(),
-				IsEqual.equalTo(false));
-		Assert.assertThat(
-				this.createMatrix(3, 2, new double[] { 0, 0, 0, 0, 0, 0 }).isZeroMatrix(),
-				IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.createMatrix(3, 2, new double[]{
+				-3, 2, -5, 7, -1, 8
+		}).isZeroMatrix(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.createMatrix(3, 2, new double[]{
+				-3, 2, -5, 0, -1, 8
+		}).isZeroMatrix(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.createMatrix(3, 2, new double[]{
+				0, 0, -1, 1, 0, 0
+		}).isZeroMatrix(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.createMatrix(3, 2, new double[]{
+				0, 0, -1, 0, 0, 0
+		}).isZeroMatrix(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.createMatrix(3, 2, new double[]{
+				0, 0, 0, 0, 0, 0
+		}).isZeroMatrix(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNonZeroElementRowIterator
+	// region getNonZeroElementRowIterator
 
 	@Test
 	public void hasNextReturnsTrueIfMoreColumnsAreAvailable() {
@@ -673,7 +740,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 		// Act + Assert
 		for (int i = 0; i < 3; i++) {
-			Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(iterator.hasNext(), IsEqual.equalTo(true));
 			iterator.next();
 		}
 	}
@@ -685,7 +752,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(1);
 
 		// Assert:
-		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
 		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
 	}
 
@@ -701,7 +768,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		}
 
 		// Assert:
-		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
 		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
 	}
 
@@ -712,9 +779,9 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act + Assert:
-		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 0, 1.1)));
-		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 1, 2.2)));
-		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 3, 4.4)));
+		MatcherAssert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 0, 1.1)));
+		MatcherAssert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 1, 2.2)));
+		MatcherAssert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 3, 4.4)));
 	}
 
 	private TMatrix createMatrixForIteratorTests() {
@@ -725,30 +792,38 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		return matrix;
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsReturnsFalseForNonMatrixObjects() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
 
 		// Assert:
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new double[] { 0, 0, 7, 0, 0, 5 }, IsNot.not(IsEqual.equalTo((Object)matrix)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(matrix)));
+		MatcherAssert.assertThat(new double[]{
+				0, 0, 7, 0, 0, 5
+		}, IsNot.not(IsEqual.equalTo((Object) matrix)));
 	}
 
 	@Test
 	public void equalsReturnsFalseForMatrixObjectsWithDifferentDimensions() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(3, 2, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
+		final Matrix matrix2 = this.createMatrix(3, 2, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
 
 		// Assert:
-		Assert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new DenseMatrix(3, 3), IsNot.not(IsEqual.equalTo(matrix)));
-		Assert.assertThat(new DenseMatrix(2, 4), IsNot.not(IsEqual.equalTo(matrix)));
+		MatcherAssert.assertThat(matrix2, IsNot.not(IsEqual.equalTo(matrix)));
+		MatcherAssert.assertThat(new DenseMatrix(3, 3), IsNot.not(IsEqual.equalTo(matrix)));
+		MatcherAssert.assertThat(new DenseMatrix(2, 4), IsNot.not(IsEqual.equalTo(matrix)));
 	}
 
 	@Test
@@ -765,30 +840,36 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix2.setAt(99, 200, 9);
 
 		// Assert:
-		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
+		MatcherAssert.assertThat(matrix2, IsEqual.equalTo(matrix));
 	}
 
 	@Test
 	public void equalsReturnsTrueForEquivalentDenseMatrices() {
 		// Arrange:
-		final Matrix matrix = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
-		final Matrix matrix2 = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix = this.createMatrix(2, 3, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
+		final Matrix matrix2 = this.createMatrix(2, 3, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
 
 		// Assert:
-		Assert.assertThat(matrix2, IsEqual.equalTo(matrix));
+		MatcherAssert.assertThat(matrix2, IsEqual.equalTo(matrix));
 	}
 
 	@Test
 	public void hashCodesAreEqualForObjectsWithEquivalentDimensions() {
 		// Arrange:
-		final Matrix matrix1 = this.createMatrix(2, 3, new double[] { 0, 0, 7, 0, 0, 5 });
+		final Matrix matrix1 = this.createMatrix(2, 3, new double[]{
+				0, 0, 7, 0, 0, 5
+		});
 
 		// Assert:
-		Assert.assertThat(this.createMatrix(2, 3).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
-		Assert.assertThat(this.createMatrix(3, 2).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
-		Assert.assertThat(this.createMatrix(2, 2).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
-		Assert.assertThat(this.createMatrix(2, 4).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
+		MatcherAssert.assertThat(this.createMatrix(2, 3).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
+		MatcherAssert.assertThat(this.createMatrix(3, 2).hashCode(), IsEqual.equalTo(matrix1.hashCode()));
+		MatcherAssert.assertThat(this.createMatrix(2, 2).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
+		MatcherAssert.assertThat(this.createMatrix(2, 4).hashCode(), IsNot.not(IsEqual.equalTo(matrix1.hashCode())));
 	}
 
-	//endregion
+	// endregion
 }

@@ -15,7 +15,8 @@ public class MultisigMinCosignatoriesModificationNotification extends Notificati
 	 * @param multisigAccount The multisig account.
 	 * @param modification The modification.
 	 */
-	public MultisigMinCosignatoriesModificationNotification(final Account multisigAccount, final MultisigMinCosignatoriesModification modification) {
+	public MultisigMinCosignatoriesModificationNotification(final Account multisigAccount,
+			final MultisigMinCosignatoriesModification modification) {
 		super(NotificationType.MinCosignatoriesModification);
 		this.multisigAccount = multisigAccount;
 		this.modification = modification;

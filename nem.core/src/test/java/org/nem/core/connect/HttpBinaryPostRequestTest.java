@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.BinarySerializer;
@@ -16,9 +17,7 @@ public class HttpBinaryPostRequestTest {
 		final HttpPostRequest request = new HttpBinaryPostRequest(entity);
 
 		// Assert:
-		Assert.assertThat(
-				request.getPayload(),
-				IsEqual.equalTo(BinarySerializer.serializeToBytes(entity)));
+		MatcherAssert.assertThat(request.getPayload(), IsEqual.equalTo(BinarySerializer.serializeToBytes(entity)));
 	}
 
 	@Test
@@ -30,8 +29,6 @@ public class HttpBinaryPostRequestTest {
 		final HttpPostRequest request = new HttpBinaryPostRequest(entity);
 
 		// Assert:
-		Assert.assertThat(
-				request.getContentType(),
-				IsEqual.equalTo("application/binary"));
+		MatcherAssert.assertThat(request.getContentType(), IsEqual.equalTo("application/binary"));
 	}
 }

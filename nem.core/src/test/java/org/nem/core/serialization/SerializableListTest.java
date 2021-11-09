@@ -1,6 +1,7 @@
 package org.nem.core.serialization;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -10,7 +11,7 @@ import java.util.function.Function;
 
 public class SerializableListTest {
 
-	//region Constructors
+	// region Constructors
 
 	@Test
 	public void ctorCapacityHasNoImpactOnSize() {
@@ -18,8 +19,8 @@ public class SerializableListTest {
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(100);
 
 		// Assert:
-		Assert.assertThat(list.size(), IsEqual.equalTo(0));
-		Assert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
 	}
 
 	@Test
@@ -28,8 +29,8 @@ public class SerializableListTest {
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(100, "items");
 
 		// Assert:
-		Assert.assertThat(list.size(), IsEqual.equalTo(0));
-		Assert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
 	}
 
 	@Test
@@ -43,10 +44,10 @@ public class SerializableListTest {
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList);
 
 		// Assert:
-		Assert.assertThat(list.size(), IsEqual.equalTo(2));
-		Assert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
-		Assert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
-		Assert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
+		MatcherAssert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
+		MatcherAssert.assertThat(list.getLabel(), IsEqual.equalTo("data"));
 	}
 
 	@Test
@@ -60,10 +61,10 @@ public class SerializableListTest {
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList, "items");
 
 		// Assert:
-		Assert.assertThat(list.size(), IsEqual.equalTo(2));
-		Assert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
-		Assert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
-		Assert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(list.get(0), IsSame.sameInstance(rawList.get(0)));
+		MatcherAssert.assertThat(list.get(1), IsSame.sameInstance(rawList.get(1)));
+		MatcherAssert.assertThat(list.getLabel(), IsEqual.equalTo("items"));
 	}
 
 	@Test
@@ -78,8 +79,8 @@ public class SerializableListTest {
 		rawList.add(new MockSerializableEntity());
 
 		// Assert:
-		Assert.assertThat(rawList.size(), IsEqual.equalTo(3));
-		Assert.assertThat(list.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(rawList.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(2));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -112,10 +113,10 @@ public class SerializableListTest {
 		list.add(entity3);
 
 		// Assert:
-		Assert.assertThat(list.size(), IsEqual.equalTo(3));
-		Assert.assertThat(list.get(0), IsEqual.equalTo(entity1));
-		Assert.assertThat(list.get(1), IsEqual.equalTo(entity2));
-		Assert.assertThat(list.get(2), IsEqual.equalTo(entity3));
+		MatcherAssert.assertThat(list.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(list.get(0), IsEqual.equalTo(entity1));
+		MatcherAssert.assertThat(list.get(1), IsEqual.equalTo(entity2));
+		MatcherAssert.assertThat(list.get(2), IsEqual.equalTo(entity3));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -218,24 +219,22 @@ public class SerializableListTest {
 
 	// endregion
 
-	//region asCollection
+	// region asCollection
 
 	@Test
 	public void asCollectionReturnsRawCollection() {
 		// Arrange:
-		final List<MockSerializableEntity> rawList = Arrays.asList(
-				new MockSerializableEntity(12, "a", 12),
-				new MockSerializableEntity(4, "b", 4),
-				new MockSerializableEntity(122, "c", 122));
+		final List<MockSerializableEntity> rawList = Arrays.asList(new MockSerializableEntity(12, "a", 12),
+				new MockSerializableEntity(4, "b", 4), new MockSerializableEntity(122, "c", 122));
 		final SerializableList<MockSerializableEntity> list = new SerializableList<>(rawList);
 
 		// Assert:
-		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(rawList));
+		MatcherAssert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(rawList));
 	}
 
-	//endregion
+	// endregion
 
-	//region Serialization
+	// region Serialization
 
 	@Test
 	public void canSerializeListWithDefaultLabel() {
@@ -259,24 +258,23 @@ public class SerializableListTest {
 		assertSerializedData(list -> new SerializableList<>(list, "objects"), "objects");
 	}
 
-	private static void assertSerializedData(
-			final Function<List<MockSerializableEntity>, SerializableList<MockSerializableEntity>> factory,
+	private static void assertSerializedData(final Function<List<MockSerializableEntity>, SerializableList<MockSerializableEntity>> factory,
 			final String expectedArrayName) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
-		final SerializableList<MockSerializableEntity> list1 = factory.apply(
-				Arrays.asList(new MockSerializableEntity(5, "foo", 6), new MockSerializableEntity(8, "bar", 7)));
+		final SerializableList<MockSerializableEntity> list1 = factory
+				.apply(Arrays.asList(new MockSerializableEntity(5, "foo", 6), new MockSerializableEntity(8, "bar", 7)));
 
 		// Act:
 		list1.serialize(serializer);
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		final JSONArray dataArray = (JSONArray)object.get(expectedArrayName);
-		Assert.assertThat(dataArray.size(), IsEqual.equalTo(2));
-		Assert.assertThat(deserializeFromObject(dataArray.get(0)), IsEqual.equalTo(list1.get(0)));
-		Assert.assertThat(deserializeFromObject(dataArray.get(1)), IsEqual.equalTo(list1.get(1)));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		final JSONArray dataArray = (JSONArray) object.get(expectedArrayName);
+		MatcherAssert.assertThat(dataArray.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(deserializeFromObject(dataArray.get(0)), IsEqual.equalTo(list1.get(0)));
+		MatcherAssert.assertThat(deserializeFromObject(dataArray.get(1)), IsEqual.equalTo(list1.get(1)));
 	}
 
 	@Test
@@ -288,11 +286,10 @@ public class SerializableListTest {
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
-		final SerializableList<MockSerializableEntity> list =
-				new SerializableList<>(deserializer, MockSerializableEntity::new);
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
+		MatcherAssert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
 	}
 
 	@Test
@@ -304,16 +301,15 @@ public class SerializableListTest {
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalList, null);
-		final SerializableList<MockSerializableEntity> list =
-				new SerializableList<>(deserializer, MockSerializableEntity::new, "objects");
+		final SerializableList<MockSerializableEntity> list = new SerializableList<>(deserializer, MockSerializableEntity::new, "objects");
 
 		// Assert:
-		Assert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
+		MatcherAssert.assertThat(list.asCollection(), IsEquivalent.equivalentTo(originalList.asCollection()));
 	}
 
-	//endregion
+	// endregion
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Test
 	public void hashCodeIsConsistentForUnchangedList() {
@@ -322,7 +318,7 @@ public class SerializableListTest {
 		final int hashCode = list.hashCode();
 
 		// Assert:
-		Assert.assertThat(list.hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(list.hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	@Test
@@ -335,17 +331,15 @@ public class SerializableListTest {
 		list.add(new MockSerializableEntity());
 
 		// Assert:
-		Assert.assertThat(list.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(list.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final List<MockSerializableEntity> entities1 = Arrays.asList(
-				new MockSerializableEntity(5, "foo", 6),
+		final List<MockSerializableEntity> entities1 = Arrays.asList(new MockSerializableEntity(5, "foo", 6),
 				new MockSerializableEntity(8, "bar", 7));
-		final List<MockSerializableEntity> entities2 = Arrays.asList(
-				new MockSerializableEntity(5, "foo", 6),
+		final List<MockSerializableEntity> entities2 = Arrays.asList(new MockSerializableEntity(5, "foo", 6),
 				new MockSerializableEntity(8, "bar", 8));
 
 		final SerializableList<MockSerializableEntity> list1 = new SerializableList<>(entities1);
@@ -353,33 +347,30 @@ public class SerializableListTest {
 		final SerializableList<MockSerializableEntity> list3 = new SerializableList<>(entities2);
 
 		// Assert:
-		Assert.assertThat(list2, IsEqual.equalTo(list1));
-		Assert.assertThat(list3, IsNot.not(IsEqual.equalTo(list1)));
-		Assert.assertThat(entities1, IsNot.not((Object)IsEqual.equalTo(list1)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(list1)));
+		MatcherAssert.assertThat(list2, IsEqual.equalTo(list1));
+		MatcherAssert.assertThat(list3, IsNot.not(IsEqual.equalTo(list1)));
+		MatcherAssert.assertThat(entities1, IsNot.not((Object) IsEqual.equalTo(list1)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(list1)));
 	}
 
-	//endregion
+	// endregion
 
-	private static void assertListComparison(
-			final SerializableList<MockSerializableEntity> list1,
-			final SerializableList<MockSerializableEntity> list2,
-			final int expectedDifferenceIndex,
-			final boolean expectedEquals) {
+	private static void assertListComparison(final SerializableList<MockSerializableEntity> list1,
+			final SerializableList<MockSerializableEntity> list2, final int expectedDifferenceIndex, final boolean expectedEquals) {
 		// Assert:
 		if (expectedEquals) {
-			Assert.assertThat(list1, IsEqual.equalTo(list2));
-			Assert.assertThat(list2, IsEqual.equalTo(list1));
+			MatcherAssert.assertThat(list1, IsEqual.equalTo(list2));
+			MatcherAssert.assertThat(list2, IsEqual.equalTo(list1));
 		} else {
-			Assert.assertThat(list1, IsNot.not(IsEqual.equalTo(list2)));
-			Assert.assertThat(list2, IsNot.not(IsEqual.equalTo(list1)));
+			MatcherAssert.assertThat(list1, IsNot.not(IsEqual.equalTo(list2)));
+			MatcherAssert.assertThat(list2, IsNot.not(IsEqual.equalTo(list1)));
 		}
 
-		Assert.assertThat(list1.findFirstDifference(list2), IsEqual.equalTo(expectedDifferenceIndex));
-		Assert.assertThat(list2.findFirstDifference(list1), IsEqual.equalTo(expectedDifferenceIndex));
+		MatcherAssert.assertThat(list1.findFirstDifference(list2), IsEqual.equalTo(expectedDifferenceIndex));
+		MatcherAssert.assertThat(list2.findFirstDifference(list1), IsEqual.equalTo(expectedDifferenceIndex));
 	}
 
 	private static MockSerializableEntity deserializeFromObject(final Object object) {
-		return new MockSerializableEntity(new JsonDeserializer((JSONObject)object, null));
+		return new MockSerializableEntity(new JsonDeserializer((JSONObject) object, null));
 	}
 }

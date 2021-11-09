@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class TransferTransactionAttachmentTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateEmptyAttachment() {
@@ -20,8 +21,8 @@ public class TransferTransactionAttachmentTest {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsNull.nullValue());
-		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(attachment.getMessage(), IsNull.nullValue());
+		MatcherAssert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -31,13 +32,13 @@ public class TransferTransactionAttachmentTest {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
-		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region message
+	// region message
 
 	@Test
 	public void canSetMessage() {
@@ -49,7 +50,7 @@ public class TransferTransactionAttachmentTest {
 		attachment.setMessage(message);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
 	}
 
 	@Test
@@ -61,17 +62,15 @@ public class TransferTransactionAttachmentTest {
 		attachment.setMessage(message1);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> attachment.setMessage(message2),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrows(v -> attachment.setMessage(message2), IllegalStateException.class);
 
 		// Assert:
-		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message1));
+		MatcherAssert.assertThat(attachment.getMessage(), IsEqual.equalTo(message1));
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaics
+	// region mosaics
 
 	@Test
 	public void canAddMosaics() {
@@ -84,11 +83,9 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId(3), new Quantity(41));
 
 		// Assert:
-		final Collection<Mosaic> expectedPairs = Arrays.asList(
-				new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
-				new Mosaic(Utils.createMosaicId(2), new Quantity(77)),
-				new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
-		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<Mosaic> expectedPairs = Arrays.asList(new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
+				new Mosaic(Utils.createMosaicId(2), new Quantity(77)), new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
+		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -102,9 +99,8 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(41));
 
 		// Assert:
-		final Collection<Mosaic> expectedPairs = Collections.singletonList(
-				new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
-		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<Mosaic> expectedPairs = Collections.singletonList(new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
+		MatcherAssert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -119,15 +115,11 @@ public class TransferTransactionAttachmentTest {
 		attachment.addMosaic(Utils.createMosaicId("aa", "a"), Quantity.ZERO);
 
 		// Assert:
-		final Collection<MosaicId> expectedMosaicIds = Arrays.asList(
-				Utils.createMosaicId("a", "b"),
-				Utils.createMosaicId("aa", "a"),
-				Utils.createMosaicId("b", "a"),
-				Utils.createMosaicId("b", "c"));
-		Assert.assertThat(
-				attachment.getMosaics().stream().map(Mosaic::getMosaicId).collect(Collectors.toList()),
+		final Collection<MosaicId> expectedMosaicIds = Arrays.asList(Utils.createMosaicId("a", "b"), Utils.createMosaicId("aa", "a"),
+				Utils.createMosaicId("b", "a"), Utils.createMosaicId("b", "c"));
+		MatcherAssert.assertThat(attachment.getMosaics().stream().map(Mosaic::getMosaicId).collect(Collectors.toList()),
 				IsEqual.equalTo(expectedMosaicIds));
 	}
 
-	//endregion
+	// endregion
 }

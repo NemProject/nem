@@ -50,8 +50,7 @@ public class HashMetaData {
 			return false;
 		}
 
-		final HashMetaData rhs = (HashMetaData)obj;
-		return this.height.equals(rhs.height)
-				&& this.timeStamp.equals(rhs.timeStamp);
+		final HashMetaData rhs = (HashMetaData) obj;
+		return this.height.equals(rhs.height) && this.timeStamp.equals(rhs.timeStamp);
 	}
 }

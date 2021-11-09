@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -10,7 +11,7 @@ import java.math.BigInteger;
 
 public class BlockChainScoreTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void cannotBeCreatedAroundNegativeScore() {
@@ -22,20 +23,20 @@ public class BlockChainScoreTest {
 	@Test
 	public void canBeCreatedAroundZeroScore() {
 		// Assert:
-		Assert.assertThat(new BlockChainScore(0).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
-		Assert.assertThat(new BlockChainScore(BigInteger.ZERO).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(new BlockChainScore(0).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(new BlockChainScore(BigInteger.ZERO).getRaw(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
 	public void canBeCreatedAroundPositiveScore() {
 		// Assert:
-		Assert.assertThat(new BlockChainScore(1).getRaw(), IsEqual.equalTo(BigInteger.ONE));
-		Assert.assertThat(new BlockChainScore(BigInteger.ONE).getRaw(), IsEqual.equalTo(BigInteger.ONE));
+		MatcherAssert.assertThat(new BlockChainScore(1).getRaw(), IsEqual.equalTo(BigInteger.ONE));
+		MatcherAssert.assertThat(new BlockChainScore(BigInteger.ONE).getRaw(), IsEqual.equalTo(BigInteger.ONE));
 	}
 
-	//endregion
+	// endregion
 
-	//region add/subtract
+	// region add/subtract
 
 	@Test
 	public void scoresCanBeAdded() {
@@ -47,7 +48,7 @@ public class BlockChainScoreTest {
 		final BlockChainScore result = score1.add(score2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(20))));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(20))));
 	}
 
 	@Test
@@ -60,7 +61,7 @@ public class BlockChainScoreTest {
 		final BlockChainScore result = score1.subtract(score2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(14))));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(14))));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -73,9 +74,9 @@ public class BlockChainScoreTest {
 		score2.subtract(score1);
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void scoreCanBeSerialized() {
@@ -88,10 +89,8 @@ public class BlockChainScoreTest {
 		final JSONObject jsonObject = serializer.getObject();
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
-		Assert.assertThat(
-				jsonObject.get("score"),
-				IsEqual.equalTo("008e"));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(jsonObject.get("score"), IsEqual.equalTo("008e"));
 	}
 
 	@Test
@@ -100,7 +99,7 @@ public class BlockChainScoreTest {
 		final BlockChainScore score = createRoundTrippedScore(new BlockChainScore(BigInteger.valueOf(142)));
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(142))));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(new BlockChainScore(BigInteger.valueOf(142))));
 	}
 
 	private static BlockChainScore createRoundTrippedScore(final BlockChainScore originalScore) {

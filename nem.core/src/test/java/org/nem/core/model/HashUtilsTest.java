@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -8,7 +9,7 @@ import org.nem.core.test.*;
 
 public class HashUtilsTest {
 
-	//region calculateHash
+	// region calculateHash
 
 	@Test
 	public void identicalEntitiesHaveSameHash() {
@@ -22,7 +23,7 @@ public class HashUtilsTest {
 		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
-		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
+		MatcherAssert.assertThat(hash1, IsEqual.equalTo(hash2));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class HashUtilsTest {
 		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
-		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
+		MatcherAssert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class HashUtilsTest {
 		final Hash hash2 = HashUtils.calculateHash(entity2);
 
 		// Assert:
-		Assert.assertThat(hash1, IsEqual.equalTo(hash2));
+		MatcherAssert.assertThat(hash1, IsEqual.equalTo(hash2));
 	}
 
 	@Test
@@ -69,12 +70,12 @@ public class HashUtilsTest {
 		final Hash hash2 = HashUtils.calculateHash(entity);
 
 		// Assert:
-		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
+		MatcherAssert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region nextHash
+	// region nextHash
 
 	@Test
 	public void nextHashProducesHashEquivalentToConcatenatingTheInputs() {
@@ -87,10 +88,10 @@ public class HashUtilsTest {
 		final Hash hash2 = HashUtils.calculateHash(new HashPublicKeyPair(inputHash, inputKey));
 
 		// Assert:
-		Assert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
+		MatcherAssert.assertThat(hash1, IsNot.not(IsEqual.equalTo(hash2)));
 	}
 
-	//endregion
+	// endregion
 
 	private static class HashPublicKeyPair implements SerializableEntity {
 

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -9,7 +10,7 @@ import java.util.stream.*;
 
 public class TransactionExtensionsTest {
 
-	//region getChildSignatures
+	// region getChildSignatures
 
 	@Test
 	public void getSignaturesForNonMultisigReturnsEmptyStream() {
@@ -20,7 +21,7 @@ public class TransactionExtensionsTest {
 		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(transaction).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(signatures.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(signatures.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -32,11 +33,11 @@ public class TransactionExtensionsTest {
 		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(multisigTransaction).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(signatures.size(), IsEqual.equalTo(3));
-		Assert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
+		MatcherAssert.assertThat(signatures.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void canStreamSelfAndFirstChildTransactions() {
@@ -47,9 +48,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndFirstChildTransactions(transaction));
 
 		// Assert:
-		Assert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}
 
 	@Test
@@ -61,9 +60,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamSelfAndAllTransactions(transaction));
 
 		// Assert:
-		Assert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 61, 62, 70, 80, 81, 82));
 	}
 
 	@Test
@@ -75,9 +72,7 @@ public class TransactionExtensionsTest {
 		final List<Integer> customFields = getCustomFields(TransactionExtensions.streamDefault(transaction));
 
 		// Assert:
-		Assert.assertThat(
-				customFields,
-				IsEquivalent.equivalentTo(50, 60, 70, 80));
+		MatcherAssert.assertThat(customFields, IsEquivalent.equivalentTo(50, 60, 70, 80));
 	}
 
 	private static List<Integer> getCustomFields(final Stream<Transaction> stream) {

@@ -1,6 +1,7 @@
 package org.nem.core.model.ncc;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,7 +19,7 @@ public class AccountIdTest {
 		final AccountId accountId = new AccountId(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -28,14 +29,14 @@ public class AccountIdTest {
 		final AccountId accountId = new AccountId(address);
 
 		// Assert:
-		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
 	public void accountIdCannotBeCreatedAroundInvalidAddress() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountId((Address)null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new AccountId((String)null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountId((Address) null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountId((String) null), IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(v -> new AccountId("ABC"), IllegalArgumentException.class);
 	}
 
@@ -48,7 +49,7 @@ public class AccountIdTest {
 		final AccountId accountId = this.createAccountIdFromJson(address.getEncoded());
 
 		// Assert:
-		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -69,10 +70,10 @@ public class AccountIdTest {
 		final AccountId request = new AccountId(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(request.getAddress(), IsEqual.equalTo(address));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -81,12 +82,12 @@ public class AccountIdTest {
 		final AccountId request = new AccountId(address);
 
 		// Assert:
-		Assert.assertThat(request, IsEqual.equalTo(new AccountId(address)));
-		Assert.assertThat(request, IsEqual.equalTo(new AccountId(address.getEncoded())));
-		Assert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
-		Assert.assertThat(request, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()))));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(request)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)request)));
+		MatcherAssert.assertThat(request, IsEqual.equalTo(new AccountId(address)));
+		MatcherAssert.assertThat(request, IsEqual.equalTo(new AccountId(address.getEncoded())));
+		MatcherAssert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
+		MatcherAssert.assertThat(request, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()))));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(request)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) request)));
 	}
 
 	@Test
@@ -97,13 +98,13 @@ public class AccountIdTest {
 		final int hashCode = request.hashCode();
 
 		// Assert:
-		Assert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address.getEncoded()).hashCode()));
-		Assert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
-		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()).hashCode())));
+		MatcherAssert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address).hashCode()));
+		MatcherAssert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address.getEncoded()).hashCode()));
+		MatcherAssert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
+		MatcherAssert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()).hashCode())));
 	}
 
-	//endregion
+	// endregion
 
 	private AccountId createAccountIdFromJson(final String address) {
 		final JSONObject jsonObject = new JSONObject();

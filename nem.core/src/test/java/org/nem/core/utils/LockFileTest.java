@@ -1,6 +1,7 @@
 package org.nem.core.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -12,7 +13,7 @@ public class LockFileTest {
 	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");
 	private static final File TEST_EXISTING_FILE = new File(TEST_FILE_DIRECTORY, "test.lock");
 
-	//region BeforeClass / AfterClass
+	// region BeforeClass / AfterClass
 
 	@BeforeClass
 	public static void createTestFiles() throws IOException {
@@ -28,16 +29,16 @@ public class LockFileTest {
 		FileUtils.deleteDirectory(TEST_FILE_DIRECTORY);
 	}
 
-	//endregion
+	// endregion
 
-	//region tryAcquireLock
+	// region tryAcquireLock
 
 	@Test
 	public void tryAcquireLockReturnsNullWhenLockFileIsInvalid() throws IOException {
 		// Act:
 		try (final Closeable lock = LockFile.tryAcquireLock(new File("foo\u0000.lock"))) {
 			// Assert:
-			Assert.assertThat(lock, IsNull.nullValue());
+			MatcherAssert.assertThat(lock, IsNull.nullValue());
 		}
 	}
 
@@ -46,7 +47,7 @@ public class LockFileTest {
 		// Act:
 		try (final Closeable lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			// Assert:
-			Assert.assertThat(lock, IsNull.notNullValue());
+			MatcherAssert.assertThat(lock, IsNull.notNullValue());
 		}
 	}
 
@@ -55,7 +56,7 @@ public class LockFileTest {
 		// Act:
 		try (final Closeable lock = LockFile.tryAcquireLock(new File(TEST_FILE_DIRECTORY, "tryAcquireLock_new.lock"))) {
 			// Assert:
-			Assert.assertThat(lock, IsNull.notNullValue());
+			MatcherAssert.assertThat(lock, IsNull.notNullValue());
 		}
 	}
 
@@ -65,15 +66,15 @@ public class LockFileTest {
 		try (final Closeable lock1 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			try (final Closeable lock2 = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 				// Assert:
-				Assert.assertThat(lock1, IsNull.notNullValue());
-				Assert.assertThat(lock2, IsNull.nullValue());
+				MatcherAssert.assertThat(lock1, IsNull.notNullValue());
+				MatcherAssert.assertThat(lock2, IsNull.nullValue());
 			}
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region isLocked
+	// region isLocked
 
 	@Test
 	public void isLockedReturnsFalseWhenLockFileIsInvalid() throws IOException {
@@ -81,7 +82,7 @@ public class LockFileTest {
 		final boolean isLocked = LockFile.isLocked(new File("foo\u0000.lock"));
 
 		// Assert:
-		Assert.assertThat(isLocked, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isLocked, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -90,10 +91,11 @@ public class LockFileTest {
 		final boolean isLocked = LockFile.isLocked(TEST_EXISTING_FILE);
 
 		// Assert:
-		Assert.assertThat(isLocked, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isLocked, IsEqual.equalTo(false));
 	}
 
 	@Test
+	@SuppressWarnings("try")
 	public void isLockedReturnsTrueWhenLockFileIsNotLocked() throws IOException {
 		// Arrange:
 		try (final Closeable ignored = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
@@ -101,7 +103,7 @@ public class LockFileTest {
 			final boolean isLocked = LockFile.isLocked(TEST_EXISTING_FILE);
 
 			// Assert:
-			Assert.assertThat(isLocked, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(isLocked, IsEqual.equalTo(true));
 		}
 	}
 
@@ -112,10 +114,10 @@ public class LockFileTest {
 
 		try (final Closeable lock = LockFile.tryAcquireLock(TEST_EXISTING_FILE)) {
 			// Assert:
-			Assert.assertThat(isLocked, IsEqual.equalTo(false));
-			Assert.assertThat(lock, IsNull.notNullValue());
+			MatcherAssert.assertThat(isLocked, IsEqual.equalTo(false));
+			MatcherAssert.assertThat(lock, IsNull.notNullValue());
 		}
 	}
 
-	//endregion
+	// endregion
 }

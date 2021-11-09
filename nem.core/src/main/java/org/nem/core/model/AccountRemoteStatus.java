@@ -27,8 +27,7 @@ public enum AccountRemoteStatus {
 	DEACTIVATING("DEACTIVATING"),
 
 	/**
-	 * The account has inactive remote harvesting,
-	 * or it has deactivated remote harvesting and deactivation is operational.
+	 * The account has inactive remote harvesting, or it has deactivated remote harvesting and deactivation is operational.
 	 */
 	INACTIVE("INACTIVE");
 
@@ -54,7 +53,7 @@ public enum AccountRemoteStatus {
 		throw new IllegalArgumentException(String.format("Invalid account status: %s", status));
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes an account status.
@@ -78,5 +77,5 @@ public enum AccountRemoteStatus {
 		return AccountRemoteStatus.fromString(deserializer.readString(label));
 	}
 
-	//endregion
+	// endregion
 }

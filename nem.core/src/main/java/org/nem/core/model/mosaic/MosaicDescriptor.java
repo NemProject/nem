@@ -66,7 +66,7 @@ public class MosaicDescriptor {
 			return false;
 		}
 
-		final MosaicDescriptor rhs = (MosaicDescriptor)obj;
+		final MosaicDescriptor rhs = (MosaicDescriptor) obj;
 
 		// should not be case sensitive
 		return this.description.equals(rhs.description);

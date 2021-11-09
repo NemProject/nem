@@ -2,7 +2,9 @@ package org.nem.core.serialization.primitive;
 
 import org.nem.core.serialization.*;
 
-public abstract class AbstractIntegerSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, Integer> {
+public abstract class AbstractIntegerSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractPrimitiveSerializationTest<TSerializer, TDeserializer, Integer> {
 	public AbstractIntegerSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {
 		super(policy);
 	}

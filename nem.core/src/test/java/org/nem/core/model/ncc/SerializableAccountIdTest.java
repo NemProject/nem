@@ -1,6 +1,7 @@
 package org.nem.core.model.ncc;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,7 +19,7 @@ public class SerializableAccountIdTest {
 		final SerializableAccountId accountId = new SerializableAccountId(address);
 
 		// Assert:
-		Assert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class SerializableAccountIdTest {
 		final SerializableAccountId accountId = new SerializableAccountId(address.toString());
 
 		// Assert:
-		Assert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -57,7 +58,7 @@ public class SerializableAccountIdTest {
 		final SerializableAccountId accountId = createFromJson(address);
 
 		// Assert:
-		Assert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(getAddress(accountId), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -76,8 +77,8 @@ public class SerializableAccountIdTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(accountId);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
-		Assert.assertThat(jsonObject.get("account"), IsEqual.equalTo(address.toString()));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(jsonObject.get("account"), IsEqual.equalTo(address.toString()));
 	}
 
 	private static SerializableAccountId createFromJson(final Address address) {

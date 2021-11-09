@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,6 +19,6 @@ public class AccountIdBuilderTest {
 		final AccountId accountId = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 }

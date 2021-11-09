@@ -60,20 +60,13 @@ public class MockSerializableEntity implements SerializableEntity {
 			return false;
 		}
 
-		final MockSerializableEntity rhs = (MockSerializableEntity)obj;
-		return
-				this.intValue == rhs.intValue
-						&& this.stringValue.equals(rhs.stringValue)
-						&& this.longValue == rhs.longValue;
+		final MockSerializableEntity rhs = (MockSerializableEntity) obj;
+		return this.intValue == rhs.intValue && this.stringValue.equals(rhs.stringValue) && this.longValue == rhs.longValue;
 	}
 
 	@Override
 	public String toString() {
-		return String.format(
-				"int: %d; string: %s; long: %d",
-				this.intValue,
-				this.stringValue,
-				this.longValue);
+		return String.format("int: %d; string: %s; long: %d", this.intValue, this.stringValue, this.longValue);
 	}
 
 	/**

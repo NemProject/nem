@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * An asynchronous NEM connector that can be used to connect to both NCC and NIS nodes.
  *
- * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector
- * instances can only call certain APIs).
+ * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector instances can only call certain
+ *            APIs).
  */
 @SuppressWarnings("unused")
 public interface AsyncNemConnector<TApiId> {
@@ -23,10 +23,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param query The get query string or null.
 	 * @return The result.
 	 */
-	CompletableFuture<Deserializer> getAsync(
-			final NodeEndpoint endpoint,
-			final TApiId apiId,
-			final String query);
+	CompletableFuture<Deserializer> getAsync(final NodeEndpoint endpoint, final TApiId apiId, final String query);
 
 	/**
 	 * Posts a request to the specified NIS relative url path.
@@ -36,10 +33,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param postRequest The request data.
 	 * @return The result.
 	 */
-	CompletableFuture<Deserializer> postAsync(
-			final NodeEndpoint endpoint,
-			final TApiId apiId,
-			final HttpPostRequest postRequest);
+	CompletableFuture<Deserializer> postAsync(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest);
 
 	/**
 	 * Posts a request to the specified NIS relative url path.
@@ -49,8 +43,5 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param postRequest The request data.
 	 * @return The future.
 	 */
-	CompletableFuture<Void> postVoidAsync(
-			final NodeEndpoint endpoint,
-			final TApiId apiId,
-			final HttpPostRequest postRequest);
+	CompletableFuture<Void> postVoidAsync(final NodeEndpoint endpoint, final TApiId apiId, final HttpPostRequest postRequest);
 }

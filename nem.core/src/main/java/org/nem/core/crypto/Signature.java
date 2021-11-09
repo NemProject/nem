@@ -116,11 +116,11 @@ public class Signature {
 			return false;
 		}
 
-		final Signature rhs = (Signature)obj;
+		final Signature rhs = (Signature) obj;
 		return 1 == ArrayUtils.isEqualConstantTime(this.r, rhs.r) && 1 == ArrayUtils.isEqualConstantTime(this.s, rhs.s);
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a signature object.
@@ -145,7 +145,7 @@ public class Signature {
 		return new Signature(bytes);
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public String toString() {

@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 /**
  * Implementation for calculating and validating transaction fees after the first fee fork.
  */
-public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator implements TransactionFeeCalculator {
+public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final int FEE_MULTIPLIER = 3;
 
@@ -29,10 +29,10 @@ public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCal
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return this.calculateMinimumFeeImpl((TransferTransaction)transaction);
+				return this.calculateMinimumFeeImpl((TransferTransaction) transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				return this.calculateMinimumFeeImpl((MultisigAggregateModificationTransaction)transaction);
+				return this.calculateMinimumFeeImpl((MultisigAggregateModificationTransaction) transaction);
 
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:

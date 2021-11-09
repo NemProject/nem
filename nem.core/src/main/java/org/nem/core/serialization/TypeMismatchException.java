@@ -3,6 +3,7 @@ package org.nem.core.serialization;
 /**
  * Exception that is thrown to indicate a serialization failure caused by a property value having an incompatible type.
  */
+@SuppressWarnings("serial")
 public class TypeMismatchException extends InvalidPropertyException {
 
 	/**

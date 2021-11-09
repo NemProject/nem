@@ -3,6 +3,7 @@ package org.nem.core.serialization;
 /**
  * Exception that is used when a serialization operation fails.
  */
+@SuppressWarnings("serial")
 public class SerializationException extends RuntimeException {
 
 	/**

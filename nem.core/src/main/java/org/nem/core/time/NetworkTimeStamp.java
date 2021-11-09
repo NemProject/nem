@@ -36,7 +36,7 @@ public class NetworkTimeStamp extends AbstractPrimitive<NetworkTimeStamp, Long> 
 		return this.getRaw() - other.getRaw();
 	}
 
-	//region inline serialization
+	// region inline serialization
 
 	/**
 	 * Writes a network time stamp object.
@@ -60,5 +60,5 @@ public class NetworkTimeStamp extends AbstractPrimitive<NetworkTimeStamp, Long> 
 		return new NetworkTimeStamp(deserializer.readLong(label));
 	}
 
-	//endregion
+	// endregion
 }

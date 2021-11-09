@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * An abstract class for forward-only deserialization of primitive data types.
- * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
+ * An abstract class for forward-only deserialization of primitive data types. Implementations may use or ignore label parameters but
+ * label-based lookup is not guaranteed.
  */
 public abstract class Deserializer {
 	private static final Logger LOGGER = Logger.getLogger(Deserializer.class.getName());
@@ -24,7 +24,7 @@ public abstract class Deserializer {
 		this.context = null == context ? new DeserializationContext(null) : context;
 	}
 
-	//region read[Optional]Int
+	// region read[Optional]Int
 
 	/**
 	 * Reads a 32-bit integer value.
@@ -44,9 +44,9 @@ public abstract class Deserializer {
 	 */
 	public abstract Integer readOptionalInt(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]Long
+	// region read[Optional]Long
 
 	/**
 	 * Reads a 64-bit long value.
@@ -66,9 +66,9 @@ public abstract class Deserializer {
 	 */
 	public abstract Long readOptionalLong(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]Double
+	// region read[Optional]Double
 
 	/**
 	 * Reads a 64-bit double value.
@@ -88,9 +88,9 @@ public abstract class Deserializer {
 	 */
 	public abstract Double readOptionalDouble(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]BigInteger
+	// region read[Optional]BigInteger
 
 	/**
 	 * Reads a BigInteger value.
@@ -110,9 +110,9 @@ public abstract class Deserializer {
 	 */
 	public abstract BigInteger readOptionalBigInteger(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]Bytes
+	// region read[Optional]Bytes
 
 	/**
 	 * Reads a byte array value.
@@ -171,9 +171,9 @@ public abstract class Deserializer {
 	 */
 	protected abstract byte[] readOptionalBytesImpl(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]String
+	// region read[Optional]String
 
 	/**
 	 * Reads a String value that is required to be non-whitespace.
@@ -237,9 +237,9 @@ public abstract class Deserializer {
 	 */
 	protected abstract String readOptionalStringImpl(final String label);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]Object
+	// region read[Optional]Object
 
 	/**
 	 * Reads an object value.
@@ -263,9 +263,9 @@ public abstract class Deserializer {
 	 */
 	public abstract <T> T readOptionalObject(final String label, final ObjectDeserializer<T> activator);
 
-	//endregion
+	// endregion
 
-	//region read[Optional]ObjectArray
+	// region read[Optional]ObjectArray
 
 	/**
 	 * Reads an array of object values.
@@ -289,7 +289,7 @@ public abstract class Deserializer {
 	 */
 	public abstract <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator);
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the current deserialization context.

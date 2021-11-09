@@ -34,8 +34,8 @@ public class JsonSerializer extends Serializer {
 	}
 
 	/**
-	 * Creates a default json serializer that can conditionally enforce forward-only reads.
-	 * For performance reasons, this feature should not be used in production code.
+	 * Creates a default json serializer that can conditionally enforce forward-only reads. For performance reasons, this feature should not
+	 * be used in production code.
 	 *
 	 * @param enforceReadWriteOrder true if forward-only reads should be enforced.
 	 */
@@ -101,9 +101,7 @@ public class JsonSerializer extends Serializer {
 			return;
 		}
 
-		final JSONArray jsonObjects = objects.stream()
-				.map(this::serializeObject)
-				.collect(Collectors.toCollection(JSONArray::new));
+		final JSONArray jsonObjects = objects.stream().map(this::serializeObject).collect(Collectors.toCollection(JSONArray::new));
 
 		this.object.put(label, jsonObjects);
 	}

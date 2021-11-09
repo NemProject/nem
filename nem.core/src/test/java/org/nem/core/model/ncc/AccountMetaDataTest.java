@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -11,7 +12,7 @@ import java.util.*;
 
 public class AccountMetaDataTest {
 
-	//region create
+	// region create
 
 	@Test
 	public void canCreateAccountMetaDataWithNeitherCosignatoriesNorCosignatoriesOf() {
@@ -37,38 +38,34 @@ public class AccountMetaDataTest {
 		assertCanCreateAccountMetaData(createAccountInfos(), createAccountInfos());
 	}
 
-	private static void assertCanCreateAccountMetaData(
-			final List<AccountInfo> multisigAccounts,
+	private static void assertCanCreateAccountMetaData(final List<AccountInfo> multisigAccounts,
 			final List<AccountInfo> cosignatoryAccounts) {
 		// Arrange:
-		final AccountMetaData metaData = createAccountMetaData(
-				AccountStatus.UNLOCKED,
-				AccountRemoteStatus.ACTIVE,
-				multisigAccounts,
+		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE, multisigAccounts,
 				cosignatoryAccounts);
 
 		// Assert:
-		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
-		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
+		MatcherAssert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		MatcherAssert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
 
 		if (multisigAccounts.isEmpty()) {
-			Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
 		} else {
-			Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
 			assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
 		}
 
 		if (cosignatoryAccounts.isEmpty()) {
-			Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
 		} else {
-			Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
 			assertAccountInfos(metaData.getCosignatories(), cosignatoryAccounts);
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
+	// region roundtrip
 
 	@Test
 	public void canRoundTripAccountMetaDataWithNeitherCosignatoriesNorCosignatoriesOf() {
@@ -94,43 +91,34 @@ public class AccountMetaDataTest {
 		assertCanRoundTrip(createAccountInfos(), createAccountInfos());
 	}
 
-	private static void assertCanRoundTrip(
-			final List<AccountInfo> multisigAccounts,
-			final List<AccountInfo> cosignatoryAccounts) {
+	private static void assertCanRoundTrip(final List<AccountInfo> multisigAccounts, final List<AccountInfo> cosignatoryAccounts) {
 		// Arrange:
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
-				createAccountMetaData(
-						AccountStatus.LOCKED,
-						AccountRemoteStatus.DEACTIVATING,
-						multisigAccounts,
-						cosignatoryAccounts));
+				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING, multisigAccounts, cosignatoryAccounts));
 
 		// Assert:
-		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
-		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
+		MatcherAssert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		MatcherAssert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
 
 		if (multisigAccounts.isEmpty()) {
-			Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
 		} else {
-			Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
 			assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
 		}
 
 		if (cosignatoryAccounts.isEmpty()) {
-			Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
 		} else {
-			Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
 			assertAccountInfos(metaData.getCosignatories(), cosignatoryAccounts);
 		}
 	}
 
-	//endregion
+	// endregion
 
-	private static AccountMetaData createAccountMetaData(
-			final AccountStatus status,
-			final AccountRemoteStatus remoteStatus,
-			final List<AccountInfo> multisigAccounts,
-			final List<AccountInfo> cosignatoryAccounts) {
+	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus,
+			final List<AccountInfo> multisigAccounts, final List<AccountInfo> cosignatoryAccounts) {
 		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
 	}
 
@@ -142,23 +130,25 @@ public class AccountMetaDataTest {
 
 	private static List<AccountInfo> createAccountInfos() {
 		return Arrays.asList(
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), Amount.fromNem(111), new BlockAmount(234), "account1", 0.1),
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), Amount.fromNem(333), new BlockAmount(456), "account2", 0.2));
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), Amount.fromNem(111), new BlockAmount(234), "account1",
+						0.1),
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), Amount.fromNem(333), new BlockAmount(456), "account2",
+						0.2));
 	}
 
 	private static void assertAccountInfos(final List<AccountInfo> actual, final List<AccountInfo> expected) {
-		Assert.assertThat(actual.size(), IsEqual.equalTo(expected.size()));
+		MatcherAssert.assertThat(actual.size(), IsEqual.equalTo(expected.size()));
 		for (int i = 0; i < actual.size(); ++i) {
 			assertAccountInfo(actual.get(i), expected.get(i));
 		}
 	}
 
 	private static void assertAccountInfo(final AccountInfo actual, final AccountInfo expected) {
-		Assert.assertThat(actual.getAddress(), IsEqual.equalTo(expected.getAddress()));
-		Assert.assertThat(actual.getBalance(), IsEqual.equalTo(expected.getBalance()));
-		Assert.assertThat(actual.getVestedBalance(), IsEqual.equalTo(expected.getVestedBalance()));
-		Assert.assertThat(actual.getNumHarvestedBlocks(), IsEqual.equalTo(expected.getNumHarvestedBlocks()));
-		Assert.assertThat(actual.getLabel(), IsEqual.equalTo(expected.getLabel()));
-		Assert.assertThat(actual.getImportance(), IsEqual.equalTo(expected.getImportance()));
+		MatcherAssert.assertThat(actual.getAddress(), IsEqual.equalTo(expected.getAddress()));
+		MatcherAssert.assertThat(actual.getBalance(), IsEqual.equalTo(expected.getBalance()));
+		MatcherAssert.assertThat(actual.getVestedBalance(), IsEqual.equalTo(expected.getVestedBalance()));
+		MatcherAssert.assertThat(actual.getNumHarvestedBlocks(), IsEqual.equalTo(expected.getNumHarvestedBlocks()));
+		MatcherAssert.assertThat(actual.getLabel(), IsEqual.equalTo(expected.getLabel()));
+		MatcherAssert.assertThat(actual.getImportance(), IsEqual.equalTo(expected.getImportance()));
 	}
 }

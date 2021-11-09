@@ -22,8 +22,8 @@ public class MosaicUtils {
 	}
 
 	/**
-	 * Adds supplies representing assets corresponding to a mosaic with the specified divisibility.
-	 * Throws an exception if the supplies cannot be added.
+	 * Adds supplies representing assets corresponding to a mosaic with the specified divisibility. Throws an exception if the supplies
+	 * cannot be added.
 	 *
 	 * @param divisibility The mosaic divisibility.
 	 * @param s1 The first supply.

@@ -3,6 +3,7 @@ package org.nem.core.connect;
 /**
  * An exception that is thrown when a connection cannot be established with a peer.
  */
+@SuppressWarnings("serial")
 public class InactivePeerException extends RuntimeException {
 
 	/**

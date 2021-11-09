@@ -5,16 +5,12 @@ import java.net.*;
 import java.util.*;
 
 /**
- * A custom resource bundle control that supports loading UTF8 resources from properties files.
- * See http://stackoverflow.com/a/4660195/1330640.
+ * A custom resource bundle control that supports loading UTF8 resources from properties files. See
+ * http://stackoverflow.com/a/4660195/1330640.
  */
 public class UTF8ResourceBundleControl extends ResourceBundle.Control {
 	@Override
-	public ResourceBundle newBundle(
-			final String baseName,
-			final Locale locale,
-			final String format,
-			final ClassLoader loader,
+	public ResourceBundle newBundle(final String baseName, final Locale locale, final String format, final ClassLoader loader,
 			final boolean reload) throws IllegalAccessException, InstantiationException, IOException {
 		// The below is a copy of the default implementation.
 		final String bundleName = this.toBundleName(baseName, locale);

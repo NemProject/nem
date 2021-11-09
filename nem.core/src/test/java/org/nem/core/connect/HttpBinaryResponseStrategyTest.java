@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -15,13 +16,12 @@ public class HttpBinaryResponseStrategyTest extends HttpDeserializerResponseStra
 		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(null);
 
 		// Assert:
-		Assert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
+		MatcherAssert.assertThat(strategy.getSupportedContentType(), IsEqual.equalTo("application/binary"));
 	}
 
 	@Override
-	protected Deserializer coerceDeserializer(
-			final SerializableEntity originalEntity,
-			final AccountLookup accountLookup) throws IOException {
+	protected Deserializer coerceDeserializer(final SerializableEntity originalEntity, final AccountLookup accountLookup)
+			throws IOException {
 		// Arrange:
 		final byte[] serializedBytes = BinarySerializer.serializeToBytes(originalEntity);
 
@@ -29,9 +29,7 @@ public class HttpBinaryResponseStrategyTest extends HttpDeserializerResponseStra
 		return coerceDeserializer(serializedBytes, accountLookup);
 	}
 
-	private static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final AccountLookup accountLookup) throws IOException {
+	private static Deserializer coerceDeserializer(final byte[] serializedBytes, final AccountLookup accountLookup) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(accountLookup);
 		final HttpDeserializerResponseStrategy strategy = new HttpBinaryResponseStrategy(context);

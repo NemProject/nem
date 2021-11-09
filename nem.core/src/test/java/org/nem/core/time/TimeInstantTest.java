@@ -1,6 +1,7 @@
 package org.nem.core.time;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -8,17 +9,17 @@ import org.nem.core.test.Utils;
 
 public class TimeInstantTest {
 
-	//region constants
+	// region constants
 
 	@Test
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
-		Assert.assertThat(TimeInstant.ZERO, IsEqual.equalTo(new TimeInstant(0)));
+		MatcherAssert.assertThat(TimeInstant.ZERO, IsEqual.equalTo(new TimeInstant(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedAroundNegativeTime() {
@@ -32,7 +33,7 @@ public class TimeInstantTest {
 		final TimeInstant instant = new TimeInstant(0);
 
 		// Assert:
-		Assert.assertThat(instant.getRawTime(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(instant.getRawTime(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -41,12 +42,12 @@ public class TimeInstantTest {
 		final TimeInstant instant = new TimeInstant(1);
 
 		// Assert:
-		Assert.assertThat(instant.getRawTime(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(instant.getRawTime(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region addX
+	// region addX
 
 	@Test
 	public void addSecondsCreatesNewInstant() {
@@ -57,7 +58,7 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = instant1.addSeconds(2);
 
 		// Assert:
-		Assert.assertThat(instant2.getRawTime(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(instant2.getRawTime(), IsEqual.equalTo(9));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = instant1.addMinutes(3);
 
 		// Assert:
-		Assert.assertThat(instant2.getRawTime(), IsEqual.equalTo(187));
+		MatcherAssert.assertThat(instant2.getRawTime(), IsEqual.equalTo(187));
 	}
 
 	@Test
@@ -81,7 +82,7 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = instant1.addHours(4);
 
 		// Assert:
-		Assert.assertThat(instant2.getRawTime(), IsEqual.equalTo(4 * 60 * 60 + 7));
+		MatcherAssert.assertThat(instant2.getRawTime(), IsEqual.equalTo(4 * 60 * 60 + 7));
 	}
 
 	@Test
@@ -93,12 +94,12 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = instant1.addDays(5);
 
 		// Assert:
-		Assert.assertThat(instant2.getRawTime(), IsEqual.equalTo(5 * 24 * 60 * 60 + 7));
+		MatcherAssert.assertThat(instant2.getRawTime(), IsEqual.equalTo(5 * 24 * 60 * 60 + 7));
 	}
 
-	//endregion
+	// endregion
 
-	//region subtract
+	// region subtract
 
 	@Test
 	public void subtractCanSubtractEqualInstances() {
@@ -107,8 +108,8 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = new TimeInstant(7);
 
 		// Assert:
-		Assert.assertThat(instant1.subtract(instant2), IsEqual.equalTo(0));
-		Assert.assertThat(instant2.subtract(instant1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(instant1.subtract(instant2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(instant2.subtract(instant1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -118,13 +119,13 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = new TimeInstant(11);
 
 		// Assert:
-		Assert.assertThat(instant1.subtract(instant2), IsEqual.equalTo(-4));
-		Assert.assertThat(instant2.subtract(instant1), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(instant1.subtract(instant2), IsEqual.equalTo(-4));
+		MatcherAssert.assertThat(instant2.subtract(instant1), IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
-	//region compareTo
+	// region compareTo
 
 	@Test
 	public void compareToCanCompareEqualInstances() {
@@ -133,8 +134,8 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = new TimeInstant(7);
 
 		// Assert:
-		Assert.assertThat(instant1.compareTo(instant2), IsEqual.equalTo(0));
-		Assert.assertThat(instant2.compareTo(instant1), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(instant1.compareTo(instant2), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(instant2.compareTo(instant1), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -144,13 +145,13 @@ public class TimeInstantTest {
 		final TimeInstant instant2 = new TimeInstant(8);
 
 		// Assert:
-		Assert.assertThat(instant1.compareTo(instant2), IsEqual.equalTo(-1));
-		Assert.assertThat(instant2.compareTo(instant1), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(instant1.compareTo(instant2), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(instant2.compareTo(instant1), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -158,11 +159,11 @@ public class TimeInstantTest {
 		final TimeInstant instant = new TimeInstant(7);
 
 		// Assert:
-		Assert.assertThat(new TimeInstant(7), IsEqual.equalTo(instant));
-		Assert.assertThat(new TimeInstant(6), IsNot.not(IsEqual.equalTo(instant)));
-		Assert.assertThat(new TimeInstant(8), IsNot.not(IsEqual.equalTo(instant)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(instant)));
-		Assert.assertThat(7, IsNot.not(IsEqual.equalTo((Object)instant)));
+		MatcherAssert.assertThat(new TimeInstant(7), IsEqual.equalTo(instant));
+		MatcherAssert.assertThat(new TimeInstant(6), IsNot.not(IsEqual.equalTo(instant)));
+		MatcherAssert.assertThat(new TimeInstant(8), IsNot.not(IsEqual.equalTo(instant)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(instant)));
+		MatcherAssert.assertThat(7, IsNot.not(IsEqual.equalTo((Object) instant)));
 	}
 
 	@Test
@@ -172,14 +173,14 @@ public class TimeInstantTest {
 		final int hashCode = instant.hashCode();
 
 		// Assert:
-		Assert.assertThat(new TimeInstant(7).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new TimeInstant(6).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new TimeInstant(8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new TimeInstant(7).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new TimeInstant(6).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new TimeInstant(8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsRawTime() {
@@ -187,12 +188,12 @@ public class TimeInstantTest {
 		final TimeInstant instant = new TimeInstant(22561);
 
 		// Assert:
-		Assert.assertThat(instant.toString(), IsEqual.equalTo("22561"));
+		MatcherAssert.assertThat(instant.toString(), IsEqual.equalTo("22561"));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
+	// region inline serialization
 
 	@Test
 	public void canWriteTimeInstant() {
@@ -205,8 +206,8 @@ public class TimeInstantTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("TimeInstant"), IsEqual.equalTo(77124));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("TimeInstant"), IsEqual.equalTo(77124));
 	}
 
 	@Test
@@ -222,8 +223,8 @@ public class TimeInstantTest {
 		final TimeInstant instant = TimeInstant.readFrom(deserializer, "TimeInstant");
 
 		// Assert:
-		Assert.assertThat(instant, IsEqual.equalTo(originalInstant));
+		MatcherAssert.assertThat(instant, IsEqual.equalTo(originalInstant));
 	}
 
-	//endregion
+	// endregion
 }

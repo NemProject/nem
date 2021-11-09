@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -11,7 +12,7 @@ import java.math.BigInteger;
 
 public class AccountTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void accountCanBeCreatedAroundKeyPairWithPrivateKey() {
@@ -21,10 +22,10 @@ public class AccountTest {
 		final Account account = new Account(kp);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -34,11 +35,12 @@ public class AccountTest {
 		final Account account = new Account(kp);
 
 		// Assert:
-		Assert.assertThat(account.getAddress().getEncoded(), IsEqual.equalTo("TBHJXFS62GRKEDJVCEYDJCDZRDBT2X4LITF5YMWV"));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
-		Assert.assertThat(account.getAddress().getPublicKey().toString(), IsEqual.equalTo("14800bb3f4a60c407d660f3b74e566beffeabcd170acd971190ec358e0aaaf4f"));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.getAddress().getEncoded(), IsEqual.equalTo("TBHJXFS62GRKEDJVCEYDJCDZRDBT2X4LITF5YMWV"));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey().toString(),
+				IsEqual.equalTo("14800bb3f4a60c407d660f3b74e566beffeabcd170acd971190ec358e0aaaf4f"));
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -49,10 +51,10 @@ public class AccountTest {
 		final Account account = new Account(new KeyPair(kp.getPublicKey()));
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -63,10 +65,10 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -76,15 +78,15 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		MatcherAssert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -94,15 +96,15 @@ public class AccountTest {
 
 		// Assert:
 		for (final Account account2 : createEquivalentAccounts(kp)) {
-			Assert.assertThat(account2, IsEqual.equalTo(account));
+			MatcherAssert.assertThat(account2, IsEqual.equalTo(account));
 		}
 
 		for (final Account account2 : createNonEquivalentAccounts(kp)) {
-			Assert.assertThat(account2, IsNot.not(IsEqual.equalTo(account)));
+			MatcherAssert.assertThat(account2, IsNot.not(IsEqual.equalTo(account)));
 		}
 
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(account)));
-		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)account)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(account)));
+		MatcherAssert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object) account)));
 	}
 
 	@Test
@@ -114,33 +116,30 @@ public class AccountTest {
 
 		// Assert:
 		for (final Account account2 : createEquivalentAccounts(kp)) {
-			Assert.assertThat(account2.hashCode(), IsEqual.equalTo(hashCode));
+			MatcherAssert.assertThat(account2.hashCode(), IsEqual.equalTo(hashCode));
 		}
 
 		for (final Account account2 : createNonEquivalentAccounts(kp)) {
-			Assert.assertThat(account2.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+			MatcherAssert.assertThat(account2.hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		}
 	}
 
 	private static Account[] createEquivalentAccounts(final KeyPair keyPair) {
-		return new Account[] {
-				new Account(keyPair),
-				new Account(new KeyPair(keyPair.getPublicKey())),
-				new Account(new KeyPair(keyPair.getPrivateKey()))
+		return new Account[]{
+				new Account(keyPair), new Account(new KeyPair(keyPair.getPublicKey())), new Account(new KeyPair(keyPair.getPrivateKey()))
 		};
 	}
 
 	private static Account[] createNonEquivalentAccounts(final KeyPair keyPair) {
-		return new Account[] {
-				Utils.generateRandomAccount(),
-				new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
+		return new Account[]{
+				Utils.generateRandomAccount(), new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
 				new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsEncodedAddress() {
@@ -148,14 +147,12 @@ public class AccountTest {
 		final Account account = new Account(Address.fromEncoded("Sigma Gamma"));
 
 		// Assert:
-		Assert.assertThat(account.toString(), IsEqual.equalTo("SIGMA GAMMA"));
+		MatcherAssert.assertThat(account.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
-	//endregion
+	// endregion
 
-	//region inline serialization
-
-	//region write
+	// region write
 
 	@Test
 	public void canWriteAccountWithDefaultEncoding() {
@@ -168,8 +165,8 @@ public class AccountTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Account"), IsEqual.equalTo(address.getEncoded()));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Account"), IsEqual.equalTo(address.getEncoded()));
 	}
 
 	@Test
@@ -178,10 +175,7 @@ public class AccountTest {
 		final Address address = Address.fromEncoded("MockAcc");
 
 		// Assert:
-		assertCanWriteAccountWithEncoding(
-				new Account(address),
-				AddressEncoding.COMPRESSED,
-				address.getEncoded());
+		assertCanWriteAccountWithEncoding(new Account(address), AddressEncoding.COMPRESSED, address.getEncoded());
 	}
 
 	@Test
@@ -190,10 +184,7 @@ public class AccountTest {
 		final KeyPair kp = new KeyPair();
 
 		// Assert:
-		assertCanWriteAccountWithEncoding(
-				new Account(kp),
-				AddressEncoding.PUBLIC_KEY,
-				kp.getPublicKey().toString());
+		assertCanWriteAccountWithEncoding(new Account(kp), AddressEncoding.PUBLIC_KEY, kp.getPublicKey().toString());
 	}
 
 	@Test
@@ -202,15 +193,10 @@ public class AccountTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Assert:
-		assertCanWriteAccountWithEncoding(
-				new Account(address),
-				AddressEncoding.PUBLIC_KEY,
-				null);
+		assertCanWriteAccountWithEncoding(new Account(address), AddressEncoding.PUBLIC_KEY, null);
 	}
 
-	private static void assertCanWriteAccountWithEncoding(
-			final Account account,
-			final AddressEncoding encoding,
+	private static void assertCanWriteAccountWithEncoding(final Account account, final AddressEncoding encoding,
 			final String expectedSerializedString) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
@@ -220,13 +206,13 @@ public class AccountTest {
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("Account"), IsEqual.equalTo(expectedSerializedString));
+		MatcherAssert.assertThat(object.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(object.get("Account"), IsEqual.equalTo(expectedSerializedString));
 	}
 
-	//endregion
+	// endregion
 
-	//region roundtrip
+	// region roundtrip
 
 	@Test
 	public void canRoundtripAccountWithDefaultEncoding() {
@@ -238,14 +224,12 @@ public class AccountTest {
 		// Act:
 		Account.writeTo(serializer, "Account", new Account(address));
 
-		final JsonDeserializer deserializer = new JsonDeserializer(
-				serializer.getObject(),
-				new DeserializationContext(accountLookup));
+		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), new DeserializationContext(accountLookup));
 		final Account account = Account.readFrom(deserializer, "Account");
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -269,12 +253,12 @@ public class AccountTest {
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
 	}
 
-	//endregion
+	// endregion
 
-	//region public key reading
+	// region public key reading
 
 	@Test
 	public void readFromReturnsAddressWithPublicKeyIfDeserializedAddressAndCacheBothContainPublicKey() {
@@ -300,9 +284,7 @@ public class AccountTest {
 		assertExpectedAccountLookupUse(false, AddressEncoding.COMPRESSED, false);
 	}
 
-	private static void assertExpectedAccountLookupUse(
-			final boolean isPublicKeyInCache,
-			final AddressEncoding encoding,
+	private static void assertExpectedAccountLookupUse(final boolean isPublicKeyInCache, final AddressEncoding encoding,
 			final boolean isPublicKeyInResult) {
 		// Arrange:
 		// - note that when isPublicKeyInCache is true, the cache account also has a private key
@@ -318,10 +300,10 @@ public class AccountTest {
 
 		// Assert:
 		// - since the private key is never serialized, it will only be present when it is in the cache (and isPublicKeyInCache is true)
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(isPublicKeyInCache));
-		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
+		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
+		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(isPublicKeyInCache));
+		MatcherAssert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
 	private static class TestContext {
@@ -348,11 +330,9 @@ public class AccountTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region createSigner
+	// region createSigner
 
 	@Test
 	public void cannotCreateSignerWhenAccountDoesNotHavePublicKey() {
@@ -360,9 +340,7 @@ public class AccountTest {
 		final Account account = new Account(Utils.generateRandomAddress());
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> account.createSigner(),
-				CryptoException.class);
+		ExceptionAssert.assertThrows(v -> account.createSigner(), CryptoException.class);
 	}
 
 	@Test
@@ -374,7 +352,7 @@ public class AccountTest {
 		final Signer signer = account.createSigner();
 
 		// Assert:
-		Assert.assertThat(signer, IsNull.notNullValue());
+		MatcherAssert.assertThat(signer, IsNull.notNullValue());
 	}
 
 	@Test
@@ -392,12 +370,12 @@ public class AccountTest {
 		final boolean isVerified = verifier.verify(payload, signature);
 
 		// Assert:
-		Assert.assertThat(isVerified, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region createCipher
+	// region createCipher
 
 	@Test
 	public void cannotCreateCipherIfNeitherAccountHasPrivateKey() {
@@ -406,9 +384,7 @@ public class AccountTest {
 		final Account otherAccount = new Account(Utils.generateRandomAddressWithPublicKey());
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> account.createCipher(otherAccount, false),
-				CryptoException.class);
+		ExceptionAssert.assertThrows(v -> account.createCipher(otherAccount, false), CryptoException.class);
 	}
 
 	@Test
@@ -418,36 +394,26 @@ public class AccountTest {
 		final Account otherAccount = new Account(Utils.generateRandomAddress());
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> account.createCipher(otherAccount, false),
-				CryptoException.class);
-		ExceptionAssert.assertThrows(
-				v -> otherAccount.createCipher(account, false),
-				CryptoException.class);
+		ExceptionAssert.assertThrows(v -> account.createCipher(otherAccount, false), CryptoException.class);
+		ExceptionAssert.assertThrows(v -> otherAccount.createCipher(account, false), CryptoException.class);
 	}
 
 	@Test
 	public void canEncryptAndDecryptDataWithSignerWhenFirstAccountHasPrivateKey() {
 		// Assert:
-		assertCanEncryptAndDecrypt(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccountWithoutPrivateKey());
+		assertCanEncryptAndDecrypt(Utils.generateRandomAccount(), Utils.generateRandomAccountWithoutPrivateKey());
 	}
 
 	@Test
 	public void canEncryptAndDecryptDataWithSignerWhenSecondAccountHasPrivateKey() {
 		// Assert:
-		assertCanEncryptAndDecrypt(
-				Utils.generateRandomAccountWithoutPrivateKey(),
-				Utils.generateRandomAccount());
+		assertCanEncryptAndDecrypt(Utils.generateRandomAccountWithoutPrivateKey(), Utils.generateRandomAccount());
 	}
 
 	@Test
 	public void canEncryptAndDecryptDataWithSignerWhenBothAccountsHavePrivateKey() {
 		// Assert:
-		assertCanEncryptAndDecrypt(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount());
+		assertCanEncryptAndDecrypt(Utils.generateRandomAccount(), Utils.generateRandomAccount());
 	}
 
 	private static void assertCanEncryptAndDecrypt(final Account account1, final Account account2) {
@@ -461,8 +427,8 @@ public class AccountTest {
 		final byte[] decryptedPayload = decryptCipher.decrypt(encryptedPayload);
 
 		// Assert:
-		Assert.assertThat(decryptedPayload, IsEqual.equalTo(payload));
+		MatcherAssert.assertThat(decryptedPayload, IsEqual.equalTo(payload));
 	}
 
-	//endregion
+	// endregion
 }

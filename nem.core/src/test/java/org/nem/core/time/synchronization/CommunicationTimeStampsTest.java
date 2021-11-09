@@ -1,5 +1,6 @@
 package org.nem.core.time.synchronization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 
 public class CommunicationTimeStampsTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateCommunicationTimeStamps() {
@@ -17,13 +18,13 @@ public class CommunicationTimeStampsTest {
 		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17));
 
 		// Assert:
-		Assert.assertThat(timeStamps.getSendTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(5)));
-		Assert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
+		MatcherAssert.assertThat(timeStamps.getSendTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(5)));
+		MatcherAssert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void communicationTimeStampsCanBeRoundTripped() {
@@ -34,13 +35,13 @@ public class CommunicationTimeStampsTest {
 		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(Utils.roundtripSerializableEntity(originalTimeStamps, null));
 
 		// Assert:
-		Assert.assertThat(timeStamps.getSendTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(5)));
-		Assert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
+		MatcherAssert.assertThat(timeStamps.getSendTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(5)));
+		MatcherAssert.assertThat(timeStamps.getReceiveTimeStamp(), IsEqual.equalTo(new NetworkTimeStamp(17)));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -49,11 +50,11 @@ public class CommunicationTimeStampsTest {
 		final HashMap<String, CommunicationTimeStamps> timeStampsMap = this.createTestCommunicationTimeStampsForEqualityTests();
 
 		// Assert:
-		Assert.assertThat(timeStampsMap.get("default"), IsEqual.equalTo(timeStamps));
-		Assert.assertThat(timeStampsMap.get("diff-sendTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
-		Assert.assertThat(timeStampsMap.get("diff-receiveTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(timeStamps)));
-		Assert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object)timeStamps)));
+		MatcherAssert.assertThat(timeStampsMap.get("default"), IsEqual.equalTo(timeStamps));
+		MatcherAssert.assertThat(timeStampsMap.get("diff-sendTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
+		MatcherAssert.assertThat(timeStampsMap.get("diff-receiveTimeStamp"), IsNot.not(IsEqual.equalTo(timeStamps)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(timeStamps)));
+		MatcherAssert.assertThat("foo", IsNot.not(IsEqual.equalTo((Object) timeStamps)));
 	}
 
 	@Test
@@ -63,13 +64,13 @@ public class CommunicationTimeStampsTest {
 		final HashMap<String, CommunicationTimeStamps> timeStampsMap = this.createTestCommunicationTimeStampsForEqualityTests();
 
 		// Assert:
-		Assert.assertThat(timeStampsMap.get("default").hashCode(), IsEqual.equalTo(timeStamps.hashCode()));
-		Assert.assertThat(timeStampsMap.get("diff-sendTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(timeStamps.hashCode())));
-		Assert.assertThat(timeStampsMap.get("diff-receiveTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(timeStamps.hashCode())));
+		MatcherAssert.assertThat(timeStampsMap.get("default").hashCode(), IsEqual.equalTo(timeStamps.hashCode()));
+		MatcherAssert.assertThat(timeStampsMap.get("diff-sendTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(timeStamps.hashCode())));
+		MatcherAssert.assertThat(timeStampsMap.get("diff-receiveTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(timeStamps.hashCode())));
 	}
 
-	//endregion
-
+	// endregion
+	@SuppressWarnings("serial")
 	private HashMap<String, CommunicationTimeStamps> createTestCommunicationTimeStampsForEqualityTests() {
 		return new HashMap<String, CommunicationTimeStamps>() {
 			{

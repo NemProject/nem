@@ -20,10 +20,7 @@ public class TransactionMetaData implements SerializableEntity {
 	 * @param id The transaction id.
 	 * @param hash The transaction hash.
 	 */
-	public TransactionMetaData(
-			final BlockHeight blockHeight,
-			final Long id,
-			final Hash hash) {
+	public TransactionMetaData(final BlockHeight blockHeight, final Long id, final Hash hash) {
 		this(blockHeight, id, hash, null);
 	}
 
@@ -35,11 +32,7 @@ public class TransactionMetaData implements SerializableEntity {
 	 * @param hash The transaction hash.
 	 * @param innerHash The hash of an inner transaction or null.
 	 */
-	public TransactionMetaData(
-			final BlockHeight blockHeight,
-			final Long id,
-			final Hash hash,
-			final Hash innerHash) {
+	public TransactionMetaData(final BlockHeight blockHeight, final Long id, final Hash hash, final Hash innerHash) {
 		this.height = blockHeight;
 		this.id = id;
 		this.hash = hash;

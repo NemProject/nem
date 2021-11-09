@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -34,7 +35,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 			final PublicKey publicKey2 = MathUtils.derivePublicKey(kp.getPrivateKey());
 
 			// Assert:
-			Assert.assertThat(publicKey1, IsEqual.equalTo(publicKey2));
+			MatcherAssert.assertThat(publicKey1, IsEqual.equalTo(publicKey2));
 		}
 	}
 

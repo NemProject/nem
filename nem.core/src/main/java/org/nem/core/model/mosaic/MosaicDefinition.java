@@ -23,11 +23,7 @@ public class MosaicDefinition implements SerializableEntity {
 	 * @param properties The properties.
 	 * @param levy The (optional) mosaic levy.
 	 */
-	public MosaicDefinition(
-			final Account creator,
-			final MosaicId id,
-			final MosaicDescriptor descriptor,
-			final MosaicProperties properties,
+	public MosaicDefinition(final Account creator, final MosaicId id, final MosaicDescriptor descriptor, final MosaicProperties properties,
 			final MosaicLevy levy) {
 		this.creator = creator;
 		this.id = id;
@@ -137,7 +133,7 @@ public class MosaicDefinition implements SerializableEntity {
 			return false;
 		}
 
-		final MosaicDefinition rhs = (MosaicDefinition)obj;
+		final MosaicDefinition rhs = (MosaicDefinition) obj;
 		return this.id.equals(rhs.id);
 	}
 }

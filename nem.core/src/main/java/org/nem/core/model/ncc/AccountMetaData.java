@@ -22,10 +22,7 @@ public class AccountMetaData implements SerializableEntity {
 	 * @param cosignatoryOf The list of multisig accounts.
 	 * @param cosignatories The list of multisig cosigners.
 	 */
-	public AccountMetaData(
-			final AccountStatus status,
-			final AccountRemoteStatus remoteStatus,
-			final List<AccountInfo> cosignatoryOf,
+	public AccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus, final List<AccountInfo> cosignatoryOf,
 			final List<AccountInfo> cosignatories) {
 		this.status = status;
 		this.remoteStatus = remoteStatus;

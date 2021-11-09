@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,8 +14,8 @@ public class MultisigInfoTest {
 		final MultisigInfo info = new MultisigInfo(12, 7);
 
 		// Assert:
-		Assert.assertThat(info.getCosignatoriesCount(), IsEqual.equalTo(12));
-		Assert.assertThat(info.getMinCosignatories(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(info.getCosignatoriesCount(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(info.getMinCosignatories(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -28,12 +29,12 @@ public class MultisigInfoTest {
 		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
 
 		// Assert:
-		Assert.assertThat(deserializer.readInt("cosignatoriesCount"), IsEqual.equalTo(12));
-		Assert.assertThat(deserializer.readInt("minCosignatories"), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(deserializer.readInt("cosignatoriesCount"), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(deserializer.readInt("minCosignatories"), IsEqual.equalTo(7));
 
 		// 2 "real" properties and 1 "hidden" (ordering) property
 		final int expectedProperties = 2 + 1;
-		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
+		MatcherAssert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class MultisigInfoTest {
 		final MultisigInfo info = new MultisigInfo(Utils.roundtripSerializableEntity(originalInfo, null));
 
 		// Assert:
-		Assert.assertThat(info.getCosignatoriesCount(), IsEqual.equalTo(12));
-		Assert.assertThat(info.getMinCosignatories(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(info.getCosignatoriesCount(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(info.getMinCosignatories(), IsEqual.equalTo(7));
 	}
 }

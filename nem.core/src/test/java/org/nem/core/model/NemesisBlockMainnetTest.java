@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -23,8 +24,7 @@ public class NemesisBlockMainnetTest {
 	// users, devs, marketing, contributors + funds (transfer + multisig)
 	private static final int NUM_NEMESIS_TRANSFER_TRANSACTIONS = 1307 + 21 + 5 + 8 + 6;
 	private static final int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
-	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
-			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5) + 2 * (5 + 3 * 6));
+	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5) + 2 * (5 + 3 * 6));
 	private static final int EXPECTED_VERSION = 0x68000001;
 
 	@BeforeClass
@@ -47,19 +47,19 @@ public class NemesisBlockMainnetTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Assert:
-			Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
-			Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
-			Assert.assertThat(block.getVersion(), IsEqual.equalTo(EXPECTED_VERSION));
-			Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
+			MatcherAssert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
+			MatcherAssert.assertThat(block.getType(), IsEqual.equalTo(-1));
+			MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(EXPECTED_VERSION));
+			MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
 			// 2 multisig aggregate transactions
-			Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE.multiply(2)));
-			Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
-			Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
-			Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
+			MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE.multiply(2)));
+			MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
+			MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+			MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
 
-			Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
-			Assert.assertThat(block.getGenerationHash(), IsNull.notNullValue());
+			MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
+			MatcherAssert.assertThat(block.getGenerationHash(), IsNull.notNullValue());
 		}
 
 		@Test
@@ -68,7 +68,7 @@ public class NemesisBlockMainnetTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Assert:
-			Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(block.verify(), IsEqual.equalTo(true));
 		}
 
 		@Test
@@ -78,7 +78,7 @@ public class NemesisBlockMainnetTest {
 
 			// Assert:
 			for (final Transaction transaction : block.getTransactions()) {
-				Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
+				MatcherAssert.assertThat(transaction.verify(), IsEqual.equalTo(true));
 			}
 		}
 
@@ -92,7 +92,7 @@ public class NemesisBlockMainnetTest {
 				final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 						? Amount.ZERO
 						: NemGlobals.getTransactionFeeCalculator().calculateMinimumFee(transaction);
-				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
+				MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 			}
 		}
 
@@ -103,12 +103,11 @@ public class NemesisBlockMainnetTest {
 
 			// Act:
 			final Set<Address> allAddresses = block.getTransactions().stream()
-					.flatMap(t -> t.getAccounts().stream().map(Account::getAddress))
-					.collect(Collectors.toSet());
+					.flatMap(t -> t.getAccounts().stream().map(Account::getAddress)).collect(Collectors.toSet());
 
 			// Assert:
 			for (final Address address : allAddresses) {
-				Assert.assertThat(address.toString(), address.isValid(), IsEqual.equalTo(true));
+				MatcherAssert.assertThat(address.toString(), address.isValid(), IsEqual.equalTo(true));
 			}
 		}
 
@@ -118,19 +117,18 @@ public class NemesisBlockMainnetTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Act:
-			final Set<Address> signerAddresses = block.getTransactions().stream()
-					.map(t -> t.getSigner().getAddress())
+			final Set<Address> signerAddresses = block.getTransactions().stream().map(t -> t.getSigner().getAddress())
 					.collect(Collectors.toSet());
 
 			// Assert:
 			for (final Address address : signerAddresses) {
-				Assert.assertThat(address.getPublicKey(), IsNull.notNullValue());
+				MatcherAssert.assertThat(address.getPublicKey(), IsNull.notNullValue());
 			}
 		}
 
-		//endregion
+		// endregion
 
-		//region constants
+		// region constants
 
 		@Test
 		public void amountConstantIsConsistentWithNemesisBlock() {
@@ -139,12 +137,12 @@ public class NemesisBlockMainnetTest {
 			final Block block = this.loadNemesisBlock();
 			for (final Transaction transaction : block.getTransactions()) {
 				if (transaction instanceof TransferTransaction) {
-					totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
+					totalAmount = totalAmount.add(((TransferTransaction) transaction).getAmount());
 				}
 			}
 
 			// Assert:
-			Assert.assertThat(totalAmount, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAmount()));
+			MatcherAssert.assertThat(totalAmount, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAmount()));
 		}
 
 		@Test
@@ -154,9 +152,9 @@ public class NemesisBlockMainnetTest {
 			final Address blockAddress = block.getSigner().getAddress();
 
 			// Assert:
-			Assert.assertThat(blockAddress, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
-			Assert.assertThat(blockAddress.getPublicKey(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress().getPublicKey()));
-			Assert.assertThat(blockAddress.getPublicKey(), IsNull.notNullValue());
+			MatcherAssert.assertThat(blockAddress, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
+			MatcherAssert.assertThat(blockAddress.getPublicKey(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress().getPublicKey()));
+			MatcherAssert.assertThat(blockAddress.getPublicKey(), IsNull.notNullValue());
 		}
 
 		@Test
@@ -165,10 +163,10 @@ public class NemesisBlockMainnetTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Assert:
-			Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getGenerationHash()));
+			MatcherAssert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getGenerationHash()));
 		}
 
-		//endregion
+		// endregion
 
 		protected abstract Block loadNemesisBlock(final MockAccountLookup accountLookup);
 
@@ -177,7 +175,7 @@ public class NemesisBlockMainnetTest {
 		}
 	}
 
-	//region basic
+	// region basic
 
 	public static class ResourceNemesisBlockTest extends AbstractNemesisBlockTest {
 
@@ -208,15 +206,9 @@ public class NemesisBlockMainnetTest {
 		public void nemesisBlockCannotBeLoadedFromInvalidBlob() {
 			// Arrange:
 			final byte[] buffer = loadNemesisBlockBlobObject();
-			final byte[] badBuffer1 = ByteBuffer.allocate(3 + buffer.length)
-					.put("bad".getBytes())
-					.put(buffer)
-					.array();
-			final byte[] badBuffer2 = ByteBuffer.allocate(3 + buffer.length)
-					.put(Arrays.copyOfRange(buffer, 0, 100))
-					.put("bad".getBytes())
-					.put(Arrays.copyOfRange(buffer, 100, buffer.length))
-					.array();
+			final byte[] badBuffer1 = ByteBuffer.allocate(3 + buffer.length).put("bad".getBytes()).put(buffer).array();
+			final byte[] badBuffer2 = ByteBuffer.allocate(3 + buffer.length).put(Arrays.copyOfRange(buffer, 0, 100)).put("bad".getBytes())
+					.put(Arrays.copyOfRange(buffer, 100, buffer.length)).array();
 
 			// Act:
 			ExceptionAssert.assertThrows(

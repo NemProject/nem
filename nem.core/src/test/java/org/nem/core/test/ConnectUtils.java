@@ -21,9 +21,8 @@ public class ConnectUtils {
 	 * @return The deserializer.
 	 * @throws IOException On an IO error.
 	 */
-	public static Deserializer coerceDeserializer(
-			final byte[] serializedBytes,
-			final HttpDeserializerResponseStrategy strategy) throws IOException {
+	public static Deserializer coerceDeserializer(final byte[] serializedBytes, final HttpDeserializerResponseStrategy strategy)
+			throws IOException {
 		// Arrange:
 		final HttpResponse response = Mockito.mock(HttpResponse.class);
 		mockStatusCode(response, 200);

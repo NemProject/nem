@@ -66,8 +66,7 @@ public class NisNodeInfo implements SerializableEntity {
 			return false;
 		}
 
-		final NisNodeInfo rhs = (NisNodeInfo)obj;
-		return this.node.equals(rhs.node) &&
-				this.appMetaData.equals(rhs.appMetaData);
+		final NisNodeInfo rhs = (NisNodeInfo) obj;
+		return this.node.equals(rhs.node) && this.appMetaData.equals(rhs.appMetaData);
 	}
 }

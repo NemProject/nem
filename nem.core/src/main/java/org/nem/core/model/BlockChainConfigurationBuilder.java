@@ -10,7 +10,9 @@ public class BlockChainConfigurationBuilder {
 	private int maxTransactionsPerBlock = 120;
 	private int blockGenerationTargetTime = 60;
 	private int blockChainRewriteLimit = 360;
-	private BlockChainFeature[] blockChainFeatures = new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE };
+	private BlockChainFeature[] blockChainFeatures = new BlockChainFeature[]{
+			BlockChainFeature.PROOF_OF_IMPORTANCE
+	};
 
 	/**
 	 * Sets the maximum number of transactions that a remote peer supplies in a chain part.
@@ -90,10 +92,7 @@ public class BlockChainConfigurationBuilder {
 			this.blockChainRewriteLimit = builder.blockChainRewriteLimit;
 			this.blockChainFeatures = builder.blockChainFeatures;
 
-			MustBe.inRange(
-					this.maxTransactionsPerSyncAttempt,
-					"max transactions per sync attempt",
-					this.maxTransactionsPerBlock,
+			MustBe.inRange(this.maxTransactionsPerSyncAttempt, "max transactions per sync attempt", this.maxTransactionsPerBlock,
 					this.maxTransactionsPerBlock * this.blockChainRewriteLimit);
 			MustBe.inRange(this.maxTransactionsPerBlock, "max transactions per block", 1, 10_000);
 			MustBe.inRange(this.blockGenerationTargetTime, "block generation target time", 10, 86_400);

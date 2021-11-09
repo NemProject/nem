@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -14,15 +15,16 @@ public class NetworkInfoTest {
 	public void canCreateNetworkInfo() {
 		// Arrange:
 		final NemesisBlockInfo nemesisBlockInfo = createNemesisBlockInfo();
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', nemesisBlockInfo);
+		final NetworkInfo info = new NetworkInfo((byte) 0xC8, 'Z', nemesisBlockInfo);
 
 		// Assert:
-		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0xC8));
-		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('Z'));
-		Assert.assertThat(info.getNemesisBlockInfo(), IsEqual.equalTo(nemesisBlockInfo));
+		MatcherAssert.assertThat(info.getVersion(), IsEqual.equalTo((byte) 0xC8));
+		MatcherAssert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('Z'));
+		MatcherAssert.assertThat(info.getNemesisBlockInfo(), IsEqual.equalTo(nemesisBlockInfo));
 	}
 
 	@Test
+	@SuppressWarnings("serial")
 	public void isCompatibleOnlyReturnsTrueForCompatibleAddresses() {
 		// Arrange:
 		final Map<String, Address> descToAddressMap = new HashMap<String, Address>() {
@@ -34,13 +36,13 @@ public class NetworkInfoTest {
 			}
 		};
 
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', createNemesisBlockInfo());
+		final NetworkInfo info = new NetworkInfo((byte) 0xC8, 'Z', createNemesisBlockInfo());
 
 		// Assert:
-		Assert.assertThat(info.isCompatible(descToAddressMap.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(descToAddressMap.get("UNKNOWN_NETWORK")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(descToAddressMap.get("COMPATIBLE")), IsEqual.equalTo(true));
-		Assert.assertThat(info.isCompatible(descToAddressMap.get("NON_COMPATIBLE")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(info.isCompatible(descToAddressMap.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(info.isCompatible(descToAddressMap.get("UNKNOWN_NETWORK")), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(info.isCompatible(descToAddressMap.get("COMPATIBLE")), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(info.isCompatible(descToAddressMap.get("NON_COMPATIBLE")), IsEqual.equalTo(false));
 	}
 
 	private static NemesisBlockInfo createNemesisBlockInfo() {

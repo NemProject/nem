@@ -1,5 +1,6 @@
 package org.nem.core.metadata;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -9,7 +10,7 @@ import java.util.jar.*;
 
 public class JarFacadeTest {
 
-	//region from url
+	// region from url
 
 	@Test
 	public void canCreateFacadeAroundWebStartJarFile() throws IOException {
@@ -18,8 +19,8 @@ public class JarFacadeTest {
 		final JarFacade facade = new JarFacade(url);
 
 		// Assert:
-		Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-		Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+		MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(true));
 		assertFacadeHasDefaultProperties(facade);
 	}
 
@@ -30,14 +31,14 @@ public class JarFacadeTest {
 		final JarFacade facade = new JarFacade(url);
 
 		// Assert:
-		Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-		Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+		MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
 		assertFacadeHasDefaultProperties(facade);
 	}
 
-	//endregion
+	// endregion
 
-	//region manifest processing
+	// region manifest processing
 
 	@Test
 	public void canCreateFacadeAroundJarStreamWithIoException() throws IOException {
@@ -46,8 +47,8 @@ public class JarFacadeTest {
 		final JarFacade facade = new JarFacade(url);
 
 		// Assert:
-		Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-		Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+		MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
 		assertFacadeHasDefaultProperties(facade);
 	}
 
@@ -61,8 +62,8 @@ public class JarFacadeTest {
 			final JarFacade facade = new JarFacade(url);
 
 			// Assert:
-			Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-			Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+			MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
 			assertFacadeHasDefaultProperties(facade);
 		}
 	}
@@ -83,8 +84,8 @@ public class JarFacadeTest {
 			final JarFacade facade = new JarFacade(url);
 
 			// Assert:
-			Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-			Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+			MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
 			assertFacadeHasDefaultProperties(facade);
 		}
 	}
@@ -116,18 +117,18 @@ public class JarFacadeTest {
 			final JarFacade facade = new JarFacade(url);
 
 			// Assert:
-			Assert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
-			Assert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
-			Assert.assertThat(facade.getVersion(), IsEqual.equalTo("test-version"));
-			Assert.assertThat(facade.getTitle(), IsEqual.equalTo("test-title"));
+			MatcherAssert.assertThat(facade.getName(), IsEqual.equalTo("nem.jar"));
+			MatcherAssert.assertThat(facade.isWebStart(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(facade.getVersion(), IsEqual.equalTo("test-version"));
+			MatcherAssert.assertThat(facade.getTitle(), IsEqual.equalTo("test-title"));
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertFacadeHasDefaultProperties(final JarFacade facade) {
 		// Assert:
-		Assert.assertThat(facade.getVersion(), IsEqual.equalTo("0.6.0-DEVELOPER BUILD"));
-		Assert.assertThat(facade.getTitle(), IsEqual.equalTo("NEM"));
+		MatcherAssert.assertThat(facade.getVersion(), IsEqual.equalTo("0.6.0-DEVELOPER BUILD"));
+		MatcherAssert.assertThat(facade.getTitle(), IsEqual.equalTo("NEM"));
 	}
 }

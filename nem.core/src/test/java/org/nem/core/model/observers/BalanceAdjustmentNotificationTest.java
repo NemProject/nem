@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -12,14 +13,12 @@ public class BalanceAdjustmentNotificationTest {
 	public void canCreateNotification() {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
-		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(
-				NotificationType.BalanceCredit,
-				account,
+		final BalanceAdjustmentNotification notification = new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account,
 				Amount.fromNem(123));
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
-		Assert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
-		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(Amount.fromNem(123)));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.BalanceCredit));
+		MatcherAssert.assertThat(notification.getAccount(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(notification.getAmount(), IsEqual.equalTo(Amount.fromNem(123)));
 	}
 }

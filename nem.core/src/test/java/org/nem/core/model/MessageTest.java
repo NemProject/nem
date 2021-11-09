@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
@@ -12,8 +13,8 @@ public class MessageTest {
 		final MockMessage message = new MockMessage(121);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
-		Assert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
+		MatcherAssert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
 	}
 
 	@Test
@@ -25,8 +26,8 @@ public class MessageTest {
 		final MockMessage message = createRoundTrippedMessage(originalMessage);
 
 		// Assert:
-		Assert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
-		Assert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
+		MatcherAssert.assertThat(message.getType(), IsEqual.equalTo(MockMessage.TYPE));
+		MatcherAssert.assertThat(message.getCustomField(), IsEqual.equalTo(121));
 	}
 
 	private static MockMessage createRoundTrippedMessage(final MockMessage originalMessage) {

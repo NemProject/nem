@@ -7,6 +7,7 @@ import java.util.*;
 /**
  * Class holding all public keys of accounts that are blocked from harvesting.
  */
+@SuppressWarnings("serial")
 public class BlockedHarvesterPublicKeys {
 
 	private static final Set<PublicKey> PUBLIC_KEYS = new HashSet<PublicKey>() {

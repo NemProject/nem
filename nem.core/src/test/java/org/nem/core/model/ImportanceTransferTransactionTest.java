@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -36,11 +37,11 @@ public class ImportanceTransferTransactionTest {
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Assert:
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		MatcherAssert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -80,9 +81,7 @@ public class ImportanceTransferTransactionTest {
 		final Account remote = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, remote);
 
-		final ImportanceTransferTransaction originalEntity = createImportanceTransferTransaction(
-				signer,
-				ImportanceTransferMode.Activate,
+		final ImportanceTransferTransaction originalEntity = createImportanceTransferTransaction(signer, ImportanceTransferMode.Activate,
 				remote);
 		originalEntity.sign();
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
@@ -120,17 +119,16 @@ public class ImportanceTransferTransactionTest {
 		// Act:
 		final ImportanceTransferTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(EXPECTED_FEE));
+		MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		MatcherAssert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		MatcherAssert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+		MatcherAssert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		MatcherAssert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		MatcherAssert.assertThat(transaction.getFee(), IsEqual.equalTo(EXPECTED_FEE));
 	}
 
-	private ImportanceTransferTransaction createRoundTrippedTransaction(
-			final ImportanceTransferTransaction originalTransaction,
+	private ImportanceTransferTransaction createRoundTrippedTransaction(final ImportanceTransferTransaction originalTransaction,
 			final AccountLookup accountLookup) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
@@ -138,9 +136,9 @@ public class ImportanceTransferTransactionTest {
 		return new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region getAccounts
+	// region getAccounts
 
 	@Test
 	public void getAccountsIncludesSignerAndRemoteAccounts() {
@@ -154,12 +152,12 @@ public class ImportanceTransferTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, remote));
+		MatcherAssert.assertThat(accounts, IsEquivalent.equivalentTo(signer, remote));
 	}
 
-	//endregion
+	// endregion
 
-	//region execute / undo
+	// region execute / undo
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -178,10 +176,7 @@ public class ImportanceTransferTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), remote);
-		NotificationUtils.assertImportanceTransferNotification(
-				notificationCaptor.getAllValues().get(1),
-				signer,
-				remote,
+		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, remote,
 				ImportanceTransferMode.Activate);
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
 	}
@@ -203,20 +198,15 @@ public class ImportanceTransferTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), remote);
-		NotificationUtils.assertImportanceTransferNotification(
-				notificationCaptor.getAllValues().get(1),
-				signer,
-				remote,
+		NotificationUtils.assertImportanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, remote,
 				ImportanceTransferMode.Activate);
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
 	}
 
 	// endregion
 
-	private static ImportanceTransferTransaction createImportanceTransferTransaction(
-			final Account sender,
-			final ImportanceTransferMode mode,
-			final Account remote) {
+	private static ImportanceTransferTransaction createImportanceTransferTransaction(final Account sender,
+			final ImportanceTransferMode mode, final Account remote) {
 		return new ImportanceTransferTransaction(TIME, sender, mode, remote);
 	}
 }

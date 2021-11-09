@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
@@ -14,11 +15,11 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getT(), IsEqual.equalTo(null));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getT(), IsEqual.equalTo(null));
 	}
 
 	@Test
@@ -27,10 +28,10 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
 	}
 
 	@Test
@@ -39,11 +40,11 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = Ed25519GroupElement.p1xp1(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P1xP1));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P1xP1));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ONE));
 	}
 
 	@Test
@@ -52,11 +53,11 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.PRECOMPUTED));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ZERO));
-		Assert.assertThat(g.getT(), IsEqual.equalTo(null));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.PRECOMPUTED));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getT(), IsEqual.equalTo(null));
 	}
 
 	@Test
@@ -65,29 +66,25 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = Ed25519GroupElement.cached(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ZERO));
 	}
 
 	@Test
 	public void canBeCreatedWithSpecifiedCoordinates() {
 		// Arrange:
-		final Ed25519GroupElement g = new Ed25519GroupElement(
-				CoordinateSystem.P3,
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
+		final Ed25519GroupElement g = new Ed25519GroupElement(CoordinateSystem.P3, Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,
 				Ed25519Field.ZERO);
 
 		// Assert:
-		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
-		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
-		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
-		Assert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
+		MatcherAssert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
+		MatcherAssert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getZ(), IsEqual.equalTo(Ed25519Field.ONE));
+		MatcherAssert.assertThat(g.getT(), IsEqual.equalTo(Ed25519Field.ZERO));
 	}
 
 	@Test
@@ -102,7 +99,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.toGroupElement(encoded.getRaw());
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
 		}
 	}
 
@@ -120,7 +117,7 @@ public class Ed25519GroupElementTest {
 			}
 
 			// Assert:
-			Assert.assertThat(Arrays.equals(encoded.getRaw(), bytes), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(Arrays.equals(encoded.getRaw(), bytes), IsEqual.equalTo(true));
 		}
 	}
 
@@ -152,12 +149,12 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h = g.toP2();
 
 			// Assert:
-			Assert.assertThat(h, IsEqual.equalTo(g));
-			Assert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
-			Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-			Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-			Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-			Assert.assertThat(h.getT(), IsEqual.equalTo(null));
+			MatcherAssert.assertThat(h, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
+			MatcherAssert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+			MatcherAssert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+			MatcherAssert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+			MatcherAssert.assertThat(h.getT(), IsEqual.equalTo(null));
 		}
 	}
 
@@ -172,12 +169,12 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.toRepresentation(g, CoordinateSystem.P2);
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
-			Assert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
-			Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX()));
-			Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY()));
-			Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
-			Assert.assertThat(h1.getT(), IsEqual.equalTo(null));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
+			MatcherAssert.assertThat(h1.getX(), IsEqual.equalTo(g.getX()));
+			MatcherAssert.assertThat(h1.getY(), IsEqual.equalTo(g.getY()));
+			MatcherAssert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
+			MatcherAssert.assertThat(h1.getT(), IsEqual.equalTo(null));
 		}
 	}
 
@@ -192,12 +189,12 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.toRepresentation(g, CoordinateSystem.P2);
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
-			Assert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
-			Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
-			Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
-			Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
-			Assert.assertThat(h1.getT(), IsEqual.equalTo(null));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P2));
+			MatcherAssert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+			MatcherAssert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+			MatcherAssert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+			MatcherAssert.assertThat(h1.getT(), IsEqual.equalTo(null));
 		}
 	}
 
@@ -239,12 +236,12 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.toRepresentation(g, CoordinateSystem.P3);
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
-			Assert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
-			Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
-			Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
-			Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
-			Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
+			MatcherAssert.assertThat(h1.getX(), IsEqual.equalTo(g.getX().multiply(g.getT())));
+			MatcherAssert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().multiply(g.getZ())));
+			MatcherAssert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ().multiply(g.getT())));
+			MatcherAssert.assertThat(h1.getT(), IsEqual.equalTo(g.getX().multiply(g.getY())));
 		}
 	}
 
@@ -258,13 +255,13 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h = g.toP3();
 
 			// Assert:
-			Assert.assertThat(h, IsEqual.equalTo(g));
-			Assert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
-			Assert.assertThat(h, IsEqual.equalTo(g));
-			Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-			Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-			Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-			Assert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
+			MatcherAssert.assertThat(h, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P3));
+			MatcherAssert.assertThat(h, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+			MatcherAssert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+			MatcherAssert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+			MatcherAssert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
 		}
 	}
 
@@ -305,13 +302,13 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h = g.toCached();
 
 			// Assert:
-			Assert.assertThat(h, IsEqual.equalTo(g));
-			Assert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
-			Assert.assertThat(h, IsEqual.equalTo(g));
-			Assert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
-			Assert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
-			Assert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
-			Assert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
+			MatcherAssert.assertThat(h, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
+			MatcherAssert.assertThat(h, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h.getX(), IsEqual.equalTo(g.getX()));
+			MatcherAssert.assertThat(h.getY(), IsEqual.equalTo(g.getY()));
+			MatcherAssert.assertThat(h.getZ(), IsEqual.equalTo(g.getZ()));
+			MatcherAssert.assertThat(h.getT(), IsEqual.equalTo(g.getT()));
 		}
 	}
 
@@ -326,13 +323,13 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.toRepresentation(g, CoordinateSystem.CACHED);
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
-			Assert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
-			Assert.assertThat(h1, IsEqual.equalTo(g));
-			Assert.assertThat(h1.getX(), IsEqual.equalTo(g.getY().add(g.getX())));
-			Assert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().subtract(g.getX())));
-			Assert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
-			Assert.assertThat(h1.getT(), IsEqual.equalTo(g.getT().multiply(Ed25519Field.D_Times_TWO)));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.CACHED));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(g));
+			MatcherAssert.assertThat(h1.getX(), IsEqual.equalTo(g.getY().add(g.getX())));
+			MatcherAssert.assertThat(h1.getY(), IsEqual.equalTo(g.getY().subtract(g.getX())));
+			MatcherAssert.assertThat(h1.getZ(), IsEqual.equalTo(g.getZ()));
+			MatcherAssert.assertThat(h1.getT(), IsEqual.equalTo(g.getT().multiply(Ed25519Field.D_Times_TWO)));
 		}
 	}
 
@@ -347,7 +344,7 @@ public class Ed25519GroupElementTest {
 		for (int i = 0; i < 32; i++) {
 			Ed25519GroupElement h = g;
 			for (int j = 0; j < 8; j++) {
-				Assert.assertThat(MathUtils.toRepresentation(h, CoordinateSystem.PRECOMPUTED),
+				MatcherAssert.assertThat(MathUtils.toRepresentation(h, CoordinateSystem.PRECOMPUTED),
 						IsEqual.equalTo(Ed25519Group.BASE_POINT.getPrecomputedForSingle()[i][j]));
 				h = MathUtils.addGroupElements(h, g);
 			}
@@ -365,7 +362,7 @@ public class Ed25519GroupElementTest {
 
 		// Act + Assert:
 		for (int i = 0; i < 8; i++) {
-			Assert.assertThat(MathUtils.toRepresentation(g, CoordinateSystem.PRECOMPUTED),
+			MatcherAssert.assertThat(MathUtils.toRepresentation(g, CoordinateSystem.PRECOMPUTED),
 					IsEqual.equalTo(Ed25519Group.BASE_POINT.getPrecomputedForDouble()[i]));
 			g = MathUtils.addGroupElements(g, h);
 		}
@@ -382,16 +379,13 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.doubleGroupElement(g);
 
 			// Assert:
-			Assert.assertThat(h2, IsEqual.equalTo(h1));
+			MatcherAssert.assertThat(h2, IsEqual.equalTo(h1));
 		}
 	}
 
 	@Test
 	public void addingNeutralGroupElementDoesNotChangeGroupElement() {
-		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
+		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,
 				Ed25519Field.ZERO);
 		for (int i = 0; i < 1000; i++) {
 			// Arrange:
@@ -402,8 +396,8 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = neutral.add(g.toCached());
 
 			// Assert:
-			Assert.assertThat(g, IsEqual.equalTo(h1));
-			Assert.assertThat(g, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(g, IsEqual.equalTo(h1));
+			MatcherAssert.assertThat(g, IsEqual.equalTo(h2));
 		}
 	}
 
@@ -419,7 +413,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.addGroupElements(g1, g2);
 
 			// Assert:
-			Assert.assertThat(h2, IsEqual.equalTo(h1));
+			MatcherAssert.assertThat(h2, IsEqual.equalTo(h1));
 		}
 	}
 
@@ -435,7 +429,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.addGroupElements(g1, MathUtils.negateGroupElement(g2));
 
 			// Assert:
-			Assert.assertThat(h2, IsEqual.equalTo(h1));
+			MatcherAssert.assertThat(h2, IsEqual.equalTo(h1));
 		}
 	}
 
@@ -451,13 +445,13 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g5 = MathUtils.getRandomGroupElement();
 
 		// Assert
-		Assert.assertThat(g2, IsEqual.equalTo(g1));
-		Assert.assertThat(g3, IsEqual.equalTo(g1));
-		Assert.assertThat(g1, IsEqual.equalTo(g4));
-		Assert.assertThat(g1, IsNot.not(IsEqual.equalTo(g5)));
-		Assert.assertThat(g2, IsNot.not(IsEqual.equalTo(g5)));
-		Assert.assertThat(g3, IsNot.not(IsEqual.equalTo(g5)));
-		Assert.assertThat(g5, IsNot.not(IsEqual.equalTo(g4)));
+		MatcherAssert.assertThat(g2, IsEqual.equalTo(g1));
+		MatcherAssert.assertThat(g3, IsEqual.equalTo(g1));
+		MatcherAssert.assertThat(g1, IsEqual.equalTo(g4));
+		MatcherAssert.assertThat(g1, IsNot.not(IsEqual.equalTo(g5)));
+		MatcherAssert.assertThat(g2, IsNot.not(IsEqual.equalTo(g5)));
+		MatcherAssert.assertThat(g3, IsNot.not(IsEqual.equalTo(g5)));
+		MatcherAssert.assertThat(g5, IsNot.not(IsEqual.equalTo(g4)));
 	}
 
 	@Test
@@ -469,11 +463,11 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g4 = MathUtils.getRandomGroupElement();
 
 		// Assert
-		Assert.assertThat(g2.hashCode(), IsEqual.equalTo(g1.hashCode()));
-		Assert.assertThat(g3.hashCode(), IsEqual.equalTo(g1.hashCode()));
-		Assert.assertThat(g1.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
-		Assert.assertThat(g2.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
-		Assert.assertThat(g3.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+		MatcherAssert.assertThat(g2.hashCode(), IsEqual.equalTo(g1.hashCode()));
+		MatcherAssert.assertThat(g3.hashCode(), IsEqual.equalTo(g1.hashCode()));
+		MatcherAssert.assertThat(g1.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+		MatcherAssert.assertThat(g2.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
+		MatcherAssert.assertThat(g3.hashCode(), IsNot.not(IsEqual.equalTo(g4.hashCode())));
 	}
 
 	// endregion
@@ -494,7 +488,7 @@ public class Ed25519GroupElementTest {
 				"0000000000000000000000000000000000000000000000000000000000000000");
 
 		// Assert:
-		Assert.assertThat(gAsString, IsEqual.equalTo(expectedString));
+		MatcherAssert.assertThat(gAsString, IsEqual.equalTo(expectedString));
 	}
 
 	// endregion
@@ -508,7 +502,7 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = basePoint.scalarMultiply(Ed25519Field.ZERO.encode());
 
 		// Assert:
-		Assert.assertThat(Ed25519Group.ZERO_P3, IsEqual.equalTo(g));
+		MatcherAssert.assertThat(Ed25519Group.ZERO_P3, IsEqual.equalTo(g));
 	}
 
 	@Test
@@ -520,7 +514,7 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = basePoint.scalarMultiply(Ed25519Field.ONE.encode());
 
 		// Assert:
-		Assert.assertThat(basePoint, IsEqual.equalTo(g));
+		MatcherAssert.assertThat(basePoint, IsEqual.equalTo(g));
 	}
 
 	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
@@ -536,7 +530,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h = MathUtils.scalarMultiplyGroupElement(basePoint, f);
 
 			// Assert:
-			Assert.assertThat(g, IsEqual.equalTo(h));
+			MatcherAssert.assertThat(g, IsEqual.equalTo(h));
 		}
 	}
 
@@ -556,7 +550,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h2 = MathUtils.doubleScalarMultiplyGroupElements(basePoint, f1, g, f2);
 
 			// Assert:
-			Assert.assertThat(h1, IsEqual.equalTo(h2));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(h2));
 		}
 	}
 
@@ -569,7 +563,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 
 			// Assert:
-			Assert.assertThat(g.satisfiesCurveEquation(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(g.satisfiesCurveEquation(), IsEqual.equalTo(true));
 		}
 	}
 
@@ -581,7 +575,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement h = Ed25519GroupElement.p2(g.getX(), g.getY(), g.getZ().multiply(Ed25519Field.TWO));
 
 			// Assert (can only fail for 5*Z^2=1):
-			Assert.assertThat(h.satisfiesCurveEquation(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(h.satisfiesCurveEquation(), IsEqual.equalTo(false));
 		}
 	}
 }

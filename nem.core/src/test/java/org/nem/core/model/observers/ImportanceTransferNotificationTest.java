@@ -1,5 +1,6 @@
 package org.nem.core.model.observers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -12,12 +13,13 @@ public class ImportanceTransferNotificationTest {
 		// Act:
 		final Account lessor = Utils.generateRandomAccount();
 		final Account lessee = Utils.generateRandomAccount();
-		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee, ImportanceTransferMode.Activate);
+		final ImportanceTransferNotification notification = new ImportanceTransferNotification(lessor, lessee,
+				ImportanceTransferMode.Activate);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
-		Assert.assertThat(notification.getLessor(), IsEqual.equalTo(lessor));
-		Assert.assertThat(notification.getLessee(), IsEqual.equalTo(lessee));
-		Assert.assertThat(notification.getMode(), IsEqual.equalTo(ImportanceTransferMode.Activate));
+		MatcherAssert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
+		MatcherAssert.assertThat(notification.getLessor(), IsEqual.equalTo(lessor));
+		MatcherAssert.assertThat(notification.getLessee(), IsEqual.equalTo(lessee));
+		MatcherAssert.assertThat(notification.getMode(), IsEqual.equalTo(ImportanceTransferMode.Activate));
 	}
 }

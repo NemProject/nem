@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -13,7 +14,7 @@ public class NodeTest {
 	private static final NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
 	private static final NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null);
 
-	//region construction
+	// region construction
 
 	@Test
 	public void canCreateNewNodeWithoutMetaData() {
@@ -25,9 +26,9 @@ public class NodeTest {
 		final Node node = new Node(identity, endpoint);
 
 		// Assert:
-		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
-		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
+		MatcherAssert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
+		MatcherAssert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+		MatcherAssert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
 	}
 
 	@Test
@@ -41,9 +42,9 @@ public class NodeTest {
 		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:
-		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
-		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
-		Assert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
+		MatcherAssert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
+		MatcherAssert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+		MatcherAssert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test
@@ -58,9 +59,9 @@ public class NodeTest {
 		final Node node = new Node(Utils.roundtripSerializableEntity(originalNode, null));
 
 		// Assert:
-		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(metaData));
+		MatcherAssert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
+		MatcherAssert.assertThat(node.getMetaData(), IsEqual.equalTo(metaData));
 	}
 
 	@Test
@@ -78,32 +79,28 @@ public class NodeTest {
 		final Node node = new Node(new JsonDeserializer(serializer.getObject(), null));
 
 		// Assert:
-		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
-		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
+		MatcherAssert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
+		MatcherAssert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
 	}
 
 	@Test
 	public void identityCannotBeNull() {
 		// Act:
 		ExceptionAssert.assertThrows(v -> new Node(null, DEFAULT_ENDPOINT), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new Node(null, DEFAULT_ENDPOINT, DEFAULT_META_DATA),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Node(null, DEFAULT_ENDPOINT, DEFAULT_META_DATA), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void endpointCannotBeNull() {
 		// Act:
 		ExceptionAssert.assertThrows(v -> new Node(DEFAULT_IDENTITY, null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new Node(DEFAULT_IDENTITY, null, DEFAULT_META_DATA),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Node(DEFAULT_IDENTITY, null, DEFAULT_META_DATA), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region setters
+	// region setters
 
 	@Test
 	public void canChangeEndpoint() {
@@ -115,7 +112,7 @@ public class NodeTest {
 		node.setEndpoint(endpoint);
 
 		// Assert:
-		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
+		MatcherAssert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -134,7 +131,7 @@ public class NodeTest {
 		node.setMetaData(metaData);
 
 		// Assert:
-		Assert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
+		MatcherAssert.assertThat(node.getMetaData(), IsSame.sameInstance(metaData));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -143,10 +140,11 @@ public class NodeTest {
 		new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT).setMetaData(null);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, Node> DESC_TO_NODE_MAP = new HashMap<String, Node>() {
 		{
 			this.put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));
@@ -162,12 +160,12 @@ public class NodeTest {
 		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA);
 
 		// Assert:
-		Assert.assertThat(DESC_TO_NODE_MAP.get("default"), IsEqual.equalTo(node));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-identity"), IsNot.not(IsEqual.equalTo(node)));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint"), IsEqual.equalTo(node));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data"), IsEqual.equalTo(node));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(node)));
-		Assert.assertThat(DEFAULT_IDENTITY, IsNot.not(IsEqual.equalTo((Object)node)));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("default"), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-identity"), IsNot.not(IsEqual.equalTo(node)));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint"), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data"), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(node)));
+		MatcherAssert.assertThat(DEFAULT_IDENTITY, IsNot.not(IsEqual.equalTo((Object) node)));
 	}
 
 	@Test
@@ -177,15 +175,15 @@ public class NodeTest {
 		final int hashCode = node.hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_NODE_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-identity").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-endpoint").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_NODE_MAP.get("diff-meta-data").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -196,8 +194,8 @@ public class NodeTest {
 		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:
-		Assert.assertThat(node.toString(), IsEqual.equalTo("Node [(Weak Id) alice] @ [localhost]"));
+		MatcherAssert.assertThat(node.toString(), IsEqual.equalTo("Node [(Weak Id) alice] @ [localhost]"));
 	}
 
-	//endregion
+	// endregion
 }

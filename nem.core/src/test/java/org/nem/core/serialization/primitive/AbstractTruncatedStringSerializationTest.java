@@ -2,7 +2,9 @@ package org.nem.core.serialization.primitive;
 
 import org.nem.core.serialization.*;
 
-public abstract class AbstractTruncatedStringSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractStringSerializationTest<TSerializer, TDeserializer> {
+public abstract class AbstractTruncatedStringSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
+		extends
+			AbstractStringSerializationTest<TSerializer, TDeserializer> {
 	private static final int LIMIT = 20;
 
 	public AbstractTruncatedStringSerializationTest(final SerializationPolicy<TSerializer, TDeserializer> policy) {

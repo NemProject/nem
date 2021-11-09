@@ -142,7 +142,7 @@ public class Utils {
 	 */
 	public static String incrementAtIndex(final String s, final int index) {
 		final char[] chars = s.toCharArray();
-		chars[index] = (char)(chars[index] + 1);
+		chars[index] = (char) (chars[index] + 1);
 		return new String(chars);
 	}
 
@@ -157,7 +157,7 @@ public class Utils {
 		final char[] chars = s.toCharArray();
 		final char currentChar = chars[index];
 
-		char newChar = (char)(currentChar + 1);
+		char newChar = (char) (currentChar + 1);
 		switch (currentChar) {
 			case 'Z':
 			case '7':
@@ -199,16 +199,14 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes originalEntity and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns an ObjectDeserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param deserializedSigner The signer that should be associated with the deserialized object.
 	 * @param <T> The concrete VerifiableEntity type.
 	 * @return The object deserializer.
 	 */
-	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
-			final T originalEntity,
+	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(final T originalEntity,
 			final Account deserializedSigner) {
 		// Arrange:
 		final MockAccountLookup accountLookup = new MockAccountLookup();
@@ -226,8 +224,7 @@ public class Utils {
 	 * @param <T> The concrete VerifiableEntity type.
 	 * @return The object deserializer.
 	 */
-	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(
-			final T originalEntity,
+	public static <T extends VerifiableEntity> Deserializer roundtripVerifiableEntity(final T originalEntity,
 			final AccountLookup accountLookup) {
 		// Arrange:
 		originalEntity.sign();
@@ -246,8 +243,7 @@ public class Utils {
 	 * @param <T> The concrete SerializableEntity type.
 	 * @return The object deserializer.
 	 */
-	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntity(
-			final T originalEntity,
+	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntity(final T originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
 		final JsonSerializer jsonSerializer = new JsonSerializer(true);
@@ -263,8 +259,7 @@ public class Utils {
 	 * @param <T> The concrete SerializableEntity type.
 	 * @return The binary object deserializer.
 	 */
-	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntityWithBinarySerializer(
-			final T originalEntity,
+	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntityWithBinarySerializer(final T originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
 		final BinarySerializer binarySerializer = new BinarySerializer();
@@ -278,7 +273,7 @@ public class Utils {
 	 * @param monitor The monitor.
 	 */
 	public static void monitorWait(final Object monitor) {
-		//noinspection SynchronizationOnLocalVariableOrMethodParameter
+		// noinspection SynchronizationOnLocalVariableOrMethodParameter
 		synchronized (monitor) {
 			ExceptionUtils.propagateVoid(monitor::wait);
 		}
@@ -290,7 +285,7 @@ public class Utils {
 	 * @param monitor The monitor.
 	 */
 	public static void monitorSignal(final Object monitor) {
-		//noinspection SynchronizationOnLocalVariableOrMethodParameter
+		// noinspection SynchronizationOnLocalVariableOrMethodParameter
 		synchronized (monitor) {
 			monitor.notifyAll();
 		}
@@ -323,9 +318,7 @@ public class Utils {
 	 * @return The deserializer.
 	 */
 	public static JsonDeserializer createDeserializer(final JSONObject object) {
-		return new JsonDeserializer(
-				object,
-				new DeserializationContext(new MockAccountLookup()));
+		return new JsonDeserializer(object, new DeserializationContext(new MockAccountLookup()));
 	}
 
 	/**
@@ -345,7 +338,7 @@ public class Utils {
 		return timeProvider;
 	}
 
-	//region createMosaicDefinition
+	// region createMosaicDefinition
 
 	/**
 	 * Creates a default mosaic definition.
@@ -355,10 +348,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
-		return createMosaicDefinition(
-				generateRandomAccount(),
-				Utils.createMosaicId(namespaceId, name),
-				createMosaicProperties());
+		return createMosaicDefinition(generateRandomAccount(), Utils.createMosaicId(namespaceId, name), createMosaicProperties());
 	}
 
 	/**
@@ -368,10 +358,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final Account creator) {
-		return createMosaicDefinition(
-				creator,
-				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
-				createMosaicProperties());
+		return createMosaicDefinition(creator, Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"), createMosaicProperties());
 	}
 
 	/**
@@ -382,10 +369,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicLevy levy) {
-		return createMosaicDefinition(
-				creator,
-				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
-				createMosaicProperties(),
+		return createMosaicDefinition(creator, Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"), createMosaicProperties(),
 				levy);
 	}
 
@@ -397,16 +381,9 @@ public class Utils {
 	 * @param properties The mosaic properties.
 	 * @return The mosaic definition.
 	 */
-	public static MosaicDefinition createMosaicDefinition(
-			final Account creator,
-			final MosaicId mosaicId,
+	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return new MosaicDefinition(
-				creator,
-				mosaicId,
-				new MosaicDescriptor("precious vouchers"),
-				properties,
-				null);
+		return new MosaicDefinition(creator, mosaicId, new MosaicDescriptor("precious vouchers"), properties, null);
 	}
 
 	/**
@@ -418,17 +395,9 @@ public class Utils {
 	 * @param levy The mosaic levy.
 	 * @return The mosaic definition.
 	 */
-	public static MosaicDefinition createMosaicDefinition(
-			final Account creator,
-			final MosaicId mosaicId,
-			final MosaicProperties properties,
+	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicId mosaicId, final MosaicProperties properties,
 			final MosaicLevy levy) {
-		return new MosaicDefinition(
-				creator,
-				mosaicId,
-				new MosaicDescriptor("precious vouchers"),
-				properties,
-				levy);
+		return new MosaicDefinition(creator, mosaicId, new MosaicDescriptor("precious vouchers"), properties, levy);
 	}
 
 	/**
@@ -449,10 +418,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties) {
-		return createMosaicDefinition(
-				generateRandomAccount(),
-				createMosaicId(id),
-				properties);
+		return createMosaicDefinition(generateRandomAccount(), createMosaicId(id), properties);
 	}
 
 	/**
@@ -464,11 +430,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicLevy levy) {
-		return createMosaicDefinition(
-				generateRandomAccount(),
-				createMosaicId(id),
-				properties,
-				levy);
+		return createMosaicDefinition(generateRandomAccount(), createMosaicId(id), properties, levy);
 	}
 
 	/**
@@ -479,13 +441,9 @@ public class Utils {
 	 * @param descriptor The mosaic descriptor.
 	 * @return The mosaic definition.
 	 */
-	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicDescriptor descriptor) {
-		return new MosaicDefinition(
-				generateRandomAccount(),
-				createMosaicId(id),
-				descriptor,
-				properties,
-				null);
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties,
+			final MosaicDescriptor descriptor) {
+		return new MosaicDefinition(generateRandomAccount(), createMosaicId(id), descriptor, properties, null);
 	}
 
 	/**
@@ -496,10 +454,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id) {
-		return createMosaicDefinition(
-				generateRandomAccount(),
-				createMosaicId(namespaceId, id),
-				createMosaicProperties());
+		return createMosaicDefinition(generateRandomAccount(), createMosaicId(namespaceId, id), createMosaicProperties());
 	}
 
 	/**
@@ -511,15 +466,12 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id, final MosaicProperties properties) {
-		return createMosaicDefinition(
-				generateRandomAccount(),
-				createMosaicId(namespaceId, id),
-				properties);
+		return createMosaicDefinition(generateRandomAccount(), createMosaicId(namespaceId, id), properties);
 	}
 
-	//endregion
+	// endregion
 
-	//region createMosaicProperties
+	// region createMosaicProperties
 
 	/**
 	 * Creates default mosaic properties.
@@ -549,11 +501,8 @@ public class Utils {
 	 * @param isTransferable A value indicating whether or not the mosaic is transferable.
 	 * @return The properties.
 	 */
-	public static MosaicProperties createMosaicProperties(
-			final Long initialSupply,
-			final Integer divisibility,
-			final Boolean isSupplyMutable,
-			final Boolean isTransferable) {
+	public static MosaicProperties createMosaicProperties(final Long initialSupply, final Integer divisibility,
+			final Boolean isSupplyMutable, final Boolean isTransferable) {
 		final Properties properties = new Properties();
 		if (null != initialSupply) {
 			properties.put("initialSupply", Long.toString(initialSupply));
@@ -574,9 +523,9 @@ public class Utils {
 		return new DefaultMosaicProperties(properties);
 	}
 
-	//endregion
+	// endregion
 
-	//region createMosaicId
+	// region createMosaicId
 
 	/**
 	 * Creates a mosaic id that conforms to a certain pattern.
@@ -610,9 +559,9 @@ public class Utils {
 		return new MosaicId(new NamespaceId(namespaceId), name);
 	}
 
-	//endregion
+	// endregion
 
-	//region createMosaic
+	// region createMosaic
 
 	/**
 	 * Creates a mosaic that conforms to a certain pattern.
@@ -646,9 +595,9 @@ public class Utils {
 		return new Mosaic(createMosaicId(namespaceId, name), new Quantity(1000));
 	}
 
-	//endregion
+	// endregion
 
-	//region createMosaicLevy
+	// region createMosaicLevy
 
 	/**
 	 * Creates a mosaic levy.
@@ -666,16 +615,12 @@ public class Utils {
 	 * @return The mosaic levy.
 	 */
 	public static MosaicLevy createMosaicLevy(final MosaicId mosaicId) {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				generateRandomAccount(),
-				mosaicId,
-				Quantity.fromValue(123));
+		return new MosaicLevy(MosaicTransferFeeType.Absolute, generateRandomAccount(), mosaicId, Quantity.fromValue(123));
 	}
 
-	//endregion
+	// endregion
 
-	//region nem globals
+	// region nem globals
 
 	/**
 	 * Sets up nem globals for testing.
@@ -693,9 +638,9 @@ public class Utils {
 		NemGlobals.setBlockChainConfiguration(null);
 	}
 
-	//endregion
+	// endregion
 
-	//region block chain configuration
+	// region block chain configuration
 
 	/**
 	 * Creates a new block chain configuration.
@@ -705,17 +650,11 @@ public class Utils {
 	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
 	 * @param blockChainRewriteLimit The block chain rewrite limit.
 	 */
-	public static BlockChainConfiguration createBlockChainConfiguration(
-			final int maxTransactionsPerSyncAttempt,
-			final int maxTransactionsPerBlock,
-			final int blockGenerationTargetTime,
-			final int blockChainRewriteLimit) {
-		return new BlockChainConfigurationBuilder()
-				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
-				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
-				.setBlockGenerationTargetTime(blockGenerationTargetTime)
-				.setBlockChainRewriteLimit(blockChainRewriteLimit)
-				.build();
+	public static BlockChainConfiguration createBlockChainConfiguration(final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock, final int blockGenerationTargetTime, final int blockChainRewriteLimit) {
+		return new BlockChainConfigurationBuilder().setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock).setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit).build();
 	}
 
 	/**
@@ -727,20 +666,13 @@ public class Utils {
 	 * @param blockChainRewriteLimit The block chain rewrite limit.
 	 * @param blockChainFeatures The block chain features.
 	 */
-	public static BlockChainConfiguration createBlockChainConfiguration(
-			final int maxTransactionsPerSyncAttempt,
-			final int maxTransactionsPerBlock,
-			final int blockGenerationTargetTime,
-			final int blockChainRewriteLimit,
+	public static BlockChainConfiguration createBlockChainConfiguration(final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock, final int blockGenerationTargetTime, final int blockChainRewriteLimit,
 			final BlockChainFeature[] blockChainFeatures) {
-		return new BlockChainConfigurationBuilder()
-				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
-				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
-				.setBlockGenerationTargetTime(blockGenerationTargetTime)
-				.setBlockChainRewriteLimit(blockChainRewriteLimit)
-				.setBlockChainFeatures(blockChainFeatures)
-				.build();
+		return new BlockChainConfigurationBuilder().setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock).setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit).setBlockChainFeatures(blockChainFeatures).build();
 	}
 
-	//endregion
+	// endregion
 }

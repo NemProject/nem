@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -35,7 +36,7 @@ public class MultisigMinCosignatoriesModificationTest {
 		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(relativeChange);
 
 		// Assert:
-		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(relativeChange));
+		MatcherAssert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(relativeChange));
 	}
 
 	// endregion
@@ -72,7 +73,7 @@ public class MultisigMinCosignatoriesModificationTest {
 		final MultisigMinCosignatoriesModification entity = new MultisigMinCosignatoriesModification(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity.getRelativeChange(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(entity.getRelativeChange(), IsEqual.equalTo(12));
 	}
 
 	// endregion

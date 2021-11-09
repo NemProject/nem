@@ -13,10 +13,9 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 	public static void setup() {
 		DEFAULT_HEIGHT = new BlockHeight(100);
 		final MosaicFeeInformationLookup lookup = AbstractTransactionFeeCalculatorTest.createMosaicFeeInformationLookup();
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
-				lookup,
-				() -> DEFAULT_HEIGHT,
-				new BlockHeight[] { DEFAULT_HEIGHT.prev(), new BlockHeight(1_000_000_000L) }));
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(lookup, () -> DEFAULT_HEIGHT, new BlockHeight[]{
+				DEFAULT_HEIGHT.prev(), new BlockHeight(1_000_000_000L)
+		}));
 		setNamespaceAndMosaicRelatedDefaultFee(20_000_000);
 		setTransactionDefaultFee(6_000_000);
 		setMultisigSignatureMinimumFee(6_000_000);
@@ -27,12 +26,10 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		Utils.resetGlobals();
 	}
 
-	//region calculateMinimumFee
-
-	//region transfer
-
 	public static class TransferMinimumFeeCalculation {
 		private static final long MIN_TRANSFER_FEE = 1;
+
+		// region transfer
 
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
@@ -109,9 +106,9 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			assertMessageFee(128, 96, Amount.fromNem(MIN_TRANSFER_FEE + 5));
 		}
 
-		// region mosaic transfers
+		// endregion
 
-		// region small business mosaics
+		// region mosaic transfers - small business mosaics
 
 		// - A so-called small business mosaic has divisibility of 0 and a max supply of 10000
 		// - It is always charged 1 xem fee no matter how many mosaics are transferred
@@ -251,15 +248,9 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			final TransactionFeeCalculator calculator = createCalculator();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> calculator.calculateMinimumFee(transaction),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> calculator.calculateMinimumFee(transaction), IllegalArgumentException.class);
 		}
 
 		// endregion
 	}
-
-	//endregion
-
-	//endregion
 }

@@ -21,10 +21,7 @@ public class MosaicSupplyChangeNotification extends Notification {
 	 * @param delta The supply change quantity.
 	 * @param supplyType The supply type.
 	 */
-	public MosaicSupplyChangeNotification(
-			final Account supplier,
-			final MosaicId mosaicId,
-			final Supply delta,
+	public MosaicSupplyChangeNotification(final Account supplier, final MosaicId mosaicId, final Supply delta,
 			final MosaicSupplyType supplyType) {
 		super(NotificationType.MosaicSupplyChange);
 		this.supplier = supplier;
