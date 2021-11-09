@@ -10,8 +10,7 @@ import org.nem.nis.state.AccountState;
 public interface AccountStateCache extends ReadOnlyAccountStateCache {
 
 	/**
-	 * Finds a poi account state given an address. This function will NOT return
-	 * forwarded states.
+	 * Finds a poi account state given an address. This function will NOT return forwarded states.
 	 *
 	 * @param address The address.
 	 * @return The poi account state.
@@ -19,18 +18,12 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	AccountState findStateByAddress(Address address);
 
 	/**
-	 * Finds the latest poi account state given an address following all forwards.
-	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
-	 * - Otherwise, it will return the state for the passed in address
+	 * Finds the latest poi account state given an address following all forwards. When passed a remote harvester, it will return the state
+	 * for the "owner" (the account harvesting remotely). Otherwise, it will return the state for the passed in address. <br>
+	 * Let's say we have account A and remote account B: A has link (B, height, HarvestingRemotely); B has link (A, height, RemoteHarvester)
 	 * <br>
-	 * Let's say we have account A and remote account B,
-	 * A has link (B, height, HarvestingRemotely)
-	 * B has link (A, height, RemoteHarvester)
-	 * <br>
-	 * findForwardedStateByAddress(A *) should return A
-	 * findForwardedStateByAddress(B, h+1439) should return B
+	 * findForwardedStateByAddress(A *) should return A; findForwardedStateByAddress(B, h+1439) should return B;
 	 * findForwardedStateByAddress(B, h+1440) should return B
-	 * <br>
 	 *
 	 * @param address The address.
 	 * @return The poi account state.
@@ -38,18 +31,12 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	AccountState findLatestForwardedStateByAddress(Address address);
 
 	/**
-	 * Finds a poi account state given an address following all forwards at a height.
-	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
-	 * - Otherwise, it will return the state for the passed in address
+	 * Finds a poi account state given an address following all forwards at a height. When passed a remote harvester, it will return the
+	 * state for the "owner" (the account harvesting remotely). Otherwise, it will return the state for the passed in address <br>
+	 * Let's say we have account A and remote account B: A has link (B, height, HarvestingRemotely); B has link (A, height, RemoteHarvester)
 	 * <br>
-	 * Let's say we have account A and remote account B,
-	 * A has link (B, height, HarvestingRemotely)
-	 * B has link (A, height, RemoteHarvester)
-	 * <br>
-	 * findForwardedStateByAddress(A *) should return A
-	 * findForwardedStateByAddress(B, h+1439) should return B
+	 * findForwardedStateByAddress(A *) should return A; findForwardedStateByAddress(B, h+1439) should return B;
 	 * findForwardedStateByAddress(B, h+1440) should return A
-	 * <br>
 	 *
 	 * @param address The address.
 	 * @param height Height at which check should be performed.

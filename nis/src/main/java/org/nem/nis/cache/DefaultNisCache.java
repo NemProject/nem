@@ -19,11 +19,8 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * @param transactionHashCache The cache of transaction hashes.
 	 * @param namespaceCache The namespace cache.
 	 */
-	public DefaultNisCache(
-			final SynchronizedAccountCache accountCache,
-			final SynchronizedAccountStateCache accountStateCache,
-			final SynchronizedPoxFacade poxFacade,
-			final SynchronizedHashCache transactionHashCache,
+	public DefaultNisCache(final SynchronizedAccountCache accountCache, final SynchronizedAccountStateCache accountStateCache,
+			final SynchronizedPoxFacade poxFacade, final SynchronizedHashCache transactionHashCache,
 			final SynchronizedNamespaceCache namespaceCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
@@ -68,12 +65,8 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * @return The deep copy.
 	 */
 	public DefaultNisCache deepCopy() {
-		return new DefaultNisCache(
-				this.accountCache.deepCopy(),
-				this.accountStateCache.deepCopy(),
-				this.poxFacade.copy(),
-				this.transactionHashCache.deepCopy(),
-				this.namespaceCache.deepCopy());
+		return new DefaultNisCache(this.accountCache.deepCopy(), this.accountStateCache.deepCopy(), this.poxFacade.copy(),
+				this.transactionHashCache.deepCopy(), this.namespaceCache.deepCopy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {

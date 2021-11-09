@@ -3,8 +3,8 @@ package org.nem.nis.secret;
 import org.nem.core.model.observers.*;
 
 /**
- * An observer that implements BlockTransactionObserver by forwarding all transfer notifications
- * to the wrapped TransactionObserver implementation.
+ * An observer that implements BlockTransactionObserver by forwarding all transfer notifications to the wrapped TransactionObserver
+ * implementation.
  */
 public class TransactionObserverToBlockTransferObserverAdapter implements BlockTransactionObserver {
 	private final TransactionObserver observer;

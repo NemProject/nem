@@ -31,11 +31,10 @@ public class DefaultChainServices implements ChainServices {
 
 	@Override
 	public CompletableFuture<Boolean> isChainSynchronized(final Collection<Node> nodes) {
-		return this.getMaxChainHeightAsync(nodes)
-				.thenApply(maxHeight -> {
-					final BlockHeight localBlockHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
-					return localBlockHeight.compareTo(maxHeight) >= 0;
-				});
+		return this.getMaxChainHeightAsync(nodes).thenApply(maxHeight -> {
+			final BlockHeight localBlockHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
+			return localBlockHeight.compareTo(maxHeight) >= 0;
+		});
 	}
 
 	@Override
@@ -44,14 +43,11 @@ public class DefaultChainServices implements ChainServices {
 				.map(n -> this.connectorPool.getSyncConnector(null).getChainHeightAsync(n).exceptionally(e -> null))
 				.collect(Collectors.toList());
 
-		return CompletableFuture.allOf(chainHeightFutures.toArray(new CompletableFuture[chainHeightFutures.size()]))
-				.thenApply(v -> {
-					final Optional<BlockHeight> maxChainHeight = chainHeightFutures.stream()
-							.map(CompletableFuture::join)
-							.filter(h -> null != h)
-							.max(BlockHeight::compareTo);
+		return CompletableFuture.allOf(chainHeightFutures.toArray(new CompletableFuture<?>[chainHeightFutures.size()])).thenApply(v -> {
+			final Optional<BlockHeight> maxChainHeight = chainHeightFutures.stream().map(CompletableFuture::join).filter(h -> null != h)
+					.max(BlockHeight::compareTo);
 
-					return maxChainHeight.isPresent() ? maxChainHeight.get() : BlockHeight.ONE;
-				});
+			return maxChainHeight.isPresent() ? maxChainHeight.get() : BlockHeight.ONE;
+		});
 	}
 }

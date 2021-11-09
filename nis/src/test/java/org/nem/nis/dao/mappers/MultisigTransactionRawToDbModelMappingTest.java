@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -19,7 +20,7 @@ import java.util.Collection;
 @RunWith(Enclosed.class)
 public class MultisigTransactionRawToDbModelMappingTest {
 
-	//region General
+	// region General
 
 	public static class General extends AbstractTransferRawToDbModelMappingTest<DbMultisigTransaction> {
 
@@ -29,9 +30,9 @@ public class MultisigTransactionRawToDbModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -47,6 +48,7 @@ public class MultisigTransactionRawToDbModelMappingTest {
 		}
 
 		@Test
+		@SuppressWarnings("rawtypes")
 		public void rawDataCanBeMappedToDbModelWithInnerTransfer() {
 			// Arrange:
 			final int offset = getOffset(this.entry.type);
@@ -71,9 +73,9 @@ public class MultisigTransactionRawToDbModelMappingTest {
 
 				final AbstractBlockTransfer dbTransferFromMappedModel = entry.getFromMultisig.apply(dbModel);
 				if (type == this.entry.type) {
-					Assert.assertThat(dbTransferFromMappedModel, IsEqual.equalTo(dbTransfer));
+					MatcherAssert.assertThat(dbTransferFromMappedModel, IsEqual.equalTo(dbTransfer));
 				} else {
-					Assert.assertThat(dbTransferFromMappedModel, IsNull.nullValue());
+					MatcherAssert.assertThat(dbTransferFromMappedModel, IsNull.nullValue());
 				}
 			}
 		}
@@ -93,15 +95,15 @@ public class MultisigTransactionRawToDbModelMappingTest {
 
 		private static void assertDbModelFields(final DbMultisigTransaction dbModel) {
 			// Assert:
-			Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
-			Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
-			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().isEmpty(), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
+			MatcherAssert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
+			MatcherAssert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().isEmpty(), IsEqual.equalTo(true));
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -116,23 +118,23 @@ public class MultisigTransactionRawToDbModelMappingTest {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[17];
-			raw[0] = BigInteger.valueOf(123L);                              // block id
-			raw[1] = BigInteger.valueOf(234L);                              // id
-			raw[2] = rawHash;                                               // raw hash
-			raw[3] = 1;                                                     // version
-			raw[4] = BigInteger.valueOf(345L);                              // fee
-			raw[5] = 456;                                                   // timestamp
-			raw[6] = 567;                                                   // deadline
-			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
-			raw[8] = senderProof;                                           // sender proof
-			raw[9] = 432;                                                   // block index
-			raw[10] = BigInteger.valueOf(654L);                             // referenced transaction
-			raw[11] = null;                                                 // db transfer id
-			raw[12] = null;                                                 // db importance transfer id
-			raw[13] = null;                                                 // db modification transaction id
-			raw[14] = null;                                                 // db provision namespace transaction id
-			raw[15] = null;                                                 // db mosaic definition creation transaction id
-			raw[16] = null;                                                 // db mosaic supply change transaction id
+			raw[0] = BigInteger.valueOf(123L); // block id
+			raw[1] = BigInteger.valueOf(234L); // id
+			raw[2] = rawHash; // raw hash
+			raw[3] = 1; // version
+			raw[4] = BigInteger.valueOf(345L); // fee
+			raw[5] = 456; // timestamp
+			raw[6] = 567; // deadline
+			raw[7] = BigInteger.valueOf(this.senderId); // sender id
+			raw[8] = senderProof; // sender proof
+			raw[9] = 432; // block index
+			raw[10] = BigInteger.valueOf(654L); // referenced transaction
+			raw[11] = null; // db transfer id
+			raw[12] = null; // db importance transfer id
+			raw[13] = null; // db modification transaction id
+			raw[14] = null; // db provision namespace transaction id
+			raw[15] = null; // db mosaic definition creation transaction id
+			raw[16] = null; // db mosaic supply change transaction id
 			return raw;
 		}
 	}

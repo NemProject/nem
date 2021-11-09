@@ -23,10 +23,7 @@ public class Neighborhood {
 	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
 	 * @param epsilon The structural similarity threshold that will cause nodes to be considered highly similar.
 	 */
-	public Neighborhood(
-			final NeighborhoodRepository repository,
-			final SimilarityStrategy similarityStrategy,
-			final int mu,
+	public Neighborhood(final NeighborhoodRepository repository, final SimilarityStrategy similarityStrategy, final int mu,
 			final double epsilon) {
 		this.repository = repository;
 		this.similarityStrategy = similarityStrategy;
@@ -71,11 +68,7 @@ public class Neighborhood {
 	 * @return A collection of all neighboring communities.
 	 */
 	public Collection<Community> getNeighboringCommunities(final NodeId nodeId) {
-		return this.repository.getNeighbors(nodeId)
-				.toList()
-				.stream()
-				.map(this::getCommunity)
-				.collect(Collectors.toList());
+		return this.repository.getNeighbors(nodeId).toList().stream().map(this::getCommunity).collect(Collectors.toList());
 	}
 
 	/**
@@ -92,13 +85,11 @@ public class Neighborhood {
 		int index = 0;
 		for (final NodeId neighborId : neighbors) {
 			// ignore one-hop neighbors
-			twoHopAwayNeighborsArray[index++] = nodeId.equals(neighborId)
-					? new NodeNeighbors()
-					: this.repository.getNeighbors(neighborId);
+			twoHopAwayNeighborsArray[index++] = nodeId.equals(neighborId) ? new NodeNeighbors() : this.repository.getNeighbors(neighborId);
 		}
 
-		return NodeNeighbors.union(twoHopAwayNeighborsArray)
-				.difference(new NodeNeighbors(nodeId)); // don't report the starting node as two-hops away
+		// don't report the starting node as two-hops away
+		return NodeNeighbors.union(twoHopAwayNeighborsArray).difference(new NodeNeighbors(nodeId));
 	}
 
 	/**

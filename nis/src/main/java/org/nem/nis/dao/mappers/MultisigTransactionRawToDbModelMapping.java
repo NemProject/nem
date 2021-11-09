@@ -10,6 +10,7 @@ import java.util.HashSet;
 /**
  * A mapping that is able to map raw multisig transaction data to a db multisig transaction.
  */
+@SuppressWarnings("rawtypes")
 public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawToDbModelMapping<DbMultisigTransaction> {
 	private final MultisigTransferMap multisigTransferMap;
 
@@ -28,7 +29,7 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	protected DbMultisigTransaction mapImpl(final Object[] source) {
 		final DbMultisigTransaction dbMultisigTransaction = new DbMultisigTransaction();
 		dbMultisigTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbMultisigTransaction.setBlkIndex((Integer)source[9]);
+		dbMultisigTransaction.setBlkIndex((Integer) source[9]);
 		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
 
 		int offset = 0;
@@ -46,9 +47,7 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void set(
-			final TransactionRegistry.Entry registryEntry,
-			final DbMultisigTransaction dbMultisigTransaction,
+	private static void set(final TransactionRegistry.Entry registryEntry, final DbMultisigTransaction dbMultisigTransaction,
 			final AbstractBlockTransfer dbTransfer) {
 		registryEntry.setInMultisig.accept(dbMultisigTransaction, dbTransfer);
 	}

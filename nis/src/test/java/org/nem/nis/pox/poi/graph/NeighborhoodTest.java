@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi.graph;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public class NeighborhoodTest {
 	private static final double DEFAULT_EPSILON = 0.65;
 
-	//region getCommunity
+	// region getCommunity
 
 	@Test
 	public void getCommunityAlwaysTreatsPivotNodeAsSimilar() {
@@ -65,14 +66,11 @@ public class NeighborhoodTest {
 		return neighborhood.getCommunity(new NodeId(pivotId));
 	}
 
-	private static void assertCommunity(
-			final Community community,
-			final NodeId pivotId,
-			final List<NodeId> similarNodeIds,
+	private static void assertCommunity(final Community community, final NodeId pivotId, final List<NodeId> similarNodeIds,
 			final List<NodeId> dissimilarNodeIds) {
-		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(pivotId));
-		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(similarNodeIds));
-		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(dissimilarNodeIds));
+		MatcherAssert.assertThat(community.getPivotId(), IsEqual.equalTo(pivotId));
+		MatcherAssert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(similarNodeIds));
+		MatcherAssert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(dissimilarNodeIds));
 	}
 
 	@Test
@@ -94,9 +92,10 @@ public class NeighborhoodTest {
 		final Community community = neighborhood.getCommunity(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(2)));
-		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 7, 9)));
-		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
+		MatcherAssert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(2)));
+		MatcherAssert.assertThat(community.getSimilarNeighbors().toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 7, 9)));
+		MatcherAssert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
 	}
 
 	@Test
@@ -111,12 +110,12 @@ public class NeighborhoodTest {
 		final Community community2 = neighborhood.getCommunity(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(community2, IsSame.sameInstance(community1));
+		MatcherAssert.assertThat(community2, IsSame.sameInstance(community1));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNeighboringCommunities
+	// region getNeighboringCommunities
 
 	@Test
 	public void getNeighboringCommunitiesReturnsAllNeighboringCommunities() {
@@ -134,14 +133,13 @@ public class NeighborhoodTest {
 		final Collection<Community> neighboringCommunities = neighborhood.getNeighboringCommunities(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(
-				neighboringCommunities.stream().map(Community::getPivotId).collect(Collectors.toList()),
+		MatcherAssert.assertThat(neighboringCommunities.stream().map(Community::getPivotId).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3, 7, 9)));
 	}
 
-	//endregion
+	// endregion
 
-	//region getTwoHopAwayNeighbors
+	// region getTwoHopAwayNeighbors
 
 	@Test
 	public void getTwoHopAwayNeighborsReturnsEmptyNodeNeighborsWhenNodeHasZeroSimilarNeighbor() {
@@ -154,7 +152,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(neighbors.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(neighbors.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -168,7 +166,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(neighbors.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(neighbors.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -190,9 +188,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert:
-		Assert.assertThat(
-				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 3, 5, 7, 9, 10, 11, 12)));
+		MatcherAssert.assertThat(neighbors.toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 3, 5, 7, 9, 10, 11, 12)));
 	}
 
 	@Test
@@ -210,9 +206,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert: 2 is not included
-		Assert.assertThat(
-				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 7)));
+		MatcherAssert.assertThat(neighbors.toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 7)));
 	}
 
 	@Test
@@ -230,9 +224,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert: 3 (2 -> 4 -> 3) and 4 (2 -> 3 -> 4) are included
-		Assert.assertThat(
-				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 4, 5, 7)));
+		MatcherAssert.assertThat(neighbors.toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 4, 5, 7)));
 	}
 
 	@Test
@@ -251,9 +243,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert: 3 (2 -> 3 -> 4 -> 3) and 5 are not included
-		Assert.assertThat(
-				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(4, 7, 8)));
+		MatcherAssert.assertThat(neighbors.toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(4, 7, 8)));
 	}
 
 	@Test
@@ -272,9 +262,7 @@ public class NeighborhoodTest {
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
 		// Assert: 5 is only present once
-		Assert.assertThat(
-				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 8, 9)));
+		MatcherAssert.assertThat(neighbors.toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 8, 9)));
 	}
 
 	private static SimilarityStrategy createAlwaysSimilarStrategy() {
@@ -283,9 +271,9 @@ public class NeighborhoodTest {
 		return strategy;
 	}
 
-	//endregion
+	// endregion
 
-	//region size
+	// region size
 
 	@Test
 	public void sizeReturnsNeighborhoodRepositoryLogicalSize() {
@@ -298,15 +286,13 @@ public class NeighborhoodTest {
 		final int size = neighborhood.size();
 
 		// Assert:
-		Assert.assertThat(size, IsEqual.equalTo(18));
+		MatcherAssert.assertThat(size, IsEqual.equalTo(18));
 		Mockito.verify(repository, Mockito.only()).getLogicalSize();
 	}
 
-	//endregion
+	// endregion
 
-	private static Neighborhood createNeighborhood(
-			final NeighborhoodRepository repository,
-			final SimilarityStrategy similarityStrategy) {
+	private static Neighborhood createNeighborhood(final NeighborhoodRepository repository, final SimilarityStrategy similarityStrategy) {
 		return NisUtils.createNeighborhood(repository, similarityStrategy);
 	}
 }

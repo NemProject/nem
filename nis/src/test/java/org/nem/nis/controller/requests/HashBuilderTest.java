@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -18,6 +19,6 @@ public class HashBuilderTest {
 		final Hash hash = builder.build();
 
 		// Assert:
-		Assert.assertThat(hash, IsEqual.equalTo(originalHash));
+		MatcherAssert.assertThat(hash, IsEqual.equalTo(originalHash));
 	}
 }

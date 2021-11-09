@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
 /**
  * A mapping that is able to map a db multisig signer modification transfer to a model multisig signer modification transaction.
  */
-public class MultisigAggregateModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationDbModelToModelMapping
+		extends
+			AbstractTransferDbModelToModelMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -27,27 +29,20 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 
 		final List<MultisigCosignatoryModification> multisigCosignatoryModifications = source.getMultisigModifications().stream()
-				.map(this::mapMultisigModification)
-				.collect(Collectors.toList());
+				.map(this::mapMultisigModification).collect(Collectors.toList());
 
 		final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = source.getMultisigMinCosignatoriesModification();
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = null == dbMinCosignatoriesModification
 				? null
 				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
 
-		return new MultisigAggregateModificationTransaction(
-				source.getVersion() & 0x00FFFFFF,
-				new TimeInstant(source.getTimeStamp()),
-				sender,
-				multisigCosignatoryModifications,
-				minCosignatoriesModification);
+		return new MultisigAggregateModificationTransaction(source.getVersion() & 0x00FFFFFF, new TimeInstant(source.getTimeStamp()),
+				sender, multisigCosignatoryModifications, minCosignatoriesModification);
 	}
 
 	private MultisigCosignatoryModification mapMultisigModification(final DbMultisigModification source) {
 		final Account cosignatory = this.mapper.map(source.getCosignatory(), Account.class);
 
-		return new MultisigCosignatoryModification(
-				MultisigModificationType.fromValueOrDefault(source.getModificationType()),
-				cosignatory);
+		return new MultisigCosignatoryModification(MultisigModificationType.fromValueOrDefault(source.getModificationType()), cosignatory);
 	}
 }

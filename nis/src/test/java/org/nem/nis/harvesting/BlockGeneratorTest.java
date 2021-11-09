@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -20,7 +21,7 @@ import java.util.*;
 
 public class BlockGeneratorTest {
 
-	//region generated block properties
+	// region generated block properties
 
 	@Test
 	public void generatedBlockHasBlockHeightOneGreaterThanLastBlockHeight() {
@@ -31,7 +32,7 @@ public class BlockGeneratorTest {
 		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(8)));
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(8)));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class BlockGeneratorTest {
 		final Block block = context.generateNextBlock(lastBlock).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(lastBlockHash));
+		MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(lastBlockHash));
 	}
 
 	@Test
@@ -54,13 +55,11 @@ public class BlockGeneratorTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				Utils.generateRandomAccount(),
-				new TimeInstant(17)).getBlock();
+		final Block block = context
+				.generateNextBlock(NisUtils.createRandomBlockWithHeight(7), Utils.generateRandomAccount(), new TimeInstant(17)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(17)));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(17)));
 	}
 
 	@Test
@@ -72,7 +71,7 @@ public class BlockGeneratorTest {
 		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -82,13 +81,11 @@ public class BlockGeneratorTest {
 		final Account signerAccount = context.accountCache.findByAddress(Utils.generateRandomAddress());
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				signerAccount).getBlock();
+		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7), signerAccount).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
 
 	@Test
@@ -102,14 +99,13 @@ public class BlockGeneratorTest {
 		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				remoteAccount).getBlock();
+		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7), remoteAccount).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
-		Assert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
-		Mockito.verify(context.accountStateCache, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(8));
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
+		Mockito.verify(context.accountStateCache, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(),
+				new BlockHeight(8));
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(ownerAccount.getAddress());
 	}
 
@@ -122,17 +118,15 @@ public class BlockGeneratorTest {
 		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void generatedBlockCanHaveTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = Arrays.asList(
-				new MockTransaction(7, new TimeInstant(1)),
-				new MockTransaction(11, new TimeInstant(2)),
-				new MockTransaction(5, new TimeInstant(3)));
+		final List<Transaction> transactions = Arrays.asList(new MockTransaction(7, new TimeInstant(1)),
+				new MockTransaction(11, new TimeInstant(2)), new MockTransaction(5, new TimeInstant(3)));
 		transactions.forEach(VerifiableEntity::sign);
 		context.setBlockTransactions(transactions);
 
@@ -143,16 +137,14 @@ public class BlockGeneratorTest {
 		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(123),
-				remoteAccount,
-				new TimeInstant(11)).getBlock();
+		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(123), remoteAccount, new TimeInstant(11))
+				.getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(3));
-		Assert.assertThat(block.getTransactions(), IsEqual.equalTo(transactions));
-		Mockito.verify(context.transactionsProvider, Mockito.only())
-				.getBlockTransactions(ownerAccount.getAddress(), new TimeInstant(11), new BlockHeight(124));
+		MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(block.getTransactions(), IsEqual.equalTo(transactions));
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(ownerAccount.getAddress(), new TimeInstant(11),
+				new BlockHeight(124));
 	}
 
 	@Test
@@ -164,14 +156,13 @@ public class BlockGeneratorTest {
 		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
-		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any()))
-				.thenReturn(difficulty);
+		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any())).thenReturn(difficulty);
 
 		// Act:
 		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getTimeStampsFrom(new BlockHeight(1), 7);
 		Mockito.verify(context.blockDao, Mockito.times(1)).getDifficultiesFrom(new BlockHeight(1), 7);
 		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps);
@@ -186,22 +177,21 @@ public class BlockGeneratorTest {
 		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
-		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any()))
-				.thenReturn(difficulty);
+		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any())).thenReturn(difficulty);
 
 		// Act:
 		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(100)).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
+		MatcherAssert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getTimeStampsFrom(new BlockHeight(41), 60);
 		Mockito.verify(context.blockDao, Mockito.times(1)).getDifficultiesFrom(new BlockHeight(41), 60);
 		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps);
 	}
 
-	//endregion
+	// endregion
 
-	//region evaluation
+	// region evaluation
 
 	@Test
 	public void blockIsReturnedIfHitIsLessThanTarget() {
@@ -217,8 +207,8 @@ public class BlockGeneratorTest {
 		final Block block = generatedBlock.getBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(generatedBlock.getScore(), IsEqual.equalTo(1245L));
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(generatedBlock.getScore(), IsEqual.equalTo(1245L));
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(block);
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(lastBlock, block);
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateBlockScore(lastBlock, block);
@@ -237,7 +227,7 @@ public class BlockGeneratorTest {
 		final GeneratedBlock generatedBlock = context.generateNextBlock(lastBlock);
 
 		// Assert:
-		Assert.assertThat(generatedBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(generatedBlock, IsNull.nullValue());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
@@ -256,7 +246,7 @@ public class BlockGeneratorTest {
 		final GeneratedBlock generatedBlock = context.generateNextBlock(lastBlock);
 
 		// Assert:
-		Assert.assertThat(generatedBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(generatedBlock, IsNull.nullValue());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
@@ -275,7 +265,7 @@ public class BlockGeneratorTest {
 		final Block block = generatedBlock.getBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
 		Mockito.verify(context.validator, Mockito.only()).validate(block);
 	}
 
@@ -290,13 +280,13 @@ public class BlockGeneratorTest {
 		final GeneratedBlock generatedBlock = context.generateNextBlock(lastBlock);
 
 		// Assert:
-		Assert.assertThat(generatedBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(generatedBlock, IsNull.nullValue());
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region availability of public key
+	// region availability of public key
 
 	@Test
 	public void generateNextBlockUsesSuppliedHarvesterAccountToFilterBlockTransactionsWhenNotRemoteHarvesting() {
@@ -309,18 +299,17 @@ public class BlockGeneratorTest {
 				.thenReturn(new AccountState(signerAccountWithoutPublicKey.getAddress()));
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				signerAccount).getBlock();
+		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7), signerAccount).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
-		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.nullValue());
 
 		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
-		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(signerAccount.getAddress()));
-		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(),
+				Mockito.any());
+		MatcherAssert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(signerAccount.getAddress()));
+		MatcherAssert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -334,22 +323,21 @@ public class BlockGeneratorTest {
 		Mockito.when(context.accountCache.findByAddress(Mockito.eq(ownerAccount.getAddress()))).thenReturn(ownerAccount);
 
 		// Act:
-		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				remoteAccount).getBlock();
+		final Block block = context.generateNextBlock(NisUtils.createRandomBlockWithHeight(7), remoteAccount).getBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
-		Assert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
 
 		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
-		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(ownerAccount.getAddress()));
-		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(),
+				Mockito.any());
+		MatcherAssert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(ownerAccount.getAddress()));
+		MatcherAssert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
@@ -360,11 +348,8 @@ public class BlockGeneratorTest {
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
-				NisCacheFactory.createReadOnly(this.accountCache, this.accountStateCache),
-				this.transactionsProvider,
-				this.blockDao,
-				this.scorer,
-				this.validator);
+				NisCacheFactory.createReadOnly(this.accountCache, this.accountStateCache), this.transactionsProvider, this.blockDao,
+				this.scorer, this.validator);
 
 		private TestContext() {
 			final Account signer = Utils.generateRandomAccount();
@@ -395,7 +380,8 @@ public class BlockGeneratorTest {
 		}
 
 		private void setBlockTransactions(final List<Transaction> transactions) {
-			Mockito.when(this.transactionsProvider.getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(transactions);
+			Mockito.when(this.transactionsProvider.getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any()))
+					.thenReturn(transactions);
 		}
 	}
 }

@@ -8,8 +8,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 /**
- * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
- * by their addresses.
+ * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts by their addresses.
  */
 public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
 	private static final int INITIAL_CAPACITY = 65536;

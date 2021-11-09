@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -17,16 +18,17 @@ import java.util.Arrays;
 
 public class MosaicDefinitionCreationObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
-	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
-			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
-	private final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION = new BlockHeight(
+			BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private final long[] HEIGHTS_BEFORE_FORK = new long[]{
+			1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1
+	};
 	private final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
-			FORK_HEIGHT_MOSAIC_REDEFINITION,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
+			FORK_HEIGHT_MOSAIC_REDEFINITION, FORK_HEIGHT_MOSAIC_REDEFINITION + 1, FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000
+	};
 
-	//region mosaic creation
+	// region mosaic creation
 
 	@Test
 	public void notifyExecuteCallsMosaicCacheAddWithExpectedMosaicDefinition() {
@@ -37,9 +39,9 @@ public class MosaicDefinitionCreationObserverTest {
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(1));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -52,16 +54,14 @@ public class MosaicDefinitionCreationObserverTest {
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaic definition change
-
-	//region any height
+	// region mosaic definition change
 
 	@Test
 	public void notifyExecuteCreatesUntouchedMosaicEntryIfPropertiesChangedAtAnyHeight() {
@@ -76,51 +76,34 @@ public class MosaicDefinitionCreationObserverTest {
 	@Test
 	public void notifyExecuteCreatesUntouchedMosaicEntryIfLevyChangedAtAnyHeight() {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				7,
-				Utils.createMosaicPropertiesWithInitialSupply(5L),
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
 				Utils.createMosaicLevy());
 		// Assert:
 		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
 		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
 	}
 
-	//endregion
-
-	//region before fork
-
 	@Test
 	public void notifyExecuteCreatesUntouchedMosaicEntryIfOnlyDescriptorChangedBeforeFork() {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				7,
-				Utils.createMosaicPropertiesWithInitialSupply(5L),
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
 				new MosaicDescriptor("This is a new description"));
 
 		// Assert:
 		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
 	}
 
-	//region at and after fork
-
 	@Test
 	public void notifyExecuteCreatesMosaicEntryWithInheritedDataIfOnlyDescriptorChangedAtAndAfterFork() {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-				7,
-				Utils.createMosaicPropertiesWithInitialSupply(5L),
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
 				new MosaicDescriptor("This is a new description"));
 
 		// Assert:
 		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 15L, 2));
 	}
 
-	//endregion
-
-	private void assertMosaicRedefinitionBehavior(
-			final MosaicDefinition mosaicDefinition,
-			final long height,
-			final long expectedSupply,
+	private void assertMosaicRedefinitionBehavior(final MosaicDefinition mosaicDefinition, final long height, final long expectedSupply,
 			final int expectedBalancesSize) {
 		// Arrange: initial supply is 5
 		final TestContext context = new TestContext();
@@ -141,13 +124,13 @@ public class MosaicDefinitionCreationObserverTest {
 
 	private static void assertMosaicEntry(final TestContext context, final Long supply, final int numBalances) {
 		MosaicEntry entry = context.getMosaicEntry();
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(supply)));
-		Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numBalances));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(supply)));
+		MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numBalances));
 	}
 
-	//endregion
+	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -156,48 +139,40 @@ public class MosaicDefinitionCreationObserverTest {
 		final MosaicDefinitionCreationObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(
-						Utils.generateRandomAccount(),
-						Utils.generateRandomAccount(),
-						Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
-		Assert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
-		Assert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		MatcherAssert.assertThat(context.getNumMosaicDefinitions(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.cacheContainsMosaicDefinition(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	private void notifyMosaicDefinitionCreation(
-			final TestContext context,
-			final NotificationTrigger notificationTrigger) {
+	private void notifyMosaicDefinitionCreation(final TestContext context, final NotificationTrigger notificationTrigger) {
 		// Act:
 		notifyMosaicDefinitionCreation(context, context.mosaicDefinition, NOTIFY_BLOCK_HEIGHT, notificationTrigger);
 	}
 
-	private void notifyMosaicDefinitionCreation(
-			final TestContext context,
-			final MosaicDefinition mosaicDefinition,
-			final long height,
+	private void notifyMosaicDefinitionCreation(final TestContext context, final MosaicDefinition mosaicDefinition, final long height,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final MosaicDefinitionCreationObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicDefinitionCreationNotification(mosaicDefinition),
+		observer.notify(new MosaicDefinitionCreationNotification(mosaicDefinition),
 				NisUtils.createBlockNotificationContext(new BlockHeight(height), notificationTrigger));
 	}
 
 	private class TestContext {
-		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L));
+		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7,
+				Utils.createMosaicPropertiesWithInitialSupply(5L));
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 
 		public TestContext() {
-			this.namespaceCache.add(new Namespace(this.mosaicDefinition.getId().getNamespaceId(), this.mosaicDefinition.getCreator(), BlockHeight.ONE));
+			this.namespaceCache.add(
+					new Namespace(this.mosaicDefinition.getId().getNamespaceId(), this.mosaicDefinition.getCreator(), BlockHeight.ONE));
 		}
 
 		public int getNumNamespaces() {
@@ -209,7 +184,8 @@ public class MosaicDefinitionCreationObserverTest {
 		}
 
 		public boolean cacheContainsMosaicDefinition() {
-			return this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics().contains(this.mosaicDefinition.getId());
+			return this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics()
+					.contains(this.mosaicDefinition.getId());
 		}
 
 		public MosaicEntry getMosaicEntry() {

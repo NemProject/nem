@@ -35,8 +35,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(matchPredicate::isMatch);
-		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
-				this.transactions,
+		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(this.transactions,
 				new ImpactfulTransactionPredicate(nisCache.getAccountStateCache()));
 
 		this.resetState();
@@ -73,8 +72,8 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds a transaction listener to unconfirmed transactions state.
-	 * Listener will be informed about incoming unconfirmed transactions that passed the validation.
+	 * Adds a transaction listener to unconfirmed transactions state. Listener will be informed about incoming unconfirmed transactions that
+	 * passed the validation.
 	 *
 	 * @param transactionListener The unconfirmed transaction listener.
 	 */
@@ -102,8 +101,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 	@Override
 	public void dropExpiredTransactions(final TimeInstant time) {
-		final List<Transaction> notExpiredTransactions = this.transactions.stream()
-				.filter(tx -> !this.isExpired(tx, time))
+		final List<Transaction> notExpiredTransactions = this.transactions.stream().filter(tx -> !this.isExpired(tx, time))
 				.collect(Collectors.toList());
 		if (notExpiredTransactions.size() == this.transactions.size()) {
 			return;
@@ -131,7 +129,6 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		this.transactions.clear();
 		final List<UnconfirmedTransactionListener> listeners = this.state != null ? this.state.getListeners() : null;
 		this.state = this.unconfirmedStateFactory.create(this.nisCache.copy(), this.transactions);
-
 
 		// replay all transactions
 		transactions.forEach(this.state::addExisting);

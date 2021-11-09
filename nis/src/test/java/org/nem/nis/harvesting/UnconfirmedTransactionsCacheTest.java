@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsCacheTest {
 
-	//region construction
+	// region construction
 
 	@Test
 	public void cacheIsInitiallyEmpty() {
@@ -19,13 +20,13 @@ public class UnconfirmedTransactionsCacheTest {
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region add
+	// region add
 
 	@Test
 	public void canAddNewTransactionWithoutChildTransactions() {
@@ -37,10 +38,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -56,12 +57,12 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -75,10 +76,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -95,10 +96,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -117,10 +118,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -136,15 +137,15 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(innerTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region add (multisig signature)
+	// region add (multisig signature)
 
 	@Test
 	public void cannotAddMultisigSignatureWithNoExistingTransactions() {
@@ -157,10 +158,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(signatureTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -175,10 +176,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(signatureTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -193,10 +194,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final ValidationResult result = cache.add(signatureTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2)); // the multisig transaction has an inner transaction
-		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2)); // the multisig transaction has an inner transaction
+		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -213,16 +214,17 @@ public class UnconfirmedTransactionsCacheTest {
 
 		// Assert:
 		// - check the cache state
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2 + 1)); // the multisig transaction has an inner transaction and a signature
-		Assert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2 + 1)); // the multisig transaction has an inner transaction and a
+																			// signature
+		MatcherAssert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
 
 		// - check the cache multisig transaction signatures
-		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-		Assert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
+		MatcherAssert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
 	}
 
 	@Test
@@ -244,16 +246,16 @@ public class UnconfirmedTransactionsCacheTest {
 
 		// Assert:
 		// - check the cache state
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(4 * 2 + 1)); // each multisig transaction has an inner transaction
-		Assert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(4 * 2 + 1)); // each multisig transaction has an inner transaction
+		MatcherAssert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
 
 		// - check the cache multisig transaction signatures
-		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-		Assert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
+		MatcherAssert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
 	}
 
 	private static class MultisigTestContext {
@@ -275,9 +277,9 @@ public class UnconfirmedTransactionsCacheTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region add (deterministic)
+	// region add (deterministic)
 
 	@Test
 	public void addedTransactionsAreStoredInOrder() {
@@ -292,13 +294,13 @@ public class UnconfirmedTransactionsCacheTest {
 		}
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(numTransactions));
-		Assert.assertThat(cache.stream().collect(Collectors.toList()), IsEqual.equalTo(transactions));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(numTransactions));
+		MatcherAssert.assertThat(cache.stream().collect(Collectors.toList()), IsEqual.equalTo(transactions));
 	}
 
-	//endregion
+	// endregion
 
-	//region remove
+	// region remove
 
 	@Test
 	public void canRemoveExistingTransactionWithoutChildTransactions() {
@@ -314,11 +316,11 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -338,11 +340,11 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -360,12 +362,12 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(deepCopy(transaction2));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(transaction3), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(transaction3), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -381,10 +383,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -403,10 +405,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -423,17 +425,17 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(innerTransaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
-		Assert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region clear
+	// region clear
 
 	@Test
 	public void clearRemovesAllTransactions() {
@@ -451,11 +453,11 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.clear();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 
 		for (final Transaction transaction : transactions) {
-			Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
 		}
 	}
 
@@ -471,13 +473,13 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.clear();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	//region contains
+	// region contains
 
 	@Test
 	public void containsReturnsTrueForRootTransactions() {
@@ -489,8 +491,8 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction2);
 
 		// Assert:
-		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -504,8 +506,8 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -517,12 +519,12 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction1);
 
 		// Assert:
-		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region stream / flatStream
+	// region stream / flatStream
 
 	@Test
 	public void streamReturnsAllRootTransactions() {
@@ -533,8 +535,7 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(createTransactionWithTwoChildTransaction(30));
 
 		// Assert:
-		Assert.assertThat(
-				cache.stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(cache.stream().map(t -> ((MockTransaction) t).getCustomField()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(10, 20, 30));
 	}
 
@@ -547,12 +548,11 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(createTransactionWithTwoChildTransaction(30));
 
 		// Assert:
-		Assert.assertThat(
-				cache.streamFlat().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(cache.streamFlat().map(t -> ((MockTransaction) t).getCustomField()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(10, 11, 12, 20, 21, 22, 30, 31, 32));
 	}
 
-	//endregion
+	// endregion
 
 	private static MockTransaction deepCopy(final MockTransaction transaction) {
 		final MockTransaction copy = new MockTransaction(transaction.getSigner());

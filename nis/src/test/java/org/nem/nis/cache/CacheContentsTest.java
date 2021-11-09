@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
@@ -13,8 +14,7 @@ public class CacheContentsTest {
 	@Test
 	public void iteratorExposesCopyOfSourceCollection() {
 		// Assert:
-		assertCopyOfSourceCollection(
-				contents -> StreamSupport.stream(contents.spliterator(), false).collect(Collectors.toList()));
+		assertCopyOfSourceCollection(contents -> StreamSupport.stream(contents.spliterator(), false).collect(Collectors.toList()));
 	}
 
 	@Test
@@ -39,10 +39,10 @@ public class CacheContentsTest {
 		final Collection<Integer> cacheCollection = toCollection.apply(contents);
 
 		// Assert:
-		Assert.assertThat(original.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(original.isEmpty(), IsEqual.equalTo(true));
 
 		// Assert:
-		Assert.assertThat(cacheCollection.size(), IsEqual.equalTo(3));
-		Assert.assertThat(cacheCollection, IsEquivalent.equivalentTo(Arrays.asList(6, 2, 5)));
+		MatcherAssert.assertThat(cacheCollection.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cacheCollection, IsEquivalent.equivalentTo(Arrays.asList(6, 2, 5)));
 	}
 }

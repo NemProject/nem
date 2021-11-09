@@ -1,5 +1,6 @@
 package org.nem.nis.cache.delta;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -19,12 +20,12 @@ public class SkipListDeltaMapTest {
 		final SkipListDeltaMap<TimeInstant, Hash> map = new SkipListDeltaMap<>();
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void canCreateMapWithInitialValues() {
-		//Arrange:
+		// Arrange:
 		final Map<TimeInstant, Set<Hash>> initialEntries = createStandardInnerMapEntries();
 		final DefaultSkipListMap<TimeInstant, Hash> innerMap = createInnerMapWithValues(initialEntries);
 
@@ -32,11 +33,11 @@ public class SkipListDeltaMapTest {
 		final SkipListDeltaMap<TimeInstant, Hash> map = new SkipListDeltaMap<>(innerMap);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(6));
-		assertContents(map, Arrays.asList(
-				createEntry(new TimeInstant(7), initialEntries.get(new TimeInstant(7))),
-				createEntry(new TimeInstant(8), initialEntries.get(new TimeInstant(8))),
-				createEntry(new TimeInstant(5), initialEntries.get(new TimeInstant(5)))));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(6));
+		assertContents(map,
+				Arrays.asList(createEntry(new TimeInstant(7), initialEntries.get(new TimeInstant(7))),
+						createEntry(new TimeInstant(8), initialEntries.get(new TimeInstant(8))),
+						createEntry(new TimeInstant(5), initialEntries.get(new TimeInstant(5)))));
 	}
 
 	// endregion
@@ -45,7 +46,7 @@ public class SkipListDeltaMapTest {
 
 	@Test
 	public void clearRemovesAllKeyValuePairs() {
-		//Arrange:
+		// Arrange:
 		final Map<TimeInstant, Set<Hash>> initialEntries = createStandardInnerMapEntries();
 		final SkipListDeltaMap<TimeInstant, Hash> map = new SkipListDeltaMap<>(createInnerMapWithValues(initialEntries));
 
@@ -53,7 +54,7 @@ public class SkipListDeltaMapTest {
 		map.clear();
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -77,28 +78,24 @@ public class SkipListDeltaMapTest {
 		};
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<TimeInstant, Set<Hash>> createStandardInnerMapEntries() {
 		return new HashMap<TimeInstant, Set<Hash>>() {
 			{
-				this.put(new TimeInstant(7), new HashSet<>(Arrays.asList(
-						Utils.generateRandomHash(),
-						Utils.generateRandomHash())));
+				this.put(new TimeInstant(7), new HashSet<>(Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash())));
 				this.put(new TimeInstant(8), Collections.singleton(Utils.generateRandomHash()));
-				this.put(new TimeInstant(5), new HashSet<>(Arrays.asList(
-						Utils.generateRandomHash(),
-						Utils.generateRandomHash(),
-						Utils.generateRandomHash())));
+				this.put(new TimeInstant(5),
+						new HashSet<>(Arrays.asList(Utils.generateRandomHash(), Utils.generateRandomHash(), Utils.generateRandomHash())));
 			}
 		};
 	}
 
-	private static void assertContents(
-			final SkipListDeltaMap<TimeInstant, Hash> map,
+	private static void assertContents(final SkipListDeltaMap<TimeInstant, Hash> map,
 			final Collection<Map.Entry<TimeInstant, Set<Hash>>> entries) {
 		final int count = entries.stream().mapToInt(e -> e.getValue().size()).sum();
-		Assert.assertThat(map.size(), IsEqual.equalTo(count));
-		entries.stream()
-				.forEach(e -> e.getValue().stream().forEach(h -> Assert.assertThat(map.contains(e.getKey(), h), IsEqual.equalTo(true))));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(count));
+		entries.stream().forEach(
+				e -> e.getValue().stream().forEach(h -> MatcherAssert.assertThat(map.contains(e.getKey(), h), IsEqual.equalTo(true))));
 	}
 
 	private static DefaultSkipListMap<TimeInstant, Hash> createInnerMapWithValues(final Map<TimeInstant, Set<Hash>> entries) {

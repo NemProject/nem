@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -26,10 +27,7 @@ public class TransactionDeadlineBlockValidatorTest {
 		assertBlockValidationResult(123, TEST_HEIGHT + 1, 124, ValidationResult.SUCCESS);
 	}
 
-	private static void assertBlockValidationResult(
-			final int blockTimeStamp,
-			final long blockHeight,
-			final int transactionDeadline,
+	private static void assertBlockValidationResult(final int blockTimeStamp, final long blockHeight, final int transactionDeadline,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithTimeStampAndHeight(blockTimeStamp, blockHeight);
@@ -41,7 +39,7 @@ public class TransactionDeadlineBlockValidatorTest {
 		addTransaction(block, transactionDeadline);
 
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(block), IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(VALIDATOR.validate(block), IsEqual.equalTo(expectedResult));
 	}
 
 	private static void addTransaction(final Block block, final int deadline) {

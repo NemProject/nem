@@ -32,10 +32,7 @@ public class PushService {
 	private final HashCache blockHashCache;
 
 	@Autowired(required = true)
-	public PushService(
-			final UnconfirmedTransactions unconfirmedTransactions,
-			final BlockChain blockChain,
-			final NisPeerNetworkHost host,
+	public PushService(final UnconfirmedTransactions unconfirmedTransactions, final BlockChain blockChain, final NisPeerNetworkHost host,
 			final TimeProvider timeProvider) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChain = blockChain;
@@ -97,13 +94,14 @@ public class PushService {
 
 			this.isValid = e -> ValidationResult.SUCCESS;
 			this.isAccepted = e -> ValidationResult.SUCCESS;
-			this.logAdditionalInfo = e -> {};
-			this.broadcaster = e -> {};
+			this.logAdditionalInfo = e -> {
+			};
+			this.broadcaster = e -> {
+			};
 		}
 	}
 
-	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntityWithCache(
-			final PushContext<T> context,
+	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntityWithCache(final PushContext<T> context,
 			final HashCache hashCache) {
 		final Hash hash = HashUtils.calculateHash(context.entity);
 		final ValidationResult cachedResult = hashCache.getCachedResult(hash);
@@ -129,16 +127,14 @@ public class PushService {
 		switch (result) {
 			case FAILURE_TRANSACTION_CACHE_TOO_FULL:
 				return false;
+			default :
+				break;
 		}
 
 		return result.isFailure();
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(final PushContext<T> context) {
-		final String message = String.format("   received: %s from %s  (signer: %s)",
-				context.entity.getType(),
-				context.identity,
-				context.entity.getSigner().getAddress());
 		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();
@@ -166,8 +162,7 @@ public class PushService {
 		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
 		if (status.isSuccess()) {
-			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
-					context.entity,
+			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(context.entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
 			context.broadcaster.accept(secureEntity);
 		}
@@ -177,7 +172,7 @@ public class PushService {
 
 	private static boolean isSameNetwork(final VerifiableEntity entity) {
 		final byte ourNetworkVersion = NetworkInfos.getDefault().getVersion();
-		final byte remoteNetworkVersion = (byte)(entity.getVersion() >>> 24);
+		final byte remoteNetworkVersion = (byte) (entity.getVersion() >>> 24);
 		return ourNetworkVersion == remoteNetworkVersion;
 	}
 

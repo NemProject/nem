@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -71,11 +72,12 @@ public class HarvestingTaskTest {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void harvestedBlockIsPushedIfItPassesBlockChainProcessing() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block block = createSignedBlock();
-		final Hash blockHash = HashUtils.calculateHash((SerializableEntity)block);
+		final Hash blockHash = HashUtils.calculateHash((SerializableEntity) block);
 		Mockito.when(context.harvester.harvestBlock()).thenReturn(block);
 		Mockito.when(context.blockChain.processBlock(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
@@ -90,8 +92,8 @@ public class HarvestingTaskTest {
 		Mockito.verify(context.network, Mockito.times(1)).broadcast(Mockito.eq(NisPeerId.REST_PUSH_BLOCK), captor.capture());
 
 		final Hash entityHash = HashUtils.calculateHash(captor.getValue().getEntity());
-		Assert.assertThat(entityHash, IsEqual.equalTo(blockHash));
-		Assert.assertThat(captor.getValue().getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
+		MatcherAssert.assertThat(entityHash, IsEqual.equalTo(blockHash));
+		MatcherAssert.assertThat(captor.getValue().getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
 	}
 
 	private static Block createSignedBlock() {

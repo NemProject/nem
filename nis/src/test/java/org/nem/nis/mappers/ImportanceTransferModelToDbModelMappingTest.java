@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -8,7 +9,9 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
+public class ImportanceTransferModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToDbModel() {
@@ -38,11 +41,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 
 	@Override
 	protected ImportanceTransferTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new ImportanceTransferTransaction(
-				timeStamp,
-				sender,
-				ImportanceTransferMode.Activate,
-				Utils.generateRandomAccount());
+		return new ImportanceTransferTransaction(timeStamp, sender, ImportanceTransferMode.Activate, Utils.generateRandomAccount());
 	}
 
 	@Override
@@ -61,22 +60,16 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		}
 
 		public ImportanceTransferTransaction createModel(final ImportanceTransferMode mode) {
-			return new ImportanceTransferTransaction(
-					TimeInstant.ZERO,
-					Utils.generateRandomAccount(),
-					mode,
-					this.remote);
+			return new ImportanceTransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), mode, this.remote);
 		}
 
-		public void assertDbModel(
-				final DbImportanceTransferTransaction dbModel,
-				final Integer expectedMode,
+		public void assertDbModel(final DbImportanceTransferTransaction dbModel, final Integer expectedMode,
 				final ImportanceTransferTransaction model) {
-			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
-			Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(expectedMode));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
+			MatcherAssert.assertThat(dbModel.getMode(), IsEqual.equalTo(expectedMode));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
+			MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
 	}
 }

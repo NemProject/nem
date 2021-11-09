@@ -112,6 +112,7 @@ public class NemesisBlockCreator {
 		this.saveNemesisBlock(block);
 	}
 
+	@SuppressWarnings("try")
 	private void saveNemesisBlock(final Block block) {
 		final BinarySerializer serializer = new BinarySerializer();
 		block.serialize(serializer);

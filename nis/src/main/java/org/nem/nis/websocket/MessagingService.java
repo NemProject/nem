@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
 @Service
 public class MessagingService implements BlockListener, UnconfirmedTransactionListener {
 	public static final BlockHeight JS_MAX_SAFE_INTEGER = new BlockHeight(9007199254740991L); // 2^53 -1
@@ -68,16 +67,10 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	// TODO 20151204 G-G: probably /node/info related part should be moved to separate messaging service
 	@Autowired
-	public MessagingService(
-			final BlockChain blockChain,
-			final UnconfirmedState unconfirmedState,
-			final SimpMessagingTemplate messagingTemplate,
-			final AccountInfoFactory accountInfoFactory,
-			final AccountMetaDataFactory accountMetaDataFactory,
-			final MosaicInfoFactory mosaicInfoFactory,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
-			final NisPeerNetworkHost host)
-	{
+	public MessagingService(final BlockChain blockChain, final UnconfirmedState unconfirmedState,
+			final SimpMessagingTemplate messagingTemplate, final AccountInfoFactory accountInfoFactory,
+			final AccountMetaDataFactory accountMetaDataFactory, final MosaicInfoFactory mosaicInfoFactory,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions, final NisPeerNetworkHost host) {
 		this.messagingTemplate = messagingTemplate;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountMetaDataFactory = accountMetaDataFactory;
@@ -101,9 +94,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	/**
-	 * Pushes new block to a /block endpoint and transactions within a block involving
-	 * observed acconuts into /transactions/<address> endpoint.
-	 * Finally pushes accounts that could change within a block to /account/<address> endpoint.
+	 * Pushes new block to a /block endpoint and transactions within a block involving observed acconuts into /transactions/<address>
+	 * endpoint. Finally pushes accounts that could change within a block to /account/<address> endpoint.
 	 *
 	 * @param block Block to be pushed
 	 */
@@ -131,18 +123,23 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		this.messagingTemplate.convertAndSend("/node/info", node);
 	}
 
-	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction) {
+	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height,
+			final Transaction transaction) {
 		pushTransaction(prefix, blockChangedAccounts, height, transaction, null);
 	}
 
-	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
-		final TransactionMetaDataPair transactionMetaDataPair = transaction.getType() != TransactionTypes.MULTISIG ?
-				(optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction))))
+	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height,
+			final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
+		final TransactionMetaDataPair transactionMetaDataPair = transaction.getType() != TransactionTypes.MULTISIG
+				? (optionalMetaDataPair != null
+						? optionalMetaDataPair
+						: new TransactionMetaDataPair(transaction,
+								new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction))))
 				: null;
 
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
-				final TransferTransaction t = (TransferTransaction)transaction;
+				final TransferTransaction t = (TransferTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getRecipient().getAddress());
 
@@ -152,38 +149,37 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 					}
 					blockChangedAccounts.addAccountMosaic(t.getRecipient().getAddress());
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
-					t.getMosaics().stream()
-							.map(m -> this.mosaicInfoFactory.getMosaicDefinition(m.getMosaicId()))
+					t.getMosaics().stream().map(m -> this.mosaicInfoFactory.getMosaicDefinition(m.getMosaicId()))
 							.filter(m -> m != null && m.getMosaicLevy() != null)
 							.forEach(m -> blockChangedAccounts.addAccountMosaic(m.getMosaicLevy().getRecipient().getAddress()));
 				}
 			}
-			break;
+				break;
 			case TransactionTypes.IMPORTANCE_TRANSFER: {
-				final ImportanceTransferTransaction t = (ImportanceTransferTransaction)transaction;
+				final ImportanceTransferTransaction t = (ImportanceTransferTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getRemote().getAddress());
 			}
-			break;
+				break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION: {
-				final MultisigAggregateModificationTransaction t = (MultisigAggregateModificationTransaction)transaction;
+				final MultisigAggregateModificationTransaction t = (MultisigAggregateModificationTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				for (final MultisigCosignatoryModification modification : t.getCosignatoryModifications()) {
 					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, modification.getCosignatory().getAddress());
 				}
 			}
-			break;
+				break;
 			case TransactionTypes.PROVISION_NAMESPACE: {
-				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction)transaction;
+				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				if (blockChangedAccounts != null) {
 					blockChangedAccounts.addAccountNamespace(t.getSigner().getAddress());
 				}
 				// 20151123 TODO: does it make sense to push to .getRentalFeeSink too? (I doubt it)
 			}
-			break;
+				break;
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION: {
-				final MosaicDefinitionCreationTransaction t = (MosaicDefinitionCreationTransaction)transaction;
+				final MosaicDefinitionCreationTransaction t = (MosaicDefinitionCreationTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				if (blockChangedAccounts != null) {
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
@@ -197,7 +193,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				}
 				// 20151123 TODO: does it make sense to push to .getMosaicFeeSink too? (I doubt it)
 			}
-			break;
+				break;
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE: {
 				final MosaicSupplyChangeTransaction t = (MosaicSupplyChangeTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
@@ -214,22 +210,26 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 					}
 				}
 			}
-			break;
+				break;
 			case TransactionTypes.MULTISIG: {
-				final MultisigTransaction t = (MultisigTransaction)transaction;
-				final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t), HashUtils.calculateHash(t.getOtherTransaction())));
+				final MultisigTransaction t = (MultisigTransaction) transaction;
+				final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(t,
+						new TransactionMetaData(height, 0L, HashUtils.calculateHash(t), HashUtils.calculateHash(t.getOtherTransaction())));
 				pushToAddress(prefix, blockChangedAccounts, metaDataPair, t.getSigner().getAddress());
 				this.pushTransaction(prefix, blockChangedAccounts, height, t.getOtherTransaction(), metaDataPair);
 			}
-			break;
-			default:
+				break;
+			default :
 				break;
 		}
 	}
 
-	private void pushToAddress(String prefix, BlockChangedAccounts blockChangedAccounts, TransactionMetaDataPair transactionMetaDataPair, Address signerAddress) {
+	private void pushToAddress(String prefix, BlockChangedAccounts blockChangedAccounts, TransactionMetaDataPair transactionMetaDataPair,
+			Address signerAddress) {
 		if (this.observedAddresses.contains(signerAddress)) {
-			if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(signerAddress); }
+			if (blockChangedAccounts != null) {
+				blockChangedAccounts.addAccount(signerAddress);
+			}
 			this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, signerAddress), transactionMetaDataPair);
 		}
 	}
@@ -241,8 +241,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	/**
-	 * Publishes unconfirmed transaction to /unconfirmed endpoint.
-	 * If involved account is observed also pushes to /unconfirmed/<address> endpoint.
+	 * Publishes unconfirmed transaction to /unconfirmed endpoint. If involved account is observed also pushes to /unconfirmed/<address>
+	 * endpoint.
 	 *
 	 * @param transaction Unconfirmed transaction.
 	 * @param validationResult Result of a validation, only successful transactions are
@@ -290,8 +290,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	public void pushOwnedMosaicDefinition(final Address address) {
-		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address)
-				.forEach(t -> this.pushMosaicDefinition(address, t));
+		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address).forEach(t -> this.pushMosaicDefinition(address, t));
 	}
 
 	private void pushMosaicDefinition(final Address address, final MosaicDefinitionSupplyPair mosaicDefinitionSupplyPair) {
@@ -299,8 +298,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	public void pushOwnedMosaic(final Address address) {
-		this.mosaicInfoFactory.getAccountOwnedMosaics(address)
-				.forEach(t -> this.pushMosaic(address, t));
+		this.mosaicInfoFactory.getAccountOwnedMosaics(address).forEach(t -> this.pushMosaic(address, t));
 	}
 
 	private void pushMosaic(final Address address, final Mosaic mosaic) {
@@ -308,8 +306,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	public void pushOwnedNamespace(final Address address) {
-		this.mosaicInfoFactory.getAccountOwnedNamespaces(address)
-				.forEach(t -> this.pushNamespace(address, t));
+		this.mosaicInfoFactory.getAccountOwnedNamespaces(address).forEach(t -> this.pushNamespace(address, t));
 	}
 
 	private void pushNamespace(final Address address, final Namespace namespace) {

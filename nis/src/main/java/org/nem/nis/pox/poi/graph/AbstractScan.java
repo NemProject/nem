@@ -40,8 +40,7 @@ public abstract class AbstractScan {
 	}
 
 	/**
-	 * Builds a cluster around the specified community.
-	 * <em>This function is only called for unclassified core communities.</em>
+	 * Builds a cluster around the specified community. <em>This function is only called for unclassified core communities.</em>
 	 *
 	 * @param community The community to cluster around.
 	 */
@@ -79,8 +78,8 @@ public abstract class AbstractScan {
 
 	private boolean isHub(final Community community) {
 		final HashSet<ClusterId> connectedClusterIds = new HashSet<>();
-		return this.isHub(connectedClusterIds, community.getDissimilarNeighbors()) ||
-				this.isHub(connectedClusterIds, community.getSimilarNeighbors());
+		return this.isHub(connectedClusterIds, community.getDissimilarNeighbors())
+				|| this.isHub(connectedClusterIds, community.getSimilarNeighbors());
 	}
 
 	private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {
@@ -120,7 +119,7 @@ public abstract class AbstractScan {
 		}
 	}
 
-	//region getters / setters
+	// region getters / setters
 
 	/**
 	 * Gets the neighborhood.
@@ -162,9 +161,9 @@ public abstract class AbstractScan {
 		return null != state && NON_MEMBER_CLUSTER_ID != state;
 	}
 
-	//endregion
+	// endregion
 
-	//region cluster functions
+	// region cluster functions
 
 	/**
 	 * Adds the specified cluster.
@@ -225,5 +224,5 @@ public abstract class AbstractScan {
 		return cluster;
 	}
 
-	//endregion
+	// endregion
 }

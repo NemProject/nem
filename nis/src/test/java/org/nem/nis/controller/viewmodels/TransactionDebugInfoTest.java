@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -12,7 +13,7 @@ import java.text.ParseException;
 
 public class TransactionDebugInfoTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void constructorParametersAreApplied() {
@@ -26,21 +27,22 @@ public class TransactionDebugInfoTest {
 		final String message = "Test message";
 
 		// Act:
-		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee, message);
+		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee,
+				message);
 
 		// Assert:
-		Assert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
-		Assert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
-		Assert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
-		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
-		Assert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
+		MatcherAssert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
+		MatcherAssert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
+		MatcherAssert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
+		MatcherAssert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void canRoundtripTransactionDebugInfo() throws ParseException {
@@ -52,21 +54,22 @@ public class TransactionDebugInfoTest {
 		final Amount amount = Amount.fromNem(100);
 		final Amount fee = Amount.fromNem(10);
 		final String message = "Test message";
-		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount, fee, message);
+		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp, deadline, sender, recipient, amount,
+				fee, message);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransactionDebugInfo, null);
 		final TransactionDebugInfo transactionDebugInfo = new TransactionDebugInfo(deserializer);
 
 		// Assert:
-		Assert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
-		Assert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
-		Assert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
-		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
-		Assert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
+		MatcherAssert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
+		MatcherAssert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
+		MatcherAssert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
+		MatcherAssert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
+		MatcherAssert.assertThat(transactionDebugInfo.getMessage(), IsEqual.equalTo(message));
 	}
 
-	//endregion
+	// endregion
 }

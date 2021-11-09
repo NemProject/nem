@@ -38,10 +38,8 @@ public class NodeNeighborMap implements NeighborhoodRepository {
 			nonZeroEntries.addAll(getNonZeroRowElements(matrix, row));
 			nonZeroEntries.addAll(getNonZeroRowElements(transposedMatrix, row));
 
-			final List<MatrixElement> elements = nonZeroEntries.stream()
-					.distinct()
-					.sorted((e1, e2) -> e1.getColumn().compareTo(e2.getColumn()))
-					.collect(Collectors.toList());
+			final List<MatrixElement> elements = nonZeroEntries.stream().distinct()
+					.sorted((e1, e2) -> e1.getColumn().compareTo(e2.getColumn())).collect(Collectors.toList());
 			for (final MatrixElement e : elements) {
 				final NodeId neighborId = new NodeId(e.getColumn());
 				if (null == nodeNeighbors) {

@@ -10,8 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Multisig Signer Modification db entity
- * <br>
+ * Multisig Signer Modification db entity <br>
  * Holds information about Transactions having type TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
  */
 @Entity
@@ -37,7 +36,8 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 		return this.multisigMinCosignatoriesModification;
 	}
 
-	public void setMultisigMinCosignatoriesModification(final DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModifications) {
+	public void setMultisigMinCosignatoriesModification(
+			final DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModifications) {
 		this.multisigMinCosignatoriesModification = multisigMinCosignatoriesModifications;
 	}
 

@@ -16,7 +16,5 @@ public interface PoxFacade extends ReadOnlyPoxFacade {
 	 * @param blockHeight The block height.
 	 * @param accountStates The account states.
 	 */
-	void recalculateImportances(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates);
+	void recalculateImportances(final BlockHeight blockHeight, final Collection<AccountState> accountStates);
 }

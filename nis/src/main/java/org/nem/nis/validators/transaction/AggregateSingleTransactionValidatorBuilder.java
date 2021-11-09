@@ -27,7 +27,8 @@ public class AggregateSingleTransactionValidatorBuilder {
 	 * @param validator The validator to add.
 	 */
 	public void add(final BatchTransactionValidator validator) {
-		this.validators.add((transaction, context) -> validator.validate(Collections.singletonList(new TransactionsContextPair(transaction, context))));
+		this.validators.add(
+				(transaction, context) -> validator.validate(Collections.singletonList(new TransactionsContextPair(transaction, context))));
 	}
 
 	/**
@@ -48,16 +49,13 @@ public class AggregateSingleTransactionValidatorBuilder {
 
 		@Override
 		public String getName() {
-			return this.validators.stream()
-					.map(NamedValidator::getName)
-					.collect(Collectors.joining(","));
+			return this.validators.stream().map(NamedValidator::getName).collect(Collectors.joining(","));
 		}
 
 		@Override
 		public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-			return ValidationResult.aggregate(this.validators.stream()
-					.map(validator -> validator.validate(transaction, context))
-					.iterator());
+			return ValidationResult
+					.aggregate(this.validators.stream().map(validator -> validator.validate(transaction, context)).iterator());
 		}
 	}
 }

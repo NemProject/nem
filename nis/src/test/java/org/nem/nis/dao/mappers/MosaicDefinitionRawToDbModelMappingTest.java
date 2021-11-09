@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -23,17 +24,17 @@ public class MosaicDefinitionRawToDbModelMappingTest {
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creatorId, DbAccount.class);
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.recipientId, DbAccount.class);
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
-		Assert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
-		Assert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
-		Assert.assertThat(dbModel.getFeeType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getFeeRecipient(), IsEqual.equalTo(context.dbRecipient));
-		Assert.assertThat(dbModel.getFeeDbMosaicId(), IsEqual.equalTo(234L));
-		Assert.assertThat(dbModel.getFeeQuantity(), IsEqual.equalTo(345L));
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
+		MatcherAssert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
+		MatcherAssert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
+		MatcherAssert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
+		MatcherAssert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
+		MatcherAssert.assertThat(dbModel.getFeeType(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbModel.getFeeRecipient(), IsEqual.equalTo(context.dbRecipient));
+		MatcherAssert.assertThat(dbModel.getFeeDbMosaicId(), IsEqual.equalTo(234L));
+		MatcherAssert.assertThat(dbModel.getFeeQuantity(), IsEqual.equalTo(345L));
 	}
 
 	@Test
@@ -47,17 +48,17 @@ public class MosaicDefinitionRawToDbModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creatorId, DbAccount.class);
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
-		Assert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
-		Assert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
-		Assert.assertThat(dbModel.getFeeType(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getFeeRecipient(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getFeeDbMosaicId(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getFeeQuantity(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
+		MatcherAssert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
+		MatcherAssert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
+		MatcherAssert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
+		MatcherAssert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
+		MatcherAssert.assertThat(dbModel.getFeeType(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getFeeRecipient(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getFeeDbMosaicId(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel.getFeeQuantity(), IsNull.nullValue());
 	}
 
 	private IMapping<Object[], DbMosaicDefinition> createMapping(final IMapper mapper) {
@@ -78,16 +79,16 @@ public class MosaicDefinitionRawToDbModelMappingTest {
 
 		private Object[] createRaw(final boolean hasFee) {
 			final Object[] raw = new Object[9];
-			raw[0] = BigInteger.valueOf(123L);                    // id
-			raw[1] = BigInteger.valueOf(this.creatorId);          // creator id
-			raw[2] = "Alice's vouchers";                          // name
-			raw[3] = "precious vouchers";                         // description
-			raw[4] = "alice.voucher";                             // namespace id
+			raw[0] = BigInteger.valueOf(123L); // id
+			raw[1] = BigInteger.valueOf(this.creatorId); // creator id
+			raw[2] = "Alice's vouchers"; // name
+			raw[3] = "precious vouchers"; // description
+			raw[4] = "alice.voucher"; // namespace id
 			if (hasFee) {
-				raw[5] = 1;                                       // fee type
-				raw[6] = BigInteger.valueOf(this.recipientId);    // fee recipient id
-				raw[7] = BigInteger.valueOf(234L);                // fee db mosaic id
-				raw[8] = BigInteger.valueOf(345L);                // fee quantity
+				raw[5] = 1; // fee type
+				raw[6] = BigInteger.valueOf(this.recipientId); // fee recipient id
+				raw[7] = BigInteger.valueOf(234L); // fee db mosaic id
+				raw[8] = BigInteger.valueOf(345L); // fee quantity
 			}
 			return raw;
 		}

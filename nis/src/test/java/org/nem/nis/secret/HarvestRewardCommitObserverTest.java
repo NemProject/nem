@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import org.nem.nis.test.NisUtils;
 
 public class HarvestRewardCommitObserverTest {
 
-	//region execute
+	// region execute
 
 	@Test
 	public void harvestRewardExecuteIncrementsHarvestedBlocks() {
@@ -24,7 +25,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
 	}
 
 	@Test
@@ -36,12 +37,12 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region undo
 
 	@Test
 	public void harvestRewardUndoDecrementsHarvestedBlocks() {
@@ -52,7 +53,7 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	@Test
@@ -64,11 +65,12 @@ public class HarvestRewardCommitObserverTest {
 		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
-	//endregion
 
-	//region other types
+	// endregion
+
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -76,16 +78,15 @@ public class HarvestRewardCommitObserverTest {
 		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account, Amount.fromNem(22)),
+		context.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account, Amount.fromNem(22)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		MatcherAssert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddress();
@@ -106,14 +107,12 @@ public class HarvestRewardCommitObserverTest {
 		}
 
 		private void notifyHarvestRewardExecute() {
-			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 		}
 
 		public void notifyHarvestRewardUndo() {
-			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 		}
 	}

@@ -23,12 +23,8 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 	private final TimeProvider timeProvider;
 	private final PeerNetworkState networkState;
 
-	public NisTimeSynchronizer(
-			final NodeSelector selector,
-			final TimeSynchronizationStrategy syncStrategy,
-			final TimeSynchronizationConnector connector,
-			final TimeProvider timeProvider,
-			final PeerNetworkState networkState) {
+	public NisTimeSynchronizer(final NodeSelector selector, final TimeSynchronizationStrategy syncStrategy,
+			final TimeSynchronizationConnector connector, final TimeProvider timeProvider, final PeerNetworkState networkState) {
 		this.selector = selector;
 		this.syncStrategy = syncStrategy;
 		this.connector = connector;
@@ -41,30 +37,26 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		final List<Node> nodes = this.selector.selectNodes();
 		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
-		final CompletableFuture[] futures = new CompletableFuture[nodes.size()];
+		final CompletableFuture<?>[] futures = new CompletableFuture<?>[nodes.size()];
 		int i = 0;
 		for (final Node n : nodes) {
 			final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();
-			final CompletableFuture<TimeSynchronizationSample> future = this.connector.getCommunicationTimeStamps(n)
-					.thenApply(c -> {
-						final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
-						final TimeSynchronizationSample sample = new TimeSynchronizationSample(
-								n,
-								new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp),
-								c);
-						samples.add(sample);
-						return sample;
-					});
+			final CompletableFuture<TimeSynchronizationSample> future = this.connector.getCommunicationTimeStamps(n).thenApply(c -> {
+				final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
+				final TimeSynchronizationSample sample = new TimeSynchronizationSample(n,
+						new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp), c);
+				samples.add(sample);
+				return sample;
+			});
 			futures[i++] = future;
 		}
 
-		return CompletableFuture.allOf(futures)
-				.whenComplete((o, e) -> {
-					TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
-					timeOffset = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(timeOffset.getRaw())
-							? timeOffset
-							: new TimeOffset(0);
-					this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
-				});
+		return CompletableFuture.allOf(futures).whenComplete((o, e) -> {
+			TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
+			timeOffset = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(timeOffset.getRaw())
+					? timeOffset
+					: new TimeOffset(0);
+			this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
+		});
 	}
 }

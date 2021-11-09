@@ -1,5 +1,6 @@
 package org.nem.nis.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -15,62 +16,57 @@ public class DefaultPeerNetworkServicesFactoryTest {
 	@Test
 	public void createInactiveNodePrunerReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createInactiveNodePruner(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createInactiveNodePruner(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createLocalNodeEndpointUpdaterReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createLocalNodeEndpointUpdater(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createLocalNodeEndpointUpdater(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createNodeBroadcasterReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createNodeBroadcaster(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createNodeBroadcaster(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createNodeRefresherReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createNodeRefresher(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createNodeRefresher(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createNodeSynchronizerReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createNodeSynchronizer(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createNodeSynchronizer(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createNodeExperienceUpdaterReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createNodeExperiencesUpdater(Mockito.mock(SystemTimeProvider.class)),
+		MatcherAssert.assertThat(createFactory().createNodeExperiencesUpdater(Mockito.mock(SystemTimeProvider.class)),
 				IsNull.notNullValue());
 	}
 
 	@Test
 	public void getChainServicesReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().getChainServices(), IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().getChainServices(), IsNull.notNullValue());
 	}
 
 	@Test
 	public void createTimeSynchronizerReturnsNonNull() {
 		// Assert:
-		Assert.assertThat(createFactory().createTimeSynchronizer(Mockito.mock(ImportanceAwareNodeSelector.class), Mockito.mock(SystemTimeProvider.class)),
-				IsNull.notNullValue());
+		MatcherAssert.assertThat(createFactory().createTimeSynchronizer(Mockito.mock(ImportanceAwareNodeSelector.class),
+				Mockito.mock(SystemTimeProvider.class)), IsNull.notNullValue());
 	}
 
 	private static PeerNetworkServicesFactory createFactory() {
-		return new DefaultPeerNetworkServicesFactory(
-				Mockito.mock(PeerNetworkState.class),
-				Mockito.mock(PeerConnector.class),
-				Mockito.mock(TimeSynchronizationConnector.class),
-				Mockito.mock(SyncConnectorPool.class),
-				Mockito.mock(BlockSynchronizer.class),
-				Mockito.mock(ChainServices.class),
-				Mockito.mock(TimeSynchronizationStrategy.class),
+		return new DefaultPeerNetworkServicesFactory(Mockito.mock(PeerNetworkState.class), Mockito.mock(PeerConnector.class),
+				Mockito.mock(TimeSynchronizationConnector.class), Mockito.mock(SyncConnectorPool.class),
+				Mockito.mock(BlockSynchronizer.class), Mockito.mock(ChainServices.class), Mockito.mock(TimeSynchronizationStrategy.class),
 				Mockito.mock(NodeCompatibilityChecker.class));
 	}
 }

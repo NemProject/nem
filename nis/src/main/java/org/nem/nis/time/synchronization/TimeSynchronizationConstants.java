@@ -26,16 +26,14 @@ public class TimeSynchronizationConstants {
 	public static final double COUPLING_DECAY_STRENGTH = 0.3;
 
 	/**
-	 * Value that indicates how large the change in network time must be
-	 * in order to update the node's network time.
-	 * This constant is used to prevent slow shifts in network time.
-	 * The unit of this constant is milli seconds.
+	 * Value that indicates how large the change in network time must be in order to update the node's network time. This constant is used
+	 * to prevent slow shifts in network time. The unit of this constant is milli seconds.
 	 */
 	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 75;
 
 	/**
-	 * The minimum importance a node must have in order to be considered as synchronization partner.
-	 * The value corresponds to having a vested balance of 1 NEM stake.
+	 * The minimum importance a node must have in order to be considered as synchronization partner. The value corresponds to having a
+	 * vested balance of 1 NEM stake.
 	 */
 	public static final double REQUIRED_MINIMUM_IMPORTANCE = 0.00025;
 }

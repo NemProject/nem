@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -19,7 +20,7 @@ import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.createMockTransa
 public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
 
-	//region getAll
+	// region getAll
 
 	@Test
 	public void getAllReturnsAllTransactions() {
@@ -31,7 +32,7 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
 	}
 
 	@Test
@@ -46,10 +47,10 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7, 9)));
 	}
 
-	//endregion
+	// endregion
 
 	// region getUnknownTransactions
 
@@ -65,7 +66,7 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
 	}
 
 	@Test
@@ -84,8 +85,7 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(
-				unknownTransactions,
+		MatcherAssert.assertThat(unknownTransactions,
 				IsEquivalent.equivalentTo(Arrays.asList(transactions.get(0), transactions.get(3), transactions.get(5))));
 	}
 
@@ -96,20 +96,19 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		final Account account = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = createMockTransactionsWithRandomTimeStamp(account, 6);
 		context.addAll(transactions);
-		final List<HashShortId> hashShortIds = transactions.stream()
-				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+		final List<HashShortId> hashShortIds = transactions.stream().map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
 
 		// Act:
 		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
 	}
 
 	// endregion
 
-	//region getMostRecentTransactionsForAccount
+	// region getMostRecentTransactionsForAccount
 
 	@Test
 	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
@@ -119,10 +118,11 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(),
+				20);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
 	}
 
 	@Test
@@ -133,10 +133,11 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 20));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(),
+				10);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
 	}
 
 	@Test
@@ -147,10 +148,11 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(),
+				10);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
 	}
 
 	@Test
@@ -161,19 +163,20 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 25);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(),
+				25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
 		for (final Transaction tx : mostRecentTransactions) {
-			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
 			curTimeStamp = tx.getTimeStamp();
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getTransactionsBefore
+	// region getTransactionsBefore
 
 	@Test
 	public void getTransactionsBeforeReturnsAllTransactionsBeforeSpecifiedTimeInstant() {
@@ -183,10 +186,11 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 
 		// Act:
 		final TimeInstant timeThreshold = new TimeInstant(CURRENT_TIME + 8);
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
+		final List<Integer> customFieldValues = MockTransactionUtils
+				.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
 	@Test
@@ -199,15 +203,16 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 
 		// Act:
 		final TimeInstant timeThreshold = new TimeInstant(CURRENT_TIME + 9);
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
+		final List<Integer> customFieldValues = MockTransactionUtils
+				.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7)));
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private TestContext createTestContext() {
 		return new TestContext(this::createUnconfirmedTransactions);
@@ -220,5 +225,5 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		}
 	}
 
-	//endregion
+	// endregion
 }

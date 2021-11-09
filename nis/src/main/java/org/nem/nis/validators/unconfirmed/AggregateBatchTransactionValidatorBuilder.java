@@ -39,16 +39,13 @@ public class AggregateBatchTransactionValidatorBuilder {
 
 		@Override
 		public String getName() {
-			return this.validators.stream()
-					.map(NamedValidator::getName)
-					.collect(Collectors.joining(","));
+			return this.validators.stream().map(NamedValidator::getName).collect(Collectors.joining(","));
 		}
 
 		@Override
 		public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
-			return ValidationResult.aggregate(this.validators.stream()
-					.map(validator -> validator.validate(groupedTransactions))
-					.iterator());
+			return ValidationResult
+					.aggregate(this.validators.stream().map(validator -> validator.validate(groupedTransactions)).iterator());
 		}
 	}
 }

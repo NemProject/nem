@@ -1,16 +1,19 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
 public class TransactionValidatorFactoryTest {
 
-	//region single
+	// region single
 
 	@Test
 	public void createSingleAddsDesiredSingleValidators() {
@@ -57,6 +60,7 @@ public class TransactionValidatorFactoryTest {
 		return expectedClasses;
 	}
 
+	@SuppressWarnings("serial")
 	private static Collection<String> getIncompleteSingleValidatorNames() {
 		return new ArrayList<String>() {
 			{
@@ -74,6 +78,7 @@ public class TransactionValidatorFactoryTest {
 
 				this.add("MultisigNonOperationalValidator");
 				this.add("MultisigTransactionSignerValidator");
+				this.add("FeeSinkNonOperationalValidator");
 				this.add("NumCosignatoryRangeValidator");
 				this.add("MultisigCosignatoryModificationValidator");
 
@@ -86,9 +91,9 @@ public class TransactionValidatorFactoryTest {
 		};
 	}
 
-	//endregion
+	// endregion
 
-	//region batch
+	// region batch
 
 	@Test
 	public void createBatchAddsDesiredBatchValidators() {
@@ -103,17 +108,17 @@ public class TransactionValidatorFactoryTest {
 		assertAreEquivalent(name, expectedSubValidatorNames);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertAreEquivalent(final String name, final Collection<String> expectedSubValidatorNames) {
 		// Act:
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
+		MatcherAssert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
 	}
 
 	private static TransactionValidatorFactory createFactory() {
-		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), false);
+		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), NetworkInfos.getDefault(), new ForkConfiguration(), false);
 	}
 }

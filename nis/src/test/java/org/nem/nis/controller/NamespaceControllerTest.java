@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,15 +22,13 @@ import java.util.stream.Collectors;
 
 public class NamespaceControllerTest {
 
-	//region getRoots
+	// region getRoots
 
 	@Test
 	public void getRootsReturnsAllRoots() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Collection<DbNamespace> dbNamespaces = Arrays.asList(
-				createDbNamespace(8L, "a"),
-				createDbNamespace(5L, "b"),
+		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace(8L, "a"), createDbNamespace(5L, "b"),
 				createDbNamespace(11L, "c"));
 		Mockito.when(context.namespaceDao.getRootNamespaces(444L, 12)).thenReturn(dbNamespaces);
 		Mockito.when(context.namespaceDao.getRootNamespaces(11L, 12)).thenReturn(Collections.emptyList());
@@ -46,21 +45,15 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getRootNamespaces(11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
-				projectNamespaces(pairs, p -> p.getMetaData().getId()),
-				IsEquivalent.equivalentTo(8L, 5L, 11L));
-		Assert.assertThat(
-				projectNamespaces(pairs, p -> p.getEntity().getId().toString()),
-				IsEquivalent.equivalentTo("a", "b", "c"));
+		MatcherAssert.assertThat(projectNamespaces(pairs, p -> p.getMetaData().getId()), IsEquivalent.equivalentTo(8L, 5L, 11L));
+		MatcherAssert.assertThat(projectNamespaces(pairs, p -> p.getEntity().getId().toString()), IsEquivalent.equivalentTo("a", "b", "c"));
 	}
 
 	@Test
 	public void getRootsFiltersExpiredRoots() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Collection<DbNamespace> dbNamespaces = Arrays.asList(
-				createDbNamespace(8L, "a"),
-				createDbNamespace(5L, "b"),
+		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace(8L, "a"), createDbNamespace(5L, "b"),
 				createDbNamespace(11L, "c"));
 		Mockito.when(context.namespaceDao.getRootNamespaces(444L, 12)).thenReturn(dbNamespaces);
 		Mockito.when(context.namespaceDao.getRootNamespaces(11L, 12)).thenReturn(Collections.emptyList());
@@ -78,17 +71,13 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getRootNamespaces(11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
-				projectNamespaces(pairs, p -> p.getMetaData().getId()),
-				IsEquivalent.equivalentTo(8L, 11L));
-		Assert.assertThat(
-				projectNamespaces(pairs, p -> p.getEntity().getId().toString()),
-				IsEquivalent.equivalentTo("a", "c"));
+		MatcherAssert.assertThat(projectNamespaces(pairs, p -> p.getMetaData().getId()), IsEquivalent.equivalentTo(8L, 11L));
+		MatcherAssert.assertThat(projectNamespaces(pairs, p -> p.getEntity().getId().toString()), IsEquivalent.equivalentTo("a", "c"));
 	}
 
-	//endregion
+	// endregion
 
-	//region get
+	// region get
 
 	@Test
 	public void getOfKnownNamespaceReturnsKnownNamespace() {
@@ -104,7 +93,7 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespace(id);
 		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(namespace.getId(), IsEqual.equalTo(id));
+		MatcherAssert.assertThat(namespace.getId(), IsEqual.equalTo(id));
 	}
 
 	@Test
@@ -130,18 +119,16 @@ public class NamespaceControllerTest {
 		ExceptionAssert.assertThrows(v -> context.controller.get(createIdBuilder(id)), MissingResourceException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region accountNamespaces
+	// region accountNamespaces
 
 	@Test
 	public void accountNamespacesDelegatesToNamespaceDao() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
-		final Collection<DbNamespace> dbNamespaces = Arrays.asList(
-				createDbNamespace(8L, "a"),
-				createDbNamespace(5L, "b"),
+		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace(8L, "a"), createDbNamespace(5L, "b"),
 				createDbNamespace(11L, "c"));
 		Mockito.when(context.namespaceDao.getNamespacesForAccount(address, new NamespaceId("foo"), 12)).thenReturn(dbNamespaces);
 
@@ -159,8 +146,7 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
-				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
 
@@ -169,9 +155,7 @@ public class NamespaceControllerTest {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
-		final Collection<DbNamespace> dbNamespaces = Arrays.asList(
-				createDbNamespace(8L, "a"),
-				createDbNamespace(5L, "b"),
+		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace(8L, "a"), createDbNamespace(5L, "b"),
 				createDbNamespace(11L, "c"));
 		Mockito.when(context.namespaceDao.getNamespacesForAccount(address, new NamespaceId("foo"), 12)).thenReturn(dbNamespaces);
 		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(new NamespaceId("b"))).thenReturn(false);
@@ -190,14 +174,14 @@ public class NamespaceControllerTest {
 		Mockito.verify(context.namespaceDao, Mockito.times(1)).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
-		Assert.assertThat(
-				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
+		MatcherAssert.assertThat(namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("a", "c"));
 	}
 
-	//endregion
+	// endregion
 
-	private static <T> List<T> projectNamespaces(final SerializableList<NamespaceMetaDataPair> namespaces, final Function<NamespaceMetaDataPair, T> map) {
+	private static <T> List<T> projectNamespaces(final SerializableList<NamespaceMetaDataPair> namespaces,
+			final Function<NamespaceMetaDataPair, T> map) {
 		return namespaces.asCollection().stream().map(map).collect(Collectors.toList());
 	}
 
@@ -228,9 +212,8 @@ public class NamespaceControllerTest {
 			// set up the mock mapper
 			Mockito.when(this.mapper.map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class)))
 					.then(invocationOnMock -> new Namespace(
-							new NamespaceId(((DbNamespace)invocationOnMock.getArguments()[0]).getFullName()),
-							Utils.generateRandomAccount(),
-							BlockHeight.ONE));
+							new NamespaceId(((DbNamespace) invocationOnMock.getArguments()[0]).getFullName()),
+							Utils.generateRandomAccount(), BlockHeight.ONE));
 
 			Mockito.when(this.mosaicInfoFactory.isNamespaceActive(Mockito.any())).thenReturn(true);
 

@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -21,7 +22,8 @@ import java.util.*;
 
 public class BlockAnalyzerTest {
 	private static final EnumSet<ObserverOption> DEFAULT_OPTIONS = EnumSet.of(ObserverOption.NoIncrementalPoi);
-	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
+	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey
+			.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
 	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 
@@ -30,7 +32,7 @@ public class BlockAnalyzerTest {
 		NetworkInfos.setDefault(null);
 	}
 
-	//region loadNemesisBlock
+	// region loadNemesisBlock
 
 	@Test
 	public void loadNemesisBlockReturnsExpectedBlockForTestNetwork() {
@@ -42,9 +44,9 @@ public class BlockAnalyzerTest {
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 
 		// Assert:
-		Assert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
-		Assert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
-		Assert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(162));
+		MatcherAssert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
+		MatcherAssert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
+		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(162));
 	}
 
 	@Test
@@ -58,12 +60,12 @@ public class BlockAnalyzerTest {
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 
 		// Assert:
-		Assert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
-		Assert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
-		Assert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(1353));
+		MatcherAssert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
+		MatcherAssert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
+		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(1353));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void analyzeWithNullMaxHeightLoadsCompleteDb() {
@@ -77,8 +79,8 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(346)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(346)));
 	}
 
 	@Test
@@ -93,8 +95,8 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS, 234L);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(234)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(234)));
 	}
 
 	@Test
@@ -109,7 +111,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(BlockHeight.ONE);
 		Mockito.verify(context.blockDao, Mockito.times(6 + 1)).getBlocksAfterAndUpdateCache(Mockito.any(), Mockito.eq(100));
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(568)).analyzeLastBlock(Mockito.any());
@@ -132,7 +134,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, options);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
 		Mockito.verify(context.importanceCalculator, Mockito.times(3)).recalculate(Mockito.any(), Mockito.any());
 	}
 
@@ -144,21 +146,19 @@ public class BlockAnalyzerTest {
 		final NemesisBlockInfo nemesisBlockInfo = NetworkInfos.getTestNetworkInfo().getNemesisBlockInfo();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 		context.fillDatabase(nemesisBlock, 0);
-		final Amount nemesisFees = BlockExtensions.streamDefault(nemesisBlock)
-				.map(Transaction::getFee)
-				.reduce(Amount.ZERO, Amount::add);
+		final Amount nemesisFees = BlockExtensions.streamDefault(nemesisBlock).map(Transaction::getFee).reduce(Amount.ZERO, Amount::add);
 
 		// Act:
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(copy.getAccountCache().isKnownAddress(nemesisBlockInfo.getAddress()), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(copy.getAccountCache().isKnownAddress(nemesisBlockInfo.getAddress()), IsEqual.equalTo(true));
 		final AccountState nemesisState = copy.getAccountStateCache().findStateByAddress(nemesisBlockInfo.getAddress());
-		Assert.assertThat(nemesisState.getAccountInfo().getBalance(), IsEqual.equalTo(nemesisFees));
-		Assert.assertThat(nemesisState.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(nemesisState.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(nemesisFees));
-		Assert.assertThat(nemesisState.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(nemesisState.getAccountInfo().getBalance(), IsEqual.equalTo(nemesisFees));
+		MatcherAssert.assertThat(nemesisState.getWeightedBalances().getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(nemesisState.getWeightedBalances().getUnvested(BlockHeight.ONE), IsEqual.equalTo(nemesisFees));
+		MatcherAssert.assertThat(nemesisState.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 	}
 
 	@Test
@@ -174,9 +174,9 @@ public class BlockAnalyzerTest {
 
 		// Assert:
 		// - just test the balances of two prototype accounts
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50000000L)));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50000000L)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50000000L)));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50000000L)));
 	}
 
 	@Test
@@ -186,12 +186,8 @@ public class BlockAnalyzerTest {
 		final NisCache copy = context.nisCache.copy();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 		final Block block = NisUtils.createBlockList(nemesisBlock, 1).get(0);
-		final Transaction transfer = new TransferTransaction(
-				TimeInstant.ZERO,
-				new Account(new KeyPair(TEST_ADDRESS1_PK)),
-				new Account(TEST_ADDRESS2),
-				Amount.fromNem(1_000_000),
-				null);
+		final Transaction transfer = new TransferTransaction(TimeInstant.ZERO, new Account(new KeyPair(TEST_ADDRESS1_PK)),
+				new Account(TEST_ADDRESS2), Amount.fromNem(1_000_000), null);
 		transfer.setFee(Amount.fromNem(100));
 		transfer.sign();
 		block.addTransaction(transfer);
@@ -203,9 +199,9 @@ public class BlockAnalyzerTest {
 
 		// Assert:
 		// - just test the balances of two prototype accounts
-		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		MatcherAssert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
 	}
 
 	@Test
@@ -221,7 +217,7 @@ public class BlockAnalyzerTest {
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
 
 		// Assert:
-		Assert.assertThat(success, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(success, IsEqual.equalTo(false));
 	}
 
 	private static Amount getBalance(final ReadOnlyNisCache cache, final Address address) {
@@ -239,8 +235,9 @@ public class BlockAnalyzerTest {
 		private final ReadOnlyNisCache nisCache;
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 		private final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao));
-		private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
-		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(this.blockDao, this.mapper));
+		private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao);
+		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito
+				.spy(new BlockChainLastBlockLayer(this.blockDao, this.mapper));
 		private final BlockChainScoreManager scoreManager;
 		private final NisMapperFactory nisMapperFactory;
 		private final BlockAnalyzer blockAnalyzer;
@@ -251,11 +248,7 @@ public class BlockAnalyzerTest {
 			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));
-			this.blockAnalyzer = new BlockAnalyzer(
-					this.blockDao,
-					this.scoreManager,
-					this.blockChainLastBlockLayer,
-					this.nisMapperFactory,
+			this.blockAnalyzer = new BlockAnalyzer(this.blockDao, this.scoreManager, this.blockChainLastBlockLayer, this.nisMapperFactory,
 					ESTIMATED_BLOCKS_PER_YEAR);
 		}
 

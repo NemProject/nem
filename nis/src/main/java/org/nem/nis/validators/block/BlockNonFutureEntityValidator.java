@@ -5,8 +5,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.validators.*;
 
 /**
- * Block validator that validates:
- * - the block time stamp is not too far in the future
+ * Block validator that validates the block time stamp is not too far in the future.
  */
 public class BlockNonFutureEntityValidator extends NonFutureEntityValidator implements BlockValidator {
 

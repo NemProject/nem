@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.ValidationResult;
@@ -42,8 +43,7 @@ public class DeadlineValidatorTest {
 		assertTimeStampDeadlineValidation(ts -> ts.addDays(1).addSeconds(1), ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertTimeStampDeadlineValidation(
-			final Function<TimeInstant, TimeInstant> getDeadlineFromTimeStamp,
+	private static void assertTimeStampDeadlineValidation(final Function<TimeInstant, TimeInstant> getDeadlineFromTimeStamp,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
@@ -54,6 +54,6 @@ public class DeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

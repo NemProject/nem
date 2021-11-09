@@ -6,7 +6,9 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a model importance transfer transaction to a db importance transfer.
  */
-public class ImportanceTransferModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
+public class ImportanceTransferModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
 
 	/**
 	 * Creates a new mapping.

@@ -1,7 +1,6 @@
 package org.nem.nis.chain;
 
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 

@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -24,7 +25,7 @@ public class TransactionNetworkValidatorTest {
 		final ValidationResult result = validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class TransactionNetworkValidatorTest {
 		final ValidationResult result = validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
 	}
 
 	private static void setDefaultNetwork(final NetworkInfo networkInfo) {

@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -14,9 +15,9 @@ public class ValidationContextTest {
 		final ValidationContext context = new ValidationContext(validationState);
 
 		// Assert:
-		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
-		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
-		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+		MatcherAssert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		MatcherAssert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		MatcherAssert.assertThat(context.getState(), IsEqual.equalTo(validationState));
 	}
 
 	@Test
@@ -26,9 +27,9 @@ public class ValidationContextTest {
 		final ValidationContext context = new ValidationContext(new BlockHeight(11), validationState);
 
 		// Assert:
-		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+		MatcherAssert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(context.getState(), IsEqual.equalTo(validationState));
 	}
 
 	@Test
@@ -38,8 +39,8 @@ public class ValidationContextTest {
 		final ValidationContext context = new ValidationContext(new BlockHeight(11), new BlockHeight(7), validationState);
 
 		// Assert:
-		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
-		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+		MatcherAssert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
+		MatcherAssert.assertThat(context.getState(), IsEqual.equalTo(validationState));
 	}
 }

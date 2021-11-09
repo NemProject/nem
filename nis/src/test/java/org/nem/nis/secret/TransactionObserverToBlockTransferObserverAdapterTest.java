@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -18,7 +19,7 @@ public class TransactionObserverToBlockTransferObserverAdapterTest {
 		final String name = adapter.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("inner"));
 		Mockito.verify(observer, Mockito.only()).getName();
 	}
 

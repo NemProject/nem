@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 /**
  * A default skip list map implementation.
  */
-public class DefaultSkipListMap<TKey extends Comparable, TValue> {
+public class DefaultSkipListMap<TKey extends Comparable<?>, TValue> {
 	private final ConcurrentSkipListMap<TKey, Set<TValue>> map;
 
 	/**
@@ -34,9 +34,7 @@ public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 	public int size() {
 		return this.map.isEmpty()
 				? 0
-				: this.map.keySet().stream()
-						.mapToInt(key -> this.map.get(key).size())
-						.reduce(Integer::sum).getAsInt();
+				: this.map.keySet().stream().mapToInt(key -> this.map.get(key).size()).reduce(Integer::sum).getAsInt();
 	}
 
 	/**

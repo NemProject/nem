@@ -5,23 +5,16 @@ import org.nem.core.model.primitive.*;
 import java.util.*;
 
 /**
- * Implementation of the initial SCAN algorithm, from this paper:
- * Xu, X., Yuruk, N., Feng, Z., &amp; Schweiger, T. A. (2007, August),
- * "ScanClusteringStrategy: a structural clustering algorithm for networks."
- * <br>
- * In Proceedings of the 13th ACM SIGKDD international conference
- * on Knowledge discovery and data mining (pp. 824-833). ACM.
- * http://www.ualr.edu/xwxu/publications/kdd07.pdf
- * <br>
- * Given a set of vertices V and edges between the vertices E the paper defines when a vertex v is connected to a vertex w.
- * This definition gives rise to the definition of a relation in the set of vertices:
- * <br>
- * For v,w &isin; V define v &sim; w &hArr; CONNECTε,μ(v,w)
- * <br>
- * The relation &sim; is reflexive, symmetric and transitive, i.e. an equivalence relation.
- * Thus the factorization V/&sim; is well defined and induces a partition of V.
- * The elements of the partition are called clusters.
- * Aside from regular cluster the paper introduces the notions of hubs and outliers.
+ * Implementation of the initial SCAN algorithm, from this paper: Xu, X., Yuruk, N., Feng, Z., &amp; Schweiger, T. A. (2007, August),
+ * "ScanClusteringStrategy: a structural clustering algorithm for networks." <br>
+ * In Proceedings of the 13th ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 824-833). ACM.
+ * http://www.ualr.edu/xwxu/publications/kdd07.pdf <br>
+ * Given a set of vertices V and edges between the vertices E the paper defines when a vertex v is connected to a vertex w. This definition
+ * gives rise to the definition of a relation in the set of vertices: <br>
+ * For v,w &isin; V define v &sim; w &hArr; CONNECTε,μ(v,w) <br>
+ * The relation &sim; is reflexive, symmetric and transitive, i.e. an equivalence relation. Thus the factorization V/&sim; is well defined
+ * and induces a partition of V. The elements of the partition are called clusters. Aside from regular cluster the paper introduces the
+ * notions of hubs and outliers.
  */
 public class ScanClusteringStrategy implements GraphClusteringStrategy {
 

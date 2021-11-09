@@ -33,12 +33,8 @@ public class ChainController {
 	private final int blocksLimit;
 
 	@Autowired(required = true)
-	public ChainController(
-			final ReadOnlyBlockDao blockDao,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockChainScoreManager blockChainScoreManager,
-			final NisPeerNetworkHost host,
-			final NisDbModelToModelMapper mapper) {
+	public ChainController(final ReadOnlyBlockDao blockDao, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockChainScoreManager blockChainScoreManager, final NisPeerNetworkHost host, final NisDbModelToModelMapper mapper) {
 		this.blockDao = blockDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockChainScoreManager = blockChainScoreManager;
@@ -47,7 +43,7 @@ public class ChainController {
 		this.blocksLimit = NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}
 
-	//region blockLast
+	// region blockLast
 
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@ClientApi
@@ -65,7 +61,7 @@ public class ChainController {
 		return new AuthenticatedResponse<>(this.blockLast(), localNode.getIdentity(), challenge);
 	}
 
-	//endregion
+	// endregion
 
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
@@ -78,25 +74,18 @@ public class ChainController {
 		boolean enough = this.addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
 		while (!enough) {
-			enough = this.addBlocks(blockList, blockList.get(blockList.size() - 1).getHeight(), numBlocks, chainRequest.getMaxTransactions());
+			enough = this.addBlocks(blockList, blockList.get(blockList.size() - 1).getHeight(), numBlocks,
+					chainRequest.getMaxTransactions());
 		}
 
 		final long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("Pulling %d blocks from db starting at height %d needed %dms.",
-				blockList.size(),
-				chainRequest.getHeight().getRaw(),
-				stop - start));
+		LOGGER.info(String.format("Pulling %d blocks from db starting at height %d needed %dms.", blockList.size(),
+				chainRequest.getHeight().getRaw(), stop - start));
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(
-				blockList,
-				localNode.getIdentity(),
-				request.getChallenge());
+		return new AuthenticatedResponse<>(blockList, localNode.getIdentity(), request.getChallenge());
 	}
 
-	private boolean addBlocks(
-			final SerializableList<Block> blockList,
-			final BlockHeight height,
-			final int numBlocksToRequest,
+	private boolean addBlocks(final SerializableList<Block> blockList, final BlockHeight height, final int numBlocksToRequest,
 			final int maxTransactions) {
 		int numTransactions = blockList.asCollection().stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
 		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
@@ -129,13 +118,11 @@ public class ChainController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<HashChain> hashesFrom(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(
-				this.blockDao.getHashesFrom(request.getEntity(), this.blocksLimit),
-				localNode.getIdentity(),
+		return new AuthenticatedResponse<>(this.blockDao.getHashesFrom(request.getEntity(), this.blocksLimit), localNode.getIdentity(),
 				request.getChallenge());
 	}
 
-	//region chainScore
+	// region chainScore
 
 	@RequestMapping(value = "/chain/score", method = RequestMethod.GET)
 	@PublicApi
@@ -151,9 +138,9 @@ public class ChainController {
 		return new AuthenticatedResponse<>(this.chainScore(), localNode.getIdentity(), challenge);
 	}
 
-	//endregion
+	// endregion
 
-	//region chainHeight
+	// region chainHeight
 
 	@RequestMapping(value = "/chain/height", method = RequestMethod.GET)
 	@PublicApi
@@ -169,5 +156,5 @@ public class ChainController {
 		return new AuthenticatedResponse<>(this.chainHeight(), localNode.getIdentity(), challenge);
 	}
 
-	//endregion
+	// endregion
 }

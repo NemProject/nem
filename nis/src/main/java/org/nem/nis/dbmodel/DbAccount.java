@@ -7,14 +7,10 @@ import javax.persistence.*;
 import java.util.Objects;
 
 /**
- * DbAccount entity.
- * <br>
- * Probably it should be called Address, as it's main purpose is to associate
- * printableKey with publicKey.
- * <br>
- * In future it should probably also two 'heights' of an DbAccount,
- * marking at what blockchain height has network 'learned' about
- * DbAccount NEM address (printableKey) and public key respectively.
+ * DbAccount entity. <br>
+ * Probably it should be called Address, as it's main purpose is to associate printableKey with publicKey. <br>
+ * In future it should probably also two 'heights' of an DbAccount, marking at what blockchain height has network 'learned' about DbAccount
+ * NEM address (printableKey) and public key respectively.
  */
 @Entity
 @Table(name = "accounts")
@@ -80,7 +76,7 @@ public class DbAccount {
 			return false;
 		}
 
-		final DbAccount rhs = (DbAccount)obj;
+		final DbAccount rhs = (DbAccount) obj;
 		return Objects.equals(this.id, rhs.id);
 	}
 }

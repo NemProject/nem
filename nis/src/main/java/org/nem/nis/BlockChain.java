@@ -21,9 +21,7 @@ public class BlockChain implements BlockSynchronizer {
 	private final BlockChainUpdater updater;
 
 	@Autowired(required = true)
-	public BlockChain(
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockChainUpdater updater) {
+	public BlockChain(final BlockChainLastBlockLayer blockChainLastBlockLayer, final BlockChainUpdater updater) {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.updater = updater;
 	}
@@ -46,10 +44,7 @@ public class BlockChain implements BlockSynchronizer {
 	private boolean isLastBlockParent(final Block block) {
 		final DbBlock lastDbBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final boolean result = lastDbBlock.getBlockHash().equals(block.getPreviousBlockHash());
-		LOGGER.info(String.format(
-				"isLastBlockParent? %s; last block height: %s; hash: %s",
-				result,
-				lastDbBlock.getHeight(),
+		LOGGER.info(String.format("isLastBlockParent? %s; last block height: %s; hash: %s", result, lastDbBlock.getHeight(),
 				lastDbBlock.getBlockHash()));
 		return result;
 	}
@@ -84,16 +79,14 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Synch algorithm:
-	 * 1. Get peer's last block compare with ours, assuming it's ok
-	 * 2. Take hashes of last blocks - at most DEFAULT_REWRITE_LIMIT hashes, compare with proper hashes
-	 * of peer, to find last common and first different block.
-	 * If all peer's hashes has been checked we have nothing to do
-	 * 3. if we have some blocks left AFTER common blocks, we'll need to revert those transactions,
-	 * but before that we'll do some simple check, to see if peer's chain is actually better
-	 * 4. Now we can get peer's chain and verify it
-	 * 5. Once we've verified it, we can apply it
-	 * (all-or-nothing policy, if verification failed, we won't try to apply part of it)
+	 * Synch algorithm:<br>
+	 * 1. Get peer's last block compare with ours, assuming it's ok<br>
+	 * 2. Take hashes of last blocks - at most DEFAULT_REWRITE_LIMIT hashes, compare with proper hashes of peer, to find last common and
+	 * first different block. If all peer's hashes has been checked we have nothing to do<br>
+	 * 3. if we have some blocks left AFTER common blocks, we'll need to revert those transactions, but before that we'll do some simple
+	 * check, to see if peer's chain is actually better<br>
+	 * 4. Now we can get peer's chain and verify it<br>
+	 * 5. Once we've verified it, we can apply it (all-or-nothing policy, if verification failed, we won't try to apply part of it)
 	 *
 	 * @param connectorPool The sync connector pool.
 	 * @param node The other node.
@@ -123,8 +116,8 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Adds a block listener to the block updater mechanism.
-	 * Listener will be informed about blocks that were successfully added to the chain.
+	 * Adds a block listener to the block updater mechanism. Listener will be informed about blocks that were successfully added to the
+	 * chain.
 	 *
 	 * @param blockListener The block listener.
 	 */

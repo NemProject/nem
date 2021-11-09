@@ -16,9 +16,7 @@ public class LocalController {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired(required = true)
-	public LocalController(
-			final NisPeerNetworkHost host,
-			final CommonStarter starter,
+	public LocalController(final NisPeerNetworkHost host, final CommonStarter starter,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.host = host;
 		this.starter = starter;

@@ -17,10 +17,10 @@ import java.util.*;
  * Class supplying Spring MVC configuration.
  */
 @Configuration
-@ComponentScan(
-		basePackages = { "org.nem.nis.controller", "org.nem.nis.a" }
-)
-//@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
+@ComponentScan(basePackages = {
+		"org.nem.nis.controller", "org.nem.nis.a"
+})
+// @EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
 public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	@Autowired
 	private AccountLookup accountLookup;
@@ -44,9 +44,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 		this.addDefaultHttpMessageConverters(converters);
 	}
 
-	private static void addConvertersForPolicy(
-			final List<HttpMessageConverter<?>> converters,
-			final SerializationPolicy policy) {
+	private static void addConvertersForPolicy(final List<HttpMessageConverter<?>> converters, final SerializationPolicy policy) {
 		converters.add(new DeserializerHttpMessageConverter(policy));
 		converters.add(new SerializableEntityHttpMessageConverter(policy));
 		converters.add(new DeserializableEntityMessageConverter(policy));
@@ -61,8 +59,6 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	}
 
 	private HandlerInterceptorAdapter createAuditInterceptor() {
-		return new AuditInterceptor(
-				Arrays.asList(this.nisConfiguration.getNonAuditedApiPaths()),
-				this.host.getIncomingAudits());
+		return new AuditInterceptor(Arrays.asList(this.nisConfiguration.getNonAuditedApiPaths()), this.host.getIncomingAudits());
 	}
 }

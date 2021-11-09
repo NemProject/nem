@@ -28,9 +28,7 @@ public class BinderControllerAdvice {
 	 * @param nisConfiguration The NIS configuration.
 	 */
 	@Autowired(required = true)
-	public BinderControllerAdvice(
-			final LocalHostDetector localHostDetector,
-			final ReadOnlyAccountStateCache accountStateCache,
+	public BinderControllerAdvice(final LocalHostDetector localHostDetector, final ReadOnlyAccountStateCache accountStateCache,
 			final NisConfiguration nisConfiguration) {
 		this.localHostDetector = localHostDetector;
 		this.accountStateCache = accountStateCache;
@@ -39,14 +37,13 @@ public class BinderControllerAdvice {
 
 	@InitBinder
 	public void addBinders(final WebDataBinder binder, final HttpServletRequest request) {
-		final Validator[] validators = new Validator[] {
+		final Validator[] validators = new Validator[]{
 				new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, request),
 				new ConfiguredPrivateKeyValidator(this.nisConfiguration.getAllowedHarvesterAddresses())
 		};
 
 		final Validator[] filteredValidators = Arrays.stream(validators)
-				.filter(validator -> validator.supports(binder.getTarget().getClass()))
-				.toArray(Validator[]::new);
+				.filter(validator -> validator.supports(binder.getTarget().getClass())).toArray(Validator[]::new);
 
 		binder.addValidators(filteredValidators);
 	}

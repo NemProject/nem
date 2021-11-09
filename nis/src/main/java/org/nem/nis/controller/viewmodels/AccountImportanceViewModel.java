@@ -72,16 +72,14 @@ public class AccountImportanceViewModel implements SerializableEntity {
 			return false;
 		}
 
-		final AccountImportanceViewModel rhs = (AccountImportanceViewModel)obj;
+		final AccountImportanceViewModel rhs = (AccountImportanceViewModel) obj;
 		return this.address.equals(rhs.address) && areImportancesEqual(this.importance, rhs.importance);
 	}
 
 	private static boolean areImportancesEqual(final ReadOnlyAccountImportance lhs, final ReadOnlyAccountImportance rhs) {
 		final boolean areBothUnset = !lhs.isSet() && !rhs.isSet();
-		final boolean areBothSetWithSameValues = lhs.isSet() &&
-				rhs.isSet() &&
-				lhs.getHeight().equals(rhs.getHeight()) &&
-				lhs.getImportance(lhs.getHeight()) == rhs.getImportance(rhs.getHeight());
+		final boolean areBothSetWithSameValues = lhs.isSet() && rhs.isSet() && lhs.getHeight().equals(rhs.getHeight())
+				&& lhs.getImportance(lhs.getHeight()) == rhs.getImportance(rhs.getHeight());
 		return areBothUnset || areBothSetWithSameValues;
 	}
 

@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.junit.Test;
 import org.nem.core.async.SleepFuture;
-import org.nem.core.connect.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
@@ -39,14 +38,7 @@ public class NetworkSpammer {
 			"07e38011514bcce7cbc0d80aa1e29e1666183eb144bcc175f89a818e80454536",
 			"4d6bcee45a4416c5c63de19bfabe5301aa59fe84b7eb9aed6c703b1c68c971f9",
 			"d0f77aca106aa070523dd9ef0ef9fdf91d594c557e54a4894ba94ab26f804a18");
-	private static final List<NodeEndpoint> ENDPOINTS_25 = Arrays.asList(
-			new NodeEndpoint("http", "45.32.11.215", 7895),
-			new NodeEndpoint("http", "108.61.162.159", 7895),
-			new NodeEndpoint("http", "104.238.150.159", 7895),
-			new NodeEndpoint("http", "45.63.121.130", 7895),
-			new NodeEndpoint("http", "45.63.61.189", 7895),
-			new NodeEndpoint("http", "127.0.0.1", 7895)
-	);
+
 	private static final List<Node> NODES_50 = Arrays.asList(
 			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "108.61.247.91", 7895)),
@@ -75,6 +67,7 @@ public class NetworkSpammer {
 		this.spamNetwork(NODES_50);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void spamNetwork(final List<Node> nodes) {
 		final SecureRandom random = new SecureRandom();
 		final int transactionsPerSecond = 100;
@@ -164,13 +157,6 @@ public class NetworkSpammer {
 		transaction.setDeadline(timeInstant.addHours(23));
 		transaction.sign();
 		return transaction;
-	}
-
-	private static HttpMethodClient<ErrorResponseDeserializerUnion> createHttpMethodClient() {
-		final int connectionTimeout = 4000;
-		final int socketTimeout = 10000;
-		final int requestTimeout = 30000;
-		return new HttpMethodClient<>(connectionTimeout, socketTimeout, requestTimeout);
 	}
 
 	private static PeerConnector createPeerConnector() {

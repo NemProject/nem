@@ -27,9 +27,8 @@ public abstract class AbstractPruningObserver implements BlockTransactionObserve
 	protected abstract void prune(final BlockNotificationContext context);
 
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
-		return NotificationTrigger.Execute == context.getTrigger() &&
-				NotificationType.BlockHarvest == notification.getType() &&
-				1 == (context.getHeight().getRaw() % PRUNE_INTERVAL);
+		return NotificationTrigger.Execute == context.getTrigger() && NotificationType.BlockHarvest == notification.getType()
+				&& 1 == (context.getHeight().getRaw() % PRUNE_INTERVAL);
 	}
 
 	/**

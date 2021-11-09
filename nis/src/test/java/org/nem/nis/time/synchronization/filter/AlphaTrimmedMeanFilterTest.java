@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization.filter;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.TimeSyncUtils;
@@ -27,8 +28,9 @@ public class AlphaTrimmedMeanFilterTest {
 		final List<TimeSynchronizationSample> samples = filter.filter(originalSamples, null);
 
 		// Assert:
-		final int value = (int)(originalSamples.size() * FilterConstants.ALPHA / 2);
-		Assert.assertThat(samples.size(), IsEqual.equalTo(originalSamples.size() - 2 * value));
-		Assert.assertThat(samples, IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(value, originalSamples.size() - 2 * value)));
+		final int value = (int) (originalSamples.size() * FilterConstants.ALPHA / 2);
+		MatcherAssert.assertThat(samples.size(), IsEqual.equalTo(originalSamples.size() - 2 * value));
+		MatcherAssert.assertThat(samples,
+				IsEqual.equalTo(TimeSyncUtils.createTolerableSortedSamples(value, originalSamples.size() - 2 * value)));
 	}
 }

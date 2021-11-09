@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,11 +20,10 @@ import java.util.function.Function;
 public class BlockTransactionObserverFactoryTest {
 	private static final EnumSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = EnumSet.of(ObserverOption.NoIncrementalPoi);
 	private static final EnumSet<ObserverOption> OPTIONS_NO_OUTLINK_OBSERVER = EnumSet.of(ObserverOption.NoOutlinkObserver);
-	private static final EnumSet<ObserverOption> OPTIONS_NONE = EnumSet.range(ObserverOption.NoIncrementalPoi, ObserverOption.NoOutlinkObserver);
+	private static final EnumSet<ObserverOption> OPTIONS_NONE = EnumSet.range(ObserverOption.NoIncrementalPoi,
+			ObserverOption.NoOutlinkObserver);
 
-	//region basic
-
-	//region execute
+	// region basic - execute
 
 	@Test
 	public void createExecuteCommitObserverReturnsValidObserver() {
@@ -34,13 +34,15 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI),
+				getObserverNamesWithoutIncrementalPoi());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER),
+				getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
@@ -49,7 +51,8 @@ public class BlockTransactionObserverFactoryTest {
 		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
 	}
 
-	private static void assertExecuteCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
+	private static void assertExecuteCommitObserverNames(final BlockTransactionObserverFactory factory,
+			final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -57,13 +60,13 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
 
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
+		MatcherAssert.assertThat(observer, IsNull.notNullValue());
 		assertAreEquivalent(observer.getName(), expectedNames);
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region basic - undo
 
 	@Test
 	public void createUndoCommitObserverReturnsValidObserver() {
@@ -74,13 +77,15 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI),
+				getObserverNamesWithoutIncrementalPoi());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER),
+				getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
@@ -89,7 +94,8 @@ public class BlockTransactionObserverFactoryTest {
 		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
 	}
 
-	private static void assertUndoCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
+	private static void assertUndoCommitObserverNames(final BlockTransactionObserverFactory factory,
+			final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -97,11 +103,11 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
 
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
+		MatcherAssert.assertThat(observer, IsNull.notNullValue());
 		assertAreEquivalent(observer.getName(), expectedNames);
 	}
 
-	//endregion
+	// endregion
 
 	private static Collection<String> getDefaultObserverNames() {
 		final Collection<String> expectedClasses = getBaseObserverNames();
@@ -122,6 +128,7 @@ public class BlockTransactionObserverFactoryTest {
 		return expectedClasses;
 	}
 
+	@SuppressWarnings("serial")
 	private static Collection<String> getBaseObserverNames() {
 		return new ArrayList<String>() {
 			{
@@ -152,12 +159,10 @@ public class BlockTransactionObserverFactoryTest {
 		final List<String> subObserverNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
+		MatcherAssert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
 	}
 
-	//endregion
-
-	//region options
+	// region options
 
 	@Test
 	public void createExecuteDoesPerformIncrementalPoiWhenEnabled() {
@@ -195,8 +200,7 @@ public class BlockTransactionObserverFactoryTest {
 		assertRecalculateImportancesIsNotCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
 	}
 
-	private static void assertRecalculateImportancesIsCalled(
-			final Function<NisCache, BlockTransactionObserver> createObserver,
+	private static void assertRecalculateImportancesIsCalled(final Function<NisCache, BlockTransactionObserver> createObserver,
 			final NotificationTrigger trigger) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -206,11 +210,10 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
-	private static void assertRecalculateImportancesIsNotCalled(
-			final Function<NisCache, BlockTransactionObserver> createObserver,
+	private static void assertRecalculateImportancesIsNotCalled(final Function<NisCache, BlockTransactionObserver> createObserver,
 			final NotificationTrigger trigger) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -223,15 +226,15 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
-	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account, final NotificationTrigger trigger) {
-		observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, account, Amount.ZERO),
+	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account,
+			final NotificationTrigger trigger) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BlockHarvest, account, Amount.ZERO),
 				new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, trigger));
 	}
 
-	//endregion
+	// endregion
 
-	//region outlink side effects
+	// region outlink side effects
 
 	@Test
 	public void executeUpdatesOutlinks() {
@@ -297,9 +300,9 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.verify(context.accountContext2.importance, Mockito.never()).removeOutlink(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region weighted balance side effects
+	// region weighted balance side effects
 
 	@Test
 	public void executeUpdatesWeightedBalances() {
@@ -339,23 +342,24 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.verify(context.accountContext2.balances, Mockito.times(1)).undoReceive(Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region execute / undo outlink update ordering
+	// region execute / undo outlink update ordering
 
 	@Test
 	public void executeAddsOutlinkAfterUpdatingBalances() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<String> breadcrumbs = new ArrayList<>();
-		final Function<String, Answer> createAnswer = breadcrumb -> invocationOnMock -> {
+		final Function<String, Answer<?>> createAnswer = breadcrumb -> invocationOnMock -> {
 			breadcrumbs.add(breadcrumb);
 			return null;
 		};
 
 		Mockito.doAnswer(createAnswer.apply("outlink")).when(context.accountContext1.importance).addOutlink(Mockito.any());
 		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.accountInfo).decrementBalance(Mockito.any());
-		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).addSend(Mockito.any(), Mockito.any());
+		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).addSend(Mockito.any(),
+				Mockito.any());
 
 		// Act:
 		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
@@ -364,7 +368,7 @@ public class BlockTransactionObserverFactoryTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
+		MatcherAssert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
 	}
 
 	@Test
@@ -372,14 +376,15 @@ public class BlockTransactionObserverFactoryTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<String> breadcrumbs = new ArrayList<>();
-		final Function<String, Answer> createAnswer = breadcrumb -> invocationOnMock -> {
+		final Function<String, Answer<?>> createAnswer = breadcrumb -> invocationOnMock -> {
 			breadcrumbs.add(breadcrumb);
 			return null;
 		};
 
 		Mockito.doAnswer(createAnswer.apply("outlink")).when(context.accountContext1.importance).removeOutlink(Mockito.any());
 		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.accountInfo).incrementBalance(Mockito.any());
-		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).undoSend(Mockito.any(), Mockito.any());
+		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).undoSend(Mockito.any(),
+				Mockito.any());
 
 		// Act:
 		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
@@ -388,10 +393,10 @@ public class BlockTransactionObserverFactoryTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
-		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
+		MatcherAssert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
 	}
 
-	//endregion
+	// endregion
 
 	private static class MockAccountContext {
 		private final Account account = Mockito.mock(Account.class);

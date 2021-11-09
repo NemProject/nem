@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -26,7 +27,7 @@ public class DbBlockIoAdapterTest {
 		final Block block = context.blockIo.getBlockAt(height);
 
 		// Assert:
-		Assert.assertThat(block.getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
+		MatcherAssert.assertThat(block.getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
 		Mockito.verify(context.blockDao, Mockito.only()).findByHeight(height);
 	}
 
@@ -43,8 +44,7 @@ public class DbBlockIoAdapterTest {
 	private static class TestContext {
 		private final DbBlock block = NisUtils.createDbBlockWithTimeStampAtHeight(1, VALID_BLOCK_HEIGHT);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
-		private final BlockIo blockIo = new DbBlockIoAdapter(
-				this.blockDao,
+		private final BlockIo blockIo = new DbBlockIoAdapter(this.blockDao,
 				MapperUtils.createDbModelToModelNisMapper(new MockAccountLookup()));
 	}
 }

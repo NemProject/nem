@@ -17,9 +17,7 @@ public class BlockHeightBlockValidatorDecorator implements BlockValidator {
 	 * @param effectiveBlockHeight The height at which the inner validator should be in effect.
 	 * @param innerValidator The inner validator.
 	 */
-	public BlockHeightBlockValidatorDecorator(
-			final BlockHeight effectiveBlockHeight,
-			final BlockValidator innerValidator) {
+	public BlockHeightBlockValidatorDecorator(final BlockHeight effectiveBlockHeight, final BlockValidator innerValidator) {
 		this.effectiveBlockHeight = effectiveBlockHeight;
 		this.innerValidator = innerValidator;
 	}
@@ -31,8 +29,6 @@ public class BlockHeightBlockValidatorDecorator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		return block.getHeight().compareTo(this.effectiveBlockHeight) < 0
-				? ValidationResult.SUCCESS
-				: this.innerValidator.validate(block);
+		return block.getHeight().compareTo(this.effectiveBlockHeight) < 0 ? ValidationResult.SUCCESS : this.innerValidator.validate(block);
 	}
 }

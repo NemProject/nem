@@ -36,9 +36,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(MissingResourceException.class)
 	public ResponseEntity<ErrorResponse> handleMissingResourceException(final MissingResourceException e) {
-		return this.createResponse(
-				String.format("%s '%s' (%s)", e.getMessage(), e.getKey(), e.getClassName()),
-				HttpStatus.NOT_FOUND);
+		return this.createResponse(String.format("%s '%s' (%s)", e.getMessage(), e.getKey(), e.getClassName()), HttpStatus.NOT_FOUND);
 	}
 
 	/**

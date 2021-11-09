@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -11,6 +12,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -18,7 +20,7 @@ import java.util.function.Function;
 
 public class BlockChainValidatorTest {
 
-	//region block chain size
+	// region block chain size
 
 	@Test
 	public void blockChainSizeCanBeLessThanBlockLimit() {
@@ -48,12 +50,12 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, size));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region block checks
+	// region block checks
 
 	@Test
 	public void allBlocksInChainMustHaveCorrectParentBlockHash() {
@@ -72,7 +74,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -97,7 +99,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
 	}
 
 	@Test
@@ -116,7 +118,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
 	}
 
 	@Test
@@ -136,7 +138,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
 	}
 
 	@Test
@@ -154,7 +156,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
 	}
 
 	@Test
@@ -175,7 +177,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		Mockito.verify(blockValidator, Mockito.times(2)).validate(Mockito.any());
 	}
 
@@ -197,7 +199,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_NOT_HIT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_NOT_HIT));
 	}
 
 	@Test
@@ -213,12 +215,12 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction checks
+	// region transaction checks
 
 	@Test
 	public void allTransactionsInChainMustVerify() {
@@ -234,11 +236,41 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 
+		// - repair the chain after changes to the middle block
+		blocks.set(2, new Block(Utils.generateRandomAccount(), middleBlock, TimeInstant.ZERO));
+		blocks.get(2).sign();
+
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
+	}
+
+	@Test
+	public void transactionsAtTreasuryReissuanceForkHeightDoNotNeedToVerify() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator(
+				new ForkConfiguration(new BlockHeight(100), new ArrayList<Hash>(), new ArrayList<Hash>()));
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 98);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidNonVerifiableTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// - repair the chain after changes to the middle block
+		blocks.set(2, new Block(Utils.generateRandomAccount(), middleBlock, TimeInstant.ZERO));
+		blocks.get(2).sign();
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -253,8 +285,7 @@ public class BlockChainValidatorTest {
 
 		final List<Block> blocks = createBlocksForTransactionValidationTests(parentBlock);
 
-		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(transactionValidator.validate(Mockito.eq(blocks.get(1).getTransactions().get(1)), Mockito.any()))
 				.thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
@@ -262,7 +293,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert: (validation should short circuit after the first failure even though there are three transactions)
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		Mockito.verify(transactionValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -294,7 +325,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -317,7 +348,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -348,7 +379,7 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -375,12 +406,12 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region block execution
+	// region block execution
 
 	@Test
 	public void executorIsCreatedForEachBlockInChain() {
@@ -391,8 +422,8 @@ public class BlockChainValidatorTest {
 		context.validate();
 
 		// Assert:
-		Assert.assertThat(context.numExecutorFactoryCalls[0], IsEqual.equalTo(2));
-		Assert.assertThat(context.heights, IsEqual.equalTo(Arrays.asList(new BlockHeight(12), new BlockHeight(13))));
+		MatcherAssert.assertThat(context.numExecutorFactoryCalls[0], IsEqual.equalTo(2));
+		MatcherAssert.assertThat(context.heights, IsEqual.equalTo(Arrays.asList(new BlockHeight(12), new BlockHeight(13))));
 	}
 
 	@Test
@@ -428,7 +459,9 @@ public class BlockChainValidatorTest {
 	private static class TestContextForExecutorTests {
 		private final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		private final BlockProcessor processor = Mockito.mock(BlockProcessor.class);
-		private final int[] numExecutorFactoryCalls = new int[] { 0 };
+		private final int[] numExecutorFactoryCalls = new int[]{
+				0
+		};
 		private final List<BlockHeight> heights = new ArrayList<>();
 
 		private final BlockChainValidator validator;
@@ -466,15 +499,13 @@ public class BlockChainValidatorTest {
 			final ValidationResult result = this.validator.isValid(this.parentBlock, this.blocks);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction validate arguments
-
-	//region single validation
+	// region transaction validate arguments - single validation
 
 	@Test
 	public void singleTransactionValidationContextConfirmedBlockHeightIsConstant() {
@@ -483,9 +514,7 @@ public class BlockChainValidatorTest {
 
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
-			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getConfirmedBlockHeight(),
-					IsEqual.equalTo(new BlockHeight(11)));
+			MatcherAssert.assertThat(contextCaptor.getAllValues().get(i).getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		}
 	}
 
@@ -496,9 +525,7 @@ public class BlockChainValidatorTest {
 
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
-			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getBlockHeight(),
-					IsEqual.equalTo(new BlockHeight(12 + i / 2)));
+			MatcherAssert.assertThat(contextCaptor.getAllValues().get(i).getBlockHeight(), IsEqual.equalTo(new BlockHeight(12 + i / 2)));
 		}
 	}
 
@@ -510,9 +537,7 @@ public class BlockChainValidatorTest {
 
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
-			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getState(),
-					IsEqual.equalTo(factory.validationState));
+			MatcherAssert.assertThat(contextCaptor.getAllValues().get(i).getState(), IsEqual.equalTo(factory.validationState));
 		}
 	}
 
@@ -520,7 +545,8 @@ public class BlockChainValidatorTest {
 		return captureValidationContext(new BlockChainValidatorFactory(), parentBlockHeight);
 	}
 
-	private static ArgumentCaptor<ValidationContext> captureValidationContext(final BlockChainValidatorFactory factory, final long parentBlockHeight) {
+	private static ArgumentCaptor<ValidationContext> captureValidationContext(final BlockChainValidatorFactory factory,
+			final long parentBlockHeight) {
 		// Arrange:
 		final SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
 		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
@@ -536,14 +562,14 @@ public class BlockChainValidatorTest {
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		final ArgumentCaptor<ValidationContext> contextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
 		Mockito.verify(transactionValidator, Mockito.times(6)).validate(Mockito.any(), contextCaptor.capture());
 		return contextCaptor;
 	}
 
-	//endregion
+	// endregion
 
 	private static List<Block> createBlocksForValidationContextCaptureTests(final Block parentBlock) {
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
@@ -564,13 +590,7 @@ public class BlockChainValidatorTest {
 		return blocks;
 	}
 
-	//endregion
-
-	//endregion
-
-	//region helper functions
-
-	//region transactions
+	// region helper functions - transactions
 
 	private static Transaction createValidNonVerifiableTransaction() {
 		final TimeInstant timeStamp = new TimeInstant(15);
@@ -592,9 +612,9 @@ public class BlockChainValidatorTest {
 		return transaction;
 	}
 
-	//endregion
+	// endregion
 
-	//region blocks
+	// region helper functions - blocks
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
@@ -610,7 +630,7 @@ public class BlockChainValidatorTest {
 		return new Block(account, parentBlock, TimeInstant.ZERO);
 	}
 
-	//endregion
+	// endregion
 
 	private static class BlockChainValidatorFactory {
 		public Function<Block, BlockProcessor> processorFactory = block -> Mockito.mock(BlockProcessor.class);
@@ -629,19 +649,20 @@ public class BlockChainValidatorTest {
 		}
 
 		public BlockChainValidator create() {
-			return new BlockChainValidator(
-					this.processorFactory,
-					this.scorer,
-					this.maxChainSize,
-					this.blockValidator,
-					this.transactionValidator,
-					this.validationState);
+			return create(new ForkConfiguration());
+		}
+
+		public BlockChainValidator create(final ForkConfiguration forkConfiguration) {
+			return new BlockChainValidator(this.processorFactory, this.scorer, this.maxChainSize, this.blockValidator,
+					this.transactionValidator, this.validationState, forkConfiguration);
 		}
 	}
 
 	private static BlockChainValidator createValidator() {
-		return new BlockChainValidatorFactory().create();
+		return createValidator(new ForkConfiguration());
 	}
 
-	//endregion
+	private static BlockChainValidator createValidator(final ForkConfiguration forkConfiguration) {
+		return new BlockChainValidatorFactory().create(forkConfiguration);
+	}
 }

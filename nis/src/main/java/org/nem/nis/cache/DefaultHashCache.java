@@ -35,10 +35,8 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		this(new ImmutableObjectDeltaMap<>(initialCapacity), new SkipListDeltaMap<>(), retentionTime);
 	}
 
-	private DefaultHashCache(
-			final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
-			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap,
-			final int retentionTime) {
+	private DefaultHashCache(final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
+			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap, final int retentionTime) {
 		this.map = map;
 		this.navigationalMap = navigationalMap;
 		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
@@ -134,10 +132,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		}
 
 		// note that this is not copying at all.
-		final DefaultHashCache copy = new DefaultHashCache(
-				this.map.rebase(),
-				this.navigationalMap.rebase(),
-				this.retentionTime);
+		final DefaultHashCache copy = new DefaultHashCache(this.map.rebase(), this.navigationalMap.rebase(), this.retentionTime);
 		copy.isCopy = true;
 		return copy;
 	}

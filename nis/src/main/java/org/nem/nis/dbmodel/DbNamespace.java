@@ -5,8 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Namespace db entity
- * <br>
+ * Namespace db entity <br>
  * Holds information about a single namespace.
  */
 @Entity

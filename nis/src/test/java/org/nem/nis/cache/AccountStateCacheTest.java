@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -34,7 +35,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	 */
 	protected abstract T createCacheWithoutAutoCache();
 
-	//region findStateByAddress
+	// region findStateByAddress
 
 	@Test
 	public void findStateByAddressReturnsStateForAddress() {
@@ -46,9 +47,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state = cache.findStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state, IsNull.notNullValue());
-		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state, IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -63,34 +64,31 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state2 = cache.findStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state2, IsEqual.equalTo(state1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state2, IsEqual.equalTo(state1));
 	}
 
 	@Test
 	public void findStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findStateByAddress(address));
 	}
 
 	@Test
 	public void findStateByAddressDoesNotCacheStateForUnknownAddressInNonAutoCacheMode() {
 		// Act:
-		this.assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode((address, cache) -> cache.findStateByAddress(address));
 	}
 
 	@Test
 	public void findStateByAddressSucceedsForKnownAddressInNonAutoCacheMode() {
 		// Assert:
-		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findStateByAddress(address));
+		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode((address, cache) -> cache.findStateByAddress(address));
 	}
 
-	//endregion
+	// endregion
 
-	//region findLatestForwardedStateByAddress
+	// region findLatestForwardedStateByAddress
 
 	@Test
 	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
@@ -102,25 +100,25 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state = cache.findLatestForwardedStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state, IsNull.notNullValue());
-		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state, IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
 	public void findLatestForwardedStateByAddressReturnsLocalStateWhenAccountIsHarvestingRemotely() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findLatestForwardedStateByAddressReturnsRemoteStateWhenAccountIsRemoteHarvester() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(false));
 	}
 
 	private boolean isLatestLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
@@ -128,11 +126,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 		final AccountState state = this.addToCache(cache.copy(), address);
-		final RemoteLink link = new RemoteLink(
-				Utils.generateRandomAddress(),
-				new BlockHeight(remoteBlockHeight),
-				mode,
-				owner);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, owner);
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
@@ -145,8 +139,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findLatestForwardedStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findLatestForwardedStateByAddress(address));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findLatestForwardedStateByAddress(address));
 	}
 
 	@Test
@@ -159,13 +152,12 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void findLatestForwardedStateByAddressSucceedsForKnownAddressInNonAutoCacheMode() {
 		// Assert:
-		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(
-				(address, cache) -> cache.findLatestForwardedStateByAddress(address));
+		this.assertFunctionSucceedsForKnownAddressInNonAutoCachedMode((address, cache) -> cache.findLatestForwardedStateByAddress(address));
 	}
 
-	//endregion
+	// endregion
 
-	//region findForwardedStateByAddress
+	// region findForwardedStateByAddress
 
 	@Test
 	public void findForwardedStateByAddressReturnsStateForAddress() {
@@ -177,9 +169,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state, IsNull.notNullValue());
-		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state, IsNull.notNullValue());
+		MatcherAssert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -194,8 +186,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state2 = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state2, IsEqual.equalTo(state1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state2, IsEqual.equalTo(state1));
 	}
 
 	@Test
@@ -209,14 +201,13 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState forwardedState = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
+		MatcherAssert.assertThat(forwardedState, IsEqual.equalTo(state));
 	}
 
 	@Test
 	public void findForwardedStateByAddressFailsForInvalidAddress() {
 		// Assert:
-		this.assertFunctionFailsForInvalidAddress(
-				(address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
+		this.assertFunctionFailsForInvalidAddress((address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
 	}
 
 	@Test
@@ -233,9 +224,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 				(address, cache) -> cache.findForwardedStateByAddress(address, BlockHeight.ONE));
 	}
 
-	//endregion
+	// endregion
 
-	//region common helpers
+	// region common helpers
 
 	private void assertFunctionFailsForInvalidAddress(final BiFunction<Address, T, AccountState> findState) {
 		// Arrange:
@@ -243,9 +234,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> findState.apply(address, cache),
-				MissingResourceException.class);
+		ExceptionAssert.assertThrows(v -> findState.apply(address, cache), MissingResourceException.class);
 	}
 
 	private void assertFunctionDoesNotCacheStateForUnknownAddressInNonAutoCachedMode(final BiFunction<Address, T, AccountState> findState) {
@@ -257,8 +246,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state = findState.apply(address, cache);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(state, IsNull.notNullValue());
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(state, IsNull.notNullValue());
 	}
 
 	private void assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(final BiFunction<Address, T, AccountState> findState) {
@@ -271,112 +260,109 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState state2 = findState.apply(address, cache);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(state2, IsNull.notNullValue());
-		Assert.assertThat(state2.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(state2, IsSame.sameInstance(state1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(state2, IsNull.notNullValue());
+		MatcherAssert.assertThat(state2.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(state2, IsSame.sameInstance(state1));
 	}
 
-	//endregion
+	// endregion
 
-	//region HarvestingRemotely
+	// region HarvestingRemotely
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 2880, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1000, 2880, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedLessThanRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedLessThanRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenRemoteModeIsUnknown() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(UNKNOWN, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region RemoteHarvester
+	// region RemoteHarvester
 
 	@Test
 	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenActiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenActiveRemoteIsAgedLessThanRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenInactiveRemoteIsAgedLessThanRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY, owner), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenInactiveRemoteIsAgedAtLeastRemoteHarvestingDelayLimitBlocks() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(DEACTIVATE, 1000, REMOTE_HARVESTING_DELAY + 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenRemoteModeIsUnknown() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(UNKNOWN, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1, REMOTE_HARVESTING_DELAY + 1, owner), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight,
+			final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 		final AccountState state = this.addToCache(cache.copy(), address);
-		final RemoteLink link = new RemoteLink(
-				Utils.generateRandomAddress(),
-				new BlockHeight(remoteBlockHeight),
-				mode,
-				owner);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(remoteBlockHeight), mode, owner);
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
@@ -386,9 +372,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		return forwardedState.equals(state);
 	}
 
-	//endregion
+	// endregion
 
-	//region removeFromCache
+	// region removeFromCache
 
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
@@ -401,7 +387,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		cache.removeFromCache(address);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -415,7 +401,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		cache.removeFromCache(address);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -429,12 +415,12 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		cache.removeFromCache(Utils.generateRandomAddress());
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCreatesUnlinkedAccountStateCopy() {
@@ -456,15 +442,15 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState copyState3 = copy.findStateByAddress(address3);
 
 		// Assert:
-		Assert.assertThat(copy.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(3));
 		assertEquivalentButNotSame(copyState1, state1);
 		assertEquivalentButNotSame(copyState2, state2);
 		assertEquivalentButNotSame(copyState3, state3);
 	}
 
 	private static void assertEquivalentButNotSame(final AccountState lhs, final AccountState rhs) {
-		Assert.assertThat(lhs, IsNot.not(IsSame.sameInstance(rhs)));
-		Assert.assertThat(lhs.getAddress(), IsEqual.equalTo(rhs.getAddress()));
+		MatcherAssert.assertThat(lhs, IsNot.not(IsSame.sameInstance(rhs)));
+		MatcherAssert.assertThat(lhs.getAddress(), IsEqual.equalTo(rhs.getAddress()));
 	}
 
 	@Test
@@ -481,13 +467,13 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState copyStateFromPublicKey = copyCache.findStateByAddress(address1);
 
 		// Assert:
-		Assert.assertThat(copyCache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(copyStateFromEncoded, IsSame.sameInstance(copyStateFromPublicKey));
+		MatcherAssert.assertThat(copyCache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(copyStateFromEncoded, IsSame.sameInstance(copyStateFromPublicKey));
 	}
 
-	//endregion
+	// endregion
 
-	//region shallowCopyTo
+	// region shallowCopyTo
 
 	@Test
 	public void shallowCopyToCreatesLinkedCacheCopy() {
@@ -510,10 +496,10 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState copyState3 = copyCache.findStateByAddress(address3);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
-		Assert.assertThat(copyState2, IsSame.sameInstance(state2));
-		Assert.assertThat(copyState3, IsSame.sameInstance(state3));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(copyState1, IsSame.sameInstance(state1));
+		MatcherAssert.assertThat(copyState2, IsSame.sameInstance(state2));
+		MatcherAssert.assertThat(copyState3, IsSame.sameInstance(state3));
 	}
 
 	@Test
@@ -535,14 +521,14 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState copyState2 = copyCache.findStateByAddress(address2);
 
 		// Assert:
-		Assert.assertThat(copyCache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
-		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2))); // note that copyState2 is created on access
+		MatcherAssert.assertThat(copyCache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(copyState1, IsSame.sameInstance(state1));
+		MatcherAssert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2))); // note that copyState2 is created on access
 	}
 
-	//endregion
+	// endregion
 
-	//region undoVesting
+	// region undoVesting
 
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
@@ -552,7 +538,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 
 		// Expect: all accounts should have two weighted balance entries
 		for (final AccountState accountState : accountStates) {
-			Assert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(2));
 		}
 
 		// Act:
@@ -561,7 +547,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 
 		// Assert: one weighted balance entry should have been removed from all accounts
 		for (final ReadOnlyAccountState accountState : cache.contents().asCollection()) {
-			Assert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(1));
 		}
 	}
 
@@ -576,9 +562,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		return accountStates;
 	}
 
-	//endregion
+	// endregion
 
-	//region contents / mutable contents
+	// region contents / mutable contents
 
 	@Test
 	public void contentsReturnsAllAccounts() {
@@ -592,7 +578,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		this.assertContentsReturnsAllAccounts(AccountStateCache::mutableContents);
 	}
 
-	private void assertContentsReturnsAllAccounts(final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {
+	private void assertContentsReturnsAllAccounts(
+			final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {
 		// Arrange:
 		final AccountStateCache cache = this.createCache();
 
@@ -605,13 +592,12 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Collection<? extends ReadOnlyAccountState> contents = toContents.apply(cache).asCollection();
 
 		// Assert:
-		Assert.assertThat(contents.size(), IsEqual.equalTo(3));
-		Assert.assertThat(
-				contents.stream().map(ReadOnlyAccountState::getAddress).collect(Collectors.toList()),
+		MatcherAssert.assertThat(contents.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(contents.stream().map(ReadOnlyAccountState::getAddress).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(accountStates.stream().map(AccountState::getAddress).collect(Collectors.toList())));
 	}
 
-	//endregion
+	// endregion
 
 	private AccountState addToCache(final T cache, final Address address) {
 		// note: this is necessary in order for the state getting copied to the copiedValues map

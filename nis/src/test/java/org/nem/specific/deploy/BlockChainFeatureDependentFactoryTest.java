@@ -1,5 +1,6 @@
 package org.nem.specific.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -16,30 +17,26 @@ public class BlockChainFeatureDependentFactoryTest {
 		final Object object = createObject(BlockChainFeature.explode(7), BlockChainFeature.explode(2));
 
 		// Assert:
-		Assert.assertThat(object, IsNull.notNullValue());
+		MatcherAssert.assertThat(object, IsNull.notNullValue());
 	}
 
 	@Test
 	public void cannotCreateObjectIfMultipleMatchingFeaturesAreSelected() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> createObject(BlockChainFeature.explode(7), BlockChainFeature.explode(5)),
+		ExceptionAssert.assertThrows(v -> createObject(BlockChainFeature.explode(7), BlockChainFeature.explode(5)),
 				NisConfigurationException.class);
 	}
 
 	@Test
 	public void cannotCreateObjectIfNoMatchingFeaturesAreSelected() {
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> createObject(BlockChainFeature.explode(5), BlockChainFeature.explode(2)),
+		ExceptionAssert.assertThrows(v -> createObject(BlockChainFeature.explode(5), BlockChainFeature.explode(2)),
 				NisConfigurationException.class);
 	}
 
 	private static Object createObject(final BlockChainFeature[] configuredFeatures, final BlockChainFeature[] matchingFeatures) {
 		// Arrange:
-		final BlockChainConfiguration config = new BlockChainConfigurationBuilder()
-				.setBlockChainFeatures(configuredFeatures)
-				.build();
+		final BlockChainConfiguration config = new BlockChainConfigurationBuilder().setBlockChainFeatures(configuredFeatures).build();
 
 		final Map<BlockChainFeature, Supplier<Object>> featureSupplierMap = new HashMap<>();
 		Arrays.stream(matchingFeatures).forEach(feature -> featureSupplierMap.put(feature, Object::new));

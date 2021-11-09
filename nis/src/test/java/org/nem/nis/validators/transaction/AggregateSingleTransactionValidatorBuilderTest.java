@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -11,9 +12,11 @@ import org.nem.nis.validators.*;
 
 import java.util.*;
 
-public class AggregateSingleTransactionValidatorBuilderTest extends AggregateValidatorBuilderTest<AggregateSingleTransactionValidatorBuilder, SingleTransactionValidator, Transaction> {
+public class AggregateSingleTransactionValidatorBuilderTest
+		extends
+			AggregateValidatorBuilderTest<AggregateSingleTransactionValidatorBuilder, SingleTransactionValidator, Transaction> {
 
-	//region AggregateValidatorBuilderTest
+	// region AggregateValidatorBuilderTest
 
 	@Override
 	public AggregateSingleTransactionValidatorBuilder createBuilder() {
@@ -48,15 +51,14 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 	}
 
 	@Override
-	public void verifyValidate(final SingleTransactionValidator validator, final Transaction transaction, final VerificationMode verificationMode) {
+	public void verifyValidate(final SingleTransactionValidator validator, final Transaction transaction,
+			final VerificationMode verificationMode) {
 		Mockito.verify(validator, verificationMode).validate(Mockito.eq(transaction), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region mapping
-
-	//region SingleTransactionValidator mapping
+	// region SingleTransactionValidator mapping
 
 	@Test
 	public void singleValidationDelegatesToSingleTransactionValidator() {
@@ -72,13 +74,13 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		final ValidationResult result = aggregate.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(validator, Mockito.only()).validate(transaction, validationContext);
 	}
 
-	//endregion
+	// endregion
 
-	//region BatchTransactionValidator mapping
+	// region BatchTransactionValidator mapping
 
 	@Test
 	public void singleValidationDelegatesToBatchTransactionValidator() {
@@ -94,24 +96,24 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 		final ValidationResult result = aggregate.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
 		Mockito.verify(validator, Mockito.only()).validate(pairsCaptor.capture());
 
 		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-		Assert.assertThat(pair.getContext(), IsSame.sameInstance(validationContext));
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
+		MatcherAssert.assertThat(pair.getContext(), IsSame.sameInstance(validationContext));
+		MatcherAssert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
-		return ArgumentCaptor.forClass((Class)List.class);
+		return ArgumentCaptor.forClass((Class) List.class);
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 
 	private static BatchTransactionValidator createBatchValidator(final ValidationResult result) {
 		final BatchTransactionValidator validator = Mockito.mock(BatchTransactionValidator.class);

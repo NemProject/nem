@@ -9,11 +9,11 @@ import org.nem.nis.validators.ValidationContext;
 import java.util.HashSet;
 
 /**
- * Single transaction validator that validates a multisig aggregate modification:
- * - Only adds accounts that are not already cosigners.
- * - Only deletes accounts that are cosigners.
- * - There are no duplicate add or delete modifications.
- * - A delete aggregate modification can delete at most one account.
+ * Single transaction validator that validates a multisig aggregate modification:<br>
+ * - Only adds accounts that are not already cosigners.<br>
+ * - Only deletes accounts that are cosigners.<br>
+ * - There are no duplicate add or delete modifications.<br>
+ * - A delete aggregate modification can delete at most one account.<br>
  * - Only adds accounts that are not multisig accounts.
  */
 public class MultisigCosignatoryModificationValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
@@ -30,7 +30,8 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
-		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion()) > context.getBlockHeight().getRaw() && transaction.getEntityVersion() != 1) {
+		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion()) > context.getBlockHeight().getRaw()
+				&& transaction.getEntityVersion() != 1) {
 			return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
 		}
 
@@ -63,6 +64,8 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 					}
 
 					accountsToRemove.add(cosignerAddress);
+					break;
+				default :
 					break;
 			}
 		}

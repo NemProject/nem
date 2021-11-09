@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -23,7 +24,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	@Override
 	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 			case 1:
@@ -33,7 +34,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 			case 3:
 			case 4:
 				return Collections.emptyList();
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}
@@ -41,7 +42,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	@Override
 	protected List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		final List<Integer> expectedIds = Arrays.asList(baseId + 27, baseId + 24, baseId + 20, baseId + 17, baseId + 14, baseId + 10);
 		switch (accountIndex) {
 			case 0:
@@ -51,7 +52,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 			case 3:
 			case 4:
 				return expectedIds;
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}
@@ -75,17 +76,14 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 		final TransactionRetriever retriever = this.getTransactionRetriever();
 		for (final Account ACCOUNT : ACCOUNTS) {
 			// Act:
-			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
-					this.session,
-					this.getAccountId(ACCOUNT),
-					Long.MAX_VALUE,
-					100,
-					transferType);
+			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(this.session, this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE, 100, transferType);
 
 			// Assert:
-			pairs.stream().forEach(p -> Assert.assertThat(
-					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
-					IsNull.nullValue()));
+			pairs.stream()
+					.forEach(p -> MatcherAssert.assertThat(
+							DbModelUtils.getInnerTransaction((DbMultisigTransaction) p.getTransfer()).getSenderProof(),
+							IsNull.nullValue()));
 		}
 	}
 
@@ -101,25 +99,16 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 		final MappingRepository repository = factory.createDbModelToModelMapper(new DefaultAccountCache().copy());
 
 		// Act:
-		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
-				this.session,
-				this.getAccountId(ACCOUNTS[0]),
-				Long.MAX_VALUE,
-				100,
-				ReadOnlyTransferDao.TransferType.OUTGOING);
+		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(this.session, this.getAccountId(ACCOUNTS[0]),
+				Long.MAX_VALUE, 100, ReadOnlyTransferDao.TransferType.OUTGOING);
 		final Collection<Long> quantities = pairs.stream()
-				.map(p -> DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()))
-				.map(t -> repository.map(t, Transaction.class))
-				.filter(t -> TransactionTypes.TRANSFER == t.getType())
-				.map(t -> (TransferTransaction)t)
-				.map(t -> t.getAttachment().getMosaics())
-				.findFirst().get()
-				.stream()
-				.map(m -> m.getQuantity().getRaw())
-				.collect(Collectors.toList());
+				.map(p -> DbModelUtils.getInnerTransaction((DbMultisigTransaction) p.getTransfer()))
+				.map(t -> repository.map(t, Transaction.class)).filter(t -> TransactionTypes.TRANSFER == t.getType())
+				.map(t -> (TransferTransaction) t).map(t -> t.getAttachment().getMosaics()).findFirst().get().stream()
+				.map(m -> m.getQuantity().getRaw()).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
+		MatcherAssert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
 	}
 
 	// endregion

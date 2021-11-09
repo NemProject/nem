@@ -5,8 +5,8 @@ import org.nem.core.model.primitive.*;
 import java.util.ArrayList;
 
 /**
- * Trivial clustering: Do not scan at all but build one cluster with all nodes in it.
- * Using this clusterer the NCD-aware algorithm equals the original PR algorithm.
+ * Trivial clustering: Do not scan at all but build one cluster with all nodes in it. Using this clusterer the NCD-aware algorithm equals
+ * the original PR algorithm.
  */
 public class SingleClusterScan implements GraphClusteringStrategy {
 

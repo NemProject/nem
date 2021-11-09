@@ -5,13 +5,12 @@ import org.nem.core.utils.SetOnce;
 import java.util.function.Supplier;
 
 /**
- * Helper class for storing NEM globals related to behavior of nem state.
- * <br>
+ * Helper class for storing NEM globals related to behavior of nem state. <br>
  * This class should really be used sparingly!
  */
 public class NemStateGlobals {
-	private static final SetOnce<Supplier<WeightedBalances>> WEIGHTED_BALANCES_SUPPLIER =
-			new SetOnce<>(TimeBasedVestingWeightedBalances::new);
+	private static final SetOnce<Supplier<WeightedBalances>> WEIGHTED_BALANCES_SUPPLIER = new SetOnce<>(
+			TimeBasedVestingWeightedBalances::new);
 
 	/**
 	 * Creates a weighted balances object using the currently configured policy.

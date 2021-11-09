@@ -28,11 +28,11 @@ public class MosaicDefinitionRawToDbModelMapping implements IMapping<Object[], D
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		dbMosaicDefinition.setId(RawMapperUtils.castToLong(source[0]));
 		dbMosaicDefinition.setCreator(dbCreator);
-		dbMosaicDefinition.setName((String)source[2]);
-		dbMosaicDefinition.setDescription((String)source[3]);
-		dbMosaicDefinition.setNamespaceId((String)source[4]);
+		dbMosaicDefinition.setName((String) source[2]);
+		dbMosaicDefinition.setDescription((String) source[3]);
+		dbMosaicDefinition.setNamespaceId((String) source[4]);
 		dbMosaicDefinition.setProperties(new HashSet<>());
-		dbMosaicDefinition.setFeeType((Integer)source[5]);
+		dbMosaicDefinition.setFeeType((Integer) source[5]);
 		dbMosaicDefinition.setFeeRecipient(dbFeeRecipient);
 		dbMosaicDefinition.setFeeDbMosaicId(RawMapperUtils.castToLong(source[7]));
 		dbMosaicDefinition.setFeeQuantity(RawMapperUtils.castToLong(source[8]));

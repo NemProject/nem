@@ -1,12 +1,13 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
 public class DbMosaicDefinitionCreationTransactionTest {
 
-	//region setSender
+	// region setSender
 
 	@Test
 	public void setSenderSetsCreatorInMosaic() {
@@ -18,8 +19,8 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		transaction.setSender(sender);
 
 		// Assert:
-		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getMosaicDefinition().getCreator(), IsSame.sameInstance(sender));
+		MatcherAssert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transaction.getMosaicDefinition().getCreator(), IsSame.sameInstance(sender));
 	}
 
 	@Test
@@ -32,8 +33,8 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		transaction.setSender(sender);
 
 		// Assert:
-		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(sender));
+		MatcherAssert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(sender));
 	}
 
 	@Test
@@ -46,8 +47,8 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		transaction.setSender(sender);
 
 		// Assert:
-		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsEqual.equalTo(new DbAccount(234L)));
+		MatcherAssert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsEqual.equalTo(new DbAccount(234L)));
 	}
 
 	@Test
@@ -70,10 +71,10 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		transaction.setSender(new DbAccount(123L));
 
 		// Assert:
-		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(feeRecipient));
+		MatcherAssert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(feeRecipient));
 	}
 
-	//endregion
+	// endregion
 
 	private static DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount feeRecipient) {
 		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();

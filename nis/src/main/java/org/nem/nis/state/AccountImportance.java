@@ -34,10 +34,7 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	 * @param importance The importance.
 	 * @param lastPageRank The last page rank.
 	 */
-	public AccountImportance(
-			final BlockHeight height,
-			final double importance,
-			final double lastPageRank) {
+	public AccountImportance(final BlockHeight height, final double importance, final double lastPageRank) {
 		this();
 		this.importanceHeight = height;
 		this.importance = importance;
@@ -70,10 +67,7 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	 * @param accountLink The account link to add.
 	 */
 	public void addOutlink(final AccountLink accountLink) {
-		this.historicalOutlinks.add(
-				accountLink.getHeight(),
-				accountLink.getOtherAccountAddress(),
-				accountLink.getAmount());
+		this.historicalOutlinks.add(accountLink.getHeight(), accountLink.getOtherAccountAddress(), accountLink.getAmount());
 	}
 
 	/**
@@ -82,10 +76,7 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	 * @param accountLink The account link to remove.
 	 */
 	public void removeOutlink(final AccountLink accountLink) {
-		this.historicalOutlinks.remove(
-				accountLink.getHeight(),
-				accountLink.getOtherAccountAddress(),
-				accountLink.getAmount());
+		this.historicalOutlinks.remove(accountLink.getHeight(), accountLink.getOtherAccountAddress(), accountLink.getAmount());
 	}
 
 	@Override

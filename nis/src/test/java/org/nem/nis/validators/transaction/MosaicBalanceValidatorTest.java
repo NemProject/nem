@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -35,7 +36,7 @@ public class MosaicBalanceValidatorTest {
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 	}
 
@@ -60,12 +61,13 @@ public class MosaicBalanceValidatorTest {
 		@Override
 		protected Transaction createTransaction(final long delta) {
 			// Arrange: create a real TransferTransaction because all levy logic is in TransferTransaction class :/
-			//          seed the account with two extra quantity because the levy costs 2
+			// seed the account with two extra quantity because the levy costs 2
 			final Account sender = this.createAccount(createMosaic(MOSAIC_WITH_LEVY_ID, 102 + delta));
 			final Account recipient = this.createAccount(null);
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 			attachment.addMosaic(Utils.createMosaicId(MOSAIC_WITH_LEVY_ID), Quantity.fromValue(100));
-			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO,  sender,  recipient,  Amount.fromNem(1), attachment);
+			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(1),
+					attachment);
 			transaction.setFee(Amount.fromNem(0));
 			return transaction;
 		}
@@ -104,12 +106,10 @@ public class MosaicBalanceValidatorTest {
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
 			// Act:
-			final ValidationResult result = validator.validate(
-					transaction,
-					createValidationContext(this.createMosaicDebitPredicate()));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 
 		@Test
@@ -125,12 +125,10 @@ public class MosaicBalanceValidatorTest {
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
 			// Act:
-			final ValidationResult result = validator.validate(
-					transaction,
-					createValidationContext(this.createMosaicDebitPredicate()));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		}
 
 		@Test
@@ -155,12 +153,10 @@ public class MosaicBalanceValidatorTest {
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
 			// Act:
-			final ValidationResult result = validator.validate(
-					transaction,
-					createValidationContext(this.createMosaicDebitPredicate()));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		}
 
 		@Test
@@ -185,12 +181,10 @@ public class MosaicBalanceValidatorTest {
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
 			// Act:
-			final ValidationResult result = validator.validate(
-					transaction,
-					createValidationContext(this.createMosaicDebitPredicate()));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		}
 	}
 
@@ -225,12 +219,10 @@ public class MosaicBalanceValidatorTest {
 			final Transaction transaction = this.createTransaction(balanceDelta);
 
 			// Act:
-			final ValidationResult result = validator.validate(
-					transaction,
-					createValidationContext(this.createMosaicDebitPredicate()));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
 		protected Account createAccount(final Mosaic mosaic) {
@@ -262,21 +254,13 @@ public class MosaicBalanceValidatorTest {
 			final Account namespaceOwner = Utils.generateRandomAccount();
 			copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
 
-			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-					namespaceOwner,
-					mosaicId,
-					new MosaicDescriptor("awesome mosaic"),
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(namespaceOwner, mosaicId, new MosaicDescriptor("awesome mosaic"),
 					Utils.createMosaicProperties(),
 					new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, Quantity.fromValue(2)));
-			copyCache.getNamespaceCache()
-					.get(mosaicId.getNamespaceId())
-					.getMosaics()
-					.add(mosaicDefinition);
+			copyCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics().add(mosaicDefinition);
 			copyCache.commit();
 
-			final ValidationState validationState = new ValidationState(
-					DebitPredicates.XemThrow,
-					mosaicDebitPredicate,
+			final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate,
 					NisCacheUtils.createTransactionExecutionState(readOnlyNisCache));
 			return new ValidationContext(validationState);
 		}

@@ -25,11 +25,8 @@ public class PeerNetworkBootstrapper {
 	 * @param selectorFactory The node selector factory.
 	 * @param ipDetectionMode The desired IP detection mode.
 	 */
-	public PeerNetworkBootstrapper(
-			final PeerNetworkState state,
-			final PeerNetworkServicesFactory servicesFactory,
-			final PeerNetworkNodeSelectorFactory selectorFactory,
-			final IpDetectionMode ipDetectionMode) {
+	public PeerNetworkBootstrapper(final PeerNetworkState state, final PeerNetworkServicesFactory servicesFactory,
+			final PeerNetworkNodeSelectorFactory selectorFactory, final IpDetectionMode ipDetectionMode) {
 		this.ipDetectionMode = ipDetectionMode;
 		this.network = new PeerNetwork(state, servicesFactory, selectorFactory);
 	}
@@ -66,15 +63,14 @@ public class PeerNetworkBootstrapper {
 				? CompletableFuture.completedFuture(true)
 				: this.network.boot();
 
-		return future
-				.handle((result, e) -> {
-					if (null != e || (!result && IpDetectionMode.AutoRequired == this.ipDetectionMode)) {
-						this.canBoot.set(true);
-						throw new IllegalStateException("network boot failed", e);
-					}
+		return future.handle((result, e) -> {
+			if (null != e || (!result && IpDetectionMode.AutoRequired == this.ipDetectionMode)) {
+				this.canBoot.set(true);
+				throw new IllegalStateException("network boot failed", e);
+			}
 
-					this.isBooted = true;
-					return this.network;
-				});
+			this.isBooted = true;
+			return this.network;
+		});
 	}
 }

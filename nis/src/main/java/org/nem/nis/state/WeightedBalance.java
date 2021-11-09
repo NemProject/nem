@@ -4,10 +4,9 @@ import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.*;
 
 /**
- * Calculates vested and unvested balances at a specified block height.
- * <br>
- * This class is really just an implementation detail of WeightedBalances (it is package private).
- * As a result, it holds a few things that only make sense the context of that class (like amount).
+ * Calculates vested and unvested balances at a specified block height. <br>
+ * This class is really just an implementation detail of WeightedBalances (it is package private). As a result, it holds a few things that
+ * only make sense the context of that class (like amount).
  */
 class WeightedBalance implements Comparable<WeightedBalance> {
 	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
@@ -18,7 +17,7 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 	private final Amount balance;
 	private final Amount amount;
 
-	//region create*
+	// region create*
 
 	/**
 	 * Creates a weighted balance that is fully unvested.
@@ -55,11 +54,7 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 		return new WeightedBalance(balance, height, balance, unvested.getNumMicroNem(), vested.getNumMicroNem());
 	}
 
-	private WeightedBalance(
-			final Amount amount,
-			final BlockHeight blockHeight,
-			final Amount balance,
-			final long unvestedBalance,
+	private WeightedBalance(final Amount amount, final BlockHeight blockHeight, final Amount balance, final long unvestedBalance,
 			final long vestedBalance) {
 		this.amount = amount;
 		this.blockHeight = blockHeight;
@@ -68,11 +63,10 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 		this.balance = balance;
 	}
 
-	//endregion
+	// endregion
 
 	/**
-	 * Creates a new weighted balance representing a new relative outflow (send).
-	 * This decreases the balance.
+	 * Creates a new weighted balance representing a new relative outflow (send). This decreases the balance.
 	 *
 	 * @param blockHeight The block height.
 	 * @param amount The amount sent.
@@ -80,8 +74,8 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 	 */
 	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
 		final Amount balance = this.balance.subtract(amount);
-		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
-		final long sendUv = (long)(ratio * amount.getNumMicroNem());
+		final double ratio = (double) this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
+		final long sendUv = (long) (ratio * amount.getNumMicroNem());
 		long unvested = this.unvestedBalance - sendUv;
 		long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
 		if (0 > vested) {
@@ -93,8 +87,7 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	/**
-	 * Creates a new weighted balance representing a new relative inflow (receive).
-	 * This increases the balance.
+	 * Creates a new weighted balance representing a new relative inflow (receive). This increases the balance.
 	 *
 	 * @param blockHeight The block height.
 	 * @param amount The amount received.
@@ -121,19 +114,15 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The next weighted balance.
 	 */
 	public WeightedBalance next() {
-		final long newUv = this.unvestedBalance * WeightedBalanceDecayConstants.DECAY_NUMERATOR / WeightedBalanceDecayConstants.DECAY_DENOMINATOR;
+		final long newUv = this.unvestedBalance * WeightedBalanceDecayConstants.DECAY_NUMERATOR
+				/ WeightedBalanceDecayConstants.DECAY_DENOMINATOR;
 		final long move = this.unvestedBalance - newUv;
 
 		final long blocksPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
 		final long originalHeight = this.blockHeight.getRaw();
 		final BlockHeight height = new BlockHeight(1 + ((originalHeight + blocksPerDay - 1) / blocksPerDay) * blocksPerDay);
 
-		return new WeightedBalance(
-				Amount.ZERO,
-				height,
-				this.balance,
-				this.unvestedBalance - move,
-				this.vestedBalance + move);
+		return new WeightedBalance(Amount.ZERO, height, this.balance, this.unvestedBalance - move, this.vestedBalance + move);
 	}
 
 	/**
@@ -173,10 +162,9 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	/**
-	 * Gets the amount of the inflow or outflow that is associated with this balance. This is typically one of:
-	 * - The magnitude of the initial balance if this weighted balance was created by a factory function.
-	 * - The magnitude of the inflow or outflow if this weighted balance was created by a send or receive.
-	 * - Amount.ZERO if this weighted balance was created by aging.
+	 * Gets the amount of the inflow or outflow that is associated with this balance. This is typically one of: - The magnitude of the
+	 * initial balance if this weighted balance was created by a factory function. - The magnitude of the inflow or outflow if this weighted
+	 * balance was created by a send or receive. - Amount.ZERO if this weighted balance was created by aging.
 	 *
 	 * @return The total amount.
 	 */

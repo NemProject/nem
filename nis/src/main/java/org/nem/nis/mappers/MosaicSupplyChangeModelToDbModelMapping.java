@@ -6,7 +6,9 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a model mosaic supply change transaction to a db mosaic supply change transaction.
  */
-public class MosaicSupplyChangeModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MosaicSupplyChangeTransaction, DbMosaicSupplyChangeTransaction> {
+public class MosaicSupplyChangeModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<MosaicSupplyChangeTransaction, DbMosaicSupplyChangeTransaction> {
 
 	/**
 	 * Creates a new mapping.

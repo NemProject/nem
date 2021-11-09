@@ -6,8 +6,8 @@ import org.nem.nis.state.ReadOnlyMultisigLinks;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * Single transaction validator that validates a multisig aggregate modification:
- * - will not cause a multisig account to have greater than MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT cosigners
+ * Single transaction validator that validates a multisig aggregate modification:<br>
+ * - will not cause a multisig account to have greater than MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT cosigners<br>
  * - will not cause the min cosignatories value to be out of range (less than zero or greater than the number of cosigners)
  */
 public class NumCosignatoryRangeValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
@@ -36,6 +36,8 @@ public class NumCosignatoryRangeValidator implements TSingleTransactionValidator
 
 				case DelCosignatory:
 					--numCosigners;
+					break;
+				default :
 					break;
 			}
 		}

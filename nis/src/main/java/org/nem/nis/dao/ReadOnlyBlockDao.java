@@ -29,8 +29,7 @@ public interface ReadOnlyBlockDao {
 	DbBlock findByHeight(final BlockHeight height);
 
 	/**
-	 * Retrieves list of at most limit hashes for blocks starting at given height.
-	 * This should be used, not to pull whole block from the db.
+	 * Retrieves list of at most limit hashes for blocks starting at given height. This should be used, not to pull whole block from the db.
 	 *
 	 * @param height height of a first block.
 	 * @param limit maximum number of hashes to return.
@@ -58,9 +57,8 @@ public interface ReadOnlyBlockDao {
 	Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
 
 	/**
-	 * Gets at most blocksCount blocks after blockHeight.
-	 * This function has the side-effect of updating the mosaic id cache and
-	 * should only be called on startup during the initial block loading.
+	 * Gets at most blocksCount blocks after blockHeight. This function has the side-effect of updating the mosaic id cache and should only
+	 * be called on startup during the initial block loading.
 	 *
 	 * @param height The height of the block before the first desired block.
 	 * @param limit The maximum number of blocks to return.

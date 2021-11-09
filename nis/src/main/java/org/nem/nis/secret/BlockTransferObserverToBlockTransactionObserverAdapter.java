@@ -5,8 +5,8 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
 /**
- * An observer that implements BlockTransactionObserver by forwarding all transfer notifications
- * to the wrapped BlockTransferObserver implementation.
+ * An observer that implements BlockTransactionObserver by forwarding all transfer notifications to the wrapped BlockTransferObserver
+ * implementation.
  */
 public class BlockTransferObserverToBlockTransactionObserverAdapter implements BlockTransactionObserver {
 	private final BlockTransferObserver observer;
@@ -29,15 +29,17 @@ public class BlockTransferObserverToBlockTransactionObserverAdapter implements B
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		switch (notification.getType()) {
 			case BalanceTransfer:
-				this.notifyBlockTransfer((BalanceTransferNotification)notification, context);
+				this.notifyBlockTransfer((BalanceTransferNotification) notification, context);
 				break;
 
 			case BalanceCredit:
-				this.notifyCredit((BalanceAdjustmentNotification)notification, context);
+				this.notifyCredit((BalanceAdjustmentNotification) notification, context);
 				break;
 
 			case BalanceDebit:
-				this.notifyDebit((BalanceAdjustmentNotification)notification, context);
+				this.notifyDebit((BalanceAdjustmentNotification) notification, context);
+				break;
+			default :
 				break;
 		}
 	}

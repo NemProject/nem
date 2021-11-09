@@ -1,5 +1,6 @@
 package org.nem.nis.validators.unconfirmed;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,7 +17,7 @@ import java.util.function.Consumer;
 
 public class BatchUniqueHashTransactionValidatorTest {
 
-	//region some transaction hash already exists in cache
+	// region some transaction hash already exists in cache
 
 	@Test
 	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInHashCache() {
@@ -33,10 +34,10 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void validateReturnsSuccessIfCalledWithEmptyList() {
@@ -47,7 +48,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(Collections.emptyList());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static class TestContext {
@@ -79,8 +80,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private void setTransactionHashCacheForHashes() {
-			Mockito.when(this.transactionHashCache.anyHashExists(this.hashes))
-					.thenReturn(true);
+			Mockito.when(this.transactionHashCache.anyHashExists(this.hashes)).thenReturn(true);
 		}
 
 		private ValidationResult validateAtHeight(final long height) {
@@ -91,9 +91,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private TransactionsContextPair createPair(final int start, final int end, final long height) {
-			final ValidationContext validationContext = new ValidationContext(
-					new BlockHeight(height),
-					this.confirmedBlockHeight,
+			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight,
 					ValidationStates.Throw);
 			final List<Transaction> transactions = new ArrayList<>();
 			for (int i = start; i <= end; ++i) {

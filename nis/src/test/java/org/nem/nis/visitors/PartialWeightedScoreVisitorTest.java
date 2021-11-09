@@ -1,5 +1,6 @@
 package org.nem.nis.visitors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Block;
@@ -15,26 +16,26 @@ public class PartialWeightedScoreVisitorTest {
 		final PartialWeightedScoreVisitor visitor = new PartialWeightedScoreVisitor(scorer);
 
 		// Assert: score is initially zero
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(BlockChainScore.ZERO));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(BlockChainScore.ZERO));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 1);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(1)));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(1)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 4);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(5)));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(5)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 14);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(19)));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(19)));
 
 		// Act / Assert:
 		visitBlockWithScore(visitor, scorer, 7);
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(26)));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(26)));
 
 		// Assert: scores are unchanged in-between visits
-		Assert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(26)));
+		MatcherAssert.assertThat(visitor.getScore(), IsEqual.equalTo(new BlockChainScore(26)));
 	}
 
 	private static void visitBlockWithScore(final BlockVisitor visitor, final MockBlockScorer scorer, final long score) {

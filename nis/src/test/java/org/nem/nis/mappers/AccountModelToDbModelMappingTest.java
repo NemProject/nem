@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -23,7 +24,7 @@ public class AccountModelToDbModelMappingTest {
 		final DbAccount dbAccount = mapping.map(account);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsEqual.equalTo(dbAccountReturnedByAccountLookup));
+		MatcherAssert.assertThat(dbAccount, IsEqual.equalTo(dbAccountReturnedByAccountLookup));
 		Mockito.verify(accountLookup, Mockito.only()).findByAddress(account.getAddress());
 	}
 }

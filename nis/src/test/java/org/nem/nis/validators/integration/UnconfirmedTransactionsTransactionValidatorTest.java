@@ -1,32 +1,27 @@
 package org.nem.nis.validators.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
 public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTransactionValidationTest {
 
 	@Override
-	protected void assertTransactions(
-			final BlockHeight chainHeight,
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			List<Transaction> expectedFiltered,
-			final ValidationResult expectedResult) {
+	protected void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
+			List<Transaction> expectedFiltered, final ValidationResult expectedResult) {
 		// Arrange:
-		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
-				NisUtils.createTransactionValidatorFactory(),
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(),
 				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> chainHeight,
-				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK,
+				new ForkConfiguration());
 		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);
@@ -36,10 +31,10 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 
 			// Assert:
 			if (expectedFiltered.contains(t)) {
-				Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+				MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 				expectedFiltered.remove(t);
 			} else {
-				Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+				MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 			}
 		}
 	}

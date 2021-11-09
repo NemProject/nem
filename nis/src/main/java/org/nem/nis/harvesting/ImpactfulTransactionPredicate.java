@@ -27,8 +27,7 @@ public class ImpactfulTransactionPredicate implements BiPredicate<Address, Trans
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
-		return transaction.getAccounts().stream()
-				.map(Account::getAddress)
+		return transaction.getAccounts().stream().map(Account::getAddress)
 				.anyMatch(transactionAddress -> transactionAddress.equals(address));
 	}
 
@@ -38,6 +37,6 @@ public class ImpactfulTransactionPredicate implements BiPredicate<Address, Trans
 		}
 
 		final ReadOnlyAccountState state = this.accountStateCache.findStateByAddress(address);
-		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)transaction).getOtherTransaction().getSigner().getAddress());
+		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction) transaction).getOtherTransaction().getSigner().getAddress());
 	}
 }

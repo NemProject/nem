@@ -24,14 +24,13 @@ public class AccountDaoImpl implements AccountDao {
 	@Override
 	@Transactional(readOnly = true)
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
-		final Query query = this.getCurrentSession()
-				.createQuery("from DbAccount a where a.printableKey = :key")
-				.setParameter("key", printableAddress);
+		final Query query = this.getCurrentSession().createQuery("from DbAccount a where a.printableKey = :key").setParameter("key",
+				printableAddress);
 		return firstFromQuery(query);
 	}
 
 	private static DbAccount firstFromQuery(final Query query) {
 		final List<?> userList = query.list();
-		return !userList.isEmpty() ? (DbAccount)userList.get(0) : null;
+		return !userList.isEmpty() ? (DbAccount) userList.get(0) : null;
 	}
 }

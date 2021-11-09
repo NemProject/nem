@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
@@ -7,7 +8,7 @@ import org.nem.core.test.ExceptionAssert;
 
 public class TimeBasedVestingWeightedBalancesTest {
 
-	//region addReceive
+	// region addReceive
 
 	@Test
 	public void canAddToEmptyBalances() {
@@ -62,9 +63,10 @@ public class TimeBasedVestingWeightedBalancesTest {
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.next().getUnvestedBalance());
 		assertUnvested(weightedBalances, 2881 + 1440, Amount.fromMicroNem(400_167_000L));
 	}
-	//endregion
 
-	//region receiveUndo
+	// endregion
+
+	// region receiveUndo
 
 	@Test
 	public void undoRestoresProperBalance() {
@@ -85,12 +87,13 @@ public class TimeBasedVestingWeightedBalancesTest {
 		// Assert:
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 		// use previous test as a reference to obtain proper value here
-		Assert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(400_167_000L)));
+		MatcherAssert.assertThat(afterNext, IsEqual.equalTo(Amount.fromMicroNem(400_167_000L)));
 		assertUnvested(weightedBalances, 2881 + 1440, referenceBalance.getUnvestedBalance());
 	}
-	//endregion
 
-	//region addSend
+	// endregion
+
+	// region addSend
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSendFromEmptyBalances() {
@@ -171,7 +174,7 @@ public class TimeBasedVestingWeightedBalancesTest {
 
 		// Assert:
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
-		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem((long)(123_000_000 * .9)));
+		assertUnvested(weightedBalances, 1441, Amount.fromMicroNem((long) (123_000_000 * .9)));
 	}
 
 	@Test
@@ -211,9 +214,9 @@ public class TimeBasedVestingWeightedBalancesTest {
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 	}
 
-	//endregion
+	// endregion
 
-	//region safety checks
+	// region safety checks
 
 	@Test
 	public void addSendThrowsIfPassedHeightIsPriorToLastHeight() {
@@ -221,7 +224,8 @@ public class TimeBasedVestingWeightedBalancesTest {
 		final WeightedBalances weightedBalances = setupWeightedBalances();
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.addSend(new BlockHeight(9), Amount.fromNem(321)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.addSend(new BlockHeight(9), Amount.fromNem(321)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -230,7 +234,8 @@ public class TimeBasedVestingWeightedBalancesTest {
 		final WeightedBalances weightedBalances = setupWeightedBalances();
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.addReceive(new BlockHeight(9), Amount.fromNem(321)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.addReceive(new BlockHeight(9), Amount.fromNem(321)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -239,8 +244,10 @@ public class TimeBasedVestingWeightedBalancesTest {
 		final WeightedBalances weightedBalances = setupWeightedBalances();
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(9), Amount.fromNem(123)), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(11), Amount.fromNem(123)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(9), Amount.fromNem(123)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(11), Amount.fromNem(123)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -249,8 +256,10 @@ public class TimeBasedVestingWeightedBalancesTest {
 		final WeightedBalances weightedBalances = setupWeightedBalances();
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(122)), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(124)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(122)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(124)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -260,8 +269,10 @@ public class TimeBasedVestingWeightedBalancesTest {
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(9), Amount.fromNem(1234)), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(11), Amount.fromNem(1234)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(9), Amount.fromNem(1234)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(11), Amount.fromNem(1234)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -271,8 +282,10 @@ public class TimeBasedVestingWeightedBalancesTest {
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 
 		// Act + Assert:
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1233)), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1235)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1233)),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1235)),
+				IllegalArgumentException.class);
 	}
 
 	private static WeightedBalances setupWeightedBalances() {
@@ -282,9 +295,9 @@ public class TimeBasedVestingWeightedBalancesTest {
 		return weightedBalances;
 	}
 
-	//endregion
+	// endregion
 
-	//region getVested / getUnvested
+	// region getVested / getUnvested
 
 	@Test
 	public void getVestedReturnsAmountZeroIfBalancesAreEmpty() {
@@ -377,9 +390,9 @@ public class TimeBasedVestingWeightedBalancesTest {
 		assertUnvested(weightedBalances, 15, Amount.fromNem(2200));
 	}
 
-	//endregion
+	// endregion
 
-	//region convertToFullyVested
+	// region convertToFullyVested
 
 	@Test
 	public void convertToFullyVestedFailsIfBalancesSizeIsNotOne() {
@@ -412,20 +425,20 @@ public class TimeBasedVestingWeightedBalancesTest {
 		// Arrange:
 		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
+		MatcherAssert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
 
 		// Act:
 		weightedBalances.convertToFullyVested();
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
+		MatcherAssert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void canCopyWeightedBalances() {
@@ -445,34 +458,33 @@ public class TimeBasedVestingWeightedBalancesTest {
 		assertEqualAtHeight(copiedBalances, originalBalances, height2);
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAtPruneHeight() {
 		// Arrange:
-		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
+		final long[] heights = new long[]{
+				1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4
+		};
 		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[3]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[4]), Amount.fromNem(23));
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
 
-		final WeightedBalance referenceBalance =
-				WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000))
-						.next()
-						.createSend(new BlockHeight(heights[1]), Amount.fromNem(23))
-						.next()
-						.createSend(new BlockHeight(heights[2]), Amount.fromNem(23));
+		final WeightedBalance referenceBalance = WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000)).next()
+				.createSend(new BlockHeight(heights[1]), Amount.fromNem(23)).next()
+				.createSend(new BlockHeight(heights[2]), Amount.fromNem(23));
 
 		// Act:
 		weightedBalances.prune(new BlockHeight(heights[2]));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
 		assertVested(weightedBalances, heights[2], referenceBalance.getVestedBalance());
 		assertUnvested(weightedBalances, heights[2], referenceBalance.getUnvestedBalance());
 	}
@@ -480,36 +492,34 @@ public class TimeBasedVestingWeightedBalancesTest {
 	@Test
 	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAfterPruneHeight() {
 		// Arrange:
-		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
+		final long[] heights = new long[]{
+				1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4
+		};
 		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[3]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[4]), Amount.fromNem(23));
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
 
-		final WeightedBalance referenceBalance =
-				WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000))
-						.next()
-						.createSend(new BlockHeight(heights[1]), Amount.fromNem(23))
-						.next()
-						.createSend(new BlockHeight(heights[2]), Amount.fromNem(23))
-						.next()
-						.createSend(new BlockHeight(heights[3]), Amount.fromNem(23));
+		final WeightedBalance referenceBalance = WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000)).next()
+				.createSend(new BlockHeight(heights[1]), Amount.fromNem(23)).next()
+				.createSend(new BlockHeight(heights[2]), Amount.fromNem(23)).next()
+				.createSend(new BlockHeight(heights[3]), Amount.fromNem(23));
 
 		// Act:
 		weightedBalances.prune(new BlockHeight(heights[2]));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
 		assertVested(weightedBalances, heights[3], referenceBalance.getVestedBalance());
 		assertUnvested(weightedBalances, heights[3], referenceBalance.getUnvestedBalance());
 	}
 
-	//endregion
+	// endregion
 
-	//region undoChain
+	// region undoChain
 
 	@Test
 	public void undoChainDoesNothingIfPassedHeightIsLargerThanLastHeight() {
@@ -522,7 +532,7 @@ public class TimeBasedVestingWeightedBalancesTest {
 		weightedBalances.undoChain(new BlockHeight(12));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -536,7 +546,7 @@ public class TimeBasedVestingWeightedBalancesTest {
 		weightedBalances.undoChain(new BlockHeight(11));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -556,24 +566,22 @@ public class TimeBasedVestingWeightedBalancesTest {
 		weightedBalances.undoChain(new BlockHeight(11));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(4));
-		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(11)), IsEqual.equalTo(Amount.fromNem(10_000 - 3 * 23)));
-		Assert.assertThat(weightedBalances.getVested(new BlockHeight(11)), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(weightedBalances.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(weightedBalances.getUnvested(new BlockHeight(11)), IsEqual.equalTo(Amount.fromNem(10_000 - 3 * 23)));
+		MatcherAssert.assertThat(weightedBalances.getVested(new BlockHeight(11)), IsEqual.equalTo(Amount.ZERO));
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertUnvested(final ReadOnlyWeightedBalances weightedBalances, final long height, final Amount amount) {
-		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
 	private static void assertVested(final ReadOnlyWeightedBalances weightedBalances, final long height, final Amount amount) {
-		Assert.assertThat(weightedBalances.getVested(new BlockHeight(height)), IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(weightedBalances.getVested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
 
-	private static void assertEqualAtHeight(
-			final ReadOnlyWeightedBalances actualBalances,
-			final ReadOnlyWeightedBalances expectedBalances,
+	private static void assertEqualAtHeight(final ReadOnlyWeightedBalances actualBalances, final ReadOnlyWeightedBalances expectedBalances,
 			final BlockHeight height) {
 		assertUnvested(actualBalances, height.getRaw(), expectedBalances.getUnvested(height));
 		assertVested(actualBalances, height.getRaw(), expectedBalances.getVested(height));
@@ -582,6 +590,6 @@ public class TimeBasedVestingWeightedBalancesTest {
 	private static void assertSum(final ReadOnlyWeightedBalances weightedBalances, final long height, final Amount amount) {
 		final BlockHeight blockHeight = new BlockHeight(height);
 		final Amount actualSum = weightedBalances.getUnvested(blockHeight).add(weightedBalances.getVested(blockHeight));
-		Assert.assertThat(actualSum, IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(actualSum, IsEqual.equalTo(amount));
 	}
 }

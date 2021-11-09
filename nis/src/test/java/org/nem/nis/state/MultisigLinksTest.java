@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -10,7 +11,7 @@ import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 
-	//region MultisigLinks
+	// region MultisigLinks
 
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
@@ -18,8 +19,8 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -31,8 +32,8 @@ public class MultisigLinksTest {
 		context.addCosignatory(context.address);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -44,9 +45,9 @@ public class MultisigLinksTest {
 		context.addCosignatoryOf(context.address);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -56,14 +57,12 @@ public class MultisigLinksTest {
 
 		// Act:
 		context.addCosignatoryOf(context.address);
-		ExceptionAssert.assertThrows(
-				v -> context.addCosignatory(context.address),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.addCosignatory(context.address), IllegalArgumentException.class);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -73,19 +72,17 @@ public class MultisigLinksTest {
 
 		// Act:
 		context.addCosignatory(context.address);
-		ExceptionAssert.assertThrows(
-				v -> context.addCosignatoryOf(context.address),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.addCosignatoryOf(context.address), IllegalArgumentException.class);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region removal
+	// region removal
 
 	@Test
 	public void canRemoveCosignatory() {
@@ -97,8 +94,8 @@ public class MultisigLinksTest {
 		context.removeCosignatory(context.address);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -111,13 +108,13 @@ public class MultisigLinksTest {
 		context.removeCosignatoryOf(context.address);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesMultisig() {
@@ -129,8 +126,8 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(false));
-		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -143,9 +140,9 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertThat(multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
-		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(true));
-		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -161,12 +158,12 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region getCosignatories
+	// region getCosignatories
 
 	@Test
 	public void getCosignatoriesIsReadOnly() {
@@ -175,9 +172,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
-		ExceptionAssert.assertThrows(
-				v -> cosignatories.add(Utils.generateRandomAddress()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> cosignatories.add(Utils.generateRandomAddress()), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -193,12 +188,12 @@ public class MultisigLinksTest {
 		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
 
 		// Assert:
-		Assert.assertThat(cosignatories, IsEquivalent.equivalentTo(cosignatory1, cosignatory2));
+		MatcherAssert.assertThat(cosignatories, IsEquivalent.equivalentTo(cosignatory1, cosignatory2));
 	}
 
-	//endregion
+	// endregion
 
-	//region getCosignatoriesOf
+	// region getCosignatoriesOf
 
 	@Test
 	public void getCosignatoriesOfIsReadOnly() {
@@ -207,9 +202,7 @@ public class MultisigLinksTest {
 
 		// Act:
 		final Collection<Address> multisigAddresses = context.multisigLinks.getCosignatoriesOf();
-		ExceptionAssert.assertThrows(
-				v -> multisigAddresses.add(Utils.generateRandomAddress()),
-				UnsupportedOperationException.class);
+		ExceptionAssert.assertThrows(v -> multisigAddresses.add(Utils.generateRandomAddress()), UnsupportedOperationException.class);
 	}
 
 	@Test
@@ -225,12 +218,12 @@ public class MultisigLinksTest {
 		final Collection<Address> multisigAddresses = context.multisigLinks.getCosignatoriesOf();
 
 		// Assert:
-		Assert.assertThat(multisigAddresses, IsEquivalent.equivalentTo(multisig1, multisig2));
+		MatcherAssert.assertThat(multisigAddresses, IsEquivalent.equivalentTo(multisig1, multisig2));
 	}
 
-	//endregion
+	// endregion
 
-	//region incrementCosignatoriesBy
+	// region incrementCosignatoriesBy
 
 	@Test
 	public void incrementCosignatoriesByFailsIfResultingMinCosignatoriesIsNegative() {
@@ -252,7 +245,7 @@ public class MultisigLinksTest {
 		context.multisigLinks.incrementMinCosignatoriesBy(3);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -266,7 +259,7 @@ public class MultisigLinksTest {
 		context.multisigLinks.incrementMinCosignatoriesBy(-1);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -281,7 +274,7 @@ public class MultisigLinksTest {
 		context.multisigLinks.incrementMinCosignatoriesBy(3);
 
 		// Assert:
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -292,14 +285,14 @@ public class MultisigLinksTest {
 
 		// Act + Assert:
 		context.multisigLinks.incrementMinCosignatoriesBy(3);
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
 		context.multisigLinks.incrementMinCosignatoriesBy(-2);
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
 		context.multisigLinks.incrementMinCosignatoriesBy(3);
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();

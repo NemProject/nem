@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.model.TransferTransaction;
 import org.nem.core.model.primitive.BlockHeight;
@@ -22,7 +23,7 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 	@Override
 	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 				return new ArrayList<>();
@@ -34,7 +35,7 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				return Collections.singletonList(baseId + 34);
 			case 4:
 				return Collections.emptyList();
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}
@@ -42,7 +43,7 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 	@Override
 	protected List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 				return Arrays.asList(baseId + 32, baseId + 31);
@@ -54,7 +55,7 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				return Collections.singletonList(baseId + 34);
 			case 4:
 				return Collections.emptyList();
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}
@@ -69,22 +70,14 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 		final MappingRepository repository = factory.createDbModelToModelMapper(new DefaultAccountCache());
 
 		// Act:
-		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
-				this.session,
-				this.getAccountId(ACCOUNTS[0]),
-				Long.MAX_VALUE,
-				100,
-				ReadOnlyTransferDao.TransferType.OUTGOING);
-		final Collection<Long> quantities = pairs.stream()
-				.map(p -> repository.map(p.getTransfer(), TransferTransaction.class))
-				.map(t -> t.getAttachment().getMosaics())
-				.findFirst().get()
-				.stream()
-				.map(m -> m.getQuantity().getRaw())
+		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(this.session, this.getAccountId(ACCOUNTS[0]),
+				Long.MAX_VALUE, 100, ReadOnlyTransferDao.TransferType.OUTGOING);
+		final Collection<Long> quantities = pairs.stream().map(p -> repository.map(p.getTransfer(), TransferTransaction.class))
+				.map(t -> t.getAttachment().getMosaics()).findFirst().get().stream().map(m -> m.getQuantity().getRaw())
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
+		MatcherAssert.assertThat(quantities, IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L, 40L, 50L, 60L, 70L, 80L, 90L, 100L)));
 	}
 
 	// endregion

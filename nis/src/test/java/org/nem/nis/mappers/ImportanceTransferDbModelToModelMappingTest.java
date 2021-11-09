@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -7,7 +8,9 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
-public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
+public class ImportanceTransferDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToModel() {
@@ -42,9 +45,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 		final DbImportanceTransferTransaction dbTransfer = context.createDbTransfer(3);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(dbTransfer),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.mapping.map(dbTransfer), IllegalArgumentException.class);
 	}
 
 	@Override
@@ -86,8 +87,8 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 		}
 
 		public void assertModel(final ImportanceTransferTransaction model, final ImportanceTransferMode expectedMode) {
-			Assert.assertThat(model.getRemote(), IsEqual.equalTo(this.remote));
-			Assert.assertThat(model.getMode(), IsEqual.equalTo(expectedMode));
+			MatcherAssert.assertThat(model.getRemote(), IsEqual.equalTo(this.remote));
+			MatcherAssert.assertThat(model.getMode(), IsEqual.equalTo(expectedMode));
 		}
 	}
 }

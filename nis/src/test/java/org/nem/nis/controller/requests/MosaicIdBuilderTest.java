@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicId;
@@ -17,7 +18,7 @@ public class MosaicIdBuilderTest {
 		final MosaicId mosaicId = builder.build();
 
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
-		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
+		MatcherAssert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+		MatcherAssert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
 	}
 }

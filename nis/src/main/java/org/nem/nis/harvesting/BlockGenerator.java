@@ -33,12 +33,8 @@ public class BlockGenerator {
 	 * @param blockScorer The block scorer.
 	 * @param blockValidator The block validator.
 	 */
-	public BlockGenerator(
-			final ReadOnlyNisCache nisCache,
-			final NewBlockTransactionsProvider transactionsProvider,
-			final BlockDao blockDao,
-			final BlockScorer blockScorer,
-			final BlockValidator blockValidator) {
+	public BlockGenerator(final ReadOnlyNisCache nisCache, final NewBlockTransactionsProvider transactionsProvider, final BlockDao blockDao,
+			final BlockScorer blockScorer, final BlockValidator blockValidator) {
 		this.nisCache = nisCache;
 		this.transactionsProvider = transactionsProvider;
 		this.blockDao = blockDao;
@@ -54,10 +50,7 @@ public class BlockGenerator {
 	 * @param blockTime The block time.
 	 * @return The block.
 	 */
-	public GeneratedBlock generateNextBlock(
-			final Block lastBlock,
-			final Account harvesterAccount,
-			final TimeInstant blockTime) {
+	public GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterAccount, final TimeInstant blockTime) {
 		final GenerationState state = new GenerationState(this, lastBlock, harvesterAccount, blockTime);
 		if (!state.isHit()) {
 			return null;
@@ -71,7 +64,8 @@ public class BlockGenerator {
 		}
 
 		LOGGER.info(String.format("[HIT] harvester: %s", harvesterAccount.getAddress()));
-		LOGGER.info(String.format("[HIT] harvester effective importance: %s", this.blockScorer.calculateHarvesterEffectiveImportance(newBlock)));
+		LOGGER.info(String.format("[HIT] harvester effective importance: %s",
+				this.blockScorer.calculateHarvesterEffectiveImportance(newBlock)));
 		LOGGER.info(String.format("[HIT] last block: %s", newBlock.getPreviousBlockHash()));
 		LOGGER.info(String.format("[HIT] timestamp diff: %s", newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp())));
 		LOGGER.info(String.format("[HIT] block diff: %s", newBlock.getDifficulty()));
@@ -93,10 +87,7 @@ public class BlockGenerator {
 		private final Account ownerAccount;
 		private final Block newBlock;
 
-		public GenerationState(
-				final BlockGenerator generator,
-				final Block lastBlock,
-				final Account harvesterAccount,
+		public GenerationState(final BlockGenerator generator, final Block lastBlock, final Account harvesterAccount,
 				final TimeInstant blockTime) {
 			this.nisCache = generator.nisCache;
 			this.transactionsProvider = generator.transactionsProvider;
@@ -126,9 +117,7 @@ public class BlockGenerator {
 			final Address harvesterAddress = this.ownerAccount.getAddress().equals(this.harvesterAccount.getAddress())
 					? this.harvesterAccount.getAddress()
 					: this.ownerAccount.getAddress();
-			final Collection<Transaction> transactions = this.transactionsProvider.getBlockTransactions(
-					harvesterAddress,
-					this.blockTime,
+			final Collection<Transaction> transactions = this.transactionsProvider.getBlockTransactions(harvesterAddress, this.blockTime,
 					this.harvestedBlockHeight);
 			this.newBlock.addTransactions(transactions);
 			this.newBlock.sign();
@@ -136,15 +125,15 @@ public class BlockGenerator {
 		}
 
 		private Account getOwnerAccount(final Account account, final BlockHeight height) {
-			final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(
-					account.getAddress(),
+			final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(account.getAddress(),
 					height);
 			return this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 		}
 
 		private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final BlockHeight lastBlockHeight) {
-			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, lastBlockHeight.getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
-			final int limit = (int)Math.min(lastBlockHeight.getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
+			final BlockHeight blockHeight = new BlockHeight(
+					Math.max(1L, lastBlockHeight.getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1));
+			final int limit = (int) Math.min(lastBlockHeight.getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 			final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 			return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);

@@ -17,12 +17,15 @@ public class DbTestUtils {
 	 * @param <T> The transfer db model type.
 	 * @return The created transfer db model.
 	 */
+	@SuppressWarnings({
+			"deprecation", "rawtypes"
+	})
 	public static <T extends AbstractBlockTransfer> T createTransferDbModel(final Class<T> dbModelClass) {
 		final T dbTransfer = ExceptionUtils.propagate(dbModelClass::newInstance);
 
 		// initialize any derived required fields
 		if (dbModelClass.equals(DbProvisionNamespaceTransaction.class)) {
-			((DbProvisionNamespaceTransaction)dbTransfer).setNamespace(new DbNamespace());
+			((DbProvisionNamespaceTransaction) dbTransfer).setNamespace(new DbNamespace());
 		}
 
 		return dbTransfer;

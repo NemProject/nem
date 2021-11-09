@@ -25,9 +25,7 @@ public class ChildAwareSingleTransactionValidator implements SingleTransactionVa
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		return ValidationResult.aggregate(
-				TransactionExtensions.streamDefault(transaction)
-						.map(t -> this.validator.validate(t, context))
-						.iterator());
+		return ValidationResult
+				.aggregate(TransactionExtensions.streamDefault(transaction).map(t -> this.validator.validate(t, context)).iterator());
 	}
 }

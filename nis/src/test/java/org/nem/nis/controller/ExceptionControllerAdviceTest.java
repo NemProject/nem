@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -17,8 +18,8 @@ public class ExceptionControllerAdviceTest {
 	public void handleMissingResourceExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = createAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleMissingResourceException(
-				new MissingResourceException("badness", "class", "resource"));
+		final ResponseEntity<ErrorResponse> entity = advice
+				.handleMissingResourceException(new MissingResourceException("badness", "class", "resource"));
 
 		// Assert:
 		assertEntity(entity, HttpStatus.NOT_FOUND, "badness 'resource' (class)");
@@ -48,8 +49,8 @@ public class ExceptionControllerAdviceTest {
 	public void handleNisIllegalStateExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = createAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleNisIllegalStateException(
-				new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED));
+		final ResponseEntity<ErrorResponse> entity = advice
+				.handleNisIllegalStateException(new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED));
 
 		// Assert:
 		assertEntity(entity, HttpStatus.SERVICE_UNAVAILABLE, "NIS_ILLEGAL_STATE_NOT_BOOTED");
@@ -70,12 +71,13 @@ public class ExceptionControllerAdviceTest {
 		assertEntity(entity, expectedCode, "badness");
 	}
 
-	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode, final String expectedMessage) {
+	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode,
+			final String expectedMessage) {
 		// Assert:
-		Assert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
-		Assert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
-		Assert.assertThat(entity.getBody().getStatus(), IsEqual.equalTo(expectedCode.value()));
-		Assert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo(expectedMessage));
+		MatcherAssert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
+		MatcherAssert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
+		MatcherAssert.assertThat(entity.getBody().getStatus(), IsEqual.equalTo(expectedCode.value()));
+		MatcherAssert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo(expectedMessage));
 	}
 
 	private static ExceptionControllerAdvice createAdvice() {

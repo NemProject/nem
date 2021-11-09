@@ -75,9 +75,8 @@ public class MockBlockScorer extends BlockScorer {
 				return false;
 			}
 
-			final BlockScoreKey rhs = (BlockScoreKey)obj;
-			return this.parentBlock.equals(rhs.parentBlock)
-					&& this.block.equals(rhs.block);
+			final BlockScoreKey rhs = (BlockScoreKey) obj;
+			return this.parentBlock.equals(rhs.parentBlock) && this.block.equals(rhs.block);
 		}
 	}
 }

@@ -11,17 +11,17 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	private static final int REMOTE_LINKS_SIZE = 2;
 
 	// The following rules will apply:
-	//  1. one will have to wait REMOTE_HARVESTING_DELAY blocks to activate/deactivate remote account (before it'll become operational)
-	//  2. one cannot make two SAME subsequent announcements: so let's say I've announced address X as my remote address.
-	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
+	// 1. one will have to wait REMOTE_HARVESTING_DELAY blocks to activate/deactivate remote account (before it'll become operational)
+	// 2. one cannot make two SAME subsequent announcements: so let's say I've announced address X as my remote address.
+	// now if I want to announce address Y. I first need to cancel/deactivate address X first.
 	//
 	// This makes whole logic a lot simpler
 	//
 	// I thought we're gonna need 3 elements, but it would work with 2.
-	//    1. let's say there is alias created at block 1000, it becomes effective at block 2440
-	//    2. now at block 2500 user removes alias, removal will become effective at block 3940
-	//    3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
-	//        as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
+	// 1. let's say there is alias created at block 1000, it becomes effective at block 2440
+	// 2. now at block 2500 user removes alias, removal will become effective at block 3940
+	// 3. user won't be able to create new alias before 3940, so there is no need, for this to have 3 elements
+	// as eventual (blockchain) rollback won't change anything, so I'm changing REMOTE_STATE_SIZE to 2
 	private final CircularStack<RemoteLink> remoteLinks = new CircularStack<>(REMOTE_LINKS_SIZE);
 
 	/**

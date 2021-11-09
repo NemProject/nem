@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -12,7 +13,7 @@ public class HistoricalImportancesTest {
 		final HistoricalImportances importances = new HistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(importances.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(importances.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -39,8 +40,8 @@ public class HistoricalImportancesTest {
 		importances.addHistoricalImportance(new AccountImportance(height, 0.3, 0.5));
 
 		// Assert:
-		Assert.assertThat(importances.getHistoricalImportance(height), IsEqual.equalTo(0.3));
-		Assert.assertThat(importances.getHistoricalPageRank(height), IsEqual.equalTo(0.5));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(height), IsEqual.equalTo(0.3));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(height), IsEqual.equalTo(0.5));
 	}
 
 	@Test
@@ -49,8 +50,8 @@ public class HistoricalImportancesTest {
 		final HistoricalImportances importances = createDefaultHistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(13)), IsEqual.equalTo(0.3));
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(18)), IsEqual.equalTo(0.1));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(13)), IsEqual.equalTo(0.3));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(18)), IsEqual.equalTo(0.1));
 	}
 
 	@Test
@@ -59,8 +60,8 @@ public class HistoricalImportancesTest {
 		final HistoricalImportances importances = createDefaultHistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(10)), IsEqual.equalTo(0.0));
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(21)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(10)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(21)), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -69,8 +70,8 @@ public class HistoricalImportancesTest {
 		final HistoricalImportances importances = createDefaultHistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(13)), IsEqual.equalTo(0.5));
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(18)), IsEqual.equalTo(0.6));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(13)), IsEqual.equalTo(0.5));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(18)), IsEqual.equalTo(0.6));
 	}
 
 	@Test
@@ -79,8 +80,8 @@ public class HistoricalImportancesTest {
 		final HistoricalImportances importances = createDefaultHistoricalImportances();
 
 		// Assert:
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(10)), IsEqual.equalTo(0.0));
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(21)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(10)), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(21)), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public class HistoricalImportancesTest {
 		importances.prune();
 
 		// Assert:
-		Assert.assertThat(importances.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(importances.size(), IsEqual.equalTo(0));
 	}
 
 	private static HistoricalImportances createDefaultHistoricalImportances() {
@@ -116,10 +117,10 @@ public class HistoricalImportancesTest {
 
 	private static void assertDefaultHistoricalImportances(final HistoricalImportances importances) {
 		// Assert:
-		Assert.assertThat(importances.size(), IsEqual.equalTo(2));
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(13)), IsEqual.equalTo(0.3));
-		Assert.assertThat(importances.getHistoricalImportance(new BlockHeight(18)), IsEqual.equalTo(0.1));
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(13)), IsEqual.equalTo(0.5));
-		Assert.assertThat(importances.getHistoricalPageRank(new BlockHeight(18)), IsEqual.equalTo(0.6));
+		MatcherAssert.assertThat(importances.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(13)), IsEqual.equalTo(0.3));
+		MatcherAssert.assertThat(importances.getHistoricalImportance(new BlockHeight(18)), IsEqual.equalTo(0.1));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(13)), IsEqual.equalTo(0.5));
+		MatcherAssert.assertThat(importances.getHistoricalPageRank(new BlockHeight(18)), IsEqual.equalTo(0.6));
 	}
 }

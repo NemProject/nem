@@ -1,5 +1,6 @@
 package org.nem.nis.pox.pos;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
@@ -30,9 +31,8 @@ public class PosImportanceCalculatorTest {
 		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
-		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
-				accountImportance.getHeight(),
-				IsEqual.equalTo(HEIGHT)));
+		states.stream().map(AccountState::getImportanceInfo)
+				.forEach(accountImportance -> MatcherAssert.assertThat(accountImportance.getHeight(), IsEqual.equalTo(HEIGHT)));
 	}
 
 	@Test
@@ -41,33 +41,29 @@ public class PosImportanceCalculatorTest {
 		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
-		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
-				accountImportance.getLastPageRank(),
-				IsEqual.equalTo(0.0)));
+		states.stream().map(AccountState::getImportanceInfo)
+				.forEach(accountImportance -> MatcherAssert.assertThat(accountImportance.getLastPageRank(), IsEqual.equalTo(0.0)));
 	}
 
 	@Test
 	public void recalculateCalculatesImportanceAccordingToBalance() {
 		// Act:
 		final Collection<AccountState> states = recalculate(5, 2, 3);
-		final Collection<Double> importances = states.stream()
-				.map(s -> s.getImportanceInfo().getImportance(HEIGHT))
+		final Collection<Double> importances = states.stream().map(s -> s.getImportanceInfo().getImportance(HEIGHT))
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
 	}
 
 	@Test
 	public void recalculateCalculatesImportancesThatSumToOne() {
 		// Act:
 		final Collection<AccountState> states = recalculate(1, 2, 3, 4, 5);
-		final Double sum = states.stream()
-				.map(state -> state.getImportanceInfo().getImportance(HEIGHT))
-				.reduce(0.0, Double::sum);
+		final Double sum = states.stream().map(state -> state.getImportanceInfo().getImportance(HEIGHT)).reduce(0.0, Double::sum);
 
 		// Assert:
-		Assert.assertThat(sum, IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(sum, IsEqual.equalTo(1.0));
 	}
 
 	@Test
@@ -76,12 +72,11 @@ public class PosImportanceCalculatorTest {
 		final Collection<AccountState> states = recalculate(5, 2, 3);
 
 		// Assert:
-		final Collection<Double> importances = states.stream()
-				.map(s -> s.getHistoricalImportances().getHistoricalImportance(HEIGHT))
+		final Collection<Double> importances = states.stream().map(s -> s.getHistoricalImportances().getHistoricalImportance(HEIGHT))
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
 	}
 
 	private static Collection<AccountState> recalculate(final long... balances) {

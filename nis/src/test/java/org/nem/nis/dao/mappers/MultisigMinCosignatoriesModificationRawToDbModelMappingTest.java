@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.DbMultisigMinCosignatoriesModification;
@@ -19,8 +20,8 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 		final DbMultisigMinCosignatoriesModification dbModel = this.createMapping().map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getRelativeChange(), IsEqual.equalTo(12));
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getRelativeChange(), IsEqual.equalTo(12));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 		final DbMultisigMinCosignatoriesModification dbModel = this.createMapping().map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.nullValue());
+		MatcherAssert.assertThat(dbModel, IsNull.nullValue());
 	}
 
 	private IMapping<Object[], DbMultisigMinCosignatoriesModification> createMapping() {
@@ -43,8 +44,8 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 
 		private Object[] createRaw() {
 			final Object[] raw = new Object[18];
-			raw[16] = BigInteger.valueOf(123L);       // id
-			raw[17] = 12;                             // relative change
+			raw[16] = BigInteger.valueOf(123L); // id
+			raw[17] = 12; // relative change
 			return raw;
 		}
 	}

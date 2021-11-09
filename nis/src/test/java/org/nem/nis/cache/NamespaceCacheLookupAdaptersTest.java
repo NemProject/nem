@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -10,7 +11,7 @@ import org.nem.core.test.Utils;
 
 public class NamespaceCacheLookupAdaptersTest {
 
-	//region asMosaicFeeInformationLookup
+	// region asMosaicFeeInformationLookup
 
 	@Test
 	public void asMosaicFeeInformationLookupFindByIdReturnsNullIfNamespaceIdIsNotInCache() {
@@ -18,10 +19,11 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("bar", "coins"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("bar", "coins"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.nullValue());
+		MatcherAssert.assertThat(information, IsNull.nullValue());
 	}
 
 	@Test
@@ -30,10 +32,11 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "tokens"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.nullValue());
+		MatcherAssert.assertThat(information, IsNull.nullValue());
 	}
 
 	@Test
@@ -42,17 +45,18 @@ public class NamespaceCacheLookupAdaptersTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup().findById(Utils.createMosaicId("foo", "coins"));
+		final MosaicFeeInformation information = context.adapters.asMosaicFeeInformationLookup()
+				.findById(Utils.createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(information, IsNull.notNullValue());
-		Assert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(1133)));
-		Assert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(information, IsNull.notNullValue());
+		MatcherAssert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(1133)));
+		MatcherAssert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
-	//region asMosaicLevyLookup
+	// region asMosaicLevyLookup
 
 	@Test
 	public void asMosaicLevyLookupFindByIdReturnsNullIfNamespaceIdIsNotInCache() {
@@ -63,7 +67,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("bar", "coins"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -75,7 +79,7 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("foo", "tokens"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.nullValue());
+		MatcherAssert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -87,11 +91,11 @@ public class NamespaceCacheLookupAdaptersTest {
 		final MosaicLevy levy = context.adapters.asMosaicLevyLookup().findById(Utils.createMosaicId("foo", "coins"));
 
 		// Assert:
-		Assert.assertThat(levy, IsNull.notNullValue());
-		Assert.assertThat(levy, IsEqual.equalTo(context.levy));
+		MatcherAssert.assertThat(levy, IsNull.notNullValue());
+		MatcherAssert.assertThat(levy, IsEqual.equalTo(context.levy));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final NamespaceCache cache = new DefaultNamespaceCache().copy();
@@ -103,11 +107,8 @@ public class NamespaceCacheLookupAdaptersTest {
 			final Account namespaceOwner = Utils.generateRandomAccount();
 			this.cache.add(new Namespace(namespaceId, namespaceOwner, BlockHeight.ONE));
 
-			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
-					namespaceOwner,
-					Utils.createMosaicId("foo", "coins"),
-					Utils.createMosaicProperties(1111L, 4, null, null),
-					this.levy);
+			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, Utils.createMosaicId("foo", "coins"),
+					Utils.createMosaicProperties(1111L, 4, null, null), this.levy);
 			this.cache.get(namespaceId).getMosaics().add(mosaicDefinition).increaseSupply(new Supply(22));
 		}
 	}

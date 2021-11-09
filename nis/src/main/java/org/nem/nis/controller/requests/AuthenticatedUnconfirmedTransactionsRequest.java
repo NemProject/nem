@@ -5,12 +5,9 @@ import org.nem.peer.node.*;
 import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 
 /**
- * An authenticated request that has an unconfirmed transactions request parameter.
- * <br>
- * This is glue code that allows automatic deserialization to work
- * without needing to hydrate multiple constructor parameters.
- * This class is required because the base class (AuthenticatedRequest) doesn't
- * have a constructor that accepts a single Deserializer parameter.
+ * An authenticated request that has an unconfirmed transactions request parameter. <br>
+ * This is glue code that allows automatic deserialization to work without needing to hydrate multiple constructor parameters. This class is
+ * required because the base class (AuthenticatedRequest) doesn't have a constructor that accepts a single Deserializer parameter.
  */
 public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRequest<UnconfirmedTransactionsRequest> {
 
@@ -39,6 +36,7 @@ public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRe
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedUnconfirmedTransactionsRequest(final Deserializer deserializer) {
-		this(deserializer.readObject("entity", UnconfirmedTransactionsRequest::new), deserializer.readObject("challenge", NodeChallenge::new));
+		this(deserializer.readObject("entity", UnconfirmedTransactionsRequest::new),
+				deserializer.readObject("challenge", NodeChallenge::new));
 	}
 }

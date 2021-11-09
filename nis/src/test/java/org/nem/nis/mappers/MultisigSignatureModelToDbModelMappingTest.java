@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -9,7 +10,9 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbMultisigSignatureTransaction;
 
-public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, DbMultisigSignatureTransaction> {
+public class MultisigSignatureModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, DbMultisigSignatureTransaction> {
 
 	@Test
 	public void multisigTransactionIsMappedToDbModelAsNull() {
@@ -40,16 +43,13 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 		private final MultisigSignatureModelToDbModelMapping mapping = new MultisigSignatureModelToDbModelMapping(this.mapper);
 
 		public MultisigSignatureTransaction createModel() {
-			return new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					Utils.generateRandomAccount(),
-					Utils.generateRandomAccount(),
+			return new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), Utils.generateRandomAccount(),
 					this.otherTransactionHash);
 		}
 
 		public void assertDbModel(final DbMultisigSignatureTransaction dbModel, final MultisigSignatureTransaction model) {
-			Assert.assertThat(dbModel.getMultisigTransaction(), IsNull.nullValue());
-			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
+			MatcherAssert.assertThat(dbModel.getMultisigTransaction(), IsNull.nullValue());
+			MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
 	}
 }

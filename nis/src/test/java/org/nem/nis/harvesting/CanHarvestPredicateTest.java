@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
@@ -14,8 +15,8 @@ public class CanHarvestPredicateTest {
 		final Amount minBalanceMinusOne = Amount.fromMicroNem(22222221);
 
 		// Assert:
-		Assert.assertThat(canHarvest(Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canHarvest(minBalanceMinusOne), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(canHarvest(Amount.ZERO), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(canHarvest(minBalanceMinusOne), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -25,8 +26,8 @@ public class CanHarvestPredicateTest {
 		final Amount twiceMinBalance = Amount.fromNem(44444444);
 
 		// Assert:
-		Assert.assertThat(canHarvest(minBalance), IsEqual.equalTo(true));
-		Assert.assertThat(canHarvest(twiceMinBalance), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(canHarvest(minBalance), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(canHarvest(twiceMinBalance), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -41,9 +42,9 @@ public class CanHarvestPredicateTest {
 		});
 
 		// Assert:
-		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(2)), IsEqual.equalTo(true));
-		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(3)), IsEqual.equalTo(true));
-		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(4)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(predicate.canHarvest(state, new BlockHeight(2)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(predicate.canHarvest(state, new BlockHeight(3)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(predicate.canHarvest(state, new BlockHeight(4)), IsEqual.equalTo(false));
 	}
 
 	private static boolean canHarvest(final Amount vestedBalance) {

@@ -4,8 +4,8 @@ package org.nem.nis.mappers;
  * A mapping type pair that describes the source and target types of a mapping.
  */
 public class MappingTypePair {
-	private final Class sourceClass;
-	private final Class targetClass;
+	private final Class<?> sourceClass;
+	private final Class<?> targetClass;
 
 	/**
 	 * Creates a new mapping type pair.
@@ -13,7 +13,7 @@ public class MappingTypePair {
 	 * @param sourceClass The source mapping class.
 	 * @param targetClass The target mapping class.
 	 */
-	public MappingTypePair(final Class sourceClass, final Class targetClass) {
+	public MappingTypePair(final Class<?> sourceClass, final Class<?> targetClass) {
 		this.sourceClass = sourceClass;
 		this.targetClass = targetClass;
 	}
@@ -23,7 +23,7 @@ public class MappingTypePair {
 	 *
 	 * @return The source class.
 	 */
-	public Class getSourceClass() {
+	public Class<?> getSourceClass() {
 		return this.sourceClass;
 	}
 
@@ -32,7 +32,7 @@ public class MappingTypePair {
 	 *
 	 * @return The target class.
 	 */
-	public Class getTargetClass() {
+	public Class<?> getTargetClass() {
 		return this.targetClass;
 	}
 
@@ -47,7 +47,7 @@ public class MappingTypePair {
 			return false;
 		}
 
-		final MappingTypePair rhs = (MappingTypePair)obj;
+		final MappingTypePair rhs = (MappingTypePair) obj;
 		return this.sourceClass.equals(rhs.sourceClass) && this.targetClass.equals(rhs.targetClass);
 	}
 

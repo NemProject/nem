@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,19 +20,15 @@ public class DefaultNisCacheTest {
 		final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
 
 		// Act:
-		final ReadOnlyNisCache cache = new DefaultNisCache(
-				accountCache,
-				accountStateCache,
-				poxFacade,
-				transactionsHashCache,
+		final ReadOnlyNisCache cache = new DefaultNisCache(accountCache, accountStateCache, poxFacade, transactionsHashCache,
 				namespaceCache);
 
 		// Assert:
-		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
-		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
-		Assert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
-		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
-		Assert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
+		MatcherAssert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
+		MatcherAssert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
+		MatcherAssert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
+		MatcherAssert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
+		MatcherAssert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
 	}
 
 	@Test
@@ -46,8 +43,7 @@ public class DefaultNisCacheTest {
 		assertFunctionCreatesNewCacheByDelegatingToComponents(DefaultNisCache::deepCopy, false);
 	}
 
-	private static void assertFunctionCreatesNewCacheByDelegatingToComponents(
-			final Function<DefaultNisCache, ReadOnlyNisCache> createCopy,
+	private static void assertFunctionCreatesNewCacheByDelegatingToComponents(final Function<DefaultNisCache, ReadOnlyNisCache> createCopy,
 			final boolean isCopyShallow) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -72,11 +68,11 @@ public class DefaultNisCacheTest {
 			Mockito.verify(context.namespaceCache, Mockito.only()).deepCopy();
 		}
 
-		Assert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
-		Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
-		Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
-		Assert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
-		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
+		MatcherAssert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
+		MatcherAssert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
+		MatcherAssert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
+		MatcherAssert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
+		MatcherAssert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
 	}
 
 	@Test
@@ -106,9 +102,7 @@ public class DefaultNisCacheTest {
 		final NisCache copyCache = context.cache.copy();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> copyCache.copy(),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrows(v -> copyCache.copy(), IllegalStateException.class);
 	}
 
 	private static void setupCopy(final TestContext original, final TestContext copy) {
@@ -129,11 +123,7 @@ public class DefaultNisCacheTest {
 		private final SynchronizedPoxFacade poxFacade = Mockito.mock(SynchronizedPoxFacade.class);
 		private final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		private final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
-		private final DefaultNisCache cache = new DefaultNisCache(
-				this.accountCache,
-				this.accountStateCache,
-				this.poxFacade,
-				this.transactionsHashCache,
-				this.namespaceCache);
+		private final DefaultNisCache cache = new DefaultNisCache(this.accountCache, this.accountStateCache, this.poxFacade,
+				this.transactionsHashCache, this.namespaceCache);
 	}
 }

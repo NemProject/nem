@@ -29,6 +29,7 @@ public class NisDbModelToModelMapper implements IMapper {
 	 * @param transfer The TDbModel derived from abstract block transfer.
 	 * @return The model transfer transaction.
 	 */
+	@SuppressWarnings("rawtypes")
 	public <TDbModel extends AbstractBlockTransfer> Transaction map(final TDbModel transfer) {
 		return this.mapper.map(transfer, Transaction.class);
 	}
@@ -74,12 +75,9 @@ public class NisDbModelToModelMapper implements IMapper {
 		return this.mapper.map(source, targetClass);
 	}
 
-	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(
-			final Collection<TDbModel> dbTransactions,
+	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(final Collection<TDbModel> dbTransactions,
 			final Predicate<AbstractTransfer> shouldInclude) {
-		return dbTransactions.stream()
-				.filter(shouldInclude::test)
-				.map(t -> this.mapper.map(t, Transaction.class))
+		return dbTransactions.stream().filter(shouldInclude::test).map(t -> this.mapper.map(t, Transaction.class))
 				.collect(Collectors.toList());
 	}
 }

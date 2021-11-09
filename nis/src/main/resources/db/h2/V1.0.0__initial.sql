@@ -1,17 +1,17 @@
 CREATE TABLE IF NOT EXISTS `accounts` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
 
   `printableKey` VARCHAR(42) NOT NULL,
 
   `publicKey` VARBINARY(34), -- additional two bytes
-  PRIMARY KEY (`id`)  
-);  
+  PRIMARY KEY (`id`)
+);
 
--- 
+--
 -- BLOCKS
--- 
+--
 
-CREATE TABLE IF NOT EXISTS `blocks` (  
+CREATE TABLE IF NOT EXISTS `blocks` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
 
   `version` INT NOT NULL,
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS `blocks` (
   `difficulty` BIGINT NOT NULL,
 
   PRIMARY KEY (`id`)
-);  
- 
+);
+
 ALTER TABLE public.blocks ADD
   FOREIGN KEY (harvesterId)
   REFERENCES public.accounts(id);
@@ -45,9 +45,9 @@ CREATE SEQUENCE transaction_id_seq;
 
 --
 -- TRANSFERS
--- 
+--
 
-CREATE TABLE IF NOT EXISTS `transfers` (  
+CREATE TABLE IF NOT EXISTS `transfers` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -84,11 +84,11 @@ ALTER TABLE transfers ADD
   FOREIGN KEY (senderId)
   REFERENCES accounts(id);
 
--- 
+--
 -- IMPORTANCE TRANSFERS
--- 
+--
 
-CREATE TABLE IF NOT EXISTS `importancetransfers` (  
+CREATE TABLE IF NOT EXISTS `importancetransfers` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -126,7 +126,7 @@ ALTER TABLE public.importancetransfers ADD
 --- MULTISIG (signer modifications)
 ---
 
-CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (  
+CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -176,7 +176,7 @@ ALTER TABLE public.multisigmodifications ADD
 --- MULTISIG (transaction)
 ---
 
-CREATE TABLE IF NOT EXISTS `multisigtransactions` (  
+CREATE TABLE IF NOT EXISTS `multisigtransactions` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `multisigtransactions` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66) NOT NULL,
-  
+
   `blkIndex` INT NOT NULL, -- index inside block
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
@@ -221,7 +221,7 @@ ALTER TABLE public.multisigtransactions ADD
   REFERENCES multisigsignermodifications(id);
 
 
-CREATE TABLE IF NOT EXISTS `multisigsignatures` (  
+CREATE TABLE IF NOT EXISTS `multisigsignatures` (
   `multisigTransactionId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -234,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `multisigsignatures` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66) NOT NULL,
-  
+
   PRIMARY KEY (`id`)
 );
 
@@ -282,7 +282,7 @@ ALTER TABLE public.multisigreceives ADD
 
 ---
 --- indices
---- 
+---
 
 CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
 CREATE INDEX IDX_BLOCKS_HEIGHT ON `blocks` (height);

@@ -36,10 +36,7 @@ public class ValidationContext {
 	 * @param confirmedBlockHeight The block height of common parent.
 	 * @param state The validation state.
 	 */
-	public ValidationContext(
-			final BlockHeight blockHeight,
-			final BlockHeight confirmedBlockHeight,
-			final ValidationState state) {
+	public ValidationContext(final BlockHeight blockHeight, final BlockHeight confirmedBlockHeight, final ValidationState state) {
 		this.blockHeight = blockHeight;
 		this.confirmedBlockHeight = confirmedBlockHeight;
 		this.state = state;

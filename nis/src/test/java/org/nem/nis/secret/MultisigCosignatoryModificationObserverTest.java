@@ -12,7 +12,7 @@ import org.nem.nis.test.NisUtils;
 
 public class MultisigCosignatoryModificationObserverTest {
 
-	//region AddCosignatory
+	// region AddCosignatory
 
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
@@ -32,9 +32,9 @@ public class MultisigCosignatoryModificationObserverTest {
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress());
 	}
 
-	//endregion
+	// endregion
 
-	//region DelCosignatory
+	// region DelCosignatory
 
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
@@ -54,9 +54,9 @@ public class MultisigCosignatoryModificationObserverTest {
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress());
 	}
 
-	//endregion
+	// endregion
 
-	//region other type
+	// region other type
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -76,7 +76,7 @@ public class MultisigCosignatoryModificationObserverTest {
 		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatoryOf(Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	private TestContext notifyTransferPrepare(final MultisigModificationType value, final NotificationTrigger notificationTrigger) {
 		// Arrange:
@@ -85,8 +85,7 @@ public class MultisigCosignatoryModificationObserverTest {
 
 		// Act:
 		final MultisigCosignatoryModification cosignatoryModification = new MultisigCosignatoryModification(value, context.account2);
-		observer.notify(
-				new MultisigCosignatoryModificationNotification(context.account1, cosignatoryModification),
+		observer.notify(new MultisigCosignatoryModificationNotification(context.account1, cosignatoryModification),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 		return context;
 	}

@@ -24,10 +24,10 @@ public class NamespaceRawToDbModelMapping implements IMapping<Object[], DbNamesp
 		final DbAccount dbOwner = RawMapperUtils.mapAccount(this.mapper, source[2]);
 		final DbNamespace dbNamespace = new DbNamespace();
 		dbNamespace.setId(RawMapperUtils.castToLong(source[0]));
-		dbNamespace.setFullName((String)source[1]);
+		dbNamespace.setFullName((String) source[1]);
 		dbNamespace.setOwner(dbOwner);
 		dbNamespace.setHeight(RawMapperUtils.castToLong(source[3]));
-		dbNamespace.setLevel((Integer)source[4]);
+		dbNamespace.setLevel((Integer) source[4]);
 		return dbNamespace;
 	}
 }

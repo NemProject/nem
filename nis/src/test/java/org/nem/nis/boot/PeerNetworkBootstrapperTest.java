@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -27,8 +28,8 @@ public class PeerNetworkBootstrapperTest {
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
 
 		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
 		context.verifyBootCalls(Mockito.never());
 	}
 
@@ -41,9 +42,9 @@ public class PeerNetworkBootstrapperTest {
 		final PeerNetwork network = context.bootstrapper.boot().join();
 
 		// Assert:
-		Assert.assertThat(network, IsNull.notNullValue());
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network, IsNull.notNullValue());
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -57,9 +58,9 @@ public class PeerNetworkBootstrapperTest {
 		final CompletableFuture<?> future = context.bootstrapper.boot();
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -67,16 +68,16 @@ public class PeerNetworkBootstrapperTest {
 	public void networkBootFailsOnUpdateLocalNodeEndpointException() {
 		// Arrange:
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
-		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
+		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> {
+			throw new RuntimeException("runtime");
+		}));
 
 		// Act:
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> context.bootstrapper.boot().join(),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrowsCompletionException(v -> context.bootstrapper.boot().join(), IllegalStateException.class);
 
 		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -87,13 +88,11 @@ public class PeerNetworkBootstrapperTest {
 		context.setUpdaterResult(CompletableFuture.completedFuture(false));
 
 		// Act:
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> context.bootstrapper.boot().join(),
-				IllegalStateException.class);
+		ExceptionAssert.assertThrowsCompletionException(v -> context.bootstrapper.boot().join(), IllegalStateException.class);
 
 		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -107,8 +106,8 @@ public class PeerNetworkBootstrapperTest {
 		context.bootstrapper.boot().join();
 
 		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -121,8 +120,8 @@ public class PeerNetworkBootstrapperTest {
 		context.bootstrapper.boot().join();
 
 		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
 		context.verifyBootCalls(Mockito.never());
 	}
 
@@ -133,11 +132,10 @@ public class PeerNetworkBootstrapperTest {
 
 		// Act:
 		context.bootstrapper.boot().join();
-		NisUtils.assertThrowsNisIllegalStateException(
-				v -> context.bootstrapper.boot().join(),
+		NisUtils.assertThrowsNisIllegalStateException(v -> context.bootstrapper.boot().join(),
 				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_ALREADY_BOOTED);
 
-		//Assert:
+		// Assert:
 		context.verifyBootCalls(Mockito.only());
 	}
 
@@ -147,19 +145,19 @@ public class PeerNetworkBootstrapperTest {
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
 
 		// Act: first boot should fail
-		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> context.bootstrapper.boot().join(),
-				IllegalStateException.class);
+		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> {
+			throw new RuntimeException("runtime");
+		}));
+		ExceptionAssert.assertThrowsCompletionException(v -> context.bootstrapper.boot().join(), IllegalStateException.class);
 
 		// Act: second boot should succeed
 		context.setUpdaterResult(CompletableFuture.completedFuture(true));
 		final PeerNetwork network = context.bootstrapper.boot().join();
 
 		// Assert:
-		Assert.assertThat(network, IsNull.notNullValue());
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network, IsNull.notNullValue());
+		MatcherAssert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
 		context.verifyBootCalls(Mockito.times(2));
 	}
 
@@ -179,16 +177,11 @@ public class PeerNetworkBootstrapperTest {
 			Mockito.when(this.updater.updateAny(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
 			Mockito.when(this.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(this.updater);
 
-			this.bootstrapper = new PeerNetworkBootstrapper(
-					this.state,
-					this.servicesFactory,
-					this.selectorFactory,
-					ipDetectionMode);
+			this.bootstrapper = new PeerNetworkBootstrapper(this.state, this.servicesFactory, this.selectorFactory, ipDetectionMode);
 		}
 
 		public void setUpdaterResult(final CompletableFuture<Boolean> future) {
-			Mockito.when(this.updater.updateAny(Mockito.any()))
-					.thenReturn(future);
+			Mockito.when(this.updater.updateAny(Mockito.any())).thenReturn(future);
 		}
 
 		private void verifyBootCalls(final VerificationMode mode) {

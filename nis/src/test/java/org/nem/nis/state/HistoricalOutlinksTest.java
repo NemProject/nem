@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -18,10 +19,11 @@ public class HistoricalOutlinksTest {
 		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
+		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
 	}
 
-	//region add
+	// region add
+
 	@Test
 	public void canAddOutlinkToHistoricalOutlink() {
 		// Arrange:
@@ -33,8 +35,8 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
-		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
+		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
+		MatcherAssert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
 	}
 
 	@Test
@@ -48,12 +50,14 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
-		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1235)));
+		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(2));
+		MatcherAssert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1235)));
 	}
-	//endregion
 
-	//region remove
+	// endregion
+
+	// region remove
+
 	@Test
 	public void canRemoveOutlinkFromHistoricalOutlink() {
 		// Arrange:
@@ -65,7 +69,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
+		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(0));
 	}
 
 	@Test
@@ -80,8 +84,8 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.remove(new BlockHeight(1235), address, Amount.fromNem(789));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinkSize(), equalTo(1));
-		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
+		MatcherAssert.assertThat(historicalOutlinks.outlinkSize(), equalTo(1));
+		MatcherAssert.assertThat(historicalOutlinks.getLastHistoricalOutlink().getHeight(), equalTo(new BlockHeight(1234)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -107,9 +111,10 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(789));
 		historicalOutlinks.remove(new BlockHeight(1234), address, Amount.fromNem(789));
 	}
-	//endregion
 
-	//region size/iterator
+	// endregion
+
+	// region size/iterator
 
 	@Test
 	public void historicalOutlinksSizeReturnsProperValue() {
@@ -118,10 +123,10 @@ public class HistoricalOutlinksTest {
 		final HistoricalOutlinks historicalOutlinks = createDefaultHistoricalOutlinks(address);
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1225)), equalTo(0));
-		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1235)), equalTo(4));
-		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1236)), equalTo(5));
-		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1275)), equalTo(6));
+		MatcherAssert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1225)), equalTo(0));
+		MatcherAssert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1235)), equalTo(4));
+		MatcherAssert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1236)), equalTo(5));
+		MatcherAssert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1275)), equalTo(6));
 	}
 
 	@Test
@@ -176,15 +181,15 @@ public class HistoricalOutlinksTest {
 
 	private static void assertLinkAmounts(final Iterator<AccountLink> it, final int... expectedAmounts) {
 		for (final int expectedAmount : expectedAmounts) {
-			Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(expectedAmount)));
+			MatcherAssert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(expectedAmount)));
 		}
 
 		Assert.assertFalse(it.hasNext());
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void pruneRemovesAllOlderOutlinks() {
@@ -202,14 +207,13 @@ public class HistoricalOutlinksTest {
 		// Assert:
 		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
-				.map(link -> link.getAmount().getNumNem())
-				.collect(Collectors.toList());
-		Assert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(345L, 456L)));
+				.map(link -> link.getAmount().getNumNem()).collect(Collectors.toList());
+		MatcherAssert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(345L, 456L)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCopiesOutlinks() {
@@ -226,9 +230,8 @@ public class HistoricalOutlinksTest {
 		// Assert:
 		final Iterator<AccountLink> it = copy.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
-				.map(link -> link.getAmount().getNumNem())
-				.collect(Collectors.toList());
-		Assert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(123L, 234L, 345L)));
+				.map(link -> link.getAmount().getNumNem()).collect(Collectors.toList());
+		MatcherAssert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(123L, 234L, 345L)));
 	}
 
 	@Test
@@ -245,9 +248,9 @@ public class HistoricalOutlinksTest {
 		copy.add(new BlockHeight(1235), address, Amount.fromNem(111));
 
 		// Assert:
-		Assert.assertThat(historicalOutlinks.getLastHistoricalOutlink().size(), IsEqual.equalTo(1));
-		Assert.assertThat(copy.getLastHistoricalOutlink().size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(historicalOutlinks.getLastHistoricalOutlink().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(copy.getLastHistoricalOutlink().size(), IsEqual.equalTo(2));
 	}
 
-	//endregion
+	// endregion
 }

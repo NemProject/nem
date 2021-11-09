@@ -18,9 +18,7 @@ public final class RawMapperUtils {
 	 * @return The db model account.
 	 */
 	public static DbAccount mapAccount(final IMapper mapper, final Long id) {
-		return null == id
-				? null
-				: mapper.map(id, DbAccount.class);
+		return null == id ? null : mapper.map(id, DbAccount.class);
 	}
 
 	/**
@@ -53,7 +51,7 @@ public final class RawMapperUtils {
 	 * @return The Long value.
 	 */
 	public static Long castToLong(final Object value) {
-		return castBigIntegerToLong((BigInteger)value);
+		return castBigIntegerToLong((BigInteger) value);
 	}
 
 	private static Long castBigIntegerToLong(final BigInteger value) {

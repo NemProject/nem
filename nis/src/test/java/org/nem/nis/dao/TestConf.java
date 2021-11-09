@@ -15,9 +15,7 @@ import java.util.Collection;
 import java.util.function.Function;
 
 @Configuration
-@ComponentScan(
-		basePackages = "org.nem.nis.dao",
-		excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
+@ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
 @EnableTransactionManagement
 public class TestConf {
 	@Bean

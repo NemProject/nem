@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.node.Node;
@@ -8,7 +9,7 @@ import org.nem.peer.trust.score.NodeExperience;
 
 public class ExtendedNodeExperiencePairTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void pairCanBeCreated() {
@@ -20,9 +21,9 @@ public class ExtendedNodeExperiencePairTest {
 		final ExtendedNodeExperiencePair pair = new ExtendedNodeExperiencePair(node, experience, 89);
 
 		// Assert:
-		Assert.assertThat(pair.getNode(), IsSame.sameInstance(node));
-		Assert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
-		Assert.assertThat(pair.getNumSyncAttempts(), IsEqual.equalTo(89));
+		MatcherAssert.assertThat(pair.getNode(), IsSame.sameInstance(node));
+		MatcherAssert.assertThat(pair.getExperience(), IsSame.sameInstance(experience));
+		MatcherAssert.assertThat(pair.getNumSyncAttempts(), IsEqual.equalTo(89));
 	}
 
 	@Test
@@ -38,14 +39,14 @@ public class ExtendedNodeExperiencePairTest {
 				org.nem.core.test.Utils.roundtripSerializableEntity(originalPair, null));
 
 		// Assert:
-		Assert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getPort(), IsEqual.equalTo(81));
-		Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
-		Assert.assertThat(pair.getNumSyncAttempts(), IsEqual.equalTo(89));
+		MatcherAssert.assertThat(pair.getNode().getEndpoint().getBaseUrl().getPort(), IsEqual.equalTo(81));
+		MatcherAssert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(17L));
+		MatcherAssert.assertThat(pair.getNumSyncAttempts(), IsEqual.equalTo(89));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -53,13 +54,13 @@ public class ExtendedNodeExperiencePairTest {
 		final ExtendedNodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", 5, 1, 9);
 
 		// Assert:
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 9), IsEqual.equalTo(pair));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1, 9), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1, 9), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7, 9), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 9), IsEqual.equalTo(pair));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1, 9), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1, 9), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7, 9), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(5L, IsNot.not(IsEqual.equalTo((Object) pair)));
 	}
 
 	@Test
@@ -69,16 +70,16 @@ public class ExtendedNodeExperiencePairTest {
 		final int hashCode = pair.hashCode();
 
 		// Assert:
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 9).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 9).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.2", 5, 1, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 2, 1, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 7, 9).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperiencePair("10.0.0.1", 5, 1, 8).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -86,30 +87,19 @@ public class ExtendedNodeExperiencePairTest {
 		final ExtendedNodeExperiencePair pair = createNodeExperiencePair("10.0.0.1", "bob", 5, 1, 9);
 
 		// Assert:
-		Assert.assertThat(
-				pair.toString(),
-				IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) bob] @ [10.0.0.1]]"));
+		MatcherAssert.assertThat(pair.toString(), IsEqual.equalTo("[success: 5, failure: 1] @ [Node [(Weak Id) bob] @ [10.0.0.1]]"));
 	}
 
-	//endregion
+	// endregion
 
-	private static ExtendedNodeExperiencePair createNodeExperiencePair(
-			final String host,
-			final int numSuccess,
-			final int numFailures,
+	private static ExtendedNodeExperiencePair createNodeExperiencePair(final String host, final int numSuccess, final int numFailures,
 			final int numSyncAttempts) {
 		return createNodeExperiencePair(host, host, numSuccess, numFailures, numSyncAttempts);
 	}
 
-	private static ExtendedNodeExperiencePair createNodeExperiencePair(
-			final String host,
-			final String name,
-			final int numSuccess,
-			final int numFailures,
-			final int numSyncAttempts) {
-		return new ExtendedNodeExperiencePair(
-				NodeUtils.createNodeWithHost(host, name),
-				new NodeExperience(numSuccess, numFailures),
+	private static ExtendedNodeExperiencePair createNodeExperiencePair(final String host, final String name, final int numSuccess,
+			final int numFailures, final int numSyncAttempts) {
+		return new ExtendedNodeExperiencePair(NodeUtils.createNodeWithHost(host, name), new NodeExperience(numSuccess, numFailures),
 				numSyncAttempts);
 	}
 }

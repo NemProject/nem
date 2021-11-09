@@ -23,16 +23,12 @@ public class NoSelfSignedTransactionsBlockValidator implements BlockValidator {
 	@Override
 	public ValidationResult validate(final Block block) {
 		final Address harvesterAddress = block.getSigner().getAddress();
-		final ReadOnlyAccountState ownerState = this.accountStateCache.findForwardedStateByAddress(
-				harvesterAddress,
-				block.getHeight());
+		final ReadOnlyAccountState ownerState = this.accountStateCache.findForwardedStateByAddress(harvesterAddress, block.getHeight());
 		final boolean isSelfSigned = block.getTransactions().stream().anyMatch(transaction -> {
 			final Address signerAddress = transaction.getSigner().getAddress();
 			return signerAddress.equals(harvesterAddress) || signerAddress.equals(ownerState.getAddress());
 		});
 
-		return isSelfSigned
-				? ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION
-				: ValidationResult.SUCCESS;
+		return isSelfSigned ? ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION : ValidationResult.SUCCESS;
 	}
 }

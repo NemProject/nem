@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,7 +17,7 @@ import java.util.function.BiFunction;
 
 public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 
-	//region 1:1 delegation
+	// region 1:1 delegation
 
 	@Test
 	public void getUnconfirmedBalanceDelegatesToState() {
@@ -29,7 +30,7 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		final Amount result = context.transactions.getUnconfirmedBalance(account);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(Amount.fromNem(757)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(Amount.fromNem(757)));
 		Mockito.verify(context.state, Mockito.only()).getUnconfirmedBalance(account);
 	}
 
@@ -45,7 +46,7 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		final Quantity result = context.transactions.getUnconfirmedMosaicBalance(account, mosaicId);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new Quantity(898)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new Quantity(898)));
 		Mockito.verify(context.state, Mockito.only()).getUnconfirmedMosaicBalance(account, mosaicId);
 	}
 
@@ -60,7 +61,7 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		final ValidationResult result = context.transactions.addNewBatch(transactions);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 		Mockito.verify(context.state, Mockito.only()).addNewBatch(transactions);
 	}
 
@@ -86,13 +87,13 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		final ValidationResult result = add.apply(context.transactions, transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 		add.apply(Mockito.verify(context.state, Mockito.only()), transaction);
 	}
 
-	//endregion
+	// endregion
 
-	//region create transactions
+	// region create transactions
 
 	private static MockTransaction createMockTransaction(final int customField) {
 		return new MockTransaction(Utils.generateRandomAccount(), customField, new TimeInstant(customField));
@@ -108,9 +109,9 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		return transactions;
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private TestContext createTestContext() {
 		return new TestContext(this::createUnconfirmedTransactions);
@@ -127,5 +128,5 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 		}
 	}
 
-	//endregion
+	// endregion
 }

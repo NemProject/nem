@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -100,7 +101,7 @@ public class BasicNodeSelectorITCase {
 			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0] * 100) + "% certainty.");
 		}
 
-		Assert.assertThat(probability <= 75.0, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(probability <= 75.0, IsEqual.equalTo(true));
 	}
 
 	private static class TestContext {

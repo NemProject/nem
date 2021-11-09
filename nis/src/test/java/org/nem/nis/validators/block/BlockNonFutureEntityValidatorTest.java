@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -27,10 +28,7 @@ public class BlockNonFutureEntityValidatorTest {
 		this.assertBlockValidationResult(11, 22, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
-	private void assertBlockValidationResult(
-			final int currentTime,
-			final int entityTime,
-			final ValidationResult expectedResult) {
+	private void assertBlockValidationResult(final int currentTime, final int entityTime, final ValidationResult expectedResult) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithTimeStamp(entityTime);
 		final BlockValidator validator = createValidator(currentTime);
@@ -39,7 +37,7 @@ public class BlockNonFutureEntityValidatorTest {
 		final ValidationResult result = validator.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static BlockValidator createValidator(final int currentTime) {

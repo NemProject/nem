@@ -1,5 +1,6 @@
 package org.nem.nis.validators.unconfirmed;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -10,7 +11,7 @@ import java.util.Collections;
 
 public class TransactionDeadlineValidatorTest {
 
-	//region childless transaction
+	// region childless transaction
 
 	@Test
 	public void childlessTransactionWithFutureDeadlineValidates() {
@@ -30,7 +31,8 @@ public class TransactionDeadlineValidatorTest {
 		assertValidationOfChildlessTransactionWithRelativeDeadline(-1, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
-	private static void assertValidationOfChildlessTransactionWithRelativeDeadline(final int relativeDeadline, final ValidationResult expectedResult) {
+	private static void assertValidationOfChildlessTransactionWithRelativeDeadline(final int relativeDeadline,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TimeProvider timeProvider = Utils.createMockTimeProvider(100);
 		final TransactionDeadlineValidator validator = new TransactionDeadlineValidator(timeProvider);
@@ -42,12 +44,12 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region single child transaction (always valid child)
+	// region single child transaction (always valid child)
 
 	@Test
 	public void singleChildTransactionWithFutureDeadlineValidates() {
@@ -67,7 +69,8 @@ public class TransactionDeadlineValidatorTest {
 		assertValidationOfSingleChildTransactionWithRelativeDeadline(-1, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
-	private static void assertValidationOfSingleChildTransactionWithRelativeDeadline(final int relativeDeadline, final ValidationResult expectedResult) {
+	private static void assertValidationOfSingleChildTransactionWithRelativeDeadline(final int relativeDeadline,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TimeProvider timeProvider = Utils.createMockTimeProvider(100);
 		final TransactionDeadlineValidator validator = new TransactionDeadlineValidator(timeProvider);
@@ -83,12 +86,12 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region single child transaction (always valid root)
+	// region single child transaction (always valid root)
 
 	@Test
 	public void singleChildTransactionWithChildHavingFutureDeadlineValidates() {
@@ -108,7 +111,8 @@ public class TransactionDeadlineValidatorTest {
 		assertValidationOfSingleChildTransactionWithRelativeChildDeadline(-1, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
-	private static void assertValidationOfSingleChildTransactionWithRelativeChildDeadline(final int relativeDeadline, final ValidationResult expectedResult) {
+	private static void assertValidationOfSingleChildTransactionWithRelativeChildDeadline(final int relativeDeadline,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TimeProvider timeProvider = Utils.createMockTimeProvider(100);
 		final TransactionDeadlineValidator validator = new TransactionDeadlineValidator(timeProvider);
@@ -124,8 +128,8 @@ public class TransactionDeadlineValidatorTest {
 		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -61,18 +62,18 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		final AbstractTransfer dbModel = this.createMapping(mapper).map(model);
 
 		// Assert:
-		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
-		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(this.getVersion()));
-		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(2310000000L));
-		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
+		MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
+		MatcherAssert.assertThat(dbModel.getVersion(), IsEqual.equalTo(this.getVersion()));
+		MatcherAssert.assertThat(dbModel.getFee(), IsEqual.equalTo(2310000000L));
+		MatcherAssert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 
-		Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
-		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(dbAccount));
+		MatcherAssert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
+		MatcherAssert.assertThat(dbModel.getSender(), IsEqual.equalTo(dbAccount));
 
 		if (signModel) {
-			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(model.getSignature().getBytes()));
+			MatcherAssert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(model.getSignature().getBytes()));
 		} else {
-			Assert.assertThat(dbModel.getSenderProof(), IsNull.nullValue());
+			MatcherAssert.assertThat(dbModel.getSenderProof(), IsNull.nullValue());
 		}
 	}
 

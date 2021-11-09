@@ -54,10 +54,8 @@ public class HistoricalOutlinks {
 	 * @return number of AccountLink
 	 */
 	public int outlinksSize(final BlockHeight blockHeight) {
-		return this.outlinks.stream()
-				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
-				.map(HistoricalOutlink::size)
-				.reduce(0, Integer::sum);
+		return this.outlinks.stream().filter(x -> x.getHeight().compareTo(blockHeight) <= 0).map(HistoricalOutlink::size).reduce(0,
+				Integer::sum);
 	}
 
 	/**
@@ -68,10 +66,8 @@ public class HistoricalOutlinks {
 	 * @return iterator
 	 */
 	public Iterator<AccountLink> outlinksIterator(final BlockHeight startHeight, final BlockHeight endHeight) {
-		return this.outlinks.stream()
-				.filter(x -> x.getHeight().compareTo(startHeight) >= 0 && x.getHeight().compareTo(endHeight) <= 0)
-				.flatMap(x -> x.getOutlinks().stream())
-				.iterator();
+		return this.outlinks.stream().filter(x -> x.getHeight().compareTo(startHeight) >= 0 && x.getHeight().compareTo(endHeight) <= 0)
+				.flatMap(x -> x.getOutlinks().stream()).iterator();
 	}
 
 	/**
@@ -80,9 +76,7 @@ public class HistoricalOutlinks {
 	 * @return number of AccountLink
 	 */
 	public int outlinkSize() {
-		return this.outlinks.stream()
-				.map(HistoricalOutlink::size)
-				.reduce(0, Integer::sum);
+		return this.outlinks.stream().map(HistoricalOutlink::size).reduce(0, Integer::sum);
 	}
 
 	/**

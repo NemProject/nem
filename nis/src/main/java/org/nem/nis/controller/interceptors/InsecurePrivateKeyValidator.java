@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 /**
- * A spring validator used to lock down private key request arguments:
- * - remote requests with non-remote harvester private keys are blocked
+ * A spring validator used to lock down private key request arguments such that remote requests with non-remote harvester private keys are
+ * blocked
  */
 public class InsecurePrivateKeyValidator implements Validator {
 	private static final Logger LOGGER = Logger.getLogger(InsecurePrivateKeyValidator.class.getName());
@@ -27,9 +27,7 @@ public class InsecurePrivateKeyValidator implements Validator {
 	 * @param accountStateCache The readonly account state cache.
 	 * @param request The request.
 	 */
-	public InsecurePrivateKeyValidator(
-			final LocalHostDetector localHostDetector,
-			final ReadOnlyAccountStateCache accountStateCache,
+	public InsecurePrivateKeyValidator(final LocalHostDetector localHostDetector, final ReadOnlyAccountStateCache accountStateCache,
 			final HttpServletRequest request) {
 		this.localHostDetector = localHostDetector;
 		this.request = request;
@@ -47,15 +45,12 @@ public class InsecurePrivateKeyValidator implements Validator {
 			return;
 		}
 
-		final PrivateKey privateKey = (PrivateKey)target;
+		final PrivateKey privateKey = (PrivateKey) target;
 		final Address address = Address.fromPublicKey(new KeyPair(privateKey).getPublicKey());
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		if (!accountState.getRemoteLinks().isRemoteHarvester()) {
-			final String message = String.format(
-					"remote %s attempted to call local %s with non-remote address %s",
-					this.request.getRemoteAddr(),
-					this.request.getRequestURI(),
-					address);
+			final String message = String.format("remote %s attempted to call local %s with non-remote address %s",
+					this.request.getRemoteAddr(), this.request.getRequestURI(), address);
 			LOGGER.warning(message);
 			throw new UnauthorizedAccessException(message);
 		}

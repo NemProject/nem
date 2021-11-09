@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -22,7 +23,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final String name = adapter.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("inner"));
 		Mockito.verify(observer, Mockito.only()).getName();
 	}
 
@@ -38,8 +39,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceTransferNotification(account1, account2, amount),
+		adapter.notify(new BalanceTransferNotification(account1, account2, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
@@ -64,8 +64,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceTransferNotification(account1, account2, amount),
+		adapter.notify(new BalanceTransferNotification(account1, account2, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
@@ -89,8 +88,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
+		adapter.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
@@ -113,8 +111,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
+		adapter.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
@@ -137,8 +134,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
+		adapter.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
@@ -161,8 +157,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
+		adapter.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
 				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
@@ -181,8 +176,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
 
 		// Act:
-		adapter.notify(
-				new AccountNotification(Utils.generateRandomAccount()),
+		adapter.notify(new AccountNotification(Utils.generateRandomAccount()),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:

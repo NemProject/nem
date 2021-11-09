@@ -19,9 +19,7 @@ public class ValidationState {
 	 * @param mosaicDebitPredicate The mosaic debit predicate.
 	 * @param transactionExecutionState The transaction execution state.
 	 */
-	public ValidationState(
-			final DebitPredicate<Amount> xemDebitPredicate,
-			final DebitPredicate<Mosaic> mosaicDebitPredicate,
+	public ValidationState(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic> mosaicDebitPredicate,
 			final TransactionExecutionState transactionExecutionState) {
 		this.xemDebitPredicate = xemDebitPredicate;
 		this.mosaicDebitPredicate = mosaicDebitPredicate;

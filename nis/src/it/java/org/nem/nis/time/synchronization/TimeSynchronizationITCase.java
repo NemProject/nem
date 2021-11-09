@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.utils.FormatUtils;
@@ -74,7 +75,7 @@ public class TimeSynchronizationITCase {
 				EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = this.setupNetwork("network", networkSize, viewSize, settings);
 		network.advanceInTime(15 * Network.MINUTE, Network.MINUTE);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
 	}
 
 	/**
@@ -163,8 +164,8 @@ public class TimeSynchronizationITCase {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		Network.log(String.format("%s time shift per day %sms.", network.getName(), format.format(shiftPerDay)));
 		network.outputOutOfRangeNodes(TOLERABLE_MAX_DEVIATION_FROM_MEAN);
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -209,10 +210,10 @@ public class TimeSynchronizationITCase {
 		Network.log("Final state of network:");
 		network.updateStatistics();
 		network.logStatistics();
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
 		final double changeInMean = Math.abs(oldMean - network.calculateMean());
 		Network.log(String.format("Change in mean: %fms", changeInMean));
-		Assert.assertThat(changeInMean < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(changeInMean < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -249,7 +250,7 @@ public class TimeSynchronizationITCase {
 		Network.log("Final state of network:");
 		network1.updateStatistics();
 		network1.logStatistics();
-		Assert.assertThat(network1.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network1.hasConverged(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -286,7 +287,7 @@ public class TimeSynchronizationITCase {
 		Network.log("Final state of network:");
 		networks.get(0).updateStatistics();
 		networks.get(0).logStatistics();
-		Assert.assertThat(networks.get(0).hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(networks.get(0).hasConverged(), IsEqual.equalTo(true));
 	}
 
 	/**
@@ -338,8 +339,8 @@ public class TimeSynchronizationITCase {
 		final double shiftPerDay = Math.abs(mean - network.calculateMean());
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		Network.log(String.format("%s time shift per day %sms.", network.getName(), format.format(shiftPerDay)));
-		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
 	}
 
 	private Network setupNetwork(

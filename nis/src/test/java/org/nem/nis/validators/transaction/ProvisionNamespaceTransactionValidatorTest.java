@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -18,7 +19,8 @@ import java.util.*;
 public class ProvisionNamespaceTransactionValidatorTest {
 	private static final int BLOCKS_PER_YEAR = NisTestConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final int BLOCKS_PER_MONTH = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final PublicKey RENTAL_FEE_SINK_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey RENTAL_FEE_SINK_PUBLIC_KEY = PublicKey
+			.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	private static final Account RENTAL_FEE_SINK = new Account(Address.fromPublicKey(RENTAL_FEE_SINK_PUBLIC_KEY));
 	private static final long ROOT_RENTAL_FEE_BEFORE_FORK = 50000;
 	private static final long SUBLEVEL_RENTAL_FEE_BEFORE_FORK = 5000;
@@ -29,7 +31,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	private static final long FIRST_FEE_FORK_HEIGHT = BlockMarkerConstants.FEE_FORK(0x98 << 24);
 	private static final long SECOND_FEE_FORK_HEIGHT = BlockMarkerConstants.SECOND_FEE_FORK(0x98 << 24);
 
-	//region valid (basic)
+	// region valid (basic)
 
 	@Test
 	public void validTransactionWithNonRootNamespacePassesValidator() {
@@ -43,9 +45,9 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		assertValid(null, "bar");
 	}
 
-	//endregion
+	// endregion
 
-	//region invalid non-root
+	// region invalid non-root
 
 	@Test
 	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfParentNamespaceIsUnknown() {
@@ -58,7 +60,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_UNKNOWN));
 	}
 
 	@Test
@@ -71,7 +73,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 40);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
 	}
 
 	@Test
@@ -85,12 +87,12 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
 	}
 
-	//endregion
+	// endregion
 
-	//region name check
+	// region name check
 
 	@Test
 	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxSublevelLength() {
@@ -116,9 +118,9 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		assertValid(null, "0123456789abcdef");
 	}
 
-	//endregion
+	// endregion
 
-	//region reserved root check
+	// region reserved root check
 
 	@Test
 	public void transactionWithNonClaimableSubNamespaceDoesNotPassValidator() {
@@ -129,20 +131,18 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionWithNonClaimableRootNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedNamespaceFilter.getAll().stream()
-				.forEach(r -> assertNotClaimable(null, r.toString()));
+		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertNotClaimable(null, r.toString()));
 	}
 
 	@Test
 	public void transactionWithNonClaimableRootNamespaceWithClaimableSubNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedNamespaceFilter.getAll().stream()
-				.forEach(r -> assertNotClaimable(r.toString(), "xyz"));
+		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertNotClaimable(r.toString(), "xyz"));
 	}
 
-	//endregion
+	// endregion
 
-	//region rental fee sink check
+	// region rental fee sink check
 
 	@Test
 	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfRentalFeeSinkIsInvalid() {
@@ -156,14 +156,15 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		assertInvalidRentalFeeSink(null, "bar");
 	}
 
-	//endregion
+	// endregion
 
-	//region rental fee check
+	// region rental fee check
 
 	@Test
 	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfRentalFeeIsLessThanMinimum() {
 		// Assert:
-		assertRentalFee("foo", "bar", Amount.fromNem(SUBLEVEL_RENTAL_FEE_BEFORE_FORK - 1), ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
+		assertRentalFee("foo", "bar", Amount.fromNem(SUBLEVEL_RENTAL_FEE_BEFORE_FORK - 1),
+				ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 	}
 
 	@Test
@@ -181,7 +182,8 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionWithRootNamespaceDoesNotPassValidatorIfRentalFeeIsLessThanMinimum() {
 		// Assert:
-		assertRentalFee(null, "bar", Amount.fromNem(ROOT_RENTAL_FEE_BEFORE_FORK - 1), ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
+		assertRentalFee(null, "bar", Amount.fromNem(ROOT_RENTAL_FEE_BEFORE_FORK - 1),
+				ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 	}
 
 	@Test
@@ -196,11 +198,9 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		assertRentalFee(null, "bar", Amount.fromNem(ROOT_RENTAL_FEE_BEFORE_FORK + 100), ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region renewal
-
-	//region non-root
+	// region renewal -non-root
 
 	@Test
 	public void transactionWithNonRootNamespaceCannotBeRenewedDirectly() {
@@ -209,10 +209,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		for (final String name : Arrays.asList("foo", "foo.bar")) {
-			final Namespace namespace = new Namespace(
-					new NamespaceId(name),
-					TestContext.OWNER,
-					new BlockHeight(100000));
+			final Namespace namespace = new Namespace(new NamespaceId(name), TestContext.OWNER, new BlockHeight(100000));
 			context.namespaceCache.add(namespace);
 		}
 
@@ -220,20 +217,17 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR - 1);
 
 		// Assert: the non-root part is not renewable
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
 	}
 
-	//endregion
+	// endregion
 
-	//region root
+	// region root
 
 	@Test
 	public void transactionWithRootNamespaceDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndDoesNotExpireWithinAMonth() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(
-				null,
-				BLOCKS_PER_MONTH + 1,
-				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+		assertRenewalOfRootWithExpiration(null, BLOCKS_PER_MONTH + 1, ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
@@ -252,31 +246,23 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndDoesNotExpireWithinAMonth() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(
-				Utils.generateRandomAccount(),
-				BLOCKS_PER_MONTH + 1,
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), BLOCKS_PER_MONTH + 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
 	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndExpiresWithinAMonth() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(
-				Utils.generateRandomAccount(),
-				BLOCKS_PER_MONTH - 1,
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), BLOCKS_PER_MONTH - 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
-		assertRenewalOfRootWithExpiration(
-				Utils.generateRandomAccount(),
-				BLOCKS_PER_MONTH,
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), BLOCKS_PER_MONTH,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
 	public void transactionWithRootNamespaceWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndNamespaceExpiredLessThanAMonthAgo() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(
-				Utils.generateRandomAccount(),
-				-BLOCKS_PER_MONTH + 1,
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), -BLOCKS_PER_MONTH + 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
@@ -287,11 +273,9 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), -BLOCKS_PER_MONTH - 1, ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region helper asserts
+	// region helper asserts
 
 	private static void assertValid(final String parent, final String part) {
 		// Assert:
@@ -317,7 +301,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertInvalidRentalFeeSink(final String parent, final String part) {
@@ -330,10 +314,11 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK));
 	}
 
-	private static void assertRentalFee(final String parent, final String part, final Amount rentalFee, final ValidationResult expectedResult) {
+	private static void assertRentalFee(final String parent, final String part, final Amount rentalFee,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(parent, part);
 		context.setRentalFee(rentalFee);
@@ -343,12 +328,10 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	private static void assertRenewalOfRootWithExpiration(
-			final Account signer,
-			final int expirationBlocks,
+	private static void assertRenewalOfRootWithExpiration(final Account signer, final int expirationBlocks,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(null, "foo");
@@ -357,9 +340,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		}
 
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		final Namespace namespace = new Namespace(
-				new NamespaceId(context.part.toString()),
-				TestContext.OWNER,
+		final Namespace namespace = new Namespace(new NamespaceId(context.part.toString()), TestContext.OWNER,
 				new BlockHeight(100000 + expirationBlocks));
 		context.namespaceCache.add(namespace);
 
@@ -367,14 +348,12 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region fee forks
-
-	//region first fee fork
+	// region fee forks - first fee fork
 
 	@Test
 	public void transactionBeforeFirstForkWithLessThan50kXemFeeForRootNamespaceIsInvalid() {
@@ -384,10 +363,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -401,10 +377,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -416,10 +389,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 1000L, ROOT_RENTAL_FEE_AFTER_FIRST_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					true,
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
+			assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 		});
 	}
@@ -430,10 +400,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					false,
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
+			assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 		});
 	}
@@ -445,10 +412,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -461,10 +425,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -473,58 +434,35 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionAtFirstForkHeightWithAtLeast1500XemFeeForRootNamespaceIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 100,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
+		final Collection<Long> fees = Arrays.asList(ROOT_RENTAL_FEE_AFTER_FIRST_FORK, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1,
+				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 100, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1000, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					true,
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAtFirstForkHeightWithAtLeast200XemFeeForSubNamespaceIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 100,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
+		final Collection<Long> fees = Arrays.asList(SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK, SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1,
+				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 100, SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
 				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					false,
-					Amount.fromNem(fee),
-					new BlockHeight(FIRST_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(FIRST_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAfterFirstForkHeightWithAtLeast1500XemFeeForRootNamespaceIsValid() {
 		final Collection<Long> heights = Arrays.asList(FIRST_FEE_FORK_HEIGHT + 1, FIRST_FEE_FORK_HEIGHT + 10, FIRST_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 100,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
-				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
+		final Collection<Long> fees = Arrays.asList(ROOT_RENTAL_FEE_AFTER_FIRST_FORK, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1,
+				ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 100, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 1000, ROOT_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
@@ -532,27 +470,20 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionAfterFirstForkHeightWithAtLeast200XemFeeForSubNamespaceIsValid() {
 		final Collection<Long> heights = Arrays.asList(FIRST_FEE_FORK_HEIGHT + 1, FIRST_FEE_FORK_HEIGHT + 10, FIRST_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 100,
-				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
+		final Collection<Long> fees = Arrays.asList(SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK, SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1,
+				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 100, SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 1000,
 				SUBLEVEL_RENTAL_FEE_AFTER_FIRST_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
 
-	//endregion
+	// endregion
 
-	//region second fee fork
+	// region fee forks - second fee fork
 
 	@Test
 	public void transactionBeforeSecondForkWithLessThan1500XemFeeForRootNamespaceIsInvalid() {
@@ -562,10 +493,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -579,10 +507,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -594,10 +519,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 50L, ROOT_RENTAL_FEE_AFTER_SECOND_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					true,
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
+			assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 		});
 	}
@@ -608,25 +530,20 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 5L, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					false,
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
+			assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT),
 					ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 		});
 	}
 
 	@Test
 	public void transactionAfterSecondForkHeightWithLessThan100XemFeeForRootNamespaceIsInvalid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 50L, ROOT_RENTAL_FEE_AFTER_SECOND_FORK - 1);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -634,15 +551,13 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 	@Test
 	public void transactionAfterSecondForkHeightWithLessThan10XemFeeForSubNamespaceIsInvalid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
 		final Collection<Long> fees = Arrays.asList(0L, 1L, 5L, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK - 1);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height),
 						ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
 			});
 		});
@@ -651,89 +566,60 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionAtSecondForkHeightWithAtLeast100XemFeeForRootNamespaceIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 100,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
+		final Collection<Long> fees = Arrays.asList(ROOT_RENTAL_FEE_AFTER_SECOND_FORK, ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1,
+				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 100, ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
 				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					true,
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAtSecondForkHeightWithAtLeast10XemFeeForSubNamespaceIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 100,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
+		final Collection<Long> fees = Arrays.asList(SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1,
+				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 100, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
 				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
-			assertValidationResult(
-					false,
-					Amount.fromNem(fee),
-					new BlockHeight(SECOND_FEE_FORK_HEIGHT),
-					ValidationResult.SUCCESS);
+			assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(SECOND_FEE_FORK_HEIGHT), ValidationResult.SUCCESS);
 		});
 	}
 
 	@Test
 	public void transactionAfterSecondForkHeightWithAtLeast100XemFeeForRootNamespaceIsValid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 100,
-				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> fees = Arrays.asList(ROOT_RENTAL_FEE_AFTER_SECOND_FORK, ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1,
+				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 100, ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
 				ROOT_RENTAL_FEE_AFTER_SECOND_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						true,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(true, Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
 
 	@Test
 	public void transactionAfterSecondForkHeightWithAtLeast10XemFeeForSubNamespaceIsValid() {
-		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10, SECOND_FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 100,
-				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
+		final Collection<Long> heights = Arrays.asList(SECOND_FEE_FORK_HEIGHT + 1, SECOND_FEE_FORK_HEIGHT + 10,
+				SECOND_FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> fees = Arrays.asList(SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1,
+				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 100, SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 1000,
 				SUBLEVEL_RENTAL_FEE_AFTER_SECOND_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
-				assertValidationResult(
-						false,
-						Amount.fromNem(fee),
-						new BlockHeight(height),
-						ValidationResult.SUCCESS);
+				assertValidationResult(false, Amount.fromNem(fee), new BlockHeight(height), ValidationResult.SUCCESS);
 			});
 		});
 	}
 
-	//endregion
+	// endregion
 
-	private static void assertValidationResult(
-			final boolean isRoot,
-			final Amount fee,
-			final BlockHeight height,
+	private static void assertValidationResult(final boolean isRoot, final Amount fee, final BlockHeight height,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(isRoot ? null : "foo", "bar", height, fee);
@@ -743,10 +629,8 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, height.getRaw());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
-
-	//endregion
 
 	private static class TestContext {
 		private static final Account OWNER = Utils.generateRandomAccount();
@@ -757,23 +641,15 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
-		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
+		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(
+				this.namespaceCache);
 
 		private TestContext(final String parent, final String part) {
-			this(
-					parent,
-					part,
-					new BlockHeight(50),
-					null == parent
-							? Amount.fromNem(ROOT_RENTAL_FEE_BEFORE_FORK)
-							: Amount.fromNem(SUBLEVEL_RENTAL_FEE_BEFORE_FORK));
+			this(parent, part, new BlockHeight(50),
+					null == parent ? Amount.fromNem(ROOT_RENTAL_FEE_BEFORE_FORK) : Amount.fromNem(SUBLEVEL_RENTAL_FEE_BEFORE_FORK));
 		}
 
-		private TestContext(
-				final String parent,
-				final String part,
-				final BlockHeight height,
-				final Amount rentalFee) {
+		private TestContext(final String parent, final String part, final BlockHeight height, final Amount rentalFee) {
 			this.rentalFeeSink = RENTAL_FEE_SINK;
 			this.rentalFee = rentalFee;
 			this.signer = OWNER;
@@ -803,12 +679,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	private static ProvisionNamespaceTransaction createTransaction(final TestContext context) {
-		return new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				context.signer,
-				context.rentalFeeSink,
-				context.rentalFee,
-				context.part,
+		return new ProvisionNamespaceTransaction(TimeInstant.ZERO, context.signer, context.rentalFeeSink, context.rentalFee, context.part,
 				context.parent);
 	}
 }

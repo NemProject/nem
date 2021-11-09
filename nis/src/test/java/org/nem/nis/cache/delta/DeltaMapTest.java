@@ -1,5 +1,6 @@
 package org.nem.nis.cache.delta;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -7,7 +8,7 @@ import java.util.*;
 
 public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & CopyableDeltaMap<TMap>> {
 
-	//region abstract functions
+	// region abstract functions
 
 	/**
 	 * Creates a delta map with the specified capacity.
@@ -25,9 +26,9 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 	 */
 	protected abstract TMap createMapWithValues(final Map<Integer, String> initialValues);
 
-	//endregion
+	// endregion
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void canCreateMapWithInitialCapacity() {
@@ -35,10 +36,11 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 		final DeltaMap<?, ?> map = this.createMapWithCapacity(11);
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
+	@SuppressWarnings("serial")
 	public void canCreateMapWithInitialValues() {
 		// Arrange:
 		final Map<Integer, String> initialValues = new HashMap<Integer, String>() {
@@ -54,7 +56,7 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 		assertContents(map, Arrays.asList(createEntry(7, "aaa"), createEntry(8, "bbb"), createEntry(5, "ccc")));
 	}
 
-	//endregion
+	// endregion
 
 	private static Map.Entry<Integer, String> createEntry(final Integer key, final String value) {
 		return new Map.Entry<Integer, String>() {
@@ -75,14 +77,11 @@ public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & Copy
 		};
 	}
 
-	private static void assertContents(
-			final DeltaMap<Integer, String> map,
-			final Collection<Map.Entry<Integer, String>> entries) {
-		Assert.assertThat(map.size(), IsEqual.equalTo(entries.size()));
-		entries.stream()
-				.forEach(e -> {
-					Assert.assertThat(map.containsKey(e.getKey()), IsEqual.equalTo(true));
-					Assert.assertThat(map.get(e.getKey()), IsEqual.equalTo(e.getValue()));
-				});
+	private static void assertContents(final DeltaMap<Integer, String> map, final Collection<Map.Entry<Integer, String>> entries) {
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(entries.size()));
+		entries.stream().forEach(e -> {
+			MatcherAssert.assertThat(map.containsKey(e.getKey()), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(map.get(e.getKey()), IsEqual.equalTo(e.getValue()));
+		});
 	}
 }

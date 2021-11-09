@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -20,10 +21,10 @@ public class DbNamespaceTest {
 		final DbNamespace dbNamespace = new DbNamespace(dbOriginal, dbAccount, 543L);
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getId(), IsEqual.equalTo(5L));
-		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("a.b.c"));
-		Assert.assertThat(dbNamespace.getLevel(), IsEqual.equalTo(22));
-		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(543L));
-		Assert.assertThat(dbNamespace.getOwner(), IsEqual.equalTo(dbAccount));
+		MatcherAssert.assertThat(dbNamespace.getId(), IsEqual.equalTo(5L));
+		MatcherAssert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("a.b.c"));
+		MatcherAssert.assertThat(dbNamespace.getLevel(), IsEqual.equalTo(22));
+		MatcherAssert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(543L));
+		MatcherAssert.assertThat(dbNamespace.getOwner(), IsEqual.equalTo(dbAccount));
 	}
 }

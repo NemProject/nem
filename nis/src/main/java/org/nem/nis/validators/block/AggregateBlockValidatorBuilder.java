@@ -39,15 +39,12 @@ public class AggregateBlockValidatorBuilder {
 
 		@Override
 		public String getName() {
-			return this.validators.stream()
-					.map(NamedValidator::getName)
-					.collect(Collectors.joining(","));
+			return this.validators.stream().map(NamedValidator::getName).collect(Collectors.joining(","));
 		}
 
 		@Override
 		public ValidationResult validate(final Block block) {
-			final Iterator<ValidationResult> resultIterator = this.validators.stream()
-					.map(validator -> validator.validate(block))
+			final Iterator<ValidationResult> resultIterator = this.validators.stream().map(validator -> validator.validate(block))
 					.iterator();
 			return ValidationResult.aggregate(resultIterator);
 		}

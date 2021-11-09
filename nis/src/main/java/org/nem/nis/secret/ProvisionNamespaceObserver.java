@@ -29,15 +29,12 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((ProvisionNamespaceNotification)notification, context);
+		this.notify((ProvisionNamespaceNotification) notification, context);
 	}
 
 	private void notify(final ProvisionNamespaceNotification notification, final BlockNotificationContext context) {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
-			final Namespace namespace = new Namespace(
-					notification.getNamespaceId(),
-					notification.getOwner(),
-					context.getHeight());
+			final Namespace namespace = new Namespace(notification.getNamespaceId(), notification.getOwner(), context.getHeight());
 			this.namespaceCache.add(namespace);
 			if (namespace.getId().isRoot()) {
 				this.updateAccountStates(namespace.getId());

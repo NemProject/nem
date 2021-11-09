@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -16,6 +17,6 @@ public class NamespaceIdBuilderTest {
 		final NamespaceId namespaceId = builder.build();
 
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("a.b.c"));
+		MatcherAssert.assertThat(namespaceId.toString(), IsEqual.equalTo("a.b.c"));
 	}
 }

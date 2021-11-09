@@ -1,6 +1,7 @@
 package org.nem.nis.validators.integration;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -15,6 +16,7 @@ import org.nem.nis.chain.BlockExecuteProcessor;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -38,10 +40,10 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
 		// - C 200 - 0 (No Change) = 200
 		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
-		Assert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	@Test
@@ -65,12 +67,12 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// - C2 202 - 0 (No Change) = 202
 		// - C3 203 - 0 (No Change) = 203
 		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
-		Assert.assertThat(getAccountInfo(nisCache, cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
-		Assert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
+		MatcherAssert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	@Test
@@ -89,21 +91,17 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 	}
 
 	@Override
-	protected void assertTransactions(
-			final BlockHeight chainHeight,
-			final ReadOnlyNisCache nisCache,
-			final List<Transaction> all,
-			final List<Transaction> expectedFiltered,
-			final ValidationResult expectedResult) {
+	protected void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
+			final List<Transaction> expectedFiltered, final ValidationResult expectedResult) {
 		// Act:
 		final ValidationResult result = this.validateTransactions(chainHeight, nisCache.copy(), all);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);
@@ -116,9 +114,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Arrange:
 		final BlockChainValidator validator = new BlockChainValidatorFactory().create(nisCache);
 
-		final Block parentBlock = NisUtils.createParentBlock(
-				Utils.generateRandomAccount(),
-				chainHeight.getRaw());
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), chainHeight.getRaw());
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);
@@ -139,9 +135,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// change version
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(blockTemplate.asNonVerifiable());
 		jsonObject.put("version", version | NetworkInfos.getDefault().getVersion() << 24);
-		final Block block = new Block(
-				blockTemplate.getType(),
-				VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
+		final Block block = new Block(blockTemplate.getType(), VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
 				Utils.createDeserializer(jsonObject));
 		block.signBy(blockTemplate.getSigner());
 		return block;
@@ -158,13 +152,10 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		public BlockChainValidator create(final NisCache nisCache) {
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
-			return new BlockChainValidator(
-					block -> new BlockExecuteProcessor(nisCache, block, observer),
-					this.scorer,
-					this.maxChainSize,
+			return new BlockChainValidator(block -> new BlockExecuteProcessor(nisCache, block, observer), this.scorer, this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
-					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
-					NisCacheUtils.createValidationState(nisCache));
+					NisUtils.createTransactionValidatorFactory().createSingle(nisCache), NisCacheUtils.createValidationState(nisCache),
+					new ForkConfiguration());
 		}
 	}
 }

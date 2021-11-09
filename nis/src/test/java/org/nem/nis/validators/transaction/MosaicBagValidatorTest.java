@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -20,7 +21,7 @@ public class MosaicBagValidatorTest {
 	private static final Amount FIVE_XEM = Amount.fromNem(5);
 	private static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
 
-	//region unknown mosaic
+	// region unknown mosaic
 
 	@Test
 	public void transactionIsInvalidIfNamespaceIdIsUnknown() {
@@ -44,9 +45,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_UNKNOWN);
 	}
 
-	//endregion
+	// endregion
 
-	//region unknown levy
+	// region unknown levy
 
 	@Test
 	public void transactionIsInvalidIfMosaicLevyIsUnknown() {
@@ -60,9 +61,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_LEVY_UNKNOWN);
 	}
 
-	//endregion
+	// endregion
 
-	//region expired namespace
+	// region expired namespace
 
 	@Test
 	public void transactionIsInvalidIfNamespaceIsNotActive() {
@@ -76,9 +77,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_NAMESPACE_EXPIRED);
 	}
 
-	//endregion
+	// endregion
 
-	//region transferable
+	// region transferable
 
 	@Test
 	public void transactionIsValidIfMosaicIsNotTransferableAndSenderIsTheMosaicCreator() {
@@ -121,9 +122,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
 	}
 
-	//endregion
+	// endregion
 
-	//region fractional amount
+	// region fractional amount
 
 	@Test
 	public void transactionWithFractionalAmountAndNoMosaicsValidates() {
@@ -147,9 +148,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED);
 	}
 
-	//endregion
+	// endregion
 
-	//region max mosaics
+	// region max mosaics
 
 	@Test
 	public void transactionWithMaxMosaicsValidates() {
@@ -171,9 +172,9 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_TOO_MANY_MOSAIC_TRANSFERS);
 	}
 
-	//endregion
+	// endregion
 
-	//region valid
+	// region valid
 
 	@Test
 	public void transactionWithNoMosaicsValidates() {
@@ -209,7 +210,7 @@ public class MosaicBagValidatorTest {
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
 	private static MosaicProperties createMosaicProperties(final boolean transferable) {
 		return Utils.createMosaicProperties(INITIAL_SUPPLY.getRaw(), 4, null, transferable);
@@ -226,7 +227,8 @@ public class MosaicBagValidatorTest {
 		}
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition, final BlockHeight namespaceHeight) {
-			final Namespace namespace = new Namespace(mosaicDefinition.getId().getNamespaceId(), mosaicDefinition.getCreator(), namespaceHeight);
+			final Namespace namespace = new Namespace(mosaicDefinition.getId().getNamespaceId(), mosaicDefinition.getCreator(),
+					namespaceHeight);
 			this.namespaceCache.add(namespace);
 			this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaicDefinition);
 		}
@@ -253,14 +255,10 @@ public class MosaicBagValidatorTest {
 			return Utils.createMosaicDefinition(this.signer, mosaicId, createMosaicProperties(true), Utils.createMosaicLevy());
 		}
 
-		//region createTransaction
+		// region createTransaction
 
-		private TransferTransaction createTransaction(
-				final Account signer,
-				final Account recipient,
-				final Amount amount,
-				final MosaicId mosaicId,
-				final long quantity) {
+		private TransferTransaction createTransaction(final Account signer, final Account recipient, final Amount amount,
+				final MosaicId mosaicId, final long quantity) {
 			// Arrange: add three mosaic definitions with the "interesting" one in the middle
 			final MosaicDefinition firstMosaicDefinition = this.addTestMosaicDefinition(signer.getAddress(), Utils.createMosaicId(1));
 			final MosaicDefinition lastMosaicDefinition = this.addTestMosaicDefinition(signer.getAddress(), Utils.createMosaicId(3));
@@ -284,16 +282,11 @@ public class MosaicBagValidatorTest {
 			return mosaicDefinition;
 		}
 
-		private TransferTransaction createTransaction(
-				final Amount amount,
-				final MosaicId mosaicId,
-				final long quantity) {
+		private TransferTransaction createTransaction(final Amount amount, final MosaicId mosaicId, final long quantity) {
 			return this.createTransaction(this.signer, this.recipient, amount, mosaicId, quantity);
 		}
 
-		private TransferTransaction createTransaction(
-				final Amount amount,
-				final TransferTransactionAttachment attachment) {
+		private TransferTransaction createTransaction(final Amount amount, final TransferTransactionAttachment attachment) {
 			return createTransaction(this.signer, this.recipient, amount, attachment);
 		}
 
@@ -308,17 +301,9 @@ public class MosaicBagValidatorTest {
 			return this.createTransaction(Amount.fromNem(1), attachment);
 		}
 
-		private static TransferTransaction createTransaction(
-				final Account signer,
-				final Account recipient,
-				final Amount amount,
+		private static TransferTransaction createTransaction(final Account signer, final Account recipient, final Amount amount,
 				final TransferTransactionAttachment attachment) {
-			return new TransferTransaction(
-					TimeInstant.ZERO,
-					signer,
-					recipient,
-					amount,
-					attachment);
+			return new TransferTransaction(TimeInstant.ZERO, signer, recipient, amount, attachment);
 		}
 
 		private void assertValidationResult(final TransferTransaction transaction, final ValidationResult expectedResult) {
@@ -326,9 +311,9 @@ public class MosaicBagValidatorTest {
 			final ValidationResult result = this.validate(transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
-		//endregion
+		// endregion
 	}
 }

@@ -33,8 +33,7 @@ public enum RemoteStatus {
 	OWNER_DEACTIVATING,
 
 	/**
-	 * Queried account is a remote, remote harvesting is inactive.
-	 * <br>
+	 * Queried account is a remote, remote harvesting is inactive. <br>
 	 * note: this indicates, that account was at some point used as a remote account.
 	 */
 	REMOTE_INACTIVE,
@@ -72,7 +71,7 @@ public enum RemoteStatus {
 			case OWNER_DEACTIVATING:
 				return AccountRemoteStatus.DEACTIVATING;
 
-			default:
+			default :
 				return AccountRemoteStatus.REMOTE;
 		}
 	}

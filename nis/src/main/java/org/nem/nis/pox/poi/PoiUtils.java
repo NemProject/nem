@@ -17,9 +17,7 @@ public class PoiUtils {
 	 * @param importanceVector The importance (weights).
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
-	public static double calculateDangleSum(
-			final List<Integer> dangleIndexes,
-			final double teleportationProbability,
+	public static double calculateDangleSum(final List<Integer> dangleIndexes, final double teleportationProbability,
 			final ColumnVector importanceVector) {
 
 		double dangleSum = 0;

@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class InsecurePrivateKeyValidatorTest {
 
-	//region supports
+	// region supports
 
 	@Test
 	public void privateKeyValidationIsSupported() {
@@ -27,7 +28,7 @@ public class InsecurePrivateKeyValidatorTest {
 		final boolean isSupported = validator.supports(PrivateKey.class);
 
 		// Assert:
-		Assert.assertThat(isSupported, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isSupported, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -39,12 +40,12 @@ public class InsecurePrivateKeyValidatorTest {
 		final boolean isSupported = validator.supports(PublicKey.class);
 
 		// Assert:
-		Assert.assertThat(isSupported, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isSupported, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region validate
+	// region validate
 
 	@Test
 	public void localRequestWithRemoteHarvesterKeyIsAllowed() {
@@ -85,12 +86,10 @@ public class InsecurePrivateKeyValidatorTest {
 		context.setLocalRequest(false);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.validate(),
-				UnauthorizedAccessException.class);
+		ExceptionAssert.assertThrows(v -> context.validate(), UnauthorizedAccessException.class);
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final KeyPair keyPair = new KeyPair();
@@ -100,10 +99,7 @@ public class InsecurePrivateKeyValidatorTest {
 		private final LocalHostDetector localHostDetector = Mockito.mock(LocalHostDetector.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		private final Validator validator = new InsecurePrivateKeyValidator(
-				this.localHostDetector,
-				this.accountStateCache,
-				this.request);
+		private final Validator validator = new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, this.request);
 
 		public TestContext() {
 			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);

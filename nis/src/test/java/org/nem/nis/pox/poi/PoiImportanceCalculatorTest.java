@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -23,10 +24,9 @@ public class PoiImportanceCalculatorTest {
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 
 	/**
-	 * This is currently used as a multipler for amounts in many tests.
-	 * Both the initial balance and outlink amounts are multiplied by this constant.
-	 * This ensures that the ratios crafted when the tests were written are unchanged.
-	 * While it might look weird to multiply an initial balance by this constant, it is correct.
+	 * This is currently used as a multipler for amounts in many tests. Both the initial balance and outlink amounts are multiplied by this
+	 * constant. This ensures that the ratios crafted when the tests were written are unchanged. While it might look weird to multiply an
+	 * initial balance by this constant, it is correct.
 	 */
 	private static final long MIN_OUTLINK_WEIGHT = DEFAULT_OPTIONS.getMinOutlinkWeight().getNumMicroNem();
 
@@ -43,21 +43,19 @@ public class PoiImportanceCalculatorTest {
 
 		// Act:
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(DEFAULT_IMPORTANCE_SCORER, getPoiOptions);
-		Assert.assertThat(heights.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(0));
 
 		for (int i = 0; i < numIterations; ++i) {
 			// Act:
 			importanceCalculator.recalculate(new BlockHeight(100 + i), accountStates);
 
 			// Assert:
-			Assert.assertThat(heights.size(), IsEqual.equalTo(1 + i));
+			MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(1 + i));
 		}
 
 		// Assert:
-		Assert.assertThat(heights.size(), IsEqual.equalTo(numIterations));
-		Assert.assertThat(
-				heights,
-				IsEqual.equalTo(Arrays.asList(new BlockHeight(100), new BlockHeight(101), new BlockHeight(102))));
+		MatcherAssert.assertThat(heights.size(), IsEqual.equalTo(numIterations));
+		MatcherAssert.assertThat(heights, IsEqual.equalTo(Arrays.asList(new BlockHeight(100), new BlockHeight(101), new BlockHeight(102))));
 	}
 
 	@Test
@@ -112,8 +110,8 @@ public class PoiImportanceCalculatorTest {
 		}
 
 		// Assert: max index and next max index are 2 and 4
-		Assert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(6));
-		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(6));
+		MatcherAssert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(2));
 	}
 
 	private static double calculateDistanceBetweenFastScanAndOtherImportances(final GraphClusteringStrategy clusteringStrategy) {
@@ -130,13 +128,15 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {
-		final Collection<AccountState> accountStates = createAccountStatesFromGraph(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final Collection<AccountState> accountStates = createAccountStatesFromGraph(
+				GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
 		if (null == clusteringStrategy) {
 			final PoiOptions defaultOptions = poiOptionsBuilder.create();
-			final double totalTeleportationProbability = defaultOptions.getTeleportationProbability() + defaultOptions.getInterLevelTeleportationProbability();
+			final double totalTeleportationProbability = defaultOptions.getTeleportationProbability()
+					+ defaultOptions.getInterLevelTeleportationProbability();
 			poiOptionsBuilder.setTeleportationProbability(totalTeleportationProbability);
 			poiOptionsBuilder.setInterLevelTeleportationProbability(0.00);
 		}
@@ -144,9 +144,9 @@ public class PoiImportanceCalculatorTest {
 		return calculateImportances(poiOptionsBuilder.create(), new BlockHeight(2), accountStates);
 	}
 
-	//endregion
+	// endregion
 
-	//region prototypical graphs
+	// region prototypical graphs
 
 	/**
 	 * <pre>
@@ -189,15 +189,15 @@ public class PoiImportanceCalculatorTest {
 		final double hubImportance = importances.getAt(0);
 		final double spokeImportance = importances.getAt(1);
 		for (int i = 2; i < importances.size(); ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
 		}
 
 		// - the hub importance is greater than the spoke importance
 		// - the higher the negative outlink weight and the lower the teleportation probability the more the ratio approaches 1.0
 		final double ratio = hubImportance / spokeImportance;
 		LOGGER.info(String.format("hub: %f; spoke %f; ratio: %f", hubImportance, spokeImportance, ratio));
-		Assert.assertThat(ratio > 1.10, IsEqual.equalTo(true));
-		Assert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio > 1.10, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -241,19 +241,19 @@ public class PoiImportanceCalculatorTest {
 		final double hubImportance = importances.getAt(0);
 		final double spokeImportance = importances.getAt(1);
 		for (int i = 2; i < importances.size(); ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(spokeImportance));
 		}
 
 		// - the hub importance is greater than the spoke importance
 		final double ratio = hubImportance / spokeImportance;
 		LOGGER.info(String.format("hub: %f; spoke %f; ratio: %f", hubImportance, spokeImportance, ratio));
-		Assert.assertThat(ratio > 1.20, IsEqual.equalTo(true));
-		Assert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio > 1.20, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
 	}
 
 	/**
-	 * Importances rise from node 2 onwards, such that 2 < 3 < 4 < 5 < 1 because the PageRank of each node increases. Nodes 1 and 6 have a lower PageRank
-	 * because they have outlinks to two nodes, thus lowering their ranks.
+	 * Importances rise from node 2 onwards, such that 2 < 3 < 4 < 5 < 1 because the PageRank of each node increases. Nodes 1 and 6 have a
+	 * lower PageRank because they have outlinks to two nodes, thus lowering their ranks.
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
 	 */
@@ -276,16 +276,24 @@ public class PoiImportanceCalculatorTest {
 		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
-		for (int i = 2; i <= 5; ++i) { accountStates.add(createAccountStateWithBalance(Amount.fromNem(2100))); }
+		for (int i = 2; i <= 5; ++i) {
+			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2100)));
+		}
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
-		for (int i = 7; i <= 10; ++i) { accountStates.add(createAccountStateWithBalance(Amount.fromNem(2100))); }
+		for (int i = 7; i <= 10; ++i) {
+			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2100)));
+		}
 
 		final Matrix outlinkMatrix = new DenseMatrix(11, 11);
 		outlinkMatrix.setAt(0, 1, 100);
-		for (int i = 1; i <= 4; ++i) { outlinkMatrix.setAt(i + 1, i, 100); }
+		for (int i = 1; i <= 4; ++i) {
+			outlinkMatrix.setAt(i + 1, i, 100);
+		}
 		outlinkMatrix.setAt(1, 5, 100);
 		outlinkMatrix.setAt(0, 6, 100);
-		for (int i = 6; i <= 9; ++i) { outlinkMatrix.setAt(i + 1, i, 100); }
+		for (int i = 6; i <= 9; ++i) {
+			outlinkMatrix.setAt(i + 1, i, 100);
+		}
 		outlinkMatrix.setAt(6, 10, 100);
 
 		final BlockHeight height = new BlockHeight(2);
@@ -313,25 +321,24 @@ public class PoiImportanceCalculatorTest {
 		// - all importances should be within a small range
 		for (int i = 0; i < importances.size(); ++i) {
 			final double importance = importances.getAt(i);
-			Assert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
 		}
 
 		// - the ring importances should be the same for the corresponding position
 		for (int i = 1; i <= 5; ++i) {
-			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
+			MatcherAssert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
 		}
 	}
 
 	// region spam scenario
 
 	/**
-	 * Given 2 6-rings, the right one got only few edges, the left one got many edges.
-	 * Try to find parameters so that the left ring has (ideally) not more importance than the right ring.
-	 * (because the transaction within a ring should not matter to the overall importance of a ring.)
-	 * <br>
-	 * Outcome:
-	 * Independent of the used algorithm it seems it doesn't matter at all if there are additional transactions.
-	 * This is probably due to the normalization of the columns of the outlink matrix.
+	 * Given 2 6-rings, the right one got only few edges, the left one got many edges. Try to find parameters so that the left ring has
+	 * (ideally) not more importance than the right ring. (because the transaction within a ring should not matter to the overall importance
+	 * of a ring.) <br>
+	 * Outcome: Independent of the used algorithm it seems it doesn't matter at all if there are additional transactions. This is probably
+	 * due to the normalization of the columns of the outlink matrix.
+	 *
 	 * <pre>
 	 *           1------o2                 7------o8
 	 *         o \     /  \              o          \
@@ -376,8 +383,8 @@ public class PoiImportanceCalculatorTest {
 		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Ideally the ratio should be within a small range.
-		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
-		Assert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -385,11 +392,11 @@ public class PoiImportanceCalculatorTest {
 	// region transfer of importance between clusters
 
 	/**
-	 * Given 2 6-rings with a link between them, analyze the difference between normal page rank matrix and ILP-matrix.
-	 * (TP = teleportation probability, ILTP = inter level teleportation probability, PR = normal page rank)
-	 * <br>
-	 * a) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
-	 * The ratio for the normal page rank is 2.1398
+	 * Given 2 6-rings with a link between them, analyze the difference between normal page rank matrix and ILP-matrix. (TP = teleportation
+	 * probability, ILTP = inter level teleportation probability, PR = normal page rank) <br>
+	 * a) Connection between ring 1 and ring 2 is as strong as the connections within the ring. The ratio for the normal page rank is 2.1398
+	 *
+	 * <pre>
 	 * TP   | ILTP | ratio ring 1 : ring 2
 	 * 0.85 | 0.0  |       2.1398
 	 * 0.75 | 0.1  |       2.0999
@@ -400,13 +407,15 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 | 0.6  |       1.8929
 	 * 0.15 | 0.7  |       1.8562
 	 * 0.05 | 0.8  |       1.8245
+	 * </pre>
+	 *
 	 * <br>
-	 * Outcome:
-	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer less importance from one cluster to another than normal page rank.
-	 * The difference is not that huge though.
-	 * <br>
-	 * b) Connection between ring 1 and ring 2 is a factor 100 weaker than the connections within the ring.
-	 * The ratio for the normal page rank is 1.01841
+	 * Outcome: With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer less importance from one cluster to
+	 * another than normal page rank. The difference is not that huge though. <br>
+	 * b) Connection between ring 1 and ring 2 is a factor 100 weaker than the connections within the ring. The ratio for the normal page
+	 * rank is 1.01841
+	 *
+	 * <pre>
 	 * TP   | ILTP | ratio ring 1 : ring 2
 	 * 0.85 | 0.0  |       1.0184
 	 * 0.75 | 0.1  |       1.1267
@@ -417,13 +426,15 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 | 0.6  |       1.6153
 	 * 0.15 | 0.7  |       1.6970
 	 * 0.05 | 0.8  |       1.7737
+	 * </pre>
+	 *
 	 * <br>
-	 * Outcome:
-	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
-	 * The difference is not that huge though.
-	 * <br>
-	 * c) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
-	 * ILTP is set to 0.1 for ncd aware page rank and 0.0 for normal page rank. TP is varied.
+	 * Outcome: With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer more importance from one cluster to
+	 * another than normal page rank. The difference is not that huge though. <br>
+	 * c) Connection between ring 1 and ring 2 is as strong as the connections within the ring. ILTP is set to 0.1 for ncd aware page rank
+	 * and 0.0 for normal page rank. TP is varied.
+	 *
+	 * <pre>
 	 * PR                  ncd aware
 	 * TP   | ratio ring 1 : ring 2 | ratio ring 1 : ring 2
 	 * 1.00 |     7.281 * 10^75     |        ---
@@ -446,9 +457,11 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 |
 	 * 0.15 |
 	 * 0.05 |
+	 * </pre>
+	 *
 	 * <br>
-	 * Outcome:
-	 * Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
+	 * Outcome: Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
+	 *
 	 * <pre>
 	 *             ring 1                   ring 2
 	 *           1------o2                 7------o8
@@ -498,8 +511,8 @@ public class PoiImportanceCalculatorTest {
 
 		// Assert:
 		// There should have been some importance transferred from the right ring to the left one.
-		Assert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
-		Assert.assertThat(ratio2 > 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ratio2 > 1, IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -540,15 +553,14 @@ public class PoiImportanceCalculatorTest {
 		return sum;
 	}
 
-	//region users-merchant-exchange
+	// region users-merchant-exchange
 
 	/**
-	 * 10 users transfer NEM to a merchant. The merchant transfers NEM to a exchange.
-	 * From the exchange, the NEM flow back to the users.
-	 * The importances for the merchant and the exchange are independent of the amount of nem that flows.
-	 * This is due to the normalization of the outlink matrix and imo a weak point because the amount should matter.
-	 * This can be countered to a certain degree by setting the minOutlinkWeight to a reasonable value.
-	 * For our standard values, there is not much difference between normal and ncd aware page rank.
+	 * 10 users transfer NEM to a merchant. The merchant transfers NEM to a exchange. From the exchange, the NEM flow back to the users. The
+	 * importances for the merchant and the exchange are independent of the amount of nem that flows. This is due to the normalization of
+	 * the outlink matrix and imo a weak point because the amount should matter. This can be countered to a certain degree by setting the
+	 * minOutlinkWeight to a reasonable value. For our standard values, there is not much difference between normal and ncd aware page rank.
+	 *
 	 * <pre>
 	 *                  --------------------------
 	 *                /                U          |
@@ -590,10 +602,10 @@ public class PoiImportanceCalculatorTest {
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.
-		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
-		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
-		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
-		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
 	}
 
 	private class StandardContext {
@@ -619,18 +631,16 @@ public class PoiImportanceCalculatorTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	/**
-	 * a --o b   c
+	 * a --o b c
 	 */
 	@Test
 	public void outlinkHasPositiveImpactOnImportance() {
 		// Arrange:
-		final List<AccountState> accountStates = Arrays.asList(
-				createAccountStateWithBalance(Amount.fromNem(101000)),
-				createAccountStateWithBalance(Amount.fromNem(100000)),
-				createAccountStateWithBalance(Amount.fromNem(100000)));
+		final List<AccountState> accountStates = Arrays.asList(createAccountStateWithBalance(Amount.fromNem(101000)),
+				createAccountStateWithBalance(Amount.fromNem(100000)), createAccountStateWithBalance(Amount.fromNem(100000)));
 
 		// 0 sends part of balance to 1
 		final BlockHeight height = new BlockHeight(2);
@@ -644,23 +654,19 @@ public class PoiImportanceCalculatorTest {
 		assertEqualBalances(height, accountStates, 100000);
 
 		// - outlink > inlink > outlier
-		Assert.assertThat(importances.getAt(1) > importances.getAt(0), IsEqual.equalTo(true));
-		Assert.assertThat(importances.getAt(0) > importances.getAt(2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importances.getAt(1) > importances.getAt(0), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(importances.getAt(0) > importances.getAt(2), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region test helpers
+	// region test helpers
 
-	private static void addOutlink(
-			final AccountState senderAccountState,
-			final AccountState recipientAccountState,
-			final BlockHeight blockHeight,
-			final Amount amount) {
+	private static void addOutlink(final AccountState senderAccountState, final AccountState recipientAccountState,
+			final BlockHeight blockHeight, final Amount amount) {
 		final Amount adjustedAmount = Amount.fromMicroNem(amount.getNumNem() * MIN_OUTLINK_WEIGHT);
 		senderAccountState.getWeightedBalances().addSend(blockHeight, adjustedAmount);
-		senderAccountState.getImportanceInfo().addOutlink(
-				new AccountLink(blockHeight, adjustedAmount, recipientAccountState.getAddress()));
+		senderAccountState.getImportanceInfo().addOutlink(new AccountLink(blockHeight, adjustedAmount, recipientAccountState.getAddress()));
 
 		recipientAccountState.getWeightedBalances().addReceive(blockHeight, adjustedAmount);
 	}
@@ -691,9 +697,7 @@ public class PoiImportanceCalculatorTest {
 		return accountStates;
 	}
 
-	private static void addOutlinksFromGraph(
-			final List<AccountState> accountStates,
-			final BlockHeight blockHeight,
+	private static void addOutlinksFromGraph(final List<AccountState> accountStates, final BlockHeight blockHeight,
 			final Matrix outlinkMatrix) {
 		for (int i = 0; i < outlinkMatrix.getRowCount(); ++i) {
 			final MatrixNonZeroElementRowIterator iterator = outlinkMatrix.getNonZeroElementRowIterator(i);
@@ -709,28 +713,20 @@ public class PoiImportanceCalculatorTest {
 		}
 	}
 
-	private static ColumnVector calculateImportances(
-			final PoiOptions options,
-			final BlockHeight importanceBlockHeight,
+	private static ColumnVector calculateImportances(final PoiOptions options, final BlockHeight importanceBlockHeight,
 			final Collection<AccountState> accountStates) {
 		return calculateImportances(options, importanceBlockHeight, accountStates, DEFAULT_IMPORTANCE_SCORER);
 	}
 
-	private static ColumnVector calculateImportances(
-			final PoiOptions options,
-			final BlockHeight importanceBlockHeight,
-			final Collection<AccountState> accountStates,
-			final ImportanceScorer scorer) {
+	private static ColumnVector calculateImportances(final PoiOptions options, final BlockHeight importanceBlockHeight,
+			final Collection<AccountState> accountStates, final ImportanceScorer scorer) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(scorer, height -> options);
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		return getImportances(importanceBlockHeight, accountStates);
 	}
 
-	private static ColumnVector getBalances(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates) {
-		final List<Amount> balances = accountStates.stream()
-				.map(a -> a.getWeightedBalances().getVested(blockHeight))
+	private static ColumnVector getBalances(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+		final List<Amount> balances = accountStates.stream().map(a -> a.getWeightedBalances().getVested(blockHeight))
 				.collect(Collectors.toList());
 
 		final ColumnVector balancesVector = new ColumnVector(balances.size());
@@ -742,43 +738,35 @@ public class PoiImportanceCalculatorTest {
 		return balancesVector;
 	}
 
-	private static void assertEqualBalances(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates,
+	private static void assertEqualBalances(final BlockHeight blockHeight, final Collection<AccountState> accountStates,
 			final double amount) {
 		// Act:
 		final ColumnVector balances = getBalances(blockHeight, accountStates);
 
 		// Assert:
-		final double adjustedAmount = Amount.fromMicroNem((long)(amount * MIN_OUTLINK_WEIGHT)).getNumNem();
+		final double adjustedAmount = Amount.fromMicroNem((long) (amount * MIN_OUTLINK_WEIGHT)).getNumNem();
 		for (int i = 0; i < balances.size(); ++i) {
-			Assert.assertThat(balances.getAt(i), IsEqual.equalTo(adjustedAmount));
+			MatcherAssert.assertThat(balances.getAt(i), IsEqual.equalTo(adjustedAmount));
 		}
 	}
 
-	private static void assertBalancesInRange(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates,
-			final double lowAmount,
-			final double highAmount) {
+	private static void assertBalancesInRange(final BlockHeight blockHeight, final Collection<AccountState> accountStates,
+			final double lowAmount, final double highAmount) {
 		// Act:
 		final ColumnVector balances = getBalances(blockHeight, accountStates);
 
 		// Assert:
-		final double adjustedLowAmount = Amount.fromMicroNem((long)(lowAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
-		final double adjustedHighAmount = Amount.fromMicroNem((long)(highAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
+		final double adjustedLowAmount = Amount.fromMicroNem((long) (lowAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
+		final double adjustedHighAmount = Amount.fromMicroNem((long) (highAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
 
 		for (int i = 0; i < balances.size(); ++i) {
 			final double balance = balances.getAt(i);
-			Assert.assertThat(balance >= adjustedLowAmount && balance < adjustedHighAmount, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(balance >= adjustedLowAmount && balance < adjustedHighAmount, IsEqual.equalTo(true));
 		}
 	}
 
-	private static ColumnVector getImportances(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accountStates) {
-		final List<Double> importances = accountStates.stream()
-				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
+	private static ColumnVector getImportances(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+		final List<Double> importances = accountStates.stream().map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());
 
 		final ColumnVector importancesVector = new ColumnVector(importances.size());
@@ -790,24 +778,19 @@ public class PoiImportanceCalculatorTest {
 		return importancesVector;
 	}
 
-	//endregion
+	// endregion
 
 	private static class DoubleLoopTestContext {
 		private final GraphClusteringStrategy clusteringStrategy = Mockito.mock(FastScanClusteringStrategy.class);
 
 		public DoubleLoopTestContext() {
 			// setup clusters
-			final ClusteringResult clusteringResult = new ClusteringResult(
-					buildLoopClusters(),
-					buildLoopHubs(),
-					buildLoopOutliers());
+			final ClusteringResult clusteringResult = new ClusteringResult(buildLoopClusters(), buildLoopHubs(), buildLoopOutliers());
 			Mockito.when(this.clusteringStrategy.cluster(Mockito.any())).thenReturn(clusteringResult);
 		}
 
 		private static Collection<Cluster> buildLoopClusters() {
-			return Arrays.asList(
-					buildCluster(1, 1, 2, 3, 4, 5),
-					buildCluster(6, 6, 7, 8, 9, 10));
+			return Arrays.asList(buildCluster(1, 1, 2, 3, 4, 5), buildCluster(6, 6, 7, 8, 9, 10));
 		}
 
 		private static Collection<Cluster> buildLoopHubs() {

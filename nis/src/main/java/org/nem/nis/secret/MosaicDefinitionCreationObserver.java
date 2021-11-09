@@ -26,7 +26,7 @@ public class MosaicDefinitionCreationObserver implements BlockTransactionObserve
 			return;
 		}
 
-		this.notify((MosaicDefinitionCreationNotification)notification, context);
+		this.notify((MosaicDefinitionCreationNotification) notification, context);
 	}
 
 	private void notify(final MosaicDefinitionCreationNotification notification, final BlockNotificationContext context) {

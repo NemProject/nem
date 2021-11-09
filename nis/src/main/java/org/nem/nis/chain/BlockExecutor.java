@@ -24,7 +24,7 @@ public class BlockExecutor {
 		this.nisCache = nisCache;
 	}
 
-	//region execute
+	// region execute
 
 	/**
 	 * Executes all transactions in the block with a custom observer.
@@ -38,9 +38,9 @@ public class BlockExecutor {
 		processor.process();
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region undo
 
 	/**
 	 * Undoes all transactions in the block with a custom observer.
@@ -54,7 +54,7 @@ public class BlockExecutor {
 		getReverseTransactions(block).forEach(processor::process);
 	}
 
-	//endregion
+	// endregion
 
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
 		return () -> new ReverseListIterator<>(block.getTransactions());

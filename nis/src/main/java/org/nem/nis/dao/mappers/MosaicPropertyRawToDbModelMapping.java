@@ -11,8 +11,8 @@ public class MosaicPropertyRawToDbModelMapping implements IMapping<Object[], DbM
 	public DbMosaicProperty map(final Object[] source) {
 		final DbMosaicProperty dbMosaicProperty = new DbMosaicProperty();
 		dbMosaicProperty.setId(RawMapperUtils.castToLong(source[1]));
-		dbMosaicProperty.setName((String)source[2]);
-		dbMosaicProperty.setValue((String)source[3]);
+		dbMosaicProperty.setName((String) source[2]);
+		dbMosaicProperty.setValue((String) source[3]);
 		return dbMosaicProperty;
 	}
 }

@@ -9,12 +9,9 @@ import javax.persistence.Table;
 import java.util.*;
 
 /**
- * Transfer Db entity.
- * <br>
- * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE
- * <br>
- * Associated sender and recipient are obtained automatically (by TransferDao)
- * thanks to @Cascade annotations.
+ * Transfer Db entity. <br>
+ * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE <br>
+ * Associated sender and recipient are obtained automatically (by TransferDao) thanks to @Cascade annotations.
  */
 @Entity
 @Table(name = "transfers")

@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,29 +26,29 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void isNotMatchIfSignatureAndMultisigTransactionsHaveDifferentOtherTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1, Utils.generateRandomHash());
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1,
+				Utils.generateRandomHash());
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
 
 		// Act:
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void isNotMatchIfSignatureAndMultisigTransactionsHaveDifferentMultisigAccounts() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransactionWithMultisig(
-				context.cosigner1,
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransactionWithMultisig(context.cosigner1,
 				Utils.generateRandomAccount());
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
 
@@ -55,7 +56,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class MultisigSignatureMatchPredicateTest {
 		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
 
 		// Assert:
-		Assert.assertThat(isMatch, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isMatch, IsEqual.equalTo(true));
 	}
 
 	private static class TestContext {
@@ -98,7 +99,7 @@ public class MultisigSignatureMatchPredicateTest {
 
 		public TestContext() {
 			Mockito.when(this.accountStateCache.findStateByAddress(Mockito.any()))
-					.thenAnswer(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
+					.thenAnswer(invocationOnMock -> new AccountState((Address) invocationOnMock.getArguments()[0]));
 			for (final Account cosigner : Arrays.asList(this.cosigner1, this.cosigner2)) {
 				final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 				cosignerAccountState.getMultisigLinks().addCosignatoryOf(this.multisig.getAddress());

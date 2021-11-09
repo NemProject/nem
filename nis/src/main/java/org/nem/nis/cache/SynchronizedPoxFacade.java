@@ -42,7 +42,7 @@ public class SynchronizedPoxFacade implements PoxFacade, CopyableCache<Synchroni
 		}
 	}
 
-	//region CopyableCache
+	// region CopyableCache
 
 	@Override
 	public void shallowCopyTo(final SynchronizedPoxFacade rhs) {
@@ -58,5 +58,5 @@ public class SynchronizedPoxFacade implements PoxFacade, CopyableCache<Synchroni
 		}
 	}
 
-	//endregion
+	// endregion
 }

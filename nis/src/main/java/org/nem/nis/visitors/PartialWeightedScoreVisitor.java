@@ -5,9 +5,7 @@ import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.BlockScorer;
 
 /**
- * Block visitor that visits all blocks in a chain and calculates
- * a partial chain score.
- * All blocks are weighted equally.
+ * Block visitor that visits all blocks in a chain and calculates a partial chain score. All blocks are weighted equally.
  */
 public class PartialWeightedScoreVisitor implements BlockVisitor {
 

@@ -21,9 +21,7 @@ public class ExplorerBlockViewModel implements SerializableEntity {
 	 * @param block The block.
 	 * @param blockHash The block hash.
 	 */
-	public ExplorerBlockViewModel(
-			final Block block,
-			final Hash blockHash) {
+	public ExplorerBlockViewModel(final Block block, final Hash blockHash) {
 		this.block = block;
 		this.blockHash = blockHash;
 		this.transactions = new ArrayList<>();

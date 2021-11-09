@@ -1,12 +1,13 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
 public class MappingRepositoryTest {
 
-	//region add success
+	// region add success
 
 	@Test
 	public void canAddSingleMapping() {
@@ -15,8 +16,8 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
-		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
-		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
 	}
 
 	@Test
@@ -27,9 +28,9 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
 
 		// Assert:
-		Assert.assertThat(repository.size(), IsEqual.equalTo(2));
-		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
-		Assert.assertThat(repository.map(7, Double.class), IsEqual.equalTo(7.0));
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
+		MatcherAssert.assertThat(repository.map(7, Double.class), IsEqual.equalTo(7.0));
 	}
 
 	@Test
@@ -40,14 +41,14 @@ public class MappingRepositoryTest {
 		repository.addMapping(Double.class, String.class, Object::toString);
 
 		// Assert:
-		Assert.assertThat(repository.size(), IsEqual.equalTo(2));
-		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
-		Assert.assertThat(repository.map(7.1, String.class), IsEqual.equalTo("7.1"));
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
+		MatcherAssert.assertThat(repository.map(7.1, String.class), IsEqual.equalTo("7.1"));
 	}
 
-	//endregion
+	// endregion
 
-	//region add failure
+	// region add failure
 
 	@Test
 	public void cannotAddMappingForSameTypePairMoreThanOnce() {
@@ -56,10 +57,8 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> repository.addMapping(Integer.class, String.class, Object::toString),
-				MappingException.class);
-		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
+		ExceptionAssert.assertThrows(v -> repository.addMapping(Integer.class, String.class, Object::toString), MappingException.class);
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -69,15 +68,13 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> repository.map(7, Double.class),
-				MappingException.class);
-		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
+		ExceptionAssert.assertThrows(v -> repository.map(7, Double.class), MappingException.class);
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region size / isSupported
+	// region size / isSupported
 
 	@Test
 	public void sizeReturnsTotalNumberOfKnownMappings() {
@@ -89,7 +86,7 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
 
 		// Assert:
-		Assert.assertThat(repository.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(repository.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -102,10 +99,10 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
 
 		// Assert:
-		Assert.assertThat(repository.isSupported(Integer.class, String.class), IsEqual.equalTo(true));
-		Assert.assertThat(repository.isSupported(Double.class, String.class), IsEqual.equalTo(true));
-		Assert.assertThat(repository.isSupported(String.class, String.class), IsEqual.equalTo(true));
-		Assert.assertThat(repository.isSupported(Integer.class, Double.class), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(repository.isSupported(Integer.class, String.class), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(repository.isSupported(Double.class, String.class), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(repository.isSupported(String.class, String.class), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(repository.isSupported(Integer.class, Double.class), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -118,11 +115,11 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
 
 		// Assert:
-		Assert.assertThat(repository.isSupported(Integer.class, Object.class), IsEqual.equalTo(false));
-		Assert.assertThat(repository.isSupported(String.class, Double.class), IsEqual.equalTo(false));
-		Assert.assertThat(repository.isSupported(Object.class, Object.class), IsEqual.equalTo(false));
-		Assert.assertThat(repository.isSupported(Long.class, Double.class), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(repository.isSupported(Integer.class, Object.class), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(repository.isSupported(String.class, Double.class), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(repository.isSupported(Object.class, Object.class), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(repository.isSupported(Long.class, Double.class), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 }

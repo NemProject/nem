@@ -11,8 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * General class for holding namespaces.
- * Note that the namespace with id "nem" is handled in a special way.
+ * General class for holding namespaces. Note that the namespace with id "nem" is handled in a special way.
  */
 public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultNamespaceCache> {
 	private final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap;
@@ -33,27 +32,22 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		this.rootMap = rootMap;
 	}
 
-	//region ReadOnlyNamespaceCache
+	// region ReadOnlyNamespaceCache
 
 	@Override
 	public int size() {
-		return 1 + this.rootMap.readOnlyEntrySet().stream()
-				.map(Map.Entry::getValue)
-				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
+		return 1 + this.rootMap.readOnlyEntrySet().stream().map(Map.Entry::getValue).map(nh -> 1 + nh.numActiveRootSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public int deepSize() {
-		return 1 + this.rootMap.streamValues()
-				.map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces())
-				.reduce(0, Integer::sum);
+		return 1 + this.rootMap.streamValues().map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces()).reduce(0, Integer::sum);
 	}
 
 	@Override
 	public Collection<NamespaceId> getRootNamespaceIds() {
-		return this.rootMap.readOnlyEntrySet().stream()
-				.map(Map.Entry<NamespaceId, RootNamespaceHistory>::getKey)
+		return this.rootMap.readOnlyEntrySet().stream().map(Map.Entry<NamespaceId, RootNamespaceHistory>::getKey)
 				.collect(Collectors.toList());
 	}
 
@@ -77,9 +71,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 			return Collections.emptyList();
 		}
 
-		return history.last().children().stream()
-				.map(cn -> cn.id)
-				.collect(Collectors.toList());
+		return history.last().children().stream().map(cn -> cn.id).collect(Collectors.toList());
 	}
 
 	@Override
@@ -106,9 +98,9 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		return null == history ? null : history.firstActiveOrDefault(height);
 	}
 
-	//endregion
+	// endregion
 
-	//region NamespaceCache
+	// region NamespaceCache
 
 	@Override
 	public void add(final Namespace namespace) {
@@ -181,9 +173,9 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		rootsToRemove.forEach(this.rootMap::remove);
 	}
 
-	//endregion
+	// endregion
 
-	//region CopyableCache
+	// region CopyableCache
 
 	@Override
 	public void shallowCopyTo(final DefaultNamespaceCache cache) {
@@ -211,7 +203,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		this.rootMap.commit();
 	}
 
-	//endregion
+	// endregion
 
 	public DefaultNamespaceCache deepCopy() {
 		// TODO 20151013 J-J: add test for deepCopy
@@ -221,7 +213,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		return copy;
 	}
 
-	//region ChildNamespace
+	// region ChildNamespace
 
 	private static class ChildNamespace {
 		public final NamespaceId id;
@@ -241,9 +233,9 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region RootNamespace
+	// region RootNamespace
 
 	private static class RootNamespace {
 		private final NamespaceEntry root;
@@ -300,15 +292,15 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 			// must have same owner as root
 			if (!this.rootNamespace().getOwner().equals(namespace.getOwner())) {
-				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", id));
+				throw new IllegalArgumentException(
+						String.format("cannot add sub-namespace '%s' with different owner than root namespace", id));
 			}
 
 			this.children.put(id, new ChildNamespace(id));
 		}
 
 		public void remove(final NamespaceId id) {
-			final boolean hasDescendants = this.children.keySet().stream()
-					.anyMatch(fid -> id.equals(fid.getParent()));
+			final boolean hasDescendants = this.children.keySet().stream().anyMatch(fid -> id.equals(fid.getParent()));
 
 			if (hasDescendants) {
 				throw new IllegalArgumentException(String.format("namespace '%s' cannot be removed because it has descendants", id));
@@ -325,9 +317,9 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region RootNamespaceHistory
+	// region RootNamespaceHistory
 
 	private static class RootNamespaceHistory implements Copyable<RootNamespaceHistory> {
 		private final List<RootNamespace> namespaces = new ArrayList<>();
@@ -344,9 +336,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 
 		public int numActiveRootSubNamespaces() {
-			return this.namespaces.isEmpty()
-					? 0
-					: this.last().size();
+			return this.namespaces.isEmpty() ? 0 : this.last().size();
 		}
 
 		public int historyDepth() {
@@ -382,10 +372,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 
 		public RootNamespace firstActiveOrDefault(final BlockHeight height) {
-			return this.namespaces.stream()
-					.filter(rn -> rn.rootNamespace().isActive(height))
-					.findFirst()
-					.orElse(null);
+			return this.namespaces.stream().filter(rn -> rn.rootNamespace().isActive(height)).findFirst().orElse(null);
 		}
 
 		public void prune(final BlockHeight height) {
@@ -400,5 +387,5 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 	}
 
-	//endregion
+	// endregion
 }

@@ -14,7 +14,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 	@Override
 	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 				return Collections.emptyList();
@@ -26,7 +26,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 				return Collections.singletonList(baseId + 8);
 			case 4:
 				return Collections.emptyList();
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}
@@ -34,7 +34,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 	@Override
 	protected List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
+		final int baseId = (int) ((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 				return Collections.singletonList(baseId + 8);
@@ -43,7 +43,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 			case 3:
 			case 4:
 				return Collections.emptyList();
-			default:
+			default :
 				throw new RuntimeException("unknown account id.");
 		}
 	}

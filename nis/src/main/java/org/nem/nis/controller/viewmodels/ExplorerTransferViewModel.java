@@ -5,8 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**
- * A transfer view model that is used by NIS services like the block explorer.
- * <br>
+ * A transfer view model that is used by NIS services like the block explorer. <br>
  * This currently only supports transfer transactions.
  */
 public class ExplorerTransferViewModel implements SerializableEntity {
@@ -29,7 +28,7 @@ public class ExplorerTransferViewModel implements SerializableEntity {
 		serializer.writeObject("tx", this.transaction);
 		serializer.writeBytes("hash", this.hash.getRaw());
 		if (this.transaction.getType() == TransactionTypes.MULTISIG) {
-			serializer.writeBytes("innerHash", ((MultisigTransaction)this.transaction).getOtherTransactionHash().getRaw());
+			serializer.writeBytes("innerHash", ((MultisigTransaction) this.transaction).getOtherTransactionHash().getRaw());
 		}
 	}
 }

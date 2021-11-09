@@ -1,5 +1,7 @@
 package org.nem.nis;
 
+import java.util.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.NetworkInfos;
@@ -9,145 +11,111 @@ public class BlockMarkerConstantsTest {
 	private static final int MAINNET_VERSION = NetworkInfos.getMainNetworkInfo().getVersion();
 	private static final int MIJINNET_VERSION = NetworkInfos.getMijinNetworkInfo().getVersion();
 
-	//region MULTISIG_M_OF_N_FORK
-
 	@Test
-	public void multisigMOfNForkTestnetVersionReturns90k() {
-		// Assert:
-		assertMultisigMOfNFork(TESTNET_VERSION, 90_000L);
-	}
+	public void multisigMOfNForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 199_800L);
+		expectedMappings.put(TESTNET_VERSION, 90_000L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
 
-	@Test
-	public void multisigMOfNForkMainnetVersionReturns199800() {
-		// Assert:
-		assertMultisigMOfNFork(MAINNET_VERSION, 199_800L);
-	}
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
 
-	@Test
-	public void multisigMOfNForkMijinnetVersionReturns1() {
-		// Assert:
-		assertMultisigMOfNFork(MIJINNET_VERSION, 1L);
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
 
 	@Test
-	public void multisigMOfNForkUnknownNetworkVersionReturns90k() {
-		// Assert:
-		assertMultisigMOfNFork(0, 90_000L);
-	}
+	public void mosaicsForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 440_000L);
+		expectedMappings.put(TESTNET_VERSION, 180_000L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
 
-	private static void assertMultisigMOfNFork(final int version, final long expectedForkHeight) {
-		// Act:
-		final long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.MOSAICS_FORK(version << 24);
 
-		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
-	}
-
-	//region MOSAICS_FORK
-
-	@Test
-	public void mosaicsForkTestnetVersionReturns180k() {
-		// Assert:
-		assertMosaicsFork(TESTNET_VERSION, 180_000L);
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
 
 	@Test
-	public void mosaicsForkMainnetVersionReturns440000() {
-		// Assert:
-		assertMosaicsFork(MAINNET_VERSION, 440_000L);
+	public void feeForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 875_000L);
+		expectedMappings.put(TESTNET_VERSION, 572_500L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
+
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.FEE_FORK(version << 24);
+
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
 
 	@Test
-	public void mosaicsForkMijinnetVersionReturns1() {
-		// Assert:
-		assertMosaicsFork(MIJINNET_VERSION, 1L);
+	public void remoteAccountForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 1_025_000L);
+		expectedMappings.put(TESTNET_VERSION, 830_000L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
+
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version << 24);
+
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
 
 	@Test
-	public void mosaicsForkUnknownNetworkVersionReturns180k() {
-		// Assert:
-		assertMosaicsFork(0, 180_000L);
-	}
+	public void mosaicRedefinitionForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 1_110_000L);
+		expectedMappings.put(TESTNET_VERSION, 871_500L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
 
-	private static void assertMosaicsFork(final int version, final long expectedForkHeight) {
-		// Act:
-		final long marker = BlockMarkerConstants.MOSAICS_FORK(version << 24);
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version << 24);
 
-		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
-	}
-
-	//endregion
-
-	//region FEE_FORK
-
-	@Test
-	public void feeForkTestnetVersionReturns572500() {
-		// Assert:
-		assertFeeFork(TESTNET_VERSION, 572_500L);
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
 
 	@Test
-	public void feeForkMainnetVersionReturns875000() {
-		// Assert:
-		assertFeeFork(MAINNET_VERSION, 875_000L);
+	public void secondFeeForkReturnsCorrectHeights() {
+		// Arrange:
+		final HashMap<Integer, Long> expectedMappings = new HashMap<Integer, Long>();
+		expectedMappings.put(MAINNET_VERSION, 1_250_000L);
+		expectedMappings.put(TESTNET_VERSION, 975_000L);
+		expectedMappings.put(MIJINNET_VERSION, 1L);
+		expectedMappings.put(0, 1L);
+
+		expectedMappings.forEach((version, expectedMarker) -> {
+			// Act:
+			final long marker = BlockMarkerConstants.SECOND_FEE_FORK(version << 24);
+
+			// Assert:
+			MatcherAssert.assertThat(String.format("%s network", version), marker, IsEqual.equalTo(expectedMarker));
+		});
 	}
-
-	@Test
-	public void feeForkMijinnetVersionReturns1() {
-		// Assert:
-		assertFeeFork(MIJINNET_VERSION, 1L);
-	}
-
-	@Test
-	public void feeForkUnknownNetworkVersionReturns572500() {
-		// Assert:
-		assertFeeFork(0, 572_500L);
-	}
-
-	private static void assertFeeFork(final int version, final long expectedForkHeight) {
-		// Act:
-		final long marker = BlockMarkerConstants.FEE_FORK(version << 24);
-
-		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
-	}
-
-	//endregion
-
-	//region SECOND_FEE_FORK
-
-	@Test
-	public void secondFeeForkTestnetVersionReturns975000() {
-		// Assert:
-		assertSecondFeeFork(TESTNET_VERSION, 975_000);
-	}
-
-	@Test
-	public void secondFeeForkMainnetVersionReturns1250000() {
-		// Assert:
-		assertSecondFeeFork(MAINNET_VERSION, 1_250_000);
-	}
-
-	@Test
-	public void secondFeeForkMijinnetVersionReturns1() {
-		// Assert:
-		assertSecondFeeFork(MIJINNET_VERSION, 1L);
-	}
-
-	@Test
-	public void secondFeeForkUnknownNetworkVersionReturns975000() {
-		// Assert:
-		assertSecondFeeFork(0, 975_000);
-	}
-
-	private static void assertSecondFeeFork(final int version, final long expectedForkHeight) {
-		// Act:
-		final long marker = BlockMarkerConstants.SECOND_FEE_FORK(version << 24);
-
-		// Assert:
-		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
-	}
-
-	//endregion
 }

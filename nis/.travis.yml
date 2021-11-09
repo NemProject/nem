@@ -1,0 +1,40 @@
+language: java
+
+jdk:
+  - openjdk8
+  - openjdk11
+
+before_install:
+  - bash ./setup_java9.sh
+
+install:
+  - pushd .
+  - mkdir .nemdeps
+  - cd .nemdeps
+
+  - git clone https://github.com/NemProject/nem.core.git
+  - cd nem.core
+  - git checkout dev
+  - bash ./setup_java9.sh
+  - mvn install -DskipTests=true
+  - cd ..
+
+  - git clone https://github.com/NemProject/nem.deploy.git
+  - cd nem.deploy
+  - git checkout dev
+  - bash ./setup_java9.sh
+  - mvn install -DskipTests=true
+  - cd ..
+
+  - git clone git@github.com:NemProject/nem.peer.git
+  - cd nem.peer
+  - git checkout dev
+  - bash ./setup_java9.sh
+  - mvn install -DskipTests=true
+  - cd ..
+
+  - popd
+
+script:
+  - mvn spotless:check -B
+  - mvn test -B

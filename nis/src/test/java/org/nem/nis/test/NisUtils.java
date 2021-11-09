@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountId;
@@ -18,6 +18,7 @@ import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.peer.trust.*;
 
 import java.util.*;
@@ -93,11 +94,7 @@ public class NisUtils {
 	 * @return The block.
 	 */
 	public static Block createRandomBlock() {
-		return new Block(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				TimeInstant.ZERO,
+		return new Block(Utils.generateRandomAccount(), Utils.generateRandomHash(), Utils.generateRandomHash(), TimeInstant.ZERO,
 				BlockHeight.ONE);
 	}
 
@@ -119,12 +116,7 @@ public class NisUtils {
 	 * @return The block.
 	 */
 	public static Block createRandomBlockWithHeight(final Account signer, final long height) {
-		return new Block(
-				signer,
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				TimeInstant.ZERO,
-				new BlockHeight(height));
+		return new Block(signer, Utils.generateRandomHash(), Utils.generateRandomHash(), TimeInstant.ZERO, new BlockHeight(height));
 	}
 
 	/**
@@ -134,11 +126,7 @@ public class NisUtils {
 	 * @return The block.
 	 */
 	public static Block createRandomBlockWithTimeStamp(final int timeStamp) {
-		return new Block(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				new TimeInstant(timeStamp),
+		return new Block(Utils.generateRandomAccount(), Utils.generateRandomHash(), Utils.generateRandomHash(), new TimeInstant(timeStamp),
 				BlockHeight.ONE);
 	}
 
@@ -150,11 +138,7 @@ public class NisUtils {
 	 * @return The block.
 	 */
 	public static Block createRandomBlockWithTimeStampAndHeight(final int timeStamp, final long height) {
-		return new Block(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				new TimeInstant(timeStamp),
+		return new Block(Utils.generateRandomAccount(), Utils.generateRandomHash(), Utils.generateRandomHash(), new TimeInstant(timeStamp),
 				new BlockHeight(height));
 	}
 
@@ -252,10 +236,7 @@ public class NisUtils {
 	 * @return The account link.
 	 */
 	public static AccountLink createLink(final int blockHeight, final long amount, final String address) {
-		return new AccountLink(
-				new BlockHeight(blockHeight),
-				Amount.fromNem(amount),
-				Address.fromEncoded(address));
+		return new AccountLink(new BlockHeight(blockHeight), Amount.fromNem(amount), Address.fromEncoded(address));
 	}
 
 	/**
@@ -274,7 +255,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
-		return new TransactionValidatorFactory(timeProvider, false);
+		return new TransactionValidatorFactory(timeProvider, NetworkInfos.getDefault(), new ForkConfiguration(), false);
 	}
 
 	/**
@@ -292,7 +273,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
-		return new BlockValidatorFactory(new SystemTimeProvider());
+		return new BlockValidatorFactory(new SystemTimeProvider(), new ForkConfiguration());
 	}
 
 	/**
@@ -312,9 +293,7 @@ public class NisUtils {
 	public static TrustProvider createTrustProvider() {
 		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
 		final int TRUST_CACHE_TIME = 15 * 60;
-		return new CachedTrustProvider(
-				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
-				TRUST_CACHE_TIME,
+		return new CachedTrustProvider(new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT), TRUST_CACHE_TIME,
 				new SystemTimeProvider());
 	}
 
@@ -360,17 +339,12 @@ public class NisUtils {
 	 * @param similarityStrategy The similarity strategy.
 	 * @return The neighborhood.
 	 */
-	public static Neighborhood createNeighborhood(
-			final NeighborhoodRepository repository,
-			final SimilarityStrategy similarityStrategy) {
-		return new Neighborhood(
-				repository,
-				similarityStrategy,
-				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
+	public static Neighborhood createNeighborhood(final NeighborhoodRepository repository, final SimilarityStrategy similarityStrategy) {
+		return new Neighborhood(repository, similarityStrategy, DEFAULT_POI_OPTIONS.getMuClusteringValue(),
 				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 	}
 
-	//region createBlockNotificationContext
+	// region createBlockNotificationContext
 
 	/**
 	 * Creates a block notification context.
@@ -402,9 +376,9 @@ public class NisUtils {
 		return new BlockNotificationContext(height, new TimeInstant(987), trigger);
 	}
 
-	//endregion
+	// endregion
 
-	//region exception utils
+	// region exception utils
 
 	/**
 	 * Asserts that the execution of consumer throws a NisIllegalStateException with the specified reason.
@@ -412,18 +386,14 @@ public class NisUtils {
 	 * @param consumer The consumer.
 	 * @param reason The expected reason.
 	 */
-	public static void assertThrowsNisIllegalStateException(
-			final Consumer<Void> consumer,
-			final NisIllegalStateException.Reason reason) {
-		ExceptionAssert.assertThrows(
-				consumer,
-				NisIllegalStateException.class,
-				ex -> Assert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
+	public static void assertThrowsNisIllegalStateException(final Consumer<Void> consumer, final NisIllegalStateException.Reason reason) {
+		ExceptionAssert.assertThrows(consumer, NisIllegalStateException.class,
+				ex -> MatcherAssert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
 	}
 
-	//endregion
+	// endregion
 
-	//region controller utils
+	// region controller utils
 
 	/**
 	 * Gets an account ids deserializer that contains the specified account ids.
@@ -433,12 +403,10 @@ public class NisUtils {
 	 */
 	public static Deserializer getAccountIdsDeserializer(final Collection<AccountId> accountIds) {
 		final List<SerializableEntity> serializableAccountIds = accountIds.stream()
-				.map(aid -> (SerializableEntity)serializer -> Address.writeTo(serializer, "account", aid.getAddress()))
+				.map(aid -> (SerializableEntity) serializer -> Address.writeTo(serializer, "account", aid.getAddress()))
 				.collect(Collectors.toList());
-		return Utils.roundtripSerializableEntity(
-				new SerializableList<>(serializableAccountIds),
-				null);
+		return Utils.roundtripSerializableEntity(new SerializableList<>(serializableAccountIds), null);
 	}
 
-	//endregion
+	// endregion
 }

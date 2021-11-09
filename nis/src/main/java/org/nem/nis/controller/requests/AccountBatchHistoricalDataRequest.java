@@ -30,7 +30,8 @@ public class AccountBatchHistoricalDataRequest {
 		final long range = this.historicalDataRequest.getEndHeight().subtract(this.historicalDataRequest.getStartHeight());
 		final long dataPointsPerAccount = range / this.historicalDataRequest.getIncrement();
 		if (MAX_DATA_POINTS < dataPointsPerAccount * this.getAccountIds().size()) {
-			throw new IllegalArgumentException(String.format("only up to %d data points are supported for batch operations", MAX_DATA_POINTS));
+			throw new IllegalArgumentException(
+					String.format("only up to %d data points are supported for batch operations", MAX_DATA_POINTS));
 		}
 	}
 

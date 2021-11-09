@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -9,7 +10,9 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigAggregateModificationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
 
 	@Test
 	public void transferWithNoCosignatoryModificationsAndNoMinCosignatoriesModificationCannotBeMappedToModel() {
@@ -18,9 +21,7 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 		final DbMultisigAggregateModificationTransaction dbModel = context.createDbModel();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(dbModel),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.mapping.map(dbModel), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -109,7 +110,8 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 	}
 
 	@Override
-	protected IMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> createMapping(
+			final IMapper mapper) {
 		return new MultisigAggregateModificationDbModelToModelMapping(mapper);
 	}
 
@@ -119,7 +121,8 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<org.nem.core.model.Account, Integer> expectedModifications = new HashMap<>();
 		private final Set<DbMultisigModification> modifications = new HashSet<>();
-		private final MultisigAggregateModificationDbModelToModelMapping mapping = new MultisigAggregateModificationDbModelToModelMapping(this.mapper);
+		private final MultisigAggregateModificationDbModelToModelMapping mapping = new MultisigAggregateModificationDbModelToModelMapping(
+				this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, org.nem.core.model.Account.class)).thenReturn(this.sender);
@@ -148,21 +151,20 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 			return dbModification;
 		}
 
-		public void assertModel(
-				final MultisigAggregateModificationTransaction model,
-				final int numExpectedModifications,
+		public void assertModel(final MultisigAggregateModificationTransaction model, final int numExpectedModifications,
 				final int expectedRelativeChange) {
-			Assert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
+			MatcherAssert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.core.model.Account, Integer> actualModifications = new HashMap<>();
 			for (final MultisigCosignatoryModification modification : model.getCosignatoryModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType().value());
 			}
 
-			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
+			MatcherAssert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
 			if (0 != expectedRelativeChange) {
-				Assert.assertThat(model.getMinCosignatoriesModification().getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
+				MatcherAssert.assertThat(model.getMinCosignatoriesModification().getRelativeChange(),
+						IsEqual.equalTo(expectedRelativeChange));
 			} else {
-				Assert.assertThat(model.getMinCosignatoriesModification(), IsNull.nullValue());
+				MatcherAssert.assertThat(model.getMinCosignatoriesModification(), IsNull.nullValue());
 			}
 		}
 	}

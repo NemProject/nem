@@ -19,8 +19,7 @@ public class PoiScorer implements ImportanceScorer {
 		final double importanceWeight = 0.1337;
 
 		// WO: l1norm(max(0, stakes + outlinkWeight*outlinkVector))
-		final ColumnVector weightedOutlinks = context.getOutlinkVector()
-				.multiply(outlinkWeight)
+		final ColumnVector weightedOutlinks = context.getOutlinkVector().multiply(outlinkWeight)
 				.addElementWise(context.getVestedBalanceVector());
 		weightedOutlinks.removeNegatives();
 		weightedOutlinks.normalize();
@@ -29,7 +28,6 @@ public class PoiScorer implements ImportanceScorer {
 		final ColumnVector weightedImportances = context.getImportanceVector().multiply(importanceWeight);
 
 		// (WO + WI) * graphWeightVector
-		return weightedOutlinks.addElementWise(weightedImportances)
-				.multiplyElementWise(context.getGraphWeightVector());
+		return weightedOutlinks.addElementWise(weightedImportances).multiplyElementWise(context.getGraphWeightVector());
 	}
 }

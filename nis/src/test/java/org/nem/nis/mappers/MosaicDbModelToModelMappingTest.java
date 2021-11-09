@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -22,8 +23,8 @@ public class MosaicDbModelToModelMappingTest {
 		final Mosaic mosaic = context.mapping.map(dbMosaic);
 
 		// Assert:
-		Assert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(context.mosaicId));
-		Assert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123L)));
+		MatcherAssert.assertThat(mosaic.getMosaicId(), IsEqual.equalTo(context.mosaicId));
+		MatcherAssert.assertThat(mosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123L)));
 
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 	}

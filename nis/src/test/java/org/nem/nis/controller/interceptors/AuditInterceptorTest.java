@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -10,7 +11,7 @@ import java.util.Collections;
 
 public class AuditInterceptorTest {
 
-	//region preHandle
+	// region preHandle
 
 	@Test
 	public void preHandleAddsToAuditCollection() throws Exception {
@@ -21,7 +22,7 @@ public class AuditInterceptorTest {
 		final boolean result = context.interceptor.preHandle(context.request, context.response, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(1)).add("127.0.0.10", "/foo/bar");
 	}
 
@@ -45,13 +46,13 @@ public class AuditInterceptorTest {
 		final boolean result = context.interceptor.preHandle(context.request, context.response, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.collection, Mockito.times(0)).add(Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region afterCompletion
+	// region afterCompletion
 
 	@Test
 	public void afterCompletionRemovesFromAuditCollection() throws Exception {
@@ -88,7 +89,7 @@ public class AuditInterceptorTest {
 		Mockito.verify(context.collection, Mockito.times(0)).add(Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	private static HttpServletRequest createRequest(final String address, final String path) {
 		// Arrange:
@@ -100,9 +101,7 @@ public class AuditInterceptorTest {
 
 	private static class TestContext {
 		private final AuditCollection collection = Mockito.mock(AuditCollection.class);
-		private final AuditInterceptor interceptor = new AuditInterceptor(
-				Collections.singletonList("/heartbeat"),
-				this.collection);
+		private final AuditInterceptor interceptor = new AuditInterceptor(Collections.singletonList("/heartbeat"), this.collection);
 		private final HttpServletRequest request;
 		private final HttpServletResponse response;
 

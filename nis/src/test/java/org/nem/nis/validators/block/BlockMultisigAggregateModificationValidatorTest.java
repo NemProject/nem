@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -13,7 +14,7 @@ import java.util.Collections;
 public class BlockMultisigAggregateModificationValidatorTest {
 	private static final BlockValidator VALIDATOR = new BlockMultisigAggregateModificationValidator();
 
-	//region passes validation
+	// region passes validation
 
 	@Test
 	public void blockWithNoTransactionsValidates() {
@@ -62,9 +63,9 @@ public class BlockMultisigAggregateModificationValidatorTest {
 		assertBlockValidation(block, ValidationResult.SUCCESS);
 	}
 
-	//endregion
+	// endregion
 
-	//region fails validation
+	// region fails validation
 
 	@Test
 	public void blockWithMultipleModificationsWithSameSignerDoesNotValidate() {
@@ -131,20 +132,15 @@ public class BlockMultisigAggregateModificationValidatorTest {
 		assertBlockValidation(block, ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
 	}
 
-	//endregion
+	// endregion
 
 	private static Transaction createModificationTransactionInMultisig(final Account signer) {
-		return new MultisigTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				createModificationTransaction(signer));
+		return new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), createModificationTransaction(signer));
 	}
 
 	private static Transaction createModificationTransaction(final Account signer) {
-		return new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				signer,
-				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+		return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, signer, Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	private static void assertBlockValidation(final Block block, final ValidationResult expectedResult) {
@@ -152,6 +148,6 @@ public class BlockMultisigAggregateModificationValidatorTest {
 		final ValidationResult result = VALIDATOR.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

@@ -25,12 +25,14 @@ public class BalanceCommitTransferObserver implements TransactionObserver {
 	public void notify(final Notification notification) {
 		switch (notification.getType()) {
 			case BalanceTransfer:
-				this.notify((BalanceTransferNotification)notification);
+				this.notify((BalanceTransferNotification) notification);
 				break;
 
 			case BalanceCredit:
 			case BalanceDebit:
-				this.notify((BalanceAdjustmentNotification)notification);
+				this.notify((BalanceAdjustmentNotification) notification);
+				break;
+			default :
 				break;
 		}
 	}

@@ -25,7 +25,7 @@ public class HarvestRewardCommitObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((BalanceAdjustmentNotification)notification, context);
+		this.notify((BalanceAdjustmentNotification) notification, context);
 	}
 
 	private void notify(final BalanceAdjustmentNotification notification, final BlockNotificationContext context) {

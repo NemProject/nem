@@ -50,34 +50,23 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbMosaicDefinition> getMosaicDefinitionsForAccount(
-			final Address address,
-			final NamespaceId namespaceId,
-			final Long maxId,
-			final int limit) {
+	public Collection<DbMosaicDefinition> getMosaicDefinitionsForAccount(final Address address, final NamespaceId namespaceId,
+			final Long maxId, final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
 		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), address);
 		if (null == accountId) {
 			return Collections.emptyList();
 		}
 
-		return this.retriever.getMosaicDefinitionsForAccount(
-				this.getCurrentSession(),
-				accountId,
-				namespaceId,
-				id,
-				limit);
+		return this.retriever.getMosaicDefinitionsForAccount(this.getCurrentSession(), accountId, namespaceId, id, limit);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbMosaicDefinition> getMosaicDefinitionsForNamespace(final NamespaceId namespaceId, final Long maxId, final int limit) {
+	public Collection<DbMosaicDefinition> getMosaicDefinitionsForNamespace(final NamespaceId namespaceId, final Long maxId,
+			final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
-		return this.retriever.getMosaicDefinitionsForNamespace(
-				this.getCurrentSession(),
-				namespaceId,
-				id,
-				limit);
+		return this.retriever.getMosaicDefinitionsForNamespace(this.getCurrentSession(), namespaceId, id, limit);
 	}
 
 	@Override

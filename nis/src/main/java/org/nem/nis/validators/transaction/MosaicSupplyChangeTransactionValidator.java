@@ -8,12 +8,12 @@ import org.nem.nis.state.ReadOnlyMosaicEntry;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * A single transaction validator implementation that validates mosaic supply change transactions:
- * - [mosaic] underlying mosaic definition must be known
- * - [namespace] underlying namespace must be active at the context height
- * - [mosaic] transaction signer must be the creator of the mosaic
- * - [mosaic] quantity is mutable
- * - [mosaic] the max quantity is not exceeded
+ * A single transaction validator implementation that validates mosaic supply change transactions:<br>
+ * - [mosaic] underlying mosaic definition must be known<br>
+ * - [namespace] underlying namespace must be active at the context height<br>
+ * - [mosaic] transaction signer must be the creator of the mosaic<br>
+ * - [mosaic] quantity is mutable<br>
+ * - [mosaic] the max quantity is not exceeded<br>
  * - [mosaic] only existing mosaics owned by the creator can be deleted
  */
 public class MosaicSupplyChangeTransactionValidator implements TSingleTransactionValidator<MosaicSupplyChangeTransaction> {
@@ -52,7 +52,8 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 		return this.validateQuantityChange(mosaicEntry, transaction);
 	}
 
-	private ValidationResult validateQuantityChange(final ReadOnlyMosaicEntry mosaicEntry, final MosaicSupplyChangeTransaction transaction) {
+	private ValidationResult validateQuantityChange(final ReadOnlyMosaicEntry mosaicEntry,
+			final MosaicSupplyChangeTransaction transaction) {
 		final int divisibility = mosaicEntry.getMosaicDefinition().getProperties().getDivisibility();
 		final Supply existingSupply = mosaicEntry.getSupply();
 		final Supply delta = transaction.getDelta();
@@ -69,6 +70,8 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 				if (existingBalanceAsSupply.compareTo(delta) < 0) {
 					return ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE;
 				}
+				break;
+			default :
 				break;
 		}
 

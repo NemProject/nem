@@ -4,8 +4,7 @@ import org.nem.core.model.*;
 import org.nem.nis.validators.*;
 
 /**
- * Single transaction validator that:
- * - validates entities match the default network
+ * Single transaction validator that validates entities match the default network
  */
 public class TransactionNetworkValidator extends NetworkValidator implements SingleTransactionValidator {
 

@@ -3,6 +3,7 @@ package org.nem.nis;
 /**
  * A fatal configuration exception.
  */
+@SuppressWarnings("serial")
 public class FatalConfigException extends RuntimeException {
 
 	/**

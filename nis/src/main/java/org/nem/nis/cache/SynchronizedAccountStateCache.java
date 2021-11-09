@@ -3,7 +3,9 @@ package org.nem.nis.cache;
 /**
  * A synchronized AccountStateCache implementation.
  */
-public class SynchronizedAccountStateCache extends BasicSynchronizedAccountStateCache implements ExtendedAccountStateCache<SynchronizedAccountStateCache> {
+public class SynchronizedAccountStateCache extends BasicSynchronizedAccountStateCache
+		implements
+			ExtendedAccountStateCache<SynchronizedAccountStateCache> {
 	private final DefaultAccountStateCache accountStateCache;
 
 	/**

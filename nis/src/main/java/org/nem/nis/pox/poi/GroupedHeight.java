@@ -8,9 +8,8 @@ import org.nem.core.model.primitive.BlockHeight;
 public class GroupedHeight {
 
 	/**
-	 * Number of blocks that should be treated as a group for POI purposes.
-	 * In other words, POI importances will only be calculated at blocks that
-	 * are a multiple of this grouping number.
+	 * Number of blocks that should be treated as a group for POI purposes. In other words, POI importances will only be calculated at
+	 * blocks that are a multiple of this grouping number.
 	 */
 	private static final int POI_GROUPING = 359;
 

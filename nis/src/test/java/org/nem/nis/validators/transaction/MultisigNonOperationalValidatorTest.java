@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -11,7 +12,7 @@ import java.util.Collections;
 
 public class MultisigNonOperationalValidatorTest {
 
-	//region non-multisig account
+	// region non-multisig account
 
 	@Test
 	public void nonMultisigAccountCanIssueAnyTransaction() {
@@ -25,7 +26,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -41,12 +42,12 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig account
+	// region multisig account
 
 	@Test
 	public void multisigAccountCannotIssueAnyTransaction() {
@@ -59,7 +60,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
@@ -68,17 +69,15 @@ public class MultisigNonOperationalValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		final Account multisig = createMultisigAccount(context);
 
-		final Transaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				multisig,
-				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 		transaction.sign();
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
@@ -93,10 +92,10 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	//endregion
+	// endregion
 
 	private static Transaction createMockTransaction(final Account account) {
 		final Transaction transaction = new MockTransaction(account);

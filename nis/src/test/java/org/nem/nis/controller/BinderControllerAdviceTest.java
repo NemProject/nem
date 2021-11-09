@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
@@ -22,11 +23,10 @@ public class BinderControllerAdviceTest {
 		final Collection<Class<?>> validatorClasses = getValidatorClassesForTarget(new KeyPair().getPrivateKey());
 
 		// Assert:
-		final Class<?>[] expectedValidatorClasses = new Class<?>[] {
-				InsecurePrivateKeyValidator.class,
-				ConfiguredPrivateKeyValidator.class
+		final Class<?>[] expectedValidatorClasses = new Class<?>[]{
+				InsecurePrivateKeyValidator.class, ConfiguredPrivateKeyValidator.class
 		};
-		Assert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
+		MatcherAssert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
 	}
 
 	@Test
@@ -35,16 +35,14 @@ public class BinderControllerAdviceTest {
 		final Collection<Class<?>> validatorClasses = getValidatorClassesForTarget(new KeyPair().getPublicKey());
 
 		// Assert:
-		final Class<?>[] expectedValidatorClasses = new Class<?>[] {};
-		Assert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
+		final Class<?>[] expectedValidatorClasses = new Class<?>[]{};
+		MatcherAssert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
 	}
 
 	private static Collection<Class<?>> getValidatorClassesForTarget(final Object target) {
 		// Arrange:
-		final BinderControllerAdvice advice = new BinderControllerAdvice(
-				Mockito.mock(LocalHostDetector.class),
-				Mockito.mock(ReadOnlyAccountStateCache.class),
-				Mockito.mock(NisConfiguration.class));
+		final BinderControllerAdvice advice = new BinderControllerAdvice(Mockito.mock(LocalHostDetector.class),
+				Mockito.mock(ReadOnlyAccountStateCache.class), Mockito.mock(NisConfiguration.class));
 		final WebDataBinder binder = new WebDataBinder(target);
 
 		// Act:

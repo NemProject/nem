@@ -3,6 +3,7 @@ package org.nem.specific.deploy;
 /**
  * Exception that is used when a NIS configuration is corrupt.
  */
+@SuppressWarnings("serial")
 public class NisConfigurationException extends RuntimeException {
 
 	/**

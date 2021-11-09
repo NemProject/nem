@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import java.util.*;
 
 public class ChildAwareSingleTransactionValidatorTest {
 
-	//region getName
+	// region getName
 
 	@Test
 	public void getNameDelegatesToInnerValidator() {
@@ -26,13 +27,13 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final String name = validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("inner"));
 		Mockito.verify(innerValidator, Mockito.only()).getName();
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction without child transactions
+	// region transaction without child transactions
 
 	@Test
 	public void validateDelegatesToInnerValidatorForValidTransactionWithoutChildTransactions() {
@@ -46,7 +47,8 @@ public class ChildAwareSingleTransactionValidatorTest {
 		assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(final ValidationResult expectedResult) {
+	private static void assertValidateDelegatesToInnerValidatorForTransactionWithoutChildTransactions(
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final SingleTransactionValidator innerValidator = Mockito.mock(SingleTransactionValidator.class);
 		final SingleTransactionValidator validator = new ChildAwareSingleTransactionValidator(innerValidator);
@@ -59,13 +61,13 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = validator.validate(transaction, context);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 		Mockito.verify(innerValidator, Mockito.only()).validate(transaction, context);
 	}
 
-	//endregion
+	// endregion
 
-	//region transaction with child transactions
+	// region transaction with child transactions
 
 	@Test
 	public void validateSucceedsForValidTransactionWithValidChildTransactions() {
@@ -78,7 +80,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		context.verifyValidation(true, true, true, true);
 	}
 
@@ -93,7 +95,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 
@@ -108,7 +110,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on first inner transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		context.verifyValidation(true, true, true, false);
 	}
 
@@ -123,7 +125,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 
@@ -138,9 +140,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		private final ValidationContext context = new ValidationContext(ValidationStates.Throw);
 
 		private ThreeChildTransactionTestContext() {
-			final Collection<Transaction> transactions = Arrays.asList(
-					this.innerTransaction1,
-					this.innerTransaction2,
+			final Collection<Transaction> transactions = Arrays.asList(this.innerTransaction1, this.innerTransaction2,
 					this.innerTransaction3);
 			for (final Transaction transaction : transactions) {
 				Mockito.when(this.innerValidator.validate(transaction, this.context)).thenReturn(ValidationResult.SUCCESS);
@@ -161,10 +161,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 			return this.validator.validate(this.transaction, this.context);
 		}
 
-		private void verifyValidation(
-				final boolean isOuterValidated,
-				final boolean isInner1Validated,
-				final boolean isInner2Validated,
+		private void verifyValidation(final boolean isOuterValidated, final boolean isInner1Validated, final boolean isInner2Validated,
 				final boolean isInner3Validated) {
 			Mockito.verify(this.innerValidator, getModeFromFlag(isOuterValidated)).validate(this.transaction, this.context);
 			Mockito.verify(this.innerValidator, getModeFromFlag(isInner1Validated)).validate(this.innerTransaction1, this.context);
@@ -177,5 +174,5 @@ public class ChildAwareSingleTransactionValidatorTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

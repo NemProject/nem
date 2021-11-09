@@ -31,11 +31,7 @@ public class AccountPrivateKeyTransactionsPage {
 	 * @param id The (optional) id.
 	 * @param pageSize The (optional) page size.
 	 */
-	public AccountPrivateKeyTransactionsPage(
-			final PrivateKey privateKey,
-			final String hash,
-			final String id,
-			final String pageSize) {
+	public AccountPrivateKeyTransactionsPage(final PrivateKey privateKey, final String hash, final String id, final String pageSize) {
 		if (null == privateKey) {
 			throw new IllegalArgumentException("private key must not be null.");
 		}
@@ -52,10 +48,7 @@ public class AccountPrivateKeyTransactionsPage {
 	 * @param deserializer The deserializer to use.
 	 */
 	public AccountPrivateKeyTransactionsPage(final Deserializer deserializer) {
-		this(
-				new PrivateKey(deserializer),
-				deserializer.readOptionalString("hash"),
-				deserializer.readOptionalString("id"),
+		this(new PrivateKey(deserializer), deserializer.readOptionalString("hash"), deserializer.readOptionalString("id"),
 				deserializer.readOptionalString("pageSize"));
 	}
 

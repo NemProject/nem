@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -47,7 +48,7 @@ public class WeightedBalancesObserverTest {
 		notify.accept(context.observer);
 
 		// Assert:
-		Assert.assertThat(context.balances.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.balances.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -80,8 +81,8 @@ public class WeightedBalancesObserverTest {
 		Mockito.verify(context.balances, Mockito.never()).convertToFullyVested();
 		verifyCallCounts(context.balances, 0, 1, 0, 0);
 
-		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
-		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
+		MatcherAssert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -100,8 +101,8 @@ public class WeightedBalancesObserverTest {
 		Mockito.verify(context.balances, Mockito.never()).convertToFullyVested();
 		verifyCallCounts(context.balances, 0, 1, 0, 0);
 
-		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
-		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
+		MatcherAssert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -119,8 +120,8 @@ public class WeightedBalancesObserverTest {
 		Mockito.verify(context.balances, Mockito.times(1)).convertToFullyVested();
 		verifyCallCounts(context.balances, 0, 1, 0, 1);
 
-		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(new Amount(54)));
+		MatcherAssert.assertThat(balances.getUnvested(height), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(balances.getVested(height), IsEqual.equalTo(new Amount(54)));
 	}
 
 	@Test
@@ -149,12 +150,8 @@ public class WeightedBalancesObserverTest {
 		verifyCallCounts(context.balances, 0, 0, 0, 1);
 	}
 
-	private static void verifyCallCounts(
-			final WeightedBalances balances,
-			final int addSendCounts,
-			final int addReceiveCounts,
-			final int undoSendCounts,
-			final int undoReceiveCounts) {
+	private static void verifyCallCounts(final WeightedBalances balances, final int addSendCounts, final int addReceiveCounts,
+			final int undoSendCounts, final int undoReceiveCounts) {
 		Mockito.verify(balances, Mockito.times(addSendCounts)).addSend(Mockito.any(), Mockito.any());
 		Mockito.verify(balances, Mockito.times(addReceiveCounts)).addReceive(Mockito.any(), Mockito.any());
 		Mockito.verify(balances, Mockito.times(undoSendCounts)).undoSend(Mockito.any(), Mockito.any());

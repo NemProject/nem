@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import java.util.function.*;
 
 public class ImpactfulTransactionPredicateTest {
 
-	//region non-multisig
+	// region non-multisig
 
 	@Test
 	public void transactionSignerIsImpacted() {
@@ -41,12 +42,12 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.test(getAccount.apply(context));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region multisig
+	// region multisig
 
 	@Test
 	public void cosignerOfMultisigIsImpacted() {
@@ -56,8 +57,7 @@ public class ImpactfulTransactionPredicateTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 		cosignerAccountState.getMultisigLinks().addCosignatory(multisig.getAddress());
-		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress()))
-				.thenReturn(cosignerAccountState);
+		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress())).thenReturn(cosignerAccountState);
 
 		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransfer(multisig, cosigner);
 
@@ -65,7 +65,7 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.predicate.test(cosigner.getAddress(), transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -76,8 +76,7 @@ public class ImpactfulTransactionPredicateTest {
 		final Account cosigner = Utils.generateRandomAccount();
 		final AccountState cosignerAccountState = new AccountState(cosigner.getAddress());
 		cosignerAccountState.getMultisigLinks().addCosignatory(multisig.getAddress());
-		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress()))
-				.thenReturn(cosignerAccountState);
+		Mockito.when(context.accountStateCache.findStateByAddress(cosigner.getAddress())).thenReturn(cosignerAccountState);
 
 		final Account nonCosigner = Utils.generateRandomAccount();
 		Mockito.when(context.accountStateCache.findStateByAddress(nonCosigner.getAddress()))
@@ -89,10 +88,10 @@ public class ImpactfulTransactionPredicateTest {
 		final boolean result = context.predicate.test(nonCosigner.getAddress(), transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);

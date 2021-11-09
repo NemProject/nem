@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -11,6 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.function.*;
@@ -20,7 +22,7 @@ import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
 public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
 
-	//region size
+	// region size
 
 	@Test
 	public void sizeReturnsTheNumberOfTransactions() {
@@ -34,12 +36,12 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		}
 
 		// Assert:
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
+		MatcherAssert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
 	}
 
-	//endregion
+	// endregion
 
-	//region multilevel existence checks
+	// region multilevel existence checks
 
 	@Test
 	public void cannotAddChildTransactionIfParentHasBeenAdded() {
@@ -56,7 +58,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result = context.add(prepare(inner));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
@@ -74,12 +76,12 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result = context.add(outer);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
-	//endregion
+	// endregion
 
-	//region validation (unconfirmed conflicts)
+	// region validation (unconfirmed conflicts)
 
 	@Test
 	public void addFailsIfImportanceTransferIsConflicting() {
@@ -87,9 +89,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		this.assertLastTransactionCannotBeAdded(context -> {
 			final Account sender = context.addAccount(Amount.fromNem(50000));
 			final Account remote = Utils.generateRandomAccount();
-			return Arrays.asList(
-					createImportanceTransfer(sender, remote, 1000),
-					createImportanceTransfer(sender, remote, 2000));
+			return Arrays.asList(createImportanceTransfer(sender, remote, 1000), createImportanceTransfer(sender, remote, 2000));
 		}, ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -99,13 +99,12 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		this.assertLastTransactionCannotBeAdded(context -> {
 			final Account account1 = context.addAccount(Amount.fromNem(14));
 			final Account account2 = context.addAccount(Amount.fromNem(110));
-			return Arrays.asList(
-					createTransfer(account1, account2, 5, 5),
-					createTransfer(account1, account2, 8, 2));
+			return Arrays.asList(createTransfer(account1, account2, 5, 5), createTransfer(account1, account2, 8, 2));
 		}, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	private void assertLastTransactionCannotBeAdded(final Function<TestContext, List<Transaction>> createTransactions, final ValidationResult expectedResult) {
+	private void assertLastTransactionCannotBeAdded(final Function<TestContext, List<Transaction>> createTransactions,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final List<Transaction> transactions = createTransactions.apply(context);
@@ -115,14 +114,14 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final ValidationResult result2 = context.add(prepare(transactions.get(1)));
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(expectedResult));
-		Assert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
+		MatcherAssert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result2, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
 	}
 
-	//endregion
+	// endregion
 
-	//region removeAll
+	// region removeAll
 
 	@Test
 	public void removeAllRemovesAllSpecifiedTransactions() {
@@ -136,7 +135,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
 	}
 
 	@Test
@@ -151,7 +150,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
 	}
 
 	@Test
@@ -171,8 +170,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (50) < 80 + 2
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 50, 0, 10);
 	}
 
@@ -183,10 +182,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final TestContext context = this.createTestContext();
 		final List<TransferTransaction> transactions = createThreeTransferTransactions(context, 100, 20, 0);
 
-		final Transaction transaction = createTransferWithTimeStamp(
-				transactions.get(0).getSigner(),
-				transactions.get(0).getRecipient(),
-				8,
+		final Transaction transaction = createTransferWithTimeStamp(transactions.get(0).getSigner(), transactions.get(0).getRecipient(), 8,
 				8);
 
 		// Act:
@@ -203,8 +199,9 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (18) < 80 + 2
 		// - second transaction can be added - account2 balance (100) >= 50 + 2
 		// - third transaction can be added - account2 balance (48) >= 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(),
+				IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 18, 36, 60);
 	}
 
@@ -225,14 +222,14 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction cannot be added - account1 balance (50) < 80 + 2
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 50, 0, 10);
 	}
 
-	//endregion
+	// endregion
 
-	//region dropExpiredTransactions
+	// region dropExpiredTransactions
 
 	@Test
 	public void dropExpiredTransactionsRemovesAllTransactionsBeforeSpecifiedTimeInstant() {
@@ -253,7 +250,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(5, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(5, 7)));
 	}
 
 	@Test
@@ -272,55 +269,51 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// - first transaction was dropped because it expired
 		// - second was dropped because it was dependent on the first - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
-		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(3));
+		MatcherAssert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 		assertThreeTransactionBalances(context, transactions, 100, 0, 10);
 	}
 
-	//endregion
+	// endregion
 
-	//region create transactions
+	// region create transactions
 
 	private static MockTransaction createMockTransaction(final Account account, final int customField) {
 		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));
 	}
 
-	private static TransferTransaction createTransferWithTimeStamp(final Account sender, final Account recipient, final int amount, final int timeStamp) {
-		final TransferTransaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME + timeStamp), sender, recipient, Amount.fromNem(amount), null);
+	private static TransferTransaction createTransferWithTimeStamp(final Account sender, final Account recipient, final int amount,
+			final int timeStamp) {
+		final TransferTransaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME + timeStamp), sender, recipient,
+				Amount.fromNem(amount), null);
 		t.setFee(Amount.fromNem(2));
 		return prepare(t);
 	}
 
-	private static List<TransferTransaction> createThreeTransferTransactions(
-			final TestContext context,
-			final int amount1,
-			final int amount2,
-			final int amount3) {
+	private static List<TransferTransaction> createThreeTransferTransactions(final TestContext context, final int amount1,
+			final int amount2, final int amount3) {
 		final Account account1 = context.addAccount(Amount.fromNem(amount1));
 		final Account account2 = context.addAccount(Amount.fromNem(amount2));
 		final Account account3 = context.addAccount(Amount.fromNem(amount3));
-		final List<TransferTransaction> transactions = Arrays.asList(
-				createTransferWithTimeStamp(account1, account2, 80, 5),
-				createTransferWithTimeStamp(account2, account3, 50, 8),
-				createTransferWithTimeStamp(account2, account3, 10, 9));
+		final List<TransferTransaction> transactions = Arrays.asList(createTransferWithTimeStamp(account1, account2, 80, 5),
+				createTransferWithTimeStamp(account2, account3, 50, 8), createTransferWithTimeStamp(account2, account3, 10, 9));
 		context.addAll(transactions);
 		return transactions;
 	}
 
-	private static void assertThreeTransactionBalances(
-			final TestContext context,
-			final List<TransferTransaction> transactions,
-			final int amount1,
-			final int amount2,
-			final int amount3) {
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(0).getSigner()), IsEqual.equalTo(Amount.fromNem(amount1)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getSigner()), IsEqual.equalTo(Amount.fromNem(amount2)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getRecipient()), IsEqual.equalTo(Amount.fromNem(amount3)));
+	private static void assertThreeTransactionBalances(final TestContext context, final List<TransferTransaction> transactions,
+			final int amount1, final int amount2, final int amount3) {
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(0).getSigner()),
+				IsEqual.equalTo(Amount.fromNem(amount1)));
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getSigner()),
+				IsEqual.equalTo(Amount.fromNem(amount2)));
+		MatcherAssert.assertThat(context.transactions.getUnconfirmedBalance(transactions.get(1).getRecipient()),
+				IsEqual.equalTo(Amount.fromNem(amount3)));
 	}
 
-	//endregion
+	// endregion
 
-	//region TestContext
+	// region TestContext
 
 	private TestContext createTestContext() {
 		return new TestContext(this::createUnconfirmedTransactions);
@@ -332,12 +325,9 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 
 		public TestContext(final BiFunction<UnconfirmedStateFactory, ReadOnlyNisCache, UnconfirmedTransactions> creator) {
 			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
-			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
-					NisUtils.createTransactionValidatorFactory(timeProvider),
-					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-					timeProvider,
-					() -> new BlockHeight(1234),
-					NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(timeProvider),
+					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver, timeProvider,
+					() -> new BlockHeight(1234), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration());
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
@@ -353,8 +343,6 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 			transactions.forEach(t -> this.transactions.addNew(prepare(t)));
 		}
 
-		//region modify state
-
 		@Override
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
@@ -364,10 +352,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		}
 
 		public void notify(final Notification notification) {
-			this.modifyCache(copyCache ->
-					NisUtils.createBlockTransactionObserverFactory().createExecuteCommitObserver(copyCache).notify(
-							notification,
-							new BlockNotificationContext(new BlockHeight(2), TimeInstant.ZERO, NotificationTrigger.Execute)));
+			this.modifyCache(copyCache -> NisUtils.createBlockTransactionObserverFactory().createExecuteCommitObserver(copyCache)
+					.notify(notification, new BlockNotificationContext(new BlockHeight(2), TimeInstant.ZERO, NotificationTrigger.Execute)));
 		}
 
 		private void modifyCache(final Consumer<NisCache> modify) {
@@ -377,13 +363,12 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		}
 
 		private void setBalance(final Account account, final Amount amount) {
-			final ReadOnlyAccountInfo accountInfo = this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo();
+			final ReadOnlyAccountInfo accountInfo = this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress())
+					.getAccountInfo();
 			this.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, accountInfo.getBalance()));
 			this.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
 		}
-
-		//endregion
 	}
 
-	//endregion
+	// endregion
 }

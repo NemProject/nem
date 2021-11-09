@@ -26,7 +26,7 @@ public class MultisigModificationRawToDbModelMapping implements IMapping<Object[
 		final DbMultisigModification dbModification = new DbMultisigModification();
 		dbModification.setId(RawMapperUtils.castToLong(source[13]));
 		dbModification.setCosignatory(cosignatory);
-		dbModification.setModificationType((Integer)source[15]);
+		dbModification.setModificationType((Integer) source[15]);
 
 		return dbModification;
 	}

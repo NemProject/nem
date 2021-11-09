@@ -3,6 +3,7 @@ package org.nem.nis.time.synchronization;
 /**
  * A synchronization exception.
  */
+@SuppressWarnings("serial")
 public class TimeSynchronizationException extends RuntimeException {
 
 	/**

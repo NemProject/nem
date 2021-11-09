@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
@@ -28,6 +29,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class BlockDaoTest {
 
 	@ContextConfiguration(classes = TestConf.class)
@@ -48,29 +50,35 @@ public class BlockDaoTest {
 		@Autowired
 		protected SessionFactory sessionFactory;
 
-		private Session session;
+		protected Session session;
 
 		@Before
 		public void before() {
 			Utils.setupGlobals();
-			this.session = this.sessionFactory.openSession();
+
+			if (null != this.sessionFactory) {
+				this.session = this.sessionFactory.openSession();
+			}
 		}
 
 		@After
 		public void after() {
-			DbTestUtils.dbCleanup(this.session);
-			this.mosaicIdCache.clear();
-			this.session.close();
+			if (null != this.session) {
+				DbTestUtils.dbCleanup(this.session);
+				this.mosaicIdCache.clear();
+				this.session.close();
+			}
+
 			Utils.resetGlobals();
 		}
 
-		//region helpers
+		// region helpers
 
 		protected AccountDaoLookup prepareMapping(final Object... accounts) {
 			// Arrange:
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			for (final Object o : accounts) {
-				final Account a = (Account)o;
+				final Account a = (Account) o;
 				final Address address = a.getAddress();
 				final DbAccount dbA = new DbAccount(address);
 				mockAccountDao.addMapping(a, dbA);
@@ -80,21 +88,18 @@ public class BlockDaoTest {
 
 		protected org.nem.core.model.Block createTestEmptyBlock(final Account signer, final long height, final int i) {
 			final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getAddress().getPublicKey());
-			final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer,
-					Hash.ZERO,
-					generationHash,
-					new TimeInstant(123 + i),
-					new BlockHeight(height));
+			final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer, Hash.ZERO, generationHash,
+					new TimeInstant(123 + i), new BlockHeight(height));
 			emptyBlock.sign();
 			return emptyBlock;
 		}
 
-		//endregion
+		// endregion
 	}
 
 	public static class General extends Base {
 
-		//region save
+		// region save
 
 		@Test
 		public void savingBlockSavesAccounts() {
@@ -108,8 +113,8 @@ public class BlockDaoTest {
 			this.blockDao.save(entity);
 
 			// Assert:
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
 		}
 
 		@Test
@@ -128,13 +133,13 @@ public class BlockDaoTest {
 			final DbBlock entity = this.blockDao.findByHeight(block.getHeight());
 
 			// Assert:
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final List<? extends AbstractBlockTransfer> blockTransactions = entry.getFromBlock.apply(entity);
-				Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
-				Assert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
+				MatcherAssert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+				MatcherAssert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
 			}
 		}
 
@@ -147,9 +152,7 @@ public class BlockDaoTest {
 			final int numBlocks = 3;
 			final List<DbBlock> blocks = new ArrayList<>();
 			for (int i = 2; i < 2 + numBlocks; i++) {
-				final Block dummyBlock = this.createBlockWithTransactions(
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final Block dummyBlock = this.createBlockWithTransactions(new TimeInstant(i * 123), new BlockHeight(i));
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
@@ -162,13 +165,13 @@ public class BlockDaoTest {
 			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 			// Assert:
-			Assert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
+			MatcherAssert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
 			for (final DbBlock block : blocks) {
-				Assert.assertThat(this.blockDao.findByHeight(new BlockHeight(block.getHeight())), IsNull.notNullValue());
+				MatcherAssert.assertThat(this.blockDao.findByHeight(new BlockHeight(block.getHeight())), IsNull.notNullValue());
 			}
 		}
 
-		//endregion
+		// endregion
 
 		// region retrieve
 
@@ -185,14 +188,14 @@ public class BlockDaoTest {
 			final DbBlock entity = this.blockDao.findByHeight(emptyBlock.getHeight());
 
 			// Assert:
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
-			Assert.assertThat(entity.getHeight(), IsEqual.equalTo(emptyBlock.getHeight().getRaw()));
-			Assert.assertThat(entity.getBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(emptyBlock)));
-			Assert.assertThat(entity.getGenerationHash(), IsEqual.equalTo(emptyBlock.getGenerationHash()));
-			Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
-			Assert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
-			Assert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
+			MatcherAssert.assertThat(entity.getHeight(), IsEqual.equalTo(emptyBlock.getHeight().getRaw()));
+			MatcherAssert.assertThat(entity.getBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(emptyBlock)));
+			MatcherAssert.assertThat(entity.getGenerationHash(), IsEqual.equalTo(emptyBlock.getGenerationHash()));
+			MatcherAssert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
+			MatcherAssert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
 		}
 
 		@Test
@@ -201,7 +204,7 @@ public class BlockDaoTest {
 			final DbBlock entity = this.blockDao.findByHeight(new BlockHeight(123L));
 
 			// Assert:
-			Assert.assertThat(entity, IsNull.nullValue());
+			MatcherAssert.assertThat(entity, IsNull.nullValue());
 		}
 
 		@Test
@@ -217,11 +220,11 @@ public class BlockDaoTest {
 			final Collection<DbBlock> entities = this.blockDao.getBlocksForAccount(signer, null, 25);
 
 			// Assert:
-			Assert.assertThat(entities.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(1));
 			final DbBlock entity = entities.iterator().next();
 
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
 
 			ExceptionAssert.assertThrows(v -> entity.getBlockTransferTransactions().size(), LazyInitializationException.class);
 		}
@@ -251,8 +254,8 @@ public class BlockDaoTest {
 
 			// Assert:
 			// - 25 is expected because getBlocksForAccount returns both blocks harvested directly (15)
-			//   and blocks harvested remotely (15) up to the limit (25)
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			// and blocks harvested remotely (15) up to the limit (25)
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
 		}
 
 		@Test
@@ -275,8 +278,8 @@ public class BlockDaoTest {
 			final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, ids.get(0), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(0));
 		}
 
 		@Test
@@ -301,21 +304,23 @@ public class BlockDaoTest {
 
 			// Assert:
 			final BiConsumer<Collection<DbBlock>, Long> assertCollectionContainsBlocksStartingAtHeight = (entities, startHeight) -> {
-				Assert.assertThat(entities.size(), IsEqual.equalTo(25));
+				MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(25));
 
 				long lastHeight = startHeight;
 				for (final DbBlock entity : entities) {
-					Assert.assertThat(entity.getHeight(), IsEqual.equalTo(lastHeight--));
+					MatcherAssert.assertThat(entity.getHeight(), IsEqual.equalTo(lastHeight--));
 				}
 			};
 
 			assertCollectionContainsBlocksStartingAtHeight.accept(entities1, 456L + 29);
 			assertCollectionContainsBlocksStartingAtHeight.accept(entities2, 456L + 28);
-			Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 		}
-		//endregion
 
-		//region delete/modify
+		// endregion
+
+		// region delete/modify
+
 		@Test
 		public void deleteBlockDoesNotRemoveAccounts() {
 			// Arrange:
@@ -330,22 +335,20 @@ public class BlockDaoTest {
 			final DbAccount entity = this.accountDao.getAccountByPrintableAddress(dbBlock.getHarvester().getPrintableKey());
 
 			// Assert:
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getHarvester().getId()));
-			Assert.assertThat(entity.getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getHarvester().getId()));
+			MatcherAssert.assertThat(entity.getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
 		}
 
 		@Test
 		public void deleteBlockRemovesTransactions() {
 			// Arrange:
-			final Collection<String> transactionTables = TestTransactionRegistry.stream()
-					.map(e -> e.tableName)
-					.filter(tn -> null != tn)
+			final Collection<String> transactionTables = TestTransactionRegistry.stream().map(e -> e.tableName).filter(tn -> null != tn)
 					.collect(Collectors.toList());
 
 			// Assert: preconditions
 			for (final String table : transactionTables) {
-				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+				MatcherAssert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
 
 			final MockAccountDao mockAccountDao = new MockAccountDao();
@@ -359,14 +362,14 @@ public class BlockDaoTest {
 
 			// Assert: preconditions
 			for (final String table : transactionTables) {
-				Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
+				MatcherAssert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
 			}
 
 			this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
 
 			// Assert:
 			for (final String table : transactionTables) {
-				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+				MatcherAssert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
 		}
 
@@ -374,18 +377,12 @@ public class BlockDaoTest {
 		public void deleteBlockRemovesEntriesFromNonTransactionTables() {
 			// Assert: preconditions
 			final String[] nonTransactionTables = {
-					"MultisigSends",
-					"MultisigReceives",
-					"MultisigModifications",
-					"MinCosignatoriesModifications",
-					"Namespaces",
-					"MosaicDefinitions",
-					"MosaicProperties",
-					"TransferredMosaics"
+					"MultisigSends", "MultisigReceives", "MultisigModifications", "MinCosignatoriesModifications", "Namespaces",
+					"MosaicDefinitions", "MosaicProperties", "TransferredMosaics"
 			};
 
 			for (final String table : nonTransactionTables) {
-				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+				MatcherAssert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
 
 			// Arrange:
@@ -395,7 +392,8 @@ public class BlockDaoTest {
 			final Account cosignatoryToAdd = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, cosignatoryToAdd);
 			final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
-			block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
+			block.addTransaction(
+					this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
 			block.addTransaction(sign(RandomTransactionFactory.createMosaicDefinitionCreationTransaction()));
 			block.addTransaction(sign(this.prepareTransferTransactionWithAttachment()));
@@ -403,7 +401,7 @@ public class BlockDaoTest {
 			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup, this.mosaicIdCache);
 			this.blockDao.save(dbBlock);
 			for (final String table : nonTransactionTables) {
-				Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
+				MatcherAssert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
 			}
 
 			// Act:
@@ -411,24 +409,24 @@ public class BlockDaoTest {
 
 			// Assert:
 			for (final String table : nonTransactionTables) {
-				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+				MatcherAssert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
 		}
 
 		private long getScanCount(final String tableName) {
 			final Session session = this.sessionFactory.openSession();
-			final Long count = (Long)session.createSQLQuery("SELECT COUNT(*) as count FROM " + tableName)
-					.addScalar("count", LongType.INSTANCE)
-					.uniqueResult();
+			final Long count = (Long) session.createSQLQuery("SELECT COUNT(*) as count FROM " + tableName)
+					.addScalar("count", LongType.INSTANCE).uniqueResult();
 			session.flush();
 			session.clear();
 			session.close();
 			return count;
 		}
 
-		//endregion
+		// endregion
 
-		//region getters
+		// region getters
+
 		@Test
 		public void getHashesFromReturnsProperHashes() {
 			// Arrange:
@@ -448,12 +446,12 @@ public class BlockDaoTest {
 			final HashChain entities2 = this.blockDao.getHashesFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final Hash entity : entities1.asCollection()) {
-				Assert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
+				MatcherAssert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
 				i = i + 1;
 			}
 		}
@@ -478,12 +476,12 @@ public class BlockDaoTest {
 			final HashChain entities2 = this.blockDao.getHashesFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final Hash entity : entities1.asCollection()) {
-				Assert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
+				MatcherAssert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
 				i = i + 1;
 			}
 		}
@@ -508,12 +506,12 @@ public class BlockDaoTest {
 			final List<BlockDifficulty> entities2 = this.blockDao.getDifficultiesFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final BlockDifficulty entity : entities1) {
-				Assert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
+				MatcherAssert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
 				i = i + 1;
 			}
 		}
@@ -538,12 +536,12 @@ public class BlockDaoTest {
 			final List<BlockDifficulty> entities2 = this.blockDao.getDifficultiesFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final BlockDifficulty entity : entities1) {
-				Assert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
+				MatcherAssert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
 				i = i + 1;
 			}
 		}
@@ -567,12 +565,12 @@ public class BlockDaoTest {
 			final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final TimeInstant entity : entities1) {
-				Assert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimestamps.get(i)));
+				MatcherAssert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimestamps.get(i)));
 				i = i + 1;
 			}
 		}
@@ -597,12 +595,12 @@ public class BlockDaoTest {
 			final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 			// Assert:
-			Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-			Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
+			MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+			MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 			int i = 0;
 			for (final TimeInstant entity : entities1) {
-				Assert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimeStamps.get(i)));
+				MatcherAssert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimeStamps.get(i)));
 				i = i + 1;
 			}
 		}
@@ -616,7 +614,7 @@ public class BlockDaoTest {
 			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
 
 			// Assert:
-			Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
+			MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(5));
 		}
 
 		@Test
@@ -628,7 +626,7 @@ public class BlockDaoTest {
 			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 			// Assert:
-			Assert.assertThat(blocks.size(), IsEqual.equalTo(9));
+			MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(9));
 		}
 
 		@Test
@@ -640,10 +638,10 @@ public class BlockDaoTest {
 			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 			// Assert:
-			Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
+			MatcherAssert.assertThat(blocks.size(), IsEqual.equalTo(3));
 			for (final DbBlock block : blocks) {
 				final int numExpectedTransactions = TransactionRegistry.size() + 1; // 1 multisig inner
-				Assert.assertThat(DbBlockExtensions.countTransactions(block), IsEqual.equalTo(numExpectedTransactions));
+				MatcherAssert.assertThat(DbBlockExtensions.countTransactions(block), IsEqual.equalTo(numExpectedTransactions));
 			}
 		}
 
@@ -656,7 +654,7 @@ public class BlockDaoTest {
 			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 			// Assert:
-			Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
+			MatcherAssert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
 		}
 
 		@Test
@@ -671,15 +669,15 @@ public class BlockDaoTest {
 			DbBlock previousDbBlock = null;
 			for (final DbBlock block : blocks) {
 				if (null != previousDbBlock) {
-					Assert.assertThat(previousDbBlock.getHeight(), IsEqual.equalTo(block.getHeight() - 1));
+					MatcherAssert.assertThat(previousDbBlock.getHeight(), IsEqual.equalTo(block.getHeight() - 1));
 				}
 				previousDbBlock = block;
 			}
 		}
 
-		//endregion
+		// endregion
 
-		//mosaicIdCache
+		// mosaicIdCache
 
 		@Test
 		public void saveBlockUpdatesMosaicIdCache() {
@@ -688,14 +686,14 @@ public class BlockDaoTest {
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 
 			// Act:
 			this.blockDao.save(dbBlock);
 
 			// Assert
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
-			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
+			MatcherAssert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
 		}
 
 		@Test
@@ -716,14 +714,14 @@ public class BlockDaoTest {
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 
 			this.blockDao.save(dbBlock);
 
 			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
 			this.mosaicIdCache.remove(mosaicId);
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 
 			// Act:
 			if (updateCache) {
@@ -735,8 +733,8 @@ public class BlockDaoTest {
 			final DbMosaicId mosaicIdFromCache = this.mosaicIdCache.get(mosaicId);
 
 			// Assert:
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + (updateCache ? 1 : 0)));
-			Assert.assertThat(mosaicIdFromCache, IsEqual.equalTo(expectedDbMosaicId));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + (updateCache ? 1 : 0)));
+			MatcherAssert.assertThat(mosaicIdFromCache, IsEqual.equalTo(expectedDbMosaicId));
 		}
 
 		@Test
@@ -745,23 +743,23 @@ public class BlockDaoTest {
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 
 			this.blockDao.save(dbBlock);
 
 			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + 1));
 
 			// Act:
 			this.blockDao.deleteBlocksAfterHeight(new BlockHeight(100));
 
 			// Assert
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
 		}
 
-		//endregion
+		// endregion
 
-		//region helpers
+		// region helpers
 
 		private static Transaction sign(final Transaction transaction) {
 			transaction.sign();
@@ -778,32 +776,19 @@ public class BlockDaoTest {
 			return RandomTransactionFactory.createTransferWithAttachment(attachment);
 		}
 
-		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(
-				final Account issuer,
-				final Account multisig,
-				final Account cosignatory,
-				final Account cosignatoryToAdd) {
+		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(final Account issuer, final Account multisig,
+				final Account cosignatory, final Account cosignatoryToAdd) {
 			final MultisigCosignatoryModification cosignatoryModification = new MultisigCosignatoryModification(
-					MultisigModificationType.AddCosignatory,
-					cosignatoryToAdd);
-			final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					Collections.singletonList(cosignatoryModification),
-					new MultisigMinCosignatoriesModification(1));
+					MultisigModificationType.AddCosignatory, cosignatoryToAdd);
+			final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO,
+					multisig, Collections.singletonList(cosignatoryModification), new MultisigMinCosignatoriesModification(1));
 			return this.prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
 		}
 
-		private MultisigTransaction prepareMultisigTransaction(
-				final Transaction transaction,
-				final Account issuer,
-				final Account multisig,
+		private MultisigTransaction prepareMultisigTransaction(final Transaction transaction, final Account issuer, final Account multisig,
 				final Account cosignatory) {
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					cosignatory,
-					multisig,
-					transaction);
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosignatory,
+					multisig, transaction);
 			signatureTransaction.sign();
 			final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 			multisigTransaction.sign();
@@ -818,12 +803,8 @@ public class BlockDaoTest {
 			this.addMapping(mockAccountDao, sender);
 
 			for (int i = startHeight; i <= endHeight; i++) {
-				final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
-						sender,
-						Hash.ZERO,
-						Hash.ZERO,
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(sender, Hash.ZERO, Hash.ZERO,
+						new TimeInstant(i * 123), new BlockHeight(i));
 				final Account recipient = Utils.generateRandomAccount();
 				this.addMapping(mockAccountDao, recipient);
 				dummyBlock.sign();
@@ -852,7 +833,7 @@ public class BlockDaoTest {
 			}
 
 			// Sanity:
-			Assert.assertThat(transactionFactories.size(), IsEqual.equalTo(TransactionRegistry.size()));
+			MatcherAssert.assertThat(transactionFactories.size(), IsEqual.equalTo(TransactionRegistry.size()));
 
 			final Account blockSigner = Utils.generateRandomAccount();
 			final Block dummyBlock = new Block(blockSigner, Hash.ZERO, Hash.ZERO, timeStamp, height);
@@ -862,7 +843,7 @@ public class BlockDaoTest {
 				dummyBlock.addTransaction(transaction);
 
 				// Sanity:
-				Assert.assertThat(transaction.getType(), IsEqual.equalTo(entry.getKey()));
+				MatcherAssert.assertThat(transaction.getType(), IsEqual.equalTo(entry.getKey()));
 			}
 
 			dummyBlock.sign();
@@ -874,9 +855,7 @@ public class BlockDaoTest {
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 			for (int i = startHeight; i <= endHeight; i++) {
-				final Block dummyBlock = this.createBlockWithTransactions(
-						new TimeInstant(i * 123),
-						new BlockHeight(i));
+				final Block dummyBlock = this.createBlockWithTransactions(new TimeInstant(i * 123), new BlockHeight(i));
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
@@ -893,7 +872,7 @@ public class BlockDaoTest {
 			mockAccountDao.addMapping(account);
 		}
 
-		//endregion
+		// endregion
 	}
 
 	@RunWith(Parameterized.class)
@@ -912,6 +891,9 @@ public class BlockDaoTest {
 			// manually initialize spring like the runner would do for us (but we can't use because we want parameterized tests)
 			this.testContextManager = new TestContextManager(this.getClass());
 			this.testContextManager.prepareTestInstance(this);
+
+			// needed because Base::before is run *first* prior to any dependency injections
+			this.session = this.sessionFactory.openSession();
 		}
 
 		@Parameterized.Parameters
@@ -919,19 +901,15 @@ public class BlockDaoTest {
 			return ParameterizedUtils.wrap(TransactionTypes.getMultisigEmbeddableTypes());
 		}
 
-		//region assertSavingBlockSavesTransaction
+		// region assertSavingBlockSavesTransaction
 
 		@Test
 		public void savingBlockSavesTransactions() {
 			// Assert:
-			this.assertSavingBlockSavesTransaction(
-					this.entry.type,
-					this::prepareTransaction);
+			this.assertSavingBlockSavesTransaction(this.entry.type, this::prepareTransaction);
 		}
 
-		private void assertSavingBlockSavesTransaction(
-				final int transactionType,
-				final Supplier<Transaction> createTransaction) {
+		private void assertSavingBlockSavesTransaction(final int transactionType, final Supplier<Transaction> createTransaction) {
 			// Arrange:
 			final Transaction transaction = createTransaction.get();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(transaction.getAccounts().toArray());
@@ -947,8 +925,8 @@ public class BlockDaoTest {
 			this.blockDao.save(entity);
 
 			// Assert:
-			Assert.assertThat(entity.getId(), IsNull.notNullValue());
-			Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+			MatcherAssert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
 
 			int numTransactions = 0;
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
@@ -956,41 +934,34 @@ public class BlockDaoTest {
 				numTransactions += blockTransactions.size();
 
 				if (transactionType == entry.type) {
-					Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
-					Assert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
+					MatcherAssert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+					MatcherAssert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
 				} else {
-					Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
+					MatcherAssert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
 				}
 			}
 
-			Assert.assertThat(numTransactions, IsEqual.equalTo(1));
+			MatcherAssert.assertThat(numTransactions, IsEqual.equalTo(1));
 		}
 
-		//endregion
+		// endregion
 
-		//region assertSavingBlockDoesNotChangeTransferBlockIndex
+		// region assertSavingBlockDoesNotChangeTransferBlockIndex
 
 		@Test
 		public void savingDoesNotChangeTransferBlockIndex() {
 			// Assert:
-			this.assertSavingBlockDoesNotChangeTransferBlockIndex(
-					this.entry.getFromBlock::apply,
-					this::prepareTransaction,
-					false);
+			this.assertSavingBlockDoesNotChangeTransferBlockIndex(this.entry.getFromBlock::apply, this::prepareTransaction, false);
 		}
 
 		@Test
 		public void reloadAfterSavingDoesNotChangeTransferBlockIndex() {
 			// Assert:
-			this.assertSavingBlockDoesNotChangeTransferBlockIndex(
-					this.entry.getFromBlock::apply,
-					this::prepareTransaction,
-					true);
+			this.assertSavingBlockDoesNotChangeTransferBlockIndex(this.entry.getFromBlock::apply, this::prepareTransaction, true);
 		}
 
 		private void assertSavingBlockDoesNotChangeTransferBlockIndex(
-				final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
-				final Supplier<Transaction> createTransaction,
+				final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers, final Supplier<Transaction> createTransaction,
 				final boolean reload) {
 			// Arrange:
 			final Transaction transfer1 = createTransaction.get();
@@ -1020,17 +991,17 @@ public class BlockDaoTest {
 
 			// Assert:
 			transfers = getTransfers.apply(dbBlock);
-			Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-			Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
-			Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
+			MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
+			MatcherAssert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
 
 			final Hash h1 = transfers.get(0).getTransferHash();
 			final Hash h2 = transfers.get(1).getTransferHash();
-			Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(transfer1)));
-			Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
+			MatcherAssert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(transfer1)));
+			MatcherAssert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
 		}
 
-		//endregion
+		// endregion
 
 		private Transaction prepareTransaction() {
 			final Transaction transaction = this.createModel.get();

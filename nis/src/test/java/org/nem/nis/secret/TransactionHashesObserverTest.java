@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -13,7 +14,7 @@ import java.util.*;
 
 public class TransactionHashesObserverTest {
 
-	//region execute
+	// region execute
 
 	@Test
 	public void transactionHashesExecutePutsPairsIntoTransactionHashCache() {
@@ -24,15 +25,15 @@ public class TransactionHashesObserverTest {
 		notifyTransactionHashes(context.observer, context.pairs, NotificationTrigger.Execute);
 
 		// Assert:
-		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
 		for (final HashMetaDataPair pair : context.pairs) {
-			Assert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
+			MatcherAssert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region undo
+	// region undo
 
 	@Test
 	public void transactionHashesUndoRemovesPairsFromTransactionHashCache() {
@@ -44,17 +45,14 @@ public class TransactionHashesObserverTest {
 		notifyTransactionHashes(context.observer, context.pairs, NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
 	}
 
-	//endregion
+	// endregion
 
-	private static void notifyTransactionHashes(
-			final TransactionHashesObserver observer,
-			final List<HashMetaDataPair> pairs,
+	private static void notifyTransactionHashes(final TransactionHashesObserver observer, final List<HashMetaDataPair> pairs,
 			final NotificationTrigger trigger) {
-		observer.notify(
-				new TransactionHashesNotification(pairs),
+		observer.notify(new TransactionHashesNotification(pairs),
 				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), trigger));
 	}
 
@@ -71,7 +69,8 @@ public class TransactionHashesObserverTest {
 		private List<HashMetaDataPair> createPairs() {
 			final List<HashMetaDataPair> pairs = new ArrayList<>();
 			for (int i = 0; i < 10; i++) {
-				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
+				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(),
+						new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
 			}
 
 			return pairs;

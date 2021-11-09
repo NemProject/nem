@@ -1,5 +1,6 @@
 package org.nem.nis.pox.poi;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
@@ -17,7 +18,7 @@ public class PoiContextTest {
 	private static final long MIN_HARVESTING_BALANCE = DEFAULT_OPTIONS.getMinHarvesterBalance().getNumMicroNem();
 	private static final long MIN_OUTLINK_WEIGHT = DEFAULT_OPTIONS.getMinOutlinkWeight().getNumMicroNem();
 
-	//region construction (failures)
+	// region construction (failures)
 
 	@Test
 	public void cannotCreateContextAroundZeroAccounts() {
@@ -35,8 +36,7 @@ public class PoiContextTest {
 	public void cannotCreateContextAroundZeroForagingEligibleAccounts() {
 		// Arrange:
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
-		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier - 1, null), // non-harvesting account
+		final List<TestAccountInfo> accountInfos = Arrays.asList(new TestAccountInfo(multiplier - 1, null), // non-harvesting account
 				new TestAccountInfo(multiplier - 1, null)); // non-harvesting account
 
 		final BlockHeight height = new BlockHeight(21);
@@ -46,11 +46,9 @@ public class PoiContextTest {
 		ExceptionAssert.assertThrows(v -> createPoiContext(accountStates, height), IllegalArgumentException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region process
-
-	//region vectors
+	// region vectors
 
 	@Test
 	public void vestedBalanceVectorIsInitializedCorrectly() {
@@ -60,8 +58,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) only harvesting-eligible accounts (0, 2, 3, 4) are represented
 		// (2) vested balances are not normalized
-		Assert.assertThat(
-				context.getVestedBalanceVector(),
+		MatcherAssert.assertThat(context.getVestedBalanceVector(),
 				IsEqual.equalTo(new ColumnVector(29999999999L, 50000000000L, 10000000000L, 10000000000L)));
 	}
 
@@ -73,9 +70,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) only harvesting-eligible accounts (0, 2, 3, 4) are represented
 		// (2) calculation delegates to PoiAccountInfo
-		Assert.assertThat(
-				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(0, 3e06, 0, 10e06)));
+		MatcherAssert.assertThat(context.getOutlinkScoreVector().roundTo(5), IsEqual.equalTo(new ColumnVector(0, 3e06, 0, 10e06)));
 	}
 
 	@Test
@@ -90,8 +85,7 @@ public class PoiContextTest {
 		// (2) calculation delegates to PoiAccountInfo
 		// (3) negative outflows are scaled
 		// (4) net outflows are used instead of total outflows
-		Assert.assertThat(
-				context.getOutlinkScoreVector().roundTo(5),
+		MatcherAssert.assertThat(context.getOutlinkScoreVector().roundTo(5),
 				IsEqual.equalTo(new ColumnVector(9 * MIN_OUTLINK_WEIGHT, 0, 0.6 * -15 * MIN_OUTLINK_WEIGHT, 8 * MIN_OUTLINK_WEIGHT)));
 	}
 
@@ -103,9 +97,7 @@ public class PoiContextTest {
 		// Assert:
 		// (1) start vector is uniform
 		// (2) start vector is normalized
-		Assert.assertThat(
-				context.getPoiStartVector(),
-				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
+		MatcherAssert.assertThat(context.getPoiStartVector(), IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
 
 	@Test
@@ -120,9 +112,7 @@ public class PoiContextTest {
 		expectedOutlierVector.setAt(13, 1);
 		expectedOutlierVector.setAt(17, 1);
 		expectedOutlierVector.setAt(19, 1);
-		Assert.assertThat(
-				context.getOutlierVector(),
-				IsEqual.equalTo(expectedOutlierVector));
+		MatcherAssert.assertThat(context.getOutlierVector(), IsEqual.equalTo(expectedOutlierVector));
 	}
 
 	@Test
@@ -140,14 +130,12 @@ public class PoiContextTest {
 		expectedGraphWeightVector.setAt(13, 0.75);
 		expectedGraphWeightVector.setAt(17, 0.75);
 		expectedGraphWeightVector.setAt(19, 0.75);
-		Assert.assertThat(
-				context.getGraphWeightVector(),
-				IsEqual.equalTo(expectedGraphWeightVector));
+		MatcherAssert.assertThat(context.getGraphWeightVector(), IsEqual.equalTo(expectedGraphWeightVector));
 	}
 
-	//endregion
+	// endregion
 
-	//region dangle indexes
+	// region dangle indexes
 
 	@Test
 	public void dangleIndexesAreInitializedCorrectly() {
@@ -156,14 +144,12 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) accounts without outlinks are dangling (2 has inlinks but no outlinks)
-		Assert.assertThat(
-				context.getDangleIndexes(),
-				IsEquivalent.equivalentTo(2));
+		MatcherAssert.assertThat(context.getDangleIndexes(), IsEquivalent.equivalentTo(2));
 	}
 
-	//endregion
+	// endregion
 
-	//region matrices
+	// region matrices
 
 	@Test
 	public void outlinkMatrixIsInitializedCorrectly() {
@@ -183,9 +169,7 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
-		Assert.assertThat(
-				context.getOutlinkMatrix().roundTo(5),
-				IsEqual.equalTo(expectedAccountLinks));
+		MatcherAssert.assertThat(context.getOutlinkMatrix().roundTo(5), IsEqual.equalTo(expectedAccountLinks));
 	}
 
 	@Test
@@ -208,9 +192,7 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(2, 3, 1.0);
 
-		Assert.assertThat(
-				context.getOutlinkMatrix().roundTo(5),
-				IsEqual.equalTo(expectedAccountLinks));
+		MatcherAssert.assertThat(context.getOutlinkMatrix().roundTo(5), IsEqual.equalTo(expectedAccountLinks));
 	}
 
 	@Test
@@ -223,9 +205,9 @@ public class PoiContextTest {
 		InterLevelProximityMatrixTest.assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(interLevel);
 	}
 
-	//endregion
+	// endregion
 
-	//region clustering result
+	// region clustering result
 
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
@@ -234,15 +216,16 @@ public class PoiContextTest {
 		final ClusteringResult result = context.getClusteringResult();
 
 		// Assert:
-		final ClusteringResult expectedResult = IdealizedClusterFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
+		final ClusteringResult expectedResult = IdealizedClusterFactory
+				.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		MatcherAssert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
+		MatcherAssert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
+		MatcherAssert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
-	//endregion
+	// endregion
 
-	//region updateImportances
+	// region updateImportances
 
 	@Test
 	public void canUpdateFilteredAccountsWithCompatiblePageRankVector() {
@@ -256,10 +239,9 @@ public class PoiContextTest {
 
 		// Assert:
 		// - accounts without harvesting power are given 0 page rank
-		final List<Double> importances = accountStates.stream()
-				.map(a -> a.getImportanceInfo().getLastPageRank())
+		final List<Double> importances = accountStates.stream().map(a -> a.getImportanceInfo().getLastPageRank())
 				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
 	}
 
 	@Test
@@ -274,13 +256,11 @@ public class PoiContextTest {
 
 		// Assert:
 		// - accounts without harvesting power are given 0 importance
-		final List<Double> importances = accountStates.stream()
-				.map(a -> {
-					final ReadOnlyAccountImportance ai = a.getImportanceInfo();
-					return ai.isSet() ? ai.getImportance(height) : 0.0;
-				})
-				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		final List<Double> importances = accountStates.stream().map(a -> {
+			final ReadOnlyAccountImportance ai = a.getImportanceInfo();
+			return ai.isSet() ? ai.getImportance(height) : 0.0;
+		}).collect(Collectors.toList());
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
 	}
 
 	@Test
@@ -291,11 +271,9 @@ public class PoiContextTest {
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(5, 2, 7, 3, 4, 8), new ColumnVector(4)),
+		ExceptionAssert.assertThrows(v -> context.updateImportances(new ColumnVector(5, 2, 7, 3, 4, 8), new ColumnVector(4)),
 				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(5, 2, 3), new ColumnVector(4)),
+		ExceptionAssert.assertThrows(v -> context.updateImportances(new ColumnVector(5, 2, 3), new ColumnVector(4)),
 				IllegalArgumentException.class);
 	}
 
@@ -307,11 +285,9 @@ public class PoiContextTest {
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3, 4, 8)),
+		ExceptionAssert.assertThrows(v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3, 4, 8)),
 				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 3)),
+		ExceptionAssert.assertThrows(v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 3)),
 				IllegalArgumentException.class);
 	}
 
@@ -327,14 +303,12 @@ public class PoiContextTest {
 
 		// Assert:
 		// - accounts without harvesting power have 0 historical importance and page rank
-		final List<Double> importances = accountStates.stream()
-				.map(a -> a.getHistoricalImportances().getHistoricalImportance(height))
+		final List<Double> importances = accountStates.stream().map(a -> a.getHistoricalImportances().getHistoricalImportance(height))
 				.collect(Collectors.toList());
-		final List<Double> lastPageRanks = accountStates.stream()
-				.map(a -> a.getHistoricalImportances().getHistoricalPageRank(height))
+		final List<Double> lastPageRanks = accountStates.stream().map(a -> a.getHistoricalImportances().getHistoricalPageRank(height))
 				.collect(Collectors.toList());
-		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
-		Assert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
+		MatcherAssert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		MatcherAssert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
 	}
 
 	@Test
@@ -348,31 +322,22 @@ public class PoiContextTest {
 		context.updateImportances(new ColumnVector(3, 7, 2, 5), new ColumnVector(5, 2, 7, 3));
 
 		// Assert:
-		final int numHistoricalEntries = accountStates.stream()
-				.map(a -> a.getHistoricalImportances().size())
-				.reduce(0, Integer::sum);
-		Assert.assertThat(numHistoricalEntries, IsEqual.equalTo(4));
+		final int numHistoricalEntries = accountStates.stream().map(a -> a.getHistoricalImportances().size()).reduce(0, Integer::sum);
+		MatcherAssert.assertThat(numHistoricalEntries, IsEqual.equalTo(4));
 	}
 
-	//endregion
+	// endregion
 
-	//region test helpers
+	// region utilities
 
-	//region utilities
-
-	private static void addAccountLink(
-			final BlockHeight height,
-			final AccountState sender,
-			final AccountState recipient,
+	private static void addAccountLink(final BlockHeight height, final AccountState sender, final AccountState recipient,
 			final int weight) {
 		final Amount amount = Amount.fromMicroNem(weight * MIN_OUTLINK_WEIGHT);
 		final AccountLink link = new AccountLink(height, amount, recipient.getAddress());
 		sender.getImportanceInfo().addOutlink(link);
 	}
 
-	private static List<AccountState> createTestPoiAccountStates(
-			final List<TestAccountInfo> accountInfos,
-			final BlockHeight height) {
+	private static List<AccountState> createTestPoiAccountStates(final List<TestAccountInfo> accountInfos, final BlockHeight height) {
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (final TestAccountInfo info : accountInfos) {
 			final AccountState state = new AccountState(Utils.generateRandomAddress());
@@ -390,13 +355,19 @@ public class PoiContextTest {
 	}
 
 	private static List<AccountState> createDefaultTestAccountStates(final BlockHeight height) {
-		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * MIN_HARVESTING_BALANCE - 1, null),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[] { 1 }), // 1 (insufficient balance)
-				new TestAccountInfo(5 * MIN_HARVESTING_BALANCE, new int[] { 1, 2 }), // 3
-				new TestAccountInfo(MIN_HARVESTING_BALANCE, null),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE, new int[] { 1, 1, 4, 3, 1 }), // 10
-				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[] { 7 })); // 7 (insufficient vested balance)
+		final List<TestAccountInfo> accountInfos = Arrays.asList(new TestAccountInfo(3 * MIN_HARVESTING_BALANCE - 1, null),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[]{
+						1
+				}), // 1 (insufficient balance)
+				new TestAccountInfo(5 * MIN_HARVESTING_BALANCE, new int[]{
+						1, 2
+				}), // 3
+				new TestAccountInfo(MIN_HARVESTING_BALANCE, null), new TestAccountInfo(MIN_HARVESTING_BALANCE, new int[]{
+						1, 1, 4, 3, 1
+				}), // 10
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[]{
+						7
+				})); // 7 (insufficient vested balance)
 
 		// outlinks
 		// - 0: none
@@ -416,13 +387,13 @@ public class PoiContextTest {
 
 		public TestAccountInfo(final long vestedBalance, final int[] amounts) {
 			this.vestedBalance = vestedBalance;
-			this.amounts = null == amounts ? new int[] {} : amounts;
+			this.amounts = null == amounts ? new int[]{} : amounts;
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PoiContext factories
+	// region PoiContext factories
 
 	private static PoiContext createPoiContextWithDefaultTestAccountStates() {
 		final BlockHeight height = new BlockHeight(21);
@@ -439,13 +410,10 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {
-		// Arrange: create 4 accounts
-		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(MIN_HARVESTING_BALANCE),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null)); // non-harvesting account
+		// Arrange: create 4/5 harvesting accounts
+		final List<TestAccountInfo> accountInfos = Arrays.asList(new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE), new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE), new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null));
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -500,5 +468,5 @@ public class PoiContextTest {
 		return new PoiContext(accountStates, height, poiOptionsBuilder.create());
 	}
 
-	//endregion
+	// endregion
 }

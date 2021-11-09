@@ -66,9 +66,7 @@ public class AggregateBlockTransactionObserverBuilder {
 
 		@Override
 		public String getName() {
-			return this.observers.stream()
-					.map(NamedObserver::getName)
-					.collect(Collectors.joining(","));
+			return this.observers.stream().map(NamedObserver::getName).collect(Collectors.joining(","));
 		}
 
 		@Override

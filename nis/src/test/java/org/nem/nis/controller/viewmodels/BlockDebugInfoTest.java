@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -12,7 +13,7 @@ import java.math.BigInteger;
 
 public class BlockDebugInfoTest {
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void constructorParametersAreApplied() {
@@ -29,18 +30,18 @@ public class BlockDebugInfoTest {
 		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(height, timeStamp, address, difficulty, hit, target, interBlockTime);
 
 		// Assert:
-		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
-		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
-		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
-		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
-		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
+		MatcherAssert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
+		MatcherAssert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
+		MatcherAssert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
+		MatcherAssert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
+		MatcherAssert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		MatcherAssert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
 	}
 
-	//endregion
+	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void canRoundtripBlockDebugInfo() {
@@ -52,7 +53,8 @@ public class BlockDebugInfoTest {
 		final BigInteger hit = BigInteger.valueOf(1234);
 		final BigInteger target = BigInteger.valueOf(4321);
 		final int interBlockTime = 45;
-		final BlockDebugInfo originalBlockDebugInfo = new BlockDebugInfo(height, timeStamp, address, difficulty, hit, target, interBlockTime);
+		final BlockDebugInfo originalBlockDebugInfo = new BlockDebugInfo(height, timeStamp, address, difficulty, hit, target,
+				interBlockTime);
 
 		final TimeInstant timeStamp2 = new TimeInstant(1000);
 		final TimeInstant deadline = new TimeInstant(1720);
@@ -61,7 +63,8 @@ public class BlockDebugInfoTest {
 		final Amount amount = Amount.fromNem(100);
 		final Amount fee = Amount.fromNem(10);
 		final String message = "Test message";
-		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp2, deadline, sender, recipient, amount, fee, message);
+		final TransactionDebugInfo originalTransactionDebugInfo = new TransactionDebugInfo(timeStamp2, deadline, sender, recipient, amount,
+				fee, message);
 		originalBlockDebugInfo.addTransactionDebugInfo(originalTransactionDebugInfo);
 
 		// Act:
@@ -69,24 +72,24 @@ public class BlockDebugInfoTest {
 		final BlockDebugInfo blockDebugInfo = new BlockDebugInfo(deserializer);
 
 		// Assert:
-		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
-		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
-		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
-		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
-		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
+		MatcherAssert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
+		MatcherAssert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
+		MatcherAssert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
+		MatcherAssert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
+		MatcherAssert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		MatcherAssert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(interBlockTime));
 
-		Assert.assertThat(blockDebugInfo.getTransactionDebugInfos().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(blockDebugInfo.getTransactionDebugInfos().size(), IsEqual.equalTo(1));
 
 		final TransactionDebugInfo transactionDebugInfo = blockDebugInfo.getTransactionDebugInfos().get(0);
-		Assert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp2));
-		Assert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
-		Assert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
-		Assert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
+		MatcherAssert.assertThat(transactionDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp2));
+		MatcherAssert.assertThat(transactionDebugInfo.getDeadline(), IsEqual.equalTo(deadline));
+		MatcherAssert.assertThat(transactionDebugInfo.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transactionDebugInfo.getRecipient(), IsEqual.equalTo(recipient));
+		MatcherAssert.assertThat(transactionDebugInfo.getAmount(), IsEqual.equalTo(amount));
+		MatcherAssert.assertThat(transactionDebugInfo.getFee(), IsEqual.equalTo(fee));
 	}
 
-	//endregion
+	// endregion
 }

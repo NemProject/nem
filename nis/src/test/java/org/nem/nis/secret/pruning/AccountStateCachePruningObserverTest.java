@@ -10,9 +10,10 @@ import org.nem.nis.test.NisTestConstants;
 
 public abstract class AccountStateCachePruningObserverTest extends AbstractPruningObserverTest {
 	private static final int WEIGHTED_BALANCE_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final int OUTLINK_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH + NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final int OUTLINK_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH
+			+ NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
 
-	//region overrides
+	// region overrides
 
 	protected abstract boolean pruneHistoricalData();
 
@@ -23,8 +24,8 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 
 	@Override
 	protected void assertPruning(final NisCache nisCache, final long state) {
-		final int weightedBalancePruneHeight = (int)(state >> 32);
-		final int outlinkPruneHeight = (int)state;
+		final int weightedBalancePruneHeight = (int) (state >> 32);
+		final int outlinkPruneHeight = (int) state;
 
 		// Assert:
 		if (0 != weightedBalancePruneHeight && this.pruneHistoricalData()) {
@@ -56,9 +57,9 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region helper functions
+	// region helper functions
 
 	private void assertNoWeightedBalancePruning(final NisCache nisCache) {
 		for (final AccountState accountState : nisCache.getAccountStateCache().mutableContents()) {
@@ -96,7 +97,7 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
@@ -141,24 +142,20 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 	@Test
 	public void blockBasedPruningIsTriggeredWhenBlockHeightIsMuchGreaterThanHistories() {
 		// Assert:
-		this.assertBlockBasedPruning(
-				100 * OUTLINK_BLOCK_HISTORY + 1,
-				createState(
-						100 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
-						99 * OUTLINK_BLOCK_HISTORY + 1));
+		this.assertBlockBasedPruning(100 * OUTLINK_BLOCK_HISTORY + 1,
+				createState(100 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 99 * OUTLINK_BLOCK_HISTORY + 1));
 	}
 
 	@Test
 	public void outlinkPruningUsesOutlinkBlockHistory() {
 		// Assert:
 		final int notificationHeight = 2345 * 360 + 1;
-		this.assertBlockBasedPruning(
-				notificationHeight,
+		this.assertBlockBasedPruning(notificationHeight,
 				createState(notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY, notificationHeight - OUTLINK_BLOCK_HISTORY));
 	}
 
 	private static long createState(final int weightedBalancePruneHeight, final int outlinkPruneHeight) {
-		return ((long)weightedBalancePruneHeight) << 32 | outlinkPruneHeight;
+		return ((long) weightedBalancePruneHeight) << 32 | outlinkPruneHeight;
 	}
 
 	public static class AccountStateCachePruningObserverTestWithHistoricalDataPruning extends AccountStateCachePruningObserverTest {

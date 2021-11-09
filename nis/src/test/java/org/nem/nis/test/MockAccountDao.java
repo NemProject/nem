@@ -65,9 +65,7 @@ public class MockAccountDao implements AccountDao {
 	 */
 	public void addMappings(final Block block) {
 		this.addMapping(block.getSigner());
-		block.getTransactions().stream()
-				.flatMap(t -> t.getAccounts().stream())
-				.forEach(this::addMapping);
+		block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).forEach(this::addMapping);
 	}
 
 	/**
@@ -95,42 +93,36 @@ public class MockAccountDao implements AccountDao {
 
 	// Not exactly what equals should look like but good enough for us.
 	public boolean equals(final MockAccountDao rhs) {
-		return this.knownAccounts.size() == rhs.knownAccounts.size()
-				&& this.id.equals(rhs.id)
-				&& this.areKnownAccountsEquivalent(rhs);
+		return this.knownAccounts.size() == rhs.knownAccounts.size() && this.id.equals(rhs.id) && this.areKnownAccountsEquivalent(rhs);
 	}
 
 	private boolean areKnownAccountsEquivalent(final MockAccountDao rhs) {
-		return 0 == this.knownAccounts.values().stream()
-				.mapToInt(state -> {
-					final DbAccount a1 = state.dbAccount;
-					final DbAccount a2 = rhs.getAccount(a1).dbAccount;
-					if (!a1.getPrintableKey().equals(a2.getPrintableKey()) ||
-							(null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
-						return 1;
-					}
+		return 0 == this.knownAccounts.values().stream().mapToInt(state -> {
+			final DbAccount a1 = state.dbAccount;
+			final DbAccount a2 = rhs.getAccount(a1).dbAccount;
+			if (!a1.getPrintableKey().equals(a2.getPrintableKey())
+					|| (null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
+				return 1;
+			}
 
-					return 0;
-				})
-				.sum();
+			return 0;
+		}).sum();
 	}
 
 	public void blockAdded(final DbBlock block) {
 		this.save(block.getHarvester());
-		block.getBlockTransferTransactions().stream()
-				.forEach(t -> {
-					this.save(t.getRecipient());
-					this.save(t.getSender());
-				});
+		block.getBlockTransferTransactions().stream().forEach(t -> {
+			this.save(t.getRecipient());
+			this.save(t.getSender());
+		});
 	}
 
 	public void blockDeleted(final DbBlock block) {
 		this.decrementReferenceCount(block.getHarvester());
-		block.getBlockTransferTransactions().stream()
-				.forEach(t -> {
-					this.decrementReferenceCount(t.getRecipient());
-					this.decrementReferenceCount(t.getSender());
-				});
+		block.getBlockTransferTransactions().stream().forEach(t -> {
+			this.decrementReferenceCount(t.getRecipient());
+			this.decrementReferenceCount(t.getSender());
+		});
 	}
 
 	@Override

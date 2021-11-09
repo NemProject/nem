@@ -27,12 +27,8 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 */
-	public DefaultPeerNetworkNodeSelectorFactory(
-			final NisConfiguration nisConfiguration,
-			final TrustProvider trustProvider,
-			final PeerNetworkState state,
-			final ReadOnlyPoxFacade poxFacade,
-			final ReadOnlyAccountStateCache accountStateCache) {
+	public DefaultPeerNetworkNodeSelectorFactory(final NisConfiguration nisConfiguration, final TrustProvider trustProvider,
+			final PeerNetworkState state, final ReadOnlyPoxFacade poxFacade, final ReadOnlyAccountStateCache accountStateCache) {
 		this.nisConfiguration = nisConfiguration;
 		this.trustProvider = trustProvider;
 		this.state = state;
@@ -54,15 +50,8 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 		final TrustContext context = this.state.getTrustContext();
 		final SecureRandom random = new SecureRandom();
 		final TrustResult trustResult = this.getTrustProvider(excludeBusyNodes).computeTrust(context);
-		return new PreTrustAwareNodeSelector(
-				new BasicNodeSelector(
-						this.nisConfiguration.getNodeLimit(),
-						trustResult.getTrustValues(),
-						trustResult.getTrustContext().getNodes(),
-						random),
-				this.state.getNodes(),
-				context,
-				random);
+		return new PreTrustAwareNodeSelector(new BasicNodeSelector(this.nisConfiguration.getNodeLimit(), trustResult.getTrustValues(),
+				trustResult.getTrustContext().getNodes(), random), this.state.getNodes(), context, random);
 	}
 
 	@Override
@@ -70,13 +59,8 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 		final TrustContext context = this.state.getTrustContext();
 		final SecureRandom random = new SecureRandom();
 		final TrustResult trustResult = this.getTrustProvider(true).computeTrust(context);
-		return new ImportanceAwareNodeSelector(
-				this.nisConfiguration.getTimeSyncNodeLimit(),
-				this.poxFacade,
-				this.accountStateCache,
-				trustResult.getTrustValues(),
-				trustResult.getTrustContext().getNodes(),
-				random);
+		return new ImportanceAwareNodeSelector(this.nisConfiguration.getTimeSyncNodeLimit(), this.poxFacade, this.accountStateCache,
+				trustResult.getTrustValues(), trustResult.getTrustContext().getNodes(), random);
 	}
 
 	private TrustProvider getTrustProvider(final boolean excludeBusyNodes) {

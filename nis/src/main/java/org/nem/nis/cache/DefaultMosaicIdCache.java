@@ -32,10 +32,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	@Override
 	public int deepSize() {
-		return (int)this.dbMosaicIdsMap.values().stream()
-				.flatMap(DbMosaicIds::stream)
-				.distinct()
-				.count();
+		return (int) this.dbMosaicIdsMap.values().stream().flatMap(DbMosaicIds::stream).distinct().count();
 	}
 
 	@Override

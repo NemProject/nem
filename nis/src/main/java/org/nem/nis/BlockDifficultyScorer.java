@@ -37,9 +37,7 @@ public class BlockDifficultyScorer {
 
 		final long targetTimeBetweenBlocks = NemGlobals.getBlockChainConfiguration().getBlockGenerationTargetTime();
 		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(targetTimeBetweenBlocks))
-				.multiply(BigInteger.valueOf(heightDiff - 1))
-				.divide(BigInteger.valueOf(timeDiff))
-				.longValue();
+				.multiply(BigInteger.valueOf(heightDiff - 1)).divide(BigInteger.valueOf(timeDiff)).longValue();
 
 		final long oldDifficulty = difficulties.get(difficulties.size() - 1).getRaw();
 		if (19L * oldDifficulty > 20L * difficulty) {

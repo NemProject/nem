@@ -33,20 +33,14 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public TransferBlockPair getTransactionUsingHash(
-			final Hash hash,
-			final BlockHeight height) {
+	public TransferBlockPair getTransactionUsingHash(final Hash hash, final BlockHeight height) {
 		return this.getTransferBlockPairUsingHash(hash, height);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
-			final Account address,
-			final Hash hash,
-			final BlockHeight height,
-			final TransferType transferType,
-			final int limit) {
+	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(final Account address, final Hash hash,
+			final BlockHeight height, final TransferType transferType, final int limit) {
 		final Long accountId = this.getAccountId(address);
 		if (null == accountId) {
 			return new ArrayList<>();
@@ -56,9 +50,8 @@ public class TransferDaoImpl implements TransferDao {
 		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
-	private TransferBlockPair getTransferBlockPairUsingHash(
-			final Hash hash,
-			final BlockHeight height) {
+	@SuppressWarnings("rawtypes")
+	private TransferBlockPair getTransferBlockPairUsingHash(final Hash hash, final BlockHeight height) {
 		// since we know the block height and have to search for the hash in all transaction tables, the easiest way to do it
 		// is simply to load the complete block from the db. It will be fast enough.
 		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
@@ -70,8 +63,7 @@ public class TransferDaoImpl implements TransferDao {
 		final DbBlock dbBlock = dbBlocks.get(0);
 		for (final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
 			final List<AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbBlock).stream()
-					.filter(t -> t.getTransferHash().equals(hash))
-					.collect(Collectors.toList());
+					.filter(t -> t.getTransferHash().equals(hash)).collect(Collectors.toList());
 			if (!transfers.isEmpty()) {
 				return new TransferBlockPair(transfers.get(0), dbBlock);
 			}
@@ -82,11 +74,8 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<TransferBlockPair> getTransactionsForAccountUsingId(
-			final Account address,
-			final Long id,
-			final TransferType transferType,
-			final int limit) {
+	public Collection<TransferBlockPair> getTransactionsForAccountUsingId(final Account address, final Long id,
+			final TransferType transferType, final int limit) {
 		final Long accountId = this.getAccountId(address);
 		if (null == accountId) {
 			return new ArrayList<>();
@@ -100,45 +89,35 @@ public class TransferDaoImpl implements TransferDao {
 		return DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 	}
 
-	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(
-			final Long accountId,
-			final long maxId,
-			final int limit,
+	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(final Long accountId, final long maxId, final int limit,
 			final TransferType transferType) {
 		if (TransferType.ALL == transferType) {
 			// note that we have to do separate queries for incoming and outgoing transactions since otherwise h2
 			// is not able to use an index to speed up the query.
-			final Collection<TransferBlockPair> pairs =
-					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.INCOMING);
+			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId,
+					limit, TransferType.INCOMING);
 			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.OUTGOING));
 			return this.sortAndLimit(pairs, limit);
 		} else {
-			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(
-					accountId,
-					maxId,
-					limit,
-					transferType);
+			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId,
+					limit, transferType);
 			return this.sortAndLimit(pairs, limit);
 		}
 	}
 
-	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
-			final Long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType) {
+	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(final Long accountId, final long maxId,
+			final int limit, final TransferType transferType) {
 		final Collection<TransferBlockPair> pairs = new ArrayList<>();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			pairs.addAll(entry.getTransactionRetriever.get().getTransfersForAccount(this.getCurrentSession(), accountId, maxId, limit, transferType));
+			pairs.addAll(entry.getTransactionRetriever.get().getTransfersForAccount(this.getCurrentSession(), accountId, maxId, limit,
+					transferType));
 		}
 
 		return pairs;
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
-		final List<TransferBlockPair> list = pairs.stream()
-				.sorted()
-				.collect(Collectors.toList());
+		final List<TransferBlockPair> list = pairs.stream().sorted().collect(Collectors.toList());
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
 		for (final TransferBlockPair pair : list) {

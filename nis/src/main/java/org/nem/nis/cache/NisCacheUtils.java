@@ -17,10 +17,8 @@ public class NisCacheUtils {
 	 * @return The validation state.
 	 */
 	public static ValidationState createValidationState(final ReadOnlyNisCache nisCache) {
-		return new ValidationState(
-				new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
-				new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()),
-				createTransactionExecutionState(nisCache));
+		return new ValidationState(new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
+				new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()), createTransactionExecutionState(nisCache));
 	}
 
 	/**

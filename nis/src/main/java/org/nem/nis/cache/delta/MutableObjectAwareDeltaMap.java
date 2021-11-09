@@ -9,7 +9,10 @@ import java.util.stream.*;
  * @param <TKey> The key type.
  * @param <TValue> The value type.
  */
-public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> implements DeltaMap<TKey, TValue>, CopyableDeltaMap<MutableObjectAwareDeltaMap<TKey, TValue>> {
+public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>>
+		implements
+			DeltaMap<TKey, TValue>,
+			CopyableDeltaMap<MutableObjectAwareDeltaMap<TKey, TValue>> {
 	private final Map<TKey, TValue> originalValues;
 	private final Map<TKey, TValue> copiedValues;
 	private final Map<TKey, TValue> addedValues;
@@ -47,7 +50,7 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 		this.isMutable = isMutable;
 	}
 
-	//region DeltaMap
+	// region DeltaMap
 
 	@Override
 	public int size() {
@@ -150,10 +153,8 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 		}
 
 		final Map<TKey, TValue> map = new HashMap<>(this.size());
-		this.originalValues.keySet().stream()
-				.filter(key -> !this.copiedValues.containsKey(key) &&
-						!this.addedValues.containsKey(key) &&
-						!this.removedValues.containsKey(key))
+		this.originalValues.keySet().stream().filter(
+				key -> !this.copiedValues.containsKey(key) && !this.addedValues.containsKey(key) && !this.removedValues.containsKey(key))
 				.forEach(key -> this.copiedValues.put(key, this.originalValues.get(key).copy()));
 		map.putAll(this.copiedValues);
 		map.putAll(this.addedValues);
@@ -166,18 +167,16 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 			throw new IllegalStateException("put called on immutable MutableObjectAwareDeltaMap");
 		}
 
-		this.originalValues.keySet().stream()
-				.filter(key -> !this.copiedValues.containsKey(key) &&
-						!this.addedValues.containsKey(key) &&
-						!this.removedValues.containsKey(key))
+		this.originalValues.keySet().stream().filter(
+				key -> !this.copiedValues.containsKey(key) && !this.addedValues.containsKey(key) && !this.removedValues.containsKey(key))
 				.forEach(key -> this.copiedValues.put(key, this.originalValues.get(key).copy()));
 
 		return Stream.concat(this.copiedValues.values().stream(), this.addedValues.values().stream());
 	}
 
-	//endregion
+	// endregion
 
-	//region CopyableDeltaMap
+	// region CopyableDeltaMap
 
 	@Override
 	public void commit() {
@@ -222,11 +221,10 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 		return map;
 	}
 
-	//endregion
+	// endregion
 
 	/**
-	 * Gets the entry set of the delta map without copying.
-	 * This should only be used by methods that return read only data.
+	 * Gets the entry set of the delta map without copying. This should only be used by methods that return read only data.
 	 *
 	 * @return The entry set.
 	 */
@@ -234,11 +232,11 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 		final Set<Map.Entry<TKey, TValue>> entrySet = new HashSet<>();
 		entrySet.addAll(this.copiedValues.entrySet());
 		entrySet.addAll(this.addedValues.entrySet());
-		entrySet.addAll(this.originalValues.entrySet().stream()
-				.filter(e -> !this.copiedValues.containsKey(e.getKey()) &&
-						!this.addedValues.containsKey(e.getKey()) &&
-						!this.removedValues.containsKey(e.getKey()))
-				.collect(Collectors.toList()));
+		entrySet.addAll(
+				this.originalValues
+						.entrySet().stream().filter(e -> !this.copiedValues.containsKey(e.getKey())
+								&& !this.addedValues.containsKey(e.getKey()) && !this.removedValues.containsKey(e.getKey()))
+						.collect(Collectors.toList()));
 		return entrySet;
 	}
 }

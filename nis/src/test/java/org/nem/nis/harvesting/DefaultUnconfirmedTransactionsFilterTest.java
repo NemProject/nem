@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class DefaultUnconfirmedTransactionsFilterTest {
 
-	//region getAll
+	// region getAll
 
 	@Test
 	public void getAllReturnsAllTransactions() {
@@ -27,7 +28,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
 	}
 
 	@Test
@@ -41,10 +42,10 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
 	}
 
-	//endregion
+	// endregion
 
 	// region getUnknownTransactions
 
@@ -59,7 +60,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(context.transactions));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(context.transactions));
 	}
 
 	@Test
@@ -69,15 +70,13 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Account account = Utils.generateRandomAccount();
 		context.addMockTransactionsWithRandomTimeStamp(account, 6);
 		final List<HashShortId> hashShortIds = Arrays.asList(1, 2, 4).stream()
-				.map(i -> new HashShortId(HashUtils.calculateHash(context.transactions.get(i)).getShortId()))
-				.collect(Collectors.toList());
+				.map(i -> new HashShortId(HashUtils.calculateHash(context.transactions.get(i)).getShortId())).collect(Collectors.toList());
 
 		// Act:
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(
-				unknownTransactions,
+		MatcherAssert.assertThat(unknownTransactions,
 				IsEquivalent.equivalentTo(Arrays.asList(0, 3, 5).stream().map(context.transactions::get).collect(Collectors.toList())));
 	}
 
@@ -88,14 +87,13 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Account account = Utils.generateRandomAccount();
 		context.addMockTransactionsWithRandomTimeStamp(account, 6);
 		final List<HashShortId> hashShortIds = context.transactions.stream()
-				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
-				.collect(Collectors.toList());
+				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId())).collect(Collectors.toList());
 
 		// Act:
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
 	}
 
 	@Test
@@ -112,12 +110,12 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
+		MatcherAssert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	// endregion
 
-	//region getMostRecentTransactionsForAccount
+	// region getMostRecentTransactionsForAccount
 
 	@Test
 	public void getMostRecentTransactionsForAccountReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
@@ -144,10 +142,11 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactionsWithRandomTimeStamp(account, numTotal);
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), numRequested);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(),
+				numRequested);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(numExpected));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(numExpected));
 	}
 
 	@Test
@@ -161,7 +160,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
 	}
 
 	@Test
@@ -176,14 +175,15 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
-		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions),
+				IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
 	}
 
 	@Test
 	public void getMostRecentTransactionsForAccountExcludesNonMatchingTransactions() {
 		// Arrange:
-		final TestContext context = new TestContext((account, transaction) -> 0 == ((MockTransaction)transaction).getCustomField() % 3);
+		final TestContext context = new TestContext((account, transaction) -> 0 == ((MockTransaction) transaction).getCustomField() % 3);
 		final Account account = Utils.generateRandomAccount();
 		context.addMockTransactions(1, 10);
 
@@ -191,8 +191,8 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
-		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
-		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
+		MatcherAssert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
 	}
 
 	@Test
@@ -208,14 +208,14 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
 		for (final Transaction tx : mostRecentTransactions) {
-			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
 			curTimeStamp = tx.getTimeStamp();
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getTransactionsBefore
+	// region getTransactionsBefore
 
 	@Test
 	public void getTransactionsBeforeReturnsAllTransactionsBeforeSpecifiedTimeInstant() {
@@ -224,10 +224,11 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactions(6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils
+				.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
 	@Test
@@ -238,10 +239,11 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.transactions.get(1).setFee(Amount.fromNem(11));
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils
+				.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
 	}
 
 	@Test
@@ -252,13 +254,14 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addSignatureTransactions(2, 5);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils
+				.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+		MatcherAssert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final List<Transaction> transactions = new ArrayList<>();
@@ -295,7 +298,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		private void addMockTransactionsWithChildren(final int startCustomField, final int endCustomField, final int numChildren) {
 			createMockTransactions(startCustomField, endCustomField).forEach(t -> {
-				final MockTransaction mockTransaction = (MockTransaction)t;
+				final MockTransaction mockTransaction = (MockTransaction) t;
 				final int customField = mockTransaction.getCustomField();
 				mockTransaction.setChildTransactions(createMockTransactions(customField * 100, customField * 100 + numChildren - 1));
 				this.transactions.add(mockTransaction);

@@ -26,7 +26,7 @@ public class MultisigCosignatoryModificationObserver implements BlockTransaction
 			return;
 		}
 
-		this.notify((MultisigCosignatoryModificationNotification)notification, context);
+		this.notify((MultisigCosignatoryModificationNotification) notification, context);
 	}
 
 	private void notify(final MultisigCosignatoryModificationNotification notification, final BlockNotificationContext context) {

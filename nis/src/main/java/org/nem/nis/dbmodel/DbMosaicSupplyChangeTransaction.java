@@ -3,8 +3,7 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * Mosaic supply change db entity
- * <br>
+ * Mosaic supply change db entity <br>
  * Holds information about a single mosaic supply change transaction.
  */
 @Entity

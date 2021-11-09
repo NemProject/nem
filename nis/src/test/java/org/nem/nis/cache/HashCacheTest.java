@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -39,33 +40,31 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 	 */
 	protected abstract T createReadOnlyCacheWithRetentionTime(final int retentionTime);
 
-	//region constructor
+	// region constructor
 
 	@Test
 	public void hashCacheIsInitiallyEmpty() {
 		// Assert:
-		Assert.assertThat(this.createWritableCache().size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(this.createWritableCache().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void hashCacheAppliesDefaultRetentionTime() {
 		// Assert:
-		Assert.assertThat(this.createWritableCache().getRetentionTime(), IsEqual.equalTo(36));
+		MatcherAssert.assertThat(this.createWritableCache().getRetentionTime(), IsEqual.equalTo(36));
 	}
 
 	@Test
 	public void hashCacheCannotHaveRetentionTimeBelowMinimum() {
 		// Assert:
-		Assert.assertThat(this.createWritableCacheWithRetentionTime(35).getRetentionTime(), IsEqual.equalTo(36));
+		MatcherAssert.assertThat(this.createWritableCacheWithRetentionTime(35).getRetentionTime(), IsEqual.equalTo(36));
 	}
 
 	@Test
 	public void hashCacheCanHaveUnlimitedRetentionTime() {
 		// Assert:
-		Assert.assertThat(this.createWritableCacheWithRetentionTime(-1).getRetentionTime(), IsEqual.equalTo(-1));
+		MatcherAssert.assertThat(this.createWritableCacheWithRetentionTime(-1).getRetentionTime(), IsEqual.equalTo(-1));
 	}
-
-	//endregion
 
 	// endregion
 
@@ -77,7 +76,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
 	}
 
 	// endregion
@@ -90,7 +89,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashCache cache = this.createWritableCache();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -99,7 +98,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
 	}
 
 	// endregion
@@ -115,7 +114,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.clear();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -130,7 +129,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(456)));
 
 		// Assert:
-		Assert.assertThat(cache.get(hash), IsEqual.equalTo(new HashMetaData(BlockHeight.ONE, new TimeInstant(456))));
+		MatcherAssert.assertThat(cache.get(hash), IsEqual.equalTo(new HashMetaData(BlockHeight.ONE, new TimeInstant(456))));
 	}
 
 	@Test
@@ -140,7 +139,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final Hash hash = Utils.generateRandomHash();
 
 		// Assert:
-		Assert.assertThat(cache.get(hash), IsNull.nullValue());
+		MatcherAssert.assertThat(cache.get(hash), IsNull.nullValue());
 	}
 
 	// endregion
@@ -167,7 +166,8 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(123)));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(234))), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(234))),
+				IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -184,9 +184,9 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.putAll(pairs);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(10));
 		for (final HashMetaDataPair pair : pairs) {
-			Assert.assertThat(cache.hashExists(pair.getHash()), IsEqual.equalTo(true));
+			MatcherAssert.assertThat(cache.hashExists(pair.getHash()), IsEqual.equalTo(true));
 		}
 	}
 
@@ -212,15 +212,15 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashMetaDataPair pairToRemove = new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(456));
 		cache.put(pairToRemove);
 		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(567)));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		Assert.assertThat(cache.get(pairToRemove.getHash()), IsEqual.equalTo(pairToRemove.getMetaData()));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(cache.get(pairToRemove.getHash()), IsEqual.equalTo(pairToRemove.getMetaData()));
 
 		// Act:
 		cache.remove(pairToRemove.getHash());
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		Assert.assertThat(cache.get(pairToRemove.getHash()), IsNull.nullValue());
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(cache.get(pairToRemove.getHash()), IsNull.nullValue());
 	}
 
 	// endregion
@@ -233,20 +233,20 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = createPairs(10);
 		final HashCache cache = this.createWritableCache();
 		cache.putAll(pairs);
-		Assert.assertThat(cache.size(), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(10));
 
 		// Act:
 		cache.removeAll(pairs.stream().limit(5).map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		pairs.subList(5, 10).stream().forEach(p -> Assert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(5));
+		pairs.subList(5, 10).stream().forEach(p -> MatcherAssert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
 
 		// Act:
 		cache.removeAll(pairs.subList(5, 10).stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -261,7 +261,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(123)));
 
 		// Assert:
-		Assert.assertThat(cache.hashExists(hash), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.hashExists(hash), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -270,7 +270,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 124, 124);
 
 		// Assert:
-		Assert.assertThat(cache.hashExists(Utils.generateRandomHash()), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.hashExists(Utils.generateRandomHash()), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -285,7 +285,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.put(new HashMetaDataPair(hashes.get(7), createMetaDataWithTimeStamp(10)));
 
 		// Assert:
-		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -295,7 +295,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
 
 		// Assert:
-		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -318,10 +318,10 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.prune(new TimeInstant(RETENTION_TIME + 125));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(false));
-		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(false));
-		Assert.assertThat(cache.hashExists(hash3), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(cache.hashExists(hash3), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -337,9 +337,9 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.prune(new TimeInstant(RETENTION_TIME + 125));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -355,9 +355,9 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.prune(new TimeInstant(RETENTION_TIME + 500));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -376,8 +376,8 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final T copy = original.copy();
 
 		// Assert:
-		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
-		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
+		MatcherAssert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		assertSameContents(copy, pairs);
 	}
 
@@ -408,8 +408,8 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		original.shallowCopyTo(copy);
 
 		// Assert:
-		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
-		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
+		MatcherAssert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		assertSameContents(copy, pairs);
 	}
 
@@ -428,14 +428,14 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		copy.putAll(pairs);
 
 		// sanity check
-		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
+		pairs.forEach(p -> MatcherAssert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
 
 		// Act:
 		copy.commit();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(4));
+		pairs.forEach(p -> MatcherAssert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -451,14 +451,14 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		copy.removeAll(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 
 		// sanity check
-		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
+		pairs.forEach(p -> MatcherAssert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
 
 		// Act:
 		copy.commit();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(0));
+		pairs.forEach(p -> MatcherAssert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
 	}
 
 	// endregion
@@ -480,7 +480,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.commit();
 
 		// Sanity:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(6));
 
 		// Act:
 		cache.remove(hash);
@@ -488,22 +488,21 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		cache.commit();
 
 		// Assert: size is unchanged
-		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(6));
 
 		// - meta data should be updated
 		HashMetaData metadata = cache.get(hash);
-		Assert.assertThat(metadata.getHeight(), IsEqual.equalTo(new BlockHeight(678)));
-		Assert.assertThat(metadata.getTimeStamp(), IsEqual.equalTo(new TimeInstant(579)));
+		MatcherAssert.assertThat(metadata.getHeight(), IsEqual.equalTo(new BlockHeight(678)));
+		MatcherAssert.assertThat(metadata.getTimeStamp(), IsEqual.equalTo(new TimeInstant(579)));
 	}
 
 	// endregion
 
-	//region utilities
+	// region utilities
 
 	private T createHashCacheWithTimeStamps(final int... timeStamps) {
 		final T cache = this.createWritableCache();
-		Arrays.stream(timeStamps)
-				.forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
+		Arrays.stream(timeStamps).forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
 		cache.commit();
 		return cache;
 	}
@@ -529,11 +528,11 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	private static void assertSameContents(final ReadOnlyHashCache cache, final List<HashMetaDataPair> pairs) {
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
 		for (final HashMetaDataPair pair : pairs) {
-			Assert.assertThat(cache.get(pair.getHash()), IsSame.sameInstance(pair.getMetaData()));
+			MatcherAssert.assertThat(cache.get(pair.getHash()), IsSame.sameInstance(pair.getMetaData()));
 		}
 	}
 
-	//endregion
+	// endregion
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicId;
@@ -17,14 +18,14 @@ public class AccountInfoTest {
 		final ReadOnlyAccountInfo info = new AccountInfo();
 
 		// Assert:
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(info.getReferenceCount(), IsEqual.equalTo(ReferenceCount.ZERO));
-		Assert.assertThat(info.getLabel(), IsNull.nullValue());
-		Assert.assertThat(info.getMosaicIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.ZERO));
+		MatcherAssert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
+		MatcherAssert.assertThat(info.getReferenceCount(), IsEqual.equalTo(ReferenceCount.ZERO));
+		MatcherAssert.assertThat(info.getLabel(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getMosaicIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	//region Label
+	// region Label
 
 	@Test
 	public void labelCanBeSet() {
@@ -35,12 +36,12 @@ public class AccountInfoTest {
 		info.setLabel("Beta Gamma");
 
 		// Assert:
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("Beta Gamma"));
+		MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("Beta Gamma"));
 	}
 
-	//endregion
+	// endregion
 
-	//region Balance
+	// region Balance
 
 	@Test
 	public void balanceCanBeIncremented() {
@@ -51,7 +52,7 @@ public class AccountInfoTest {
 		info.incrementBalance(new Amount(7));
 
 		// Assert:
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(7)));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(7)));
 	}
 
 	@Test
@@ -64,7 +65,7 @@ public class AccountInfoTest {
 		info.decrementBalance(new Amount(12));
 
 		// Assert:
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(88)));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(88)));
 	}
 
 	@Test
@@ -79,12 +80,12 @@ public class AccountInfoTest {
 		info.decrementBalance(new Amount(25));
 
 		// Assert:
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(85)));
+		MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(new Amount(85)));
 	}
 
-	//endregion
+	// endregion
 
-	//region refCount
+	// region refCount
 
 	@Test
 	public void referenceCountCanBeIncremented() {
@@ -95,8 +96,8 @@ public class AccountInfoTest {
 		final ReferenceCount result = info.incrementReferenceCount();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(1)));
-		Assert.assertThat(info.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new ReferenceCount(1)));
+		MatcherAssert.assertThat(info.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
 	}
 
 	@Test
@@ -109,13 +110,13 @@ public class AccountInfoTest {
 		final ReferenceCount result = info.decrementReferenceCount();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(0)));
-		Assert.assertThat(info.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(new ReferenceCount(0)));
+		MatcherAssert.assertThat(info.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
 	}
 
-	//endregion
+	// endregion
 
-	//region harvested blocks
+	// region harvested blocks
 
 	@Test
 	public void harvestedBlocksCanBeIncremented() {
@@ -127,7 +128,7 @@ public class AccountInfoTest {
 		info.incrementHarvestedBlocks();
 
 		// Assert:
-		Assert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		MatcherAssert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	@Test
@@ -141,7 +142,7 @@ public class AccountInfoTest {
 		info.decrementHarvestedBlocks();
 
 		// Assert:
-		Assert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
+		MatcherAssert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
 	}
 
 	@Test
@@ -158,12 +159,12 @@ public class AccountInfoTest {
 		info.decrementHarvestedBlocks();
 
 		// Assert:
-		Assert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		MatcherAssert.assertThat(info.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region mosaic ids
+	// region mosaic ids
 
 	@Test
 	public void mosaicIdsCanBeAdded() {
@@ -177,7 +178,7 @@ public class AccountInfoTest {
 		info.addMosaicId(Utils.createMosaicId(7));
 
 		// Assert:
-		Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 3, 7)));
+		MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 3, 7)));
 	}
 
 	@Test
@@ -192,12 +193,12 @@ public class AccountInfoTest {
 		info.removeMosaicId(Utils.createMosaicId(3));
 
 		// Assert:
-		Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 7)));
+		MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 7)));
 	}
 
-	//endregion
+	// endregion
 
-	//region copy
+	// region copy
 
 	@Test
 	public void copyCreatesDeepCopy() {
@@ -215,11 +216,11 @@ public class AccountInfoTest {
 		final ReadOnlyAccountInfo copy = info.copy();
 
 		// Assert:
-		Assert.assertThat(copy, IsNot.not(IsSame.sameInstance(info)));
-		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
-		Assert.assertThat(copy.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
-		Assert.assertThat(copy.getLabel(), IsEqual.equalTo("Alpha Sigma"));
+		MatcherAssert.assertThat(copy, IsNot.not(IsSame.sameInstance(info)));
+		MatcherAssert.assertThat(copy.getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
+		MatcherAssert.assertThat(copy.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		MatcherAssert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
+		MatcherAssert.assertThat(copy.getLabel(), IsEqual.equalTo("Alpha Sigma"));
 	}
 
 	@Test
@@ -238,11 +239,11 @@ public class AccountInfoTest {
 		// Assert:
 		// - the original mosaics were copied
 		// - 1 was only removed from the original info
-		Assert.assertThat(copy.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 7)));
-		Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(7)));
+		MatcherAssert.assertThat(copy.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(1, 7)));
+		MatcherAssert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(getMosaicIds(7)));
 	}
 
-	//endregion
+	// endregion
 
 	private static Collection<MosaicId> getMosaicIds(final int... ids) {
 		return Arrays.stream(ids).mapToObj(Utils::createMosaicId).collect(Collectors.toList());

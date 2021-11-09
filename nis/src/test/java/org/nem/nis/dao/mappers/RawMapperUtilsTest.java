@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -11,18 +12,18 @@ import java.util.function.*;
 
 public class RawMapperUtilsTest {
 
-	//region RawMapperUtils
+	// region RawMapperUtils
 
 	@Test
 	public void mapAccountMapsNullLongToNullAccount() {
 		// Assert:
-		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Long)null));
+		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Long) null));
 	}
 
 	@Test
 	public void mapAccountMapsNullObjectToNullAccount() {
 		// Assert:
-		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Object)null));
+		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Object) null));
 	}
 
 	private static void assertNullAccountIdIsMappedToNullAccount(final Function<IMapper, DbAccount> mapAccount) {
@@ -33,7 +34,7 @@ public class RawMapperUtilsTest {
 		final DbAccount account = mapAccount.apply(mapper);
 
 		// Assert:
-		Assert.assertThat(account, IsNull.nullValue());
+		MatcherAssert.assertThat(account, IsNull.nullValue());
 		Mockito.verify(mapper, Mockito.never()).map(Mockito.any(), Mockito.any());
 	}
 
@@ -59,13 +60,13 @@ public class RawMapperUtilsTest {
 		final DbAccount account = mapAccount.apply(mapper, 8L);
 
 		// Assert:
-		Assert.assertThat(account, IsEqual.equalTo(originalAccount));
+		MatcherAssert.assertThat(account, IsEqual.equalTo(originalAccount));
 		Mockito.verify(mapper, Mockito.only()).map(Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region mapBlock
+	// region mapBlock
 
 	@Test
 	public void mapBlockMapsNullObjectToBlockWithNullId() {
@@ -73,8 +74,8 @@ public class RawMapperUtilsTest {
 		final DbBlock block = RawMapperUtils.mapBlock(null);
 
 		// Assert:
-		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(block.getId(), IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getId(), IsNull.nullValue());
 	}
 
 	@Test
@@ -83,13 +84,13 @@ public class RawMapperUtilsTest {
 		final DbBlock block = RawMapperUtils.mapBlock(BigInteger.valueOf(8L));
 
 		// Assert:
-		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(block.getId(), IsEqual.equalTo(8L));
+		MatcherAssert.assertThat(block, IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getId(), IsEqual.equalTo(8L));
 	}
 
-	//endregion
+	// endregion
 
-	//region castToLong
+	// region castToLong
 
 	@Test
 	public void castToLongMapsNullObjectToNullLong() {
@@ -97,7 +98,7 @@ public class RawMapperUtilsTest {
 		final Long value = RawMapperUtils.castToLong(null);
 
 		// Assert:
-		Assert.assertThat(value, IsNull.nullValue());
+		MatcherAssert.assertThat(value, IsNull.nullValue());
 	}
 
 	@Test
@@ -106,8 +107,8 @@ public class RawMapperUtilsTest {
 		final Long value = RawMapperUtils.castToLong(BigInteger.valueOf(5L));
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(5L));
+		MatcherAssert.assertThat(value, IsEqual.equalTo(5L));
 	}
 
-	//endregion
+	// endregion
 }

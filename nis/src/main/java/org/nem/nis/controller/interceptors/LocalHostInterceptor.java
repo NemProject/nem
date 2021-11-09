@@ -26,11 +26,8 @@ public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 	}
 
 	@Override
-	public boolean preHandle(
-			final HttpServletRequest request,
-			final HttpServletResponse response,
-			final Object handler) throws Exception {
-		final HandlerMethod handlerMethod = (HandlerMethod)handler;
+	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
+		final HandlerMethod handlerMethod = (HandlerMethod) handler;
 		final Method method = handlerMethod.getMethod();
 		final boolean isTrustedApi = method.isAnnotationPresent(TrustedApi.class);
 

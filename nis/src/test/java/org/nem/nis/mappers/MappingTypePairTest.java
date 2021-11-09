@@ -1,10 +1,12 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.util.*;
 
+@SuppressWarnings("rawtypes")
 public class MappingTypePairTest {
 
 	@Test
@@ -13,12 +15,13 @@ public class MappingTypePairTest {
 		final MappingTypePair pair = new MappingTypePair(Integer.class, String.class);
 
 		// Assert:
-		Assert.assertThat(pair.getSourceClass(), IsEqual.equalTo(Integer.class));
-		Assert.assertThat(pair.getTargetClass(), IsEqual.equalTo(String.class));
+		MatcherAssert.assertThat(pair.getSourceClass(), IsEqual.equalTo(Integer.class));
+		MatcherAssert.assertThat(pair.getTargetClass(), IsEqual.equalTo(String.class));
 	}
 
-	//region equals / hashCode
+	// region equals / hashCode
 
+	@SuppressWarnings("serial")
 	private static final Map<String, MappingTypePair> DESC_TO_PAIR_MAP = new HashMap<String, MappingTypePair>() {
 		{
 			this.put("default", new MappingTypePair(Integer.class, String.class));
@@ -34,12 +37,12 @@ public class MappingTypePairTest {
 		final MappingTypePair pair = new MappingTypePair(Integer.class, String.class);
 
 		// Assert:
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("default"), IsEqual.equalTo(pair));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("diff-source"), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("diff-target"), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types"), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(Integer.class, IsNot.not(IsEqual.equalTo((Object)pair)));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("default"), IsEqual.equalTo(pair));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("diff-source"), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("diff-target"), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types"), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(Integer.class, IsNot.not(IsEqual.equalTo((Object) pair)));
 	}
 
 	@Test
@@ -48,15 +51,15 @@ public class MappingTypePairTest {
 		final int hashCode = new MappingTypePair(Integer.class, String.class).hashCode();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("diff-source").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("diff-target").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("diff-source").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("diff-target").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(DESC_TO_PAIR_MAP.get("reversed-types").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateRepresentation() {
@@ -64,8 +67,8 @@ public class MappingTypePairTest {
 		final MappingTypePair pair = new MappingTypePair(Integer.class, String.class);
 
 		// Assert:
-		Assert.assertThat(pair.toString(), IsEqual.equalTo("java.lang.Integer -> java.lang.String"));
+		MatcherAssert.assertThat(pair.toString(), IsEqual.equalTo("java.lang.Integer -> java.lang.String"));
 	}
 
-	//endregion
+	// endregion
 }

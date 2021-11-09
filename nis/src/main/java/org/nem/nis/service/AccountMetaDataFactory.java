@@ -26,11 +26,8 @@ public class AccountMetaDataFactory {
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	@Autowired(required = true)
-	public AccountMetaDataFactory(
-			final AccountInfoFactory accountInfoFactory,
-			final UnlockedAccounts unlockedAccounts,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+	public AccountMetaDataFactory(final AccountInfoFactory accountInfoFactory, final UnlockedAccounts unlockedAccounts,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions, final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountInfoFactory = accountInfoFactory;
 		this.unlockedAccounts = unlockedAccounts;
@@ -53,23 +50,17 @@ public class AccountMetaDataFactory {
 					remoteStatus = AccountRemoteStatus.DEACTIVATING;
 					break;
 
-				default:
+				default :
 					throw new IllegalStateException("unexpected remote state for account with pending importance transfer");
 			}
 		}
 
 		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
+				.map(this.accountInfoFactory::createInfo).collect(Collectors.toList());
 		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
+				.map(this.accountInfoFactory::createInfo).collect(Collectors.toList());
 
-		return new AccountMetaData(
-				this.getAccountStatus(address),
-				remoteStatus,
-				cosignatoryOf,
-				cosignatories);
+		return new AccountMetaData(this.getAccountStatus(address), remoteStatus, cosignatoryOf, cosignatories);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
@@ -78,7 +69,8 @@ public class AccountMetaDataFactory {
 	}
 
 	private boolean hasPendingImportanceTransfer(final Address address) {
-		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
+		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address,
+				Integer.MAX_VALUE);
 		return transactions.stream().anyMatch(transaction -> TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType());
 	}
 

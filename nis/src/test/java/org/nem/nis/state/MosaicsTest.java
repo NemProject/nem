@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
@@ -21,9 +22,9 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
-		Assert.assertThat(mosaics.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(mosaics.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
 	}
 
 	// endregion
@@ -40,8 +41,8 @@ public class MosaicsTest {
 		mosaics.add(createMosaicDefinition(3, 345));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(4));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(7));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(7));
 	}
 
 	// endregion
@@ -59,8 +60,8 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift vouchers"));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	@Test
@@ -75,8 +76,8 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift vouchers"));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(1337)));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(1337)));
 	}
 
 	@Test
@@ -89,7 +90,7 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift cards"));
 
 		// Assert:
-		Assert.assertThat(entry, IsNull.nullValue());
+		MatcherAssert.assertThat(entry, IsNull.nullValue());
 	}
 
 	// endregion
@@ -105,7 +106,7 @@ public class MosaicsTest {
 		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
 
 		// Assert:
-		Assert.assertThat(mosaicIds.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaicIds.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -123,7 +124,7 @@ public class MosaicsTest {
 		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
 
 		// Assert:
-		Assert.assertThat(mosaicIds, IsEquivalent.equivalentTo(expectedMosaicIds));
+		MatcherAssert.assertThat(mosaicIds, IsEquivalent.equivalentTo(expectedMosaicIds));
 	}
 
 	// endregion
@@ -133,43 +134,45 @@ public class MosaicsTest {
 	@Test
 	public void containsReturnsTrueIfMosaicWithMatchingNamespaceExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
 		// Assert:
-		IntStream.range(0, names.length)
-				.forEach(i -> Assert.assertThat(
-						mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, names[i]).getId()),
-						IsEqual.equalTo(true)));
+		IntStream.range(0, names.length).forEach(i -> MatcherAssert
+				.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, names[i]).getId()), IsEqual.equalTo(true)));
 	}
 
 	@Test
 	public void containsReturnsFalseIfMosaicWithDifferentNamespaceExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
 		// Assert:
-		IntStream.range(0, names.length)
-				.forEach(i -> Assert.assertThat(
-						mosaics.contains(Utils.createMosaicDefinition("coupons", names[i]).getId()),
-						IsEqual.equalTo(false)));
+		IntStream.range(0, names.length).forEach(i -> MatcherAssert
+				.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", names[i]).getId()), IsEqual.equalTo(false)));
 	}
 
 	@Test
 	public void containsReturnsTrueOnlyWhenBothMosaicWithMatchingNamespaceAndNameExistsInCache() {
 		// Arrange:
-		final String[] names = { "name1", "name2", "name3", "name4", };
+		final String[] names = {
+				"name1", "name2", "name3", "name4",
+		};
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, names);
 
 		// Assert:
-		Assert.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, "name2").getId()), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, "name7").getId()), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", "name2").getId()), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", "name7").getId()), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, "name2").getId()), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.contains(Utils.createMosaicDefinition(DEFAULT_NID, "name7").getId()), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", "name2").getId()), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mosaics.contains(Utils.createMosaicDefinition("coupons", "name7").getId()), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -185,9 +188,9 @@ public class MosaicsTest {
 		addToCache(mosaics, 3);
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(mosaics.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
+		IntStream.range(0, 3).forEach(i -> MatcherAssert.assertThat(mosaics.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -200,9 +203,9 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.add(createMosaicDefinition(2, 123));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -214,10 +217,10 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.add(createMosaicDefinition(7));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1));
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	@Test
@@ -230,10 +233,10 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.add(createMosaicDefinition(7, 567));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(2));
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(567)));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(567)));
 	}
 
 	@Test
@@ -246,8 +249,8 @@ public class MosaicsTest {
 		ExceptionAssert.assertThrows(v -> mosaics.add(Utils.createMosaicDefinition("coupons", "2")), IllegalArgumentException.class);
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
 	}
 
 	// endregion
@@ -261,20 +264,20 @@ public class MosaicsTest {
 		addToCache(mosaics, 5);
 
 		// sanity check
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(mosaics.size()));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(mosaics.size()));
 
 		// Act:
 		mosaics.remove(createMosaicId(2));
 		mosaics.remove(createMosaicId(4));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.contains(createMosaicId(1)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.contains(createMosaicId(4)), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(createMosaicId(5)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(1)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(4)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(5)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -285,17 +288,17 @@ public class MosaicsTest {
 		mosaics.add(createMosaicDefinition(2, 123));
 
 		// sanity check
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1 + mosaics.size()));
-		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1 + mosaics.size()));
+		MatcherAssert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 
 		// Act:
 		mosaics.remove(createMosaicId(2));
 
 		// Assert:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(5));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
-		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	@Test
@@ -305,19 +308,19 @@ public class MosaicsTest {
 		IntStream.range(0, 5).forEach(i -> mosaics.add(createMosaicDefinition(2, 3 * i)));
 
 		// Sanity:
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
 
 		IntStream.range(0, 5).forEach(i -> {
 			// Act:
 			final MosaicEntry entry = mosaics.remove(createMosaicId(2));
 
 			// Assert:
-			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(3 * (4 - i))));
+			MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(3 * (4 - i))));
 		});
 
-		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -351,8 +354,8 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.remove(createMosaicId(7));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(123)));
+		MatcherAssert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
+		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(123)));
 	}
 
 	@Test
@@ -366,8 +369,8 @@ public class MosaicsTest {
 		final MosaicEntry removedEntry = mosaics.remove(createMosaicId(2));
 
 		// Assert:
-		Assert.assertThat(removedEntry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(2)));
-		Assert.assertThat(removedEntry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(removedEntry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(2)));
+		MatcherAssert.assertThat(removedEntry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	// endregion
@@ -385,11 +388,11 @@ public class MosaicsTest {
 		final Mosaics copy = mosaics.copy();
 
 		// Assert: initial copy
-		Assert.assertThat(copy.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
-		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
-		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
-		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
-		Assert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+		MatcherAssert.assertThat(copy.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
+		MatcherAssert.assertThat(copy.size(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
+		IntStream.range(0, 4).forEach(i -> MatcherAssert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -403,8 +406,8 @@ public class MosaicsTest {
 		mosaics.remove(createMosaicId(3));
 
 		// Assert: the mosaic should be removed from the original but not removed from the copy
-		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -419,11 +422,11 @@ public class MosaicsTest {
 		mosaics.remove(createMosaicId(2));
 
 		// Assert: the mosaic history entry should be removed from the original but not removed from the copy
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
-		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
+		MatcherAssert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
 
-		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
-		Assert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(new Supply(123)));
+		MatcherAssert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(new Supply(123)));
 	}
 
 	@Test
@@ -437,15 +440,14 @@ public class MosaicsTest {
 		mosaics.get(createMosaicId(3)).increaseSupply(new Supply(123));
 
 		// Assert: the mosaic supply should be increased in the original but no the copy
-		Assert.assertThat(mosaics.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(new Supply(123)));
-		Assert.assertThat(copy.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(Supply.ZERO));
+		MatcherAssert.assertThat(mosaics.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(new Supply(123)));
+		MatcherAssert.assertThat(copy.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	// endregion
 
 	private static void addToCache(final Mosaics mosaics, final String[] names) {
-		IntStream.range(0, names.length)
-				.forEach(i -> mosaics.add(Utils.createMosaicDefinition(DEFAULT_NID, names[i])));
+		IntStream.range(0, names.length).forEach(i -> mosaics.add(Utils.createMosaicDefinition(DEFAULT_NID, names[i])));
 	}
 
 	private static void addToCache(final Mosaics mosaics, final int count) {

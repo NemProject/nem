@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class HarvesterTest {
 
-	//region harvest bypass
+	// region harvest bypass
 
 	@Test
 	public void harvestedBlockIsNullIfLastBlockLayerIsLoading() {
@@ -30,7 +31,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).isLoading();
 	}
 
@@ -44,7 +45,7 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).size();
 	}
 
@@ -59,14 +60,14 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).prune(new BlockHeight(124));
 	}
 
-	//endregion
+	// endregion
 
-	//region single unlocked account
+	// region single unlocked account
 
 	@Test
 	public void harvestBlockReturnsNullIfGeneratorReturnsNull() {
@@ -74,16 +75,14 @@ public class HarvesterTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(account).iterator());
-		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any()))
-				.thenReturn(null);
+		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
 
 		// Act:
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.generator, Mockito.times(1))
-				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
+		MatcherAssert.assertThat(block, IsNull.nullValue());
+		Mockito.verify(context.generator, Mockito.times(1)).generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
 	@Test
@@ -93,16 +92,14 @@ public class HarvesterTest {
 		final Account account = Utils.generateRandomAccount();
 		final GeneratedBlock generatedBlock = new GeneratedBlock(NisUtils.createRandomBlockWithHeight(account, 11), 12L);
 		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(account).iterator());
-		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any()))
-				.thenReturn(generatedBlock);
+		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(generatedBlock);
 
 		// Act:
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
-		Mockito.verify(context.generator, Mockito.times(1))
-				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
+		MatcherAssert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
+		Mockito.verify(context.generator, Mockito.times(1)).generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
 	@Test
@@ -115,8 +112,8 @@ public class HarvesterTest {
 		context.harvester.harvestBlock();
 
 		// Assert:
-		Mockito.verify(context.generator, Mockito.times(1))
-				.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.eq(new TimeInstant(14)));
+		Mockito.verify(context.generator, Mockito.times(1)).generateNextBlock(Mockito.any(), Mockito.any(),
+				Mockito.eq(new TimeInstant(14)));
 	}
 
 	@Test
@@ -135,30 +132,25 @@ public class HarvesterTest {
 		// Assert:
 		final ArgumentCaptor<Block> blockCaptor = ArgumentCaptor.forClass(Block.class);
 		Mockito.verify(context.mapper, Mockito.only()).map(dbLastBlock);
-		Mockito.verify(context.generator, Mockito.times(1))
-				.generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
+		Mockito.verify(context.generator, Mockito.times(1)).generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
+		MatcherAssert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
 	}
 
-	//endregion
+	// endregion
 
-	//region multiple unlocked accounts
+	// region multiple unlocked accounts
 
 	@Test
 	public void harvestBlockReturnsBestGeneratedBlock() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<GeneratedBlock> generatedBlocks = Arrays.asList(
-				null,
-				new GeneratedBlock(NisUtils.createRandomBlockWithHeight(11), 12L),
-				null,
-				new GeneratedBlock(NisUtils.createRandomBlockWithHeight(11), 18L),
+		final List<GeneratedBlock> generatedBlocks = Arrays.asList(null, new GeneratedBlock(NisUtils.createRandomBlockWithHeight(11), 12L),
+				null, new GeneratedBlock(NisUtils.createRandomBlockWithHeight(11), 18L),
 				new GeneratedBlock(NisUtils.createRandomBlockWithHeight(11), 14L));
 
 		final List<Account> accounts = generatedBlocks.stream().map(b -> {
 			final Account account = null == b ? Utils.generateRandomAccount() : b.getBlock().getSigner();
-			Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any()))
-					.thenReturn(b);
+			Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any())).thenReturn(b);
 			return account;
 		}).collect(Collectors.toList());
 
@@ -168,12 +160,11 @@ public class HarvesterTest {
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
-		Assert.assertThat(block, IsEqual.equalTo(generatedBlocks.get(3).getBlock()));
-		Mockito.verify(context.generator, Mockito.times(5))
-				.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any());
+		MatcherAssert.assertThat(block, IsEqual.equalTo(generatedBlocks.get(3).getBlock()));
+		Mockito.verify(context.generator, Mockito.times(5)).generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
@@ -182,11 +173,7 @@ public class HarvesterTest {
 		final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		final BlockGenerator generator = Mockito.mock(BlockGenerator.class);
-		final Harvester harvester = new Harvester(
-				this.timeProvider,
-				this.blockChainLastBlockLayer,
-				this.unlockedAccounts,
-				this.mapper,
+		final Harvester harvester = new Harvester(this.timeProvider, this.blockChainLastBlockLayer, this.unlockedAccounts, this.mapper,
 				this.generator);
 
 		private TestContext() {

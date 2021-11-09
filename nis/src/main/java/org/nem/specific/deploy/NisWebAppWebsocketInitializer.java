@@ -1,6 +1,5 @@
 package org.nem.specific.deploy;
 
-
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -27,7 +26,7 @@ import java.util.List;
 @Configuration
 @ComponentScan("org.nem.nis.websocket")
 @EnableWebSocketMessageBroker
-public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBrokerConfigurer  {
+public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(final MessageBrokerRegistry registry) {
@@ -41,11 +40,11 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 			@Override
 			public Object fromMessage(final Message<?> message, Class<?> targetClass) {
 				final Object parsedObject = JSONValue.parse((byte[]) message.getPayload());
-				if (! (parsedObject instanceof JSONObject)) {
+				if (!(parsedObject instanceof JSONObject)) {
 					throw new RuntimeException(String.format("unexpected data: %s", parsedObject));
 
 				}
-				final Deserializer deserializer = new JsonDeserializer((JSONObject)parsedObject, null);
+				final Deserializer deserializer = new JsonDeserializer((JSONObject) parsedObject, null);
 				return this.createInstance(targetClass, deserializer);
 			}
 
@@ -57,9 +56,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 				}
 			}
 
-			private Object createInstance(
-					final Class<?> aClass,
-					final Deserializer deserializer) {
+			private Object createInstance(final Class<?> aClass, final Deserializer deserializer) {
 				try {
 					final Constructor<?> constructor = this.getConstructor(aClass);
 					if (null == constructor) {
@@ -69,7 +66,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 					return constructor.newInstance(deserializer);
 				} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 					if (e.getCause() instanceof RuntimeException) {
-						throw (RuntimeException)e.getCause();
+						throw (RuntimeException) e.getCause();
 					}
 
 					throw new UnsupportedOperationException("could not instantiate object");
@@ -78,7 +75,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 			@Override
 			public Message<?> toMessage(final Object payload, MessageHeaders header) {
 				final JsonSerializationPolicy policy = new JsonSerializationPolicy(null);
-				return new GenericMessage<>(policy.toBytes((SerializableEntity)payload), header);
+				return new GenericMessage<>(policy.toBytes((SerializableEntity) payload), header);
 			}
 		});
 		return true;
@@ -86,23 +83,23 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 
 	@Override
 	public void registerStompEndpoints(final StompEndpointRegistry registry) {
-		registry.addEndpoint("/messages").setAllowedOrigins("*").withSockJS().setMessageCodec(
-				new AbstractSockJsMessageCodec() {
-					@Override
-					public String[] decode(String s) {
-						return new String[] { (String) ((JSONArray)JSONValue.parse(s)).get(0)};
-					}
+		registry.addEndpoint("/messages").setAllowedOrigins("*").withSockJS().setMessageCodec(new AbstractSockJsMessageCodec() {
+			@Override
+			public String[] decode(String s) {
+				return new String[]{
+						(String) ((JSONArray) JSONValue.parse(s)).get(0)
+				};
+			}
 
-					@Override
-					public String[] decodeInputStream(InputStream inputStream) throws IOException {
-						return new String[0];
-					}
+			@Override
+			public String[] decodeInputStream(InputStream inputStream) throws IOException {
+				return new String[0];
+			}
 
-					@Override
-					protected char[] applyJsonQuoting(String s) {
-						return JSONValue.escape(s).toCharArray();
-					}
-				}
-		);
+			@Override
+			protected char[] applyJsonQuoting(String s) {
+				return JSONValue.escape(s).toCharArray();
+			}
+		});
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization.filter;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.NodeAge;
@@ -24,7 +25,7 @@ public class ResponseDelayDetectionFilterTest {
 		final List<TimeSynchronizationSample> filteredSamples = filter.filter(samples, new NodeAge(0));
 
 		// Assert:
-		Assert.assertThat(filteredSamples.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(filteredSamples.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -40,7 +41,7 @@ public class ResponseDelayDetectionFilterTest {
 		final List<TimeSynchronizationSample> filteredSamples = filter.filter(samples, new NodeAge(0));
 
 		// Assert:
-		Assert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples));
+		MatcherAssert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples));
 	}
 
 	@Test
@@ -57,6 +58,6 @@ public class ResponseDelayDetectionFilterTest {
 		final List<TimeSynchronizationSample> filteredSamples = filter.filter(samples, new NodeAge(0));
 
 		// Assert:
-		Assert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples.get(1), samples.get(3)));
+		MatcherAssert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples.get(1), samples.get(3)));
 	}
 }

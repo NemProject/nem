@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization.filter;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -60,13 +61,11 @@ public class AggregateSynchronizationFilterTest {
 		Mockito.verify(filters.get(0), Mockito.times(1)).filter(originalSamples, new NodeAge(0));
 		Mockito.verify(filters.get(1), Mockito.times(1)).filter(samples1, new NodeAge(0));
 		Mockito.verify(filters.get(2), Mockito.times(1)).filter(samples2, new NodeAge(0));
-		Assert.assertThat(samples, IsEqual.equalTo(samples3));
+		MatcherAssert.assertThat(samples, IsEqual.equalTo(samples3));
 	}
 
 	private static List<SynchronizationFilter> createFilters() {
-		return Arrays.asList(
-				Mockito.mock(ResponseDelayDetectionFilter.class),
-				Mockito.mock(ClampingFilter.class),
+		return Arrays.asList(Mockito.mock(ResponseDelayDetectionFilter.class), Mockito.mock(ClampingFilter.class),
 				Mockito.mock(AlphaTrimmedMeanFilter.class));
 	}
 }

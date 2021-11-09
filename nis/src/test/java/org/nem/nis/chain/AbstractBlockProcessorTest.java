@@ -1,5 +1,6 @@
 package org.nem.nis.chain;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -22,7 +23,7 @@ public abstract class AbstractBlockProcessorTest {
 	private final int numExpectedTransactionNotifications = this.supportsTransactionExecution() ? 4 : 7;
 	private final int numExpectedBlockNotifications = this.supportsTransactionExecution() ? 3 : 7;
 
-	//region abstract methods
+	// region abstract methods
 
 	protected abstract NotificationTrigger getTrigger();
 
@@ -30,11 +31,12 @@ public abstract class AbstractBlockProcessorTest {
 
 	protected abstract void process(final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer);
 
-	protected abstract void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer);
+	protected abstract void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+			final BlockTransactionObserver observer);
 
-	//endregion
+	// endregion
 
-	//region notification propagation
+	// region notification propagation
 
 	@Test
 	public void processPropagatesAllTransactionNotificationsToSubscribedObserver() {
@@ -60,7 +62,8 @@ public abstract class AbstractBlockProcessorTest {
 			NotificationUtils.assertBalanceCreditNotification(values.get(start), context.account1, Amount.fromNem(11));
 			NotificationUtils.assertBalanceDebitNotification(values.get(start + 1), context.account2, Amount.fromNem(2));
 			NotificationUtils.assertBalanceDebitNotification(values.get(start + 2), context.account1, Amount.fromNem(9));
-			NotificationUtils.assertBalanceTransferNotification(values.get(start + 3), context.account2, context.account1, Amount.fromNem(12));
+			NotificationUtils.assertBalanceTransferNotification(values.get(start + 3), context.account2, context.account1,
+					Amount.fromNem(12));
 		}
 	}
 
@@ -101,7 +104,8 @@ public abstract class AbstractBlockProcessorTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(this.numExpectedBlockNotifications);
 
 		// check notification
-		final Notification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(), this.numExpectedBlockNotifications);
+		final Notification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(),
+				this.numExpectedBlockNotifications);
 		NotificationUtils.assertTransactionHashesNotification(notification, context.transactionHashPairs);
 	}
 
@@ -114,12 +118,13 @@ public abstract class AbstractBlockProcessorTest {
 		this.processTransaction(context);
 
 		// Assert:
-		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = context.captureNotificationContexts(this.numExpectedTransactionNotifications);
+		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = context
+				.captureNotificationContexts(this.numExpectedTransactionNotifications);
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
-			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
-			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
+			MatcherAssert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			MatcherAssert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
 		}
 	}
 
@@ -132,12 +137,13 @@ public abstract class AbstractBlockProcessorTest {
 		this.processBlock(context);
 
 		// Assert:
-		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = context.captureNotificationContexts(this.numExpectedBlockNotifications);
+		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = context
+				.captureNotificationContexts(this.numExpectedBlockNotifications);
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
-			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
-			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
+			MatcherAssert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			MatcherAssert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(this.getTrigger()));
 		}
 	}
 
@@ -158,16 +164,15 @@ public abstract class AbstractBlockProcessorTest {
 			});
 
 			this.block = this.createBlockWithTransaction(this.height, transaction);
-			final HashMetaDataPair pair = new HashMetaDataPair(
-					HashUtils.calculateHash(transaction),
+			final HashMetaDataPair pair = new HashMetaDataPair(HashUtils.calculateHash(transaction),
 					new HashMetaData(this.height, transaction.getTimeStamp()));
 			this.transactionHashPairs = Collections.singletonList(pair);
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region REMOTE harvest notifications
+	// region REMOTE harvest notifications
 
 	@Test
 	public void processPropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
@@ -206,8 +211,7 @@ public abstract class AbstractBlockProcessorTest {
 		this.processBlock(context);
 
 		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.times(1))
-				.findForwardedStateByAddress(remoteSigner.getAddress(), context.height);
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteSigner.getAddress(), context.height);
 	}
 
 	@Test
@@ -240,9 +244,9 @@ public abstract class AbstractBlockProcessorTest {
 		return context;
 	}
 
-	//endregion
+	// endregion
 
-	//region CHILD transaction hashes notifications
+	// region CHILD transaction hashes notifications
 
 	@Test
 	public void processPropagatesChildTransactionHashesToSubscribedObserver() {
@@ -275,36 +279,29 @@ public abstract class AbstractBlockProcessorTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(expectedNotifications);
 
 		// check notification
-		final TransactionHashesNotification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(), expectedNotifications);
-		Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
+		final TransactionHashesNotification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(),
+				expectedNotifications);
+		MatcherAssert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
 		NotificationUtils.assertTransactionHashesNotification(notification, transactionHashPairs);
 	}
 
-	//endregion
+	// endregion
 
-	//region helpers
+	// region helpers
 
-	private TransactionHashesNotification getTransactionHashesNotification(final List<Notification> notifications, final int expectedNotifications) {
+	private TransactionHashesNotification getTransactionHashesNotification(final List<Notification> notifications,
+			final int expectedNotifications) {
 		// when executed, transaction hashes are notified last; when undone they are first
-		final int start = NotificationTrigger.Execute == this.getTrigger()
-				? expectedNotifications - 1
-				: 0;
-		return (TransactionHashesNotification)notifications.get(start);
+		final int start = NotificationTrigger.Execute == this.getTrigger() ? expectedNotifications - 1 : 0;
+		return (TransactionHashesNotification) notifications.get(start);
 	}
 
 	private void processTransaction(final ProcessorTestContext context) {
-		this.process(
-				context.block.getTransactions().get(0),
-				context.block,
-				context.nisCache,
-				context.observer);
+		this.process(context.block.getTransactions().get(0), context.block, context.nisCache, context.observer);
 	}
 
 	private void processBlock(final ProcessorTestContext context) {
-		this.process(
-				context.block,
-				context.nisCache,
-				context.observer);
+		this.process(context.block, context.nisCache, context.observer);
 	}
 
 	private static class ProcessorTestContext {
@@ -356,5 +353,5 @@ public abstract class AbstractBlockProcessorTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

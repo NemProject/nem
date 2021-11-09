@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -44,7 +45,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 		final DbAccount entity = this.accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
 
 		// Assert:
-		Assert.assertThat(entity, IsNull.nullValue());
+		MatcherAssert.assertThat(entity, IsNull.nullValue());
 	}
 
 	@Test
@@ -58,9 +59,9 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 		final DbAccount entity = this.accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
 
 		// Assert:
-		Assert.assertThat(entity.getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbAccount.getId()));
-		Assert.assertThat(entity.getPrintableKey(), IsEqual.equalTo(account.getAddress().getEncoded()));
-		Assert.assertThat(entity.getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
+		MatcherAssert.assertThat(entity.getId(), IsNull.notNullValue());
+		MatcherAssert.assertThat(entity.getId(), IsEqual.equalTo(dbAccount.getId()));
+		MatcherAssert.assertThat(entity.getPrintableKey(), IsEqual.equalTo(account.getAddress().getEncoded()));
+		MatcherAssert.assertThat(entity.getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
 	}
 }

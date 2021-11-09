@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -18,8 +19,7 @@ public class DebugControllerTest {
 	@Test
 	public void timersInfoDelegatesToHost() {
 		// Arrange:
-		final List<NemAsyncTimerVisitor> originalVisitors = Arrays.asList(
-				new NemAsyncTimerVisitor("foo", null),
+		final List<NemAsyncTimerVisitor> originalVisitors = Arrays.asList(new NemAsyncTimerVisitor("foo", null),
 				new NemAsyncTimerVisitor("bar", null));
 		final TestContext context = new TestContext();
 		Mockito.when(context.host.getVisitors()).thenReturn(originalVisitors);
@@ -29,8 +29,7 @@ public class DebugControllerTest {
 
 		// Assert:
 		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
-		Assert.assertThat(
-				visitors.asCollection().stream().map(NemAsyncTimerVisitor::getTimerName).collect(Collectors.toList()),
+		MatcherAssert.assertThat(visitors.asCollection().stream().map(NemAsyncTimerVisitor::getTimerName).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("foo", "bar"));
 	}
 
@@ -45,7 +44,7 @@ public class DebugControllerTest {
 		final AuditCollection auditCollection = context.controller.incomingConnectionsInfo();
 
 		// Assert:
-		Assert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
+		MatcherAssert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
 		Mockito.verify(context.host, Mockito.times(1)).getIncomingAudits();
 	}
 
@@ -60,7 +59,7 @@ public class DebugControllerTest {
 		final AuditCollection auditCollection = context.controller.outgoingConnectionsInfo();
 
 		// Assert:
-		Assert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
+		MatcherAssert.assertThat(auditCollection, IsSame.sameInstance(hostAuditCollection));
 		Mockito.verify(context.host, Mockito.times(1)).getOutgoingAudits();
 	}
 

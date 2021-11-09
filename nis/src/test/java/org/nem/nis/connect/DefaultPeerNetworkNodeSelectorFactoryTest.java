@@ -1,5 +1,6 @@
 package org.nem.nis.connect;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,7 +21,7 @@ import java.util.function.Function;
 
 public class DefaultPeerNetworkNodeSelectorFactoryTest {
 
-	//region createRefreshNodeSelector
+	// region createRefreshNodeSelector
 
 	@Test
 	public void createRefreshNodeSelectorReturnsNonNull() {
@@ -34,9 +35,9 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		assertNumSelectedNodes(PeerNetworkNodeSelectorFactory::createRefreshNodeSelector, 2);
 	}
 
-	//endregion
+	// endregion
 
-	//region createUpdateNodeSelector
+	// region createUpdateNodeSelector
 
 	@Test
 	public void createUpdateNodeSelectorReturnsNonNull() {
@@ -50,9 +51,9 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		assertNumSelectedNodes(PeerNetworkNodeSelectorFactory::createUpdateNodeSelector, 1);
 	}
 
-	//endregion
+	// endregion
 
-	//region createTimeSyncNodeSelector
+	// region createTimeSyncNodeSelector
 
 	@Test
 	public void createTimeSyncNodeSelectorReturnsNonNull() {
@@ -66,7 +67,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		assertNumSelectedNodes(PeerNetworkNodeSelectorFactory::createTimeSyncNodeSelector, 1);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertNonNullSelector(final Function<PeerNetworkNodeSelectorFactory, NodeSelector> createSelector) {
 		// Arrange:
@@ -76,10 +77,11 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		final NodeSelector selector = createSelector.apply(factory);
 
 		// Assert:
-		Assert.assertThat(selector, IsNull.notNullValue());
+		MatcherAssert.assertThat(selector, IsNull.notNullValue());
 	}
 
-	private static void assertNumSelectedNodes(final Function<PeerNetworkNodeSelectorFactory, NodeSelector> createSelector, final int expectedNumNodes) {
+	private static void assertNumSelectedNodes(final Function<PeerNetworkNodeSelectorFactory, NodeSelector> createSelector,
+			final int expectedNumNodes) {
 		// Arrange:
 		final PeerNetworkNodeSelectorFactory factory = createFactory();
 		final NodeSelector selector = createSelector.apply(factory);
@@ -88,7 +90,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		final Collection<Node> nodes = selector.selectNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(expectedNumNodes));
+		MatcherAssert.assertThat(nodes.size(), IsEqual.equalTo(expectedNumNodes));
 	}
 
 	private static PeerNetworkNodeSelectorFactory createFactory() {
@@ -102,17 +104,13 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 
 		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenAnswer(invocationOnMock -> {
-			final AccountState accountState = new AccountState((Address)invocationOnMock.getArguments()[0]);
+			final AccountState accountState = new AccountState((Address) invocationOnMock.getArguments()[0]);
 			accountState.getImportanceInfo().setImportance(BlockHeight.ONE, 0.75);
 			return accountState;
 		});
 
-		return new DefaultPeerNetworkNodeSelectorFactory(
-				createNisConfiguration(),
-				createTrustProvider(),
-				new PeerNetworkState(config, new NodeExperiences(), nodes),
-				poxFacade,
-				accountStateCache);
+		return new DefaultPeerNetworkNodeSelectorFactory(createNisConfiguration(), createTrustProvider(),
+				new PeerNetworkState(config, new NodeExperiences(), nodes), poxFacade, accountStateCache);
 	}
 
 	private static NisConfiguration createNisConfiguration() {
@@ -125,7 +123,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 	private static TrustProvider createTrustProvider() {
 		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		Mockito.when(trustProvider.computeTrust(Mockito.any()))
-				.then(invocationOnMock -> new TrustResult((TrustContext)invocationOnMock.getArguments()[0], new ColumnVector(1, 1, 1)));
+				.then(invocationOnMock -> new TrustResult((TrustContext) invocationOnMock.getArguments()[0], new ColumnVector(1, 1, 1)));
 		return trustProvider;
 	}
 

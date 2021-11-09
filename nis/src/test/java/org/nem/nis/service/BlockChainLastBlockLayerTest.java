@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void layerIsInitializedWithNoLastBlock() {
@@ -21,9 +22,9 @@ public class BlockChainLastBlockLayerTest {
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -36,9 +37,9 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -50,9 +51,9 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.setLoaded();
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -66,14 +67,14 @@ public class BlockChainLastBlockLayerTest {
 		lastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
-		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
-		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region addBlockToDb
+	// region addBlockToDb
 
 	@Test
 	public void addBlockToDbDelegatesToBlockDaoAndMapper() {
@@ -103,14 +104,14 @@ public class BlockChainLastBlockLayerTest {
 		context.lastBlockLayer.addBlockToDb(block);
 
 		// Assert:
-		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
-		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region dropDbBlocksAfter
+	// region dropDbBlocksAfter
 
 	@Test
 	public void dropDbBlocksAfterDelegatesToBlockDao() {
@@ -140,14 +141,14 @@ public class BlockChainLastBlockLayerTest {
 		context.lastBlockLayer.dropDbBlocksAfter(height);
 
 		// Assert:
-		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
-		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		MatcherAssert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		MatcherAssert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region helper functions
+	// region helper functions
 
 	private static org.nem.core.model.Block createBlock(final long height) {
 		// Arrange:
@@ -164,16 +165,14 @@ public class BlockChainLastBlockLayerTest {
 	private BlockChainLastBlockLayer createBlockChainLastBlockLayer() {
 		final MockAccountDao accountDao = new MockAccountDao();
 		final MockBlockDao mockBlockDao = new MockBlockDao(null);
-		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
+		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao);
 		return new BlockChainLastBlockLayer(mockBlockDao, mapper);
 	}
 
 	private static class TestContext {
 		private final BlockDao mockBlockDao = Mockito.mock(BlockDao.class);
 		private final NisModelToDbModelMapper mapper = Mockito.mock(NisModelToDbModelMapper.class);
-		private final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(
-				this.mockBlockDao,
-				this.mapper);
+		private final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(this.mockBlockDao, this.mapper);
 
 		public TestContext() {
 			this.lastBlockLayer.setLoaded();
@@ -187,5 +186,5 @@ public class BlockChainLastBlockLayerTest {
 		}
 	}
 
-	//endregion
+	// endregion
 }

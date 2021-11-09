@@ -21,10 +21,7 @@ public class HarvestingTask {
 	 * @param harvester The harvester.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
 	 */
-	public HarvestingTask(
-			final BlockChain blockChain,
-			final Harvester harvester,
-			final UnconfirmedTransactions unconfirmedTransactions) {
+	public HarvestingTask(final BlockChain blockChain, final Harvester harvester, final UnconfirmedTransactions unconfirmedTransactions) {
 		this.blockChain = blockChain;
 		this.harvester = harvester;
 		this.unconfirmedTransactions = unconfirmedTransactions;
@@ -43,9 +40,7 @@ public class HarvestingTask {
 			return;
 		}
 
-		final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-				block,
-				network.getLocalNode().getIdentity());
+		final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(block, network.getLocalNode().getIdentity());
 		network.broadcast(NisPeerId.REST_PUSH_BLOCK, secureBlock);
 	}
 }

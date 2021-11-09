@@ -4,6 +4,7 @@ import org.nem.core.utils.ExceptionUtils;
 
 import java.sql.*;
 
+@SuppressWarnings("try")
 public class H2Database implements AutoCloseable {
 	private static final String JDBC_DRIVER = "org.h2.Driver";
 	private final Connection connection;

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -25,7 +26,7 @@ public class NisDbModelToModelMapperTest {
 		final Block result = context.nisMapper.map(context.dbBlock);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(context.block));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(context.block));
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbBlock, Block.class);
 	}
 
@@ -41,7 +42,7 @@ public class NisDbModelToModelMapperTest {
 		final Transaction result = context.nisMapper.map(dbTransferTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(transfer));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(transfer));
 		Mockito.verify(context.mapper, Mockito.only()).map(dbTransferTransaction, Transaction.class);
 	}
 
@@ -65,7 +66,9 @@ public class NisDbModelToModelMapperTest {
 		setTransactionsForMapTransactionsTests(context);
 
 		// Act:
-		final int[] count = { 0 };
+		final int[] count = {
+				0
+		};
 		final Collection<Transaction> transfers = context.nisMapper.mapTransactionsIf(context.dbBlock, t -> 0 == count[0]++ % 2);
 
 		// Assert:
@@ -81,33 +84,19 @@ public class NisDbModelToModelMapperTest {
 		final Namespace result = context.nisMapper.map(context.dbNamespace, Namespace.class);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(context.namespace));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(context.namespace));
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbNamespace, Namespace.class);
 	}
 
 	// endregion
 
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
-		context.setTransactions(
-				DbTransferTransaction::new,
-				context.dbBlock::setBlockTransferTransactions,
-				TransferTransaction.class,
-				3);
-		context.setTransactions(
-				DbImportanceTransferTransaction::new,
-				context.dbBlock::setBlockImportanceTransferTransactions,
-				ImportanceTransferTransaction.class,
-				2);
-		context.setTransactions(
-				DbMultisigAggregateModificationTransaction::new,
-				context.dbBlock::setBlockMultisigAggregateModificationTransactions,
-				MultisigAggregateModificationTransaction.class,
-				1);
-		context.setTransactions(
-				DbMultisigTransaction::new,
-				context.dbBlock::setBlockMultisigTransactions,
-				MultisigTransaction.class,
-				2);
+		context.setTransactions(DbTransferTransaction::new, context.dbBlock::setBlockTransferTransactions, TransferTransaction.class, 3);
+		context.setTransactions(DbImportanceTransferTransaction::new, context.dbBlock::setBlockImportanceTransferTransactions,
+				ImportanceTransferTransaction.class, 2);
+		context.setTransactions(DbMultisigAggregateModificationTransaction::new,
+				context.dbBlock::setBlockMultisigAggregateModificationTransactions, MultisigAggregateModificationTransaction.class, 1);
+		context.setTransactions(DbMultisigTransaction::new, context.dbBlock::setBlockMultisigTransactions, MultisigTransaction.class, 2);
 	}
 
 	private static class TestContext {
@@ -129,11 +118,8 @@ public class NisDbModelToModelMapperTest {
 			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
 		}
 
-		private <TDbModel extends AbstractTransfer, TModel extends Transaction> void setTransactions(
-				final Supplier<TDbModel> createDbModel,
-				final Consumer<List<TDbModel>> setTransactions,
-				final Class<TModel> modelClass,
-				final int num) {
+		private <TDbModel extends AbstractTransfer, TModel extends Transaction> void setTransactions(final Supplier<TDbModel> createDbModel,
+				final Consumer<List<TDbModel>> setTransactions, final Class<TModel> modelClass, final int num) {
 			final List<TDbModel> dbTransfers = new ArrayList<>();
 			final List<TModel> transfers = new ArrayList<>();
 			for (int i = 0; i < num; ++i) {
@@ -153,15 +139,15 @@ public class NisDbModelToModelMapperTest {
 			this.transfers.addAll(transfers);
 		}
 
-		private void assertMappedTransfers(
-				final Collection<Transaction> transfers,
-				final Collection<Integer> expectedTransferIndexes) {
+		private void assertMappedTransfers(final Collection<Transaction> transfers, final Collection<Integer> expectedTransferIndexes) {
 			final int numExpectedTransfers = expectedTransferIndexes.size();
-			final Collection<Transaction> expectedTransfers = expectedTransferIndexes.stream().map(this.transfers::get).collect(Collectors.toList());
-			final List<AbstractTransfer> expectedDbTransfers = expectedTransferIndexes.stream().map(this.dbTransfers::get).collect(Collectors.toList());
+			final Collection<Transaction> expectedTransfers = expectedTransferIndexes.stream().map(this.transfers::get)
+					.collect(Collectors.toList());
+			final List<AbstractTransfer> expectedDbTransfers = expectedTransferIndexes.stream().map(this.dbTransfers::get)
+					.collect(Collectors.toList());
 
-			Assert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
-			Assert.assertThat(transfers, IsEquivalent.equivalentTo(expectedTransfers));
+			MatcherAssert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
+			MatcherAssert.assertThat(transfers, IsEquivalent.equivalentTo(expectedTransfers));
 
 			for (int i = 0; i < numExpectedTransfers; ++i) {
 				Mockito.verify(this.mapper, Mockito.times(1)).map(Mockito.eq(expectedDbTransfers.get(i)), Mockito.any());

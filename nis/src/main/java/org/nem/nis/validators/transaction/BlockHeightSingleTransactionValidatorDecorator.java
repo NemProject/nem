@@ -17,8 +17,7 @@ public class BlockHeightSingleTransactionValidatorDecorator implements SingleTra
 	 * @param effectiveBlockHeight The height at which the inner validator should be in effect.
 	 * @param innerValidator The inner validator.
 	 */
-	public BlockHeightSingleTransactionValidatorDecorator(
-			final BlockHeight effectiveBlockHeight,
+	public BlockHeightSingleTransactionValidatorDecorator(final BlockHeight effectiveBlockHeight,
 			final SingleTransactionValidator innerValidator) {
 		this.effectiveBlockHeight = effectiveBlockHeight;
 		this.innerValidator = innerValidator;

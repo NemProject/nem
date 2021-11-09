@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -11,7 +12,7 @@ import org.nem.core.model.ValidationResult;
  */
 public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends NamedValidator, TParam> {
 
-	//region protected abstract members
+	// region protected abstract members
 
 	/**
 	 * Creates a validator builder.
@@ -69,9 +70,9 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 	 */
 	protected abstract void verifyValidate(final TValidator validator, final TParam param, final VerificationMode verificationMode);
 
-	//endregion
+	// endregion
 
-	//region basic aggregation
+	// region basic aggregation
 
 	@Test
 	public void canAddSingleValidator() {
@@ -86,16 +87,14 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		this.verifyValidate(validator, param, Mockito.only());
 	}
 
 	@Test
 	public void canAddMultipleValidators() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.SUCCESS,
 				ValidationResult.SUCCESS);
 
 		// Act:
@@ -103,33 +102,29 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		context.assertAllValidatorsCalledOnce();
 	}
 
 	@Test
 	public void validationShortCircuitsOnFirstSubValidatorFailure() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.SUCCESS);
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_CHAIN_INVALID, ValidationResult.SUCCESS);
 
 		// Act:
 		final TValidator aggregate = this.build(context.builder);
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
 		context.assertOnlyFirstTwoValidatorsCalledOnce();
 	}
 
 	@Test
 	public void validationDoesNotShortCircuitOnFirstSubValidatorNeutralResult() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.SUCCESS);
 
 		// Act:
@@ -137,16 +132,14 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		context.assertAllValidatorsCalledOnce();
 	}
 
 	@Test
 	public void validationFailureHasHigherPrecedenceThanNeutralResult() {
 		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
+		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(ValidationResult.SUCCESS, ValidationResult.NEUTRAL,
 				ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Act:
@@ -154,7 +147,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final ValidationResult result = this.validate(aggregate, context.param);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
 		context.assertAllValidatorsCalledOnce();
 	}
 
@@ -166,9 +159,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		private final TBuilder builder = AggregateValidatorBuilderTest.this.createBuilder();
 		private final AggregateValidatorBuilderTest<TBuilder, TValidator, TParam> parent = AggregateValidatorBuilderTest.this;
 
-		private ThreeSubValidatorTestContext(
-				final ValidationResult result1,
-				final ValidationResult result2,
+		private ThreeSubValidatorTestContext(final ValidationResult result1, final ValidationResult result2,
 				final ValidationResult result3) {
 			this.validator1 = this.parent.createValidator(result1);
 			this.validator2 = this.parent.createValidator(result2);
@@ -192,9 +183,9 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region name aggregation
+	// region name aggregation
 
 	@Test
 	public void getNameReturnsCommaSeparatedListOfInnerValidators() {
@@ -209,7 +200,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		final String name = validator.getName();
 
 		// Assert:
-		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+		MatcherAssert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
 	}
 
 	private TValidator createValidatorWithName(final String name) {
@@ -218,5 +209,5 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends
 		return validator;
 	}
 
-	//endregion
+	// endregion
 }

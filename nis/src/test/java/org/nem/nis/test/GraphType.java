@@ -1,8 +1,7 @@
 package org.nem.nis.test;
 
 /**
- * An enum of well-known graph types where the epsilon value doesn't matter
- * because the graphs are either fully connected or unconnected.
+ * An enum of well-known graph types where the epsilon value doesn't matter because the graphs are either fully connected or unconnected.
  * <br>
  * Graph interpretation: i----oj means i has directed edge to j
  */
@@ -12,9 +11,8 @@ public enum GraphType {
 	 * <pre>
 	 * Graph:         0
 	 * </pre>
-	 * Clusters: none
-	 * Hubs: none
-	 * Outliers: {0}
+	 *
+	 * Clusters: none Hubs: none Outliers: {0}
 	 */
 	GRAPH_SINGLE_NODE,
 
@@ -22,9 +20,8 @@ public enum GraphType {
 	 * <pre>
 	 * Graph:         0     1
 	 * </pre>
-	 * Clusters: none
-	 * Hubs: none
-	 * Outliers: {0}, {1}
+	 *
+	 * Clusters: none Hubs: none Outliers: {0}, {1}
 	 */
 	GRAPH_TWO_UNCONNECTED_NODES,
 
@@ -32,9 +29,8 @@ public enum GraphType {
 	 * <pre>
 	 * Graph:         0----o1
 	 * </pre>
-	 * Clusters: none
-	 * Hubs: none
-	 * Outliers: {0}, {1}
+	 *
+	 * Clusters: none Hubs: none Outliers: {0}, {1}
 	 */
 	GRAPH_TWO_CONNECTED_NODES,
 
@@ -42,9 +38,8 @@ public enum GraphType {
 	 * <pre>
 	 * Graph:         0----o1----o2----o3----o4
 	 * </pre>
-	 * Clusters: {0,1,2,3,4}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3,4} Hubs: none Outliers: none
 	 */
 	GRAPH_LINE_STRUCTURE,
 
@@ -52,9 +47,8 @@ public enum GraphType {
 	 * <pre>
 	 * Graph:         0--o1--o2--o3--o4--o5
 	 * </pre>
-	 * Clusters: {0,1,2,3,4,5}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3,4,5} Hubs: none Outliers: none
 	 */
 	GRAPH_LINE6_STRUCTURE,
 
@@ -65,9 +59,8 @@ public enum GraphType {
 	 *                |           o
 	 *                4o----------3
 	 * </pre>
-	 * Clusters: {0,1,2,3,4}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3,4} Hubs: none Outliers: none
 	 */
 	GRAPH_RING_STRUCTURE,
 
@@ -80,9 +73,8 @@ public enum GraphType {
 	 *                |/  oo
 	 *                3o---2
 	 * </pre>
-	 * Clusters: {0,1,2,3}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3} Hubs: none Outliers: none
 	 */
 	GRAPH_BOX_TWO_DIAGONALS,
 
@@ -110,9 +102,8 @@ public enum GraphType {
 	 *        com(2) = (2, {0,1,3}, {})
 	 *        com(3) = (3, {0,2}, {})
 	 * </pre>
-	 * Clusters: {0,1,2,3}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3} Hubs: none Outliers: none
 	 */
 	GRAPH_BOX_MAJOR_DIAGONAL,
 
@@ -140,9 +131,8 @@ public enum GraphType {
 	 *        com(2) = (2, {1,3}, {})
 	 *        com(3) = (3, {0,1,2}, {})
 	 * </pre>
-	 * Clusters: {0,1,2,3}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3} Hubs: none Outliers: none
 	 */
 	GRAPH_BOX_MINOR_DIAGONAL,
 
@@ -154,9 +144,8 @@ public enum GraphType {
 	 *          o  o  o
 	 *         1   2   3
 	 * </pre>
-	 * Clusters: {0,1,2,3}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3} Hubs: none Outliers: none
 	 */
 	GRAPH_TREE_STRUCTURE,
 
@@ -177,9 +166,8 @@ public enum GraphType {
 	 *                o
 	 *                7
 	 * </pre>
-	 * Clusters: {0,1,2,3}, {4,5,6,7,8}
-	 * Hubs: none
-	 * Outliers: none
+	 *
+	 * Clusters: {0,1,2,3}, {4,5,6,7,8} Hubs: none Outliers: none
 	 */
 	GRAPH_DISCONNECTED_BOX_WITH_DIAGONAL_AND_CROSS
 }

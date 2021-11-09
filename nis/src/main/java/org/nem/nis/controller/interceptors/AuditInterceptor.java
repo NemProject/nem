@@ -22,18 +22,13 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 	 * @param ignoredApiPaths The api paths to ignore.
 	 * @param auditCollection The audit collection.
 	 */
-	public AuditInterceptor(
-			final List<String> ignoredApiPaths,
-			final AuditCollection auditCollection) {
+	public AuditInterceptor(final List<String> ignoredApiPaths, final AuditCollection auditCollection) {
 		this.ignoredApiPaths = ignoredApiPaths;
 		this.auditCollection = auditCollection;
 	}
 
 	@Override
-	public boolean preHandle(
-			final HttpServletRequest request,
-			final HttpServletResponse response,
-			final Object handler) throws Exception {
+	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
 		final AuditEntry entry = new AuditEntry(request);
 		if (entry.shouldIgnore()) {
 			return true;
@@ -45,12 +40,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 	}
 
 	@Override
-	public void afterCompletion(
-			final HttpServletRequest request,
-			final HttpServletResponse response,
-			final Object handler,
-			final Exception ex)
-			throws Exception {
+	public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response, final Object handler,
+			final Exception ex) throws Exception {
 		final AuditEntry entry = new AuditEntry(request);
 		if (entry.shouldIgnore()) {
 			return;

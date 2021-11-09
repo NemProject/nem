@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -15,6 +16,7 @@ import java.util.function.*;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class DbBlockTest {
 
 	// the Enclosed.class runner seems to require at least two inner classes (at least within IntelliJ),
@@ -23,7 +25,9 @@ public class DbBlockTest {
 	public static class General {
 
 		@Test
-		@SuppressWarnings({ "unused", "EmptyMethod" })
+		@SuppressWarnings({
+				"unused", "EmptyMethod"
+		})
 		public void placeholder() {
 		}
 	}
@@ -45,20 +49,15 @@ public class DbBlockTest {
 		public void setBlockTransactionsFilterTransactionsWithNullSignature() {
 			// Arrange:
 			@SuppressWarnings("unchecked")
-			final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry =
-					(TransactionRegistry.Entry<AbstractBlockTransfer, ?>)this.entry;
+			final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>) this.entry;
 
 			// Assert:
-			assertTransactionsWithNullSignatureGetFiltered(
-					entry.getFromBlock,
-					entry.setInBlock,
+			assertTransactionsWithNullSignatureGetFiltered(entry.getFromBlock, entry.setInBlock,
 					() -> DbTestUtils.createTransferDbModel(entry.dbModelClass));
 		}
 
 		private static <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(
-				final Function<DbBlock, List<T>> getFromBlock,
-				final BiConsumer<DbBlock, List<T>> setInBlock,
-				final Supplier<T> activator) {
+				final Function<DbBlock, List<T>> getFromBlock, final BiConsumer<DbBlock, List<T>> setInBlock, final Supplier<T> activator) {
 			// Arrange:
 			final DbBlock dbBlock = new DbBlock();
 			final List<T> dbTransactions = createTransactions(activator);
@@ -68,22 +67,20 @@ public class DbBlockTest {
 			setInBlock.accept(dbBlock, dbTransactions);
 
 			// Assert:
-			Assert.assertThat(getFromBlock.apply(dbBlock).size(), IsEqual.equalTo(10));
-			getFromBlock.apply(dbBlock).stream()
-					.forEach(t -> Assert.assertThat(t.getSenderProof(), IsNull.notNullValue()));
+			MatcherAssert.assertThat(getFromBlock.apply(dbBlock).size(), IsEqual.equalTo(10));
+			getFromBlock.apply(dbBlock).stream().forEach(t -> MatcherAssert.assertThat(t.getSenderProof(), IsNull.notNullValue()));
 		}
 
 		private static <T extends AbstractBlockTransfer> List<T> createTransactions(final Supplier<T> activator) {
-			return IntStream.range(0, 10)
-					.mapToObj(i -> {
-						final T t = activator.get();
-						t.setSenderProof(new byte[64]);
-						return t;
-					})
-					.collect(Collectors.toList());
+			return IntStream.range(0, 10).mapToObj(i -> {
+				final T t = activator.get();
+				t.setSenderProof(new byte[64]);
+				return t;
+			}).collect(Collectors.toList());
 		}
 
-		private static <T extends AbstractBlockTransfer> void addTransactionsWithNullSignature(final List<T> dbTransactions, final Supplier<T> activator) {
+		private static <T extends AbstractBlockTransfer> void addTransactionsWithNullSignature(final List<T> dbTransactions,
+				final Supplier<T> activator) {
 			dbTransactions.add(0, activator.get());
 			dbTransactions.add(5, activator.get());
 			dbTransactions.add(activator.get());

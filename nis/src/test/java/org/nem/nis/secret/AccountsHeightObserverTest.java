@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import org.nem.nis.test.*;
 
 public class AccountsHeightObserverTest {
 
-	//region AccountNotification / NotificationTrigger.Execute
+	// region AccountNotification / NotificationTrigger.Execute
 
 	@Test
 	public void accountNotificationExecuteDelegatesToAccountCache() {
@@ -66,7 +67,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		final AccountState state = context.accountStateCache.findStateByAddress(account1.getAddress());
-		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
+		MatcherAssert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
 	@Test
@@ -82,12 +83,12 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		final ReadOnlyAccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
-		Assert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
+		MatcherAssert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region AccountNotification / NotificationTrigger.Undo
+	// region AccountNotification / NotificationTrigger.Undo
 
 	@Test
 	public void accountNotificationUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountCaches() {
@@ -151,13 +152,13 @@ public class AccountsHeightObserverTest {
 		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
-		Assert.assertThat(accountCache.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(accountCache.size(), IsEqual.equalTo(1));
 
 		// Act:
 		observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 
 		// Assert:
-		Assert.assertThat(accountCache.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(accountCache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -194,9 +195,9 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
 	}
 
-	//endregion
+	// endregion
 
-	//region Other Notification
+	// region Other Notification
 
 	@Test
 	public void nonAccountNotificationsAreIgnored() {
@@ -205,15 +206,14 @@ public class AccountsHeightObserverTest {
 		final Account account1 = Utils.generateRandomAccount();
 
 		// Act:
-		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account1, Amount.fromNem(12)),
+		context.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account1, Amount.fromNem(12)),
 				createExecuteNotificationContext(12));
 
 		// Assert:
 		Mockito.verifyZeroInteractions(context.accountCache, context.accountStateCache);
 	}
 
-	//endregion
+	// endregion
 
 	private static BlockNotificationContext createExecuteNotificationContext(final int height) {
 		return NisUtils.createBlockNotificationContext(new BlockHeight(height), NotificationTrigger.Execute);

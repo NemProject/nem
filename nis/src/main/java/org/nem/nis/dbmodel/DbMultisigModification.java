@@ -5,8 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Multisig Cosignatory Modification db entity
- * <br>
+ * Multisig Cosignatory Modification db entity <br>
  * Holds information about single multisig cosignatory modification
  */
 @Entity
@@ -39,7 +38,8 @@ public class DbMultisigModification {
 		return this.multisigAggregateModificationTransaction;
 	}
 
-	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
+	public void setMultisigAggregateModificationTransaction(
+			final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
 		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 

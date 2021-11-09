@@ -5,8 +5,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.validators.*;
 
 /**
- * Single transaction validator that validates:
- * - the transaction time stamp is not too far in the future
+ * Single transaction validator that validates the transaction time stamp is not too far in the future
  */
 public class TransactionNonFutureEntityValidator extends NonFutureEntityValidator implements SingleTransactionValidator {
 

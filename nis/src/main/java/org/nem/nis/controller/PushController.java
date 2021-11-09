@@ -12,13 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 /**
- * This controller will handle data propagation:
- * * /push/transaction - for what is now model.Transaction
+ * This controller will handle data propagation: <br>
+ * * /push/transaction - for what is now model.Transaction <br>
  * * /push/block - for model.Block
- * <br>
- * It would probably fit better in TransferController, but this is
- * part of p2p API, so I think it should be kept separated.
- * (I think it might pay off in future, if we'd like to add restrictions to client APIs)
  */
 @RestController
 public class PushController {
@@ -38,7 +34,8 @@ public class PushController {
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer) {
-		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
+		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer,
+				TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
 	}
 
@@ -50,8 +47,8 @@ public class PushController {
 	@RequestMapping(value = "/push/transactions", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransactions(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
-		final SerializableList<SecureSerializableEntity<Transaction>> serializableList =
-				new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
+		final SerializableList<SecureSerializableEntity<Transaction>> serializableList = new SerializableList<>(deserializer,
+				d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
 		// TODO 20151024 J-B: is this going to be too noisy in the logs?
 		LOGGER.info(String.format("received %d transactions from %s", serializableList.size(), request.getRemoteHost()));
 

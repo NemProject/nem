@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -39,17 +40,17 @@ public class NisPeerNetworkHostTest {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
-			final CompletableFuture future = host.boot(createLocalNode());
+			final CompletableFuture<?> future = host.boot(createLocalNode());
 
 			// Assert:
-			Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+			MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 
 			// Cleanup:
 			future.join();
 		}
 	}
 
-	//region getNetwork / getNetworkBroadcastBuffer
+	// region getNetwork / getNetworkBroadcastBuffer
 
 	@Test
 	public void getNetworkThrowsIfNetworkIsNotBooted() {
@@ -79,8 +80,7 @@ public class NisPeerNetworkHostTest {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
-			NisUtils.assertThrowsNisIllegalStateException(
-					v -> getSubObject.apply(host),
+			NisUtils.assertThrowsNisIllegalStateException(v -> getSubObject.apply(host),
 					NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
 		}
 	}
@@ -92,13 +92,13 @@ public class NisPeerNetworkHostTest {
 			host.boot(createLocalNode()).join();
 
 			// Assert:
-			Assert.assertThat(getSubObject.apply(host), IsNull.notNullValue());
+			MatcherAssert.assertThat(getSubObject.apply(host), IsNull.notNullValue());
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region isNetworkBooted
+	// region isNetworkBooted
 
 	@Test
 	public void isNetworkBootedReturnsFalseIfNetworkIsNotBooted() {
@@ -106,7 +106,7 @@ public class NisPeerNetworkHostTest {
 		final NisPeerNetworkHost host = createNetwork();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -118,12 +118,12 @@ public class NisPeerNetworkHostTest {
 		host.boot(createLocalNode()).join();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
 	}
 
-	//endregion
+	// endregion
 
-	//region isNetworkBooting
+	// region isNetworkBooting
 
 	@Test
 	public void isNetworkBootingReturnsFalseIfNetworkIsNotBooted() {
@@ -131,7 +131,7 @@ public class NisPeerNetworkHostTest {
 		final NisPeerNetworkHost host = createNetwork();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class NisPeerNetworkHostTest {
 		final CompletableFuture<?> future = host.boot(createLocalNode());
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(true));
 
 		// Cleanup:
 		future.join();
@@ -158,10 +158,10 @@ public class NisPeerNetworkHostTest {
 		host.boot(createLocalNode()).join();
 
 		// Assert:
-		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void networkCannotBeBootedMoreThanOnce() {
@@ -173,7 +173,7 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
-	//region getNodeInfo
+	// region getNodeInfo
 
 	@Test
 	public void getNodeInfoReturnsNodeFuture() {
@@ -189,10 +189,10 @@ public class NisPeerNetworkHostTest {
 		final CompletableFuture<Node> future = host.getNodeInfo(node);
 
 		// Assert:
-		Assert.assertThat(future.join(), IsEqual.equalTo(node));
+		MatcherAssert.assertThat(future.join(), IsEqual.equalTo(node));
 	}
 
-	//endregion
+	// endregion
 
 	@Test
 	public void getVisitorsReturnsElevenTimerVisitors() {
@@ -203,7 +203,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(11));
+			MatcherAssert.assertThat(visitors.size(), IsEqual.equalTo(11));
 		}
 	}
 
@@ -211,23 +211,14 @@ public class NisPeerNetworkHostTest {
 		return new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("10.0.0.1"));
 	}
 
-	private static NisPeerNetworkHost createNetwork(
-			final HttpConnectorPool pool,
-			final TimeProvider timeProvider,
+	private static NisPeerNetworkHost createNetwork(final HttpConnectorPool pool, final TimeProvider timeProvider,
 			final AuditCollection auditCollection) {
 		final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		Mockito.when(nisCache.getPoxFacade()).thenReturn(Mockito.mock(PoxFacade.class));
 
-		return new NisPeerNetworkHost(
-				nisCache,
-				Mockito.mock(CountingBlockSynchronizer.class),
-				new PeerNetworkScheduler(timeProvider, Mockito.mock(HarvestingTask.class)),
-				Mockito.mock(ChainServices.class),
-				Mockito.mock(NodeCompatibilityChecker.class),
-				new NisConfiguration(),
-				pool,
-				NisUtils.createTrustProvider(),
-				auditCollection,
+		return new NisPeerNetworkHost(nisCache, Mockito.mock(CountingBlockSynchronizer.class),
+				new PeerNetworkScheduler(timeProvider, Mockito.mock(HarvestingTask.class)), Mockito.mock(ChainServices.class),
+				Mockito.mock(NodeCompatibilityChecker.class), new NisConfiguration(), pool, NisUtils.createTrustProvider(), auditCollection,
 				auditCollection);
 	}
 
@@ -240,9 +231,6 @@ public class NisPeerNetworkHostTest {
 	private static NisPeerNetworkHost createNetwork() {
 		final TimeProvider timeProvider = new SystemTimeProvider();
 		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);
-		return createNetwork(
-				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
-				timeProvider,
-				auditCollection);
+		return createNetwork(new HttpConnectorPool(CommunicationMode.JSON, auditCollection), timeProvider, auditCollection);
 	}
 }

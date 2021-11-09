@@ -14,8 +14,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	private int maxId;
 
 	/**
-	 * Creates a new NodeNeighbors object.
-	 * <em>The neighbor ids MUST be sorted in ascending order.</em>
+	 * Creates a new NodeNeighbors object. <em>The neighbor ids MUST be sorted in ascending order.</em>
 	 *
 	 * @param neighborIds The (sorted) neighbor ids.
 	 */
@@ -44,8 +43,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	}
 
 	/**
-	 * Adds a new neighbor.
-	 * <em>Adding new neighbors MUST be in ascending order of ids.</em>
+	 * Adds a new neighbor. <em>Adding new neighbors MUST be in ascending order of ids.</em>
 	 *
 	 * @param nodeId The node id.
 	 */
@@ -163,7 +161,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 			return false;
 		}
 
-		final NodeNeighbors rhs = (NodeNeighbors)obj;
+		final NodeNeighbors rhs = (NodeNeighbors) obj;
 		return this.neighborIds.equals(rhs.neighborIds);
 	}
 }

@@ -16,7 +16,7 @@ public abstract class AbstractPruningObserverTest {
 	protected static final long PRUNE_INTERVAL = 360;
 	protected static final int RETENTION_HOURS = 42;
 
-	//region abstract functions
+	// region abstract functions
 
 	/**
 	 * Creates the pruning block observer.
@@ -41,9 +41,9 @@ public abstract class AbstractPruningObserverTest {
 	 */
 	protected abstract void assertNoPruning(final NisCache nisCache);
 
-	//endregion
+	// endregion
 
-	//region no-op
+	// region no-op
 
 	@Test
 	public void noPruningIsTriggeredWhenNotificationTriggerIsNotExecute() {
@@ -67,10 +67,7 @@ public abstract class AbstractPruningObserverTest {
 		}
 	}
 
-	private void assertNoPruning(
-			final long notificationHeight,
-			final int notificationTime,
-			final NotificationTrigger notificationTrigger,
+	private void assertNoPruning(final long notificationHeight, final int notificationTime, final NotificationTrigger notificationTrigger,
 			final NotificationType notificationType) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -78,17 +75,15 @@ public abstract class AbstractPruningObserverTest {
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(notificationType);
-		final BlockNotificationContext notificationContext = new BlockNotificationContext(
-				new BlockHeight(notificationHeight),
-				new TimeInstant(notificationTime),
-				notificationTrigger);
+		final BlockNotificationContext notificationContext = new BlockNotificationContext(new BlockHeight(notificationHeight),
+				new TimeInstant(notificationTime), notificationTrigger);
 		observer.notify(notification, notificationContext);
 
 		// Assert:
 		this.assertNoPruning(context.nisCache);
 	}
 
-	//endregion
+	// endregion
 
 	protected void assertBlockBasedPruning(final long notificationHeight, final long state) {
 		// Arrange:
@@ -97,10 +92,8 @@ public abstract class AbstractPruningObserverTest {
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
-		final BlockNotificationContext notificationContext = new BlockNotificationContext(
-				new BlockHeight(notificationHeight),
-				TimeInstant.ZERO,
-				NotificationTrigger.Execute);
+		final BlockNotificationContext notificationContext = new BlockNotificationContext(new BlockHeight(notificationHeight),
+				TimeInstant.ZERO, NotificationTrigger.Execute);
 		observer.notify(notification, notificationContext);
 
 		// Assert:
@@ -114,9 +107,7 @@ public abstract class AbstractPruningObserverTest {
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
-		final BlockNotificationContext notificationContext = new BlockNotificationContext(
-				BlockHeight.ONE,
-				notificationTime,
+		final BlockNotificationContext notificationContext = new BlockNotificationContext(BlockHeight.ONE, notificationTime,
 				NotificationTrigger.Execute);
 		observer.notify(notification, notificationContext);
 

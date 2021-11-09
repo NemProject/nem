@@ -13,6 +13,7 @@ public class DbModelUtils {
 	 * @param source The source multisig transaction.
 	 * @return The inner transaction.
 	 */
+	@SuppressWarnings("rawtypes")
 	public static AbstractBlockTransfer getInnerTransaction(final DbMultisigTransaction source) {
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			final AbstractBlockTransfer transaction = entry.getFromMultisig.apply(source);

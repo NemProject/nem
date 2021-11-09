@@ -5,8 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Provision namespace db entity
- * <br>
+ * Provision namespace db entity <br>
  * Holds information about a single provision namespace transaction.
  */
 @Entity

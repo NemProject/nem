@@ -24,9 +24,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 	 * @param accountStateCache The account state cache.
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
 	 */
-	public ExpiredNamespacesObserver(
-			final NamespaceCache namespaceCache,
-			final AccountStateCache accountStateCache,
+	public ExpiredNamespacesObserver(final NamespaceCache namespaceCache, final AccountStateCache accountStateCache,
 			final int estimatedBlocksPerYear) {
 		this.namespaceCache = namespaceCache;
 		this.accountStateCache = accountStateCache;
@@ -42,26 +40,23 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 		final long blocksPerYear = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear();
 		final Collection<NamespaceId> expiredNamespaces = new ArrayList<>();
 		final Collection<NamespaceId> rootIds = this.namespaceCache.getRootNamespaceIds();
-		rootIds.stream()
-				.map(this.namespaceCache::get)
+		rootIds.stream().map(this.namespaceCache::get)
 				.filter(ns -> ns.getNamespace().getHeight().getRaw() + this.estimatedBlocksPerYear == context.getHeight().getRaw())
 				.forEach(ns -> {
 					final NamespaceId rootId = ns.getNamespace().getId();
 					expiredNamespaces.add(rootId);
 					expiredNamespaces.addAll(this.namespaceCache.getSubNamespaceIds(rootId));
 				});
-		expiredNamespaces.stream()
-				.map(this::createMosaicIdToAddressMap)
-				.forEach(map -> {
-						map.forEach((key, value) -> value.forEach(address -> {
-							final AccountInfo info = this.accountStateCache.findStateByAddress(address).getAccountInfo();
-							if (NotificationTrigger.Execute == context.getTrigger()) {
-								info.removeMosaicId(key);
-							} else {
-								info.addMosaicId(key);
-							}
-						}));
-				});
+		expiredNamespaces.stream().map(this::createMosaicIdToAddressMap).forEach(map -> {
+			map.forEach((key, value) -> value.forEach(address -> {
+				final AccountInfo info = this.accountStateCache.findStateByAddress(address).getAccountInfo();
+				if (NotificationTrigger.Execute == context.getTrigger()) {
+					info.removeMosaicId(key);
+				} else {
+					info.addMosaicId(key);
+				}
+			}));
+		});
 	}
 
 	private Map<MosaicId, Collection<Address>> createMosaicIdToAddressMap(final NamespaceId namespaceId) {

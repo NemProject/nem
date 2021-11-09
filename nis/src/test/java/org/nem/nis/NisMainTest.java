@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
@@ -33,7 +34,8 @@ import java.util.concurrent.CompletableFuture;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class NisMainTest {
-	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
+	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey
+			.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
 	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 	private static final PrivateKey TEST_BOOT_KEY = new KeyPair().getPrivateKey();
@@ -46,7 +48,7 @@ public class NisMainTest {
 	private static final int PROOF_OF_STAKE = 0x000000020;
 	private static final int THROW_DURING_BOOT = 0x00000040;
 
-	//region session auto-wiring
+	// region session auto-wiring
 
 	@Autowired
 	private AccountDao accountDao;
@@ -74,9 +76,9 @@ public class NisMainTest {
 		this.session.close();
 	}
 
-	//endregion
+	// endregion
 
-	//region cache
+	// region cache
 
 	@Test
 	public void initUpdatesNisCacheWithNemesisBlockDataWhenNoBlocksArePresent() {
@@ -88,8 +90,8 @@ public class NisMainTest {
 
 		// Assert:
 		assertBlockAnalyzerUsed(context);
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
 		context.assertNoErrors();
 	}
 
@@ -98,12 +100,8 @@ public class NisMainTest {
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final Block block = NisUtils.createBlockList(context.nemesisBlock, 1).get(0);
-		final Transaction transfer = new TransferTransaction(
-				TimeInstant.ZERO,
-				new Account(new KeyPair(TEST_ADDRESS1_PK)),
-				new Account(TEST_ADDRESS2),
-				Amount.fromNem(1_000_000),
-				null);
+		final Transaction transfer = new TransferTransaction(TimeInstant.ZERO, new Account(new KeyPair(TEST_ADDRESS1_PK)),
+				new Account(TEST_ADDRESS2), Amount.fromNem(1_000_000), null);
 		transfer.setFee(Amount.fromNem(100));
 		transfer.sign();
 		block.addTransaction(transfer);
@@ -116,8 +114,8 @@ public class NisMainTest {
 
 		// Assert:
 		assertBlockAnalyzerUsed(context);
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		MatcherAssert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
 		context.assertNoErrors();
 	}
 
@@ -126,14 +124,11 @@ public class NisMainTest {
 		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.any());
 	}
 
-	//endregion
+	// endregion
 
-	//region auto-boot
+	// region auto-boot
 
-	private void assertBootConfiguration(
-			final int flags,
-			final PrivateKey bootKey,
-			final String bootName) {
+	private void assertBootConfiguration(final int flags, final PrivateKey bootKey, final String bootName) {
 		// Arrange:
 		final TestContext context = this.createTestContext(flags);
 
@@ -146,17 +141,17 @@ public class NisMainTest {
 
 		final NodeIdentity identity = nodeCaptor.getValue().getIdentity();
 		if (0 != (flags & SUPPLY_BOOT_KEY)) {
-			Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(bootKey));
+			MatcherAssert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(bootKey));
 		}
 
 		if (0 != (flags & SUPPLY_BOOT_NAME)) {
-			Assert.assertThat(identity.getName(), IsEqual.equalTo(bootName));
+			MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo(bootName));
 		} else {
-			Assert.assertThat(identity.getName(), IsEqual.equalTo(identity.getAddress().toString()));
+			MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo(identity.getAddress().toString()));
 		}
 
 		final NodeEndpoint endpoint = nodeCaptor.getValue().getEndpoint();
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
+		MatcherAssert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
 		context.assertNoErrors();
 	}
 
@@ -197,9 +192,9 @@ public class NisMainTest {
 		context.assertNoErrors();
 	}
 
-	//endregion
+	// endregion
 
-	//region nemesis block saving
+	// region nemesis block saving
 
 	@Test
 	public void initSavesNemesisBlockIfDatabaseIsEmpty() {
@@ -207,7 +202,7 @@ public class NisMainTest {
 		final TestContext context = this.createTestContext();
 
 		// sanity check
-		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
+		MatcherAssert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
 
 		// Act:
 		context.nisMain.init();
@@ -216,7 +211,7 @@ public class NisMainTest {
 		// Assert:
 		// - if nemesis block would have been saved during init, it would have been mapped to a dbBlock.
 		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any());
-		Assert.assertThat(dbBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbBlock, IsNull.notNullValue());
 		context.assertNoErrors();
 	}
 
@@ -227,7 +222,7 @@ public class NisMainTest {
 		context.saveNemesisBlock();
 
 		// sanity check
-		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.notNullValue());
+		MatcherAssert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.notNullValue());
 
 		// Act:
 		context.nisMain.init();
@@ -238,9 +233,9 @@ public class NisMainTest {
 		context.assertNoErrors();
 	}
 
-	//endregion
+	// endregion
 
-	//region failures
+	// region failures
 
 	@Test
 	public void initFailsIfDatabaseContainsNemesisBlockWithWrongBlockHash() {
@@ -288,9 +283,9 @@ public class NisMainTest {
 		context.assertError(-2);
 	}
 
-	//endregion
+	// endregion
 
-	//region delay block loading
+	// region delay block loading
 
 	@Test
 	public void initLoadsDbAsynchronouslyIfDelayBlockLoadingIsEnabled() {
@@ -301,7 +296,7 @@ public class NisMainTest {
 		context.nisMain.init();
 
 		// Assert:
-		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
 		context.assertNoErrors();
 	}
 
@@ -314,13 +309,13 @@ public class NisMainTest {
 		context.nisMain.init();
 
 		// Assert:
-		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
 		context.assertNoErrors();
 	}
 
-	//endregion
+	// endregion
 
-	//region feature -> observer mapping
+	// region feature -> observer mapping
 
 	@Test
 	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
@@ -337,8 +332,7 @@ public class NisMainTest {
 	@Test
 	public void initSupportsNoHistoricalDataPruningForProofOfStake() {
 		// Assert:
-		this.assertFlagsToOptionsMapping(
-				HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE,
+		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE,
 				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver));
 	}
 
@@ -360,18 +354,14 @@ public class NisMainTest {
 		context.assertNoErrors();
 	}
 
-	//endregion
+	// endregion
 
 	private static Amount getBalance(final ReadOnlyNisCache cache, final Address address) {
 		return cache.getAccountStateCache().findStateByAddress(address).getAccountInfo().getBalance();
 	}
 
-	private static NisConfiguration createNisConfiguration(
-			final boolean autoBoot,
-			final boolean supplyBootKey,
-			final boolean supplyBootName,
-			final boolean delayBlockLoading,
-			final boolean historicalAccountData,
+	private static NisConfiguration createNisConfiguration(final boolean autoBoot, final boolean supplyBootKey,
+			final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
 			final boolean proofOfStake) {
 		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config.properties", true);
 		final Properties properties = new Properties();
@@ -425,43 +415,26 @@ public class NisMainTest {
 		private final NetworkHostBootstrapper networkHost = Mockito.mock(NetworkHostBootstrapper.class);
 		private final NisConfiguration nisConfiguration;
 		private final NisMain nisMain;
-		private final Integer[] exitReason = new Integer[] { null };
+		private final Integer[] exitReason = new Integer[]{
+				null
+		};
 
-		private TestContext(
-				final BlockDao blockDao,
-				final AccountDao accountDao) {
+		private TestContext(final BlockDao blockDao, final AccountDao accountDao) {
 			this(blockDao, accountDao, 0);
 		}
 
-		private TestContext(
-				final BlockDao blockDao,
-				final AccountDao accountDao,
-				final int flags) {
-			this(
-					blockDao,
-					accountDao,
-					0 != (flags & AUTO_BOOT),
-					0 != (flags & SUPPLY_BOOT_KEY),
-					0 != (flags & SUPPLY_BOOT_NAME),
-					0 != (flags & DELAY_BLOCK_LOADING),
-					0 != (flags & HISTORICAL_ACCOUNT_DATA),
-					0 != (flags & PROOF_OF_STAKE),
+		private TestContext(final BlockDao blockDao, final AccountDao accountDao, final int flags) {
+			this(blockDao, accountDao, 0 != (flags & AUTO_BOOT), 0 != (flags & SUPPLY_BOOT_KEY), 0 != (flags & SUPPLY_BOOT_NAME),
+					0 != (flags & DELAY_BLOCK_LOADING), 0 != (flags & HISTORICAL_ACCOUNT_DATA), 0 != (flags & PROOF_OF_STAKE),
 					0 != (flags & THROW_DURING_BOOT));
 		}
 
-		private TestContext(
-				final BlockDao blockDao,
-				final AccountDao accountDao,
-				final boolean autoBoot,
-				final boolean supplyBootKey,
-				final boolean supplyBootName,
-				final boolean delayBlockLoading,
-				final boolean historicalAccountData,
-				final boolean proofOfStake,
-				final boolean throwDuringBoot) {
+		private TestContext(final BlockDao blockDao, final AccountDao accountDao, final boolean autoBoot, final boolean supplyBootKey,
+				final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
+				final boolean proofOfStake, final boolean throwDuringBoot) {
 			this.blockDao = blockDao;
 			this.accountDao = accountDao;
-			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
+			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao));
 
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
 			this.nisCache = NisCacheFactory.createReal(poxFacade);
@@ -469,11 +442,7 @@ public class NisMainTest {
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			this.blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
-			final BlockAnalyzer blockAnalyzer = new BlockAnalyzer(
-					blockDao,
-					scoreManager,
-					this.blockChainLastBlockLayer,
-					nisMapperFactory,
+			final BlockAnalyzer blockAnalyzer = new BlockAnalyzer(blockDao, scoreManager, this.blockChainLastBlockLayer, nisMapperFactory,
 					ESTIMATED_BLOCKS_PER_YEAR);
 			this.nemesisBlock = blockAnalyzer.loadNemesisBlock();
 			this.blockAnalyzer = Mockito.spy(blockAnalyzer);
@@ -484,25 +453,14 @@ public class NisMainTest {
 
 				return CompletableFuture.completedFuture(null);
 			});
-			this.nisConfiguration = createNisConfiguration(
-					autoBoot,
-					supplyBootKey,
-					supplyBootName,
-					delayBlockLoading,
-					historicalAccountData,
-					proofOfStake);
-			this.nisMain = new NisMain(
-					blockDao,
-					this.nisCache,
-					this.networkHost,
-					this.mapper,
-					this.nisConfiguration,
-					this.blockAnalyzer,
+			this.nisConfiguration = createNisConfiguration(autoBoot, supplyBootKey, supplyBootName, delayBlockLoading,
+					historicalAccountData, proofOfStake);
+			this.nisMain = new NisMain(blockDao, this.nisCache, this.networkHost, this.mapper, this.nisConfiguration, this.blockAnalyzer,
 					i -> this.exitReason[0] = i);
 		}
 
 		public void saveBlock(final Block block) {
-			final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapper(this.accountDao).map(block);
+			final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapperAccountDao(this.accountDao).map(block);
 			this.blockDao.save(dbBlock);
 		}
 
@@ -511,11 +469,11 @@ public class NisMainTest {
 		}
 
 		public void assertNoErrors() {
-			Assert.assertThat(this.exitReason[0], IsNull.nullValue());
+			MatcherAssert.assertThat(this.exitReason[0], IsNull.nullValue());
 		}
 
 		public void assertError(final int expectedReason) {
-			Assert.assertThat(this.exitReason[0], IsEqual.equalTo(expectedReason));
+			MatcherAssert.assertThat(this.exitReason[0], IsEqual.equalTo(expectedReason));
 		}
 	}
 }

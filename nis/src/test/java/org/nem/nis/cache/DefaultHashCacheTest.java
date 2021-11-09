@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.HashMetaDataPair;
@@ -41,8 +42,8 @@ public class DefaultHashCacheTest extends HashCacheTest<DefaultHashCache> {
 		tmp.commit();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(4));
+		pairs.forEach(p -> MatcherAssert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
 	}
 
 	// endregion

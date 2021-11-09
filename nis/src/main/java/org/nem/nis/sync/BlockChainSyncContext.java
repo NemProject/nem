@@ -7,9 +7,8 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 /**
- * Creates a block chain synchronization context. The primary point of this class is to
- * hold onto a copy of the NIS cache so that all account-related modifications during
- * a sync only modify the copy.
+ * Creates a block chain synchronization context. The primary point of this class is to hold onto a copy of the NIS cache so that all
+ * account-related modifications during a sync only modify the copy.
  */
 public class BlockChainSyncContext {
 	private final NisCache nisCache;
@@ -19,12 +18,8 @@ public class BlockChainSyncContext {
 	private final BlockChainScore ourScore;
 	private final int blocksLimit;
 
-	public BlockChainSyncContext(
-			final ReadOnlyNisCache nisCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockDao blockDao,
-			final BlockChainServices services,
-			final BlockChainScore ourScore) {
+	public BlockChainSyncContext(final ReadOnlyNisCache nisCache, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao, final BlockChainServices services, final BlockChainScore ourScore) {
 		this.nisCache = nisCache.copy();
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -43,8 +38,7 @@ public class BlockChainSyncContext {
 	}
 
 	/**
-	 * Reverses transactions between commonBlockHeight and current lastBlock.
-	 * Additionally calculates score.
+	 * Reverses transactions between commonBlockHeight and current lastBlock. Additionally calculates score.
 	 *
 	 * @param commonBlockHeight height up to which TXes should be reversed.
 	 * @return score for iterated blocks.
@@ -59,11 +53,7 @@ public class BlockChainSyncContext {
 	 * @return The local block lookup adapter.
 	 */
 	public BlockLookup createLocalBlockLookup() {
-		return new LocalBlockLookupAdapter(
-				this.blockDao,
-				this.services.createMapper(this.nisCache.getAccountCache()),
-				this.blockChainLastBlockLayer.getLastDbBlock(),
-				this.ourScore,
-				this.blocksLimit);
+		return new LocalBlockLookupAdapter(this.blockDao, this.services.createMapper(this.nisCache.getAccountCache()),
+				this.blockChainLastBlockLayer.getLastDbBlock(), this.ourScore, this.blocksLimit);
 	}
 }

@@ -12,7 +12,7 @@ import org.nem.nis.test.NisUtils;
 
 public class MultisigMinCosignatoriesModificationObserverTest {
 
-	//region MinCosignatories
+	// region MinCosignatories
 
 	@Test
 	public void notifyTransferExecuteCallsIncrementMinCosignatoriesByWithModificationValue() {
@@ -38,9 +38,9 @@ public class MultisigMinCosignatoriesModificationObserverTest {
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).incrementMinCosignatoriesBy(-12);
 	}
 
-	//endregion
+	// endregion
 
-	//region other type
+	// region other type
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -50,8 +50,7 @@ public class MultisigMinCosignatoriesModificationObserverTest {
 
 		// Act:
 		observer.notify(
-				new MultisigCosignatoryModificationNotification(
-						context.account1,
+				new MultisigCosignatoryModificationNotification(context.account1,
 						new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
@@ -59,18 +58,15 @@ public class MultisigMinCosignatoriesModificationObserverTest {
 		Mockito.verify(context.multisigLinks1, Mockito.never()).incrementMinCosignatoriesBy(Mockito.anyInt());
 	}
 
-	//endregion
+	// endregion
 
-	private void notifyMinCosignatoriesModification(
-			final TestContext context,
-			final NotificationTrigger notificationTrigger) {
+	private void notifyMinCosignatoriesModification(final TestContext context, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final MultisigMinCosignatoriesModificationObserver observer = context.createObserver();
 
 		// Act:
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = new MultisigMinCosignatoriesModification(12);
-		observer.notify(
-				new MultisigMinCosignatoriesModificationNotification(context.account1, minCosignatoriesModification),
+		observer.notify(new MultisigMinCosignatoriesModificationNotification(context.account1, minCosignatoriesModification),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 	}
 

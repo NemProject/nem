@@ -1,10 +1,12 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dbmodel.*;
 
+@SuppressWarnings("rawtypes")
 public class MultisigTransferMapTest {
 
 	@Test
@@ -13,7 +15,7 @@ public class MultisigTransferMapTest {
 		final MultisigTransferMap map = new MultisigTransferMap();
 
 		// Assert:
-		Assert.assertThat(map.size(), IsEqual.equalTo(TransactionTypes.getMultisigEmbeddableTypes().size()));
+		MatcherAssert.assertThat(map.size(), IsEqual.equalTo(TransactionTypes.getMultisigEmbeddableTypes().size()));
 	}
 
 	@Test
@@ -26,8 +28,8 @@ public class MultisigTransferMapTest {
 			final MultisigTransferMap.Entry entry = map.getEntry(type);
 
 			// Assert:
-			Assert.assertThat(entry, IsNull.notNullValue());
-			Assert.assertThat(entry.getType(), IsEqual.equalTo(type));
+			MatcherAssert.assertThat(entry, IsNull.notNullValue());
+			MatcherAssert.assertThat(entry.getType(), IsEqual.equalTo(type));
 		}
 	}
 
@@ -44,7 +46,7 @@ public class MultisigTransferMapTest {
 		final AbstractBlockTransfer result = entry.getOrDefault(1234L);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(transfer));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(transfer));
 	}
 
 	@Test
@@ -62,9 +64,9 @@ public class MultisigTransferMapTest {
 
 			// Assert:
 			if (TransactionTypes.TRANSFER == type) {
-				Assert.assertThat(result, IsSame.sameInstance(transfer));
+				MatcherAssert.assertThat(result, IsSame.sameInstance(transfer));
 			} else {
-				Assert.assertThat(result, IsNull.nullValue());
+				MatcherAssert.assertThat(result, IsNull.nullValue());
 			}
 		}
 	}
@@ -79,7 +81,7 @@ public class MultisigTransferMapTest {
 		final AbstractBlockTransfer result = entry.getOrDefault(null);
 
 		// Assert:
-		Assert.assertThat(result, IsNull.nullValue());
+		MatcherAssert.assertThat(result, IsNull.nullValue());
 	}
 
 	@Test
@@ -92,6 +94,6 @@ public class MultisigTransferMapTest {
 		final AbstractBlockTransfer result = entry.getOrDefault(1234L);
 
 		// Assert:
-		Assert.assertThat(result, IsNull.nullValue());
+		MatcherAssert.assertThat(result, IsNull.nullValue());
 	}
 }

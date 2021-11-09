@@ -8,7 +8,9 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a model provision namespace transaction to a db provision namespace transaction.
  */
-public class ProvisionNamespaceModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<ProvisionNamespaceTransaction, DbProvisionNamespaceTransaction> {
+public class ProvisionNamespaceModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<ProvisionNamespaceTransaction, DbProvisionNamespaceTransaction> {
 
 	/**
 	 * Creates a new mapping.

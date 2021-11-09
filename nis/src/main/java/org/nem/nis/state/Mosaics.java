@@ -33,9 +33,7 @@ public class Mosaics implements ReadOnlyMosaics {
 
 	@Override
 	public int deepSize() {
-		return this.hashMap.values().stream()
-				.map(MosaicEntryHistory::historyDepth)
-				.reduce(0, Integer::sum);
+		return this.hashMap.values().stream().map(MosaicEntryHistory::historyDepth).reduce(0, Integer::sum);
 	}
 
 	@Override
@@ -106,7 +104,8 @@ public class Mosaics implements ReadOnlyMosaics {
 	protected void add(final MosaicEntry entry, final BlockHeight height) {
 		final MosaicDefinition mosaicDefinition = entry.getMosaicDefinition();
 		if (!this.namespaceId.equals(mosaicDefinition.getId().getNamespaceId())) {
-			throw new IllegalArgumentException(String.format("attempting to add mosaic definition with mismatched namespace %s", mosaicDefinition));
+			throw new IllegalArgumentException(
+					String.format("attempting to add mosaic definition with mismatched namespace %s", mosaicDefinition));
 		}
 
 		if (!this.hashMap.containsKey(mosaicDefinition.getId())) {
@@ -125,7 +124,8 @@ public class Mosaics implements ReadOnlyMosaics {
 		final MosaicDefinition originalDefinition = original.getMosaicDefinition();
 		final MosaicProperties originalProperties = originalDefinition.getProperties();
 		final MosaicProperties newProperties = mosaicDefinition.getProperties();
-		if (originalProperties.equals(newProperties) && Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+		if (originalProperties.equals(newProperties)
+				&& Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
 			final MosaicEntry newEntry = new MosaicEntry(mosaicDefinition, original.getSupply(), original.getBalances().copy());
 			history.push(newEntry);
 		} else {
@@ -164,7 +164,7 @@ public class Mosaics implements ReadOnlyMosaics {
 		return copy;
 	}
 
-	//region MosaicEntryHistory
+	// region MosaicEntryHistory
 
 	private static class MosaicEntryHistory {
 		private final List<MosaicEntry> mosaicEntries = new ArrayList<>();
@@ -203,5 +203,5 @@ public class Mosaics implements ReadOnlyMosaics {
 		}
 	}
 
-	//endregion
+	// endregion
 }

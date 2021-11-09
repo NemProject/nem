@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -35,14 +36,14 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 	private void assertRawCanBeMappedToDbModel(final byte[] senderProof) {
 		final byte[] rawHash = Utils.generateRandomBytes(32);
 		final Object[] raw = new Object[RAW_SIZE];
-		raw[1] = BigInteger.valueOf(123L);          // id
-		raw[2] = rawHash;                           // raw hash
-		raw[3] = 1;                                 // version
-		raw[4] = BigInteger.valueOf(234L);          // fee
-		raw[5] = 345;                               // timestamp
-		raw[6] = 456;                               // deadline
-		raw[7] = BigInteger.valueOf(567L);          // sender id
-		raw[8] = senderProof;                       // sender proof
+		raw[1] = BigInteger.valueOf(123L); // id
+		raw[2] = rawHash; // raw hash
+		raw[3] = 1; // version
+		raw[4] = BigInteger.valueOf(234L); // fee
+		raw[5] = 345; // timestamp
+		raw[6] = 456; // deadline
+		raw[7] = BigInteger.valueOf(567L); // sender id
+		raw[8] = senderProof; // sender proof
 
 		final DbAccount dbAccount = new DbAccount(567);
 		final IMapper mapper = Mockito.mock(IMapper.class);
@@ -52,13 +53,13 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 		final AbstractTransfer dbModel = this.createMapping(mapper).map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(new Hash(rawHash)));
-		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(234L));
-		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(345));
-		Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(456));
-		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(dbAccount));
-		Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(senderProof));
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(new Hash(rawHash)));
+		MatcherAssert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbModel.getFee(), IsEqual.equalTo(234L));
+		MatcherAssert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(345));
+		MatcherAssert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(456));
+		MatcherAssert.assertThat(dbModel.getSender(), IsEqual.equalTo(dbAccount));
+		MatcherAssert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(senderProof));
 	}
 }

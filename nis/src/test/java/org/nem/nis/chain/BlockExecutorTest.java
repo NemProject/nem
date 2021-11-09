@@ -1,5 +1,6 @@
 package org.nem.nis.chain;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -18,7 +19,7 @@ import java.util.*;
 @RunWith(Enclosed.class)
 public class BlockExecutorTest {
 
-	//region ExecutorAsExecuteProcessorTests / ExecutorAsUndoProcessorTests
+	// region ExecutorAsExecuteProcessorTests / ExecutorAsUndoProcessorTests
 
 	public static class ExecutorAsExecuteProcessorTests extends AbstractBlockProcessorTest {
 
@@ -39,7 +40,8 @@ public class BlockExecutorTest {
 		}
 
 		@Override
-		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer) {
+		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+				final BlockTransactionObserver observer) {
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			executor.execute(block, observer);
 		}
@@ -64,13 +66,14 @@ public class BlockExecutorTest {
 		}
 
 		@Override
-		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer) {
+		protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+				final BlockTransactionObserver observer) {
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			executor.undo(block, observer);
 		}
 	}
 
-	//endregion
+	// endregion
 
 	public static class UndoExecuteTransactionOrderTests {
 
@@ -83,7 +86,7 @@ public class BlockExecutorTest {
 			context.execute();
 
 			// Assert:
-			Assert.assertThat(context.executeList, IsEqual.equalTo(Arrays.asList(1, 2, 3)));
+			MatcherAssert.assertThat(context.executeList, IsEqual.equalTo(Arrays.asList(1, 2, 3)));
 		}
 
 		@Test
@@ -96,7 +99,7 @@ public class BlockExecutorTest {
 			context.undo();
 
 			// Assert:
-			Assert.assertThat(context.undoList, IsEqual.equalTo(Arrays.asList(3, 2, 1)));
+			MatcherAssert.assertThat(context.undoList, IsEqual.equalTo(Arrays.asList(3, 2, 1)));
 		}
 
 		private final class UndoExecuteTransactionOrderTestContext {
@@ -111,10 +114,8 @@ public class BlockExecutorTest {
 
 			public UndoExecuteTransactionOrderTestContext() {
 				this.account = Utils.generateRandomAccount();
-				this.transactions = new MockTransaction[] {
-						this.createTransaction(1, 17),
-						this.createTransaction(2, 11),
-						this.createTransaction(3, 4)
+				this.transactions = new MockTransaction[]{
+						this.createTransaction(1, 17), this.createTransaction(2, 11), this.createTransaction(3, 4)
 				};
 
 				this.block = BlockUtils.createBlock(this.account);

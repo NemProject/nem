@@ -9,6 +9,7 @@ import java.util.*;
 /**
  * A mapping that is able to map a model block to a db block.
  */
+@SuppressWarnings("rawtypes")
 public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 	private final IMapper mapper;
 
@@ -24,9 +25,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 	@Override
 	public DbBlock map(final Block block) {
 		final DbAccount harvester = this.mapper.map(block.getSigner(), DbAccount.class);
-		final DbAccount lessor = null != block.getLessor()
-				? this.mapper.map(block.getLessor(), DbAccount.class)
-				: null;
+		final DbAccount lessor = null != block.getLessor() ? this.mapper.map(block.getLessor(), DbAccount.class) : null;
 
 		final Hash blockHash = HashUtils.calculateHash(block);
 		final DbBlock dbBlock = new DbBlock();
@@ -54,7 +53,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 
 		@SuppressWarnings("unchecked")
 		public BlockTransactionContext(final int type) {
-			this.entry = (TransactionRegistry.Entry<T, ?>)TransactionRegistry.findByType(type);
+			this.entry = (TransactionRegistry.Entry<T, ?>) TransactionRegistry.findByType(type);
 		}
 
 		public T mapAndAdd(final IMapper mapper, final Transaction transaction) {
@@ -65,7 +64,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 
 		@SuppressWarnings("unchecked")
 		public void add(final AbstractBlockTransfer dbTransfer) {
-			this.transactions.add((T)dbTransfer);
+			this.transactions.add((T) dbTransfer);
 		}
 
 		public void commit(final DbBlock dbBlock) {
@@ -97,7 +96,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 			dbTransfer.setBlock(this.dbBlock);
 
 			if (dbTransfer instanceof DbMultisigTransaction) {
-				final DbMultisigTransaction dbMultisigTransfer = (DbMultisigTransaction)dbTransfer;
+				final DbMultisigTransaction dbMultisigTransfer = (DbMultisigTransaction) dbTransfer;
 				for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 					final AbstractBlockTransfer dbInnerTransfer = entry.getFromMultisig.apply(dbMultisigTransfer);
 					if (null == dbInnerTransfer) {

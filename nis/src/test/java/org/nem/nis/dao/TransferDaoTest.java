@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hibernate.*;
 import org.junit.*;
@@ -26,6 +27,7 @@ import java.util.stream.*;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
+@SuppressWarnings("rawtypes")
 public class TransferDaoTest {
 	private static final int USE_HASH = 1;
 	private static final int USE_ID = 2;
@@ -67,12 +69,14 @@ public class TransferDaoTest {
 		// Act:
 		for (int i = 0; i < context.hashes.size(); ++i) {
 			final TransferBlockPair pair = this.transferDao.getTransactionUsingHash(context.hashes.get(i), BlockHeight.ONE);
-			Assert.assertThat(2 * i, IsEqual.equalTo(pair.getTransfer().getTimeStamp()));
-			Assert.assertThat(context.hashes.get(i), IsEqual.equalTo(pair.getTransfer().getTransferHash()));
-			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getTransfer().getSender().getPrintableKey()));
-			Assert.assertThat(123, IsEqual.equalTo(pair.getDbBlock().getTimeStamp()));
-			Assert.assertThat(1L, IsEqual.equalTo(pair.getDbBlock().getHeight()));
-			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getDbBlock().getHarvester().getPrintableKey()));
+			MatcherAssert.assertThat(2 * i, IsEqual.equalTo(pair.getTransfer().getTimeStamp()));
+			MatcherAssert.assertThat(context.hashes.get(i), IsEqual.equalTo(pair.getTransfer().getTransferHash()));
+			MatcherAssert.assertThat(context.account.getAddress().toString(),
+					IsEqual.equalTo(pair.getTransfer().getSender().getPrintableKey()));
+			MatcherAssert.assertThat(123, IsEqual.equalTo(pair.getDbBlock().getTimeStamp()));
+			MatcherAssert.assertThat(1L, IsEqual.equalTo(pair.getDbBlock().getHeight()));
+			MatcherAssert.assertThat(context.account.getAddress().toString(),
+					IsEqual.equalTo(pair.getDbBlock().getHarvester().getPrintableKey()));
 		}
 	}
 
@@ -87,13 +91,15 @@ public class TransferDaoTest {
 
 		// Act
 		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
-		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
-		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null,
+				USE_HASH);
+		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null,
+				USE_HASH);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
-		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -105,73 +111,55 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromEnd() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromStart() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromEnd() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromStart() {
-		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(ReadOnlyTransferDao.TransferType.ALL,
+				o -> 99 - o, USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_HASH);
+				ReadOnlyTransferDao.TransferType.ALL, o -> 99 - o, USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromEnd() {
-		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(ReadOnlyTransferDao.TransferType.ALL,
+				o -> 99 - o, USE_HASH);
 	}
 
 	@Test
@@ -207,9 +195,9 @@ public class TransferDaoTest {
 		final Collection<?> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
-		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
-		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		MatcherAssert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -221,79 +209,61 @@ public class TransferDaoTest {
 		final Collection<?> entities = this.getTransfersFromDbUsingAttribute(context, null, 1234L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(25));
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromEnd() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				o -> 2 * (49 - o) + 1,
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.INCOMING, o -> 2 * (49 - o) + 1, USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromStart() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromEnd() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				o -> 2 * (49 - o),
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.OUTGOING, o -> 2 * (49 - o), USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromStart() {
-		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(ReadOnlyTransferDao.TransferType.ALL,
+				o -> 99 - o, USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_ID);
+				ReadOnlyTransferDao.TransferType.ALL, o -> 99 - o, USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromEnd() {
-		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-				ReadOnlyTransferDao.TransferType.ALL,
-				o -> 99 - o,
-				USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(ReadOnlyTransferDao.TransferType.ALL,
+				o -> 99 - o, USE_ID);
 	}
 
 	@Test
@@ -374,7 +344,8 @@ public class TransferDaoTest {
 			for (int i = 0; i < count; i++) {
 				final Account recipient = Utils.generateRandomAccount();
 				TransferDaoTest.this.addMapping(mockAccountDao, recipient);
-				final TransferTransaction transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, recipient, 10, 2 * i);
+				final TransferTransaction transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, recipient, 10,
+						2 * i);
 
 				dummyBlock.addTransaction(transferTransaction);
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
@@ -397,41 +368,25 @@ public class TransferDaoTest {
 	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
 		// Arrange:
 		final MultisigTestContext context = this.createMultisigTestContext();
-		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
-				context.multisigTransferTransaction,
-				context.multisigImportanceTransferTransaction,
-				context.multisigAggregateModificationTransaction);
+		final List<MultisigTransaction> expectedTransactions = Arrays.asList(context.multisigTransferTransaction,
+				context.multisigImportanceTransferTransaction, context.multisigAggregateModificationTransaction);
 
 		// Assert:
 		// 1) signer of multisig transaction sees his own transactions as outgoing
-		this.assertExpectedMultisigTransactions(
-				context.multisigSigner,
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				expectedTransactions);
+		this.assertExpectedMultisigTransactions(context.multisigSigner, ReadOnlyTransferDao.TransferType.OUTGOING, expectedTransactions);
 
 		// 2) multisig account sees the multisig transactions as outgoing (because inner transaction involves the multisig account)
-		this.assertExpectedMultisigTransactions(
-				context.multisig,
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				expectedTransactions);
+		this.assertExpectedMultisigTransactions(context.multisig, ReadOnlyTransferDao.TransferType.OUTGOING, expectedTransactions);
 
 		// 3) cosignatories of the multisig transaction see the transactions as outgoing
 		context.cosignatories.stream()
-				.forEach(c -> this.assertExpectedMultisigTransactions(
-						c,
-						ReadOnlyTransferDao.TransferType.OUTGOING,
-						expectedTransactions));
+				.forEach(c -> this.assertExpectedMultisigTransactions(c, ReadOnlyTransferDao.TransferType.OUTGOING, expectedTransactions));
 
 		// 4) recipient (if any) of the inner transaction does not see the transaction as outgoing
-		this.assertExpectedMultisigTransactions(
-				context.recipient,
-				ReadOnlyTransferDao.TransferType.OUTGOING,
-				new ArrayList<>());
+		this.assertExpectedMultisigTransactions(context.recipient, ReadOnlyTransferDao.TransferType.OUTGOING, new ArrayList<>());
 
 		// 5) other accounts do not see any transaction as outgoing
-		this.assertExpectedMultisigTransactions(
-				Utils.generateRandomAccount(),
-				ReadOnlyTransferDao.TransferType.OUTGOING,
+		this.assertExpectedMultisigTransactions(Utils.generateRandomAccount(), ReadOnlyTransferDao.TransferType.OUTGOING,
 				new ArrayList<>());
 	}
 
@@ -442,40 +397,25 @@ public class TransferDaoTest {
 
 		// Assert:
 		// 1) signer of multisig transaction does not any the transaction as incoming
-		this.assertExpectedMultisigTransactions(
-				context.multisigSigner,
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				new ArrayList<>());
+		this.assertExpectedMultisigTransactions(context.multisigSigner, ReadOnlyTransferDao.TransferType.INCOMING, new ArrayList<>());
 
 		// 2) multisig account does not see any transaction as incoming
-		this.assertExpectedMultisigTransactions(
-				context.multisig,
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				new ArrayList<>());
+		this.assertExpectedMultisigTransactions(context.multisig, ReadOnlyTransferDao.TransferType.INCOMING, new ArrayList<>());
 
 		// 3) cosignatories of the multisig transaction do not see any transaction as incoming
 		context.cosignatories.stream()
-				.forEach(c -> this.assertExpectedMultisigTransactions(
-						c,
-						ReadOnlyTransferDao.TransferType.INCOMING,
-						new ArrayList<>()));
+				.forEach(c -> this.assertExpectedMultisigTransactions(c, ReadOnlyTransferDao.TransferType.INCOMING, new ArrayList<>()));
 
 		// 4) recipient (if any) of inner transaction sees the transaction as incoming
-		this.assertExpectedMultisigTransactions(
-				context.recipient,
-				ReadOnlyTransferDao.TransferType.INCOMING,
+		this.assertExpectedMultisigTransactions(context.recipient, ReadOnlyTransferDao.TransferType.INCOMING,
 				Arrays.asList(context.multisigTransferTransaction, context.multisigImportanceTransferTransaction));
 
 		// 5) the new cosignatory of the inner transaction (in case of modification) sees the transaction as incoming
-		this.assertExpectedMultisigTransactions(
-				context.newCosignatory,
-				ReadOnlyTransferDao.TransferType.INCOMING,
+		this.assertExpectedMultisigTransactions(context.newCosignatory, ReadOnlyTransferDao.TransferType.INCOMING,
 				Collections.singletonList(context.multisigAggregateModificationTransaction));
 
 		// 6) other accounts do not see any transaction as incoming
-		this.assertExpectedMultisigTransactions(
-				Utils.generateRandomAccount(),
-				ReadOnlyTransferDao.TransferType.INCOMING,
+		this.assertExpectedMultisigTransactions(Utils.generateRandomAccount(), ReadOnlyTransferDao.TransferType.INCOMING,
 				new ArrayList<>());
 	}
 
@@ -487,26 +427,17 @@ public class TransferDaoTest {
 		return context;
 	}
 
-	private void assertExpectedMultisigTransactions(
-			final Account account,
-			final ReadOnlyTransferDao.TransferType transferType,
+	private void assertExpectedMultisigTransactions(final Account account, final ReadOnlyTransferDao.TransferType transferType,
 			final Collection<MultisigTransaction> multisigTransactions) {
 
 		// Act:
-		final Collection<Hash> transactions = this.transferDao.getTransactionsForAccountUsingId(
-				account,
-				null,
-				transferType,
-				DEFAULT_LIMIT)
-				.stream()
-				.map(p -> p.getTransfer().getTransferHash())
-				.collect(Collectors.toList());
-		final Collection<Hash> expectedTransactions = multisigTransactions.stream()
-				.map(HashUtils::calculateHash)
+		final Collection<Hash> transactions = this.transferDao.getTransactionsForAccountUsingId(account, null, transferType, DEFAULT_LIMIT)
+				.stream().map(p -> p.getTransfer().getTransferHash()).collect(Collectors.toList());
+		final Collection<Hash> expectedTransactions = multisigTransactions.stream().map(HashUtils::calculateHash)
 				.collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
+		MatcherAssert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	private class MultisigTestContext {
@@ -565,9 +496,7 @@ public class TransferDaoTest {
 
 		private void addMultisigTransferTransactions() {
 			this.multisigTransferTransaction = this.prepareMultisigTransaction(
-					this.createTransferTransaction(this.multisig, this.recipient),
-					this.multisigSigner,
-					this.cosignatories);
+					this.createTransferTransaction(this.multisig, this.recipient), this.multisigSigner, this.cosignatories);
 			this.transactions.add(this.multisigTransferTransaction);
 			for (int i = 0; i < 3; i++) {
 				final MultisigTransaction tx = this.prepareMultisigTransaction(
@@ -580,9 +509,7 @@ public class TransferDaoTest {
 
 		private void addMultisigImportanceTransferTransactions() {
 			this.multisigImportanceTransferTransaction = this.prepareMultisigTransaction(
-					this.createImportanceTransferTransaction(this.multisig, this.recipient),
-					this.multisigSigner,
-					this.cosignatories);
+					this.createImportanceTransferTransaction(this.multisig, this.recipient), this.multisigSigner, this.cosignatories);
 			this.transactions.add(this.multisigImportanceTransferTransaction);
 			for (int i = 0; i < 3; i++) {
 				final MultisigTransaction tx = this.prepareMultisigTransaction(
@@ -595,8 +522,7 @@ public class TransferDaoTest {
 
 		private void addMultisigAggregateModificationTransactions() {
 			this.multisigAggregateModificationTransaction = this.prepareMultisigTransaction(
-					this.createMultisigAggregateModificationTransaction(this.multisig, this.newCosignatory),
-					this.multisigSigner,
+					this.createMultisigAggregateModificationTransaction(this.multisig, this.newCosignatory), this.multisigSigner,
 					this.cosignatories);
 			this.transactions.add(this.multisigAggregateModificationTransaction);
 			for (int i = 0; i < 3; i++) {
@@ -608,14 +534,9 @@ public class TransferDaoTest {
 			}
 		}
 
-		private MultisigTransaction prepareMultisigTransaction(
-				final Transaction otherTransaction,
-				final Account multisigSigner,
+		private MultisigTransaction prepareMultisigTransaction(final Transaction otherTransaction, final Account multisigSigner,
 				final List<Account> cosignatories) {
-			final MultisigTransaction transaction = new MultisigTransaction(
-					TimeInstant.ZERO,
-					multisigSigner,
-					otherTransaction);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, multisigSigner, otherTransaction);
 			cosignatories.forEach(c -> this.addSignature(c, transaction));
 			transaction.sign();
 
@@ -623,40 +544,25 @@ public class TransferDaoTest {
 		}
 
 		private TransferTransaction createTransferTransaction(final Account transferSender, final Account transferRecipient) {
-			return new TransferTransaction(
-					TimeInstant.ZERO,
-					transferSender,
-					transferRecipient,
-					Amount.fromNem(123),
-					null);
+			return new TransferTransaction(TimeInstant.ZERO, transferSender, transferRecipient, Amount.fromNem(123), null);
 		}
 
-		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender, final Account transferRecipient) {
-			return new ImportanceTransferTransaction(
-					TimeInstant.ZERO,
-					transferSender,
-					ImportanceTransferMode.Activate,
-					transferRecipient);
+		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender,
+				final Account transferRecipient) {
+			return new ImportanceTransferTransaction(TimeInstant.ZERO, transferSender, ImportanceTransferMode.Activate, transferRecipient);
 		}
 
-		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(
-				final Account multisig,
+		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(final Account multisig,
 				final Account newCosignatory) {
-			final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-					new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, newCosignatory));
-			return new MultisigAggregateModificationTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					modifications);
+			final List<MultisigCosignatoryModification> modifications = Collections
+					.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, newCosignatory));
+			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		}
 
 		public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 			final Transaction otherTransaction = multisigTransaction.getOtherTransaction();
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					signatureSigner,
-					otherTransaction.getSigner(),
-					otherTransaction);
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner,
+					otherTransaction.getSigner(), otherTransaction);
 			signatureTransaction.sign();
 			multisigTransaction.addSignature(signatureTransaction);
 		}
@@ -664,91 +570,77 @@ public class TransferDaoTest {
 
 	// endregion
 
-	private Collection<AbstractBlockTransfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
-		return this.executeGetTransactionsForAccountUsingAttribute(
-				context.account,
-				hash,
-				id,
-				context.height,
-				context.transferType,
-				callType).stream()
-				.map(TransferBlockPair::getTransfer)
-				.collect(Collectors.toList());
+	private Collection<AbstractBlockTransfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id,
+			final int callType) {
+		return this
+				.executeGetTransactionsForAccountUsingAttribute(context.account, hash, id, context.height, context.transferType, callType)
+				.stream().map(TransferBlockPair::getTransfer).collect(Collectors.toList());
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
-			final ReadOnlyTransferDao.TransferType transferType,
-			final Function<Integer, Integer> mapper,
-			final int callType) {
+			final ReadOnlyTransferDao.TransferType transferType, final Function<Integer, Integer> mapper, final int callType) {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
 		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(context, null, null, callType).stream()
-				.map(AbstractBlockTransfer::getTimeStamp)
-				.collect(Collectors.toList());
+				.map(AbstractBlockTransfer::getTimeStamp).collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
-		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(0, 25)));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(0, 25)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
-			final ReadOnlyTransferDao.TransferType transferType,
-			final Function<Integer, Integer> mapper,
-			final int callType) {
+			final ReadOnlyTransferDao.TransferType transferType, final Function<Integer, Integer> mapper, final int callType) {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
-		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(
-				context,
-				USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
-				USE_ID == callType ? (long)mapper.apply(24) + 1 : null,
-				callType).stream()
-				.map(AbstractBlockTransfer::getTimeStamp)
-				.collect(Collectors.toList());
+		final List<Integer> timeStamps = this
+				.getTransfersFromDbUsingAttribute(context, USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
+						USE_ID == callType ? (long) mapper.apply(24) + 1 : null, callType)
+				.stream().map(AbstractBlockTransfer::getTimeStamp).collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
-		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(25, 50)));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		MatcherAssert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(25, 50)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
-			final ReadOnlyTransferDao.TransferType transferType,
-			final Function<Integer, Integer> mapper,
-			final int callType) {
+			final ReadOnlyTransferDao.TransferType transferType, final Function<Integer, Integer> mapper, final int callType) {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final int pos = ReadOnlyTransferDao.TransferType.ALL == transferType ? 99 : 49;
-		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(
-				context,
-				USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
-				USE_ID == callType ? (long)mapper.apply(pos) + 1 : null,
-				callType).stream()
-				.map(AbstractBlockTransfer::getTimeStamp)
-				.collect(Collectors.toList());
+		final List<Integer> timeStamps = this
+				.getTransfersFromDbUsingAttribute(context, USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
+						USE_ID == callType ? (long) mapper.apply(pos) + 1 : null, callType)
+				.stream().map(AbstractBlockTransfer::getTimeStamp).collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(timeStamps.size(), IsEqual.equalTo(0));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
 		// Arrange: roundabout way to ensure that account is added to the db under test
 		final Account account = Utils.generateRandomAccount();
-		final long heights[] = { 3 };
-		final int blockTimestamp[] = { 1801 };
-		final int txTimestamps[][] = { { 1800 } };
+		final long heights[] = {
+				3
+		};
+		final int blockTimestamp[] = {
+				1801
+		};
+		final int txTimestamps[][] = {
+				{
+						1800
+				}
+		};
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, account, true);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> this.executeGetTransactionsForAccountUsingAttribute(
-						account,
-						Utils.generateRandomHash(),
-						new SecureRandom().nextLong(),
-						BlockHeight.ONE,
-						ReadOnlyTransferDao.TransferType.INCOMING,
-						callType),
-				MissingResourceException.class);
+		ExceptionAssert
+				.assertThrows(
+						v -> this.executeGetTransactionsForAccountUsingAttribute(account, Utils.generateRandomHash(),
+								new SecureRandom().nextLong(), BlockHeight.ONE, ReadOnlyTransferDao.TransferType.INCOMING, callType),
+						MissingResourceException.class);
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
@@ -756,98 +648,101 @@ public class TransferDaoTest {
 		final Account sender = Utils.generateRandomAccount();
 
 		final List<Long> expectedIds = Arrays.asList(9l, 8l, 7l, 6l, 5l, 4l, 3l, 2l, 1l);
-		final long heights[] = { 3, 4, 1, 2 };
-		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
-		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
+		final long heights[] = {
+				3, 4, 1, 2
+		};
+		final int blockTimestamp[] = {
+				1801, 1901, 1401, 1501
+		};
+		final int txTimestamps[][] = {
+				{
+						1800, 1600
+				}, {
+						1900, 1700, 1700
+				}, {
+						1200, 1400
+				}, {
+						1300, 1500
+				}
+		};
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act
-		final Collection<TransferBlockPair> entities1 = this.executeGetTransactionsForAccountUsingAttribute(
-				sender,
-				null,
-				null,
-				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL,
-				type);
+		final Collection<TransferBlockPair> entities1 = this.executeGetTransactionsForAccountUsingAttribute(sender, null, null,
+				BlockHeight.ONE, ReadOnlyTransferDao.TransferType.ALL, type);
 
 		final List<Long> resultIds = entities1.stream().map(pair -> pair.getTransfer().getId()).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(entities1.size(), IsEqual.equalTo(9));
-		Assert.assertThat(resultIds, IsEqual.equalTo(expectedIds));
+		MatcherAssert.assertThat(entities1.size(), IsEqual.equalTo(9));
+		MatcherAssert.assertThat(resultIds, IsEqual.equalTo(expectedIds));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final long heights[] = { 3 };
-		final int blockTimestamp[] = { 1801 };
-		final int txTimestamps[][] = { { 1800 } };
+		final long heights[] = {
+				3
+		};
+		final int blockTimestamp[] = {
+				1801
+		};
+		final int txTimestamps[][] = {
+				{
+						1800
+				}
+		};
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, true);
-		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(
-				sender,
-				null,
-				null,
-				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL,
-				type);
+		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(sender, null, null,
+				BlockHeight.ONE, ReadOnlyTransferDao.TransferType.ALL, type);
 
 		// Assert:
-		Assert.assertThat(entities.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(entities.size(), IsEqual.equalTo(1));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
-		final long heights[] = { 3, 4, 1, 2 };
-		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
-		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
+		final long heights[] = {
+				3, 4, 1, 2
+		};
+		final int blockTimestamp[] = {
+				1801, 1901, 1401, 1501
+		};
+		final int txTimestamps[][] = {
+				{
+						1800, 1600
+				}, {
+						1900, 1700, 1700
+				}, {
+						1200, 1400
+				}, {
+						1300, 1500
+				}
+		};
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act:
-		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(
-				Utils.generateRandomAccount(),
-				null,
-				null,
-				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL,
-				type);
+		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(Utils.generateRandomAccount(),
+				null, null, BlockHeight.ONE, ReadOnlyTransferDao.TransferType.ALL, type);
 
 		// Assert:
-		Assert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
 	}
 
-	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(
-			final Account sender,
-			final Hash hash,
-			final Long id,
-			final BlockHeight height,
-			final ReadOnlyTransferDao.TransferType transferType,
-			final int type) {
+	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(final Account sender, final Hash hash,
+			final Long id, final BlockHeight height, final ReadOnlyTransferDao.TransferType transferType, final int type) {
 		switch (type) {
 			case USE_HASH:
-				return this.transferDao.getTransactionsForAccountUsingHash(
-						sender,
-						hash,
-						height,
-						transferType,
-						DEFAULT_LIMIT);
+				return this.transferDao.getTransactionsForAccountUsingHash(sender, hash, height, transferType, DEFAULT_LIMIT);
 			case USE_ID:
-				return this.transferDao.getTransactionsForAccountUsingId(
-						sender,
-						id,
-						transferType,
-						DEFAULT_LIMIT);
-			default:
+				return this.transferDao.getTransactionsForAccountUsingId(sender, id, transferType, DEFAULT_LIMIT);
+			default :
 				throw new IllegalArgumentException("unknown call type");
 		}
 	}
 
-	private void createTestBlocks(
-			final long[] heights,
-			final int[] blockTimestamp,
-			final int[][] txTimestamps,
-			final Account sender,
+	private void createTestBlocks(final long[] heights, final int[] blockTimestamp, final int[][] txTimestamps, final Account sender,
 			final boolean useSenderAsRecipient) {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
@@ -878,12 +773,8 @@ public class TransferDaoTest {
 
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount, final int i) {
 		// Arrange:
-		final TransferTransaction transferTransaction = new TransferTransaction(
-				new TimeInstant(i),
-				sender,
-				recipient,
-				Amount.fromNem(amount),
-				null);
+		final TransferTransaction transferTransaction = new TransferTransaction(new TimeInstant(i), sender, recipient,
+				Amount.fromNem(amount), null);
 		transferTransaction.sign();
 		return transferTransaction;
 	}

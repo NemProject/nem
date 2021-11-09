@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
@@ -27,9 +28,8 @@ public class NamespaceDaoTest {
 		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(context.address, new NamespaceId("foo"), 25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only())
-				.getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		Mockito.verify(context.retriever, Mockito.only()).getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
 	}
 
 	@Test
@@ -43,8 +43,9 @@ public class NamespaceDaoTest {
 		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(address, new NamespaceId("foo"), 25);
 
 		// Assert:
-		Assert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
-		Mockito.verify(context.retriever, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.anyInt());
+		MatcherAssert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
+		Mockito.verify(context.retriever, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(),
+				Mockito.anyInt());
 	}
 
 	@Test
@@ -53,14 +54,13 @@ public class NamespaceDaoTest {
 		final NamespaceId id = new NamespaceId("foo");
 		final DbNamespace retrieverResult = new DbNamespace();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getNamespace(Mockito.any(), Mockito.any()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.retriever.getNamespace(Mockito.any(), Mockito.any())).thenReturn(retrieverResult);
 
 		// Act:
 		final DbNamespace result = context.namespaceDao.getNamespace(id);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getNamespace(context.session, id);
 	}
 
@@ -80,14 +80,13 @@ public class NamespaceDaoTest {
 		// Arrange:
 		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(retrieverResult);
 
 		// Act:
 		final Collection<DbNamespace> result = context.namespaceDao.getRootNamespaces(requestId, 25);
 
 		// Assert:
-		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, retrieverId, 25);
 	}
 

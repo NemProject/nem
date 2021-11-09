@@ -20,8 +20,7 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	 *
 	 * @param transactions The transactions to filter.
 	 */
-	public DefaultUnconfirmedTransactionsFilter(
-			final UnconfirmedTransactionsCache transactions,
+	public DefaultUnconfirmedTransactionsFilter(final UnconfirmedTransactionsCache transactions,
 			final BiPredicate<Address, Transaction> matchesPredicate) {
 		this.transactions = transactions;
 		this.matchesPredicate = matchesPredicate;
@@ -29,8 +28,7 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 
 	@Override
 	public Collection<Transaction> getAll() {
-		final List<Transaction> transactions = this.transactions.stream()
-				.collect(Collectors.toList());
+		final List<Transaction> transactions = this.transactions.stream().collect(Collectors.toList());
 		return this.sortTransactions(transactions);
 	}
 
@@ -40,11 +38,9 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
 
 		// note: we do not strip down any signatures from multisig transactions.
-		//       The transaction cache of the remote node will handle duplicates.
-		this.transactions.stream()
-				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
-		this.transactions.stream()
-				.flatMap(TransactionExtensions::getChildSignatures)
+		// The transaction cache of the remote node will handle duplicates.
+		this.transactions.stream().forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
+		this.transactions.stream().flatMap(TransactionExtensions::getChildSignatures)
 				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
 		return unknownHashShortIds.values().stream().collect(Collectors.toList());
@@ -52,21 +48,16 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 
 	@Override
 	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
-		return this.transactions.stream()
-				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-				.filter(tx -> this.matchesPredicate.test(address, tx))
-				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
-				.limit(maxTransactions)
-				.collect(Collectors.toList());
+		return this.transactions.stream().filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
+				.filter(tx -> this.matchesPredicate.test(address, tx)).sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
+				.limit(maxTransactions).collect(Collectors.toList());
 	}
 
 	@Override
 	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions = this.transactions.stream()
-				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-						// filter out signatures because we don't want them to be directly inside a block
-				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-				.collect(Collectors.toList());
+		final List<Transaction> transactions = this.transactions.stream().filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				// filter out signatures because we don't want them to be directly inside a block
+				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE).collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);
 	}

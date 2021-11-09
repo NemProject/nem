@@ -3,10 +3,10 @@ package org.nem.nis.cache;
 /**
  * A cache that can be copied.
  */
+@SuppressWarnings("rawtypes")
 public interface CopyableCache<TDerived extends CopyableCache> {
 
 	/**
-	 * TODO 20151013 J-J: can we remove this?
 	 * Shallow copies this cache to another cache.
 	 *
 	 * @param rhs The other cache.

@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -11,13 +12,14 @@ import org.nem.nis.mappers.NisMapperFactory;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.MapperUtils;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
 
-	//region createMapper
+	// region createMapper
 
 	@Test
 	public void createMapperDelegatesToMapperFactory() {
@@ -25,7 +27,7 @@ public class BlockChainServicesTest {
 		// note: createMapper() only uses the NisMapperFactory object
 		final NisMapperFactory factory = Mockito.mock(NisMapperFactory.class);
 		final AccountLookup lookup = new DefaultAccountCache();
-		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory);
+		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory, new ForkConfiguration());
 
 		// Act:
 		services.createMapper(lookup);
@@ -34,9 +36,9 @@ public class BlockChainServicesTest {
 		Mockito.verify(factory, Mockito.only()).createDbModelToModelNisMapper(lookup);
 	}
 
-	//endregion
+	// endregion
 
-	//region isPeerChainValid
+	// region isPeerChainValid
 
 	@Test
 	public void isPeerChainValidReturnsTrueIfPeerChainIsValid() {
@@ -45,13 +47,11 @@ public class BlockChainServicesTest {
 		final List<Block> blocks = context.createPeerChain(5);
 
 		// Act:
-		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(
-				context.getNisCacheCopy(),
-				context.getLastBlock(),
+		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(context.getNisCacheCopy(), context.getLastBlock(),
 				blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -62,13 +62,11 @@ public class BlockChainServicesTest {
 		blocks.get(0).getTransactions().get(0).setFee(Amount.fromNem(1234));
 
 		// Act:
-		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(
-				context.getNisCacheCopy(),
-				context.getLastBlock(),
+		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(context.getNisCacheCopy(), context.getLastBlock(),
 				blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
 	}
 
 	@Test
@@ -84,19 +82,19 @@ public class BlockChainServicesTest {
 		final Collection<BlockDifficulty> difficulties = blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(difficulties, IsEqual.equalTo(expectedDifficulties));
+		MatcherAssert.assertThat(difficulties, IsEqual.equalTo(expectedDifficulties));
 	}
 
-	//endregion
+	// endregion
 
-	//region undoAndGetScore
+	// region undoAndGetScore
 
 	@Test
 	public void undoAndGetScoreReturnsExpectedBlockChainScore() {
 		// Arrange:
 		// - the peer chain has empty blocks because if the blocks in the chain are undone, transaction.undo() would throw
-		//   the reason is that processing the chain is done manually and not via block.execute(). Weighted balances are not updated correctly
-		//   causing problems when trying to undo.
+		// the reason is that processing the chain is done manually and not via block.execute(). Weighted balances are not updated correctly
+		// causing problems when trying to undo.
 		final TestContext context = new TestContext();
 		final BlockChainScore initialScore = context.getBlockChainScore();
 		final BlockHeight height = context.getChainHeight();
@@ -104,13 +102,14 @@ public class BlockChainServicesTest {
 		final BlockChainScore peerScore = context.getBlockChainScore();
 
 		// sanity check
-		Assert.assertThat(peerScore, IsNot.not(IsEqual.equalTo(initialScore)));
+		MatcherAssert.assertThat(peerScore, IsNot.not(IsEqual.equalTo(initialScore)));
 
 		// Act:
-		final BlockChainScore score = context.getBlockChainServices().undoAndGetScore(context.getNisCacheCopy(), context.createBlockLookup(), height);
+		final BlockChainScore score = context.getBlockChainServices().undoAndGetScore(context.getNisCacheCopy(),
+				context.createBlockLookup(), height);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(peerScore.subtract(initialScore)));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(peerScore.subtract(initialScore)));
 	}
 
 	@Test
@@ -128,10 +127,8 @@ public class BlockChainServicesTest {
 		final NisCache copy = context.getNisCacheCopy();
 
 		// sanity check
-		copy.getAccountStateCache().contents().stream()
-				.filter(a -> !context.getNemesisAccount().getAddress().equals(a.getAddress()))
-				.forEach(a -> Assert.assertThat(
-						a.getWeightedBalances().size(),
+		copy.getAccountStateCache().contents().stream().filter(a -> !context.getNemesisAccount().getAddress().equals(a.getAddress()))
+				.forEach(a -> MatcherAssert.assertThat(a.getWeightedBalances().size(),
 						IsNot.not(IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress())))));
 
 		// Act:
@@ -139,8 +136,8 @@ public class BlockChainServicesTest {
 		copy.commit();
 
 		// Assert:
-		copy.getAccountStateCache().contents().stream()
-				.forEach(a -> Assert.assertThat(a.getWeightedBalances().size(), IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress()))));
+		copy.getAccountStateCache().contents().stream().forEach(a -> MatcherAssert.assertThat(a.getWeightedBalances().size(),
+				IsEqual.equalTo(addressToWeightedBalancesSizeMap.get(a.getAddress()))));
 	}
 
 	@Test
@@ -151,44 +148,39 @@ public class BlockChainServicesTest {
 
 		// - save all the initial balances
 		final AddressToBalanceCache cache = new AddressToBalanceCache();
-		for (final ReadOnlyAccountState accountState : context.blockChainContext.getNodeContexts().get(0).getNisCache().getAccountStateCache().contents()) {
+		for (final ReadOnlyAccountState accountState : context.blockChainContext.getNodeContexts().get(0).getNisCache()
+				.getAccountStateCache().contents()) {
 			cache.addInitialBalance(accountState.getAddress(), accountState.getAccountInfo().getBalance());
 		}
 
 		// - create a peer chain and capture the expected signer and recipient balances after execution
 		final List<Block> blocks = context.createPeerChain(5);
-		blocks.stream()
-				.flatMap(BlockExtensions::streamDefault)
-				.filter(t -> TransactionTypes.TRANSFER == t.getType())
-				.map(t -> (TransferTransaction)t)
-				.forEach(cache::addTransfer);
-		blocks.stream()
-				.forEach(b -> cache.addFee(b.getSigner().getAddress(), b.getTotalFee()));
+		blocks.stream().flatMap(BlockExtensions::streamDefault).filter(t -> TransactionTypes.TRANSFER == t.getType())
+				.map(t -> (TransferTransaction) t).forEach(cache::addTransfer);
+		blocks.stream().forEach(b -> cache.addFee(b.getSigner().getAddress(), b.getTotalFee()));
 
 		// - process the peer chain
 		context.processPeerChain(blocks);
 		final NisCache copy = context.getNisCacheCopy();
 
 		// sanity check: the balances should all be adjusted
-		Assert.assertThat(cache.addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
-		cache.addressToBalanceMap.entrySet().stream()
-				.forEach(e -> {
-					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
-					final Amount expected = e.getValue();
-					Assert.assertThat(balance, IsEqual.equalTo(expected));
-				});
+		MatcherAssert.assertThat(cache.addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
+		cache.addressToBalanceMap.entrySet().stream().forEach(e -> {
+			final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
+			final Amount expected = e.getValue();
+			MatcherAssert.assertThat(balance, IsEqual.equalTo(expected));
+		});
 
 		// Act: undo and revert changes
 		context.getBlockChainServices().undoAndGetScore(copy, context.createBlockLookup(), height);
 		copy.commit();
 
 		// Assert: all balances should have their initial values
-		cache.addressToBalanceMap.entrySet().stream()
-				.forEach(e -> {
-					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
-					final Amount expected = cache.getInitialBalance(e.getKey());
-					Assert.assertThat(balance, IsEqual.equalTo(expected));
-				});
+		cache.addressToBalanceMap.entrySet().stream().forEach(e -> {
+			final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
+			final Amount expected = cache.getInitialBalance(e.getKey());
+			MatcherAssert.assertThat(balance, IsEqual.equalTo(expected));
+		});
 	}
 
 	private static class AddressToBalanceCache {
@@ -222,7 +214,7 @@ public class BlockChainServicesTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private class TestContext {
 		private final TestOptions options = new TestOptions(10, 1, 10);
@@ -262,12 +254,9 @@ public class BlockChainServicesTest {
 		}
 
 		private BlockLookup createBlockLookup() {
-			return new LocalBlockLookupAdapter(
-					this.nodeContext.getMockBlockDao(),
+			return new LocalBlockLookupAdapter(this.nodeContext.getMockBlockDao(),
 					MapperUtils.createDbModelToModelNisMapper(this.nodeContext.getNisCache().getAccountCache()),
-					this.nodeContext.getBlockChainLastBlockLayer().getLastDbBlock(),
-					this.getBlockChainScore(),
-					0);
+					this.nodeContext.getBlockChainLastBlockLayer().getLastDbBlock(), this.getBlockChainScore(), 0);
 		}
 
 		private Account getNemesisAccount() {

@@ -8,7 +8,9 @@ import java.util.*;
 /**
  * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.
  */
-public class MultisigAggregateModificationModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationModelToDbModelMapping
+		extends
+			AbstractTransferModelToDbModelMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
 
 	/**
 	 * Creates a new mapping.

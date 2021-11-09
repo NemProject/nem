@@ -22,10 +22,7 @@ public class NamespaceRetriever {
 	 * @param limit The limit.
 	 * @return The namespaces.
 	 */
-	public Collection<DbNamespace> getNamespacesForAccount(
-			final Session session,
-			final long accountId,
-			final NamespaceId parent,
+	public Collection<DbNamespace> getNamespacesForAccount(final Session session, final long accountId, final NamespaceId parent,
 			final int limit) {
 		final HashMap<String, DbNamespace> rootMap = getCurrentRootNamespacesForAccount(session, accountId);
 
@@ -34,8 +31,8 @@ public class NamespaceRetriever {
 			return Collections.emptyList();
 		}
 
-		final Criteria criteria = session.createCriteria(DbNamespace.class)
-				.add(Restrictions.eq("owner.id", accountId))
+		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
+				.add(Restrictions.eq("owner.id", accountId)) // preserve-newline
 				.setMaxResults(limit);
 		if (null != parent) {
 			criteria.add(Restrictions.like("fullName", parent.toString() + ".", MatchMode.START));
@@ -60,15 +57,13 @@ public class NamespaceRetriever {
 	 * @param id The namespace id.
 	 * @return The specified namespace or null.
 	 */
-	public DbNamespace getNamespace(
-			final Session session,
-			final NamespaceId id) {
+	public DbNamespace getNamespace(final Session session, final NamespaceId id) {
 		final DbNamespace root = getCurrentRootNamespace(session, id);
 		if (null == root) {
 			return null;
 		}
 
-		final Criteria criteria = session.createCriteria(DbNamespace.class)
+		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
 				.add(Restrictions.eq("fullName", id.toString()));
 
 		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
@@ -88,27 +83,23 @@ public class NamespaceRetriever {
 	 * @param limit The limit.
 	 * @return The root namespaces.
 	 */
-	public Collection<DbNamespace> getRootNamespaces(
-			final Session session,
-			final long maxId,
-			final int limit) {
-		final String queryString = "SELECT n.* FROM namespaces n " +
-				"WHERE fullName NOT IN (SELECT fullName FROM namespaces WHERE id > n.id) " +
-				"AND level = 0 " +
-				"AND id < :maxId " +
-				"ORDER BY id DESC " +
-				"LIMIT :limit";
-		final Query query = session
-				.createSQLQuery(queryString)
-				.addEntity(DbNamespace.class)
-				.setParameter("maxId", maxId)
+	public Collection<DbNamespace> getRootNamespaces(final Session session, final long maxId, final int limit) {
+		final String queryString = "SELECT n.* FROM namespaces n "
+				+ "WHERE fullName NOT IN (SELECT fullName FROM namespaces WHERE id > n.id) " // preserve-newline
+				+ "AND level = 0 " // preserve-newline
+				+ "AND id < :maxId " // preserve-newline
+				+ "ORDER BY id DESC " // preserve-newline
+				+ "LIMIT :limit";
+		final Query query = session.createSQLQuery(queryString) // preserve-newline
+				.addEntity(DbNamespace.class) // preserve-newline
+				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("limit", limit);
 		return HibernateUtils.listAndCast(query);
 	}
 
 	private static HashMap<String, DbNamespace> getCurrentRootNamespacesForAccount(final Session session, final Long accountId) {
-		final Criteria criteria = session.createCriteria(DbNamespace.class)
-				.add(Restrictions.eq("owner.id", accountId))
+		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
+				.add(Restrictions.eq("owner.id", accountId)) // preserve-newline
 				.add(Restrictions.eq("level", 0));
 		final List<DbNamespace> roots = HibernateUtils.listAndCast(criteria);
 		final HashMap<String, DbNamespace> map = new HashMap<>();
@@ -124,8 +115,8 @@ public class NamespaceRetriever {
 
 	private static DbNamespace getCurrentRootNamespace(final Session session, final NamespaceId id) {
 		final String rootName = id.getRoot().toString();
-		final Criteria criteria = session.createCriteria(DbNamespace.class)
-				.add(Restrictions.eq("fullName", rootName))
+		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
+				.add(Restrictions.eq("fullName", rootName)) // preserve-newline
 				.addOrder(Order.desc("height"));
 		final List<DbNamespace> roots = HibernateUtils.listAndCast(criteria);
 		return roots.isEmpty() ? null : roots.get(0);

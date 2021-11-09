@@ -20,9 +20,7 @@ public class BlockController {
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
-	BlockController(
-			final BlockIo blockIo,
-			final NisPeerNetworkHost host) {
+	BlockController(final BlockIo blockIo, final NisPeerNetworkHost host) {
 		this.blockIo = blockIo;
 		this.host = host;
 	}
@@ -49,9 +47,6 @@ public class BlockController {
 	@P2PApi
 	public AuthenticatedResponse<Block> blockAt(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(
-				this.blockAt(request.getEntity()),
-				localNode.getIdentity(),
-				request.getChallenge());
+		return new AuthenticatedResponse<>(this.blockAt(request.getEntity()), localNode.getIdentity(), request.getChallenge());
 	}
 }

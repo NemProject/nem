@@ -25,9 +25,7 @@ public class Cluster {
 	 * @param id The unique id of the cluster's pivot.
 	 * @param memberIds The ids of nodes in this cluster.
 	 */
-	public Cluster(
-			final ClusterId id,
-			final Collection<NodeId> memberIds) {
+	public Cluster(final ClusterId id, final Collection<NodeId> memberIds) {
 		if (null == memberIds) {
 			throw new IllegalArgumentException("memberIds cannot be null");
 		}
@@ -91,7 +89,7 @@ public class Cluster {
 		this.memberIds.addAll(cluster.getMemberIds());
 	}
 
-	//region hashCode / equals
+	// region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -105,11 +103,11 @@ public class Cluster {
 		}
 
 		// The id is not relevant for a cluster
-		final Cluster rhs = (Cluster)obj;
+		final Cluster rhs = (Cluster) obj;
 		return this.memberIds.equals(rhs.memberIds);
 	}
 
-	//endregion
+	// endregion
 
 	/**
 	 * Gets the total number of nodes in this cluster.

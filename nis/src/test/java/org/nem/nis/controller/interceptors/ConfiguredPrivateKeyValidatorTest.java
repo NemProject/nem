@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -10,7 +11,7 @@ import org.springframework.validation.*;
 
 public class ConfiguredPrivateKeyValidatorTest {
 
-	//region supports
+	// region supports
 
 	@Test
 	public void privateKeyValidationIsSupported() {
@@ -21,7 +22,7 @@ public class ConfiguredPrivateKeyValidatorTest {
 		final boolean isSupported = validator.supports(PrivateKey.class);
 
 		// Assert:
-		Assert.assertThat(isSupported, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(isSupported, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -33,12 +34,12 @@ public class ConfiguredPrivateKeyValidatorTest {
 		final boolean isSupported = validator.supports(PublicKey.class);
 
 		// Assert:
-		Assert.assertThat(isSupported, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(isSupported, IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region validate
+	// region validate
 
 	@Test
 	public void anyPrivateKeyIsAllowedWithAllowAllConfiguration() {
@@ -55,9 +56,7 @@ public class ConfiguredPrivateKeyValidatorTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Address[] allowedAddresses = {
-				Utils.generateRandomAddress(),
-				Address.fromPublicKey(keyPair.getPublicKey()),
-				Utils.generateRandomAddress(),
+				Utils.generateRandomAddress(), Address.fromPublicKey(keyPair.getPublicKey()), Utils.generateRandomAddress(),
 		};
 		final Validator validator = createAllowSpecificValidator(allowedAddresses);
 
@@ -70,22 +69,18 @@ public class ConfiguredPrivateKeyValidatorTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Address[] allowedAddresses = {
-				Utils.generateRandomAddress(),
-				Utils.generateRandomAddress(),
-				Utils.generateRandomAddress(),
+				Utils.generateRandomAddress(), Utils.generateRandomAddress(), Utils.generateRandomAddress(),
 		};
 		final Validator validator = createAllowSpecificValidator(allowedAddresses);
 
 		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> validate(validator, keyPair.getPrivateKey()),
-				UnauthorizedAccessException.class);
+		ExceptionAssert.assertThrows(v -> validate(validator, keyPair.getPrivateKey()), UnauthorizedAccessException.class);
 	}
 
-	//endregion
+	// endregion
 
 	private static Validator createAllowAllValidator() {
-		return new ConfiguredPrivateKeyValidator(new Address[] {});
+		return new ConfiguredPrivateKeyValidator(new Address[]{});
 	}
 
 	private static Validator createAllowSpecificValidator(final Address[] allowedAddresses) {

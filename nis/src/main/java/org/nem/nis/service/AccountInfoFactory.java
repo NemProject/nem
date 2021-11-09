@@ -26,9 +26,7 @@ public class AccountInfoFactory {
 	 * @param accountStateCache The account state cache.
 	 */
 	@Autowired(required = true)
-	public AccountInfoFactory(
-			final AccountLookup accountLookup,
-			final ReadOnlyAccountStateCache accountStateCache,
+	public AccountInfoFactory(final AccountLookup accountLookup, final ReadOnlyAccountStateCache accountStateCache,
 			final BlockChainLastBlockLayer lastBlockLayer) {
 		this.accountLookup = accountLookup;
 		this.accountStateCache = accountStateCache;
@@ -50,17 +48,12 @@ public class AccountInfoFactory {
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 
 		final ReadOnlyMultisigLinks multisigLinks = accountState.getMultisigLinks();
-		final MultisigInfo multisigInfo = !multisigLinks.getCosignatories().isEmpty() ?
-				new MultisigInfo(multisigLinks.getCosignatories().size(), multisigLinks.minCosignatories()) :
-				null;
+		final MultisigInfo multisigInfo = !multisigLinks.getCosignatories().isEmpty()
+				? new MultisigInfo(multisigLinks.getCosignatories().size(), multisigLinks.minCosignatories())
+				: null;
 
-		return new AccountInfo(
-				account.hasPublicKey() ? account.getAddress() : address,
-				accountInfo.getBalance(),
-				accountState.getWeightedBalances().getVested(height),
-				accountInfo.getHarvestedBlocks(),
-				accountInfo.getLabel(),
-				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()),
-				multisigInfo);
+		return new AccountInfo(account.hasPublicKey() ? account.getAddress() : address, accountInfo.getBalance(),
+				accountState.getWeightedBalances().getVested(height), accountInfo.getHarvestedBlocks(), accountInfo.getLabel(),
+				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()), multisigInfo);
 	}
 }

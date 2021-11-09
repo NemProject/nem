@@ -23,26 +23,13 @@ public class AccountState implements ReadOnlyAccountState, Copyable<AccountState
 	 * @param address The address of an account.
 	 */
 	public AccountState(final Address address) {
-		this(
-				address,
-				new AccountImportance(),
-				new HistoricalImportances(),
-				NemStateGlobals.createWeightedBalances(),
-				new RemoteLinks(),
-				new MultisigLinks(),
-				new AccountInfo(),
-				null);
+		this(address, new AccountImportance(), new HistoricalImportances(), NemStateGlobals.createWeightedBalances(), new RemoteLinks(),
+				new MultisigLinks(), new AccountInfo(), null);
 	}
 
-	private AccountState(
-			final Address address,
-			final AccountImportance importance,
-			final HistoricalImportances historicalImportances,
-			final WeightedBalances weightedBalances,
-			final RemoteLinks remoteLinks,
-			final MultisigLinks multisigLinks,
-			final AccountInfo accountInfo,
-			final BlockHeight height) {
+	private AccountState(final Address address, final AccountImportance importance, final HistoricalImportances historicalImportances,
+			final WeightedBalances weightedBalances, final RemoteLinks remoteLinks, final MultisigLinks multisigLinks,
+			final AccountInfo accountInfo, final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.historicalImportances = historicalImportances;
@@ -138,14 +125,7 @@ public class AccountState implements ReadOnlyAccountState, Copyable<AccountState
 
 	@Override
 	public AccountState copy() {
-		return new AccountState(
-				this.address,
-				this.importance.copy(),
-				this.historicalImportances.copy(),
-				this.weightedBalances.copy(),
-				this.remoteLinks.copy(),
-				this.multisigLinks.copy(),
-				this.accountInfo.copy(),
-				this.height);
+		return new AccountState(this.address, this.importance.copy(), this.historicalImportances.copy(), this.weightedBalances.copy(),
+				this.remoteLinks.copy(), this.multisigLinks.copy(), this.accountInfo.copy(), this.height);
 	}
 }

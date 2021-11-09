@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
@@ -15,8 +16,8 @@ public class AccountTransactionsIdTest {
 		final AccountTransactionsId id = new AccountTransactionsId(address.getEncoded(), null);
 
 		// Assert:
-		Assert.assertThat(id.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(id.getHash(), IsNull.nullValue());
+		MatcherAssert.assertThat(id.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(id.getHash(), IsNull.nullValue());
 	}
 
 	@Test
@@ -26,8 +27,8 @@ public class AccountTransactionsIdTest {
 		final AccountTransactionsId id = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100");
 
 		// Assert:
-		Assert.assertThat(id.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(id.getHash(), IsEqual.equalTo(Hash.fromHexString("ffeeddccbbaa99887766554433221100")));
+		MatcherAssert.assertThat(id.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(id.getHash(), IsEqual.equalTo(Hash.fromHexString("ffeeddccbbaa99887766554433221100")));
 	}
 
 	@Test

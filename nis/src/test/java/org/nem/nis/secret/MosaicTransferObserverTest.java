@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Account;
@@ -15,7 +16,7 @@ import org.nem.nis.test.NisUtils;
 public class MosaicTransferObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
-	//region supply change
+	// region supply change
 
 	@Test
 	public void notifyExecuteTransfersFromSenderToRecipient() {
@@ -43,9 +44,9 @@ public class MosaicTransferObserverTest {
 		context.assertBalances(new Quantity(9750 - 111), new Quantity(250 + 111));
 	}
 
-	//endregion
+	// endregion
 
-	//region other types
+	// region other types
 
 	@Test
 	public void otherNotificationTypesAreIgnored() {
@@ -54,26 +55,22 @@ public class MosaicTransferObserverTest {
 		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
+		observer.notify(new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		context.assertBalances(new Quantity(10000), Quantity.ZERO);
 	}
 
-	//endregion
+	// endregion
 
-	private static void notifyMosaicTransfer(
-			final TestContext context,
-			final Quantity quantity,
+	private static void notifyMosaicTransfer(final TestContext context, final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
-		observer.notify(
-				new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
+		observer.notify(new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -96,18 +93,18 @@ public class MosaicTransferObserverTest {
 		private void assertBalances(final Quantity senderBalance, final Quantity recipientBalance) {
 			// Assert:
 			// - single namespace
-			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
+			MatcherAssert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
 			// - single mosaic mosaic
 			final Mosaics mosaics = this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics();
-			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 
 			// - correct balances
 			final int numExpectedBalances = isNonZero(senderBalance) + isNonZero(recipientBalance);
 			final MosaicEntry entry = mosaics.get(this.mosaicDefinition.getId());
-			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numExpectedBalances));
-			Assert.assertThat(entry.getBalances().getBalance(this.sender.getAddress()), IsEqual.equalTo(senderBalance));
-			Assert.assertThat(entry.getBalances().getBalance(this.recipient.getAddress()), IsEqual.equalTo(recipientBalance));
+			MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numExpectedBalances));
+			MatcherAssert.assertThat(entry.getBalances().getBalance(this.sender.getAddress()), IsEqual.equalTo(senderBalance));
+			MatcherAssert.assertThat(entry.getBalances().getBalance(this.recipient.getAddress()), IsEqual.equalTo(recipientBalance));
 		}
 
 		private static int isNonZero(final Quantity quantity) {

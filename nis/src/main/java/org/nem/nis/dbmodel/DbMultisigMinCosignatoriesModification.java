@@ -3,8 +3,7 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * Multisig Min Cosignatories Modification db entity.
- * <br>
+ * Multisig Min Cosignatories Modification db entity. <br>
  * Holds information about single multisig min cosignatories modification.
  */
 @Entity

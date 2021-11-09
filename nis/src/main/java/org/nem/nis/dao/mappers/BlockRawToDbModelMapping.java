@@ -28,13 +28,13 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 
 		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setId(RawMapperUtils.castToLong(source[0]));
-		dbBlock.setVersion((Integer)source[1]);
-		dbBlock.setPrevBlockHash(new Hash((byte[])source[2]));
-		dbBlock.setBlockHash(new Hash((byte[])source[3]));
-		dbBlock.setGenerationHash(new Hash((byte[])source[4]));
-		dbBlock.setTimeStamp((Integer)source[5]);
+		dbBlock.setVersion((Integer) source[1]);
+		dbBlock.setPrevBlockHash(new Hash((byte[]) source[2]));
+		dbBlock.setBlockHash(new Hash((byte[]) source[3]));
+		dbBlock.setGenerationHash(new Hash((byte[]) source[4]));
+		dbBlock.setTimeStamp((Integer) source[5]);
 		dbBlock.setHarvester(harvester);
-		dbBlock.setHarvesterProof((byte[])source[7]);
+		dbBlock.setHarvesterProof((byte[]) source[7]);
 		dbBlock.setLessor(lessor);
 		dbBlock.setHeight(RawMapperUtils.castToLong(source[9]));
 		dbBlock.setTotalFee(RawMapperUtils.castToLong(source[10]));

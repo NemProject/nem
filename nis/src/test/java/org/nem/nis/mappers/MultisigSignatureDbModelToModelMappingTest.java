@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -8,7 +9,9 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
-public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
+public class MultisigSignatureDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
 
 	@Test
 	public void signatureCanBeMappedToModelWhenLinkedMultisigTransactionHasInnerTransaction() {
@@ -31,9 +34,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		dbSignature.getMultisigTransaction().setTransferTransaction(null);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(dbSignature),
-				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.mapping.map(dbSignature), IllegalArgumentException.class);
 	}
 
 	@Override
@@ -86,8 +87,8 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		}
 
 		public void assertModel(final MultisigSignatureTransaction model) {
-			Assert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
-			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
+			MatcherAssert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
+			MatcherAssert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -11,28 +12,26 @@ import org.nem.nis.test.MockBlockLookup;
 
 public class BlockChainComparerTest {
 
-	//region chain score is compared
+	// region chain score is compared
 
 	@Test
 	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsLessThanLocalChainScore() {
 		// Assert:
-		Assert.assertThat(
-				compareDifferentChainScores(10, 9),
+		MatcherAssert.assertThat(compareDifferentChainScores(10, 9),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE));
 	}
 
 	@Test
 	public void remoteReportedLowerOrEqualChainScoreIfRemoteChainScoreIsEqualToLocalChainScore() {
 		// Assert:
-		Assert.assertThat(
-				compareDifferentChainScores(10, 10),
+		MatcherAssert.assertThat(compareDifferentChainScores(10, 10),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE));
 	}
 
 	@Test
 	public void chainScoreCheckPassesIfRemoteChainScoreIsGreaterThanLocalChainScore() {
 		// Assert:
-		Assert.assertThat(compareDifferentChainScores(10, 11), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+		MatcherAssert.assertThat(compareDifferentChainScores(10, 11), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
 	}
 
 	private static ComparisonResult.Code compareDifferentChainScores(final int localChainScore, final int remoteChainScore) {
@@ -40,14 +39,13 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		return comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(7), new BlockChainScore(localChainScore)),
+		return comparer.compare(new MockBlockLookup(createVerifiableBlock(7), new BlockChainScore(localChainScore)),
 				new MockBlockLookup(null, new BlockChainScore(remoteChainScore))).getCode();
 	}
 
-	//endregion
+	// endregion
 
-	//region last block comparison
+	// region last block comparison
 
 	@Test(expected = IllegalArgumentException.class)
 	public void localBlockChainMustHaveAtLeastOneBlock() {
@@ -55,9 +53,7 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		comparer.compare(
-				new MockBlockLookup(null),
-				new MockBlockLookup(createVerifiableBlock(7)));
+		comparer.compare(new MockBlockLookup(null), new MockBlockLookup(createVerifiableBlock(7)));
 	}
 
 	@Test
@@ -67,12 +63,11 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		final BlockHeight height = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(account, 27)),
+		final BlockHeight height = comparer.compare(new MockBlockLookup(createVerifiableBlock(account, 27)),
 				new MockBlockLookup(createVerifiableBlock(account, 11), new BlockChainScore(10))).getRemoteHeight();
 
 		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
 	}
 
 	@Test
@@ -81,12 +76,11 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(7)),
-				new MockBlockLookup(null, new BlockChainScore(10))).getCode();
+		final ComparisonResult.Code result = comparer
+				.compare(new MockBlockLookup(createVerifiableBlock(7)), new MockBlockLookup(null, new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NO_BLOCKS));
 	}
 
 	@Test
@@ -95,12 +89,11 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(7)),
+		final ComparisonResult.Code result = comparer.compare(new MockBlockLookup(createVerifiableBlock(7)),
 				new MockBlockLookup(createNonVerifiableBlock(7), new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
 	}
 
 	@Test
@@ -110,35 +103,30 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(account, 7)),
+		final ComparisonResult.Code result = comparer.compare(new MockBlockLookup(createVerifiableBlock(account, 7)),
 				new MockBlockLookup(createVerifiableBlock(account, 7), new BlockChainScore(10))).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_SYNCED));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_SYNCED));
 	}
 
 	@Test
 	public void remoteIsTooFarBehindIfRemoteIsMoreThanMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
-				compareBlocksWithHeight(18, 7),
-				IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND));
+		MatcherAssert.assertThat(compareBlocksWithHeight(18, 7), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND));
 	}
 
 	@Test
 	public void remoteIsNotTooFarBehindIfRemoteIsMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
-				compareBlocksWithHeight(17, 7),
+		MatcherAssert.assertThat(compareBlocksWithHeight(17, 7),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND)));
 	}
 
 	@Test
 	public void localCanBeMoreThanMaxBlocksToRewriteBehindLocal() {
 		// Assert:
-		Assert.assertThat(
-				compareBlocksWithHeight(7, 18),
+		MatcherAssert.assertThat(compareBlocksWithHeight(7, 18),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND)));
 	}
 
@@ -148,28 +136,25 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		return comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(account, localHeight)),
+		return comparer.compare(new MockBlockLookup(createVerifiableBlock(account, localHeight)),
 				new MockBlockLookup(createVerifiableBlock(account, remoteHeight), new BlockChainScore(10))).getCode();
 	}
 
-	//endregion
+	// endregion
 
-	//region chain comparison
+	// region chain comparison
 
 	@Test
 	public void remoteReturnedTooManyHashesIfItReturnedMoreThanMaxBlocksToAnalyze() {
 		// Assert:
-		Assert.assertThat(
-				compareBlocksWithNumRemoteHashes(21),
+		MatcherAssert.assertThat(compareBlocksWithNumRemoteHashes(21),
 				IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES));
 	}
 
 	@Test
 	public void remoteDidNotReturnTooManyHashesIfItReturnedExactlyMaxBlocksToAnalyze() {
 		// Assert:
-		Assert.assertThat(
-				compareBlocksWithNumRemoteHashes(20),
+		MatcherAssert.assertThat(compareBlocksWithNumRemoteHashes(20),
 				IsNot.not(IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES)));
 	}
 
@@ -179,8 +164,7 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		return comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(account, 7)),
+		return comparer.compare(new MockBlockLookup(createVerifiableBlock(account, 7)),
 				new MockBlockLookup(createVerifiableBlock(account, 8), new BlockChainScore(10), numHashes)).getCode();
 	}
 
@@ -191,11 +175,10 @@ public class BlockChainComparerTest {
 		final BlockChainComparer comparer = createBlockChainComparer();
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(account, 7), 1),
+		final ComparisonResult.Code result = comparer.compare(new MockBlockLookup(createVerifiableBlock(account, 7), 1),
 				new MockBlockLookup(createVerifiableBlock(account, 8), new BlockChainScore(10), 2)).getCode();
 
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_RETURNED_INVALID_HASHES));
 	}
 
 	@Test
@@ -204,17 +187,18 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes);
 		final HashChain remoteChain = createHashChain(commonHashes);
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
+		final ComparisonResult.Code result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain),
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain)).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
 	}
 
 	@Test
@@ -222,17 +206,18 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 		final HashChain remoteChain = createHashChain(commonHashes);
 
 		// Act:
-		final ComparisonResult.Code result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
+		final ComparisonResult.Code result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain),
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain)).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
 	}
 
 	@Test
@@ -240,20 +225,21 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer(5);
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes);
 		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 
 		// Act:
-		final ComparisonResult result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
+		final ComparisonResult result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain),
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain));
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result.getRemoteHeight(), IsEqual.equalTo(new BlockHeight(8)));
 	}
 
 	@Test
@@ -261,23 +247,20 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer(5);
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 
-		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
-				createVerifiableBlock(8),
-				new BlockChainScore(10),
-				remoteChain);
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain);
 		remoteBlockLookup.addBlock(createNonVerifiableBlock(5));
 
 		// Act:
-		final ComparisonResult result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
-				remoteBlockLookup);
+		final ComparisonResult result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain), remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK));
 	}
 
 	@Test
@@ -285,25 +268,22 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer(5);
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 
-		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
-				createVerifiableBlock(8),
-				new BlockChainScore(10),
-				remoteChain);
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain);
 		remoteBlockLookup.addBlock(createVerifiableBlock(5));
 
 		// Act:
-		final ComparisonResult result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
-				remoteBlockLookup);
+		final ComparisonResult result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain), remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -311,31 +291,29 @@ public class BlockChainComparerTest {
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer(5);
 
-		final byte[][] commonHashes = new byte[][] { Utils.generateRandomBytes(32), Utils.generateRandomBytes(32) };
+		final byte[][] commonHashes = new byte[][]{
+				Utils.generateRandomBytes(32), Utils.generateRandomBytes(32)
+		};
 		final HashChain localChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 		final HashChain remoteChain = createHashChain(commonHashes, Utils.generateRandomBytes(32));
 
-		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(
-				createVerifiableBlock(Utils.generateRandomAccount(), 8),
-				new BlockChainScore(10),
-				remoteChain);
+		final MockBlockLookup remoteBlockLookup = new MockBlockLookup(createVerifiableBlock(Utils.generateRandomAccount(), 8),
+				new BlockChainScore(10), remoteChain);
 		remoteBlockLookup.addBlock(createVerifiableBlock(5));
 		remoteBlockLookup.addBlock(createNonVerifiableBlock(6));
 
 		// Act:
-		final ComparisonResult result = comparer.compare(
-				new MockBlockLookup(createVerifiableBlock(8), localChain),
-				remoteBlockLookup);
+		final ComparisonResult result = comparer.compare(new MockBlockLookup(createVerifiableBlock(8), localChain), remoteBlockLookup);
 
 		// Assert:
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
-		Assert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
-		Assert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result.getCode(), IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_NOT_SYNCED));
+		MatcherAssert.assertThat(result.getCommonBlockHeight(), IsEqual.equalTo(4L));
+		MatcherAssert.assertThat(result.areChainsConsistent(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
-	//region utils
+	// region utils
 
 	private static HashChain createHashChain(final byte[]... hashes) {
 		final HashChain chain = new HashChain(hashes.length);
@@ -381,5 +359,5 @@ public class BlockChainComparerTest {
 		return createBlockChainComparer(10);
 	}
 
-	//endregion
+	// endregion
 }

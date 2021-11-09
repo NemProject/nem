@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -9,7 +10,9 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbProvisionNamespaceTransaction, ProvisionNamespaceTransaction> {
+public class ProvisionNamespaceDbModelToModelMappingTest
+		extends
+			AbstractTransferDbModelToModelMappingTest<DbProvisionNamespaceTransaction, ProvisionNamespaceTransaction> {
 
 	@Test
 	public void dbTransactionCanBeMappedToModel() {
@@ -28,10 +31,10 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		final ProvisionNamespaceTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
-		Assert.assertThat(model.getRentalFeeSink(), IsEqual.equalTo(context.rentalFeeSink));
-		Assert.assertThat(model.getRentalFee(), IsEqual.equalTo(Amount.fromNem(25)));
-		Assert.assertThat(model.getNewPart(), IsEqual.equalTo(new NamespaceIdPart("baz")));
-		Assert.assertThat(model.getParent(), IsEqual.equalTo(new NamespaceId("foo.bar")));
+		MatcherAssert.assertThat(model.getRentalFeeSink(), IsEqual.equalTo(context.rentalFeeSink));
+		MatcherAssert.assertThat(model.getRentalFee(), IsEqual.equalTo(Amount.fromNem(25)));
+		MatcherAssert.assertThat(model.getNewPart(), IsEqual.equalTo(new NamespaceIdPart("baz")));
+		MatcherAssert.assertThat(model.getParent(), IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
 	@Override

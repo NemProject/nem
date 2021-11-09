@@ -28,16 +28,11 @@ public class MosaicDefinitionDbModelToModelMapping implements IMapping<DbMosaicD
 	public MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
 		final Account creator = this.mapper.map(dbMosaicDefinition.getCreator(), Account.class);
 		final MosaicId mosaicId = new MosaicId(new NamespaceId(dbMosaicDefinition.getNamespaceId()), dbMosaicDefinition.getName());
-		final List<NemProperty> properties = dbMosaicDefinition.getProperties().stream()
-				.map(p -> this.mapper.map(p, NemProperty.class))
+		final List<NemProperty> properties = dbMosaicDefinition.getProperties().stream().map(p -> this.mapper.map(p, NemProperty.class))
 				.collect(Collectors.toList());
 
-		return new MosaicDefinition(
-				creator,
-				mosaicId,
-				new MosaicDescriptor(dbMosaicDefinition.getDescription()),
-				new DefaultMosaicProperties(properties),
-				this.mapLevy(dbMosaicDefinition, mosaicId));
+		return new MosaicDefinition(creator, mosaicId, new MosaicDescriptor(dbMosaicDefinition.getDescription()),
+				new DefaultMosaicProperties(properties), this.mapLevy(dbMosaicDefinition, mosaicId));
 	}
 
 	private MosaicLevy mapLevy(final DbMosaicDefinition dbMosaicDefinition, final MosaicId mosaicId) {
@@ -52,10 +47,7 @@ public class MosaicDefinitionDbModelToModelMapping implements IMapping<DbMosaicD
 				? mosaicId
 				: this.mapper.map(new DbMosaicId(dbMosaicDefinition.getFeeDbMosaicId()), MosaicId.class);
 
-		return new MosaicLevy(
-				MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()),
-				feeRecipient,
-				feeMosaicId,
+		return new MosaicLevy(MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()), feeRecipient, feeMosaicId,
 				Quantity.fromValue(dbMosaicDefinition.getFeeQuantity()));
 	}
 }

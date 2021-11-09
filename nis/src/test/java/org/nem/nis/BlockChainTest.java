@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -27,7 +28,7 @@ public class BlockChainTest {
 		final BlockHeight height = nodeContext.getBlockChain().getHeight();
 
 		// Assert: height is equal to common height (10) + 1
-		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
+		MatcherAssert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
 		Mockito.verify(nodeContext.getBlockChainLastBlockLayer(), Mockito.only()).getLastBlockHeight();
 	}
 
@@ -43,7 +44,7 @@ public class BlockChainTest {
 		final Block child = context.createChild(nodeContext.getChain(), 0);
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -55,7 +56,8 @@ public class BlockChainTest {
 		context.addTransactions(child, 1);
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child),
+				IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
 	}
 
 	@Test
@@ -67,7 +69,8 @@ public class BlockChainTest {
 		child.setPrevious(nodeContext.getChain().get(0));
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child),
+				IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC));
 	}
 
 	@Test
@@ -80,7 +83,7 @@ public class BlockChainTest {
 		final Block child = context.createSibling(lastBlock, lastBlockParent, 0);
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	// endregion

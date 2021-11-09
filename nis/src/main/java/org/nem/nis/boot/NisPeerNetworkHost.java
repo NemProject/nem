@@ -56,17 +56,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
-	public NisPeerNetworkHost(
-			final ReadOnlyNisCache nisCache,
-			final CountingBlockSynchronizer synchronizer,
-			final PeerNetworkScheduler scheduler,
-			final ChainServices chainServices,
-			final NodeCompatibilityChecker compatibilityChecker,
-			final NisConfiguration nisConfiguration,
-			final HttpConnectorPool httpConnectorPool,
-			final TrustProvider trustProvider,
-			final AuditCollection incomingAudits,
-			final AuditCollection outgoingAudits) {
+	public NisPeerNetworkHost(final ReadOnlyNisCache nisCache, final CountingBlockSynchronizer synchronizer,
+			final PeerNetworkScheduler scheduler, final ChainServices chainServices, final NodeCompatibilityChecker compatibilityChecker,
+			final NisConfiguration nisConfiguration, final HttpConnectorPool httpConnectorPool, final TrustProvider trustProvider,
+			final AuditCollection incomingAudits, final AuditCollection outgoingAudits) {
 		this.nisCache = nisCache;
 		this.synchronizer = synchronizer;
 		this.scheduler = scheduler;
@@ -80,29 +73,22 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	/**
-	 * Boots the network.
-	 * Note that this is scoped to the boot package to prevent it from being called externally
-	 * (boot should be called on the injected NetworkHostBootstrapper).
+	 * Boots the network. Note that this is scoped to the boot package to prevent it from being called externally (boot should be called on
+	 * the injected NetworkHostBootstrapper).
 	 *
 	 * @param localNode The local node.
 	 * @return Void future.
 	 */
 	CompletableFuture<Void> boot(final Node localNode) {
-		final Config config = new Config(
-				localNode,
+		final Config config = new Config(localNode,
 				loadJsonObject(String.format("peers-config_%s.json", this.nisConfiguration.getNetworkName())),
-				CommonStarter.META_DATA.getVersion(),
-				NetworkInfos.getDefault().getVersion(),
-				this.nisConfiguration.getOptionalFeatures());
+				CommonStarter.META_DATA.getVersion(), NetworkInfos.getDefault().getVersion(), this.nisConfiguration.getOptionalFeatures());
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
 			this.networkBroadcastBuffer = new PeerNetworkBroadcastBuffer(network, new BroadcastBuffer());
 			this.network = network;
-			this.scheduler.addTasks(
-					this.network,
-					this.networkBroadcastBuffer,
-					this.nisConfiguration.useNetworkTime(),
+			this.scheduler.addTasks(this.network, this.networkBroadcastBuffer, this.nisConfiguration.useNetworkTime(),
 					IpDetectionMode.Disabled != this.nisConfiguration.getIpDetectionMode());
 		});
 	}
@@ -114,7 +100,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
 				}
 
-				return (JSONObject)JSONValue.parse(fin);
+				return (JSONObject) JSONValue.parse(fin);
 			}
 		} catch (final Exception e) {
 			throw new FatalConfigException("Exception encountered while loading config", e);
@@ -214,40 +200,24 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
 		return new DefaultTimeSynchronizationStrategy(
-				new AggregateSynchronizationFilter(Arrays.asList(
-						new ResponseDelayDetectionFilter(),
-						new ClampingFilter(),
-						new AlphaTrimmedMeanFilter())),
-				this.nisCache.getPoxFacade(),
-				this.nisCache.getAccountStateCache());
+				new AggregateSynchronizationFilter(
+						Arrays.asList(new ResponseDelayDetectionFilter(), new ClampingFilter(), new AlphaTrimmedMeanFilter())),
+				this.nisCache.getPoxFacade(), this.nisCache.getAccountStateCache());
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.nisCache.getAccountCache());
-		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.nisCache.getAccountCache());
-		return new DefaultPeerNetworkServicesFactory(
-				networkState,
-				peerConnector,
-				timeSynchronizationConnector,
-				this.httpConnectorPool,
-				this.synchronizer,
-				this.chainServices,
-				this.createTimeSynchronizationStrategy(),
-				this.compatibilityChecker);
+		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool
+				.getTimeSyncConnector(this.nisCache.getAccountCache());
+		return new DefaultPeerNetworkServicesFactory(networkState, peerConnector, timeSynchronizationConnector, this.httpConnectorPool,
+				this.synchronizer, this.chainServices, this.createTimeSynchronizationStrategy(), this.compatibilityChecker);
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(
-				this.nisConfiguration,
-				this.trustProvider,
-				networkState,
-				this.nisCache.getPoxFacade(),
-				this.nisCache.getAccountStateCache());
-		return new PeerNetworkBootstrapper(
-				networkState,
-				this.createNetworkServicesFactory(networkState),
-				selectorFactory,
+		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(this.nisConfiguration,
+				this.trustProvider, networkState, this.nisCache.getPoxFacade(), this.nisCache.getAccountStateCache());
+		return new PeerNetworkBootstrapper(networkState, this.createNetworkServicesFactory(networkState), selectorFactory,
 				this.nisConfiguration.getIpDetectionMode());
 	}
 }

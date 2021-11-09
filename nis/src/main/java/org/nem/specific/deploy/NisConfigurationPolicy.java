@@ -10,17 +10,17 @@ import javax.servlet.http.HttpServlet;
  */
 public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	@Override
-	public Class getAppConfigClass() {
+	public Class<?> getAppConfigClass() {
 		return NisAppConfig.class;
 	}
 
 	@Override
-	public Class getWebAppInitializerClass() {
+	public Class<?> getWebAppInitializerClass() {
 		return NisWebAppInitializer.class;
 	}
 
 	@Override
-	public Class getWebAppWebsockInitializerClass() {
+	public Class<?> getWebAppWebsockInitializerClass() {
 		return NisWebAppWebsocketInitializer.class;
 	}
 

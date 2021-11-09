@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -10,7 +11,9 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
+public class MosaicDefinitionCreationModelToDbModelMappingTest
+		extends
+			AbstractTransferModelToDbModelMappingTest<MosaicDefinitionCreationTransaction, DbMosaicDefinitionCreationTransaction> {
 
 	@Test
 	public void transactionCanBeMappedToDbModel() {
@@ -22,10 +25,10 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		final DbMosaicDefinitionCreationTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-		Assert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
-		Assert.assertThat(dbModel.getCreationFeeSink(), IsEqual.equalTo(context.dbCreationFeeSink));
-		Assert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
+		MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
+		MatcherAssert.assertThat(dbModel.getCreationFeeSink(), IsEqual.equalTo(context.dbCreationFeeSink));
+		MatcherAssert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaicDefinition, DbMosaicDefinition.class);
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creationFeeSink, DbAccount.class);
 	}
@@ -48,7 +51,8 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		private final Account creationFeeSink = Utils.generateRandomAccount();
 		private final DbAccount dbCreationFeeSink = Mockito.mock(DbAccount.class);
-		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(this.mapper);
+		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(
+				this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicDefinition, DbMosaicDefinition.class)).thenReturn(this.dbMosaicDefinition);
@@ -57,11 +61,7 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		}
 
 		public MosaicDefinitionCreationTransaction createModel() {
-			return new MosaicDefinitionCreationTransaction(
-					TimeInstant.ZERO,
-					this.signer,
-					this.mosaicDefinition,
-					this.creationFeeSink,
+			return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, this.signer, this.mosaicDefinition, this.creationFeeSink,
 					Amount.fromNem(25));
 		}
 	}

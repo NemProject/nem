@@ -18,5 +18,5 @@ public class WeightedBalanceDecayConstants {
 	/**
 	 * The weighted balance decay rate.
 	 */
-	public static final double DECAY_BASE = (double)DECAY_NUMERATOR / (double)DECAY_DENOMINATOR;
+	public static final double DECAY_BASE = (double) DECAY_NUMERATOR / (double) DECAY_DENOMINATOR;
 }

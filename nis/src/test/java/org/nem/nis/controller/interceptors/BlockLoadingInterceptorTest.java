@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,7 +14,7 @@ import javax.servlet.http.*;
 
 public class BlockLoadingInterceptorTest {
 
-	//region without last block
+	// region without last block
 
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithoutLastBlock() {
@@ -51,9 +52,9 @@ public class BlockLoadingInterceptorTest {
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
-	//endregion
+	// endregion
 
-	//region with last block
+	// region with last block
 
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithLastBlock() {
@@ -81,20 +82,19 @@ public class BlockLoadingInterceptorTest {
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
-	//endregion
+	// endregion
 
 	private static void assertAccessGranted(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act:
 		final boolean result = preHandle(interceptor, requestUri);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	private static void assertAccessDenied(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act / Assert:
-		NisUtils.assertThrowsNisIllegalStateException(
-				v -> preHandle(interceptor, requestUri),
+		NisUtils.assertThrowsNisIllegalStateException(v -> preHandle(interceptor, requestUri),
 				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 	}
 

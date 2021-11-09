@@ -1,6 +1,7 @@
 package org.nem.nis.validators.block;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -52,7 +53,7 @@ public class VersionBlockValidatorTest {
 		final ValidationResult result = validator.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static Block changeBlockVersion(final int type, final int version) {

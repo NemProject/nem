@@ -62,9 +62,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * @param timeProvider The time provider.
 	 * @param harvestingTask The harvesting task.
 	 */
-	public PeerNetworkScheduler(
-			final TimeProvider timeProvider,
-			final HarvestingTask harvestingTask) {
+	public PeerNetworkScheduler(final TimeProvider timeProvider, final HarvestingTask harvestingTask) {
 		this.timeProvider = timeProvider;
 		this.harvestingTask = harvestingTask;
 	}
@@ -86,10 +84,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * @param useNetworkTime true if network time should be used.
 	 * @param enableAutoIpDetection true if auto IP detection should be enabled.
 	 */
-	public void addTasks(
-			final PeerNetwork network,
-			final PeerNetworkBroadcastBuffer networkBroadcastBuffer,
-			final boolean useNetworkTime,
+	public void addTasks(final PeerNetwork network, final PeerNetworkBroadcastBuffer networkBroadcastBuffer, final boolean useNetworkTime,
 			final boolean enableAutoIpDetection) {
 		this.addForagingTask(network);
 
@@ -107,11 +102,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private void addForagingTask(final PeerNetwork network) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setRecurringFutureSupplier(this.runnableToFutureSupplier(() -> this.harvestingTask.harvest(network, this.timeProvider.getCurrentTime())))
-				.setInitialDelay(FORAGING_INITIAL_DELAY)
-				.setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
-				.setVisitor(timerVisitor)
-				.create();
+				.setRecurringFutureSupplier(
+						this.runnableToFutureSupplier(() -> this.harvestingTask.harvest(network, this.timeProvider.getCurrentTime())))
+				.setInitialDelay(FORAGING_INITIAL_DELAY).setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
+				.setVisitor(timerVisitor).create();
 		this.timers.add(new AsyncTimer(options));
 	}
 
@@ -121,9 +115,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		private final PeerNetworkBroadcastBuffer networkBroadcastBuffer;
 		private final AsyncTimer refreshTimer;
 
-		public NetworkTaskInitializer(
-				final PeerNetworkScheduler scheduler,
-				final PeerNetwork network,
+		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler, final PeerNetwork network,
 				final PeerNetworkBroadcastBuffer networkBroadcastBuffer) {
 			this.scheduler = scheduler;
 			this.network = network;
@@ -132,72 +124,45 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		}
 
 		public void addDefaultTasks() {
-			this.addSimpleTask(
-					() -> this.network.broadcast(NisPeerId.REST_NODE_SIGN_OF_LIFE, this.network.getLocalNode()),
-					BROADCAST_INTERVAL,
-					"BROADCAST");
-			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(this.network::synchronize),
-					SYNC_INTERVAL,
-					"SYNC");
-			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(this.network::pruneInactiveNodes),
-					PRUNE_INACTIVE_NODES_DELAY,
+			this.addSimpleTask(() -> this.network.broadcast(NisPeerId.REST_NODE_SIGN_OF_LIFE, this.network.getLocalNode()),
+					BROADCAST_INTERVAL, "BROADCAST");
+			this.addSimpleTask(this.scheduler.runnableToFutureSupplier(this.network::synchronize), SYNC_INTERVAL, "SYNC");
+			this.addSimpleTask(this.scheduler.runnableToFutureSupplier(this.network::pruneInactiveNodes), PRUNE_INACTIVE_NODES_DELAY,
 					"PRUNING INACTIVE NODES");
-			this.addSimpleTask(
-					this.network::checkChainSynchronization,
-					CHECK_CHAIN_SYNC_INTERVAL,
-					"CHECKING CHAIN SYNCHRONIZATION");
-			this.addSimpleTask(
-					this.networkBroadcastBuffer::broadcastAll,
-					BROADCAST_BUFFERED_ENTITIES_INTERVAL,
+			this.addSimpleTask(this.network::checkChainSynchronization, CHECK_CHAIN_SYNC_INTERVAL, "CHECKING CHAIN SYNCHRONIZATION");
+			this.addSimpleTask(this.networkBroadcastBuffer::broadcastAll, BROADCAST_BUFFERED_ENTITIES_INTERVAL,
 					"BROADCAST BUFFERED ENTITIES");
-			this.addSimpleTask(
-					() -> this.network.updateNodeExperiences(this.scheduler.timeProvider),
-					getNodeExperienceUpdaterDelayStrategy(),
-					"UPDATE NODE EXPERIENCES");
+			this.addSimpleTask(() -> this.network.updateNodeExperiences(this.scheduler.timeProvider),
+					getNodeExperienceUpdaterDelayStrategy(), "UPDATE NODE EXPERIENCES");
 			this.addSimpleTask(
 					this.scheduler.runnableToFutureSupplier(
 							() -> this.network.pruneNodeExperiences(this.scheduler.timeProvider.getCurrentTime())),
-					NODE_EXPERIENCES_PRUNE_INTERVAL,
-					"PRUNE NODE EXPERIENCES");
+					NODE_EXPERIENCES_PRUNE_INTERVAL, "PRUNE NODE EXPERIENCES");
 		}
 
 		public void addTimeSynchronizationTask() {
-			this.addSimpleTask(
-					() -> this.network.synchronizeTime(this.scheduler.timeProvider),
-					getTimeSynchronizationDelayStrategy(),
+			this.addSimpleTask(() -> this.network.synchronizeTime(this.scheduler.timeProvider), getTimeSynchronizationDelayStrategy(),
 					"TIME SYNCHRONIZATION");
 		}
 
 		public void addAutoIpDetectionTask() {
-			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(this.network::updateLocalNodeEndpoint),
-					AUTO_IP_DETECTION_DELAY,
+			this.addSimpleTask(this.scheduler.runnableToFutureSupplier(this.network::updateLocalNodeEndpoint), AUTO_IP_DETECTION_DELAY,
 					"AUTO IP DETECTION");
 		}
 
 		private AsyncTimer addRefreshTask(final PeerNetwork network) {
-			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
-					.setRecurringFutureSupplier(network::refresh)
-					.setInitialDelay(REFRESH_INITIAL_DELAY)
-					.setDelayStrategy(getRefreshDelayStrategy());
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder().setRecurringFutureSupplier(network::refresh)
+					.setInitialDelay(REFRESH_INITIAL_DELAY).setDelayStrategy(getRefreshDelayStrategy());
 			return this.addTask("REFRESH", builder);
 		}
 
-		private void addSimpleTask(
-				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-				final int delay,
-				final String name) {
+		private void addSimpleTask(final Supplier<CompletableFuture<?>> recurringFutureSupplier, final int delay, final String name) {
 			this.addSimpleTask(recurringFutureSupplier, new UniformDelayStrategy(delay), name);
 		}
 
-		private void addSimpleTask(
-				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-				final AbstractDelayStrategy delay,
+		private void addSimpleTask(final Supplier<CompletableFuture<?>> recurringFutureSupplier, final AbstractDelayStrategy delay,
 				final String name) {
-			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
-					.setRecurringFutureSupplier(recurringFutureSupplier)
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder().setRecurringFutureSupplier(recurringFutureSupplier)
 					.setTrigger(this.refreshTimer.getFirstFireFuture())
 					.setInitialDelay(REFRESH_INITIAL_DELAY * this.scheduler.timerVisitors.size()) // stagger the timer start times
 					.setDelayStrategy(delay);
@@ -219,10 +184,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		// REFRESH_PLATEAU_INTERVAL (5m) over REFRESH_BACK_OFF_TIME (12 hours),
 		// and then plateau at that rate forever
 		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
-				LinearDelayStrategy.withDuration(
-						REFRESH_INITIAL_INTERVAL,
-						REFRESH_PLATEAU_INTERVAL,
-						REFRESH_BACK_OFF_TIME),
+				LinearDelayStrategy.withDuration(REFRESH_INITIAL_INTERVAL, REFRESH_PLATEAU_INTERVAL, REFRESH_BACK_OFF_TIME),
 				new UniformDelayStrategy(REFRESH_PLATEAU_INTERVAL));
 		return new AggregateDelayStrategy(subStrategies);
 	}
@@ -233,10 +195,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		// and then plateau at that rate forever
 		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
 				new UniformDelayStrategy(TIME_SYNC_INITIAL_INTERVAL, TIME_SYNC_INITIAL_INTERVAL_ROUNDS),
-				LinearDelayStrategy.withDuration(
-						TIME_SYNC_INITIAL_INTERVAL,
-						TIME_SYNC_PLATEAU_INTERVAL,
-						TIME_SYNC_BACK_OFF_TIME),
+				LinearDelayStrategy.withDuration(TIME_SYNC_INITIAL_INTERVAL, TIME_SYNC_PLATEAU_INTERVAL, TIME_SYNC_BACK_OFF_TIME),
 				new UniformDelayStrategy(TIME_SYNC_PLATEAU_INTERVAL));
 		return new AggregateDelayStrategy(subStrategies);
 	}
@@ -248,12 +207,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		// over NODE_EXPERIENCES_UPDATER_BACK_OFF_TIME (12 hours),
 		// and then plateau at that rate forever
 		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
-				new UniformDelayStrategy(
-						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL,
-						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL_ROUNDS),
-				LinearDelayStrategy.withDuration(
-						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL,
-						NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL,
+				new UniformDelayStrategy(NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL, NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL_ROUNDS),
+				LinearDelayStrategy.withDuration(NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL, NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL,
 						NODE_EXPERIENCES_UPDATER_BACK_OFF_TIME),
 				new UniformDelayStrategy(NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL));
 		return new AggregateDelayStrategy(subStrategies);

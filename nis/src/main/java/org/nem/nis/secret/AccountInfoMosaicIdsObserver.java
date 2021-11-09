@@ -29,11 +29,13 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		switch (notification.getType()) {
 			case MosaicDefinitionCreation:
-				this.notify((MosaicDefinitionCreationNotification)notification);
+				this.notify((MosaicDefinitionCreationNotification) notification);
 				break;
 
 			case MosaicTransfer:
-				this.notify((MosaicTransferNotification)notification);
+				this.notify((MosaicTransferNotification) notification);
+				break;
+			default :
 				break;
 		}
 	}

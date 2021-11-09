@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -18,122 +19,100 @@ import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class VersionTransactionValidatorTest {
-	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
+	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants
+			.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 	private static final long MOSAICS_FORK = BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	public static class Fork {
 
-		//region MULTISIG_M_OF_N_FORK
+		// region MULTISIG_M_OF_N_FORK
 
 		@Test
 		public void v1MultisigModificationTransactionIsAlwaysAllowed() {
 			// Assert:
-			assertAlwaysAllowed(
-					createModificationTransaction(1),
-					MULTISIG_M_OF_N_FORK);
+			assertAlwaysAllowed(createModificationTransaction(1), MULTISIG_M_OF_N_FORK);
 		}
 
 		@Test
 		public void v2MultisigModificationTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
-			assertOnlyAllowedAtAndAfterFork(
-					createModificationTransaction(2),
-					MULTISIG_M_OF_N_FORK,
+			assertOnlyAllowedAtAndAfterFork(createModificationTransaction(2), MULTISIG_M_OF_N_FORK,
 					ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 		}
 
 		@Test
 		public void v3MultisigModificationTransactionIsNotAllowed() {
 			// Assert:
-			assertNotAllowed(
-					createModificationTransaction(3),
-					MULTISIG_M_OF_N_FORK);
+			assertNotAllowed(createModificationTransaction(3), MULTISIG_M_OF_N_FORK);
 		}
 
-		//endregion
+		// endregion
 
-		//region MOSAICS_FORK
+		// region MOSAICS_FORK
 
 		@Test
 		public void provisionNamespaceTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
-			assertOnlyAllowedAtAndAfterFork(
-					RandomTransactionFactory.createProvisionNamespaceTransaction(),
-					MOSAICS_FORK,
+			assertOnlyAllowedAtAndAfterFork(RandomTransactionFactory.createProvisionNamespaceTransaction(), MOSAICS_FORK,
 					ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK);
 		}
 
 		@Test
 		public void v2ProvisionNamespaceTransactionIsNotAllowed() {
 			// Assert:
-			assertNotAllowed(
-					changeTransactionVersion(RandomTransactionFactory.createProvisionNamespaceTransaction(), 2),
-					MOSAICS_FORK);
+			assertNotAllowed(changeTransactionVersion(RandomTransactionFactory.createProvisionNamespaceTransaction(), 2), MOSAICS_FORK);
 		}
 
 		@Test
 		public void mosaicDefinitionCreationTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
-			assertOnlyAllowedAtAndAfterFork(
-					RandomTransactionFactory.createMosaicDefinitionCreationTransaction(),
-					MOSAICS_FORK,
+			assertOnlyAllowedAtAndAfterFork(RandomTransactionFactory.createMosaicDefinitionCreationTransaction(), MOSAICS_FORK,
 					ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK);
 		}
 
 		@Test
 		public void v2MosaicDefinitionCreationTransactionIsNotAllowed() {
 			// Assert:
-			assertNotAllowed(
-					changeTransactionVersion(RandomTransactionFactory.createMosaicDefinitionCreationTransaction(), 2),
+			assertNotAllowed(changeTransactionVersion(RandomTransactionFactory.createMosaicDefinitionCreationTransaction(), 2),
 					MOSAICS_FORK);
 		}
 
 		@Test
 		public void mosaicSupplyChangeTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
-			assertOnlyAllowedAtAndAfterFork(
-					RandomTransactionFactory.createMosaicSupplyChangeTransaction(),
-					MOSAICS_FORK,
+			assertOnlyAllowedAtAndAfterFork(RandomTransactionFactory.createMosaicSupplyChangeTransaction(), MOSAICS_FORK,
 					ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK);
 		}
 
 		@Test
 		public void v2MosaicSupplyChangeTransactionIsNotAllowed() {
 			// Assert:
-			assertNotAllowed(
-					changeTransactionVersion(RandomTransactionFactory.createMosaicSupplyChangeTransaction(), 2),
-					MOSAICS_FORK);
+			assertNotAllowed(changeTransactionVersion(RandomTransactionFactory.createMosaicSupplyChangeTransaction(), 2), MOSAICS_FORK);
 		}
 
 		@Test
 		public void v2TransferTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
-			assertOnlyAllowedAtAndAfterFork(
-					createTransferTransaction(2),
-					MOSAICS_FORK,
+			assertOnlyAllowedAtAndAfterFork(createTransferTransaction(2), MOSAICS_FORK,
 					ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK);
 		}
 
 		@Test
 		public void v1TransferTransactionIsAlwaysAllowed() {
 			// Assert:
-			assertAlwaysAllowed(
-					createTransferTransaction(1),
-					MOSAICS_FORK);
+			assertAlwaysAllowed(createTransferTransaction(1), MOSAICS_FORK);
 		}
 
 		@Test
 		public void v3TransferTransactionIsNotAllowed() {
 			// Assert:
-			assertNotAllowed(
-					createTransferTransaction(3),
-					MOSAICS_FORK);
+			assertNotAllowed(createTransferTransaction(3), MOSAICS_FORK);
 		}
 
-		//endregion
+		// endregion
 	}
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -175,7 +154,8 @@ public class VersionTransactionValidatorTest {
 		return changeTransactionVersion(RandomTransactionFactory.createMultisigModification(), version);
 	}
 
-	private static void assertOnlyAllowedAtAndAfterFork(final Transaction transaction, final long forkHeight, final ValidationResult expectedFailure) {
+	private static void assertOnlyAllowedAtAndAfterFork(final Transaction transaction, final long forkHeight,
+			final ValidationResult expectedFailure) {
 		assertValidation(transaction, forkHeight - 100, expectedFailure);
 		assertValidation(transaction, forkHeight - 1, expectedFailure);
 		assertValidation(transaction, forkHeight, ValidationResult.SUCCESS);
@@ -205,12 +185,12 @@ public class VersionTransactionValidatorTest {
 		final ValidationResult result = validator.validate(transaction, validationContext);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static Transaction changeTransactionVersion(final Transaction transaction, final int version) {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
-		jsonObject.put("version", version | 0xFF000000);
+		jsonObject.put("version", version | (NetworkInfos.getDefault().getVersion() << 24));
 		return TransactionFactory.NON_VERIFIABLE.deserialize(Utils.createDeserializer(jsonObject));
 	}
 }

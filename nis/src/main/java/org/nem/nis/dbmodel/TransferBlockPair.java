@@ -3,6 +3,7 @@ package org.nem.nis.dbmodel;
 /**
  * DTO containing an abstract block transfer and a block.
  */
+@SuppressWarnings("rawtypes")
 public class TransferBlockPair implements Comparable<TransferBlockPair> {
 	private final AbstractBlockTransfer transfer;
 	private final DbBlock block;

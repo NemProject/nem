@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -22,7 +23,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static class TestContext {
@@ -80,7 +81,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 
 		private TestContext() {
 			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
-					.then(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
+					.then(invocationOnMock -> new AccountState((Address) invocationOnMock.getArguments()[0]));
 		}
 
 		private void addTransaction() {

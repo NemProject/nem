@@ -36,12 +36,14 @@ public class BalanceValidator implements SingleTransactionValidator {
 		public void notify(final Notification notification) {
 			switch (notification.getType()) {
 				case BalanceTransfer:
-					this.notify((BalanceTransferNotification)notification);
+					this.notify((BalanceTransferNotification) notification);
 					break;
 
 				case BalanceCredit:
 				case BalanceDebit:
-					this.notify((BalanceAdjustmentNotification)notification);
+					this.notify((BalanceAdjustmentNotification) notification);
+					break;
+				default :
 					break;
 			}
 		}
@@ -72,7 +74,8 @@ public class BalanceValidator implements SingleTransactionValidator {
 			balance += delta;
 
 			if (balance < 0) {
-				this.hasNegativeBalances = this.hasNegativeBalances || !this.debitPredicate.canDebit(account, Amount.fromMicroNem(-1 * balance));
+				this.hasNegativeBalances = this.hasNegativeBalances
+						|| !this.debitPredicate.canDebit(account, Amount.fromMicroNem(-1 * balance));
 			}
 
 			this.accountToBalanceMap.put(account, balance);

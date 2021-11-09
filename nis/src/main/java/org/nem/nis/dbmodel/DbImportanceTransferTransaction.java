@@ -5,8 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Importance transfer db entity
- * <br>
+ * Importance transfer db entity <br>
  * Holds information about Transactions having type TransactionTypes.IMPORTANCE_TYPE
  */
 @Entity

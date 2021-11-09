@@ -25,7 +25,7 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 		this.balances = balances;
 	}
 
-	//region ReadOnlyWeightedBalances
+	// region ReadOnlyWeightedBalances
 
 	@Override
 	public int size() {
@@ -58,9 +58,9 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 		return getAmount.apply(this.balances.get(index));
 	}
 
-	//endregion
+	// endregion
 
-	//region WeightedBalances
+	// region WeightedBalances
 
 	@Override
 	public TimeBasedVestingWeightedBalances copy() {
@@ -203,5 +203,5 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 		this.balances.add(0, consolidatedBalance);
 	}
 
-	//endregion
+	// endregion
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
@@ -10,7 +11,7 @@ import org.nem.nis.test.MockAccountDao;
 
 public class AccountDaoLookupAdapterTest {
 
-	//region new object
+	// region new object
 
 	@Test
 	public void newObjectIsCreatedOnCacheMiss() {
@@ -23,9 +24,9 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount = accountDaoLookup.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsNull.notNullValue());
-		Assert.assertThat(dbAccount.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
-		Assert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		MatcherAssert.assertThat(dbAccount, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbAccount.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
+		MatcherAssert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	@Test
@@ -40,12 +41,12 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount2 = accountDaoLookup.findByAddress(address); // cache hit
 
 		// Assert:
-		Assert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
+		MatcherAssert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
 	}
 
-	//endregion
+	// endregion
 
-	//region existing object
+	// region existing object
 
 	@Test
 	public void existingObjectIsReturnedFromDaoOnCacheMiss() {
@@ -60,9 +61,9 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount = accountDaoLookup.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(dbAccount, IsSame.sameInstance(dbAccountFromDao));
-		Assert.assertThat(dbAccount.getPrintableKey(), IsNull.nullValue());
-		Assert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		MatcherAssert.assertThat(dbAccount, IsSame.sameInstance(dbAccountFromDao));
+		MatcherAssert.assertThat(dbAccount.getPrintableKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbAccount.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	@Test
@@ -79,13 +80,13 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount2 = accountDaoLookup.findByAddress(address); // cache hit
 
 		// Assert:
-		Assert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
-		Assert.assertThat(accountDao.getNumGetAccountByPrintableAddressCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
+		MatcherAssert.assertThat(accountDao.getNumGetAccountByPrintableAddressCalls(), IsEqual.equalTo(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region public key updating
+	// region public key updating
 
 	@Test
 	public void cachedObjectPublicKeyCanBeUpdated() {
@@ -99,14 +100,14 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount1 = accountDaoLookup.findByAddress(addressWithoutPublicKey);
 
 		// Assert: the returned account should not have a public key
-		Assert.assertThat(dbAccount1.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(dbAccount1.getPublicKey(), IsNull.nullValue());
 
 		// Act: request the account with an address that has the public key
 		final DbAccount dbAccount2 = accountDaoLookup.findByAddress(addressWithPublicKey);
 
 		// Assert: the returned account should have a public key
-		Assert.assertThat(dbAccount2.getPublicKey(), IsEqual.equalTo(addressWithPublicKey.getPublicKey()));
-		Assert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
+		MatcherAssert.assertThat(dbAccount2.getPublicKey(), IsEqual.equalTo(addressWithPublicKey.getPublicKey()));
+		MatcherAssert.assertThat(dbAccount2, IsSame.sameInstance(dbAccount1));
 	}
 
 	@Test
@@ -123,9 +124,9 @@ public class AccountDaoLookupAdapterTest {
 		final DbAccount dbAccount1 = accountDaoLookup.findByAddress(address);
 
 		// Assert: the returned account should still have the original public key
-		Assert.assertThat(address.getPublicKey(), IsNot.not(IsEqual.equalTo(originalPublicKey)));
-		Assert.assertThat(dbAccount1.getPublicKey(), IsEqual.equalTo(originalPublicKey));
+		MatcherAssert.assertThat(address.getPublicKey(), IsNot.not(IsEqual.equalTo(originalPublicKey)));
+		MatcherAssert.assertThat(dbAccount1.getPublicKey(), IsEqual.equalTo(originalPublicKey));
 	}
 
-	//endregion
+	// endregion
 }

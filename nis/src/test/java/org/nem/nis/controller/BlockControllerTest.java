@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,7 +20,7 @@ import java.util.function.*;
 
 public class BlockControllerTest {
 
-	//region blockAt
+	// region blockAt
 
 	@Test
 	public void blockAtGetDelegatesToBlockIo() {
@@ -27,11 +28,7 @@ public class BlockControllerTest {
 		final TestContext context = new TestContext();
 
 		// Assert:
-		runBlockAtTests(
-				context,
-				h -> h,
-				(c, h) -> c.controller.blockAt(h),
-				b -> b);
+		runBlockAtTests(context, h -> h, (c, h) -> c.controller.blockAt(h), b -> b);
 	}
 
 	@Test
@@ -42,18 +39,13 @@ public class BlockControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 
 		// Assert:
-		final AuthenticatedResponse<?> response = runBlockAtTests(
-				context,
-				h -> new AuthenticatedBlockHeightRequest(h, challenge),
-				(c, r) -> c.controller.blockAt(r),
-				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		final AuthenticatedResponse<?> response = runBlockAtTests(context, h -> new AuthenticatedBlockHeightRequest(h, challenge),
+				(c, r) -> c.controller.blockAt(r), r -> r.getEntity(localNode.getIdentity(), challenge));
+		MatcherAssert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <TRequest, TResponse> TResponse runBlockAtTests(
-			final TestContext context,
-			final Function<BlockHeight, TRequest> getRequest,
-			final BiFunction<TestContext, TRequest, TResponse> action,
+	private static <TRequest, TResponse> TResponse runBlockAtTests(final TestContext context,
+			final Function<BlockHeight, TRequest> getRequest, final BiFunction<TestContext, TRequest, TResponse> action,
 			final Function<TResponse, Block> getBlock) {
 		// Arrange
 		final BlockHeight height = new BlockHeight(17);
@@ -67,13 +59,13 @@ public class BlockControllerTest {
 		final Block block = getBlock.apply(response);
 
 		// Assert:
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(27)));
+		MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(27)));
 		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(height);
 		Mockito.verify(context.blockIo, Mockito.times(1)).getBlockAt(Mockito.any());
 		return response;
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final BlockIo blockIo = Mockito.mock(BlockIo.class);

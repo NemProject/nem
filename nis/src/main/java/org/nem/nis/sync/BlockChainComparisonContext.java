@@ -8,7 +8,6 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 
 /**
  * Context that is used during block chain comparison.
- * * TODO 20151124 J-B: consider removing this now that caching changes are in
  */
 public class BlockChainComparisonContext {
 	private final AccountCache accountCache;
@@ -17,12 +16,8 @@ public class BlockChainComparisonContext {
 	private final BlockChainServices services;
 	private final BlockChainScore ourScore;
 
-	public BlockChainComparisonContext(
-			final ReadOnlyAccountCache accountCache,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockDao blockDao,
-			final BlockChainServices services,
-			final BlockChainScore ourScore) {
+	public BlockChainComparisonContext(final ReadOnlyAccountCache accountCache, final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockDao blockDao, final BlockChainServices services, final BlockChainScore ourScore) {
 		this.accountCache = this.createAccountCacheCopy(accountCache);
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -45,11 +40,8 @@ public class BlockChainComparisonContext {
 	 * @return The local block lookup adapter.
 	 */
 	public BlockLookup createLocalBlockLookup() {
-		return new LocalBlockLookupAdapter(
-				this.blockDao,
-				this.services.createMapper(this.accountCache),
-				this.blockChainLastBlockLayer.getLastDbBlock(),
-				this.ourScore,
+		return new LocalBlockLookupAdapter(this.blockDao, this.services.createMapper(this.accountCache),
+				this.blockChainLastBlockLayer.getLastDbBlock(), this.ourScore,
 				NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt());
 	}
 

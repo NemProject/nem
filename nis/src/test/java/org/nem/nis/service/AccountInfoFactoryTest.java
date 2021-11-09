@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -65,9 +66,9 @@ public class AccountInfoFactoryTest {
 		final AccountInfo info = context.factory.createInfo(address);
 
 		// Assert:
-		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(info.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(context.address.getPublicKey()));
+		MatcherAssert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsNull.notNullValue());
+		MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(context.address.getPublicKey()));
 	}
 
 	@Test
@@ -84,9 +85,9 @@ public class AccountInfoFactoryTest {
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		Assert.assertThat(info.getMultisigInfo(), IsNull.notNullValue());
-		Assert.assertThat(info.getMultisigInfo().getCosignatoriesCount(), IsEqual.equalTo(3));
-		Assert.assertThat(info.getMultisigInfo().getMinCosignatories(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.notNullValue());
+		MatcherAssert.assertThat(info.getMultisigInfo().getCosignatoriesCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(info.getMultisigInfo().getMinCosignatories(), IsEqual.equalTo(2));
 	}
 
 	private static class TestContext {
@@ -115,14 +116,14 @@ public class AccountInfoFactoryTest {
 		public void assertAccountInfo(final AccountInfo info, final double expectedImportance, final long expectedVestedBalance) {
 			// Assert:
 			// - values
-			Assert.assertThat(info.getAddress(), IsEqual.equalTo(this.address));
-			Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(this.address.getPublicKey()));
-			Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-			Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
-			Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-			Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
-			Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
-			Assert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
+			MatcherAssert.assertThat(info.getAddress(), IsEqual.equalTo(this.address));
+			MatcherAssert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(this.address.getPublicKey()));
+			MatcherAssert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
+			MatcherAssert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
+			MatcherAssert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+			MatcherAssert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
+			MatcherAssert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
+			MatcherAssert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
 
 			// - mocks were called
 			Mockito.verify(this.accountLookup, Mockito.only()).findByAddress(this.address);

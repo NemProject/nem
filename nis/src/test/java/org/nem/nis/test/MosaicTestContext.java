@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
@@ -21,12 +21,8 @@ public class MosaicTestContext {
 	private final Map<Address, AccountState> stateMap = new HashMap<>();
 	protected final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	protected final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(
-			this.accountStateCache,
-			this.namespaceCache,
-			Mockito.mock(ReadOnlyNamespaceDao.class),
-			Mockito.mock(NisDbModelToModelMapper.class),
-			() -> new BlockHeight(123));
+	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(this.accountStateCache, this.namespaceCache,
+			Mockito.mock(ReadOnlyNamespaceDao.class), Mockito.mock(NisDbModelToModelMapper.class), () -> new BlockHeight(123));
 	private final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
 
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
@@ -41,14 +37,11 @@ public class MosaicTestContext {
 		return this.createMosaicId(namespaceName, mosaicName, initialSupply, null);
 	}
 
-	protected MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply, final MosaicLevy levy) {
+	protected MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply,
+			final MosaicLevy levy) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-				Utils.generateRandomAccount(),
-				mosaicId,
-				new MosaicDescriptor("descriptor"),
-				Utils.createMosaicPropertiesWithInitialSupply(initialSupply),
-				levy);
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.generateRandomAccount(), mosaicId,
+				new MosaicDescriptor("descriptor"), Utils.createMosaicPropertiesWithInitialSupply(initialSupply), levy);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
 	}
@@ -94,14 +87,14 @@ public class MosaicTestContext {
 	}
 
 	public void assertMosaicDefinitionsOwned(final Collection<MosaicDefinition> returnedMosaicDefinitions, final List<MosaicId> expected) {
-		Assert.assertThat(returnedMosaicDefinitions.size(), IsEqual.equalTo(expected.size()));
+		MatcherAssert.assertThat(returnedMosaicDefinitions.size(), IsEqual.equalTo(expected.size()));
 
 		final Set<MosaicDefinition> definitions = expected.stream().map(this.mosaicDefinitions::get).collect(Collectors.toSet());
-		Assert.assertThat(returnedMosaicDefinitions, IsEquivalent.equivalentTo(definitions));
+		MatcherAssert.assertThat(returnedMosaicDefinitions, IsEquivalent.equivalentTo(definitions));
 	}
 
 	public void assertMosaicsOwned(final Collection<Mosaic> returnedMosaics, final List<Mosaic> expectedMosaics) {
-		Assert.assertThat(returnedMosaics.size(), IsEqual.equalTo(expectedMosaics.size()));
-		Assert.assertThat(returnedMosaics, IsEquivalent.equivalentTo(expectedMosaics));
+		MatcherAssert.assertThat(returnedMosaics.size(), IsEqual.equalTo(expectedMosaics.size()));
+		MatcherAssert.assertThat(returnedMosaics, IsEquivalent.equivalentTo(expectedMosaics));
 	}
 }

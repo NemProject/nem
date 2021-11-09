@@ -20,8 +20,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	 * @param accountStateCache The account state cache.
 	 * @param namespaceCache The namespace cache.
 	 */
-	public ImportanceTransferTransactionValidator(
-			final ReadOnlyAccountStateCache accountStateCache,
+	public ImportanceTransferTransactionValidator(final ReadOnlyAccountStateCache accountStateCache,
 			final ReadOnlyNamespaceCache namespaceCache) {
 		this.accountStateCache = accountStateCache;
 		this.namespaceCache = namespaceCache;
@@ -46,12 +45,13 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
-		return !remoteLinks.isEmpty() &&
-				height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
+		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < NemGlobals
+				.getBlockChainConfiguration().getBlockChainRewriteLimit();
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress())
+				.getRemoteLinks();
 		if (isRemoteChangeWithinLimit(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
@@ -63,15 +63,16 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				//
 				// I finally have possible attack vector
 				// (handled by check below, and partially by BlockImportanceTransferBalanceValidator):
-				//   let's say I own account X which is harvesting and has big importance
-				//   user EVIL has small importance and announces remote harvesting, where he gives
-				//       X as his remote account
-				//   this basically cuts off X
+				// let's say I own account X which is harvesting and has big importance
+				// user EVIL has small importance and announces remote harvesting, where he gives
+				// X as his remote account
+				// this basically cuts off X
 				//
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				final ReadOnlyAccountState remoteAccountState = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress());
+				final ReadOnlyAccountState remoteAccountState = this.accountStateCache
+						.findStateByAddress(transaction.getRemote().getAddress());
 				final ReadOnlyAccountInfo remoteAccountInfo = remoteAccountState.getAccountInfo();
 				if (0 != remoteAccountInfo.getBalance().compareTo(Amount.ZERO)) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
@@ -88,12 +89,10 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
 
-					boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
-							.map(id -> {
-								final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
-								return entry.getNamespace().getOwner().equals(transaction.getRemote());
-							})
-							.reduce(false, Boolean::logicalOr);
+					boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream().map(id -> {
+						final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+						return entry.getNamespace().getOwner().equals(transaction.getRemote());
+					}).reduce(false, Boolean::logicalOr);
 					if (ownsNamespace) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
@@ -108,17 +107,22 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				}
 
 				// if a remote is already activated, it needs to be deactivated first
-				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
+				return !isRemoteActivated(remoteLinks)
+						? ValidationResult.SUCCESS
+						: ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
 
 			case Deactivate:
-			default:
+			default :
 				// if a remote is already deactivated, it needs to be activated first
-				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE;
+				return !isRemoteDeactivated(remoteLinks)
+						? ValidationResult.SUCCESS
+						: ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE;
 		}
 	}
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress())
+				.getRemoteLinks();
 
 		// was the last importance transfer where the remote was involved less than rewrite limit blocks ago?
 		if (isRemoteChangeWithinLimit(remoteLinks, height)) {
@@ -145,6 +149,8 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 			case REMOTE_ACTIVE:
 			case REMOTE_DEACTIVATING:
 				return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
+			default :
+				break;
 		}
 
 		return ValidationResult.SUCCESS;

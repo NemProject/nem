@@ -23,7 +23,8 @@ public class BlockExecuteProcessorTest extends AbstractBlockProcessorTest {
 	}
 
 	@Override
-	protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache, final BlockTransactionObserver observer) {
+	protected void process(final Transaction transaction, final Block block, final ReadOnlyNisCache nisCache,
+			final BlockTransactionObserver observer) {
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, block, observer);
 		processor.process(transaction);
 	}

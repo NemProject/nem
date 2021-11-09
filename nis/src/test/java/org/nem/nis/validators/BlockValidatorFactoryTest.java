@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.IsEquivalent;
@@ -14,16 +15,10 @@ public class BlockValidatorFactoryTest {
 	public void createAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = createFactory();
-		final List<String> expectedSubValidatorNames = Arrays.asList(
-				"TransactionDeadlineBlockValidator",
-				"BlockNonFutureEntityValidator",
-				"EligibleSignerBlockValidator",
-				"MaxTransactionsBlockValidator",
-				"NoSelfSignedTransactionsBlockValidator",
-				"BlockUniqueHashTransactionValidator",
-				"BlockNetworkValidator",
-				"VersionBlockValidator",
-				"BlockMultisigAggregateModificationValidator",
+		final List<String> expectedSubValidatorNames = Arrays.asList("TransactionDeadlineBlockValidator", "BlockNonFutureEntityValidator",
+				"EligibleSignerBlockValidator", "MaxTransactionsBlockValidator", "NoSelfSignedTransactionsBlockValidator",
+				"BlockUniqueHashTransactionValidator", "BlockNetworkValidator", "VersionBlockValidator",
+				"TreasuryReissuanceForkTransactionBlockValidator", "BlockMultisigAggregateModificationValidator",
 				"BlockMosaicDefinitionCreationValidator");
 
 		// Act:
@@ -31,15 +26,14 @@ public class BlockValidatorFactoryTest {
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
+		MatcherAssert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
 	}
 
 	@Test
 	public void createTransactionOnlyAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = createFactory();
-		final List<String> expectedSubValidatorNames = Arrays.asList(
-				"BlockMultisigAggregateModificationValidator",
+		final List<String> expectedSubValidatorNames = Arrays.asList("BlockMultisigAggregateModificationValidator",
 				"BlockMosaicDefinitionCreationValidator");
 
 		// Act:
@@ -47,7 +41,7 @@ public class BlockValidatorFactoryTest {
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:
-		Assert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
+		MatcherAssert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
 	}
 
 	private static BlockValidatorFactory createFactory() {

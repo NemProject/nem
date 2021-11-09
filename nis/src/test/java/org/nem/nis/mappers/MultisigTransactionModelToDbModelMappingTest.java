@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -16,9 +17,10 @@ import java.util.*;
 import java.util.function.*;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("rawtypes")
 public class MultisigTransactionModelToDbModelMappingTest {
 
-	//region General
+	// region General
 
 	public static class General extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, DbMultisigTransaction> {
 
@@ -29,9 +31,7 @@ public class MultisigTransactionModelToDbModelMappingTest {
 			final MultisigTransaction model = context.createModel();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> context.mapping.map(model),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> context.mapping.map(model), IllegalArgumentException.class);
 		}
 
 		@Test
@@ -42,9 +42,7 @@ public class MultisigTransactionModelToDbModelMappingTest {
 			final MultisigTransaction model = context.createModel();
 
 			// Act:
-			ExceptionAssert.assertThrows(
-					v -> context.mapping.map(model),
-					IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> context.mapping.map(model), IllegalArgumentException.class);
 		}
 
 		@Test
@@ -90,9 +88,9 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region PerTransaction
+	// region PerTransaction
 
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
@@ -115,13 +113,13 @@ public class MultisigTransactionModelToDbModelMappingTest {
 			assertCanMapMultisigWithInnerTransaction(context -> {
 				context.otherTransaction = this.createModel.get();
 				final AbstractBlockTransfer dbInner = DbTestUtils.createTransferDbModel(this.entry.dbModelClass);
-				Mockito.when(context.mapper.map(context.otherTransaction, this.entry.dbModelClass))
-						.thenAnswer(invocationOnMock -> dbInner);
+				Mockito.when(context.mapper.map(context.otherTransaction, this.entry.dbModelClass)).thenAnswer(invocationOnMock -> dbInner);
 				return dbInner;
 			});
 		}
 
-		private static void assertCanMapMultisigWithInnerTransaction(final Function<TestContext, AbstractBlockTransfer> addInnerTransaction) {
+		private static void assertCanMapMultisigWithInnerTransaction(
+				final Function<TestContext, AbstractBlockTransfer> addInnerTransaction) {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final AbstractBlockTransfer dbInner = addInnerTransaction.apply(context);
@@ -135,7 +133,7 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -155,12 +153,10 @@ public class MultisigTransactionModelToDbModelMappingTest {
 
 		private void addSignature() {
 			final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
-			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-					TimeInstant.ZERO,
-					Utils.generateRandomAccount(),
-					this.otherTransaction.getSigner(),
-					HashUtils.calculateHash(this.otherTransaction));
-			Mockito.when(this.mapper.map(Mockito.refEq(signature), Mockito.eq(DbMultisigSignatureTransaction.class))).thenReturn(dbSignature);
+			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+					this.otherTransaction.getSigner(), HashUtils.calculateHash(this.otherTransaction));
+			Mockito.when(this.mapper.map(Mockito.refEq(signature), Mockito.eq(DbMultisigSignatureTransaction.class)))
+					.thenReturn(dbSignature);
 
 			this.signatures.add(signature);
 			this.expectedDbSignatures.add(dbSignature);
@@ -173,45 +169,36 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 
 		public MultisigTransaction createModel() {
-			final MultisigTransaction model = new MultisigTransaction(
-					TimeInstant.ZERO,
-					this.sender,
-					this.otherTransaction);
+			final MultisigTransaction model = new MultisigTransaction(TimeInstant.ZERO, this.sender, this.otherTransaction);
 			this.signatures.forEach(model::addSignature);
 			return model;
 		}
 
 		public void assertDbModel(final DbMultisigTransaction dbModel, final int numExpectedSignatures) {
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
+			MatcherAssert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				Assert.assertThat(
-						entry.getFromMultisig.apply(dbModel),
-						TransactionTypes.TRANSFER == entry.type
-								? IsEqual.equalTo(this.expectedTransfer)
-								: IsNull.nullValue());
+				MatcherAssert.assertThat(entry.getFromMultisig.apply(dbModel),
+						TransactionTypes.TRANSFER == entry.type ? IsEqual.equalTo(this.expectedTransfer) : IsNull.nullValue());
 			}
 
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
 
 			for (final DbMultisigSignatureTransaction signature : dbModel.getMultisigSignatureTransactions()) {
-				Assert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
+				MatcherAssert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
 			}
 		}
 
 		public void assertDbModelWithInner(final DbMultisigTransaction dbModel, final AbstractBlockTransfer dbInner) {
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				Assert.assertThat(
-						entry.getFromMultisig.apply(dbModel),
-						dbInner.getClass().equals(entry.dbModelClass)
-								? IsEqual.equalTo(dbInner)
-								: IsNull.nullValue());
+				MatcherAssert.assertThat(entry.getFromMultisig.apply(dbModel),
+						dbInner.getClass().equals(entry.dbModelClass) ? IsEqual.equalTo(dbInner) : IsNull.nullValue());
 			}
 
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			MatcherAssert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(0));
 		}
 	}
 }

@@ -18,9 +18,7 @@ public class TSingleTransactionValidatorAdapter<TTransaction extends Transaction
 	 * @param transactionType The supported transaction type.
 	 * @param innerValidator The inner validator.
 	 */
-	public TSingleTransactionValidatorAdapter(
-			final int transactionType,
-			final TSingleTransactionValidator<TTransaction> innerValidator) {
+	public TSingleTransactionValidatorAdapter(final int transactionType, final TSingleTransactionValidator<TTransaction> innerValidator) {
 		this.transactionType = transactionType;
 		this.innerValidator = innerValidator;
 	}
@@ -35,6 +33,6 @@ public class TSingleTransactionValidatorAdapter<TTransaction extends Transaction
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		return this.transactionType != transaction.getType()
 				? ValidationResult.SUCCESS
-				: this.innerValidator.validate((TTransaction)transaction, context);
+				: this.innerValidator.validate((TTransaction) transaction, context);
 	}
 }

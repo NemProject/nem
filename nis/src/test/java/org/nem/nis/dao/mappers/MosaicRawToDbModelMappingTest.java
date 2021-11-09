@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.DbMosaic;
@@ -19,10 +20,10 @@ public class MosaicRawToDbModelMappingTest {
 		final DbMosaic dbModel = this.createMapping().map(raw);
 
 		// Assert:
-		Assert.assertThat(dbModel, IsNull.notNullValue());
-		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(context.mosaicId));
-		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(234L));
+		MatcherAssert.assertThat(dbModel, IsNull.notNullValue());
+		MatcherAssert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
+		MatcherAssert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(context.mosaicId));
+		MatcherAssert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(234L));
 	}
 
 	private IMapping<Object[], DbMosaic> createMapping() {
@@ -34,9 +35,9 @@ public class MosaicRawToDbModelMappingTest {
 
 		private Object[] createRaw() {
 			final Object[] raw = new Object[3];
-			raw[0] = BigInteger.valueOf(123L);            // id
-			raw[1] = BigInteger.valueOf(this.mosaicId);   // mosaic id
-			raw[2] = BigInteger.valueOf(234L);            // quantity
+			raw[0] = BigInteger.valueOf(123L); // id
+			raw[1] = BigInteger.valueOf(this.mosaicId); // mosaic id
+			raw[2] = BigInteger.valueOf(234L); // quantity
 			return raw;
 		}
 	}

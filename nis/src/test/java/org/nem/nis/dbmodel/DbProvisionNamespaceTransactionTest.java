@@ -1,12 +1,13 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
 public class DbProvisionNamespaceTransactionTest {
 
-	//region setNamespace
+	// region setNamespace
 
 	@Test
 	public void canSetNamespaceOnce() {
@@ -18,7 +19,7 @@ public class DbProvisionNamespaceTransactionTest {
 		transaction.setNamespace(namespace);
 
 		// Assert:
-		Assert.assertThat(transaction.getNamespace(), IsEqual.equalTo(namespace));
+		MatcherAssert.assertThat(transaction.getNamespace(), IsEqual.equalTo(namespace));
 	}
 
 	@Test
@@ -31,9 +32,9 @@ public class DbProvisionNamespaceTransactionTest {
 		ExceptionAssert.assertThrows(v -> transaction.setNamespace(new DbNamespace()), IllegalStateException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region setSender
+	// region setSender
 
 	@Test
 	public void setSenderSetsOwnerInNamespace() {
@@ -46,8 +47,8 @@ public class DbProvisionNamespaceTransactionTest {
 		transaction.setSender(sender);
 
 		// Assert:
-		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getNamespace().getOwner(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		MatcherAssert.assertThat(transaction.getNamespace().getOwner(), IsEqual.equalTo(sender));
 	}
 
 	@Test
@@ -60,9 +61,9 @@ public class DbProvisionNamespaceTransactionTest {
 		ExceptionAssert.assertThrows(v -> transaction.setSender(sender), IllegalStateException.class);
 	}
 
-	//endregion
+	// endregion
 
-	//region setBlock
+	// region setBlock
 
 	@Test
 	public void setBlockSetsHeightInNamespace() {
@@ -76,8 +77,8 @@ public class DbProvisionNamespaceTransactionTest {
 		transaction.setBlock(block);
 
 		// Assert:
-		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
-		Assert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
+		MatcherAssert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
+		MatcherAssert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
 
 	@Test
@@ -104,10 +105,10 @@ public class DbProvisionNamespaceTransactionTest {
 		transaction.setBlock(block);
 
 		// Assert:
-		Assert.assertThat(block.getHeight(), IsNull.nullValue());
-		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
-		Assert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
+		MatcherAssert.assertThat(block.getHeight(), IsNull.nullValue());
+		MatcherAssert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
+		MatcherAssert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
 
-	//endregion
+	// endregion
 }

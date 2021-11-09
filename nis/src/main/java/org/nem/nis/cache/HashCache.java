@@ -26,8 +26,7 @@ public interface HashCache extends ReadOnlyHashCache {
 	void put(final HashMetaDataPair pair);
 
 	/**
-	 * Adds new hash/meta data pairs to the cache if hash is unknown.
-	 * Throws if any of the hashes is already in the cache.
+	 * Adds new hash/meta data pairs to the cache if hash is unknown. Throws if any of the hashes is already in the cache.
 	 *
 	 * @param pairs The pairs to add.
 	 */

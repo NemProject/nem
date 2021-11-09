@@ -110,10 +110,7 @@ public class ComparisonResult {
 	 * @param areChainsConsistent true if the two chains are consistent.
 	 * @param remoteHeight Height of remote chain (can be null).
 	 */
-	public ComparisonResult(
-			final Code code,
-			final long commonBlockHeight,
-			final boolean areChainsConsistent,
+	public ComparisonResult(final Code code, final long commonBlockHeight, final boolean areChainsConsistent,
 			final BlockHeight remoteHeight) {
 		this.code = code;
 		this.commonBlockHeight = commonBlockHeight;
@@ -157,8 +154,7 @@ public class ComparisonResult {
 	}
 
 	/**
-	 * Gets a value indicating whether or not the chains are consistent (only supported when
-	 * code is REMOTE_IS_NOT_SYNCED).
+	 * Gets a value indicating whether or not the chains are consistent (only supported when code is REMOTE_IS_NOT_SYNCED).
 	 *
 	 * @return true if the chains are consistent.
 	 */
@@ -181,6 +177,8 @@ public class ComparisonResult {
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 			case REMOTE_REPORTED_LOWER_CHAIN_SCORE:
 				return NodeInteractionResult.NEUTRAL;
+			default :
+				break;
 		}
 
 		return NodeInteractionResult.FAILURE;

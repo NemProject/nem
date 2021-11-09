@@ -1,5 +1,6 @@
 package org.nem.nis.chain.integration;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -34,7 +35,7 @@ public class BlockChainHarvesterTest {
 		Utils.resetGlobals();
 	}
 
-	//region process then harvest
+	// region process then harvest
 
 	@Test
 	public void externalBlockWithLowerScoreCanBeProcessedBeforeHarvesting() {
@@ -50,8 +51,8 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with the first transaction
-		//   (set its timestamp in the past in order to increase the time-difference component of the target and make a hit very likely)
-		//   note: choose a large enough time offset or the harvested block will occasionally not meet the hit
+		// (set its timestamp in the past in order to increase the time-difference component of the target and make a hit very likely)
+		// note: choose a large enough time offset or the harvested block will occasionally not meet the hit
 		context.setTimeOffset(-60);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t1);
@@ -63,22 +64,22 @@ public class BlockChainHarvesterTest {
 
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// Assert:
 		// - the process (remote) block was accepted
 		// - the harvest (local) block with higher score was also accepted
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
 
 		// - the harvested block contains only the second transactions because the first was already present in the block
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
 
 		// Sanity:
 		// - the process block has height H and the harvest block has height H+1
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(-1L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(-1L));
 	}
 
 	@Test
@@ -95,7 +96,7 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with the same transaction
-		//   (set its timestamp in the future in order to decrease the time-difference component of the target and make a hit impossible)
+		// (set its timestamp in the future in order to decrease the time-difference component of the target and make a hit impossible)
 		context.setTimeOffset(8);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t1);
@@ -111,14 +112,14 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the process (remote) block was accepted
 		// - the harvest block was not accepted
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(harvestedBlock, IsNull.nullValue());
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(harvestedBlock, IsNull.nullValue());
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
 	}
 
-	//endregion
+	// endregion
 
-	//region harvest then process
+	// region harvest then process
 
 	@Test
 	public void externalBlockWithLowerScoreCanBeProcessedAfterHarvesting() {
@@ -135,7 +136,7 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with only the third transaction
-		//   (set its timestamp in the future so that the processed block has a lower score)
+		// (set its timestamp in the future so that the processed block has a lower score)
 		context.setTimeOffset(5);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t3);
@@ -144,7 +145,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -153,15 +154,15 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block was not accepted (because it had a lower score)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -185,7 +186,7 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with only the third transaction
-		//   (set its timestamp in the future so that the processed block has a lower score)
+		// (set its timestamp in the future so that the processed block has a lower score)
 		context.setTimeOffset(5);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t3);
@@ -194,7 +195,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -203,16 +204,16 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block was not accepted (because it had a lower score)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
-		Assert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(new Quantity(40 - 32)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
+		MatcherAssert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(new Quantity(40 - 32)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
-		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
+		MatcherAssert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -230,7 +231,7 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with only the third transaction
-		//   (set its timestamp in the past so that the processed block has a higher score)
+		// (set its timestamp in the past so that the processed block has a higher score)
 		context.setTimeOffset(-8);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t3);
@@ -239,7 +240,7 @@ public class BlockChainHarvesterTest {
 		// Act:
 		// - harvest a block
 		final Block harvestedBlock = context.harvestBlock();
-		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		MatcherAssert.assertThat(harvestedBlock, IsNull.notNullValue());
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// - process the block
@@ -248,43 +249,38 @@ public class BlockChainHarvesterTest {
 		// Assert:
 		// - the harvest (local) block with higher score was accepted
 		// - the process (remote) block with higher score was accepted (and the harvest block was reverted)
-		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 8 - 2)));
+		MatcherAssert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 8 - 2)));
 
 		// Sanity:
-		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
 
-	//endregion
+	// endregion
 
-	//region fixLessor
+	// region fixLessor
 
 	@Test
 	public void processBlockUpdatesBlockLessor() {
 		// Arrange:
 		final SynchronizedAccountStateCache accountStateCache = new SynchronizedAccountStateCache(new DefaultAccountStateCache());
-		final DefaultNisCache nisCache = new DefaultNisCache(
-				new SynchronizedAccountCache(new DefaultAccountCache()),
-				accountStateCache,
+		final DefaultNisCache nisCache = new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()), accountStateCache,
 				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
-				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
+				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
 
 		// Setup remote harvesting
 		final Account account = context.createAccount(Amount.fromNem(100000));
 		final Account remoteAccount = context.createAccount(Amount.ZERO);
 
-		final RemoteLink remoteLink1 = new RemoteLink(
-				remoteAccount.getAddress(),
-				BlockHeight.ONE,
-				ImportanceTransferMode.Activate,
+		final RemoteLink remoteLink1 = new RemoteLink(remoteAccount.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely);
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getRemoteLinks().addLink(remoteLink1);
 
-		final RemoteLink remoteLink2 = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink remoteLink2 = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
 		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2);
 
@@ -295,27 +291,26 @@ public class BlockChainHarvesterTest {
 		final ValidationResult processResult = context.processBlock(block);
 
 		// Assert:
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(block.getLessor(), IsNull.notNullValue());
-		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
-	//endregion
+	// endregion
 
-	//region exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering
+	// region exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering
 
 	/**
-	 * The harvested block has a better score because it has an earlier timestamp.
-	 * Call the transaction signer account A and abbreviate unconfirmed transaction with UT. In the beginning A has a balance of 40.
-	 * After adding t1 and t2 to the UT cache, the UT observer see an unconfirmed balance of 4 for A (40 - 12 - 2 - 20 - 2).
-	 * Then the external block B1 is applied which decreases the real balance of A to 30 (40 - 8 - 2).
-	 * Then the harvester generates a new block B2 (no exception here) and B2 gets processed. The block B1 is reverted (A has again a balance of 40)
-	 * and B2 gets applied to the nis cache so A has a balance of 4 according to the nis cache.
-	 * We are at BlockChainUpdateContext.updateOurChain() line 138 now.
-	 * Next relevant thing is addRevertedTransactionsAsUnconfirmed(). The transaction in block B1 gets added back to the UT cache via addExisting.
-	 * This leads to the call UnconfirmedTransactionsCache.add() where this.validate.apply(transaction) is called.
-	 * During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
-	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
+	 * The harvested block has a better score because it has an earlier timestamp. Call the transaction signer account A and abbreviate
+	 * unconfirmed transaction with UT. In the beginning A has a balance of 40. After adding t1 and t2 to the UT cache, the UT observer see
+	 * an unconfirmed balance of 4 for A (40 - 12 - 2 - 20 - 2). Then the external block B1 is applied which decreases the real balance of A
+	 * to 30 (40 - 8 - 2). Then the harvester generates a new block B2 (no exception here) and B2 gets processed. The block B1 is reverted
+	 * (A has again a balance of 40) and B2 gets applied to the nis cache so A has a balance of 4 according to the nis cache. We are at
+	 * BlockChainUpdateContext.updateOurChain() line 138 now. Next relevant thing is addRevertedTransactionsAsUnconfirmed(). The transaction
+	 * in block B1 gets added back to the UT cache via addExisting. This leads to the call UnconfirmedTransactionsCache.add() where
+	 * this.validate.apply(transaction) is called. During validation the BalanceValidator is called which calls
+	 * this.debitPredicate.canDebit(). The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A
+	 * has only a balance of 4.
 	 */
 	@Test
 	public void generatedNewBlockContainingTransfersCanBeRejectedByOriginatingNisIfConflictingBlockIsReceivedDuringGeneration() {
@@ -326,14 +321,11 @@ public class BlockChainHarvesterTest {
 		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
 		final Transaction t2 = context.createTransfer(account, Amount.fromNem(20));
 		final Transaction t3 = context.createTransfer(account, Amount.fromNem(8));
-		final Supplier<Amount> getAccountBalance =
-				() -> nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+		final Supplier<Amount> getAccountBalance = () -> nisCache.getAccountStateCache().findStateByAddress(account.getAddress())
+				.getAccountInfo().getBalance();
 
 		// Assert:
-		this.exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
-				nisCache,
-				context,
-				getAccountBalance,
+		this.exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(nisCache, context, getAccountBalance,
 				Arrays.asList(t1, t2), // unconfirmed
 				Collections.singletonList(t3), // block
 				null);
@@ -341,11 +333,11 @@ public class BlockChainHarvesterTest {
 		// - the cache has the correct balance for the sender account
 		// T(0): BALANCE: 40 NEM
 		// T(1): process thread is unblocked and processes a new block that is accepted
-		//       BALANCE: 30 (40 - 10) NEM
+		// BALANCE: 30 (40 - 10) NEM
 		// T(2): harvester is unblocked creates a valid block (it is working off the modified cache)
-		//       containing only t1 and rolls back the processed block
-		//       BALANCE: 26 (30 + 10 - 14) NEM
-		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 14)));
+		// containing only t1 and rolls back the processed block
+		// BALANCE: 26 (30 + 10 - 14) NEM
+		MatcherAssert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 14)));
 	}
 
 	@Test
@@ -360,19 +352,14 @@ public class BlockChainHarvesterTest {
 		final Transaction t2 = context.createImportanceTransfer(account, remote2, true);
 
 		LOGGER.info(String.format("remote 1 = %s; remote 2 = %s", remote1, remote2));
-		final Supplier<Address> getRemoteAccount =
-				() -> {
-					final ReadOnlyRemoteLinks remoteLinks = nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getRemoteLinks();
-					return remoteLinks.isHarvestingRemotely()
-							? remoteLinks.getCurrent().getLinkedAddress()
-							: null;
-				};
+		final Supplier<Address> getRemoteAccount = () -> {
+			final ReadOnlyRemoteLinks remoteLinks = nisCache.getAccountStateCache().findStateByAddress(account.getAddress())
+					.getRemoteLinks();
+			return remoteLinks.isHarvestingRemotely() ? remoteLinks.getCurrent().getLinkedAddress() : null;
+		};
 
 		// Assert:
-		this.exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
-				nisCache,
-				context,
-				getRemoteAccount,
+		this.exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(nisCache, context, getRemoteAccount,
 				Collections.singletonList(t1), // unconfirmed
 				Collections.singletonList(t2), // block
 				null);
@@ -380,29 +367,20 @@ public class BlockChainHarvesterTest {
 		// - the cache has the correct remote for the sender account
 		// T(0): REMOTE: none
 		// T(1): process thread is unblocked and processes a new block that is accepted
-		//       REMOTE: 2
+		// REMOTE: 2
 		// T(2): harvester is unblocked creates a valid block (it is working off the modified cache)
-		//       containing no transactions (t2 is rejected as in progress because t1 is in the chain even though
-		//       t1 is subsequently rolled back) and rolls back the processed block
-		//       REMOTE: none
+		// containing no transactions (t2 is rejected as in progress because t1 is in the chain even though
+		// t1 is subsequently rolled back) and rolls back the processed block
+		// REMOTE: none
 		// TODO 20151207 J-B,G: not sure if this behavior is ok (rejecting transactions due to other transactions that are rolled back)
-		Assert.assertThat(getRemoteAccount.get(), IsNull.nullValue());
+		MatcherAssert.assertThat(getRemoteAccount.get(), IsNull.nullValue());
 	}
 
-	private void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
-			final ReadOnlyNisCache nisCache,
-			final RealBlockChainTestContext context,
-			final Supplier<?> getStateToLog,
-			final List<Transaction> unconfirmedTransactions,
-			final List<Transaction> blockTransactions,
-			final Class<?> expectedHarvesterException) {
-		final RaceConditionTestContext testContext = new RaceConditionTestContext(
-				nisCache,
-				context,
-				getStateToLog,
-				unconfirmedTransactions,
-				blockTransactions,
-				expectedHarvesterException);
+	private void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(final ReadOnlyNisCache nisCache,
+			final RealBlockChainTestContext context, final Supplier<?> getStateToLog, final List<Transaction> unconfirmedTransactions,
+			final List<Transaction> blockTransactions, final Class<?> expectedHarvesterException) {
+		final RaceConditionTestContext testContext = new RaceConditionTestContext(nisCache, context, getStateToLog, unconfirmedTransactions,
+				blockTransactions, expectedHarvesterException);
 		testContext.run();
 	}
 
@@ -416,12 +394,8 @@ public class BlockChainHarvesterTest {
 		private final AtomicInteger lock1 = new AtomicInteger(1);
 		private final AtomicInteger lock2 = new AtomicInteger(1);
 
-		public RaceConditionTestContext(
-				final ReadOnlyNisCache nisCache,
-				final RealBlockChainTestContext context,
-				final Supplier<?> getStateToLog,
-				final List<Transaction> unconfirmedTransactions,
-				final List<Transaction> blockTransactions,
+		public RaceConditionTestContext(final ReadOnlyNisCache nisCache, final RealBlockChainTestContext context,
+				final Supplier<?> getStateToLog, final List<Transaction> unconfirmedTransactions, final List<Transaction> blockTransactions,
 				final Class<?> expectedHarvesterException) {
 			this.nisCache = nisCache;
 			this.context = context;
@@ -437,7 +411,7 @@ public class BlockChainHarvesterTest {
 			this.setupCopyHandshake();
 
 			// Act: start the threads
-			final CompletableFuture harvesterThread = this.runHarvesterThread();
+			final CompletableFuture<?> harvesterThread = this.runHarvesterThread();
 			final CompletableFuture<ValidationResult> processorThread = this.runProcessorThread();
 			final ValidationResult processResult = processorThread.join();
 			this.logWithThread("processor completed");
@@ -451,7 +425,7 @@ public class BlockChainHarvesterTest {
 			}
 
 			// - the processed block was accepted
-			Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+			MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 			this.logWithThread("end (main)");
 		}
 
@@ -460,10 +434,12 @@ public class BlockChainHarvesterTest {
 			// T(0): harvester thread makes a 'copy' of the cache (this isn't a deep copy since the cache is tracking changes)
 			// T(1): process thread is unblocked and processes a new block that is accepted
 			// T(2): harvester is unblocked creates an valid block (it is working off the modified cache)
-			//       but uses only a subset of transactions
-			final boolean[] isFirstTime = new boolean[] { true };
+			// but uses only a subset of transactions
+			final boolean[] isFirstTime = new boolean[]{
+					true
+			};
 			Mockito.when(this.nisCache.copy()).then(invocationOnMock -> {
-				final NisCache copyCache = (NisCache)invocationOnMock.callRealMethod();
+				final NisCache copyCache = (NisCache) invocationOnMock.callRealMethod();
 				if (!isFirstTime[0]) {
 					return copyCache;
 				}
@@ -475,7 +451,7 @@ public class BlockChainHarvesterTest {
 			});
 		}
 
-		private CompletableFuture runHarvesterThread() {
+		private CompletableFuture<?> runHarvesterThread() {
 			return CompletableFuture.runAsync(() -> {
 				this.logWithThread("start (harvester)");
 
@@ -513,7 +489,7 @@ public class BlockChainHarvesterTest {
 		private void monitorWait(final AtomicInteger lock, final String threadName, final int lockId) {
 			this.logWithThread(String.format("%s is waiting for signal lock%d", threadName, lockId));
 			while (!lock.compareAndSet(0, 1)) {
-				yield();
+				yieldSleep();
 			}
 			this.logWithThread(String.format("%s was signaled by lock%d", threadName, lockId));
 		}
@@ -528,10 +504,10 @@ public class BlockChainHarvesterTest {
 			LOGGER.info(String.format("[%d] %s (state = %s)", Thread.currentThread().getId(), message, this.getStateToLog.get()));
 		}
 
-		private static void yield() {
+		private static void yieldSleep() {
 			ExceptionUtils.propagateVoid(() -> Thread.sleep(10));
 		}
 	}
 
-	//endregion
+	// endregion
 }

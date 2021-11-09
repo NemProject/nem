@@ -26,7 +26,8 @@ public class AccountStateCachePruningObserver extends AbstractPruningObserver {
 
 	@Override
 	protected void prune(final BlockNotificationContext context) {
-		// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
+		// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after
+		// rollbacks)
 		final long blocksPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
 		final long outlinkBlockHistory = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerMonth() + blocksPerDay;
 		final BlockHeight weightedBalancePruneHeight = getPruneHeight(context.getHeight(), blocksPerDay);

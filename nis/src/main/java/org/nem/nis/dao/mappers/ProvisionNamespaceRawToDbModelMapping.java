@@ -28,7 +28,7 @@ public class ProvisionNamespaceRawToDbModelMapping extends AbstractTransferRawTo
 		dbProvisionNamespaceTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbProvisionNamespaceTransaction.setRentalFeeSink(dbRentalFeeSink);
 		dbProvisionNamespaceTransaction.setRentalFee(RawMapperUtils.castToLong(source[10]));
-		dbProvisionNamespaceTransaction.setBlkIndex((Integer)source[12]);
+		dbProvisionNamespaceTransaction.setBlkIndex((Integer) source[12]);
 		dbProvisionNamespaceTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
 		return dbProvisionNamespaceTransaction;
 	}

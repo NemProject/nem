@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.deploy.CommonStarter;
@@ -62,7 +63,7 @@ public class MissingTransactionITCase {
 		}
 
 		db.close();
-		Assert.assertThat(amounts.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(amounts.size(), IsEqual.equalTo(0));
 	}
 
 	private long getBlockId(final H2Database db, final long height) throws SQLException {

@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -20,14 +21,14 @@ import java.util.Arrays;
 
 public class BlockScorerTest {
 
-	private static final byte[] HASH_BYTES = new byte[] {
-			(byte)0xF7, (byte)0xF6, (byte)0xF5, (byte)0xF4, (byte)0xF3, (byte)0xF2, (byte)0xF1, (byte)0xF0,
-			(byte)0xE7, (byte)0xE6, (byte)0xE5, (byte)0xE4, (byte)0xE3, (byte)0xE2, (byte)0xE1, (byte)0xE0,
-			(byte)0xD7, (byte)0xD6, (byte)0xD5, (byte)0xD4, (byte)0xD3, (byte)0xD2, (byte)0xD1, (byte)0xD0,
-			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
+	private static final byte[] HASH_BYTES = new byte[]{
+			(byte) 0xF7, (byte) 0xF6, (byte) 0xF5, (byte) 0xF4, (byte) 0xF3, (byte) 0xF2, (byte) 0xF1, (byte) 0xF0, (byte) 0xE7,
+			(byte) 0xE6, (byte) 0xE5, (byte) 0xE4, (byte) 0xE3, (byte) 0xE2, (byte) 0xE1, (byte) 0xE0, (byte) 0xD7, (byte) 0xD6,
+			(byte) 0xD5, (byte) 0xD4, (byte) 0xD3, (byte) 0xD2, (byte) 0xD1, (byte) 0xD0, (byte) 0xC7, (byte) 0xC6, (byte) 0xC5,
+			(byte) 0xC4, (byte) 0xC3, (byte) 0xC2, (byte) 0xC1, (byte) 0xC0
 	};
 
-	//region calculateHit
+	// region calculateHit
 
 	@Test
 	public void hitIsCalculatedCorrectly() {
@@ -40,12 +41,12 @@ public class BlockScorerTest {
 		final BigInteger hit = scorer.calculateHit(previousBlock);
 
 		// Assert:
-		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
+		MatcherAssert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
 	}
 
-	//endregion
+	// endregion
 
-	//region calculateTarget
+	// region calculateTarget
 
 	@Test
 	public void targetIsZeroWhenBalanceIsZero() throws NoSuchFieldException, IllegalAccessException {
@@ -60,7 +61,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -92,7 +93,7 @@ public class BlockScorerTest {
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
 
 		// Assert:
-		Assert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public class BlockScorerTest {
 		final Block previousBlock = createBlock(Utils.generateRandomAccount(), 1, 11);
 		final Block block = createBlock(blockSigner, 101, 11);
 
-		block.setDifficulty(new BlockDifficulty((long)60E12));
+		block.setDifficulty(new BlockDifficulty((long) 60E12));
 		context.recalculateImportances(block.getHeight());
 
 		// Act:
@@ -114,12 +115,10 @@ public class BlockScorerTest {
 		// (time-difference [100] * block-signer-importance [72000^] * multiplier * magic-number / difficulty [60e12])
 		// ^ MockBlockScorerAnalyzer calculates importance as balance / 1000
 		final long multiplier = 8_000_000_000L;
-		final BigInteger expectedTarget = BigInteger.valueOf(100)
-				.multiply(BigInteger.valueOf(72000 * multiplier))
-				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BigInteger.valueOf((long)60E12));
+		final BigInteger expectedTarget = BigInteger.valueOf(100).multiply(BigInteger.valueOf(72000 * multiplier))
+				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64).divide(BigInteger.valueOf((long) 60E12));
 
-		Assert.assertThat(target, IsEqual.equalTo(expectedTarget));
+		MatcherAssert.assertThat(target, IsEqual.equalTo(expectedTarget));
 	}
 
 	@Test
@@ -143,9 +142,9 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
-	//endregion
+	// endregion
 
-	//region calculateHarvesterEffectiveImportance
+	// region calculateHarvesterEffectiveImportance
 
 	@Test
 	public void calculateHarvesterEffectiveImportanceDerivesEffectiveImportanceFromImportance() {
@@ -158,7 +157,7 @@ public class BlockScorerTest {
 		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
+		MatcherAssert.assertThat(score, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
 	}
 
 	@Test
@@ -174,12 +173,9 @@ public class BlockScorerTest {
 		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
 		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height))
-				.thenReturn(ownerState);
-		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight))
-				.thenReturn(remoteState);
-		Mockito.when(context.accountStateCache.mutableContents())
-				.thenReturn(new CacheContents<>(Arrays.asList(ownerState, remoteState)));
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+		Mockito.when(context.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(Arrays.asList(ownerState, remoteState)));
 
 		context.recalculateImportances(block.getHeight());
 
@@ -187,13 +183,13 @@ public class BlockScorerTest {
 		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
-		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
+		MatcherAssert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
 		Mockito.verify(context.accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
-	//endregion
+	// endregion
 
-	//region calculateBlockScore
+	// region calculateBlockScore
 
 	@Test
 	public void blockScoreIsCalculatedCorrectly() throws Exception {
@@ -208,12 +204,13 @@ public class BlockScorerTest {
 
 		// Assert:
 		final long expectedScore = 44_888_000_000_000L - (5568532 - 5567320);
-		Assert.assertThat(score, IsEqual.equalTo(expectedScore));
+		MatcherAssert.assertThat(score, IsEqual.equalTo(expectedScore));
 	}
 
-	//endregion
+	// endregion
 
-	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {
+	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block)
+			throws NoSuchFieldException, IllegalAccessException {
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(block, accountLookup);
@@ -229,7 +226,8 @@ public class BlockScorerTest {
 		return b;
 	}
 
-	private static Block createBlock(final Account account, final int timeStamp, final long height) throws NoSuchFieldException, IllegalAccessException {
+	private static Block createBlock(final Account account, final int timeStamp, final long height)
+			throws NoSuchFieldException, IllegalAccessException {
 		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 		block.sign();
 
@@ -277,8 +275,7 @@ public class BlockScorerTest {
 		}
 
 		private void recalculateImportances(final BlockHeight height) {
-			this.poxFacade.recalculateImportances(
-					GroupedHeight.fromHeight(height),
+			this.poxFacade.recalculateImportances(GroupedHeight.fromHeight(height),
 					this.accountStateCache.mutableContents().asCollection());
 		}
 	}

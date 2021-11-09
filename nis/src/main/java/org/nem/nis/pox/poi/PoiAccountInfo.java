@@ -28,7 +28,8 @@ public class PoiAccountInfo {
 		this(NemGlobals.getBlockChainConfiguration(), index, accountState, height);
 	}
 
-	private PoiAccountInfo(final BlockChainConfiguration configuration, final int index, final AccountState accountState, final BlockHeight height) {
+	private PoiAccountInfo(final BlockChainConfiguration configuration, final int index, final AccountState accountState,
+			final BlockHeight height) {
 		this.index = index;
 		this.accountState = accountState;
 
@@ -91,14 +92,12 @@ public class PoiAccountInfo {
 	}
 
 	/**
-	 * Gets the weighted net outlinks associated with this account.
-	 * The net outlinks can be negative.
+	 * Gets the weighted net outlinks associated with this account. The net outlinks can be negative.
 	 *
 	 * @return The weighted net outlinks.
 	 */
 	public List<WeightedLink> getNetOutlinks() {
-		return this.netOutlinks.entrySet().stream()
-				.map(entry -> new WeightedLink(entry.getKey(), entry.getValue()))
+		return this.netOutlinks.entrySet().stream().map(entry -> new WeightedLink(entry.getKey(), entry.getValue()))
 				.collect(Collectors.toList());
 	}
 
@@ -108,8 +107,6 @@ public class PoiAccountInfo {
 	 * @return The net out-link score.
 	 */
 	public double getNetOutlinkScore() {
-		return this.getNetOutlinks().stream()
-				.map(WeightedLink::getWeight)
-				.reduce(0.0, Double::sum);
+		return this.getNetOutlinks().stream().map(WeightedLink::getWeight).reduce(0.0, Double::sum);
 	}
 }

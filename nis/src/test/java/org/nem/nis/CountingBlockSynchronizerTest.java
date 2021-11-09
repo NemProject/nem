@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -13,13 +14,12 @@ public class CountingBlockSynchronizerTest {
 	@Test
 	public void initialSyncCountsForNodesAreZero() {
 		// Arrange:
-		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(
-				Mockito.mock(BlockSynchronizer.class));
+		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(Mockito.mock(BlockSynchronizer.class));
 
 		// Assert:
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.1")), IsEqual.equalTo(0));
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.2")), IsEqual.equalTo(0));
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.3")), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.1")), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.2")), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.3")), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -28,8 +28,7 @@ public class CountingBlockSynchronizerTest {
 		final SyncConnectorPool connectorPool = Mockito.mock(SyncConnectorPool.class);
 		final Node node = NodeUtils.createNodeWithName("10.0.0.1");
 		final BlockSynchronizer innerSynchronizer = Mockito.mock(BlockSynchronizer.class);
-		Mockito.when(innerSynchronizer.synchronizeNode(connectorPool, node))
-				.thenReturn(NodeInteractionResult.FAILURE);
+		Mockito.when(innerSynchronizer.synchronizeNode(connectorPool, node)).thenReturn(NodeInteractionResult.FAILURE);
 
 		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(innerSynchronizer);
 
@@ -37,15 +36,14 @@ public class CountingBlockSynchronizerTest {
 		final NodeInteractionResult result = synchronizer.synchronizeNode(connectorPool, node);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(NodeInteractionResult.FAILURE));
 		Mockito.verify(innerSynchronizer, Mockito.times(1)).synchronizeNode(connectorPool, node);
 	}
 
 	@Test
 	public void synchronizeNodeIncrementsNodeSyncAttempts() {
 		// Arrange:
-		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(
-				Mockito.mock(BlockSynchronizer.class));
+		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(Mockito.mock(BlockSynchronizer.class));
 
 		// Act:
 		synchronizer.synchronizeNode(null, NodeUtils.createNodeWithName("10.0.0.3"));
@@ -53,8 +51,8 @@ public class CountingBlockSynchronizerTest {
 		synchronizer.synchronizeNode(null, NodeUtils.createNodeWithName("10.0.0.3"));
 
 		// Assert:
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.1")), IsEqual.equalTo(1));
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.2")), IsEqual.equalTo(0));
-		Assert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.3")), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.1")), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.2")), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(synchronizer.getSyncAttempts(NodeUtils.createNodeWithName("10.0.0.3")), IsEqual.equalTo(2));
 	}
 }

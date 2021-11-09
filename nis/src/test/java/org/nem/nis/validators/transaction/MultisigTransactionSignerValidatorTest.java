@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -27,8 +28,7 @@ public class MultisigTransactionSignerValidatorTest {
 		assertValidationResult(context -> context.signer, ValidationResult.SUCCESS);
 	}
 
-	private static void assertValidationResult(
-			final Function<MultisigTestContext, Account> getMultisigSigner,
+	private static void assertValidationResult(final Function<MultisigTestContext, Account> getMultisigSigner,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
@@ -39,6 +39,6 @@ public class MultisigTransactionSignerValidatorTest {
 		final ValidationResult result = context.validateTransaction(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

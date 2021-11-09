@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
@@ -20,7 +21,7 @@ public class AccountNamespaceBuilderTest {
 		final AccountNamespace accountNamespace = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountNamespace.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountNamespace.getParent(), IsEqual.equalTo(new NamespaceId("foo")));
+		MatcherAssert.assertThat(accountNamespace.getAddress(), IsEqual.equalTo(address));
+		MatcherAssert.assertThat(accountNamespace.getParent(), IsEqual.equalTo(new NamespaceId("foo")));
 	}
 }

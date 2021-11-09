@@ -5,8 +5,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Mosaic definition creation transaction db entity.
- * <br>
+ * Mosaic definition creation transaction db entity. <br>
  * Holds information about Transactions having type TransactionTypes.MOSAIC_DEFINITION_CREATION.
  */
 @Entity

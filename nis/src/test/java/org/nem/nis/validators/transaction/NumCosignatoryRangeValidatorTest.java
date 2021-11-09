@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -16,9 +17,7 @@ import java.util.*;
 public class NumCosignatoryRangeValidatorTest {
 	private static final int MAX_COSIGNERS = BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT;
 
-	//region max check
-
-	//region new multisig account
+	// region max check - new multisig account
 
 	@Test
 	public void modificationThatIncreasesNewMultisigAccountCosignersToLessThanMaxValidates() {
@@ -47,12 +46,12 @@ public class NumCosignatoryRangeValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region existing multisig account
+	// region max check - existing multisig account
 
 	@Test
 	public void modificationThatIncreasesExistingMultisigAccountCosignersToLessThanMaxValidates() {
@@ -82,12 +81,12 @@ public class NumCosignatoryRangeValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//region existing (adds and deletes)
+	// region max check - existing (adds and deletes)
 
 	@Test
 	public void modificationThatReplacesExistingMultisigAccountCosignersAtMaxValidates() {
@@ -113,7 +112,8 @@ public class NumCosignatoryRangeValidatorTest {
 		assertExistingMultisigAccountModificationAddDeleteValidation(5, 6, ValidationResult.SUCCESS);
 	}
 
-	private static void assertExistingMultisigAccountModificationAddDeleteValidation(final int numAdds, final int numDeletes, final ValidationResult expectedResult) {
+	private static void assertExistingMultisigAccountModificationAddDeleteValidation(final int numAdds, final int numDeletes,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addNumCosigners(MAX_COSIGNERS);
@@ -123,14 +123,12 @@ public class NumCosignatoryRangeValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
+	// endregion
 
-	//endregion
-
-	//region min required check
+	// region min required check
 
 	@Test
 	public void cannotChangeMinCosignatoriesToValueLargerThanTheNumberOfCosignatories() {
@@ -186,33 +184,28 @@ public class NumCosignatoryRangeValidatorTest {
 		assertMinCosignatoriesOutOfRange(3, 1, 2, 3, -9, result); // 3 - 9 < 0
 	}
 
-	private static void assertMinCosignatoriesOutOfRange(
-			final int initialCosigners,
-			final int numAdds,
-			final int numDeletes,
-			final int minCosignatories,
-			final int minCosignatoriesChange,
-			final ValidationResult expectedResult) {
+	private static void assertMinCosignatoriesOutOfRange(final int initialCosigners, final int numAdds, final int numDeletes,
+			final int minCosignatories, final int minCosignatoriesChange, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addNumCosigners(initialCosigners);
 		context.multisigAccountState.getMultisigLinks().incrementMinCosignatoriesBy(minCosignatories);
 
 		// Act:
-		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numAdds, numDeletes, minCosignatoriesChange);
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numAdds, numDeletes,
+				minCosignatoriesChange);
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
-
-	//endregion
+	// endregion
 
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new NumCosignatoryRangeValidator(this.accountStateCache);
+		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new NumCosignatoryRangeValidator(
+				this.accountStateCache);
 		private final Account multisig = Utils.generateRandomAccount();
 		private final AccountState multisigAccountState = new AccountState(this.multisig.getAddress());
 
@@ -234,26 +227,23 @@ public class NumCosignatoryRangeValidatorTest {
 			return this.createModificationTransaction(numAdds, numDeletes, null);
 		}
 
-		public MultisigAggregateModificationTransaction createModificationTransaction(
-				final int numAdds,
-				final int numDeletes,
+		public MultisigAggregateModificationTransaction createModificationTransaction(final int numAdds, final int numDeletes,
 				final Integer minCosignatoriesChange) {
 			final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 			for (int i = 0; i < numAdds; ++i) {
-				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
+				modifications
+						.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 			}
 
 			for (int i = 0; i < numDeletes; ++i) {
-				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
+				modifications
+						.add(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
 			}
 
-			return new MultisigAggregateModificationTransaction(
-					TimeInstant.ZERO,
-					this.multisig,
-					modifications,
+			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.multisig, modifications,
 					null == minCosignatoriesChange ? null : new MultisigMinCosignatoriesModification(minCosignatoriesChange));
 		}
 	}
 
-	//endregion
+	// endregion
 }

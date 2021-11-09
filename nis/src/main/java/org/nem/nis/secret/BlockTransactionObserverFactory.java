@@ -41,8 +41,7 @@ public class BlockTransactionObserverFactory {
 	}
 
 	/**
-	 * Creates a block transaction observer that commits all changes in order.
-	 * This observer is appropriate for an execute operation.
+	 * Creates a block transaction observer that commits all changes in order. This observer is appropriate for an execute operation.
 	 *
 	 * @param nisCache The NIS cache.
 	 * @return The observer.
@@ -52,8 +51,7 @@ public class BlockTransactionObserverFactory {
 	}
 
 	/**
-	 * Creates a block transaction observer that commits all changes in reverse order.
-	 * This observer is appropriate for an undo operation.
+	 * Creates a block transaction observer that commits all changes in reverse order. This observer is appropriate for an undo operation.
 	 *
 	 * @param nisCache The NIS cache.
 	 * @return The observer.
@@ -80,10 +78,12 @@ public class BlockTransactionObserverFactory {
 
 		// depends on MosaicDefinitionCreationObserver and MosaicTransferObserver
 		builder.add(new AccountInfoMosaicIdsObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
-		builder.add(new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache(), this.estimatedBlocksPerYear));
+		builder.add(
+				new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache(), this.estimatedBlocksPerYear));
 
 		// pruners
-		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
+		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(),
+				!options.contains(ObserverOption.NoHistoricalDataPruning)));
 		builder.add(new NamespaceCachePruningObserver(nisCache.getNamespaceCache()));
 		builder.add(new TransactionHashCachePruningObserver(nisCache.getTransactionHashCache()));
 

@@ -46,9 +46,7 @@ public class RecalculateImportancesObserverTest {
 		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
-	private static void assertImportanceRecalculation(
-			final NotificationTrigger trigger,
-			final BlockHeight height,
+	private static void assertImportanceRecalculation(final NotificationTrigger trigger, final BlockHeight height,
 			final BlockHeight expectedRecalculateBlockHeight) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -59,13 +57,12 @@ public class RecalculateImportancesObserverTest {
 				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is called
-		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight),
+				Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.times(1)).mutableContents();
 	}
 
-	private static void assertNoImportanceRecalculation(
-			final NotificationTrigger trigger,
-			final BlockHeight height) {
+	private static void assertNoImportanceRecalculation(final NotificationTrigger trigger, final BlockHeight height) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.poxFacade.getLastRecalculationHeight()).thenReturn(BlockHeight.ONE);
