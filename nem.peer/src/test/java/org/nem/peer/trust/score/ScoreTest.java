@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.peer.test.MockScore;
@@ -12,7 +13,7 @@ public class ScoreTest {
 		final Score score = new MockScore();
 
 		// Assert:
-		Assert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
+		MatcherAssert.assertThat(score.score().get(), IsEqual.equalTo(MockScore.INITIAL_SCORE));
 	}
 
 	@Test
@@ -24,6 +25,6 @@ public class ScoreTest {
 		score.score().set(5.2);
 
 		// Assert:
-		Assert.assertThat(score.score().get(), IsEqual.equalTo(5.2));
+		MatcherAssert.assertThat(score.score().get(), IsEqual.equalTo(5.2));
 	}
 }

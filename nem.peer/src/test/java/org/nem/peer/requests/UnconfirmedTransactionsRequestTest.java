@@ -1,5 +1,6 @@
 package org.nem.peer.requests;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -21,7 +22,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest();
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -30,7 +31,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(new ArrayList<>());
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(request.getHashShortIds().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final TestContext context = new TestContext(10);
 
 		// Assert:
-		Assert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+		MatcherAssert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
 	}
 
 	// endregion
@@ -56,27 +57,21 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(transactions);
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
+		MatcherAssert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
 	}
 
 	private static MultisigTransaction createMultisigTransactionWithSignatures(final List<HashShortId> hashShortIds) {
 		{
 			final Account multisig = Utils.generateRandomAccount();
-			final TransferTransaction otherTransaction = new TransferTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(123),
-					null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), otherTransaction);
+			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, Utils.generateRandomAccount(),
+					Amount.fromNem(123), null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(),
+					otherTransaction);
 			transaction.sign();
 			hashShortIds.add(new HashShortId(HashUtils.calculateHash(transaction).getShortId()));
 			IntStream.range(0, 3).forEach(i -> {
-				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-						TimeInstant.ZERO,
-						Utils.generateRandomAccount(),
-						multisig,
-						transaction.getOtherTransaction());
+				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(TimeInstant.ZERO,
+						Utils.generateRandomAccount(), multisig, transaction.getOtherTransaction());
 				transaction.addSignature(signature);
 				hashShortIds.add(new HashShortId(HashUtils.calculateHash(signature).getShortId()));
 			});
@@ -87,7 +82,7 @@ public class UnconfirmedTransactionsRequestTest {
 
 	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void requestCanBeRoundTripped() {
@@ -99,7 +94,7 @@ public class UnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+		MatcherAssert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
 	}
 
 	// endregion
@@ -112,8 +107,7 @@ public class UnconfirmedTransactionsRequestTest {
 		private TestContext(final int count) {
 			this.transactions = this.createTransactions(count);
 			this.request = new UnconfirmedTransactionsRequest(this.transactions);
-			this.hashShortIds = this.transactions.stream()
-					.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+			this.hashShortIds = this.transactions.stream().map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 					.collect(Collectors.toList());
 		}
 

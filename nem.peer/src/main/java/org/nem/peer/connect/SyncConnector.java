@@ -34,8 +34,7 @@ public interface SyncConnector {
 	Block getBlockAt(final Node node, final BlockHeight height);
 
 	/**
-	 * Requests information about the hashes of all blocks in the chain after the specified height
-	 * from the specified node.
+	 * Requests information about the hashes of all blocks in the chain after the specified height from the specified node.
 	 *
 	 * @param node The remote node.
 	 * @param height The block height
@@ -44,8 +43,7 @@ public interface SyncConnector {
 	HashChain getHashesFrom(final Node node, final BlockHeight height);
 
 	/**
-	 * Requests information about all blocks in the chain after the specified height
-	 * from the specified node.
+	 * Requests information about all blocks in the chain after the specified height from the specified node.
 	 *
 	 * @param node The remote node.
 	 * @param chainRequest The chain request.
@@ -54,8 +52,7 @@ public interface SyncConnector {
 	Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest);
 
 	/**
-	 * Requests information about the cumulative score of the remote chain
-	 * from the specified node.
+	 * Requests information about the cumulative score of the remote chain from the specified node.
 	 *
 	 * @param node The remote node.
 	 * @return The cumulative score for the endpoint's chain.
@@ -69,7 +66,8 @@ public interface SyncConnector {
 	 * @param unconfirmedTransactionsRequest The unconfirmed transactions request.
 	 * @return All new unconfirmed transactions from the endpoint.
 	 */
-	Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
+	Collection<Transaction> getUnconfirmedTransactions(final Node node,
+			final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
 
 	// endregion
 

@@ -1,6 +1,7 @@
 package org.nem.peer.trust;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -19,7 +20,7 @@ public class CachedTrustProviderTest {
 	private static final Logger LOGGER = Logger.getLogger(CachedTrustProviderTest.class.getName());
 	private static final int MAX_MATRIX_SIZE = 101;
 
-	//region caching
+	// region caching
 
 	@Test
 	public void trustValuesAreComputedFirstTime() {
@@ -31,8 +32,8 @@ public class CachedTrustProviderTest {
 		final TrustResult result = context.computeTrust();
 
 		// Assert:
-		Assert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust1Nodes));
-		Assert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
+		MatcherAssert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust1Nodes));
+		MatcherAssert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
 		context.assertTrustProviderCalls(1);
 	}
 
@@ -56,8 +57,8 @@ public class CachedTrustProviderTest {
 		final TrustResult result = context.computeTrust();
 
 		// Assert:
-		Assert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust1Nodes));
-		Assert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
+		MatcherAssert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust1Nodes));
+		MatcherAssert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
 		context.assertTrustProviderCalls(1);
 	}
 
@@ -80,8 +81,8 @@ public class CachedTrustProviderTest {
 		final TrustResult result = context.computeTrust();
 
 		// Assert:
-		Assert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust2Nodes));
-		Assert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.25, 0.75)));
+		MatcherAssert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust2Nodes));
+		MatcherAssert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.25, 0.75)));
 		context.assertTrustProviderCalls(2);
 	}
 
@@ -99,8 +100,8 @@ public class CachedTrustProviderTest {
 		final TrustResult result = context.computeTrust();
 
 		// Assert: the value calculated at 111 is cached and returned when querying at 211
-		Assert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust2Nodes));
-		Assert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.25, 0.75)));
+		MatcherAssert.assertThat(result.getTrustContext().getNodes(), IsEqual.equalTo(context.trust2Nodes));
+		MatcherAssert.assertThat(result.getTrustValues(), IsEqual.equalTo(new ColumnVector(0.25, 0.75)));
 		context.assertTrustProviderCalls(2);
 	}
 
@@ -116,8 +117,8 @@ public class CachedTrustProviderTest {
 		final ColumnVector trustValues2 = context.computeTrust().getTrustValues();
 
 		// Assert:
-		Assert.assertThat(trustValues1, IsEqual.equalTo(new ColumnVector(0.0, 0.5)));
-		Assert.assertThat(trustValues2, IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
+		MatcherAssert.assertThat(trustValues1, IsEqual.equalTo(new ColumnVector(0.0, 0.5)));
+		MatcherAssert.assertThat(trustValues2, IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
 		context.assertTrustProviderCalls(1);
 	}
 
@@ -127,9 +128,15 @@ public class CachedTrustProviderTest {
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final CachedTrustProvider trustProvider = new CachedTrustProvider(this.innerTrustProvider, 100, this.timeProvider);
 
-		private final Node[] trust1Nodes = new Node[] { NodeUtils.createNodeWithName("1a"), NodeUtils.createNodeWithName("1b") };
-		private final Node[] trust2Nodes = new Node[] { NodeUtils.createNodeWithName("2c"), NodeUtils.createNodeWithName("2d") };
-		private final Node[] trust3Nodes = new Node[] { NodeUtils.createNodeWithName("3e"), NodeUtils.createNodeWithName("3f") };
+		private final Node[] trust1Nodes = new Node[]{
+				NodeUtils.createNodeWithName("1a"), NodeUtils.createNodeWithName("1b")
+		};
+		private final Node[] trust2Nodes = new Node[]{
+				NodeUtils.createNodeWithName("2c"), NodeUtils.createNodeWithName("2d")
+		};
+		private final Node[] trust3Nodes = new Node[]{
+				NodeUtils.createNodeWithName("3e"), NodeUtils.createNodeWithName("3f")
+		};
 
 		public TestContext() {
 			final TrustResult result1 = createTrustResult(this.trust1Nodes, new ColumnVector(1, 1));
@@ -137,7 +144,7 @@ public class CachedTrustProviderTest {
 			final TrustResult result3 = createTrustResult(this.trust3Nodes, new ColumnVector(1, 7));
 			Mockito.when(this.innerTrustProvider.computeTrust(Mockito.any())).thenReturn(result1, result2, result3);
 
-			Mockito.when(this.context.getNodes()).thenReturn(new Node[] {});
+			Mockito.when(this.context.getNodes()).thenReturn(new Node[]{});
 		}
 
 		public TrustResult computeTrust() {
@@ -153,9 +160,9 @@ public class CachedTrustProviderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region truncated nodes
+	// region truncated nodes
 
 	@Test
 	public void trustCalculationIsDelegatedToInnerProviderWhenTruncationOccurs() {
@@ -167,8 +174,8 @@ public class CachedTrustProviderTest {
 
 		// Assert:
 		Mockito.verify(context.innerTrustProvider, Mockito.only()).computeTrust(Mockito.any());
-		Assert.assertThat(actualResult.getTrustContext(), IsEqual.equalTo(context.expectedResult.getTrustContext()));
-		Assert.assertThat(actualResult.getTrustValues(), IsEqual.equalTo(context.expectedResult.getTrustValues()));
+		MatcherAssert.assertThat(actualResult.getTrustContext(), IsEqual.equalTo(context.expectedResult.getTrustContext()));
+		MatcherAssert.assertThat(actualResult.getTrustValues(), IsEqual.equalTo(context.expectedResult.getTrustValues()));
 	}
 
 	@Test
@@ -180,11 +187,11 @@ public class CachedTrustProviderTest {
 		final TrustContext trustContext = context.computeTrustAndCaptureContext();
 
 		// Assert:
-		Assert.assertThat(trustContext.getLocalNode(), IsEqual.equalTo(context.localNode));
-		Assert.assertThat(trustContext.getNodes().length, IsEqual.equalTo(MAX_MATRIX_SIZE));
-		Assert.assertThat(trustContext.getNodeExperiences(), IsEqual.equalTo(context.trustContext.getNodeExperiences()));
-		Assert.assertThat(trustContext.getPreTrustedNodes(), IsEqual.equalTo(context.trustContext.getPreTrustedNodes()));
-		Assert.assertThat(trustContext.getParams(), IsEqual.equalTo(context.trustContext.getParams()));
+		MatcherAssert.assertThat(trustContext.getLocalNode(), IsEqual.equalTo(context.localNode));
+		MatcherAssert.assertThat(trustContext.getNodes().length, IsEqual.equalTo(MAX_MATRIX_SIZE));
+		MatcherAssert.assertThat(trustContext.getNodeExperiences(), IsEqual.equalTo(context.trustContext.getNodeExperiences()));
+		MatcherAssert.assertThat(trustContext.getPreTrustedNodes(), IsEqual.equalTo(context.trustContext.getPreTrustedNodes()));
+		MatcherAssert.assertThat(trustContext.getParams(), IsEqual.equalTo(context.trustContext.getParams()));
 	}
 
 	@Test
@@ -197,7 +204,7 @@ public class CachedTrustProviderTest {
 
 		// Assert:
 		final Node lastNode = trustContext.getNodes()[trustContext.getNodes().length - 1];
-		Assert.assertThat(lastNode, IsEqual.equalTo(context.localNode));
+		MatcherAssert.assertThat(lastNode, IsEqual.equalTo(context.localNode));
 	}
 
 	@Test
@@ -210,15 +217,14 @@ public class CachedTrustProviderTest {
 		final Set<Node> nodesSet = new HashSet<>(Arrays.asList(trustContext.getNodes()));
 
 		// Assert:
-		Assert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
+		MatcherAssert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
 	}
 
 	@Test
 	public void trustContextPassedToInnerProviderDoesNotSelectHighTrustNodesThatAreNotInCurrentContext() {
 		// Assert:
-		assertTopTrustedNodeTruncationSelection(
-				(nodes, initialNodes) -> nodes,
-				names -> Assert.assertThat(names.isEmpty(), IsEqual.equalTo(true)));
+		assertTopTrustedNodeTruncationSelection((nodes, initialNodes) -> nodes,
+				names -> MatcherAssert.assertThat(names.isEmpty(), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -228,9 +234,9 @@ public class CachedTrustProviderTest {
 				(nodes, initialNodes) -> org.apache.commons.lang3.ArrayUtils.addAll(nodes, Arrays.copyOfRange(initialNodes, 5, 15)),
 				names -> names.size() < 10, // note that *occasionally* all low trust nodes can be selected due to randomness
 				names -> {
-					Assert.assertThat(names.size() < 10, IsEqual.equalTo(true));
+					MatcherAssert.assertThat(names.size() < 10, IsEqual.equalTo(true));
 					for (final String name : Arrays.asList("i6", "i8", "i10", "i12", "i14")) {
-						Assert.assertThat(names.contains(name), IsEqual.equalTo(true));
+						MatcherAssert.assertThat(names.contains(name), IsEqual.equalTo(true));
 					}
 				});
 	}
@@ -238,25 +244,20 @@ public class CachedTrustProviderTest {
 	@Test
 	public void trustContextPassedToInnerProviderContainsHighTrustNodes() {
 		// Assert:
-		assertTopTrustedNodeTruncationSelection(
-				org.apache.commons.lang3.ArrayUtils::addAll,
-				names -> {
-					for (final String name : Arrays.asList("i0", "i2", "i4", "i6", "i8", "i10", "i12", "i14", "i16", "i18")) {
-						Assert.assertThat(names.contains(name), IsEqual.equalTo(true));
-					}
-				});
+		assertTopTrustedNodeTruncationSelection(org.apache.commons.lang3.ArrayUtils::addAll, names -> {
+			for (final String name : Arrays.asList("i0", "i2", "i4", "i6", "i8", "i10", "i12", "i14", "i16", "i18")) {
+				MatcherAssert.assertThat(names.contains(name), IsEqual.equalTo(true));
+			}
+		});
 	}
 
-	private static void assertTopTrustedNodeTruncationSelection(
-			final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
+	private static void assertTopTrustedNodeTruncationSelection(final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
 			final Consumer<List<String>> assertInitialNodeNames) {
 		assertTopTrustedNodeTruncationSelection(mergeSecondRoundNodes, nodes -> true, assertInitialNodeNames);
 	}
 
-	private static void assertTopTrustedNodeTruncationSelection(
-			final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
-			final Predicate<List<String>> useGeneratedNodeNames,
-			final Consumer<List<String>> assertInitialNodeNames) {
+	private static void assertTopTrustedNodeTruncationSelection(final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
+			final Predicate<List<String>> useGeneratedNodeNames, final Consumer<List<String>> assertInitialNodeNames) {
 		// allow up to k retries
 		for (int k = 0; k < 5; ++k) {
 			// Arrange:
@@ -287,7 +288,7 @@ public class CachedTrustProviderTest {
 			// - trigger the trust calculation on the initial nodes (high, low ...)
 			trustProvider.computeTrust(createTrustContext(initialNodes, localNode));
 			// - trigger the trust calculation on the next nodes (zero ...)
-			//   (note that some of the high trust nodes from the previous calculation should be selected, if they are included)
+			// (note that some of the high trust nodes from the previous calculation should be selected, if they are included)
 			trustProvider.computeTrust(createTrustContext(nodes, localNode));
 
 			// Assert:
@@ -296,13 +297,11 @@ public class CachedTrustProviderTest {
 			final TrustContext trustContext = trustContextCaptor.getValue();
 
 			final Set<Node> nodesSet = new HashSet<>(Arrays.asList(trustContext.getNodes()));
-			final List<String> names = nodesSet.stream()
-					.map(n -> n.getIdentity().getName())
-					.filter(n -> n.startsWith("i"))
+			final List<String> names = nodesSet.stream().map(n -> n.getIdentity().getName()).filter(n -> n.startsWith("i"))
 					.collect(Collectors.toList());
 			LOGGER.info("names of selected initial nodes: " + StringUtils.join(names, ","));
 
-			Assert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
+			MatcherAssert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
 			if (!useGeneratedNodeNames.test(names)) {
 				LOGGER.info("regenerating nodes for test ...");
 				continue;
@@ -319,9 +318,12 @@ public class CachedTrustProviderTest {
 		private final Node[] nodes;
 		private final Node localNode;
 		private final TrustContext trustContext;
-		private final TrustResult expectedResult = createTrustResult(new Node[] { NodeUtils.createNodeWithName("r1") }, new ColumnVector(1));
+		private final TrustResult expectedResult = createTrustResult(new Node[]{
+				NodeUtils.createNodeWithName("r1")
+		}, new ColumnVector(1));
 		private final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
-		private final CachedTrustProvider trustProvider = new CachedTrustProvider(this.innerTrustProvider, 0, Mockito.mock(TimeProvider.class));
+		private final CachedTrustProvider trustProvider = new CachedTrustProvider(this.innerTrustProvider, 0,
+				Mockito.mock(TimeProvider.class));
 
 		public TruncationTestContext() {
 			this.nodes = new Node[200];
@@ -350,14 +352,10 @@ public class CachedTrustProviderTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static TrustContext createTrustContext(final Node[] nodes, final Node localNode) {
-		return new TrustContext(
-				nodes,
-				localNode,
-				Mockito.mock(NodeExperiences.class),
-				Mockito.mock(PreTrustedNodes.class),
+		return new TrustContext(nodes, localNode, Mockito.mock(NodeExperiences.class), Mockito.mock(PreTrustedNodes.class),
 				Mockito.mock(TrustParameters.class));
 	}
 

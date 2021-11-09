@@ -26,9 +26,7 @@ public class PeerNetwork {
 	 * @param servicesFactory The network services factory.
 	 * @param selectorFactory The node selector factory.
 	 */
-	public PeerNetwork(
-			final PeerNetworkState state,
-			final PeerNetworkServicesFactory servicesFactory,
+	public PeerNetwork(final PeerNetworkState state, final PeerNetworkServicesFactory servicesFactory,
 			final PeerNetworkNodeSelectorFactory selectorFactory) {
 		this.state = state;
 		this.servicesFactory = servicesFactory;
@@ -36,7 +34,7 @@ public class PeerNetwork {
 		this.selector = this.selectorFactory.createUpdateNodeSelector();
 	}
 
-	//region PeerNetworkState delegation
+	// region PeerNetworkState delegation
 
 	/**
 	 * Gets a value indication whether or not the local chain is synchronized with the rest of the network.
@@ -97,9 +95,9 @@ public class PeerNetwork {
 		return this.state.getTimeSynchronizationResults();
 	}
 
-	//endregion
+	// endregion
 
-	//region PeerNetworkServicesFactory delegation
+	// region PeerNetworkServicesFactory delegation
 
 	/**
 	 * Refreshes the network.
@@ -168,8 +166,7 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Void> checkChainSynchronization() {
 		final ChainServices chainServices = this.servicesFactory.getChainServices();
-		return chainServices.isChainSynchronized(this.getPartnerNodes())
-				.thenAccept(this.state::setChainSynchronized);
+		return chainServices.isChainSynchronized(this.getPartnerNodes()).thenAccept(this.state::setChainSynchronized);
 	}
 
 	/**
@@ -198,5 +195,5 @@ public class PeerNetwork {
 		return this.servicesFactory.createLocalNodeEndpointUpdater().updateAny(this.getPartnerNodes());
 	}
 
-	//endregion
+	// endregion
 }

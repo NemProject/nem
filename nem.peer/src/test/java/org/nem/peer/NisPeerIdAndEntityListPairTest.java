@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -20,9 +21,9 @@ public class NisPeerIdAndEntityListPairTest {
 		final NisPeerIdAndEntityListPair pair = new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, entities);
 
 		// Assert:
-		Assert.assertThat(pair.getApiId(), IsEqual.equalTo(NisPeerId.REST_BLOCK_AT));
-		Assert.assertThat(pair.getEntities().size(), IsEqual.equalTo(1));
-		Assert.assertThat(pair.getEntities().get(0), IsEqual.equalTo(new BlockHeight(123)));
+		MatcherAssert.assertThat(pair.getApiId(), IsEqual.equalTo(NisPeerId.REST_BLOCK_AT));
+		MatcherAssert.assertThat(pair.getEntities().size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(pair.getEntities().get(0), IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	@Test
@@ -44,13 +45,12 @@ public class NisPeerIdAndEntityListPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue(),
+			MatcherAssert.assertThat(entry.getValue(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(pair)) : IsEqual.equalTo(pair));
 		}
 
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(pair)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(pair)));
 	}
 
 	@Test
@@ -60,18 +60,19 @@ public class NisPeerIdAndEntityListPairTest {
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {
-			Assert.assertThat(
-					entry.getValue().hashCode(),
+			MatcherAssert.assertThat(entry.getValue().hashCode(),
 					!entry.getKey().equals("default") ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private static Map<String, NisPeerIdAndEntityListPair> createBroadcastableEntityListForEqualityTests() {
 		return new HashMap<String, NisPeerIdAndEntityListPair>() {
 			{
 				this.put("default", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
 				this.put("diff-api-id", new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_SCORE, createList(new BlockHeight(123))));
-				this.put("diff-entity-type", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(NodeUtils.createNodeWithName("Alice"))));
+				this.put("diff-entity-type",
+						new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(NodeUtils.createNodeWithName("Alice"))));
 				this.put("diff-entity-values", new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(234))));
 			}
 		};

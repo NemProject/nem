@@ -56,8 +56,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	}
 
 	/**
-	 * Updates the feedback credibility values for the specified node given the specified nodes
-	 * and experiences.
+	 * Updates the feedback credibility values for the specified node given the specified nodes and experiences.
 	 *
 	 * @param node The node.
 	 * @param nodes The nodes.

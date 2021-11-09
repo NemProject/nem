@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
@@ -11,7 +12,7 @@ public class PositiveLongTest {
 		final PositiveLong value = new PositiveLong(7);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(7L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(7L));
 	}
 
 	@Test
@@ -20,7 +21,7 @@ public class PositiveLongTest {
 		final PositiveLong value = new PositiveLong(-7);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -32,7 +33,7 @@ public class PositiveLongTest {
 		value.set(-3);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -44,7 +45,7 @@ public class PositiveLongTest {
 		value.set(0);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -56,7 +57,7 @@ public class PositiveLongTest {
 		value.set(3);
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(3L));
 	}
 
 	@Test
@@ -68,6 +69,6 @@ public class PositiveLongTest {
 		value.increment();
 
 		// Assert:
-		Assert.assertThat(value.get(), IsEqual.equalTo(8L));
+		MatcherAssert.assertThat(value.get(), IsEqual.equalTo(8L));
 	}
 }

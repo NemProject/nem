@@ -22,9 +22,7 @@ public class HttpCommunicator implements Communicator {
 	 * @param communicationMode The communication mode.
 	 * @param context The deserialization context.
 	 */
-	public HttpCommunicator(
-			final HttpMethodClient<Deserializer> httpMethodClient,
-			final CommunicationMode communicationMode,
+	public HttpCommunicator(final HttpMethodClient<Deserializer> httpMethodClient, final CommunicationMode communicationMode,
 			final DeserializationContext context) {
 		this.httpMethodClient = httpMethodClient;
 		this.isBinaryMode = CommunicationMode.BINARY == communicationMode;

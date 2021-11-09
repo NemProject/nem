@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -20,8 +21,8 @@ public class BroadcastBufferTest {
 		final BroadcastBuffer buffer = new BroadcastBuffer();
 
 		// Assert:
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(0));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -40,8 +41,8 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_CHAIN_HASHES_FROM, new BlockHeight(345));
 
 		// Assert:
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(2));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(3 + 1));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(3 + 1));
 	}
 
 	// endregion
@@ -57,11 +58,11 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
 
 		// Assert:
-		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
-				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(1));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(1));
-		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections
+				.singletonList(new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -75,11 +76,11 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(234));
 
 		// Assert:
-		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
-				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(1));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
-		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(new NisPeerIdAndEntityListPair(
+				NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
@@ -98,9 +99,9 @@ public class BroadcastBufferTest {
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_NODE_CAN_YOU_SEE_ME, createList(new NodeEndpoint("http", "127.0.0.1", 1234))),
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(3));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(4));
-		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(4));
+		MatcherAssert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	// endregion
@@ -113,8 +114,8 @@ public class BroadcastBufferTest {
 		final BroadcastBuffer buffer = runGetAllPairsTest(BroadcastBuffer::getAllPairs);
 
 		// Assert:
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(2));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -123,8 +124,8 @@ public class BroadcastBufferTest {
 		final BroadcastBuffer buffer = runGetAllPairsTest(BroadcastBuffer::getAllPairsAndClearMap);
 
 		// Assert:
-		Assert.assertThat(buffer.size(), IsEqual.equalTo(0));
-		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(buffer.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 	}
 
 	private static BroadcastBuffer runGetAllPairsTest(final Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
@@ -141,8 +142,8 @@ public class BroadcastBufferTest {
 		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Arrays.asList(
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
-		Assert.assertThat(pairs.size(), IsEqual.equalTo(2));
-		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
+		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		return buffer;
 	}
 

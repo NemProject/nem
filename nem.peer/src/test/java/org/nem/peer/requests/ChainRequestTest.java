@@ -1,6 +1,7 @@
 package org.nem.peer.requests;
 
 import net.minidev.json.JSONObject;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -21,10 +22,10 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(new BlockHeight(111), 222, 333);
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(333));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(333));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
 	}
 
 	@Test
@@ -33,10 +34,10 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(new BlockHeight(111));
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL + 100));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL + 100));
 	}
 
 	@Test
@@ -45,22 +46,22 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(new BlockHeight(111), 222);
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
 	}
 
 	@Test
 	public void chainRequestConstructionCorrectsMinBlocksToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMinBlocks(1), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(getMinBlocks(1), IsEqual.equalTo(10));
 	}
 
 	@Test
 	public void chainRequestConstructionCorrectsMinBlocksToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMinBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
+		MatcherAssert.assertThat(getMinBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
 	}
 
 	private static int getMinBlocks(final int initialValue) {
@@ -72,13 +73,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestConstructionCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMaxTransactions(1), IsEqual.equalTo(120));
+		MatcherAssert.assertThat(getMaxTransactions(1), IsEqual.equalTo(120));
 	}
 
 	@Test
 	public void chainRequestConstructionCorrectsMaxTransactionsToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMaxTransactions(99999999), IsEqual.equalTo(DEFAULT_TRANSACTIONS_LIMIT));
+		MatcherAssert.assertThat(getMaxTransactions(99999999), IsEqual.equalTo(DEFAULT_TRANSACTIONS_LIMIT));
 	}
 
 	private static int getMaxTransactions(final int initialValue) {
@@ -90,13 +91,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestConstructionCorrectsNumBlocksToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getNumBlocks(1), IsEqual.equalTo(110));
+		MatcherAssert.assertThat(getNumBlocks(1), IsEqual.equalTo(110));
 	}
 
 	@Test
 	public void chainRequestConstructionCorrectsNumBlocksToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getNumBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
+		MatcherAssert.assertThat(getNumBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
 	}
 
 	private static int getNumBlocks(final int initialValue) {
@@ -107,7 +108,7 @@ public class ChainRequestTest {
 
 	// endregion
 
-	//region serialization
+	// region serialization
 
 	@Test
 	public void requestCanBeRoundTripped() {
@@ -119,10 +120,10 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(deserializer);
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo((new BlockHeight(111))));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(123));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(1234));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(223));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo((new BlockHeight(111))));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(123));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(1234));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(223));
 	}
 
 	@Test
@@ -137,10 +138,10 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(Utils.createDeserializer(jsonObject));
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(333));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(222));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(333));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(322));
 	}
 
 	@Test
@@ -153,22 +154,22 @@ public class ChainRequestTest {
 		final ChainRequest request = new ChainRequest(Utils.createDeserializer(jsonObject));
 
 		// Assert:
-		Assert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
-		Assert.assertThat(request.getMinBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL));
-		Assert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
-		Assert.assertThat(request.getNumBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL + 100));
+		MatcherAssert.assertThat(request.getHeight(), IsEqual.equalTo(new BlockHeight(111)));
+		MatcherAssert.assertThat(request.getMinBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL));
+		MatcherAssert.assertThat(request.getMaxTransactions(), IsEqual.equalTo(DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS));
+		MatcherAssert.assertThat(request.getNumBlocks(), IsEqual.equalTo(DEFAULT_NUMBER_OF_BLOCKS_TO_PULL + 100));
 	}
 
 	@Test
 	public void chainRequestDeserializationCorrectsMinBlocksToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMinBlocks(1), IsEqual.equalTo(10));
+		MatcherAssert.assertThat(getDeserializedMinBlocks(1), IsEqual.equalTo(10));
 	}
 
 	@Test
 	public void chainRequestDeserializationCorrectsMinBlocksToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMinBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
+		MatcherAssert.assertThat(getDeserializedMinBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
 	}
 
 	private static int getDeserializedMinBlocks(final int initialValue) {
@@ -185,13 +186,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestDeserializationCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(120));
+		MatcherAssert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(120));
 	}
 
 	@Test
 	public void chainRequestDeserializationCorrectsMaxTransactionsToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMaxTransactions(99999999), IsEqual.equalTo(DEFAULT_TRANSACTIONS_LIMIT));
+		MatcherAssert.assertThat(getDeserializedMaxTransactions(99999999), IsEqual.equalTo(DEFAULT_TRANSACTIONS_LIMIT));
 	}
 
 	private static int getDeserializedMaxTransactions(final int initialValue) {
@@ -208,13 +209,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestDeserializationCorrectsNumBlocksToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedNumBlocks(1), IsEqual.equalTo(110));
+		MatcherAssert.assertThat(getDeserializedNumBlocks(1), IsEqual.equalTo(110));
 	}
 
 	@Test
 	public void chainRequestDeserializationCorrectsNumBlocksToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedNumBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
+		MatcherAssert.assertThat(getDeserializedNumBlocks(99999999), IsEqual.equalTo(DEFAULT_BLOCKS_LIMIT));
 	}
 
 	private static int getDeserializedNumBlocks(final int initialValue) {
@@ -228,5 +229,5 @@ public class ChainRequestTest {
 		return request.getNumBlocks();
 	}
 
-	//endregion
+	// endregion
 }

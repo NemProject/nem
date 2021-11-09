@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.Matrix;
@@ -13,7 +14,7 @@ import java.util.*;
 public class NodeExperiencesTest {
 	private static final int RETENTION_TIME = 24;
 
-	//region basic operations
+	// region basic operations
 
 	@Test
 	public void previouslyUnknownNodeExperienceCanBeRetrieved() {
@@ -25,7 +26,7 @@ public class NodeExperiencesTest {
 		final NodeExperience experience = experiences.getNodeExperience(nodes[0], nodes[1]);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class NodeExperiencesTest {
 		final NodeExperience experience2 = experiences.getNodeExperience(nodes[0], nodes[1]);
 
 		// Assert:
-		Assert.assertThat(experience2, IsSame.sameInstance(experience1));
+		MatcherAssert.assertThat(experience2, IsSame.sameInstance(experience1));
 	}
 
 	@Test
@@ -53,12 +54,12 @@ public class NodeExperiencesTest {
 		final NodeExperience experience2 = experiences.getNodeExperience(nodes[1], nodes[0]);
 
 		// Assert:
-		Assert.assertThat(experience2, IsNot.not(IsSame.sameInstance(experience1)));
+		MatcherAssert.assertThat(experience2, IsNot.not(IsSame.sameInstance(experience1)));
 	}
 
-	//endregion
+	// endregion
 
-	//region shared experiences matrix
+	// region shared experiences matrix
 
 	@Test
 	public void sharedExperiencesMatrixHasZeroRowForLocalNode() {
@@ -66,11 +67,11 @@ public class NodeExperiencesTest {
 		final Matrix matrix = createTotalSharedExperienceMatrix();
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getAt(1, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -79,11 +80,11 @@ public class NodeExperiencesTest {
 		final Matrix matrix = createTotalSharedExperienceMatrix();
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
-		Assert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getAt(0, 0), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(1, 1), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 2), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -92,13 +93,13 @@ public class NodeExperiencesTest {
 		final Matrix matrix = createTotalSharedExperienceMatrix();
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(4.0));
-		Assert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
-		Assert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(1.0));
-		Assert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(4.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 1), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 0), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getAt(2, 1), IsEqual.equalTo(1.0));
 	}
 
 	private static Matrix createTotalSharedExperienceMatrix() {
@@ -130,9 +131,9 @@ public class NodeExperiencesTest {
 		final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -148,9 +149,9 @@ public class NodeExperiencesTest {
 		final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(0.0));
 	}
 
 	@Test
@@ -166,15 +167,15 @@ public class NodeExperiencesTest {
 		final Matrix matrix = experiences.getSharedExperienceMatrix(nodes[1], nodes);
 
 		// Assert:
-		Assert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
-		Assert.assertThat(matrix.absSum(), IsEqual.equalTo(1.0));
-		Assert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getRowCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.getColumnCount(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(matrix.absSum(), IsEqual.equalTo(1.0));
+		MatcherAssert.assertThat(matrix.getAt(0, 2), IsEqual.equalTo(1.0));
 	}
 
-	//endregion
+	// endregion
 
-	//region getNodeExperiences / setNodeExperiences
+	// region getNodeExperiences / setNodeExperiences
 
 	@Test
 	public void getExperiencesReturnsAllNodeExperiences() {
@@ -190,7 +191,7 @@ public class NodeExperiencesTest {
 		final List<NodeExperiencePair> pairs = experiences.getNodeExperiences(nodes[0]);
 
 		// Assert:
-		Assert.assertThat(pairs.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(2));
 		NodeExperiencePair pair1 = pairs.get(0);
 		NodeExperiencePair pair2 = pairs.get(1);
 		if (pair1.getNode().equals(nodes[3])) {
@@ -199,11 +200,11 @@ public class NodeExperiencesTest {
 			pair2 = temp;
 		}
 
-		Assert.assertThat(pair1.getNode(), IsEqual.equalTo(nodes[1]));
-		Assert.assertThat(pair1.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
+		MatcherAssert.assertThat(pair1.getNode(), IsEqual.equalTo(nodes[1]));
+		MatcherAssert.assertThat(pair1.getExperience().successfulCalls().get(), IsEqual.equalTo(7L));
 
-		Assert.assertThat(pair2.getNode(), IsEqual.equalTo(nodes[3]));
-		Assert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(2L));
+		MatcherAssert.assertThat(pair2.getNode(), IsEqual.equalTo(nodes[3]));
+		MatcherAssert.assertThat(pair2.getExperience().successfulCalls().get(), IsEqual.equalTo(2L));
 	}
 
 	@Test
@@ -224,10 +225,10 @@ public class NodeExperiencesTest {
 		// Assert:
 		final NodeExperience experience01 = experiences.getNodeExperience(nodes[0], nodes[1]);
 		final NodeExperience experience03 = experiences.getNodeExperience(nodes[0], nodes[3]);
-		Assert.assertThat(experience01.successfulCalls().get(), IsEqual.equalTo(11L));
-		Assert.assertThat(experience03.successfulCalls().get(), IsEqual.equalTo(2L));
-		Assert.assertThat(experience01.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(experience03.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(experience01.successfulCalls().get(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(experience03.successfulCalls().get(), IsEqual.equalTo(2L));
+		MatcherAssert.assertThat(experience01.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(experience03.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	@Test
@@ -248,21 +249,18 @@ public class NodeExperiencesTest {
 		final List<NodeExperiencePair> nodeExperiences = experiences.getNodeExperiences(nodes[0]);
 
 		// Assert (can only check node[1]):
-		Assert.assertThat(nodeExperiences.size(), IsEqual.equalTo(1));
-		Assert.assertThat(nodes[1], IsSame.sameInstance(nodeExperiences.get(0).getNode()));
-		Assert.assertThat(22L, IsEqual.equalTo(nodeExperiences.get(0).getExperience().successfulCalls().get()));
+		MatcherAssert.assertThat(nodeExperiences.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(nodes[1], IsSame.sameInstance(nodeExperiences.get(0).getNode()));
+		MatcherAssert.assertThat(22L, IsEqual.equalTo(nodeExperiences.get(0).getExperience().successfulCalls().get()));
 	}
 
 	private static Node createCopy(final Node node) {
-		return new Node(
-				node.getIdentity(),
-				node.getEndpoint(),
-				node.getMetaData());
+		return new Node(node.getIdentity(), node.getEndpoint(), node.getMetaData());
 	}
 
-	//endregion
+	// endregion
 
-	//region prune
+	// region prune
 
 	@Test
 	public void prunePreservesAllExperiencesWithTimeStampAtLeastAsOldAsGivenTimeStampMinusRetentionTime() {
@@ -275,14 +273,14 @@ public class NodeExperiencesTest {
 		experiences.prune(currentTime);
 
 		// Assert:
-		for (int i = 0; i <= 5 ; ++i) {
+		for (int i = 0; i <= 5; ++i) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
 			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
-			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(1));
+			MatcherAssert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(1));
 			final NodeExperiencePair pair = nodeExperiencePairs.get(0);
-			Assert.assertThat(pair.getNode(), IsEqual.equalTo(NodeUtils.createNodeWithName("bob" + String.valueOf(i))));
-			Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(10L + i));
-			Assert.assertThat(pair.getExperience().getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(1234 + i)));
+			MatcherAssert.assertThat(pair.getNode(), IsEqual.equalTo(NodeUtils.createNodeWithName("bob" + String.valueOf(i))));
+			MatcherAssert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(10L + i));
+			MatcherAssert.assertThat(pair.getExperience().getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(1234 + i)));
 		}
 	}
 
@@ -297,29 +295,24 @@ public class NodeExperiencesTest {
 		experiences.prune(currentTime);
 
 		// Assert:
-		for (int i = -5; i < 0 ; ++i) {
+		for (int i = -5; i < 0; ++i) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
 			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
-			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(0));
+			MatcherAssert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(0));
 		}
 	}
 
 	private NodeExperiences createNodeExperiences(final int timeOffsetSecs) {
 		final NodeExperiences experiences = new NodeExperiences();
-		final List<NodeExperiencePair> pairs = new ArrayList<>();
-		for (int delta = -5; delta <= 5 ; ++delta) {
+		for (int delta = -5; delta <= 5; ++delta) {
 			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(delta));
-			final NodeExperiencePair pair = new NodeExperiencePair(
-					NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
+			final NodeExperiencePair pair = new NodeExperiencePair(NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
 					PeerUtils.createNodeExperience(10 + delta));
-			experiences.setNodeExperiences(
-					node,
-					Collections.singletonList(pair),
-					new TimeInstant(timeOffsetSecs + delta));
+			experiences.setNodeExperiences(node, Collections.singletonList(pair), new TimeInstant(timeOffsetSecs + delta));
 		}
 
 		return experiences;
 	}
 
-	//endregion
+	// endregion
 }

@@ -68,8 +68,7 @@ public abstract class Scores<T extends Score> {
 	}
 
 	/**
-	 * Gets a transposed matrix of score values for all specified nodes.
-	 * Matrix(r, c) contains the score that c has with respect to r.
+	 * Gets a transposed matrix of score values for all specified nodes. Matrix(r, c) contains the score that c has with respect to r.
 	 *
 	 * @param nodes The nodes.
 	 * @return A transposed matrix of local score values.

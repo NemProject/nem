@@ -29,9 +29,7 @@ public class ConfigFactory {
 		final PrivateKey privateKey = new PrivateKey(new BigInteger(privateKeyBytes));
 
 		// note that the Config constructor parameter should take precedence over the meta data version
-		return new Node(
-				new NodeIdentity(new KeyPair(privateKey), "local larry"),
-				new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890),
+		return new Node(new NodeIdentity(new KeyPair(privateKey), "local larry"), new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890),
 				new NodeMetaData("default-cf-plat", "default-cf-app"));
 	}
 
@@ -68,7 +66,9 @@ public class ConfigFactory {
 	 * @return The configuration.
 	 */
 	public static JSONObject createDefaultPeersConfig() {
-		return createDefaultPeersConfig(new String[] { "10.0.0.1", "10.0.0.3", "10.0.0.2" });
+		return createDefaultPeersConfig(new String[]{
+				"10.0.0.1", "10.0.0.3", "10.0.0.2"
+		});
 	}
 
 	/**
@@ -77,12 +77,9 @@ public class ConfigFactory {
 	 * @return A default Config object.
 	 */
 	public static Config createDefaultTestConfig() {
-		return new Config(
-				createDefaultLocalNode(),
-				createDefaultPeersConfig(),
-				"2.0.0",
-				4,
-				new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.PLACEHOLDER2 });
+		return new Config(createDefaultLocalNode(), createDefaultPeersConfig(), "2.0.0", 4, new NodeFeature[]{
+				NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.PLACEHOLDER2
+		});
 	}
 
 	private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {

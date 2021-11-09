@@ -35,10 +35,7 @@ public class NodeExperience implements SerializableEntity {
 	 * @param failedCalls The number of failed calls.
 	 * @param timeStamp The current timestamp.
 	 */
-	public NodeExperience(
-			final long successfulCalls,
-			final long failedCalls,
-			final TimeInstant timeStamp) {
+	public NodeExperience(final long successfulCalls, final long failedCalls, final TimeInstant timeStamp) {
 		this.successfulCalls().set(successfulCalls);
 		this.failedCalls().set(failedCalls);
 		this.lastUpdateTime = timeStamp;
@@ -116,16 +113,12 @@ public class NodeExperience implements SerializableEntity {
 			return false;
 		}
 
-		final NodeExperience rhs = (NodeExperience)obj;
-		return this.successfulCalls.get() == rhs.successfulCalls().get() &&
-				this.failedCalls().get() == rhs.failedCalls().get();
+		final NodeExperience rhs = (NodeExperience) obj;
+		return this.successfulCalls.get() == rhs.successfulCalls().get() && this.failedCalls().get() == rhs.failedCalls().get();
 	}
 
 	@Override
 	public String toString() {
-		return String.format(
-				"success: %d, failure: %d",
-				this.successfulCalls().get(),
-				this.failedCalls().get());
+		return String.format("success: %d, failure: %d", this.successfulCalls().get(), this.failedCalls().get());
 	}
 }

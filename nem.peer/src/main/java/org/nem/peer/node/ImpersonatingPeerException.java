@@ -3,6 +3,7 @@ package org.nem.peer.node;
 /**
  * An exception that is thrown when one peer is detected impersonating another.
  */
+@SuppressWarnings("serial")
 public class ImpersonatingPeerException extends RuntimeException {
 
 	/**

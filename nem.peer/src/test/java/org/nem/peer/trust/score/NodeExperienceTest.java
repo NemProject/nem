@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
@@ -7,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 
 public class NodeExperienceTest {
 
-	//region basic operation
+	// region basic operation
 
 	@Test
 	public void nodeExperienceCanBeCreatedWithDefaultValues() {
@@ -15,10 +16,10 @@ public class NodeExperienceTest {
 		final NodeExperience experience = new NodeExperience();
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
-		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
+		MatcherAssert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
 	}
 
 	@Test
@@ -27,10 +28,10 @@ public class NodeExperienceTest {
 		final NodeExperience experience = new NodeExperience(5, 18);
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
-		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
+		MatcherAssert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
 	}
 
 	@Test
@@ -39,10 +40,10 @@ public class NodeExperienceTest {
 		final NodeExperience experience = new NodeExperience(5, 18, new TimeInstant(123));
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
-		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
+		MatcherAssert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	@Test
@@ -55,7 +56,7 @@ public class NodeExperienceTest {
 		experience.failedCalls().set(7);
 
 		// Assert:
-		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(experience.totalCalls(), IsEqual.equalTo(11L));
 	}
 
 	@Test
@@ -69,13 +70,13 @@ public class NodeExperienceTest {
 		final NodeExperience experience = new NodeExperience(Utils.roundtripSerializableEntity(originalExperience, null));
 
 		// Assert:
-		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(11L));
-		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(3L));
+		MatcherAssert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(11L));
+		MatcherAssert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(3L));
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -83,12 +84,12 @@ public class NodeExperienceTest {
 		final NodeExperience experience = createNodeExperience(3, 15);
 
 		// Assert:
-		Assert.assertThat(createNodeExperience(3, 15), IsEqual.equalTo(experience));
-		Assert.assertThat(createNodeExperience(15, 3), IsNot.not(IsEqual.equalTo(experience)));
-		Assert.assertThat(createNodeExperience(3, 14), IsNot.not(IsEqual.equalTo(experience)));
-		Assert.assertThat(createNodeExperience(4, 15), IsNot.not(IsEqual.equalTo(experience)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(experience)));
-		Assert.assertThat(3L, IsNot.not(IsEqual.equalTo((Object)experience)));
+		MatcherAssert.assertThat(createNodeExperience(3, 15), IsEqual.equalTo(experience));
+		MatcherAssert.assertThat(createNodeExperience(15, 3), IsNot.not(IsEqual.equalTo(experience)));
+		MatcherAssert.assertThat(createNodeExperience(3, 14), IsNot.not(IsEqual.equalTo(experience)));
+		MatcherAssert.assertThat(createNodeExperience(4, 15), IsNot.not(IsEqual.equalTo(experience)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(experience)));
+		MatcherAssert.assertThat(3L, IsNot.not(IsEqual.equalTo((Object) experience)));
 	}
 
 	@Test
@@ -98,15 +99,15 @@ public class NodeExperienceTest {
 		final int hashCode = experience.hashCode();
 
 		// Assert:
-		Assert.assertThat(createNodeExperience(3, 15).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(createNodeExperience(15, 3).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(createNodeExperience(3, 14).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(createNodeExperience(4, 15).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperience(3, 15).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(createNodeExperience(15, 3).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(createNodeExperience(3, 14).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(createNodeExperience(4, 15).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsAppropriateStringRepresentation() {
@@ -114,10 +115,10 @@ public class NodeExperienceTest {
 		final NodeExperience experience = createNodeExperience(3, 15);
 
 		// Assert:
-		Assert.assertThat(experience.toString(), IsEqual.equalTo("success: 3, failure: 15"));
+		MatcherAssert.assertThat(experience.toString(), IsEqual.equalTo("success: 3, failure: 15"));
 	}
 
-	//endregion
+	// endregion
 
 	private static NodeExperience createNodeExperience(final int numSuccesses, final int numFailures) {
 		return new NodeExperience(numSuccesses, numFailures);

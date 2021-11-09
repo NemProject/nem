@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
 
@@ -19,13 +19,11 @@ public class NodeCollectionAssert {
 	 * @param expectedActiveNames The expected active names.
 	 * @param expectedBusyNames The expected busy names.
 	 */
-	public static void areNamesEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActiveNames,
+	public static void areNamesEquivalent(final NodeCollection nodes, final String[] expectedActiveNames,
 			final String[] expectedBusyNames) {
 		// Assert:
-		Assert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
-		Assert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
+		MatcherAssert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
+		MatcherAssert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
 	}
 
 	/**
@@ -37,22 +35,16 @@ public class NodeCollectionAssert {
 	 * @param expectedInactiveNames The expected inactive names.
 	 * @param expectedFailureNames The expected failure names.
 	 */
-	public static void areNamesEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActiveNames,
-			final String[] expectedBusyNames,
-			final String[] expectedInactiveNames,
-			final String[] expectedFailureNames) {
+	public static void areNamesEquivalent(final NodeCollection nodes, final String[] expectedActiveNames, final String[] expectedBusyNames,
+			final String[] expectedInactiveNames, final String[] expectedFailureNames) {
 		// Assert:
-		Assert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
-		Assert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(expectedInactiveNames));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(expectedFailureNames));
+		MatcherAssert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
+		MatcherAssert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(expectedInactiveNames));
+		MatcherAssert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(expectedFailureNames));
 	}
 
 	private static List<String> getNames(final Collection<Node> nodes) {
-		return nodes.stream()
-				.map(node -> node.getIdentity().getName())
-				.collect(Collectors.toList());
+		return nodes.stream().map(node -> node.getIdentity().getName()).collect(Collectors.toList());
 	}
 }

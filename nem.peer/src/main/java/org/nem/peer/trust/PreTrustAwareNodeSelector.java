@@ -22,10 +22,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 	 * @param context The trust context.
 	 * @param random The random number generator.
 	 */
-	public PreTrustAwareNodeSelector(
-			final NodeSelector selector,
-			final NodeCollection nodes,
-			final TrustContext context,
+	public PreTrustAwareNodeSelector(final NodeSelector selector, final NodeCollection nodes, final TrustContext context,
 			final Random random) {
 		this.selector = selector;
 		this.nodes = nodes;
@@ -75,7 +72,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 	}
 
 	private Node selectRandom(final List<Node> nodes) {
-		final int index = (int)(this.random.nextDouble() * nodes.size());
+		final int index = (int) (this.random.nextDouble() * nodes.size());
 		return nodes.get(index);
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -19,7 +20,7 @@ import java.util.function.BiConsumer;
 public class NodeRefresherTest {
 	private static final int DEFAULT_SLEEP = 300;
 
-	//region getInfo calls
+	// region getInfo calls
 
 	@Test
 	public void refreshCallsGetInfoForAllSpecifiedNodes() {
@@ -35,9 +36,9 @@ public class NodeRefresherTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getInfo transitions / short-circuiting
+	// region getInfo transitions / short-circuiting
 
 	@Test
 	public void refreshSuccessMovesNodesToActive() {
@@ -48,7 +49,9 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "c"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -66,7 +69,9 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert: all nodes are active
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "c"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -80,7 +85,11 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { "b" });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{
+				"b"
+		});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -105,7 +114,9 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -114,14 +125,15 @@ public class NodeRefresherTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node changedNode = NodeUtils.createNodeWithName("p");
-		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
-				.thenReturn(CompletableFuture.completedFuture(changedNode));
+		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1))).thenReturn(CompletableFuture.completedFuture(changedNode));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(changedNode);
 	}
@@ -136,14 +148,15 @@ public class NodeRefresherTest {
 		final Node incompatibleNode = context.refreshNodes.get(1);
 		incompatibleNode.setMetaData(new NodeMetaData("p", "a", new NodeVersion(1, 0, 0), 7, 4));
 		final NodeMetaData incompatibleNodeMetaData = incompatibleNode.getMetaData();
-		Mockito.when(versionCheck.check(context.localNode.getMetaData(), incompatibleNodeMetaData))
-				.thenReturn(false);
+		Mockito.when(versionCheck.check(context.localNode.getMetaData(), incompatibleNodeMetaData)).thenReturn(false);
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -159,8 +172,10 @@ public class NodeRefresherTest {
 		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
-		Assert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "c"
+		}, new String[]{});
+		MatcherAssert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -170,11 +185,8 @@ public class NodeRefresherTest {
 		final NodeMetaData expectedMetaData = new NodeMetaData("c-plat", "c-app");
 		final TestContext context = new TestContext();
 		final Node originalNode = context.refreshNodes.get(1);
-		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
-				.thenReturn(CompletableFuture.completedFuture(new Node(
-						originalNode.getIdentity(),
-						originalNode.getEndpoint(),
-						expectedMetaData)));
+		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1))).thenReturn(
+				CompletableFuture.completedFuture(new Node(originalNode.getIdentity(), originalNode.getEndpoint(), expectedMetaData)));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -182,7 +194,7 @@ public class NodeRefresherTest {
 		final NodeMetaData metaData = updatedNode.getMetaData();
 
 		// Assert:
-		Assert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
+		MatcherAssert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -191,11 +203,8 @@ public class NodeRefresherTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node originalNode = context.refreshNodes.get(1);
-		Mockito.when(context.connector.getInfo(originalNode))
-				.thenReturn(CompletableFuture.completedFuture(new Node(
-						new WeakNodeIdentity("b", "b-new-name"),
-						originalNode.getEndpoint(),
-						originalNode.getMetaData())));
+		Mockito.when(context.connector.getInfo(originalNode)).thenReturn(CompletableFuture.completedFuture(
+				new Node(new WeakNodeIdentity("b", "b-new-name"), originalNode.getEndpoint(), originalNode.getMetaData())));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -203,13 +212,13 @@ public class NodeRefresherTest {
 		final NodeIdentity identity = updatedNode.getIdentity();
 
 		// Assert:
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("b-new-name"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("b-new-name"));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
-	//endregion
+	// endregion
 
-	//region getKnownPeers calls
+	// region getKnownPeers calls
 
 	@Test
 	public void refreshCallsGetKnownPeersForActiveNodes() {
@@ -225,24 +234,27 @@ public class NodeRefresherTest {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region getKnownPeers transitions / short-circuiting
+	// region getKnownPeers transitions / short-circuiting
 
 	@Test
 	public void refreshGetKnownPeersInfoTransientFailureMovesNodesToBusy() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1)))
-				.thenReturn(CompletableFuture.supplyAsync(() -> {
-					throw new BusyPeerException("busy");
-				}));
+		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1))).thenReturn(CompletableFuture.supplyAsync(() -> {
+			throw new BusyPeerException("busy");
+		}));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { "b" });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{
+				"b"
+		});
 	}
 
 	@Test
@@ -260,21 +272,22 @@ public class NodeRefresherTest {
 	private static void assertGetKnownPeersFailureRemovesNodesFromBothLists(final RuntimeException ex) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1)))
-				.thenReturn(CompletableFuture.supplyAsync(() -> { throw ex; }));
+		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1))).thenReturn(CompletableFuture.supplyAsync(() -> {
+			throw ex;
+		}));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c"
+		}, new String[]{});
 	}
 
-	//endregion
+	// endregion
 
-	//region precedence / potential attacks
-
-	//region identity names
+	// region precedence / potential attacks
 
 	@Test
 	public void evilNodeCannotChangeNameOfKnownPeer() {
@@ -292,7 +305,7 @@ public class NodeRefresherTest {
 
 		// Assert:
 		// - since 'b' was communicated with directly, the evil peer cannot update the name
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("b"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("b"));
 	}
 
 	@Test
@@ -311,10 +324,8 @@ public class NodeRefresherTest {
 
 		// Assert:
 		// - since 'b' was not communicated with directly, the evil peer can provide the name
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("bad bob"));
+		MatcherAssert.assertThat(identity.getName(), IsEqual.equalTo("bad bob"));
 	}
-
-	//endregion
 
 	@Test
 	public void refreshDoesNotUpdateIndirectNodesWithNonActiveStatusWhenNodesAreActive() {
@@ -339,14 +350,15 @@ public class NodeRefresherTest {
 
 		// Assert:
 		// - all good peers (c, d, f, g) that were directly communicated with are active even though
-		//   some are reported as being in a bad state by other peers (d, f, g)
+		// some are reported as being in a bad state by other peers (d, f, g)
 		// - indirect peers (e) that were communicated with successfully are active
 		// - busy peers communicated with directly are busy (a, b)
-		NodeCollectionAssert.areNamesEquivalent(
-				context.nodes,
-				new String[] { "c", "d", "e", "f", "g" },
-				new String[] { "a", "b" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"c", "d", "e", "f", "g"
+		}, new String[]{
+				"a", "b"
+		});
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -373,13 +385,16 @@ public class NodeRefresherTest {
 		// Assert:
 		// - all peers (a, b, c, d, f, g) that were directly communicated preserve their original statuses
 		// - indirect peers (e) that were communicated with successfully are active
-		NodeCollectionAssert.areNamesEquivalent(
-				context.nodes,
-				new String[] { "c", "e" },
-				new String[] { "a", "b", "d" },
-				new String[] { "g" },
-				new String[] { "f" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"c", "e"
+		}, new String[]{
+				"a", "b", "d"
+		}, new String[]{
+				"g"
+		}, new String[]{
+				"f"
+		});
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -402,11 +417,12 @@ public class NodeRefresherTest {
 		// - all good peers (a, c) that were directly communicated with are active
 		// - all good peers (e) that were indirectly communicated with are active
 		// - all busy peers (b) that were directly communicated with are busy
-		NodeCollectionAssert.areNamesEquivalent(
-				context.nodes,
-				new String[] { "a", "c", "e" },
-				new String[] { "b" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "c", "e"
+		}, new String[]{
+				"b"
+		});
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -421,18 +437,15 @@ public class NodeRefresherTest {
 		context.setBusyGetInfoForNode("c", DEFAULT_SLEEP);
 
 		// Arrange: when the mock connector sees nodes w-x, it will trigger an identity change to a good node
-		final List<Node> evilNodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.100", "w"),
-				NodeUtils.createNodeWithHost("10.0.0.101", "x"),
-				NodeUtils.createNodeWithHost("10.0.0.102", "y"),
+		final List<Node> evilNodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.100", "w"),
+				NodeUtils.createNodeWithHost("10.0.0.101", "x"), NodeUtils.createNodeWithHost("10.0.0.102", "y"),
 				NodeUtils.createNodeWithHost("10.0.0.103", "z"));
 		context.setKnownPeers(evilNodes);
 		for (final Node evilNode : evilNodes) {
 			final StringBuilder newNameBuilder = new StringBuilder();
 			newNameBuilder.appendCodePoint(evilNode.getIdentity().getName().codePointAt(0) - 'w' + 'b');
 			Mockito.when(context.connector.getInfo(evilNode))
-					.thenReturn(CompletableFuture.completedFuture(
-							NodeUtils.createNodeWithName(newNameBuilder.toString())));
+					.thenReturn(CompletableFuture.completedFuture(NodeUtils.createNodeWithName(newNameBuilder.toString())));
 		}
 
 		// Act:
@@ -442,15 +455,16 @@ public class NodeRefresherTest {
 		// - all good peers (a, b, d) that were directly communicated with are active
 		// - the delayed inactive node (c) is inactive
 		// - the impersonating bad nodes are not added
-		NodeCollectionAssert.areNamesEquivalent(
-				context.nodes,
-				new String[] { "a", "b", "d" },
-				new String[] { "c" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "d"
+		}, new String[]{
+				"c"
+		});
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 
 		// Assert: the endpoints of good nodes were not changed
 		for (final Node node : context.nodes.getAllNodes()) {
-			Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+			MatcherAssert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
 		}
 	}
 
@@ -473,11 +487,12 @@ public class NodeRefresherTest {
 		// - all peers (a, b, d) that were directly communicated with successfully are active
 		// - the peer that was directly communicated with unsuccessfully (c) is inactive
 		// - the unseen inactive peer (z) is not added because the information cannot be trusted
-		NodeCollectionAssert.areNamesEquivalent(
-				context.nodes,
-				new String[] { "a", "b", "d" },
-				new String[] { "c" });
-		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "d"
+		}, new String[]{
+				"c"
+		});
+		MatcherAssert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -517,14 +532,16 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "b", "e" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"b", "e"
+		}, new String[]{});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(Mockito.any()); // b
 		Mockito.verify(context.connector, Mockito.times(2)).getInfo(Mockito.any()); // b, e
 	}
 
-	//endregion
+	// endregion
 
-	//region basic merging
+	// region basic merging
 
 	@Test
 	public void refreshOnlyMergesInRelayedActivePeers() {
@@ -538,7 +555,9 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c", "y", "z" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "c", "y", "z"
+		}, new String[]{});
 	}
 
 	@Test
@@ -552,12 +571,14 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[]{
+				"a", "b", "c"
+		}, new String[]{});
 	}
 
-	//endregion
+	// endregion
 
-	//region async
+	// region async
 
 	@Test
 	public void refreshIsAsync() {
@@ -566,20 +587,18 @@ public class NodeRefresherTest {
 		context.setBusyGetInfoForNode("b", DEFAULT_SLEEP);
 
 		// Act:
-		final CompletableFuture future = context.refresher.refresh(context.refreshNodes);
+		final CompletableFuture<?> future = context.refresher.refresh(context.refreshNodes);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static PeerConnector mockPeerConnector() {
 		final PeerConnector connector = Mockito.mock(PeerConnector.class);
-		Mockito.when(connector.getInfo(Mockito.any()))
-				.thenAnswer(i -> CompletableFuture.completedFuture((Node)i.getArguments()[0]));
-		Mockito.when(connector.getKnownPeers(Mockito.any()))
-				.thenAnswer(i -> CompletableFuture.completedFuture(new SerializableList<>(10)));
+		Mockito.when(connector.getInfo(Mockito.any())).thenAnswer(i -> CompletableFuture.completedFuture((Node) i.getArguments()[0]));
+		Mockito.when(connector.getKnownPeers(Mockito.any())).thenAnswer(i -> CompletableFuture.completedFuture(new SerializableList<>(10)));
 		return connector;
 	}
 
@@ -600,8 +619,7 @@ public class NodeRefresherTest {
 
 		public void setActiveGetInfoForNode(final String name) {
 			final Node node = NodeUtils.createNodeWithName(name);
-			Mockito.when(this.connector.getInfo(node))
-					.thenAnswer(i -> CompletableFuture.completedFuture((Node)i.getArguments()[0]));
+			Mockito.when(this.connector.getInfo(node)).thenAnswer(i -> CompletableFuture.completedFuture((Node) i.getArguments()[0]));
 		}
 
 		public void setBusyGetInfoForNode(final String name) {
@@ -610,29 +628,31 @@ public class NodeRefresherTest {
 
 		public void setBusyGetInfoForNode(final String name, final int sleep) {
 			final Node node = NodeUtils.createNodeWithName(name);
-			Mockito.when(this.connector.getInfo(node))
-					.thenReturn(CompletableFuture.supplyAsync(() -> {
-						ExceptionUtils.propagateVoid(() -> Thread.sleep(sleep));
-						throw new BusyPeerException("busy");
-					}));
+			Mockito.when(this.connector.getInfo(node)).thenReturn(CompletableFuture.supplyAsync(() -> {
+				ExceptionUtils.propagateVoid(() -> Thread.sleep(sleep));
+				throw new BusyPeerException("busy");
+			}));
 		}
 
 		public void setInactiveGetInfoForNode(final String name) {
 			final Node node = NodeUtils.createNodeWithName(name);
-			Mockito.when(this.connector.getInfo(node))
-					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new InactivePeerException("inactive"); }));
+			Mockito.when(this.connector.getInfo(node)).thenReturn(CompletableFuture.supplyAsync(() -> {
+				throw new InactivePeerException("inactive");
+			}));
 		}
 
 		public void setFatalGetInfoForNode(final String name) {
 			final Node node = NodeUtils.createNodeWithName(name);
-			Mockito.when(this.connector.getInfo(node))
-					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
+			Mockito.when(this.connector.getInfo(node)).thenReturn(CompletableFuture.supplyAsync(() -> {
+				throw new FatalPeerException("fatal");
+			}));
 		}
 
 		public void setRuntimeExceptionGetInfoForNode(final String name) {
 			final Node node = NodeUtils.createNodeWithName(name);
-			Mockito.when(this.connector.getInfo(node))
-					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime exception"); }));
+			Mockito.when(this.connector.getInfo(node)).thenReturn(CompletableFuture.supplyAsync(() -> {
+				throw new RuntimeException("runtime exception");
+			}));
 		}
 
 		public void setKnownPeers(final List<Node> nodes) {

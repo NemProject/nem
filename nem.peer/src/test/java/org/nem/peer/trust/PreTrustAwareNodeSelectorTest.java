@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class PreTrustAwareNodeSelectorTest {
 
-	//region selectNode
+	// region selectNode
 
 	@Test
 	public void selectNodeDelegatesToWrappedSelector() {
@@ -26,7 +27,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsSame.sameInstance(node));
+		MatcherAssert.assertThat(selectedNode, IsSame.sameInstance(node));
 	}
 
 	@Test
@@ -39,14 +40,13 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("r")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("r")));
 	}
 
 	@Test
 	public void selectNodeReturnsRandomOnlinePreTrustedNodeWhenSomePreTrustedNodesAreOnlineAndLocalNodeIsPreTrusted() {
 		// Arrange:
-		final TestContext context = new TestContext(
-				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i", "l"),
+		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i", "l"),
 				createMockRandom(0.5));
 		context.setTestNodeStatuses();
 
@@ -55,14 +55,13 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
 	}
 
 	@Test
 	public void selectNodeReturnsRandomOnlinePreTrustedNodeWhenSomePreTrustedNodesAreOnlineAndLocalNodeIsNotPreTrusted() {
 		// Arrange:
-		final TestContext context = new TestContext(
-				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
+		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
 				createMockRandom(0.5, 0.1));
 		context.setTestNodeStatuses();
 
@@ -71,12 +70,12 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
+		MatcherAssert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
 	}
 
-	//endregion
+	// endregion
 
-	//region selectNodes
+	// region selectNodes
 
 	@Test
 	public void selectNodesAddsAllPreTrustedNodesWhenAllAreOffline() {
@@ -90,65 +89,53 @@ public class PreTrustAwareNodeSelectorTest {
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
-				selectedNodes,
-				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("p", "q", "r", "a", "c")));
+		MatcherAssert.assertThat(selectedNodes, IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("p", "q", "r", "a", "c")));
 	}
 
 	@Test
 	public void selectNodesForLocalPreTrustedNodeAddsAllOtherOnlinePreTrustedNodes() {
 		// Arrange:
-		final TestContext context = new TestContext(
-				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i", "l"));
+		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i", "l"));
 		context.setTestNodeStatuses();
-		Mockito.when(context.innerSelector.selectNodes())
-				.thenReturn(PeerUtils.createNodesWithNames("a", "p-a", "c"));
+		Mockito.when(context.innerSelector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "p-a", "c"));
 
 		// Act:
 		final List<Node> selectedNodes = context.selector.selectNodes();
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
-				selectedNodes,
-				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a", "s-a")));
+		MatcherAssert.assertThat(selectedNodes, IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a", "s-a")));
 	}
 
 	@Test
 	public void selectNodesForLocalNonPreTrustedNodeAddsRandomPreTrustedNodes() {
 		// Arrange:
 		final TestContext context = createContextForLocalNonPreTrustedNodeSelectNodes();
-		Mockito.when(context.innerSelector.selectNodes())
-				.thenReturn(PeerUtils.createNodesWithNames("a", "p-a", "c"));
+		Mockito.when(context.innerSelector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "p-a", "c"));
 
 		// Act:
 		final List<Node> selectedNodes = context.selector.selectNodes();
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
-				selectedNodes,
-				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a")));
+		MatcherAssert.assertThat(selectedNodes, IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "p-a", "q-a")));
 	}
 
 	@Test
 	public void selectNodesForLocalNonPreTrustedNodeDoesNotAddRandomPreTrustedNodeIfNodeIsAlreadySelected() {
 		// Arrange:
 		final TestContext context = createContextForLocalNonPreTrustedNodeSelectNodes();
-		Mockito.when(context.innerSelector.selectNodes())
-				.thenReturn(PeerUtils.createNodesWithNames("a", "q-a", "c"));
+		Mockito.when(context.innerSelector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "q-a", "c"));
 
 		// Act:
 		final List<Node> selectedNodes = context.selector.selectNodes();
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(
-				selectedNodes,
-				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "q-a")));
+		MatcherAssert.assertThat(selectedNodes, IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "q-a")));
 	}
 
-	//endregion
+	// endregion
 
 	private static Random createMockRandom(final Double value, final Double... values) {
 		final Random random = Mockito.mock(Random.class);
@@ -157,8 +144,7 @@ public class PreTrustAwareNodeSelectorTest {
 	}
 
 	private static TestContext createContextForLocalNonPreTrustedNodeSelectNodes() {
-		final TestContext context = new TestContext(
-				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
+		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
 				createMockRandom(0.5));
 		context.setTestNodeStatuses();
 		return context;
@@ -182,8 +168,7 @@ public class PreTrustAwareNodeSelectorTest {
 
 		public TestContext(final List<Node> preTrustedNodes, final Random random) {
 			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);
-			Mockito.when(this.context.getPreTrustedNodes())
-					.thenReturn(new PreTrustedNodes(new LinkedHashSet<>(preTrustedNodes)));
+			Mockito.when(this.context.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new LinkedHashSet<>(preTrustedNodes)));
 
 			this.selector = new PreTrustAwareNodeSelector(this.innerSelector, this.nodes, this.context, random);
 		}

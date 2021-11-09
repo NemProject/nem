@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -32,7 +33,7 @@ public class NodeSynchronizerTest {
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -45,7 +46,7 @@ public class NodeSynchronizerTest {
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.blockSynchronizer, Mockito.times(1)).synchronizeNode(context.syncConnectorPool, remoteNode);
 	}
 
@@ -60,15 +61,14 @@ public class NodeSynchronizerTest {
 	private static void assertExperienceUpdated(final NodeInteractionResult interactionResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockSynchronizer.synchronizeNode(Mockito.any(), Mockito.any()))
-				.thenReturn(interactionResult);
+		Mockito.when(context.blockSynchronizer.synchronizeNode(Mockito.any(), Mockito.any())).thenReturn(interactionResult);
 		final Node remoteNode = context.makeSelectorReturnRemoteNode();
 
 		// Act:
 		final boolean result = context.synchronizer.synchronize(context.selector);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(context.state, Mockito.times(1)).updateExperience(remoteNode, interactionResult);
 	}
 
@@ -77,10 +77,7 @@ public class NodeSynchronizerTest {
 		private final BlockSynchronizer blockSynchronizer = Mockito.mock(BlockSynchronizer.class);
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
-		private final NodeSynchronizer synchronizer = new NodeSynchronizer(
-				this.syncConnectorPool,
-				this.blockSynchronizer,
-				this.state);
+		private final NodeSynchronizer synchronizer = new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
 
 		public Node makeSelectorReturnRemoteNode() {
 			final Node remoteNode = NodeUtils.createNodeWithName("p");

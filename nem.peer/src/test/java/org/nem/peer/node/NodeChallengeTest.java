@@ -1,5 +1,6 @@
 package org.nem.peer.node;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
@@ -7,10 +8,14 @@ import org.nem.core.test.Utils;
 
 public class NodeChallengeTest {
 
-	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
-	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final byte[] TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x71
+	};
+	private static final byte[] MODIFIED_TEST_BYTES = new byte[]{
+			0x22, (byte) 0xAB, 0x72
+	};
 
-	//region constructors
+	// region constructors
 
 	@Test
 	public void canCreateFromBytes() {
@@ -18,12 +23,12 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = new NodeChallenge(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(challenge.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		MatcherAssert.assertThat(challenge.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
-	//endregion
+	// endregion
 
-	//region serializer
+	// region serializer
 
 	@Test
 	public void challengeCanBeRoundTripped() {
@@ -31,7 +36,7 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = createRoundTrippedChallenge(new NodeChallenge(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(challenge, IsEqual.equalTo(new NodeChallenge(TEST_BYTES)));
+		MatcherAssert.assertThat(challenge, IsEqual.equalTo(new NodeChallenge(TEST_BYTES)));
 	}
 
 	private static NodeChallenge createRoundTrippedChallenge(final NodeChallenge originalChallenge) {
@@ -40,9 +45,9 @@ public class NodeChallengeTest {
 		return new NodeChallenge(deserializer);
 	}
 
-	//endregion
+	// endregion
 
-	//region equals / hashCode
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -50,10 +55,10 @@ public class NodeChallengeTest {
 		final NodeChallenge challenge = new NodeChallenge(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES), IsEqual.equalTo(challenge));
-		Assert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(challenge)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(challenge)));
-		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)challenge)));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES), IsEqual.equalTo(challenge));
+		MatcherAssert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(challenge)));
+		MatcherAssert.assertThat(null, IsNot.not(IsEqual.equalTo(challenge)));
+		MatcherAssert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object) challenge)));
 	}
 
 	@Test
@@ -63,19 +68,19 @@ public class NodeChallengeTest {
 		final int hashCode = challenge.hashCode();
 
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		MatcherAssert.assertThat(new NodeChallenge(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
-	//endregion
+	// endregion
 
-	//region toString
+	// region toString
 
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new NodeChallenge(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		MatcherAssert.assertThat(new NodeChallenge(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
-	//endregion
+	// endregion
 }

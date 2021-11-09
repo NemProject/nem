@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -31,6 +32,6 @@ public class InactiveNodePrunerTest {
 		final int result = pruner.prune(nodes);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(8));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(8));
 	}
 }

@@ -17,8 +17,7 @@ public interface ScoreProvider {
 	double calculateTrustScore(final NodeExperience experience);
 
 	/**
-	 * Calculates a credibility score given three nodes based on the shared experiences
-	 * of the first two nodes with a common node.
+	 * Calculates a credibility score given three nodes based on the shared experiences of the first two nodes with a common node.
 	 *
 	 * @param node1 The first node.
 	 * @param node2 The second node.

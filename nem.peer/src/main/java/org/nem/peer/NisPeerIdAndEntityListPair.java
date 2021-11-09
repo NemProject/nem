@@ -57,7 +57,7 @@ public class NisPeerIdAndEntityListPair {
 			return false;
 		}
 
-		final NisPeerIdAndEntityListPair rhs = (NisPeerIdAndEntityListPair)obj;
+		final NisPeerIdAndEntityListPair rhs = (NisPeerIdAndEntityListPair) obj;
 		return this.apiId.equals(rhs.apiId) && this.entities.asCollection().equals(rhs.entities.asCollection());
 	}
 }

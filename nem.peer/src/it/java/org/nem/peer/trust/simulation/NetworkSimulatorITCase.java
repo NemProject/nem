@@ -1,6 +1,7 @@
 package org.nem.peer.trust.simulation;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.peer.trust.*;
 
@@ -40,8 +41,8 @@ public class NetworkSimulatorITCase {
 			final boolean result = simulator.run(outputFileName, 1000);
 			final long stopTime = System.currentTimeMillis();
 
-			Assert.assertThat(result, IsEqual.equalTo(true));
-			Assert.assertThat(trust.getNumComputations(), IsEqual.equalTo(trust.getNumConvergences()));
+			MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+			MatcherAssert.assertThat(trust.getNumComputations(), IsEqual.equalTo(trust.getNumConvergences()));
 			builder.append(System.lineSeparator());
 			builder.append(
 					String.format(

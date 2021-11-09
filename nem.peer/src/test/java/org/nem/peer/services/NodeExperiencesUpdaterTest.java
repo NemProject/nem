@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -39,7 +40,7 @@ public class NodeExperiencesUpdaterTest {
 		final boolean result = context.updater.update(context.selector).join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -48,8 +49,7 @@ public class NodeExperiencesUpdaterTest {
 		final TestContext context = new TestContext();
 		final Node remoteNode = context.makeSelectorReturnRemoteNode();
 		final NodeExperiencesPair pair = createPair();
-		Mockito.when(context.connector.getNodeExperiences(remoteNode))
-				.thenReturn(CompletableFuture.completedFuture(pair));
+		Mockito.when(context.connector.getNodeExperiences(remoteNode)).thenReturn(CompletableFuture.completedFuture(pair));
 		Mockito.when(context.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(123));
 
 		// Act:
@@ -66,17 +66,16 @@ public class NodeExperiencesUpdaterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.makeSelectorReturnRemoteNode();
-		Mockito.when(context.connector.getNodeExperiences(Mockito.any()))
-				.thenReturn(CompletableFuture.supplyAsync(() -> {
-					ExceptionUtils.propagateVoid(() -> Thread.sleep(300));
-					return null;
-				}));
+		Mockito.when(context.connector.getNodeExperiences(Mockito.any())).thenReturn(CompletableFuture.supplyAsync(() -> {
+			ExceptionUtils.propagateVoid(() -> Thread.sleep(300));
+			return null;
+		}));
 
 		// Act:
 		final CompletableFuture<Boolean> future = context.updater.update(context.selector);
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -85,15 +84,14 @@ public class NodeExperiencesUpdaterTest {
 		final TestContext context = new TestContext();
 		final Node remoteNode = context.makeSelectorReturnRemoteNode();
 		final NodeExperiencesPair pair = createPairWithTooManyExperiences();
-		Mockito.when(context.connector.getNodeExperiences(remoteNode))
-				.thenReturn(CompletableFuture.completedFuture(pair));
+		Mockito.when(context.connector.getNodeExperiences(remoteNode)).thenReturn(CompletableFuture.completedFuture(pair));
 		Mockito.when(context.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(123));
 
 		// Act:
 		final boolean result = context.updater.update(context.selector).join();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	private NodeExperiencesPair createPairWithTooManyExperiences() {
@@ -104,9 +102,7 @@ public class NodeExperiencesUpdaterTest {
 	}
 
 	private NodeExperiencesPair createPair() {
-		final NodeExperiencePair pair = new NodeExperiencePair(
-				NodeUtils.createNodeWithName("alice"),
-				new NodeExperience(1, 2));
+		final NodeExperiencePair pair = new NodeExperiencePair(NodeUtils.createNodeWithName("alice"), new NodeExperience(1, 2));
 		return createPair(Collections.singletonList(pair));
 	}
 
@@ -119,10 +115,7 @@ public class NodeExperiencesUpdaterTest {
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
-		private final NodeExperiencesUpdater updater = new NodeExperiencesUpdater(
-				this.connector,
-				this.timeProvider,
-				this.state);
+		private final NodeExperiencesUpdater updater = new NodeExperiencesUpdater(this.connector, this.timeProvider, this.state);
 
 		public Node makeSelectorReturnRemoteNode() {
 			final Node remoteNode = NodeUtils.createNodeWithName("p");

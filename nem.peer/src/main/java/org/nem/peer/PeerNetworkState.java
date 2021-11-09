@@ -31,10 +31,7 @@ public class PeerNetworkState {
 	 * @param nodeExperiences The node experiences.
 	 * @param nodeCollection The node collection.
 	 */
-	public PeerNetworkState(
-			final Config config,
-			final NodeExperiences nodeExperiences,
-			final NodeCollection nodeCollection) {
+	public PeerNetworkState(final Config config, final NodeExperiences nodeExperiences, final NodeCollection nodeCollection) {
 		this.config = config;
 		this.localNode = config.getLocalNode();
 		this.nodeExperiences = nodeExperiences;
@@ -80,9 +77,7 @@ public class PeerNetworkState {
 	 */
 	public NodeExperiencesPair getLocalNodeAndExperiences() {
 		final Node localNode = this.getLocalNode();
-		return new NodeExperiencesPair(
-				localNode,
-				this.nodeExperiences.getNodeExperiences(localNode));
+		return new NodeExperiencesPair(localNode, this.nodeExperiences.getNodeExperiences(localNode));
 	}
 
 	/**
@@ -137,12 +132,8 @@ public class PeerNetworkState {
 	public TrustContext getTrustContext() {
 		// create a new trust context each iteration in order to allow
 		// nodes to change in-between iterations.
-		return new TrustContext(
-				toNodeArray(this.nodes, this.getLocalNode()),
-				this.getLocalNode(),
-				this.nodeExperiences,
-				this.config.getPreTrustedNodes(),
-				this.config.getTrustParameters());
+		return new TrustContext(toNodeArray(this.nodes, this.getLocalNode()), this.getLocalNode(), this.nodeExperiences,
+				this.config.getPreTrustedNodes(), this.config.getTrustParameters());
 	}
 
 	private static Node[] toNodeArray(final NodeCollection nodes, final Node localNode) {
@@ -206,8 +197,7 @@ public class PeerNetworkState {
 	}
 
 	/**
-	 * Adds a time synchronization result to the list.
-	 * Removes the oldest result if the size of the is exceeding 100.
+	 * Adds a time synchronization result to the list. Removes the oldest result if the size of the is exceeding 100.
 	 *
 	 * @param result The time result to be added.
 	 */

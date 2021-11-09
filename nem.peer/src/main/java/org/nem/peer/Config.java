@@ -28,18 +28,9 @@ public class Config {
 	 * @param networkId The network id.
 	 * @param localNodeFeatures The features supported by the local node.
 	 */
-	public Config(
-			final Node localNode,
-			final JSONObject peersConfig,
-			final String applicationVersion,
-			final int networkId,
+	public Config(final Node localNode, final JSONObject peersConfig, final String applicationVersion, final int networkId,
 			final NodeFeature[] localNodeFeatures) {
-		this(
-				localNode,
-				parseWellKnownPeers(new JsonDeserializer(peersConfig, null)),
-				null,
-				applicationVersion,
-				networkId,
+		this(localNode, parseWellKnownPeers(new JsonDeserializer(peersConfig, null)), null, applicationVersion, networkId,
 				localNodeFeatures);
 	}
 
@@ -53,13 +44,8 @@ public class Config {
 	 * @param networkId The network id.
 	 * @param localNodeFeatures The features supported by the local node.
 	 */
-	public Config(
-			final Node localNode,
-			final PreTrustedNodes preTrustedNodes,
-			final TrustParameters trustParameters,
-			final String applicationVersion,
-			final int networkId,
-			final NodeFeature[] localNodeFeatures) {
+	public Config(final Node localNode, final PreTrustedNodes preTrustedNodes, final TrustParameters trustParameters,
+			final String applicationVersion, final int networkId, final NodeFeature[] localNodeFeatures) {
 		final NodeVersion nodeVersion = NodeVersion.parse(applicationVersion);
 		if (0 == preTrustedNodes.getSize() && !"DEVELOPER BUILD".equals(nodeVersion.getTag())) {
 			throw new IllegalArgumentException("set of pre-trusted nodes cannot be empty");
@@ -71,18 +57,11 @@ public class Config {
 
 		String platform = localNode.getMetaData().getPlatform();
 		if (null == platform) {
-			platform = String.format(
-					"%s (%s) on %s",
-					System.getProperty("java.vendor"),
-					System.getProperty("java.version"),
+			platform = String.format("%s (%s) on %s", System.getProperty("java.vendor"), System.getProperty("java.version"),
 					System.getProperty("os.name"));
 		}
 
-		final NodeMetaData metaData = new NodeMetaData(
-				platform,
-				localNode.getMetaData().getApplication(),
-				nodeVersion,
-				networkId,
+		final NodeMetaData metaData = new NodeMetaData(platform, localNode.getMetaData().getApplication(), nodeVersion, networkId,
 				NodeFeature.or(localNodeFeatures));
 		localNode.setMetaData(metaData);
 	}

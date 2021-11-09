@@ -38,8 +38,7 @@ public class PeerNetworkBroadcastBufferTest {
 				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
 		Mockito.when(buffer.getAllPairsAndClearMap()).thenReturn(pairs);
 
-		Mockito.when(network.broadcast(Mockito.any(), Mockito.any()))
-				.thenReturn(CompletableFuture.completedFuture(null));
+		Mockito.when(network.broadcast(Mockito.any(), Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
 
 		// Act:
 		networkBroadcastBuffer.broadcastAll().join();

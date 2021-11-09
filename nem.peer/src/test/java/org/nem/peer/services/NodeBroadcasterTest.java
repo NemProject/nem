@@ -1,5 +1,6 @@
 package org.nem.peer.services;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -41,16 +42,14 @@ public class NodeBroadcasterTest {
 				}));
 
 		// Act:
-		final CompletableFuture future = context.broadcaster.broadcast(
-				context.broadcastNodes,
-				NisPeerId.REST_PUSH_TRANSACTION,
+		final CompletableFuture<?> future = context.broadcaster.broadcast(context.broadcastNodes, NisPeerId.REST_PUSH_TRANSACTION,
 				new MockSerializableEntity());
 
 		// Assert:
-		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(future.isDone(), IsEqual.equalTo(false));
 	}
 
-	//endregion
+	// endregion
 
 	private static PeerConnector mockPeerConnector() {
 		final PeerConnector connector = Mockito.mock(PeerConnector.class);

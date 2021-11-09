@@ -66,7 +66,7 @@ public class NodeExperiencePair implements SerializableEntity {
 			return false;
 		}
 
-		final NodeExperiencePair rhs = (NodeExperiencePair)obj;
+		final NodeExperiencePair rhs = (NodeExperiencePair) obj;
 		return this.node.equals(rhs.node) && this.experience.equals(rhs.experience);
 	}
 

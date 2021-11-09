@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
@@ -21,9 +22,9 @@ public class SecureSerializableEntityTest {
 		final SecureSerializableEntity<?> secureEntity = new SecureSerializableEntity<>(entity, identity);
 
 		// Assert:
-		Assert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
-		Assert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
+		MatcherAssert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
 	}
 
 	@Test
@@ -33,15 +34,13 @@ public class SecureSerializableEntityTest {
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SecureSerializableEntity<>(entity, identity),
-				null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(new SecureSerializableEntity<>(entity, identity), null);
 		final SecureSerializableEntity<?> secureEntity = new SecureSerializableEntity<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
-		Assert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
-		Assert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
-		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
+		MatcherAssert.assertThat(secureEntity.getSignature(), IsEqual.equalTo(identity.sign(HashUtils.calculateHash(entity).getRaw())));
+		MatcherAssert.assertThat(secureEntity.getEntity(), IsEqual.equalTo(entity));
+		MatcherAssert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(identity));
 	}
 
 	@Test(expected = ImpersonatingPeerException.class)
@@ -56,8 +55,7 @@ public class SecureSerializableEntityTest {
 		secureEntity.serialize(serializer);
 		serializer.getObject().put("identity", JsonSerializer.serializeToJson(identity2));
 		final SecureSerializableEntity<?> insecureEntity = new SecureSerializableEntity<>(
-				new JsonDeserializer(serializer.getObject(), null),
-				MockSerializableEntity::new);
+				new JsonDeserializer(serializer.getObject(), null), MockSerializableEntity::new);
 
 		// Act:
 		insecureEntity.getEntity();
