@@ -39,6 +39,18 @@ public class LocalHostInterceptorTest {
 		assertAccessGranted("trustedMethod", LOCAL_ADDRESS);
 	}
 
+	@Test
+	public void remoteAccessIsAllowedForPreflights() {
+		// Arrange:
+		final LocalHostInterceptor interceptor = createInterceptor();
+
+		// Act:
+		final boolean result = preHandlePreflight(interceptor, "trustedMethod", "194.66.82.11");
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(true));
+	}
+
 	private static void assertAccessGranted(final String methodName, final String remoteAddress) {
 		// Arrange:
 		final LocalHostInterceptor interceptor = createInterceptor();
@@ -80,6 +92,16 @@ public class LocalHostInterceptorTest {
 
 		// Act:
 		return ExceptionUtils.propagate(() -> interceptor.preHandle(request, response, handlerMethod));
+	}
+
+	private static boolean preHandlePreflight(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
+		// Arrange:
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getRemoteAddr()).thenReturn(remoteAddress);
+		final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+
+		// Act: simulate preflight by using null handler
+		return ExceptionUtils.propagate(() -> interceptor.preHandle(request, response, null));
 	}
 
 	// region annotated methods
