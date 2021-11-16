@@ -14,4 +14,3 @@ cd nem-core
 echo " [+] CREATING DOCS"
 mvn javadoc:javadoc >>$logfile
 cd ..
-
