@@ -76,7 +76,7 @@ public class TransactionValidatorFactory {
 		builder.add(new TransactionNetworkValidator());
 
 		builder.add(new RemoteNonOperationalValidator(accountStateCache));
-		builder.add(new MultisigNonOperationalValidator(accountStateCache));
+		builder.add(new MultisigNonOperationalValidator(this.forkConfiguration, accountStateCache));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new TransferTransactionValidator()));
 
