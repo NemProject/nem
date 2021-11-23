@@ -9,6 +9,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -19,7 +20,6 @@ public class MultisigTestContext {
 			this.accountStateCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(
 			this.accountStateCache);
-	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -159,7 +159,13 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return this.validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+		return validateNonOperational(BlockHeight.MAX, new ForkConfiguration(), transaction);
+	}
+
+	public ValidationResult validateNonOperational(final BlockHeight height, final ForkConfiguration forkConfiguration,
+			final Transaction transaction) {
+		final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(forkConfiguration, this.accountStateCache);
+		return validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
