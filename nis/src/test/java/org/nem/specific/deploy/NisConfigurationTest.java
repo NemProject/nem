@@ -288,8 +288,8 @@ public class NisConfigurationTest {
 		final ForkConfiguration forkConfig = config.getForkConfiguration();
 
 		// Assert:
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3464800)));
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(53));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3481580)));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(52));
 		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes().size(), IsEqual.equalTo(1));
 	}
 
