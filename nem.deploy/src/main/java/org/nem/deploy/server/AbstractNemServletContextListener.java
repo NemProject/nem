@@ -120,6 +120,7 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 				final HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
 				httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
+				httpResponse.setHeader("Allow", "GET, HEAD, POST, OPTIONS");
 				chain.doFilter(request, httpResponse);
 			}
 
