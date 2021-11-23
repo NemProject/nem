@@ -363,7 +363,8 @@ public class NisMainTest {
 	private static NisConfiguration createNisConfiguration(final boolean autoBoot, final boolean supplyBootKey,
 			final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
 			final boolean proofOfStake) {
-		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config.properties", true);
+		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config-default.properties",
+				true);
 		final Properties properties = new Properties();
 		properties.setProperty("nem.protocol", "ftp");
 		properties.setProperty("nem.host", "10.0.0.1");

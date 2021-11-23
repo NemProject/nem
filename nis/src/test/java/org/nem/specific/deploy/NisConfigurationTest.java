@@ -288,8 +288,8 @@ public class NisConfigurationTest {
 		final ForkConfiguration forkConfig = config.getForkConfiguration();
 
 		// Assert:
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3464800)));
-		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(53));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(3481580)));
+		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkTransactionHashes().size(), IsEqual.equalTo(52));
 		MatcherAssert.assertThat(forkConfig.getTreasuryReissuanceForkFallbackTransactionHashes().size(), IsEqual.equalTo(1));
 	}
 
@@ -367,11 +367,11 @@ public class NisConfigurationTest {
 	@Test
 	public void configPropertiesCopiesAreConsistent() throws Exception {
 		// Arrange:
-		// - this is more complicated than it seems in order to make sure that the right config.properties is loaded
-		// - use db.properties as a proxy to the production config.properties
-		// - use test.properties as a proxy to the test config.properties
-		final byte[] sourceConfigBytes = readAllBytes("db.properties", "config.properties");
-		final byte[] testConfigBytes = readAllBytes("test.properties", "config.properties");
+		// - this is more complicated than it seems in order to make sure that the right config-default.properties is loaded
+		// - use db.properties as a proxy to the production config-default.properties
+		// - use test.properties as a proxy to the test config-default.properties
+		final byte[] sourceConfigBytes = readAllBytes("db.properties", "config-default.properties");
+		final byte[] testConfigBytes = readAllBytes("test.properties", "config-default.properties");
 
 		// Act:
 		final boolean areBuffersEqual = Arrays.equals(sourceConfigBytes, testConfigBytes);

@@ -45,7 +45,8 @@ public class TreasuryReissuanceForkTransactionBlockValidator implements BlockVal
 			return ValidationResult.SUCCESS;
 		}
 
-		LOGGER.warning(String.format("Fork block at %s did not have expected transactions, it had\n%s", block.getHeight(),
+		LOGGER.warning(String.format("Fork block at %s did not have expected transactions, it had (%d)\n%s", block.getHeight(),
+				blockTransactionHashes.size(),
 				String.join("\n", blockTransactionHashes.stream().map(Hash::toString).collect(Collectors.toList()))));
 		return ValidationResult.FAILURE_UNKNOWN;
 	}

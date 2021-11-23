@@ -3,12 +3,15 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
+import org.nem.nis.ForkConfiguration;
 
-import java.util.Collections;
+import java.util.*;
 
 public class MultisigNonOperationalValidatorTest {
 
@@ -93,6 +96,64 @@ public class MultisigNonOperationalValidatorTest {
 
 		// Assert
 		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	// endregion
+
+	// region multisig account - treasury reissuance
+
+	@Test
+	public void multisigAccountCanIssueAllowedTransactionAtForkHeight() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account multisig = createMultisigAccount(context);
+		final Transaction transaction = createMockTransaction(multisig);
+
+		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
+		transactionHashes.add(HashUtils.calculateHash(transaction));
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), transactionHashes, new ArrayList<Hash>());
+
+		// Act:
+		final ValidationResult result = context.validateNonOperational(new BlockHeight(12345), forkConfiguration, transaction);
+
+		// Assert
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void multisigAccountCannotIssueAllowedTransactionAtOtherHeight() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account multisig = createMultisigAccount(context);
+		final Transaction transaction = createMockTransaction(multisig);
+
+		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
+		transactionHashes.add(HashUtils.calculateHash(transaction));
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), transactionHashes, new ArrayList<Hash>());
+
+		// Act:
+		final ValidationResult result = context.validateNonOperational(new BlockHeight(12346), forkConfiguration, transaction);
+
+		// Assert
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+	}
+
+	@Test
+	public void multisigAccountCannotIssueAllowedFallbackTransactionAtForkHeight() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account multisig = createMultisigAccount(context);
+		final Transaction transaction = createMockTransaction(multisig);
+
+		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
+		transactionHashes.add(HashUtils.calculateHash(transaction));
+		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), new ArrayList<Hash>(), transactionHashes);
+
+		// Act:
+		final ValidationResult result = context.validateNonOperational(new BlockHeight(12345), forkConfiguration, transaction);
+
+		// Assert
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	// endregion
