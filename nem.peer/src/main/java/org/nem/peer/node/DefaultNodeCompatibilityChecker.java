@@ -20,6 +20,21 @@ public class DefaultNodeCompatibilityChecker implements NodeCompatibilityChecker
 	}
 
 	private static boolean majorMinorMatches(final NodeVersion lhs, final NodeVersion rhs) {
-		return lhs.getMajorVersion() == rhs.getMajorVersion() && lhs.getMinorVersion() == rhs.getMinorVersion();
+		if (lhs.getMajorVersion() != rhs.getMajorVersion()) {
+			return false;
+		}
+
+		if (lhs.getMinorVersion() == rhs.getMinorVersion()) {
+			return true;
+		}
+
+		if (0 != lhs.getMajorVersion()) {
+			return false;
+		}
+
+		// allow 0.6.*.* and 0.7.*.* nodes to connect with each other
+		final int minMinorVersion = Math.min(lhs.getMinorVersion(), rhs.getMinorVersion());
+		final int maxMinorVersion = Math.max(lhs.getMinorVersion(), rhs.getMinorVersion());
+		return 6 == minMinorVersion && 7 == maxMinorVersion;
 	}
 }
