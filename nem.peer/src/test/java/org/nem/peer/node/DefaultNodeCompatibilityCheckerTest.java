@@ -91,34 +91,41 @@ public class DefaultNodeCompatibilityCheckerTest {
 
 	@Test
 	public void mismatchedMajorVersionsFailCheck() {
-		// Assert:
 		assertVersionCompatibility(new NodeVersion(7, 12, 10), new NodeVersion(8, 12, 10), false);
 	}
 
 	@Test
 	public void mismatchedMinorVersionsFailCheck() {
-		// Assert:
 		assertVersionCompatibility(new NodeVersion(7, 12, 10), new NodeVersion(7, 11, 10), false);
 	}
 
 	@Test
 	public void mismatchedBuildVersionsPassCheck() {
-		// Assert:
 		assertVersionCompatibility(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 9), true);
 	}
 
 	@Test
 	public void mismatchedTagVersionsPassCheck() {
-		// Assert:
 		assertVersionCompatibility(new NodeVersion(7, 11, 9, "foo"), new NodeVersion(7, 11, 9, "bar"), true);
 	}
 
 	@Test
 	public void matchingVersionsPassCheck() {
-		// Assert:
 		assertVersionCompatibility(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 10), true);
 		assertVersionCompatibility(new NodeVersion(7, 11, 10, "tag"), new NodeVersion(7, 11, 10, "tag"), true);
 		assertVersionCompatibility(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 10, "tag"), true);
+	}
+
+	@Test
+	public void minorVersionsSixAndSevenAreAllowedToCommunicateWhenMajorVersionIsZero() {
+		assertVersionCompatibility(new NodeVersion(0, 6, 10), new NodeVersion(0, 7, 9), true);
+		assertVersionCompatibility(new NodeVersion(0, 7, 10), new NodeVersion(0, 6, 9), true);
+	}
+
+	@Test
+	public void minorVersionsSixAndSevenAreNotAllowedToCommunicateWhenMajorVersionIsNonzero() {
+		assertVersionCompatibility(new NodeVersion(7, 6, 10), new NodeVersion(7, 7, 9), false);
+		assertVersionCompatibility(new NodeVersion(7, 7, 10), new NodeVersion(7, 6, 9), false);
 	}
 
 	// endregion
