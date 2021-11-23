@@ -7,22 +7,23 @@ RUN apt-get update \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# add github to ssh known hosts
-RUN mkdir -p ~/.ssh && ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-
-# clone repositories into /build
-RUN --mount=type=ssh mkdir -p /build \
+# clone repositories into /build (using https)
+RUN mkdir -p /build \
   && cd /build \
-  && git clone git@github.com:NemProject/nis-client.git \
+  && git clone https://github.com/NemProject/nis-client.git \
   && cd nis-client \
+  && sed -i "s/git@github.com:/https:\/\/github.com\//g" .gitmodules \
   && git submodule update --init --recursive
 
-# actually build
-RUN cd /build/nis-client && mvn clean package -DskipTests=true
+# actually build (using java 8)
+RUN echo 2 | update-alternatives --config java \
+  && cd /build/nis-client \
+  && mvn clean package install -DskipTests=true \
+  && bash package.prepare.sh package
 
-RUN mkdir -p /app
+# move package
+RUN mv /build/nis-client/package /app
 
 WORKDIR /app
 
-#CMD ["/usr/bin/java", "-Xms6G", "-Xmx6G", "-cp", "/app/testnet/:package/nis/*:package/libs/*", "foo" ]
-CMD ["echo", "foo bar"]
+CMD ["java", "-Xms6G", "-Xmx6G", "-cp", "/usersettings:./nis/*:./libs/*", "org.nem.deploy.CommonStarter"]
