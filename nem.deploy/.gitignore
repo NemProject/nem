@@ -1,0 +1,11 @@
+target/
+*~
+*.orig
+*.bak
+*.iml
+.idea
+.settings/
+.vscode/
+.classpath
+.project
+bin/
