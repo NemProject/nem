@@ -1,0 +1,10 @@
+target/
+*~
+*.orig
+*.bak
+*.iml
+.idea
+.settings
+out
+.classpath
+.project
