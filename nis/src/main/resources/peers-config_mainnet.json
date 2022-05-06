@@ -1,0 +1,148 @@
+{
+  "_info": "this file contains a list of all trusted peers and can be shared",
+  "knownPeers": [
+    {
+      "endpoint": {
+        "host": "62.75.251.134",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice2",
+        "public-key": "cd94cdcfde6878e093bc70e35b575dbe68095c69f73112e67559f71c1fb64c6e"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "62.75.163.236",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice3",
+        "public-key": "47ff934888ed8ea66433c889630bf67a46d47717e99e2f29db5b3866e7cc4c89"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "209.126.98.204",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice4",
+        "public-key": "d11ada95014685240ae69b0e44d60f931e61d444604a6a1b74ea085360dca396"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "108.61.182.27",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice5",
+        "public-key": "6ecd181da287c9ccb0075336de36427f25cbc216dc6b1f0e87e35e41a39f63fe"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "108.61.168.86",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice6",
+        "public-key": "00a30788dc1f042da959309639a884d8f6a87086cda10300d2a7c3a0e0891a4d"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "104.238.161.61",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice7",
+        "public-key": "64f0c867c52e8d3f7fe478854dbb197646d06041cc16b56595c03a217af6564b"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "62.75.171.41",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bigalice3",
+        "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "88.99.192.82",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "hugealice",
+        "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "san.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "[c=#dfa82f]s[/c][c=#8e8e8e]a[/c][c=#41ce7b]n[/c]",
+        "public-key": "7195f4d7a40ad7e31958ae96c4afed002962229675a4cae8dc8a18e290618981"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "go.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "[c=#41ce7b]g[/c][c=#dfa82f]o[c]",
+        "public-key": "26a3ac4b24647c77dc87780a95e50cb8d7744966e4569e3ac24e52c532c0cd0d"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "hachi.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "[c=#41ce7b]h[/c][c=#8e8e8e]ac[/c][c=#41ce7b]hi[/c]",
+        "public-key": "74997ca6fb75678320f9d823f73ee3406309fff7187bebece8109cf5adffb8bd"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "jusan.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "[c=#dfa82f]ju[/c][c=#8e8e8e]s[/c][c=#41ce7b]an[/c]",
+        "public-key": "733b57bfa43d66af6f0caebfee97284a768afa880a4ad2cef66f2ca5442ed206"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "nijuichi.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "[color=#dfa82f]ni[/color][color=#8e8e8e]ju[color][color=#41ce7b]ichi[/color]",
+        "public-key": "50020950fd74d102faf0402932005652afc8a15254b99e06d5d780d949035975"
+      }
+    }
+  ]
+}

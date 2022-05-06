@@ -1,0 +1,38 @@
+{
+  "_info": "this file contains a list of all trusted peers and can be shared",
+  "knownPeers": [
+    {
+      "endpoint": {
+        "host": "104.128.226.60",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bigalice2",
+        "public-key": "147eb3e4fccb655c03f4b6b12fc145f6a740c9334a8f3c59131dffd1fd42a996"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "23.228.67.85",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "medalice2",
+        "public-key": "0d57583239ee7bcbd649524332e0bac6b7e82bf48676c73ae6c4dd01d70ec1af"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "bob.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bob.nem.ninja",
+        "public-key": "f973d58cd550da293e52764d431edd5a04b28baa2b7b83b2e8fb7a5d3a7c398b"
+      }
+    }
+  ]
+}

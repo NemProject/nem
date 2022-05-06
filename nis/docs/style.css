@@ -1,0 +1,294 @@
+ /* Font Definitions */
+
+@font-face {font-family:"Roboto Light"; src:url(fonts/Roboto-Light.ttf);}
+@font-face {font-family:"Roboto Light"; src:url(fonts/Roboto-LightItalic.ttf); font-style:italic;}
+@font-face {font-family:"Roboto Medium"; src:url(fonts/Roboto-Medium.ttf);}
+@font-face {font-family:"Roboto Medium"; src:url(fonts/Roboto-MediumItalic.ttf); font-style:italic;}
+@font-face {font-family:"Roboto Black"; src:url(fonts/Roboto-Black.ttf);}
+@font-face {font-family:"Roboto Black"; src:url(fonts/Roboto-BlackItalic.ttf); font-style:italic;}
+@font-face {font-family:"Roboto Thin"; src:url(fonts/Roboto-Thin.ttf);}
+@font-face {font-family:"Roboto Thin"; src:url(fonts/Roboto-ThinItalic.ttf); font-style:italic;}
+@font-face {font-family:Roboto; src:url(fonts/Roboto-Regular.ttf);}
+@font-face {font-family:Roboto; src:url(fonts/Roboto-Bold.ttf); font-weight:bold;}
+@font-face {font-family:Roboto; src:url(fonts/Roboto-Italic.ttf); font-style:italic;}
+@font-face {font-family:Roboto; src:url(fonts/Roboto-BoldItalic.ttf); font-weight:bold; font-style:italic;}
+
+body { background-color: #fdfdfd; }
+
+ /* Page Definitions */
+@page document
+{
+	size:595.3pt 841.9pt;
+	margin:2.0cm 2.0cm 2.0cm 2.0cm;
+}
+
+@media print {
+	h1 {
+		page-break-before: always; 
+		margin:12pt 0 0 21pt;
+		text-indent:-21.6pt;
+	}
+	h2 {
+		margin:12pt 0 6pt 28pt;
+		text-indent:-28.8pt;
+	}
+	h3 {
+		margin:12pt 0 6pt 36pt;
+		text-indent:-36.0pt;
+	}
+	h4,dt {
+		margin:12pt 0 6pt 0;
+	}
+}
+
+@media screen {
+	div.document { width: 700pt; margin-left: auto; margin-right: auto; }
+	h1 { margin: 20pt 0 0 0; }
+	h2 { margin: 14pt 0 10pt 0; }
+	h3 { margin: 10pt 0 10pt 0; }
+	h4,dt { margin: 10pt 0 10pt 0; }
+}
+
+span.sep { display:inline-block; width:10pt; }
+
+
+#toc ol { list-style-type: none; padding: 0; margin: 0; }
+
+#toc li::before { display: inline-block; width: 50pt; }
+#toc li { padding-left:10pt; }
+
+#toc > ol                                 { counter-reset:l1; }
+#toc > ol > li                            { counter-increment: l1; }
+#toc > ol > li:before                     { content: counter(l1) ". "; }
+
+#toc > ol > li > ol                       { counter-reset:l2; }
+#toc > ol > li > ol > li                  { counter-increment:l2; }
+#toc > ol > li > ol > li:before           { content: counter(l1) "." counter(l2) ". "; }
+
+#toc > ol > li > ol > li > ol             { counter-reset:l3; }
+#toc > ol > li > ol > li > ol > li        { counter-increment:l3; }
+#toc > ol > li > ol > li > ol > li:before { content: counter(l1) "." counter(l2) "." counter(l3) ". "; }
+
+/* Style Definitions */
+p,td,th,div
+	{
+	margin: 0 0 8pt 0;
+	line-height:150%;
+	font-size:11.0pt;
+	font-family:Roboto;}
+li
+	{
+	margin: 4pt 0 4pt 0;
+	line-height:150%;
+	line-height:150%;
+	font-size:11.0pt;
+	font-family:Roboto;}
+
+#toc { counter-reset: hl1; }
+h1
+	{
+	line-height:150%;
+	font-size:16.0pt;
+	font-family:"Roboto Black";
+	color:#2E74B5;
+	font-weight:normal;
+	counter-reset: hl2;
+}
+h2
+	{
+	line-height:150%;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:"Roboto Medium";
+	color:#2E74B5;
+	font-weight:normal;
+	counter-reset: hl3;
+}
+h3
+	{
+	line-height:150%;
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:Roboto;
+	color:#1F4D78;
+	font-weight:normal;
+	counter-reset: hl4;
+}
+h4,dt
+	{
+	line-height:150%;
+	page-break-after:avoid;
+	font-size:12.0pt;
+	font-family:Roboto;
+	color:black;
+}
+h4colored
+	{
+	line-height:150%;
+	page-break-after:avoid;
+	font-size:12.0pt;
+	font-family:Roboto;
+	color:#1F4D78;
+}
+
+dt::before { content:'"';}
+dt::after { content:'"';}
+
+h1::before {
+	counter-increment:hl1;
+	content: counter(hl1) ". ";
+}
+h2::before {
+	counter-increment:hl2;
+	content: counter(hl1) "." counter(hl2) ". ";
+}
+h3::before {
+	counter-increment:hl3;
+	content: counter(hl1) "." counter(hl2) "." counter(hl3) ". ";
+}
+
+p.NemNoSpacing, li.NemNoSpacing, div.NemNoSpacing, p.NemNoSpacingList
+	{
+	margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:Roboto;}
+
+.FakeList {
+	padding-left: 30pt;
+}
+
+p.NemTitle
+	{
+	margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:center;
+	line-height:150%;
+	font-size:28.0pt;
+	font-family:"Roboto Light";
+	letter-spacing:-.5pt;}
+p.NemTitleText
+	{
+	margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:center;
+	line-height:150%;
+	font-size:28.0pt;
+	font-family:"Roboto Light";
+	letter-spacing:-.5pt;}
+p.NemSubtitle
+	{
+	margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:8.0pt;
+	margin-left:0cm;
+	text-align:center;
+	line-height:150%;
+	font-size:11.0pt;
+	font-family:Roboto;
+	color:#5A5A5A;
+	letter-spacing:.75pt;}
+a:link, span.NemHyperlink
+	{color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.NemHyperlinkFollowed
+	{color:#954F72;
+	text-decoration:underline;}
+
+a[href^="http://en.wikipedia"]:after {
+    content: "\1d42";
+    padding:0 3px 0 3px;
+    display:inline-block;
+    text-decoration: none;
+}
+
+strong
+	{font-family:Roboto,"serif";
+	font-weight:bold;}
+
+p.NemTocHeading
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:0cm;
+	margin-left:0cm;
+	margin-bottom:.0001pt;
+	line-height:107%;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:"Roboto Light","sans-serif";
+	color:#2E74B5;}
+
+p.JSON, span.JSON, samp.JSON, code.JSON
+	{
+	margin:0cm;
+	font-size:10.0pt;
+	font-family:Consolas;}
+
+pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+
+    background-color: #eee;
+    white-space: pre-wrap;
+    width: 90%;
+}
+
+table.NemApiGrid, table.NemTableGrid, table.NemParamsGrid {
+	border: 1px solid #111;
+	border-collapse: collapse;
+	margin-bottom: 8pt;
+    margin-top: 5pt;
+}
+
+table.NemTableGrid, table.NemParamsGrid {
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.NemApiGrid td {
+	padding:0 5pt 0 5pt;
+	width: 245pt;
+	vertical-align: top;
+	text-align: left
+}
+
+table.NemTableGrid td, table.NemParamsGrid td {
+	border: 1px solid #111;
+	padding:0 5pt 0 5pt;
+	vertical-align: top;
+	text-align: left
+}
+table.NemTableGrid td:first-child, table.NemParamsGrid td:first-child {
+	width: 120pt;
+}
+
+table.NemParamsGrid td:first-child {
+	margin:0cm;
+	font-size:10.0pt;
+	font-family:Consolas;
+}
+
+
+
+.get { background:#C8E4D5; }
+.post { background:#ECD9C3 }
+.error { background:#a00000; }
+.path { font-weight: bold; }
+
+div.warning {
+    background-color: #ffe0e0;
+    font-size: 13pt;
+    width: 70%;
+    margin: 30pt auto 30pt auto;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #444;
+}
+
+div.warning::before {
+    content: "WARNING: ";
+}
