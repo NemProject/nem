@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # install dependencies (install tzdata first to prevent 'geographic area' prompt)
 RUN apt-get update \
@@ -10,19 +10,17 @@ RUN apt-get update \
 # clone repositories into /build (using https)
 RUN mkdir -p /build \
   && cd /build \
-  && git clone https://github.com/NemProject/nis-client.git \
-  && cd nis-client \
-  && sed -i "s/git@github.com:/https:\/\/github.com\//g" .gitmodules \
-  && git submodule update --init --recursive
+  && git clone https://github.com/NemProject/nem.git \
+  && cd nem 
 
 # actually build (using java 8)
 RUN echo 2 | update-alternatives --config java \
-  && cd /build/nis-client \
+  && cd /build/nem \
   && mvn clean package install -DskipTests=true \
   && bash package.prepare.sh package
 
 # move package
-RUN mv /build/nis-client/package /app
+RUN mv /build/nem/package /app
 
 WORKDIR /app
 

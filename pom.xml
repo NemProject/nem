@@ -22,9 +22,9 @@
     </properties>
 
     <modules>
-        <module>nem.core</module>
-        <module>nem.deploy</module>
-        <module>nem.peer</module>
+        <module>core</module>
+        <module>deploy</module>
+        <module>peer</module>
         <module>nis</module>
     </modules>
     <build>
