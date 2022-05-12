@@ -1,0 +1,4 @@
+[submodule "_symbol"]
+	path = _symbol
+	url = https://github.com/symbol/symbol
+	branch = dev

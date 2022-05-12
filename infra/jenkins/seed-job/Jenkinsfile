@@ -1,0 +1,5 @@
+monorepoSeedPipeline {
+	platform = ['ubuntu']
+	organizationName = 'Nem'
+	gitHubId = 'Nem-Github-app'
+}
