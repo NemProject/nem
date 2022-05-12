@@ -1,6 +1,6 @@
 # NIS client
 
-This Java package provides a wrapper project for the [NIS repository](https://github.com/NemProject/nis) and all its dependencies. It is the simplest way to quickly build and launch a [NEM node](https://nemproject.github.io/nem-docs).
+This project for the [NEM Infrastructure Server](nis) and all its dependencies. It is the simplest way to quickly build and launch a [NEM node](https://nemproject.github.io/nem-docs).
 
 ## Package Organization
 
