@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/NemProject/nem.peer.svg?branch=dev)](https://travis-ci.org/NemProject/nem.peer)
 
-This Java package provides the peer synchronization base methods used by [NEM](https://nemproject.github.io/nem-docs) nodes, including retrieving information from peer nodes and broadcasting requests received on the node. To deploy a complete node please examine the [nis-client repository](https://github.com/NemProject/nis-client).
+This Java package provides the peer synchronization base methods used by [NEM](https://nemproject.github.io/nem-docs) nodes, including retrieving information from peer nodes and broadcasting requests received on the node. To deploy a complete node please examine the [build script](../infra/docker).
 
 ## Package Organization
 

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/NemProject/nem.deploy.svg?branch=dev)](https://travis-ci.org/NemProject/nem.deploy)
 
-This Java package provides the bootstrapping functions used by [NEM](https://nemproject.github.io/nem-docs) nodes, including reading property files. To deploy a complete node please examine the [nis-client repository](https://github.com/NemProject/nis-client).
+This Java package provides the bootstrapping functions used by [NEM](https://nemproject.github.io/nem-docs) nodes, including reading property files. To deploy a complete node please examine the [build script](../infra/docker).
 
 ## Package Organization
 

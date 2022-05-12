@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/NemProject/nem.core.svg?branch=dev)](https://travis-ci.org/NemProject/nem.core)
 
-This Java package provides the cryptographic and serialization base methods used by [NEM](https://nemproject.github.io/nem-docs) nodes. To deploy a complete node please examine the [nis-client repository](https://github.com/NemProject/nis-client).
+This Java package provides the cryptographic and serialization base methods used by [NEM](https://nemproject.github.io/nem-docs) nodes. To deploy a complete node please examine the [build script](../infra/docker).
 
 ## Package Organization
 

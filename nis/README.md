@@ -2,9 +2,9 @@
 
 This Java package provides everything needed to launch a [NEM](https://nemproject.github.io/nem-docs) node.
 
-It depends on the packages [nem.core](https://github.com/NemProject/nem.core), [nem.peer](https://github.com/NemProject/nem.peer) and [nem.deploy](https://github.com/NemProject/nem.deploy).
+It depends on the packages [core](../core), [peer](../peer) and [deploy](../deploy).
 
-For easier handling of these dependencies, please use the [nis-client repository](https://github.com/NemProject/nis-client), which takes care of downloading and building them in a single Maven project.
+For easier handling of these dependencies, please use the [build script](../infra/docker), which takes care of downloading and building them in a single Maven project.
 
 ## Package Organization
 

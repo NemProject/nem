@@ -1,31 +1,26 @@
 # NIS client
 
-This Java package provides a wrapper project for the [NIS repository](https://github.com/NemProject/nis) and all its dependencies. It is the simplest way to quickly build and launch a [NEM node](https://nemproject.github.io/nem-docs).
+This project contains [NEM Infrastructure Server](nis) and all its dependencies. It is the simplest way to quickly build and launch a [NEM node](https://nemproject.github.io/nem-docs).
 
 ## Package Organization
 
 The main folders are:
 
-| Folder       | Content                                                                                         |
-| ------------ | ----------------------------------------------------------------------------------------------- |
-| `nem.core`   | Git submodule containing the [nem.core](https://github.com/NemProject/nem.core) dependency.     |
-| `nem.deploy` | Git submodule containing the [nem.deploy](https://github.com/NemProject/nem.deploy) dependency. |
-| `nem.peer`   | Git submodule containing the [nem.peer](https://github.com/NemProject/nem.peer) dependency.     |
-| `nis`        | Git submodule containing the [nis](https://github.com/NemProject/nis) dependency.               |
+| Folder   | Content                          |
+|----------|----------------------------------|
+| `core`   | The [core](core) dependency.     |
+| `deploy` | The [deploy](deploy) dependency. |
+| `peer`   | The [peer](peer) dependency.     |
+| `nis`    | The [nis](nis) dependency.       |
 
 ## Building the package
 
-The package uses [Apache Maven](https://maven.apache.org/), but, before building it, the Git submodules need to be prepared:
+The package uses [Apache Maven](https://maven.apache.org/).
+
+If you are using a version of Java higher than 8:
 
 ```bash
-git submodule init
-git submodule update
-```
-
-Then, if you are using a version of Java higher than 8:
-
-```bash
-git submodule foreach './setup_java9.sh'
+for folder in core deploy nis peer; do pushd "${folder}"; ./setup_java9.sh; popd ; done
 ```
 
 Build the package as usual:
