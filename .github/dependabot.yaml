@@ -1,0 +1,43 @@
+version: 2
+updates:
+
+  - package-ecosystem: maven
+    directory: /core
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    labels: [core]
+    commit-message:
+      prefix: '[core] fix'
+
+  - package-ecosystem: maven
+    directory: /deploy
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    labels: [deploy]
+    commit-message:
+      prefix: '[deploy] fix'
+
+  - package-ecosystem: maven
+    directory: /nis
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    labels: [nis]
+    versioning-strategy: increase
+    commit-message:
+      prefix: '[nis] fix'
+
+  - package-ecosystem: maven
+    directory: /peer
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    labels: [peer]
+    commit-message:
+      prefix: '[peer] fix'
