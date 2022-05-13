@@ -28,7 +28,6 @@ updates:
       day: saturday
     target-branch: dev
     labels: [nis]
-    versioning-strategy: increase
     commit-message:
       prefix: '[nis] fix'
 
