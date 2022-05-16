@@ -9,7 +9,7 @@ updates:
     target-branch: dev
     labels: [core]
     commit-message:
-      prefix: '[core] fix'
+      prefix: '[dependency]'
 
   - package-ecosystem: maven
     directory: /deploy
@@ -19,7 +19,7 @@ updates:
     target-branch: dev
     labels: [deploy]
     commit-message:
-      prefix: '[deploy] fix'
+      prefix: '[dependency]'
 
   - package-ecosystem: maven
     directory: /nis
@@ -29,7 +29,7 @@ updates:
     target-branch: dev
     labels: [nis]
     commit-message:
-      prefix: '[nis] fix'
+      prefix: '[dependency]'
 
   - package-ecosystem: maven
     directory: /peer
@@ -39,4 +39,4 @@ updates:
     target-branch: dev
     labels: [peer]
     commit-message:
-      prefix: '[peer] fix'
+      prefix: '[dependency]'
