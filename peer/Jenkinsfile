@@ -3,5 +3,7 @@ defaultCiPipeline {
 	ciBuildDockerfile = 'java.Dockerfile'
 
 	packageId = 'nem-peer'
+
+	codeCoverageTool = 'jacoco'
 }
 

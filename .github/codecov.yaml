@@ -1,0 +1,54 @@
+# Setting coverage targets per flag
+# Each project represent a package which has one flag
+coverage:
+  status:
+    project:
+      default:
+        target: 95%  # overall project / repo coverage
+
+      nem-core:
+        target: auto
+        flags:
+          - nem-core
+
+      nem-deploy:
+        target: auto
+        flags:
+          - nem-deploy
+
+      nem-nis:
+        target: auto
+        flags:
+          - nem-nis
+
+      nem-peer:
+        target: auto
+        flags:
+          - nem-peer
+
+# New root YAML section = `flags:`
+# This is where you would define every flag from your
+# uploader, and update when new Flags added
+# Each flag is used to represent each package in the
+# monorepo.  This allows code coverage per package.
+
+flags:
+  nem-core:
+    paths:
+      - core
+    carryforward: true
+
+  nem-deploy:
+    paths:
+      - deploy
+    carryforward: true
+
+  nem-nis:
+    paths:
+      - nis
+    carryforward: true
+
+  nem-peer:
+    paths:
+      - peer
+    carryforward: true
