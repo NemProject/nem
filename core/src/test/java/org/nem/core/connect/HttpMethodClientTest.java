@@ -73,7 +73,7 @@ public class HttpMethodClientTest {
 
 			// Assert: this should fail because the underlying client is closed
 			ExceptionAssert.assertThrows(v -> this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get(),
-					IllegalStateException.class);
+					FatalPeerException.class);
 		}
 
 		@Test
