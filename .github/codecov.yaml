@@ -4,7 +4,7 @@ coverage:
   status:
     project:
       default:
-        target: 95%  # overall project / repo coverage
+        target: 90%  # overall project / repo coverage
 
       nem-core:
         target: auto
