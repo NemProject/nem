@@ -164,6 +164,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// receivedBlock already seen
 		if (null != this.findBlock(blockHash, receivedBlock.getHeight())) {
 			// This will happen frequently and is ok
+			LOGGER.info(String.format("updateBlock - block already seen, %s %s", blockHash, receivedBlock.getHeight()));
 			return ValidationResult.NEUTRAL;
 		}
 
@@ -173,6 +174,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// if we don't have parent, we can't do anything with this receivedBlock
 		if (null == dbParent) {
 			// We might be on a fork, don't punish remote node
+			LOGGER.info(String.format("updateBlock - parent not found, %s %s", parentHash, receivedBlock.getHeight().prev()));
 			return ValidationResult.NEUTRAL;
 		}
 
@@ -198,6 +200,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private DbBlock findBlock(final Hash hash, final BlockHeight height) {
 		final DbBlock dbBlock = this.blockDao.findByHeight(height);
+
+		System.out.println(String.format("has block in db? %s", dbBlock));
+		if (null != dbBlock) {
+			System.out.println(String.format("db block hash: %s", dbBlock.getBlockHash()));
+		}
 		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
@@ -228,6 +235,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final BlockChainUpdateContext updateContext = this.blockChainContextFactory.createUpdateContext(context, dbParentBlock, peerChain,
 				ourScore, hasOwnChain);
 		final UpdateChainResult updateResult = updateContext.update();
+
+		LOGGER.info(String.format("updateContext.update() result: %d, shouldPunishLowerPeerScore: %b",
+				updateResult.validationResult.getValue(), shouldPunishLowerPeerScore));
 
 		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) <= 0) {
 			// if we got here, the peer lied about his score, so penalize him

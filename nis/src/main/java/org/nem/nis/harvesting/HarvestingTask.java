@@ -6,10 +6,14 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
 import org.nem.peer.*;
 
+import java.util.logging.Logger;
+
 /**
  * A harvesting task.
  */
 public class HarvestingTask {
+	private static final Logger LOGGER = Logger.getLogger(HarvestingTask.class.getName());
+
 	private final BlockChain blockChain;
 	private final Harvester harvester;
 	private final UnconfirmedTransactions unconfirmedTransactions;
@@ -36,6 +40,9 @@ public class HarvestingTask {
 	public void harvest(final PeerNetwork network, final TimeInstant currentTime) {
 		this.unconfirmedTransactions.dropExpiredTransactions(currentTime);
 		final Block block = this.harvester.harvestBlock();
+
+		LOGGER.info(String.format("harvested block: %s", block));
+
 		if (null == block || !this.blockChain.processBlock(block).isSuccess()) {
 			return;
 		}
