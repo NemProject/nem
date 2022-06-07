@@ -49,6 +49,12 @@ public class Harvester {
 		final DbBlock dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Block lastBlock = this.mapper.map(dbLastBlock);
 
+		// can be null inside tests
+		if (dbLastBlock != null) {
+			LOGGER.info(String.format("db block height: %d", dbLastBlock.getHeight()));
+			LOGGER.info(
+					String.format("db block hash: %s", dbLastBlock.getBlockHash().getRaw() == null ? "null" : dbLastBlock.getBlockHash()));
+		}
 		LOGGER.info(String.format("%d harvesters are attempting to harvest a new block.", this.unlockedAccounts.size()));
 		GeneratedBlock bestGeneratedBlock = null;
 		for (final Account harvester : this.unlockedAccounts) {
