@@ -33,7 +33,7 @@ public class NisTestConstants {
 	/**
 	 * Number of blocks required for activating remote harvesting
 	 */
-	public static final int REMOTE_HARVESTING_DELAY = REWRITE_LIMIT;
+	public static final int REMOTE_HARVESTING_DELAY = 240;
 
 	/**
 	 * Maximum number of blocks to send and compare during synchronization.

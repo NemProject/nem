@@ -8,7 +8,7 @@ import org.nem.core.utils.CircularStack;
  * A collection of remote states associated with an account.
  */
 public class RemoteLinks implements ReadOnlyRemoteLinks {
-	private static final int REMOTE_LINKS_SIZE = 2;
+	private static final int REMOTE_LINKS_SIZE = 2 + 1;
 
 	// The following rules will apply:
 	// 1. one will have to wait REMOTE_HARVESTING_DELAY blocks to activate/deactivate remote account (before it'll become operational)
