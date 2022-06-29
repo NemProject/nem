@@ -8,21 +8,25 @@ coverage:
 
       nem-core:
         target: auto
+        threshold: 1%
         flags:
           - nem-core
 
       nem-deploy:
         target: auto
+        threshold: 1%
         flags:
           - nem-deploy
 
       nem-nis:
         target: auto
+        threshold: 1%
         flags:
           - nem-nis
 
       nem-peer:
         target: auto
+        threshold: 1%
         flags:
           - nem-peer
 
