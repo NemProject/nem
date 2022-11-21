@@ -10,7 +10,7 @@ rm -rf core/target/classes/nemesis-mijin*
 rm -rf nis/src/main/resources/*mijin*
 rm -rf nis/target/classes/*mijin*
 
-mvn clean package install -DskipTests=true | tee -a $logfile
+mvn clean install -DskipTests=true | tee -a $logfile
 pushd core
 echo " [+] CREATING DOCS"
 mvn javadoc:javadoc >>$logfile

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS builder
 
 # install dependencies (install tzdata first to prevent 'geographic area' prompt)
 RUN apt-get update \
@@ -11,17 +11,33 @@ RUN apt-get update \
 RUN mkdir -p /build \
   && cd /build \
   && git clone https://github.com/NemProject/nem.git \
-  && cd nem 
+  && cd nem
 
 # actually build (using java 8)
 RUN echo 2 | update-alternatives --config java \
   && cd /build/nem \
-  && mvn clean package install -DskipTests=true \
-  && bash package.prepare.sh package
+  && mvn clean install -DskipTests=true \
+  && cd infra \
+  && bash ./package.prepare.sh package
 
-# move package
-RUN mv /build/nem/package /app
+
+FROM ubuntu:22.04 AS runner
+
+ARG UID=1000
+ARG UNAME=nem
+
+RUN useradd --uid $UID -ms /bin/bash $UNAME
+
+#install jre 11 for run time
+RUN apt-get update \
+  && apt-get install -y openjdk-11-jre-headless
+
+VOLUME ["/usersettings"]
 
 WORKDIR /app
+
+USER $UNAME
+
+COPY --from=builder /build/nem/infra/package /app
 
 CMD ["java", "-Xms6G", "-Xmx6G", "-cp", "/usersettings:./nis/*:./libs/*", "org.nem.deploy.CommonStarter"]
