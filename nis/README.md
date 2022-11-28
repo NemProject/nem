@@ -35,7 +35,14 @@ The main folders are:
 > **NOTE:**
 > It is far more convenient to use the [nis-client repository](https://github.com/NemProject/nis-client) to build and run this package.
 
-The package uses [Apache Maven](https://maven.apache.org/) and the ``pom.xml`` file is initially configured to work with **Java 8**. To work on more recent versions of Java run the ``setup_java9.sh`` script first.
+The package uses [Apache Maven](https://maven.apache.org/) and  minimum required Java SDK version to build is **Java 11**.
+
+Please make sure that the Java version is 11+ by running the following command:
+
+```bash
+java -version
+# openjdk version "11.0.2" 2019-01-15
+```
 
 First build and install (with ``mvn install -DskipTests=true``) all the dependency packages [nem.core](https://github.com/NemProject/nem.core), [nem.peer](https://github.com/NemProject/nem.peer) and [nem.deploy](https://github.com/NemProject/nem.deploy). Make sure they are all accessible through the ``CLASSPATH`` environment variable.
 

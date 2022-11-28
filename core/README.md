@@ -26,7 +26,14 @@ The main folders are:
 
 ## Building the package
 
-The package uses [Apache Maven](https://maven.apache.org/) and the ``pom.xml`` file is initially configured to work with **Java 8**. To work on more recent versions of Java run the ``setup_java9.sh`` script first.
+The package uses [Apache Maven](https://maven.apache.org/) and  minimum required Java SDK version to build is **Java 11**.
+
+Please make sure that the Java version is 11+ by running the following command:
+
+```bash
+java -version
+# openjdk version "11.0.2" 2019-01-15
+```
 
 Then build and install the package as usual:
 
