@@ -16,6 +16,7 @@ import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.CancellationException;
 import java.util.function.*;
 
@@ -46,7 +47,14 @@ public class HttpMethodClientTest {
 	}
 
 	private static class TestRunner {
-		private static final String GOOD_URL = "http://bigalice2.nem.ninja/test.json";
+		private static final int LOCAL_TEST_SERVER_PORT = 8890;
+
+		private static final String TEST_JSON_ENDPOINT_URI = "/test.json";
+		private static final String GOOD_URL = String.format("http://localhost:%d%s", LOCAL_TEST_SERVER_PORT, TEST_JSON_ENDPOINT_URI);
+
+		private static final String TIMEOUT_ENDPOINT_URI = "/timeout";
+		private static final String TIMEOUT_URL = String.format("http://localhost:%d%s", LOCAL_TEST_SERVER_PORT, TIMEOUT_ENDPOINT_URI);
+
 		private static final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private static final String HOST_LESS_URI = "file:///~/calendar";
 
@@ -65,94 +73,115 @@ public class HttpMethodClientTest {
 
 		@Test
 		public void cannotCallSendAfterClose() {
-			// Arrange:
-			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+			this.runTestJsonWithMockService((mockService, requestUrl) -> {
+				// Arrange:
+				final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
-			// Act:
-			client.close();
+				// Act:
+				client.close();
 
-			// Assert: this should fail because the underlying client is closed
-			ExceptionAssert.assertThrows(v -> this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get(),
-					FatalPeerException.class);
+				// Assert: this should fail because the underlying client is closed
+				ExceptionAssert.assertThrows(v -> this.strategy.send(client, this.stringToUrl(requestUrl), DEFAULT_STRATEGY).get(),
+						FatalPeerException.class);
+			});
 		}
 
 		@Test
 		public void sendReturnsJsonDeserializerOnSuccess() {
-			// Arrange:
-			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+			this.runTestJsonWithMockService((mockService, requestUrl) -> {
+				// Arrange:
+				final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
-			// Act:
-			final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get();
+				// Act:
+				final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(requestUrl), DEFAULT_STRATEGY).get();
 
-			// Assert:
-			MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
-			MatcherAssert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
-			MatcherAssert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
+				// Assert:
+				MatcherAssert.assertThat(deserializer, IsNull.notNullValue());
+				MatcherAssert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
+				MatcherAssert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
+			});
+
 		}
 
 		@Test
 		public void sendDelegatesToStrategyOnSuccess() {
-			// Arrange:
-			final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
-			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+			this.runTestJsonWithMockService((mockService, requestUrl) -> {
+				// Arrange:
+				final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
+				final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
-			// Act:
-			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
+				// Act:
+				this.strategy.send(client, this.stringToUrl(requestUrl), strategy).get();
 
-			// Assert:
-			Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
+				// Assert:
+				Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
+			});
 		}
 
 		@Test
 		public void sendSetsRequestHeadersCorrectly() {
-			// Arrange:
-			final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
-			final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT, GOOD_TIMEOUT, GOOD_TIMEOUT);
+			this.runTestJsonWithMockService((mockService, requestUrl) -> {
+				// Arrange:
+				final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
+				final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT, GOOD_TIMEOUT, GOOD_TIMEOUT);
 
-			// Act:
-			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
+				// Act:
+				this.strategy.send(client, this.stringToUrl(requestUrl), strategy).get();
 
-			// Assert:
-			MatcherAssert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
-			MatcherAssert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
-			MatcherAssert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
+				// Assert:
+				MatcherAssert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
+				MatcherAssert.assertThat(strategy.getRequestContentType(), IsEqual.equalTo("application/json"));
+				MatcherAssert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
+			});
 		}
 
 		@Test(expected = InactivePeerException.class)
 		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
-			// Arrange:
-			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+			this.runTestWithTimeoutService((mockService, requestUrl) -> {
+				// Arrange:
 				// - stop the service so that it's no longer running and will reject connections
 				mockService.stop();
 				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
 
 				// Act:
-				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+				this.strategy.send(client, this.stringToUrl(requestUrl), DEFAULT_STRATEGY).get();
 			});
 		}
 
 		@Test(expected = BusyPeerException.class)
 		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
-			// Arrange:
-			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+			this.runTestWithTimeoutService((mockService, requestUrl) -> {
 				// Arrange:
 				// - set a delay in request processing to simulate a socket timeout
 				mockService.addRequestProcessingDelay(1000);
 				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT, 500, GOOD_TIMEOUT);
 
 				// Act:
-				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+				this.strategy.send(client, this.stringToUrl(requestUrl), DEFAULT_STRATEGY).get();
 			});
 		}
 
+		private void runTestJsonWithMockService(final BiConsumer<WireMockServer, String> action) {
+			this.runTestWithMockService(action, new MappingBuilder[]{
+					createJsonTestEndpointStub(WireMock::get), createJsonTestEndpointStub(WireMock::post)
+			}, GOOD_URL);
+		}
+
 		private void runTestWithTimeoutService(final BiConsumer<WireMockServer, String> action) {
+			this.runTestWithMockService(action, new MappingBuilder[]{
+					createTimeoutStub(WireMock::get), createTimeoutStub(WireMock::post)
+			}, TIMEOUT_URL);
+		}
+
+		private void runTestWithMockService(final BiConsumer<WireMockServer, String> action, MappingBuilder[] stubbedEndpoints,
+				String requestUrl) {
 			WireMockServer mockService = null;
 			try {
-				mockService = new WireMockServer(8890);
+				mockService = new WireMockServer(LOCAL_TEST_SERVER_PORT);
 				mockService.start();
-				mockService.stubFor(createTimeoutStub(WireMock::get));
-				mockService.stubFor(createTimeoutStub(WireMock::post));
-				action.accept(mockService, "http://localhost:" + mockService.port() + "/timeout");
+				WireMockServer finalMockService = mockService;
+				Arrays.stream(stubbedEndpoints).forEach(endpoint -> finalMockService.stubFor(endpoint));
+				action.accept(mockService, requestUrl);
 			} finally {
 				if (null != mockService) {
 					mockService.stop();
@@ -160,20 +189,37 @@ public class HttpMethodClientTest {
 			}
 		}
 
+		private static MappingBuilder createJsonTestEndpointStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
+			return createEndpointStub(createBuilder, TEST_JSON_ENDPOINT_URI,
+					"{ \"test\": \"org.nem.core.connect" + ".HttpMethodClientTest\", \"one\": \"two\" }", 200);
+		}
+
 		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
-			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(WireMock.aResponse().withStatus(200));
+			return createEndpointStub(createBuilder, TIMEOUT_ENDPOINT_URI, null, 200);
+		}
+
+		private static MappingBuilder createEndpointStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder, String uri,
+				String body, int status) {
+			ResponseDefinitionBuilder responseDefinitionBuilder = WireMock.aResponse().withHeader("content-type", "application/json")
+					.withStatus(status);
+			if (body != null) {
+				responseDefinitionBuilder = responseDefinitionBuilder.withBody(body);
+			}
+			return createBuilder.apply(WireMock.urlEqualTo(uri)).willReturn(responseDefinitionBuilder);
 		}
 
 		@Test(expected = CancellationException.class)
 		public void sendThrowsCancellationExceptionOnCancel() {
-			// Arrange:
-			final HttpMethodClient<Deserializer> client = createClient(1);
+			this.runTestJsonWithMockService((mockService, requestUrl) -> {
+				// Arrange:
+				final HttpMethodClient<Deserializer> client = createClient(1);
 
-			// Act:
-			final HttpMethodClient.AsyncToken<Deserializer> token = this.strategy.send(client, this.stringToUrl(GOOD_URL),
-					DEFAULT_STRATEGY);
-			token.abort();
-			token.get();
+				// Act:
+				final HttpMethodClient.AsyncToken<Deserializer> token = this.strategy.send(client, this.stringToUrl(requestUrl),
+						DEFAULT_STRATEGY);
+				token.abort();
+				token.get();
+			});
 		}
 
 		@Test(expected = FatalPeerException.class)
