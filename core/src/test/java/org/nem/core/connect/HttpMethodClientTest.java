@@ -179,8 +179,9 @@ public class HttpMethodClientTest {
 			try {
 				mockService = new WireMockServer(LOCAL_TEST_SERVER_PORT);
 				mockService.start();
-				WireMockServer finalMockService = mockService;
-				Arrays.stream(stubbedEndpoints).forEach(endpoint -> finalMockService.stubFor(endpoint));
+				for (MappingBuilder endpoint : stubbedEndpoints) {
+					mockService.stubFor(endpoint);
+				}
 				action.accept(mockService, requestUrl);
 			} finally {
 				if (null != mockService) {
