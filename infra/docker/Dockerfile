@@ -15,6 +15,7 @@ RUN mkdir -p /build \
 # actually build (using java 8)
 RUN echo 2 | update-alternatives --config java \
   && cd /build/nem \
+  && mvn clean package -DskipTests=true \
   && cd infra \
   && bash ./package.prepare.sh package
 
