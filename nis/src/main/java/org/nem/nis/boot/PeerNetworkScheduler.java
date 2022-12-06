@@ -180,7 +180,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	}
 
 	private static AbstractDelayStrategy getRefreshDelayStrategy() {
-		// initially refresh at REFRESH_INITIAL_INTERVAL (1s), gradually increasing to
+		// initially refresh at REFRESH_INITIAL_INTERVAL (1m), gradually increasing to
 		// REFRESH_PLATEAU_INTERVAL (5m) over REFRESH_BACK_OFF_TIME (12 hours),
 		// and then plateau at that rate forever
 		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(

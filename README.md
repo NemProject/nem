@@ -15,12 +15,13 @@ The main folders are:
 
 ## Building the package
 
-The package uses [Apache Maven](https://maven.apache.org/).
+The package uses [Apache Maven](https://maven.apache.org/) and  minimum required Java SDK version to build is **Java 11**.
 
-If you are using a version of Java higher than 8:
+Please make sure that the Java version is 11+ by running the following command:
 
 ```bash
-for folder in core deploy nis peer; do pushd "${folder}"; ./setup_java9.sh; popd ; done
+java -version
+# should print sth similar to: openjdk version "11.0.2" 2019-01-15
 ```
 
 Build the package as usual:

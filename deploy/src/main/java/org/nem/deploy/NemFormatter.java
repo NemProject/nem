@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import org.nem.core.time.*;
 
+import java.time.Instant;
 import java.util.TimeZone;
 import java.util.logging.*;
 
@@ -14,7 +15,8 @@ public class NemFormatter extends SimpleFormatter {
 
 	@Override
 	public synchronized String format(final LogRecord record) {
-		record.setMillis(TIME_PROVIDER.getNetworkTime().getRaw() + SystemTimeProvider.getEpochTimeMillis() - TIME_ZONE_OFFSET);
+		record.setInstant(
+				Instant.ofEpochMilli(TIME_PROVIDER.getNetworkTime().getRaw() + SystemTimeProvider.getEpochTimeMillis() - TIME_ZONE_OFFSET));
 		return super.format(record);
 	}
 }
