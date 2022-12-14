@@ -12,7 +12,7 @@ RUN mkdir -p /build \
   && cd /build \
   && git clone https://github.com/NemProject/nem.git
 
-# actually build (using java 8)
+# actually build (using java 11)
 RUN echo 2 | update-alternatives --config java \
   && cd /build/nem \
   && mvn clean package -DskipTests=true \
