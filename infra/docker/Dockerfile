@@ -12,9 +12,8 @@ RUN mkdir -p /build \
   && cd /build \
   && git clone https://github.com/NemProject/nem.git
 
-# actually build (using java 8)
-RUN echo 2 | update-alternatives --config java \
-  && cd /build/nem \
+# actually build (using java 11)
+RUN cd /build/nem \
   && mvn clean package -DskipTests=true \
   && cd infra \
   && bash ./package.prepare.sh package
