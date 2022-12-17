@@ -1,5 +1,6 @@
 FROM ubuntu:22.04 AS builder
 
+ARG GIT_BRANCH_NAME=main
 # install dependencies (install tzdata first to prevent 'geographic area' prompt)
 RUN apt-get update \
   && apt-get install -y tzdata \
@@ -10,7 +11,9 @@ RUN apt-get update \
 # clone repositories into /build (using https)
 RUN mkdir -p /build \
   && cd /build \
-  && git clone https://github.com/NemProject/nem.git
+  && git clone https://github.com/NemProject/nem.git \
+  && cd nem \
+  && git checkout $GIT_BRANCH_NAME
 
 # actually build (using java 11)
 RUN cd /build/nem \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=$(cat version.current.txt)
+ver=$(mvn -f $(git rev-parse --show-toplevel) -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec -q)
 
 echo " [+] RESETING REPOSITORIES and SETTING MASTER"
 git submodule foreach git reset --hard
