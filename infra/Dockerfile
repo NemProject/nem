@@ -11,9 +11,7 @@ RUN apt-get update \
 # clone repositories into /build (using https)
 RUN mkdir -p /build \
   && cd /build \
-  && git clone https://github.com/NemProject/nem.git \
-  && cd nem \
-  && git checkout $GIT_BRANCH_NAME
+  && git clone -b $GIT_BRANCH_NAME https://github.com/NemProject/nem.git \
 
 # actually build (using java 11)
 RUN cd /build/nem \

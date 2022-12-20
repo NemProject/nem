@@ -31,15 +31,9 @@ Then build and install the package as usual:
 mvn install
 ```
 
-Then check that unit tests are passing by running:
-
-```bash
-mvn test
-```
-
 ## Coding style
 
-If you want your changes to be considered for inclusion in the repository (see [CONTRIBUTING.md](CONTRIBUTING.md)), they must addhere to the coding style. You can check that the coding style and format are correct by running:
+If you want your changes to be considered for inclusion in the repository (see [CONTRIBUTING.md](CONTRIBUTING.md)), they must adhere to the coding style. You can check that the coding style and format are correct by running:
 
 ```bash
 mvn spotless:check
