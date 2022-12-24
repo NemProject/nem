@@ -4,7 +4,7 @@ defaultCiPipeline {
 	publisher = 'docker'
 	dockerImageName = 'nemofficial/nis-client'
 
-	dockerBuildArgs = "--build-arg GIT_BRANCH_NAME=${env.BRANCH_NAME} ."
+	dockerBuildArgs = "--build-arg GIT_BRANCH_NAME=$BRANCH_NAME ."
 
 	packageId = 'nem-infra'
 }
