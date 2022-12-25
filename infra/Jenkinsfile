@@ -1,5 +1,6 @@
 defaultCiPipeline {
 	platform = ['ubuntu']
+    ciBuildDockerfile = 'java.Dockerfile'
 
 	publisher = 'docker'
 	dockerImageName = 'nemofficial/nis-client'
