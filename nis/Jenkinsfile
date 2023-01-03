@@ -2,12 +2,11 @@ defaultCiPipeline {
 	platform = ['ubuntu']
 	ciBuildDockerfile = 'java.Dockerfile'
 
-    publisher = 'docker'
+	publisher = 'docker'
 	dockerImageName = 'nemofficial/nis-client'
-    dockerBuildArgs = "-f ./Dockerfile  ./../"
+	dockerBuildArgs = "-f ./Dockerfile .."
 
-    packageId = 'nem-nis'
+	packageId = 'nem-nis'
 
 	codeCoverageTool = 'jacoco'
 }
-
