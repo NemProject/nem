@@ -4,8 +4,6 @@ This Java package provides everything needed to launch a [NEM](https://nemprojec
 
 It depends on the packages [core](../core), [peer](../peer) and [deploy](../deploy).
 
-For easier handling of these dependencies, please use the [build script](../infra/docker), which takes care of downloading and building them in a single Maven project.
-
 ## Package Organization
 
 The main folders are:
@@ -33,7 +31,7 @@ The main folders are:
 ## Building the package
 
 > **NOTE:**
-> It is far more convenient to use the [nis-client repository](https://github.com/NemProject/nis-client) to build and run this package.
+> It is far more convenient to use the [nem repository](https://github.com/NemProject/nem) to build and run this package.
 
 The package uses [Apache Maven](https://maven.apache.org/) and  minimum required Java SDK version to build is **Java 11**.
 
@@ -60,7 +58,7 @@ mvn failsafe:integration-test
 
 ## Coding style
 
-If you want your changes to be considered for inclusion in the repository (see [CONTRIBUTING.md](CONTRIBUTING.md)), they must addhere to the coding style. You can check that the coding style and format are correct by running:
+If you want your changes to be considered for inclusion in the repository (see [CONTRIBUTING.md](CONTRIBUTING.md)), they must adhere to the coding style. You can check that the coding style and format are correct by running:
 
 ```bash
 mvn spotless:check
@@ -83,6 +81,23 @@ java -Xms6G -Xmx6G org.nem.deploy.CommonStarter
 Otherwise you will need to use the ``-cp`` parameter and point to each individual dependency JAR file.
 
 For more information on how to run a node see the [NEM documentation](https://nemproject.github.io/nem-docs/pages/Guides/node-operation/docs.en.html).
+
+## Running as a Docker container
+
+### Build the image
+```bash
+# note that build context must be parent directory(..)
+docker build -t nis-client -f ./Dockerfile ..
+```
+### Run the container
+```bash
+# create the nem config folder and put the config files you want to overwrite
+mkdir -p nem-config
+# see ReplaceWithYourPrivateKey below
+echo 'nis.bootKey=ReplaceWithYourPrivateKey' > nem-config/config-user.properties
+# you can overwrite other properties in the same file as well as overwriting other properties files
+docker run -d -p 7890:7890 -p 7778:7778 -v $(pwd)/nem-config:/usersettings nis-client
+```
 
 ## Contributing
 
