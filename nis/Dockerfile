@@ -7,14 +7,15 @@ RUN apt-get update \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# clone repositories into /build (using https)
-RUN mkdir -p /build \
-  && cd /build \
-  && git clone https://github.com/NemProject/nem.git
+RUN mkdir -p /build/nem
+
+# copy local code into /build/nem
+COPY . /build/nem
+
+WORKDIR /build/nem
 
 # actually build (using java 11)
-RUN cd /build/nem \
-  && mvn clean package -DskipTests=true \
+RUN mvn clean package -DskipTests=true \
   && cd infra \
   && bash ./package.prepare.sh package
 
