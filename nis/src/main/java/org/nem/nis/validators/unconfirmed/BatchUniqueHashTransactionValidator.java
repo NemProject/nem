@@ -30,8 +30,8 @@ public class BatchUniqueHashTransactionValidator implements BatchTransactionVali
 		}
 
 		final List<Hash> hashes = groupedTransactions.stream().flatMap(pair -> pair.getTransactions().stream())
-				.map(HashUtils::calculateHash).collect(Collectors.toList());
-
+				.flatMap(transaction -> TransactionExtensions.streamDefault(transaction)).map(HashUtils::calculateHash)
+				.collect(Collectors.toList());
 		return this.validate(hashes);
 	}
 

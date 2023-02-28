@@ -6,62 +6,104 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.DefaultHashCache;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BlockUniqueHashTransactionValidatorTest {
-
 	@Test
-	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInHashCache() {
-		// Assert:
-		assertValidationResult(ValidationResult.NEUTRAL, 5, true);
-	}
-
-	@Test
-	public void validateReturnsSuccessIfNoneOfTheHashesExistInHashCache() {
-		// Assert:
-		assertValidationResult(ValidationResult.SUCCESS, 5, false);
-	}
-
-	@Test
-	public void validateReturnsSuccessIfCalledWithEmptyList() {
-		// Assert:
-		assertValidationResult(ValidationResult.SUCCESS, 0, true);
-	}
-
-	private static void assertValidationResult(final ValidationResult expectedResult, final int numTransactions,
-			final boolean anyHashExistsReturnValue) {
+	public void validateReturnsNeutralWhenAtLeastOneHashAlreadyExistsInHashCache() {
 		// Arrange:
-		final TestContext context = new TestContext(numTransactions);
-		Mockito.when(context.transactionHashCache.anyHashExists(context.hashes)).thenReturn(anyHashExistsReturnValue);
+		final TestContext context = new TestContext(5);
+		final List<Transaction> blockTransactions = new ArrayList<>();
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
+		blockTransactions.add(context.transactions.get(3)); // root transaction
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 9));
+		context.setBlockTransactions(blockTransactions);
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		MatcherAssert.assertThat(result, IsEqual.equalTo(expectedResult));
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void validateReturnsNeutralWhenAtLeastOneChildHashAlreadyExistsInHashCache() {
+		// Arrange:
+		final TestContext context = new TestContext(5);
+
+		// - add mock transaction with child transaction already in cache
+		final List<Transaction> blockTransactions = new ArrayList<>();
+		final MockTransaction parentTransactionWithAlreadySeenChild = new MockTransaction(Utils.generateRandomAccount(), 10);
+		parentTransactionWithAlreadySeenChild.setChildTransactions(
+				Arrays.asList(TransactionExtensions.streamDefault(context.transactions.get(3)).collect(Collectors.toList()).get(1)));
+
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
+		blockTransactions.add(parentTransactionWithAlreadySeenChild);
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 9));
+		context.setBlockTransactions(blockTransactions);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(context.block);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void validateReturnsSuccessWhenNoneOfTheHashesExistInHashCache() {
+		// Arrange:
+		final TestContext context = new TestContext(5);
+		final List<Transaction> blockTransactions = new ArrayList<>();
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 8));
+		blockTransactions.add(new MockTransaction(Utils.generateRandomAccount(), 9));
+		context.setBlockTransactions(blockTransactions);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(context.block);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void validateReturnsSuccessWhenCalledWithEmptyBlock() {
+		// Arrange:
+		final TestContext context = new TestContext(5);
+		final List<Transaction> blockTransactions = new ArrayList<>();
+		context.setBlockTransactions(blockTransactions);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(context.block);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	private static class TestContext {
 		private final Block block = Mockito.mock(Block.class);
 		private final List<Transaction> transactions = new ArrayList<>();
-		private final List<Hash> hashes = new ArrayList<>();
-		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
+		private final DefaultHashCache transactionHashCache = new DefaultHashCache();
 		private final BlockUniqueHashTransactionValidator validator = new BlockUniqueHashTransactionValidator(this.transactionHashCache);
 
 		private TestContext(final int count) {
-			this.addTransactions(count);
-			Mockito.when(this.block.getTransactions()).thenReturn(this.transactions);
+			final HashMetaData defaultMetaData = new HashMetaData(new BlockHeight(1), new TimeInstant(0));
+			for (int i = 0; i < count; ++i) {
+				final Transaction transaction = MockTransactionUtils.createMockTransactionWithNestedChildren(i);
+				this.transactions.add(transaction);
+				TransactionExtensions.streamDefault(transaction).map(HashUtils::calculateHash)
+						.forEach(hash -> this.transactionHashCache.put(new HashMetaDataPair(hash, defaultMetaData)));
+			}
 		}
 
-		private void addTransactions(final int count) {
-			for (int i = 0; i < count; ++i) {
-				final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), i);
-				this.transactions.add(transaction);
-				this.hashes.add(HashUtils.calculateHash(transaction));
-			}
+		private void setBlockTransactions(final List<Transaction> transactions) {
+			Mockito.when(this.block.getTransactions()).thenReturn(transactions);
 		}
 	}
 }
