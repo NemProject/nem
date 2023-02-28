@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.deploy</groupId>
     <artifactId>nem-deploy</artifactId>
-    <version>0.6.100</version>
+    <version>0.6.101</version>
     <name>NEM Deploy</name>
     <organization>
         <name>NEM - New Economy Movement</name>
