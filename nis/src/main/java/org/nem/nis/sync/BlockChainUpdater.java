@@ -203,7 +203,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		LOGGER.fine(String.format("has block in db? %s", dbBlock));
 		LOGGER.fine(String.format("db block hash: %s", null == dbBlock ? "null" : dbBlock.getBlockHash()));
-		
+
 		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
