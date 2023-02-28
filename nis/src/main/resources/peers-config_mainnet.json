@@ -3,90 +3,57 @@
   "knownPeers": [
     {
       "endpoint": {
-        "host": "62.75.251.134",
+        "host": "176.9.68.110",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
-        "name": "alice2",
+        "name": "hugealice2",
         "public-key": "cd94cdcfde6878e093bc70e35b575dbe68095c69f73112e67559f71c1fb64c6e"
       }
     },
     {
       "endpoint": {
-        "host": "62.75.163.236",
+        "host": "176.9.20.180",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
-        "name": "alice3",
+        "name": "hugealice3",
         "public-key": "47ff934888ed8ea66433c889630bf67a46d47717e99e2f29db5b3866e7cc4c89"
       }
     },
     {
       "endpoint": {
-        "host": "209.126.98.204",
+        "host": "199.217.118.114",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
-        "name": "alice4",
+        "name": "hugealice4",
         "public-key": "d11ada95014685240ae69b0e44d60f931e61d444604a6a1b74ea085360dca396"
       }
     },
     {
       "endpoint": {
-        "host": "108.61.182.27",
+        "host": "94.16.109.156",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
-        "name": "alice5",
-        "public-key": "6ecd181da287c9ccb0075336de36427f25cbc216dc6b1f0e87e35e41a39f63fe"
+        "name": "SpiderNEM",
+        "public-key": "0d2e0b5335ac8cd189013e3155a092f09cc7c048d6982d8c2b2f17cdf326c098"
       }
     },
     {
       "endpoint": {
-        "host": "108.61.168.86",
+        "host": "95.110.135.55",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
-        "name": "alice6",
-        "public-key": "00a30788dc1f042da959309639a884d8f6a87086cda10300d2a7c3a0e0891a4d"
-      }
-    },
-    {
-      "endpoint": {
-        "host": "104.238.161.61",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name": "alice7",
-        "public-key": "64f0c867c52e8d3f7fe478854dbb197646d06041cc16b56595c03a217af6564b"
-      }
-    },
-    {
-      "endpoint": {
-        "host": "62.75.171.41",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name": "bigalice3",
-        "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
-      }
-    },
-    {
-      "endpoint": {
-        "host": "88.99.192.82",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name": "hugealice",
-        "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
+        "name": "rigel11",
+        "public-key": "ddb22a99ae96e87457114c7031b9e6607046809f71a8893d2cb6d1613bb8c571"
       }
     },
     {
