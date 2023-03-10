@@ -30,8 +30,7 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 
 			final BlockChainServices blockChainServices = new BlockChainServices(Mockito.mock(BlockDao.class),
 					new BlockTransactionObserverFactory(forkConfiguration), NisUtils.createBlockValidatorFactory(),
-					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory(),
-					forkConfiguration);
+					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory(), forkConfiguration);
 
 			final NisCache copyCache = nisCache.copy();
 			final Account blockSigner = createBlockSigner(copyCache, parentHeight);

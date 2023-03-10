@@ -70,7 +70,8 @@ public class TransactionValidatorFactory {
 		builder.add(new DeadlineValidator());
 		builder.add(new MinimumFeeValidator(this.networkInfo, nisCache.getNamespaceCache(), ignoreFees,
 				forkConfiguration.getFeeForkHeight(), forkConfiguration.getSecondFeeForkHeight()));
-		builder.add(new VersionTransactionValidator(this.forkConfiguration.getMosaicsForkHeight(), this.forkConfiguration.getmultisigMOfNForkHeight()));
+		builder.add(new VersionTransactionValidator(this.forkConfiguration.getMosaicsForkHeight(),
+				this.forkConfiguration.getmultisigMOfNForkHeight()));
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator(this.forkConfiguration.getTreasuryReissuanceForkHeight()));
 		builder.add(new BalanceValidator());
@@ -79,12 +80,12 @@ public class TransactionValidatorFactory {
 		builder.add(new RemoteNonOperationalValidator(accountStateCache, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 		builder.add(new MultisigNonOperationalValidator(this.forkConfiguration, accountStateCache));
 
-		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER,
-				new TransferTransactionValidator(this.forkConfiguration.getRemoteAccountForkHeight(), this.forkConfiguration.getmultisigMOfNForkHeight())));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new TransferTransactionValidator(
+				this.forkConfiguration.getRemoteAccountForkHeight(), this.forkConfiguration.getmultisigMOfNForkHeight())));
 
-		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.IMPORTANCE_TRANSFER,
-				new ImportanceTransferTransactionValidator(accountStateCache, namespaceCache,
-						this.forkConfiguration.getRemoteAccountForkHeight())));
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(TransactionTypes.IMPORTANCE_TRANSFER, new ImportanceTransferTransactionValidator(
+						accountStateCache, namespaceCache, this.forkConfiguration.getRemoteAccountForkHeight())));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
 				new MultisigTransactionSignerValidator(accountStateCache)));
@@ -96,9 +97,9 @@ public class TransactionValidatorFactory {
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				new NumCosignatoryRangeValidator(accountStateCache)));
 
-		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.PROVISION_NAMESPACE,
-				new ProvisionNamespaceTransactionValidator(namespaceCache, this.forkConfiguration.getFeeForkHeight(),
-						this.forkConfiguration.getSecondFeeForkHeight())));
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(TransactionTypes.PROVISION_NAMESPACE, new ProvisionNamespaceTransactionValidator(
+						namespaceCache, this.forkConfiguration.getFeeForkHeight(), this.forkConfiguration.getSecondFeeForkHeight())));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MOSAIC_DEFINITION_CREATION,
 				new MosaicDefinitionCreationTransactionValidator(namespaceCache, this.forkConfiguration.getFeeForkHeight(),

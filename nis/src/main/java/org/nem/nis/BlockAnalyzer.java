@@ -47,8 +47,8 @@ public class BlockAnalyzer {
 	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(final BlockDao blockDao, final BlockChainScoreManager blockChainScoreManager,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer, final NisMapperFactory mapperFactory,
-			final int estimatedBlocksPerYear, final ForkConfiguration forkConfiguration) {
+			final BlockChainLastBlockLayer blockChainLastBlockLayer, final NisMapperFactory mapperFactory, final int estimatedBlocksPerYear,
+			final ForkConfiguration forkConfiguration) {
 		this.blockDao = blockDao;
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
@@ -101,8 +101,7 @@ public class BlockAnalyzer {
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options, this.estimatedBlocksPerYear,
-				this.forkConfiguration)
-				.createExecuteCommitObserver(nisCache);
+				this.forkConfiguration).createExecuteCommitObserver(nisCache);
 		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
 
 		do {

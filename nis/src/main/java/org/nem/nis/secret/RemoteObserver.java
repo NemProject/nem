@@ -45,8 +45,7 @@ public class RemoteObserver implements BlockTransactionObserver {
 	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
 		final Address remoteAddress = ImportanceTransferMode.Activate == notification.getMode()
 				? notification.getLessee().getAddress()
-				:
-				context.getHeight().getRaw() < this.mosaicRedefinitionForkHeight.getRaw()
+				: context.getHeight().getRaw() < this.mosaicRedefinitionForkHeight.getRaw()
 						? notification.getLessee().getAddress()
 						: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
 

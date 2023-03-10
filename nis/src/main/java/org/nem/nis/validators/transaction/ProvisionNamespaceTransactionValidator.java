@@ -34,7 +34,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 	 * @param secondFeeForkHeight The second fee fork height.
 	 */
 	public ProvisionNamespaceTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final BlockHeight feeForkHeight,
-												  final BlockHeight secondFeeForkHeight) {
+			final BlockHeight secondFeeForkHeight) {
 		this.namespaceCache = namespaceCache;
 		this.feeForkHeight = feeForkHeight;
 		this.secondFeeForkHeight = secondFeeForkHeight;
@@ -94,8 +94,10 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel()
-				? getRootNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkHeight, this.secondFeeForkHeight)
-				: getSubNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkHeight, this.secondFeeForkHeight);
+				? getRootNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkHeight,
+						this.secondFeeForkHeight)
+				: getSubNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkHeight,
+						this.secondFeeForkHeight);
 		if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
 		}
@@ -113,17 +115,17 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		return null == entry ? null : entry.getNamespace();
 	}
 
-	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight, final BlockHeight secondFeeForkHeight) {
+	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight,
+			final BlockHeight secondFeeForkHeight) {
 		return feeForkHeight.getRaw() > height.getRaw()
 				? Amount.fromNem(50000)
-				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(1500) :
-				Amount.fromNem(100);
+				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(1500) : Amount.fromNem(100);
 	}
 
-	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight, final BlockHeight secondFeeForkHeight) {
+	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight,
+			final BlockHeight secondFeeForkHeight) {
 		return feeForkHeight.getRaw() > height.getRaw()
 				? Amount.fromNem(5000)
-				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(200) :
-				Amount.fromNem(10);
+				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(200) : Amount.fromNem(10);
 	}
 }

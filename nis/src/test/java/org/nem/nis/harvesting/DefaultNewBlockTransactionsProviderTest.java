@@ -137,8 +137,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration.Builder()
-						.treasuryReissuanceForkHeight(new BlockHeight(1234))
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
 						.treasuryReissuanceForkTransactionHashes(hashes).build());
 		context.addTransactions(transactions);
 
@@ -172,8 +171,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration.Builder()
-						.treasuryReissuanceForkHeight(new BlockHeight(1234))
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
 						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build());
 		context.addTransactions(transactions);
 
@@ -214,8 +212,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
 				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build());
+						.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes)
+						.build());
 		context.addTransactions(transactions);
 
 		// - create accounts

@@ -152,7 +152,8 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		public BlockChainValidator create(final NisCache nisCache) {
 			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-			final BlockTransactionObserver observer = new BlockTransactionObserverFactory(forkConfiguration).createExecuteCommitObserver(nisCache);
+			final BlockTransactionObserver observer = new BlockTransactionObserverFactory(forkConfiguration)
+					.createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(block -> new BlockExecuteProcessor(nisCache, block, observer), this.scorer, this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
 					NisUtils.createTransactionValidatorFactory().createSingle(nisCache), NisCacheUtils.createValidationState(nisCache),

@@ -642,12 +642,10 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		private final NamespaceCache namespaceCache =
-				new DefaultNamespaceCache(this.forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache(this.forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(
-				this.namespaceCache,
-				this.forkConfiguration.getFeeForkHeight(),
-				this.forkConfiguration.getSecondFeeForkHeight());
+				this.namespaceCache, this.forkConfiguration.getFeeForkHeight(), this.forkConfiguration.getSecondFeeForkHeight());
 
 		private TestContext(final String parent, final String part) {
 			this(parent, part, new BlockHeight(50),

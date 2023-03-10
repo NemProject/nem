@@ -32,7 +32,7 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 	 * @param secondFeeForkHeight The second fee fork height.
 	 */
 	public MinimumFeeValidator(final NetworkInfo networkInfo, final ReadOnlyNamespaceCache namespaceCache, final boolean ignoreFees,
-							   final BlockHeight feeForkHeight, final BlockHeight secondFeeForkHeight) {
+			final BlockHeight feeForkHeight, final BlockHeight secondFeeForkHeight) {
 		this.networkInfo = networkInfo;
 		this.namespaceCache = namespaceCache;
 		this.ignoreFees = ignoreFees;
@@ -55,8 +55,7 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 				context::getBlockHeight, new BlockHeight[]{
-						this.feeForkHeight,
-						this.secondFeeForkHeight
+						this.feeForkHeight, this.secondFeeForkHeight
 				});
 		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS

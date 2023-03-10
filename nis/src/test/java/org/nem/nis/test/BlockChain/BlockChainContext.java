@@ -51,7 +51,8 @@ public class BlockChainContext {
 				.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
 		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
 		final NisConfiguration nisConfiguration = new NisConfiguration();
-		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade, nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
+		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade,
+				nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
@@ -75,7 +76,8 @@ public class BlockChainContext {
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
-			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory(nisConfiguration.getForkConfiguration());
+			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory(
+					nisConfiguration.getForkConfiguration());
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(blockDao, blockTransactionObserverFactory,
 					blockValidatorFactory, transactionValidatorFactory, nisMapperFactory, nisConfiguration.getForkConfiguration()));
 			final BlockChainContextFactory contextFactory = Mockito

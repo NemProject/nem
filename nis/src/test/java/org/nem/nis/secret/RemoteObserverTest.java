@@ -194,7 +194,8 @@ public class RemoteObserverTest {
 		private final RemoteLinks fakeLesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache, this.forkConfiguration.getMosaicRedefinitionForkHeight());
+		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache,
+				this.forkConfiguration.getMosaicRedefinitionForkHeight());
 
 		private TestContext() {
 			this.hook(this.lessor, this.lessorRemoteLinks);

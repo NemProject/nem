@@ -167,9 +167,8 @@ public class DefaultUnconfirmedStateTest {
 			hashes.add(Utils.generateRandomHash());
 
 			// - create test context and add account
-			final TestContext context =
-					new TestContext(new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-							.treasuryReissuanceForkTransactionHashes(hashes).build());
+			final TestContext context = new TestContext(new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+					.treasuryReissuanceForkTransactionHashes(hashes).build());
 			context.prepareAccount(senderAccount, Amount.fromNem(1_000));
 
 			// Act:

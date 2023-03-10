@@ -32,10 +32,8 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		final List<Hash> hashes = generateRandomHashes(3);
 		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration =
-				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -55,11 +53,8 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		final List<Hash> hashes = generateRandomHashes(3);
 		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration =
-				new ForkConfiguration.Builder()
-						.treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -84,10 +79,8 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 
 		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration =
-				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -112,10 +105,8 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 
 		final List<Hash> fallbackHashes = generateRandomHashes(4);
 
-		final ForkConfiguration forkConfiguration =
-				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:
@@ -140,10 +131,8 @@ public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 		fallbackHashes.add(HashUtils.calculateHash(block.getTransactions().get(1)));
 		fallbackHashes.add(HashUtils.calculateHash(block.getTransactions().get(2)));
 
-		final ForkConfiguration forkConfiguration =
-				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build();
 		final BlockValidator validator = new TreasuryReissuanceForkTransactionBlockValidator(forkConfiguration);
 
 		// Act:

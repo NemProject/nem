@@ -117,7 +117,8 @@ public class ExpiredNamespacesObserverTest {
 		private final MosaicDefinition mosaicDefinition1 = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final MosaicDefinition mosaicDefinition2 = Utils.createMosaicDefinition(2, createMosaicProperties());
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final DefaultAccountStateCache accountStateCache = Mockito.mock(DefaultAccountStateCache.class);
 		private final AccountInfo accountInfo1;
 		private final AccountInfo accountInfo2;

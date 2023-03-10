@@ -198,7 +198,8 @@ public class AccountInfoMosaicIdsObserverTest {
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Account recipient2 = Utils.generateRandomAccount();
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 
 		public TestContext() {

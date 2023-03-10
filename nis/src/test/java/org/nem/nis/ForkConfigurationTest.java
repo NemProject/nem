@@ -75,8 +75,7 @@ public class ForkConfigurationTest {
 		properties.setProperty("nis.treasuryReissuanceForkFallbackTransactionHashes", String.join("|", fallbackHashStrings));
 
 		// Act + Assert
-		ExceptionAssert.assertThrows(v -> new ForkConfiguration.Builder(new NemProperties(properties)).build(),
-				CryptoException.class);
+		ExceptionAssert.assertThrows(v -> new ForkConfiguration.Builder(new NemProperties(properties)).build(), CryptoException.class);
 	}
 
 	// endregion
@@ -97,11 +96,16 @@ public class ForkConfigurationTest {
 		MatcherAssert.assertThat(config.getTreasuryReissuanceForkFallbackTransactionHashes(), IsEqual.equalTo(new ArrayList<Hash>()));
 
 		MatcherAssert.assertThat(config.getFeeForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getSecondFeeForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicsForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version))));
-		MatcherAssert.assertThat(config.getmultisigMOfNForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version))));
-		MatcherAssert.assertThat(config.getRemoteAccountForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
+		MatcherAssert.assertThat(config.getSecondFeeForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version))));
+		MatcherAssert.assertThat(config.getMosaicsForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version))));
+		MatcherAssert.assertThat(config.getmultisigMOfNForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version))));
+		MatcherAssert.assertThat(config.getRemoteAccountForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
+		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
 	}
 
 	@Test
@@ -118,17 +122,11 @@ public class ForkConfigurationTest {
 		final List<Hash> fallbackHashes = Arrays.stream(fallbackHashStrings).map(Hash::fromHexString).collect(Collectors.toList());
 
 		// Act:
-		final ForkConfiguration config =
-				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
-						.treasuryReissuanceForkTransactionHashes(hashes)
-						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes)
-						.feeForkHeight(new BlockHeight(1))
-						.mosaicsForkHeight(new BlockHeight(2))
-						.multisigMOfNForkHeight(new BlockHeight(3))
-						.remoteAccountForkHeight(new BlockHeight(4))
-						.mosaicRedefinitionForkHeight(new BlockHeight(5))
-						.secondFeeForkHeight(new BlockHeight(6))
-						.build();
+		final ForkConfiguration config = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+				.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes)
+				.feeForkHeight(new BlockHeight(1)).mosaicsForkHeight(new BlockHeight(2)).multisigMOfNForkHeight(new BlockHeight(3))
+				.remoteAccountForkHeight(new BlockHeight(4)).mosaicRedefinitionForkHeight(new BlockHeight(5))
+				.secondFeeForkHeight(new BlockHeight(6)).build();
 
 		// Assert:
 		MatcherAssert.assertThat(config.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(1234)));
@@ -158,11 +156,16 @@ public class ForkConfigurationTest {
 		MatcherAssert.assertThat(config.getTreasuryReissuanceForkFallbackTransactionHashes(), IsEqual.equalTo(new ArrayList<Hash>()));
 
 		MatcherAssert.assertThat(config.getFeeForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getSecondFeeForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicsForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version))));
-		MatcherAssert.assertThat(config.getmultisigMOfNForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version))));
-		MatcherAssert.assertThat(config.getRemoteAccountForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
+		MatcherAssert.assertThat(config.getSecondFeeForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version))));
+		MatcherAssert.assertThat(config.getMosaicsForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version))));
+		MatcherAssert.assertThat(config.getmultisigMOfNForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version))));
+		MatcherAssert.assertThat(config.getRemoteAccountForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
+		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(),
+				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
 	}
 
 	@Test

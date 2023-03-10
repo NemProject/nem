@@ -41,7 +41,8 @@ public class BlockTransactionObserverFactory {
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
 	 * @param forkConfiguration The fork configuration.
 	 */
-	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final int estimatedBlocksPerYear, final ForkConfiguration forkConfiguration) {
+	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final int estimatedBlocksPerYear,
+			final ForkConfiguration forkConfiguration) {
 		this.observerOptions = observerOptions;
 		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
 		this.forkConfiguration = forkConfiguration;

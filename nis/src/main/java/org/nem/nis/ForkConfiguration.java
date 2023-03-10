@@ -160,18 +160,17 @@ public class ForkConfiguration {
 			this.treasuryReissuanceForkFallbackTransactionHashes = Collections
 					.unmodifiableList(parseHashes(properties, "nis.treasuryReissuanceForkFallbackTransactionHashes"));
 
-			this.multisigMOfNForkHeight = new BlockHeight(properties.getOptionalLong("nis.multisigMOfNForkHeight",
-					BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version)));
-			this.mosaicsForkHeight = new BlockHeight(properties.getOptionalLong("nis.mosaicsForkHeight",
-					BlockMarkerConstants.MOSAICS_FORK(version)));
-			this.feeForkHeight = new BlockHeight(properties.getOptionalLong("nis.feeForkHeight",
-					BlockMarkerConstants.FEE_FORK(version)));
-			this.remoteAccountForkHeight = new BlockHeight(properties.getOptionalLong("nis.remoteAccountForkHeight",
-					BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version)));
-			this.mosaicRedefinitionForkHeight = new BlockHeight(properties.getOptionalLong("nis.mosaicRedefinitionForkHeight",
-					BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version)));
-			this.secondFeeForkHeight = new BlockHeight(properties.getOptionalLong("nis.secondFeeForkHeight",
-					BlockMarkerConstants.SECOND_FEE_FORK(version)));
+			this.multisigMOfNForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.multisigMOfNForkHeight", BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version)));
+			this.mosaicsForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.mosaicsForkHeight", BlockMarkerConstants.MOSAICS_FORK(version)));
+			this.feeForkHeight = new BlockHeight(properties.getOptionalLong("nis.feeForkHeight", BlockMarkerConstants.FEE_FORK(version)));
+			this.remoteAccountForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.remoteAccountForkHeight", BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version)));
+			this.mosaicRedefinitionForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.mosaicRedefinitionForkHeight", BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version)));
+			this.secondFeeForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.secondFeeForkHeight", BlockMarkerConstants.SECOND_FEE_FORK(version)));
 		}
 
 		private static List<Hash> parseHashes(final NemProperties properties, final String propertyName) {
@@ -204,8 +203,7 @@ public class ForkConfiguration {
 		 *
 		 * @return The fork configuration builder.
 		 */
-		public Builder treasuryReissuanceForkFallbackTransactionHashes(
-				final List<Hash> treasuryReissuanceForkFallbackTransactionHashes) {
+		public Builder treasuryReissuanceForkFallbackTransactionHashes(final List<Hash> treasuryReissuanceForkFallbackTransactionHashes) {
 			this.treasuryReissuanceForkFallbackTransactionHashes = treasuryReissuanceForkFallbackTransactionHashes;
 			return this;
 		}

@@ -30,7 +30,7 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 	 * @param secondFeeForkHeight The second fee fork height.
 	 */
 	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final BlockHeight feeForkHeight,
-														final BlockHeight secondFeeForkHeight) {
+			final BlockHeight secondFeeForkHeight) {
 		this.namespaceCache = namespaceCache;
 		this.feeForkHeight = feeForkHeight;
 		this.secondFeeForkHeight = secondFeeForkHeight;
@@ -115,10 +115,9 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 	}
 
 	private static Amount getMosaicCreationFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight,
-											   final BlockHeight secondFeeForkHeight) {
+			final BlockHeight secondFeeForkHeight) {
 		return feeForkHeight.getRaw() > height.getRaw()
 				? Amount.fromNem(50000)
-				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(500) :
-				Amount.fromNem(10);
+				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(500) : Amount.fromNem(10);
 	}
 }

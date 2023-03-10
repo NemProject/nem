@@ -28,7 +28,8 @@ public class NisCacheFactory {
 	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade, final BlockHeight mosaicRedefinitionForkHeight) {
 		return new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()), new SynchronizedPoxFacade(poxFacade),
-				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight)));
+				new SynchronizedHashCache(new DefaultHashCache()),
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight)));
 	}
 
 	// endregion

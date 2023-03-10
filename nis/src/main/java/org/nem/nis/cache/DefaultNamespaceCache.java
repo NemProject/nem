@@ -31,7 +31,8 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		this(new MutableObjectAwareDeltaMap<>(size), mosaicRedefinitionForkHeight);
 	}
 
-	private DefaultNamespaceCache(final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap, final BlockHeight mosaicRedefinitionForkHeight) {
+	private DefaultNamespaceCache(final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap,
+			final BlockHeight mosaicRedefinitionForkHeight) {
 		this.rootMap = rootMap;
 		this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 	}
@@ -252,7 +253,8 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 			this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 		}
 
-		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children, final BlockHeight mosaicRedefinitionForkHeight) {
+		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children,
+				final BlockHeight mosaicRedefinitionForkHeight) {
 			this.root = new NamespaceEntry(root, rootMosaics);
 			this.children = new HashMap<>(children.stream().collect(Collectors.toMap(cn -> cn.id, cn -> cn)));
 			this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;

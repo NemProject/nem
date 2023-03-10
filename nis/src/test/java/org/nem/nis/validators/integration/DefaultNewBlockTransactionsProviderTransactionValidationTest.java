@@ -39,13 +39,12 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
-					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, maxTransactionsPerBlock,
-					forkConfiguration);
+					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, maxTransactionsPerBlock, forkConfiguration);
 			this.transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(nisCache, NisUtils.createTransactionValidatorFactory(),
-					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(forkConfiguration), this.transactions.asFilter(),
-					forkConfiguration);
+					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(forkConfiguration),
+					this.transactions.asFilter(), forkConfiguration);
 		}
 
 		public List<Transaction> getBlockTransactions() {

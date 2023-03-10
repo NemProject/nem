@@ -244,7 +244,8 @@ public class RemoteNonOperationalValidatorTest {
 		public void assertValidationResult(final Transaction transaction, final BlockHeight height, final ValidationResult expectedResult) {
 			// Arrange:
 			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache, forkConfiguration.getMosaicRedefinitionForkHeight());
+			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache,
+					forkConfiguration.getMosaicRedefinitionForkHeight());
 
 			// Act:
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));

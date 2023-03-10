@@ -120,7 +120,8 @@ public class MosaicSupplyChangeObserverTest {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account supplier = this.mosaicDefinition.getCreator();
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final AccountState accountState = new AccountState(this.supplier.getAddress());
 

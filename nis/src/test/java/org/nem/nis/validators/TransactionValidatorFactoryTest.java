@@ -120,7 +120,6 @@ public class TransactionValidatorFactoryTest {
 
 	private static TransactionValidatorFactory createFactory() {
 		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), NetworkInfos.getDefault(),
-				new ForkConfiguration.Builder().build(),
-				false);
+				new ForkConfiguration.Builder().build(), false);
 	}
 }

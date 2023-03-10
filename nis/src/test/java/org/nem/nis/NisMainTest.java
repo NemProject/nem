@@ -440,7 +440,8 @@ public class NisMainTest {
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
 			this.nisConfiguration = createNisConfiguration(autoBoot, supplyBootKey, supplyBootName, delayBlockLoading,
 					historicalAccountData, proofOfStake);
-			this.nisCache = NisCacheFactory.createReal(poxFacade, this.nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
+			this.nisCache = NisCacheFactory.createReal(poxFacade,
+					this.nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);

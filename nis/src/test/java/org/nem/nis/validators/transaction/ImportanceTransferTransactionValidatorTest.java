@@ -420,7 +420,8 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private void addNamespaceOwner(final Account account, final NamespaceId id) {
 			final Namespace namespace = new Namespace(id, account, new BlockHeight(123));
-			final NamespaceEntry entry = new NamespaceEntry(namespace, new Mosaics(id, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
+			final NamespaceEntry entry = new NamespaceEntry(namespace,
+					new Mosaics(id, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 			Mockito.when(this.namespaceCache.getRootNamespaceIds()).thenReturn(Collections.singletonList(id));
 			Mockito.when(this.namespaceCache.get(id)).thenReturn(entry);
 		}
