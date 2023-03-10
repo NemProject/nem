@@ -3,7 +3,6 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.BlockHeight;
@@ -11,8 +10,6 @@ import org.nem.core.test.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
 
 public class FeeSinkNonOperationalValidatorTest {
 
@@ -22,8 +19,7 @@ public class FeeSinkNonOperationalValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext(multisigAccount);
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(1234), new ArrayList<Hash>(),
-				new ArrayList<Hash>());
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234)).build();
 		final FeeSinkNonOperationalValidator validator = new FeeSinkNonOperationalValidator(forkConfiguration);
 
 		// Act:

@@ -13,17 +13,20 @@ import org.nem.nis.validators.ValidationContext;
 public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final ReadOnlyNamespaceCache namespaceCache;
+	private final BlockHeight remoteAccountForkHeight;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param namespaceCache The namespace cache.
+	 * @param remoteAccountForkHeight The remote account fork height.
 	 */
 	public ImportanceTransferTransactionValidator(final ReadOnlyAccountStateCache accountStateCache,
-			final ReadOnlyNamespaceCache namespaceCache) {
+			final ReadOnlyNamespaceCache namespaceCache, final BlockHeight remoteAccountForkHeight) {
 		this.accountStateCache = accountStateCache;
 		this.namespaceCache = namespaceCache;
+		this.remoteAccountForkHeight = remoteAccountForkHeight;
 	}
 
 	@Override
@@ -84,7 +87,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				// - does not own any namespace
 				// - is not a multisig account
 				// - is not a cosignatory of any multsig account
-				if (height.getRaw() >= BlockMarkerConstants.REMOTE_ACCOUNT_FORK(transaction.getVersion())) {
+				if (height.getRaw() >= this.remoteAccountForkHeight.getRaw()) {
 					if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}

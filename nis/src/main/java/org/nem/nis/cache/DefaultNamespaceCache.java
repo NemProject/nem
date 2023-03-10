@@ -16,20 +16,24 @@ import java.util.stream.Collectors;
 public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultNamespaceCache> {
 	private final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap;
 	private boolean isCopy = false;
+	private final BlockHeight mosaicRedefinitionForkHeight;
 
 	/**
 	 * Creates a new namespace cache.
+	 *
+	 * @param mosaicRedefinitionForkHeight The height at which mosaic redefinition fork.
 	 */
-	public DefaultNamespaceCache() {
-		this(100);
+	public DefaultNamespaceCache(final BlockHeight mosaicRedefinitionForkHeight) {
+		this(100, mosaicRedefinitionForkHeight);
 	}
 
-	private DefaultNamespaceCache(final int size) {
-		this.rootMap = new MutableObjectAwareDeltaMap<>(size);
+	private DefaultNamespaceCache(final int size, final BlockHeight mosaicRedefinitionForkHeight) {
+		this(new MutableObjectAwareDeltaMap<>(size), mosaicRedefinitionForkHeight);
 	}
 
-	private DefaultNamespaceCache(final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap) {
+	private DefaultNamespaceCache(final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap, final BlockHeight mosaicRedefinitionForkHeight) {
 		this.rootMap = rootMap;
+		this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 	}
 
 	// region ReadOnlyNamespaceCache
@@ -111,7 +115,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 
 		if (!this.rootMap.containsKey(namespace.getId())) {
-			this.rootMap.put(namespace.getId(), new RootNamespaceHistory(namespace));
+			this.rootMap.put(namespace.getId(), new RootNamespaceHistory(namespace, this.mosaicRedefinitionForkHeight));
 			return;
 		}
 
@@ -192,7 +196,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 		// note that this is not copying at all.
 		final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rebasedDeltaMap = this.rootMap.rebase();
-		final DefaultNamespaceCache copy = new DefaultNamespaceCache(rebasedDeltaMap);
+		final DefaultNamespaceCache copy = new DefaultNamespaceCache(rebasedDeltaMap, this.mosaicRedefinitionForkHeight);
 		copy.isCopy = true;
 		return copy;
 	}
@@ -208,7 +212,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	public DefaultNamespaceCache deepCopy() {
 		// TODO 20151013 J-J: add test for deepCopy
 		// note that hash keys are immutable
-		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
+		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size(), this.mosaicRedefinitionForkHeight);
 		this.rootMap.readOnlyEntrySet().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
 	}
@@ -219,8 +223,8 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		public final NamespaceId id;
 		public final Mosaics mosaics;
 
-		public ChildNamespace(final NamespaceId id) {
-			this(id, new Mosaics(id));
+		public ChildNamespace(final NamespaceId id, final BlockHeight mosaicRedefinitionForkHeight) {
+			this(id, new Mosaics(id, mosaicRedefinitionForkHeight));
 		}
 
 		public ChildNamespace(final NamespaceId id, final Mosaics mosaics) {
@@ -240,15 +244,18 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	private static class RootNamespace {
 		private final NamespaceEntry root;
 		private final HashMap<NamespaceId, ChildNamespace> children;
+		private final BlockHeight mosaicRedefinitionForkHeight;
 
-		public RootNamespace(final NamespaceEntry root) {
+		public RootNamespace(final NamespaceEntry root, final BlockHeight mosaicRedefinitionForkHeight) {
 			this.root = root;
 			this.children = new HashMap<>();
+			this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 		}
 
-		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children) {
+		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children, final BlockHeight mosaicRedefinitionForkHeight) {
 			this.root = new NamespaceEntry(root, rootMosaics);
 			this.children = new HashMap<>(children.stream().collect(Collectors.toMap(cn -> cn.id, cn -> cn)));
+			this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 		}
 
 		public int size() {
@@ -296,7 +303,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 						String.format("cannot add sub-namespace '%s' with different owner than root namespace", id));
 			}
 
-			this.children.put(id, new ChildNamespace(id));
+			this.children.put(id, new ChildNamespace(id, this.mosaicRedefinitionForkHeight));
 		}
 
 		public void remove(final NamespaceId id) {
@@ -311,7 +318,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 		public RootNamespace copy() {
 			// note that namespace ids are immutable
-			final RootNamespace copy = new RootNamespace(this.root.copy());
+			final RootNamespace copy = new RootNamespace(this.root.copy(), this.mosaicRedefinitionForkHeight);
 			copy.children.putAll(this.children.values().stream().collect(Collectors.toMap(cn -> cn.id, ChildNamespace::copy)));
 			return copy;
 		}
@@ -323,12 +330,15 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 	private static class RootNamespaceHistory implements Copyable<RootNamespaceHistory> {
 		private final List<RootNamespace> namespaces = new ArrayList<>();
+		private final BlockHeight mosaicRedefinitionForkHeight;
 
-		public RootNamespaceHistory(final Namespace namespace) {
+		public RootNamespaceHistory(final Namespace namespace, final BlockHeight mosaicRedefinitionForkHeight) {
+			this(mosaicRedefinitionForkHeight);
 			this.push(namespace);
 		}
 
-		private RootNamespaceHistory() {
+		private RootNamespaceHistory(final BlockHeight mosaicRedefinitionForkHeight) {
+			this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 		}
 
 		public boolean isEmpty() {
@@ -349,7 +359,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 		public void push(final Namespace namespace) {
 			Collection<ChildNamespace> children = Collections.emptySet();
-			Mosaics rootMosaics = new Mosaics(namespace.getId());
+			Mosaics rootMosaics = new Mosaics(namespace.getId(), this.mosaicRedefinitionForkHeight);
 			if (!this.namespaces.isEmpty()) {
 				// if the new namespace has the same owner as the previous, carry over the root mosaics and sub-namespaces
 				final RootNamespace previousNamespace = this.last();
@@ -359,7 +369,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 				}
 			}
 
-			final RootNamespace newNamespace = new RootNamespace(namespace, rootMosaics, children);
+			final RootNamespace newNamespace = new RootNamespace(namespace, rootMosaics, children, this.mosaicRedefinitionForkHeight);
 			this.namespaces.add(newNamespace);
 		}
 
@@ -381,7 +391,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 		@Override
 		public RootNamespaceHistory copy() {
-			final RootNamespaceHistory copy = new RootNamespaceHistory();
+			final RootNamespaceHistory copy = new RootNamespaceHistory(this.mosaicRedefinitionForkHeight);
 			this.namespaces.forEach(rn -> copy.namespaces.add(rn.copy()));
 			return copy;
 		}

@@ -10,6 +10,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.NisUtils;
 
@@ -59,7 +60,8 @@ public class ProvisionNamespaceObserverTest {
 		List<Address> coinsOwners = Arrays.asList(Utils.generateRandomAddress(), namespaceOwner.getAddress());
 
 		// - namespace cache setup
-		final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		addNamespace(namespaceCache, namespaceOwner, "foo");
 		addNamespace(namespaceCache, namespaceOwner, "foo.bar");
 		addMosaic(namespaceCache, "foo", "tokens");

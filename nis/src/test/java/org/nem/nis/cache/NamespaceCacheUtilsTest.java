@@ -8,6 +8,7 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.state.ReadOnlyMosaicEntry;
 
 import java.util.*;
@@ -187,7 +188,8 @@ public class NamespaceCacheUtilsTest {
 	// endregion
 
 	private static NamespaceCache createCache() {
-		final DefaultNamespaceCache cache = new DefaultNamespaceCache().copy();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		final DefaultNamespaceCache cache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		cache.add(new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE));
 		cache.get(new NamespaceId("foo")).getMosaics().add(Utils.createMosaicDefinition("foo", "tokens"));
 		cache.commit();

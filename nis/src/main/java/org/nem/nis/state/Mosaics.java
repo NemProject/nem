@@ -16,14 +16,17 @@ import java.util.stream.Collectors;
 public class Mosaics implements ReadOnlyMosaics {
 	private final NamespaceId namespaceId;
 	private final ConcurrentHashMap<MosaicId, MosaicEntryHistory> hashMap = new ConcurrentHashMap<>();
+	private final BlockHeight mosaicRedefinitionForkHeight;
 
 	/**
 	 * Creates a new mosaics container.
 	 *
 	 * @param namespaceId The namespace id of all mosaics in the container.
+	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
 	 */
-	public Mosaics(final NamespaceId namespaceId) {
+	public Mosaics(final NamespaceId namespaceId, final BlockHeight mosaicRedefinitionForkHeight) {
 		this.namespaceId = namespaceId;
+		this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 	}
 
 	@Override
@@ -114,7 +117,7 @@ public class Mosaics implements ReadOnlyMosaics {
 		}
 
 		final MosaicEntryHistory history = this.hashMap.get(mosaicDefinition.getId());
-		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
+		if (height.getRaw() < this.mosaicRedefinitionForkHeight.getRaw()) {
 			history.push(entry);
 			return;
 		}
@@ -159,7 +162,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 */
 	public Mosaics copy() {
 		// note that mosaic ids are immutable
-		final Mosaics copy = new Mosaics(this.namespaceId);
+		final Mosaics copy = new Mosaics(this.namespaceId, this.mosaicRedefinitionForkHeight);
 		copy.hashMap.putAll(this.hashMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy())));
 		return copy;
 	}

@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.pruning.*;
 
@@ -12,21 +13,25 @@ public class BlockTransactionObserverFactory {
 	private static final int DEFAULT_ESTIMATED_BLOCKS_PER_YEAR = 60 * 24 * 365;
 	private final EnumSet<ObserverOption> observerOptions;
 	private final int estimatedBlocksPerYear;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new transaction observer factory with no additional options.
+	 *
+	 * @param forkConfiguration The fork configuration.
 	 */
-	public BlockTransactionObserverFactory() {
-		this(EnumSet.noneOf(ObserverOption.class), DEFAULT_ESTIMATED_BLOCKS_PER_YEAR);
+	public BlockTransactionObserverFactory(final ForkConfiguration forkConfiguration) {
+		this(EnumSet.noneOf(ObserverOption.class), DEFAULT_ESTIMATED_BLOCKS_PER_YEAR, forkConfiguration);
 	}
 
 	/**
 	 * Creates a new transaction observer factory which uses additional options.
 	 *
 	 * @param observerOptions The observer options.
+	 * @param forkConfiguration The fork configuration.
 	 */
-	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions) {
-		this(observerOptions, DEFAULT_ESTIMATED_BLOCKS_PER_YEAR);
+	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final ForkConfiguration forkConfiguration) {
+		this(observerOptions, DEFAULT_ESTIMATED_BLOCKS_PER_YEAR, forkConfiguration);
 	}
 
 	/**
@@ -34,10 +39,12 @@ public class BlockTransactionObserverFactory {
 	 *
 	 * @param observerOptions The observer options.
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
+	 * @param forkConfiguration The fork configuration.
 	 */
-	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final int estimatedBlocksPerYear) {
+	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final int estimatedBlocksPerYear, final ForkConfiguration forkConfiguration) {
 		this.observerOptions = observerOptions;
 		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	/**
@@ -67,7 +74,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new AccountsHeightObserver(nisCache));
 		builder.add(new BalanceCommitTransferObserver(accountStateCache));
 		builder.add(new HarvestRewardCommitObserver(accountStateCache));
-		builder.add(new RemoteObserver(accountStateCache));
+		builder.add(new RemoteObserver(accountStateCache, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 		builder.add(new MultisigCosignatoryModificationObserver(accountStateCache));
 		builder.add(new MultisigMinCosignatoriesModificationObserver(accountStateCache));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));

@@ -50,7 +50,8 @@ public class BlockChainContext {
 		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) -> accountStates.stream()
 				.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
 		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
-		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade);
+		final NisConfiguration nisConfiguration = new NisConfiguration();
+		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade, nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
@@ -58,7 +59,6 @@ public class BlockChainContext {
 		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
-		final NisConfiguration nisConfiguration = new NisConfiguration();
 		for (int i = 0; i < this.options.numNodes(); i++) {
 			final Node node = this.createNode(i + 1);
 			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache) commonNisCache).deepCopy());
@@ -75,7 +75,7 @@ public class BlockChainContext {
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
-			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
+			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory(nisConfiguration.getForkConfiguration());
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(blockDao, blockTransactionObserverFactory,
 					blockValidatorFactory, transactionValidatorFactory, nisMapperFactory, nisConfiguration.getForkConfiguration()));
 			final BlockChainContextFactory contextFactory = Mockito

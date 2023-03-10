@@ -171,7 +171,8 @@ public class NisAppConfig {
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
 		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
-		return new BlockTransactionObserverFactory(this.observerOptions(), estimatedBlocksPerYear);
+		final ForkConfiguration forkConfiguration = this.nisConfiguration().getForkConfiguration();
+		return new BlockTransactionObserverFactory(this.observerOptions(), estimatedBlocksPerYear, forkConfiguration);
 	}
 
 	@Bean
@@ -228,7 +229,7 @@ public class NisAppConfig {
 
 	@Bean
 	public SynchronizedNamespaceCache namespaceCache() {
-		return new SynchronizedNamespaceCache(new DefaultNamespaceCache());
+		return new SynchronizedNamespaceCache(new DefaultNamespaceCache(this.nisConfiguration().getForkConfiguration().getMosaicRedefinitionForkHeight()));
 	}
 
 	@Bean
@@ -309,9 +310,8 @@ public class NisAppConfig {
 		} else {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(), new BlockHeight[]{
-							new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24)),
-							new BlockHeight(
-									BlockMarkerConstants.SECOND_FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))
+							this.nisConfiguration().getForkConfiguration().getFeeForkHeight(),
+							this.nisConfiguration().getForkConfiguration().getSecondFeeForkHeight()
 					}));
 		}
 
@@ -338,8 +338,9 @@ public class NisAppConfig {
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
 		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
+		final ForkConfiguration forkConfiguration = this.nisConfiguration().getForkConfiguration();
 		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer, this.nisMapperFactory(),
-				estimatedBlocksPerYear);
+				estimatedBlocksPerYear, forkConfiguration);
 	}
 
 	@Bean

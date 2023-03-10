@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
@@ -18,19 +19,22 @@ import java.util.HashSet;
  */
 public class MultisigCosignatoryModificationValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
+	private final BlockHeight multisigMofNForkHeight;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param stateCache The account state cache.
+	 * @param multisigMofNForkHeight The multisig m-of-n fork height.
 	 */
-	public MultisigCosignatoryModificationValidator(final ReadOnlyAccountStateCache stateCache) {
+	public MultisigCosignatoryModificationValidator(final ReadOnlyAccountStateCache stateCache, final BlockHeight multisigMofNForkHeight) {
 		this.stateCache = stateCache;
+		this.multisigMofNForkHeight = multisigMofNForkHeight;
 	}
 
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
-		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion()) > context.getBlockHeight().getRaw()
+		if (this.multisigMofNForkHeight.getRaw() > context.getBlockHeight().getRaw()
 				&& transaction.getEntityVersion() != 1) {
 			return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
 		}

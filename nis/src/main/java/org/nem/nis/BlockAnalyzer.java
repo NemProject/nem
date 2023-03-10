@@ -33,26 +33,29 @@ public class BlockAnalyzer {
 	private final NisMapperFactory mapperFactory;
 	private final NemesisBlockInfo nemesisBlockInfo;
 	private final int estimatedBlocksPerYear;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new block analyzer.
 	 *
 	 * @param blockDao The block dao.
-	 * @param blockChainScoreManager The block chain score manager.
-	 * @param blockChainLastBlockLayer The block chain last block layer.
+	 * @param blockChainScoreManager The blockchain score manager.
+	 * @param blockChainLastBlockLayer The blockchain last block layer.
 	 * @param mapperFactory The mapper factory.
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
+	 * @param forkConfiguration The fork configuration.
 	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(final BlockDao blockDao, final BlockChainScoreManager blockChainScoreManager,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer, final NisMapperFactory mapperFactory,
-			final int estimatedBlocksPerYear) {
+			final int estimatedBlocksPerYear, final ForkConfiguration forkConfiguration) {
 		this.blockDao = blockDao;
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.mapperFactory = mapperFactory;
 		this.nemesisBlockInfo = NetworkInfos.getDefault().getNemesisBlockInfo();
 		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	/**
@@ -97,7 +100,8 @@ public class BlockAnalyzer {
 
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options, this.estimatedBlocksPerYear)
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options, this.estimatedBlocksPerYear,
+				this.forkConfiguration)
 				.createExecuteCommitObserver(nisCache);
 		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
 

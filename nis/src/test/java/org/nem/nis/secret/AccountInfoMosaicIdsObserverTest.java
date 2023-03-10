@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountInfo;
 import org.nem.nis.test.NisUtils;
@@ -196,7 +197,8 @@ public class AccountInfoMosaicIdsObserverTest {
 		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Account recipient2 = Utils.generateRandomAccount();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 
 		public TestContext() {

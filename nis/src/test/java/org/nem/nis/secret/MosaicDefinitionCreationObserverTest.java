@@ -10,6 +10,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.NisUtils;
@@ -168,7 +169,8 @@ public class MosaicDefinitionCreationObserverTest {
 	private class TestContext {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7,
 				Utils.createMosaicPropertiesWithInitialSupply(5L));
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 
 		public TestContext() {
 			this.namespaceCache.add(

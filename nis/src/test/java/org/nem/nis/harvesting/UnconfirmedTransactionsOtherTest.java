@@ -327,7 +327,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(timeProvider),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver, timeProvider,
-					() -> new BlockHeight(1234), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration());
+					() -> new BlockHeight(1234), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK,
+					new ForkConfiguration.Builder().build());
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

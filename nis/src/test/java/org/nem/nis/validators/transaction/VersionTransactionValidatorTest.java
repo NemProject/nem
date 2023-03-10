@@ -12,6 +12,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
@@ -178,7 +179,9 @@ public class VersionTransactionValidatorTest {
 
 	private static void assertValidation(final Transaction transaction, final long blockHeight, final ValidationResult expectedResult) {
 		// Arrange:
-		final SingleTransactionValidator validator = new VersionTransactionValidator();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		final SingleTransactionValidator validator = new VersionTransactionValidator(forkConfiguration.getMosaicsForkHeight(),
+				forkConfiguration.getmultisigMOfNForkHeight());
 		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), ValidationStates.Throw);
 
 		// Act:

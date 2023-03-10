@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public class NisUtils {
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
+	private static final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 
 	/**
 	 * Creates a dummy DbBlock.
@@ -255,7 +256,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
-		return new TransactionValidatorFactory(timeProvider, NetworkInfos.getDefault(), new ForkConfiguration(), false);
+		return new TransactionValidatorFactory(timeProvider, NetworkInfos.getDefault(), forkConfiguration, false);
 	}
 
 	/**
@@ -264,7 +265,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static BlockTransactionObserverFactory createBlockTransactionObserverFactory() {
-		return new BlockTransactionObserverFactory();
+		return new BlockTransactionObserverFactory(forkConfiguration);
 	}
 
 	/**
@@ -273,7 +274,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
-		return new BlockValidatorFactory(new SystemTimeProvider(), new ForkConfiguration());
+		return new BlockValidatorFactory(new SystemTimeProvider(), forkConfiguration);
 	}
 
 	/**

@@ -22,12 +22,16 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 	@Override
 	protected void assertTransactions(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache, final List<Transaction> all,
 			final List<Transaction> expectedFiltered, final ValidationResult expectedResult) {
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+
 		while (true) {
 			// Arrange:
 			final BlockHeight parentHeight = chainHeight.prev(); // chainHeight is for block one (P -> [1] -> 2 -> 3)
+
 			final BlockChainServices blockChainServices = new BlockChainServices(Mockito.mock(BlockDao.class),
-					new BlockTransactionObserverFactory(), NisUtils.createBlockValidatorFactory(),
-					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory(), new ForkConfiguration());
+					new BlockTransactionObserverFactory(forkConfiguration), NisUtils.createBlockValidatorFactory(),
+					NisUtils.createTransactionValidatorFactory(), MapperUtils.createNisMapperFactory(),
+					forkConfiguration);
 
 			final NisCache copyCache = nisCache.copy();
 			final Account blockSigner = createBlockSigner(copyCache, parentHeight);

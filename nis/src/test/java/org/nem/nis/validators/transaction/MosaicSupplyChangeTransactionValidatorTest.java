@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.ValidationStates;
@@ -227,7 +228,8 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		private final MosaicSupplyChangeTransactionValidator validator = new MosaicSupplyChangeTransactionValidator(this.namespaceCache);
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {

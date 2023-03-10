@@ -19,14 +19,21 @@ import java.util.Objects;
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
+	private final BlockHeight feeForkHeight;
+	private final BlockHeight secondFeeForkHeight;
 
 	/**
 	 * Creates a validator.
 	 *
 	 * @param namespaceCache The namespace cache.
+	 * @param feeForkHeight The fee fork height.
+	 * @param secondFeeForkHeight The second fee fork height.
 	 */
-	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache) {
+	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final BlockHeight feeForkHeight,
+														final BlockHeight secondFeeForkHeight) {
 		this.namespaceCache = namespaceCache;
+		this.feeForkHeight = feeForkHeight;
+		this.secondFeeForkHeight = secondFeeForkHeight;
 	}
 
 	@Override
@@ -53,7 +60,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK;
 		}
 
-		final Amount creationFee = getMosaicCreationFee(transaction.getVersion(), context.getBlockHeight());
+		final Amount creationFee = getMosaicCreationFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkHeight,
+				this.secondFeeForkHeight);
 		if (transaction.getCreationFee().compareTo(creationFee) < 0) {
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE;
 		}
@@ -106,9 +114,11 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		return creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), mosaicDefinition.getProperties().getDivisibility()));
 	}
 
-	private static Amount getMosaicCreationFee(final int version, final BlockHeight height) {
-		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
+	private static Amount getMosaicCreationFee(final int version, final BlockHeight height, final BlockHeight feeForkHeight,
+											   final BlockHeight secondFeeForkHeight) {
+		return feeForkHeight.getRaw() > height.getRaw()
 				? Amount.fromNem(50000)
-				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw() ? Amount.fromNem(500) : Amount.fromNem(10);
+				: secondFeeForkHeight.getRaw() > height.getRaw() ? Amount.fromNem(500) :
+				Amount.fromNem(10);
 	}
 }

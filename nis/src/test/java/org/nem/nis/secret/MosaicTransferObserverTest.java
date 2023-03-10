@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.DefaultNamespaceCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
@@ -78,7 +79,8 @@ public class MosaicTransferObserverTest {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 
 		private TestContext() {
 			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();

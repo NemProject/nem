@@ -7,12 +7,14 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class MosaicsTest {
 	private static final String DEFAULT_NID = "vouchers";
+	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 
 	// region constructor
 
@@ -473,6 +475,6 @@ public class MosaicsTest {
 	}
 
 	private Mosaics createCache() {
-		return new Mosaics(new NamespaceId(DEFAULT_NID));
+		return new Mosaics(new NamespaceId(DEFAULT_NID), this.forkConfiguration.getMosaicRedefinitionForkHeight());
 	}
 }

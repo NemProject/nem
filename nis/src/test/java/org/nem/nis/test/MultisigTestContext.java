@@ -16,8 +16,9 @@ import java.util.*;
 public class MultisigTestContext {
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 	private final MultisigCosignatoryModificationValidator multisigCosignatoryModificationValidator = new MultisigCosignatoryModificationValidator(
-			this.accountStateCache);
+			this.accountStateCache, this.forkConfiguration.getmultisigMOfNForkHeight());
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(
 			this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
@@ -159,7 +160,7 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return validateNonOperational(BlockHeight.MAX, new ForkConfiguration(), transaction);
+		return validateNonOperational(BlockHeight.MAX, this.forkConfiguration, transaction);
 	}
 
 	public ValidationResult validateNonOperational(final BlockHeight height, final ForkConfiguration forkConfiguration,

@@ -35,16 +35,17 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 
 		private TestContext(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache) {
 			final int maxTransactionsPerBlock = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
+			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()), () -> chainHeight, maxTransactionsPerBlock,
-					new ForkConfiguration());
+					forkConfiguration);
 			this.transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(nisCache, NisUtils.createTransactionValidatorFactory(),
-					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(), this.transactions.asFilter(),
-					new ForkConfiguration());
+					NisUtils.createBlockValidatorFactory(), new BlockTransactionObserverFactory(forkConfiguration), this.transactions.asFilter(),
+					forkConfiguration);
 		}
 
 		public List<Transaction> getBlockTransactions() {

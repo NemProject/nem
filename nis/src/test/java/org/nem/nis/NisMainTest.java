@@ -438,13 +438,15 @@ public class NisMainTest {
 			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao));
 
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
-			this.nisCache = NisCacheFactory.createReal(poxFacade);
+			this.nisConfiguration = createNisConfiguration(autoBoot, supplyBootKey, supplyBootName, delayBlockLoading,
+					historicalAccountData, proofOfStake);
+			this.nisCache = NisCacheFactory.createReal(poxFacade, this.nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			this.blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
 			final BlockAnalyzer blockAnalyzer = new BlockAnalyzer(blockDao, scoreManager, this.blockChainLastBlockLayer, nisMapperFactory,
-					ESTIMATED_BLOCKS_PER_YEAR);
+					ESTIMATED_BLOCKS_PER_YEAR, this.nisConfiguration.getForkConfiguration());
 			this.nemesisBlock = blockAnalyzer.loadNemesisBlock();
 			this.blockAnalyzer = Mockito.spy(blockAnalyzer);
 			Mockito.when(this.networkHost.boot(Mockito.any())).thenAnswer(invocationOnMock -> {
@@ -454,8 +456,7 @@ public class NisMainTest {
 
 				return CompletableFuture.completedFuture(null);
 			});
-			this.nisConfiguration = createNisConfiguration(autoBoot, supplyBootKey, supplyBootName, delayBlockLoading,
-					historicalAccountData, proofOfStake);
+
 			this.nisMain = new NisMain(blockDao, this.nisCache, this.networkHost, this.mapper, this.nisConfiguration, this.blockAnalyzer,
 					i -> this.exitReason[0] = i);
 		}

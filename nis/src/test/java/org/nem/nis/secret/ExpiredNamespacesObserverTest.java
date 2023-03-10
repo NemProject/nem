@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
@@ -115,7 +116,8 @@ public class ExpiredNamespacesObserverTest {
 	private static class TestContext {
 		private final MosaicDefinition mosaicDefinition1 = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final MosaicDefinition mosaicDefinition2 = Utils.createMosaicDefinition(2, createMosaicProperties());
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		private final DefaultAccountStateCache accountStateCache = Mockito.mock(DefaultAccountStateCache.class);
 		private final AccountInfo accountInfo1;
 		private final AccountInfo accountInfo2;

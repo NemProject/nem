@@ -1,6 +1,8 @@
 package org.nem.nis.test;
 
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 
 public class NisCacheFactory {
@@ -13,7 +15,8 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal() {
-		return createReal(new DefaultPoxFacade(NisUtils.createImportanceCalculator()));
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		return createReal(new DefaultPoxFacade(NisUtils.createImportanceCalculator()), forkConfiguration.getMosaicRedefinitionForkHeight());
 	}
 
 	/**
@@ -22,10 +25,10 @@ public class NisCacheFactory {
 	 * @param poxFacade The pox facade.
 	 * @return The NIS cache.
 	 */
-	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade) {
+	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade, final BlockHeight mosaicRedefinitionForkHeight) {
 		return new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()), new SynchronizedPoxFacade(poxFacade),
-				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
+				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight)));
 	}
 
 	// endregion

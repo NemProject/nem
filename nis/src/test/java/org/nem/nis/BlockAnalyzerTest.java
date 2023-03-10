@@ -244,12 +244,13 @@ public class BlockAnalyzerTest {
 
 		private TestContext() {
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(this.importanceCalculator);
-			this.nisCache = NisCacheFactory.createReal(poxFacade);
+			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+			this.nisCache = NisCacheFactory.createReal(poxFacade, forkConfiguration.getMosaicRedefinitionForkHeight());
 			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));
 			this.blockAnalyzer = new BlockAnalyzer(this.blockDao, this.scoreManager, this.blockChainLastBlockLayer, this.nisMapperFactory,
-					ESTIMATED_BLOCKS_PER_YEAR);
+					ESTIMATED_BLOCKS_PER_YEAR, forkConfiguration);
 		}
 
 		private void fillDatabase(final Block nemesisBlock, final int numBlocks) {

@@ -14,14 +14,17 @@ import org.nem.nis.validators.*;
  */
 public class RemoteNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
+	private final BlockHeight mosaicRedefinitionForkHeight;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param stateCache The account state cache.
+	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
 	 */
-	public RemoteNonOperationalValidator(final ReadOnlyAccountStateCache stateCache) {
+	public RemoteNonOperationalValidator(final ReadOnlyAccountStateCache stateCache, final BlockHeight mosaicRedefinitionForkHeight) {
 		this.stateCache = stateCache;
+		this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 
 	private boolean isRemoteInactive(final Account account, final BlockHeight height) {
 		final ReadOnlyRemoteLinks remoteLinks = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
-		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
+		if (height.getRaw() < this.mosaicRedefinitionForkHeight.getRaw()) {
 			return !remoteLinks.isRemoteHarvester();
 		}
 

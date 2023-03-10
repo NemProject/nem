@@ -18,7 +18,7 @@ public class UnconfirmedStateFactoryTest {
 		// Arrange:
 		final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(),
 				cache -> Mockito.mock(BlockTransactionObserver.class), Mockito.mock(TimeProvider.class), () -> BlockHeight.MAX,
-				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration());
+				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration.Builder().build());
 
 		// Act:
 		final UnconfirmedState state = factory.create(Mockito.mock(NisCache.class), Mockito.mock(UnconfirmedTransactionsCache.class));

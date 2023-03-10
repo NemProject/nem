@@ -111,7 +111,9 @@ public class MultisigNonOperationalValidatorTest {
 
 		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
 		transactionHashes.add(HashUtils.calculateHash(transaction));
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), transactionHashes, new ArrayList<Hash>());
+		final ForkConfiguration forkConfiguration =
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(12345))
+						.treasuryReissuanceForkTransactionHashes(transactionHashes).build();
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(new BlockHeight(12345), forkConfiguration, transaction);
@@ -129,7 +131,9 @@ public class MultisigNonOperationalValidatorTest {
 
 		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
 		transactionHashes.add(HashUtils.calculateHash(transaction));
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), transactionHashes, new ArrayList<Hash>());
+		final ForkConfiguration forkConfiguration =
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(12345))
+						.treasuryReissuanceForkTransactionHashes(transactionHashes).build();
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(new BlockHeight(12346), forkConfiguration, transaction);
@@ -147,7 +151,9 @@ public class MultisigNonOperationalValidatorTest {
 
 		final ArrayList<Hash> transactionHashes = new ArrayList<Hash>();
 		transactionHashes.add(HashUtils.calculateHash(transaction));
-		final ForkConfiguration forkConfiguration = new ForkConfiguration(new BlockHeight(12345), new ArrayList<Hash>(), transactionHashes);
+		final ForkConfiguration forkConfiguration =
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(12345))
+						.treasuryReissuanceForkFallbackTransactionHashes(transactionHashes).build();
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(new BlockHeight(12345), forkConfiguration, transaction);
