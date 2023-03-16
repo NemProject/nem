@@ -153,7 +153,7 @@ public class HttpMethodClientTest {
 			this.runTestWithTimeoutService((mockService, requestUrl) -> {
 				// Arrange:
 				// - set a delay in request processing to simulate a socket timeout
-				mockService.addRequestProcessingDelay(1000);
+				mockService.addRequestProcessingDelay(10000);
 				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT, 500, GOOD_TIMEOUT);
 
 				// Act:
