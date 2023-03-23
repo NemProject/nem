@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.NamespaceConstants;
+import org.nem.nis.NemNamespaceEntry;
 import org.nem.nis.cache.delta.*;
 import org.nem.nis.state.*;
 
@@ -58,7 +58,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 	public NamespaceEntry get(final NamespaceId id) {
 		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
-			return NamespaceConstants.NAMESPACE_ENTRY_NEM;
+			return NemNamespaceEntry.getInstance(this.mosaicRedefinitionForkHeight);
 		}
 
 		final RootNamespaceHistory history = this.getHistory(id);

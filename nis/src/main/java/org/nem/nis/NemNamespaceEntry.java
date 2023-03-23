@@ -8,18 +8,14 @@ import org.nem.nis.state.*;
 import java.util.*;
 
 /**
- * Constants used by namespace related classes.
+ * Nem namespace related classes.
  */
-public class NamespaceConstants {
+public class NemNamespaceEntry {
 
 	/**
 	 * The namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
 	 */
-	public static NamespaceEntry NAMESPACE_ENTRY_NEM;
-
-	static {
-		setNamespaceEntry();
-	}
+	private static NamespaceEntry instance;
 
 	private static Mosaics createNemMosaics(final BlockHeight mosaicRedefinitionForkHeight) {
 		final MosaicEntry mosaicEntry = new MosaicEntry(MosaicConstants.MOSAIC_DEFINITION_XEM);
@@ -61,17 +57,18 @@ public class NamespaceConstants {
 		}
 	}
 
-	private static void setNamespaceEntry() {
-		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
-		setNamespaceEntry(forkConfiguration.getMosaicRedefinitionForkHeight());
-	}
-
 	/**
-	 * Sets the namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
+	 * Gets the namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
 	 *
 	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
+	 * @return The namespace entry.
 	 */
-	public static void setNamespaceEntry(final BlockHeight mosaicRedefinitionForkHeight) {
-		NAMESPACE_ENTRY_NEM = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM, createNemMosaics(mosaicRedefinitionForkHeight));
+	public static NamespaceEntry getInstance(final BlockHeight mosaicRedefinitionForkHeight) {
+		if (null == instance) {
+			instance = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM,
+					createNemMosaics(mosaicRedefinitionForkHeight));
+		}
+
+		return instance;
 	}
 }

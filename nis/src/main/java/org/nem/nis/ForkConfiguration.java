@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.NemProperties;
+import org.nem.core.model.NetworkInfo;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 
@@ -135,16 +136,7 @@ public class ForkConfiguration {
 		 * Creates the default builder.
 		 */
 		public Builder() {
-			final int version = NetworkInfos.getDefault().getVersion() << 24;
-			treasuryReissuanceForkHeight = new BlockHeight(1);
-			treasuryReissuanceForkTransactionHashes = Collections.emptyList();
-			treasuryReissuanceForkFallbackTransactionHashes = Collections.emptyList();
-			multisigMOfNForkHeight = new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version));
-			mosaicsForkHeight = new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version));
-			feeForkHeight = new BlockHeight(BlockMarkerConstants.FEE_FORK(version));
-			remoteAccountForkHeight = new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version));
-			mosaicRedefinitionForkHeight = new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version));
-			secondFeeForkHeight = new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version));
+			this(new NemProperties(new Properties()));
 		}
 
 		/**
@@ -153,7 +145,17 @@ public class ForkConfiguration {
 		 * @param properties nis properties.
 		 */
 		public Builder(final NemProperties properties) {
-			final int version = NetworkInfos.getDefault().getVersion() << 24;
+			this(properties, NetworkInfos.getDefault());
+		}
+
+		/**
+		 * Creates a builder for a fork configuration from nis configuration.
+		 *
+		 * @param properties nis properties.
+		 * @param networkInfo The network info.
+		 */
+		public Builder(final NemProperties properties, final NetworkInfo networkInfo) {
+			final int version = networkInfo.getVersion() << 24;
 			this.treasuryReissuanceForkHeight = new BlockHeight(properties.getOptionalInteger("nis.treasuryReissuanceForkHeight", 1));
 			this.treasuryReissuanceForkTransactionHashes = Collections
 					.unmodifiableList(parseHashes(properties, "nis.treasuryReissuanceForkTransactionHashes"));

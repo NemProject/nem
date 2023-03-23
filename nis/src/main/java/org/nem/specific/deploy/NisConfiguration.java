@@ -89,7 +89,8 @@ public class NisConfiguration extends CommonConfiguration {
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
 		this.blockChainConfiguration = parseBlockChainConfiguration(properties);
-		this.forkConfiguration = new ForkConfiguration.Builder(properties).build();
+
+		this.forkConfiguration = new ForkConfiguration.Builder(properties, this.getNetworkInfo()).build();
 	}
 
 	private static BlockChainConfiguration parseBlockChainConfiguration(final NemProperties properties) {

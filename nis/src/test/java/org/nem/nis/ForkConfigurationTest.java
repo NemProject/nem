@@ -5,11 +5,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.NemProperties;
+import org.nem.core.model.NetworkInfo;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ForkConfigurationTest {
@@ -78,17 +80,10 @@ public class ForkConfigurationTest {
 		ExceptionAssert.assertThrows(v -> new ForkConfiguration.Builder(new NemProperties(properties)).build(), CryptoException.class);
 	}
 
-	// endregion
-
-	// region basic
-
-	@Test
-	public void canCreateDefaultConfiguration() {
-		// Arrange:
-		final int version = NetworkInfos.getDefault().getVersion() << 24;
+	private static void canReadConfiguration(final int version, final Supplier<ForkConfiguration> configSupplier) {
 
 		// Act:
-		final ForkConfiguration config = new ForkConfiguration.Builder().build();
+		final ForkConfiguration config = configSupplier.get();
 
 		// Assert:
 		MatcherAssert.assertThat(config.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(1)));
@@ -106,6 +101,19 @@ public class ForkConfigurationTest {
 				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
 		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(),
 				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
+	}
+
+
+	// endregion
+
+	// region basic
+
+	@Test
+	public void canCreateDefaultConfiguration() {
+		// Arrange:
+		final int version = NetworkInfos.getDefault().getVersion() << 24;
+
+		canReadConfiguration(version, () -> new ForkConfiguration.Builder().build());;
 	}
 
 	@Test
@@ -144,29 +152,20 @@ public class ForkConfigurationTest {
 	@Test
 	public void canReadDefaultConfiguration() {
 		// Arrange:
-		final Properties properties = new Properties();
 		final int version = NetworkInfos.getDefault().getVersion() << 24;
 
-		// Act:
-		final ForkConfiguration config = new ForkConfiguration.Builder(new NemProperties(properties)).build();
-
-		// Assert:
-		MatcherAssert.assertThat(config.getTreasuryReissuanceForkHeight(), IsEqual.equalTo(new BlockHeight(1)));
-		MatcherAssert.assertThat(config.getTreasuryReissuanceForkTransactionHashes(), IsEqual.equalTo(new ArrayList<Hash>()));
-		MatcherAssert.assertThat(config.getTreasuryReissuanceForkFallbackTransactionHashes(), IsEqual.equalTo(new ArrayList<Hash>()));
-
-		MatcherAssert.assertThat(config.getFeeForkHeight(), IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getSecondFeeForkHeight(),
-				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicsForkHeight(),
-				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(version))));
-		MatcherAssert.assertThat(config.getmultisigMOfNForkHeight(),
-				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version))));
-		MatcherAssert.assertThat(config.getRemoteAccountForkHeight(),
-				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version))));
-		MatcherAssert.assertThat(config.getMosaicRedefinitionForkHeight(),
-				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
+		canReadConfiguration(version, () -> new ForkConfiguration.Builder(new NemProperties(new Properties())).build());;
 	}
+
+	@Test
+	public void canReadMainnetConfiguration() {
+		// Arrange:
+		final NetworkInfo networkInfo = NetworkInfos.getMainNetworkInfo();
+		final int version = networkInfo.getVersion() << 24;
+
+		canReadConfiguration(version, () -> new ForkConfiguration.Builder(new NemProperties(new Properties()), networkInfo).build());
+	}
+
 
 	@Test
 	public void canReadCustomConfiguration() {

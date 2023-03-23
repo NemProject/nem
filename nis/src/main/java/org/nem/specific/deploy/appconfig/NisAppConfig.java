@@ -301,26 +301,28 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
+		final NisConfiguration nisConfiguration = this.nisConfiguration();
+
 		// initialize network info
-		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
+		NetworkInfos.setDefault(nisConfiguration.getNetworkInfo());
 
 		// initialize other globals
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
-		if (this.nisConfiguration().ignoreFees()) {
+		if (nisConfiguration.ignoreFees()) {
 			NemGlobals.setTransactionFeeCalculator(new ZeroTransactionFeeCalculator());
 		} else {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(), new BlockHeight[]{
-							this.nisConfiguration().getForkConfiguration().getFeeForkHeight(),
-							this.nisConfiguration().getForkConfiguration().getSecondFeeForkHeight()
+							nisConfiguration.getForkConfiguration().getFeeForkHeight(),
+							nisConfiguration.getForkConfiguration().getSecondFeeForkHeight()
 					}));
 		}
 
-		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
+		NemGlobals.setBlockChainConfiguration(nisConfiguration.getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
 
 		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(),
-				this.nisConfiguration(), this.blockAnalyzer(), System::exit);
+				nisConfiguration, this.blockAnalyzer(), System::exit);
 	}
 
 	@SuppressWarnings("serial")
