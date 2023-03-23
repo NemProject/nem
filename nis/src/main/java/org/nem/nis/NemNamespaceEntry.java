@@ -65,8 +65,7 @@ public class NemNamespaceEntry {
 	 */
 	public static NamespaceEntry getInstance(final BlockHeight mosaicRedefinitionForkHeight) {
 		if (null == instance) {
-			instance = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM,
-					createNemMosaics(mosaicRedefinitionForkHeight));
+			instance = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM, createNemMosaics(mosaicRedefinitionForkHeight));
 		}
 
 		return instance;

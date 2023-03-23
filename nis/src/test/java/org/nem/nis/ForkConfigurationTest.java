@@ -103,7 +103,6 @@ public class ForkConfigurationTest {
 				IsEqual.equalTo(new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(version))));
 	}
 
-
 	// endregion
 
 	// region basic
@@ -165,7 +164,6 @@ public class ForkConfigurationTest {
 
 		canReadConfiguration(version, () -> new ForkConfiguration.Builder(new NemProperties(new Properties()), networkInfo).build());
 	}
-
 
 	@Test
 	public void canReadCustomConfiguration() {

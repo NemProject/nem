@@ -321,8 +321,8 @@ public class NisAppConfig {
 		NemGlobals.setBlockChainConfiguration(nisConfiguration.getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
 
-		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(),
-				nisConfiguration, this.blockAnalyzer(), System::exit);
+		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(), nisConfiguration,
+				this.blockAnalyzer(), System::exit);
 	}
 
 	@SuppressWarnings("serial")

@@ -11,14 +11,16 @@ import org.nem.nis.state.*;
 
 public class NemNamespaceEntryTest {
 	private static final Supply NEM_XEM_SUPPLY = Supply.fromValue(8_999_999_999L);
-	private static final BlockHeight MOSAIC_REDEFINITION_FORK_HEIGHT = new ForkConfiguration.Builder().build().getMosaicRedefinitionForkHeight();
+	private static final BlockHeight MOSAIC_REDEFINITION_FORK_HEIGHT = new ForkConfiguration.Builder().build()
+			.getMosaicRedefinitionForkHeight();
 
 	// region nem namespace entry
 
 	@Test
 	public void namespaceEntryNemHasExpectedNamespace() {
 		// Assert:
-		MatcherAssert.assertThat(NemNamespaceEntry.getInstance(MOSAIC_REDEFINITION_FORK_HEIGHT).getNamespace(), IsEqual.equalTo(MosaicConstants.NAMESPACE_NEM));
+		MatcherAssert.assertThat(NemNamespaceEntry.getInstance(MOSAIC_REDEFINITION_FORK_HEIGHT).getNamespace(),
+				IsEqual.equalTo(MosaicConstants.NAMESPACE_NEM));
 	}
 
 	@Test
@@ -88,6 +90,7 @@ public class NemNamespaceEntryTest {
 	// endregion
 
 	private static MosaicEntry getMosaicXemEntry() {
-		return NemNamespaceEntry.getInstance(MOSAIC_REDEFINITION_FORK_HEIGHT).getMosaics().get(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem"));
+		return NemNamespaceEntry.getInstance(MOSAIC_REDEFINITION_FORK_HEIGHT).getMosaics()
+				.get(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem"));
 	}
 }
