@@ -40,3 +40,12 @@ updates:
     labels: [peer]
     commit-message:
       prefix: '[dependency]'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    commit-message:
+      prefix: '[dependency]'
