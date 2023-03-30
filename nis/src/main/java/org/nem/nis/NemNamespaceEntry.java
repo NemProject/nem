@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.primitive.Supply;
+import org.nem.core.utils.SetOnce;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -15,7 +16,13 @@ public class NemNamespaceEntry {
 	/**
 	 * The namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
 	 */
-	private static NamespaceEntry instance;
+	private static final SetOnce<NamespaceEntry> instance;
+
+	static {
+		final BlockHeight mosaicRedefinitionForkHeight = new ForkConfiguration.Builder().build().getMosaicRedefinitionForkHeight();
+
+		instance = new SetOnce<>(createNemNamespaceEntry(mosaicRedefinitionForkHeight));
+	}
 
 	private static Mosaics createNemMosaics(final BlockHeight mosaicRedefinitionForkHeight) {
 		final MosaicEntry mosaicEntry = new MosaicEntry(MosaicConstants.MOSAIC_DEFINITION_XEM);
@@ -57,17 +64,25 @@ public class NemNamespaceEntry {
 		}
 	}
 
+	private static NamespaceEntry createNemNamespaceEntry(final BlockHeight mosaicRedefinitionForkHeight) {
+		return new NamespaceEntry(MosaicConstants.NAMESPACE_NEM, createNemMosaics(mosaicRedefinitionForkHeight));
+	}
+
 	/**
 	 * Gets the namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
 	 *
-	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
 	 * @return The namespace entry.
 	 */
-	public static NamespaceEntry getInstance(final BlockHeight mosaicRedefinitionForkHeight) {
-		if (null == instance) {
-			instance = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM, createNemMosaics(mosaicRedefinitionForkHeight));
-		}
+	public static NamespaceEntry getDefault() {
+		return instance.get();
+	}
 
-		return instance;
+	/**
+	 * Sets the namespace entry for 'nem' that contains a single mosaic 'nem.xem'.
+	 *
+	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
+	 */
+	public static void setDefault(final BlockHeight mosaicRedefinitionForkHeight) {
+		instance.set(createNemNamespaceEntry(mosaicRedefinitionForkHeight));
 	}
 }

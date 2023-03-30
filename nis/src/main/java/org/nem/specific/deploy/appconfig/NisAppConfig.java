@@ -229,8 +229,10 @@ public class NisAppConfig {
 
 	@Bean
 	public SynchronizedNamespaceCache namespaceCache() {
-		return new SynchronizedNamespaceCache(
-				new DefaultNamespaceCache(this.nisConfiguration().getForkConfiguration().getMosaicRedefinitionForkHeight()));
+		final BlockHeight mosaicRedefinitionForkHeight = this.nisConfiguration().getForkConfiguration().getMosaicRedefinitionForkHeight();
+
+		NemNamespaceEntry.setDefault(mosaicRedefinitionForkHeight);
+		return new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight));
 	}
 
 	@Bean

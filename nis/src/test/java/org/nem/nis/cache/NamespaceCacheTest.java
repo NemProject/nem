@@ -978,7 +978,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 		// Assert:
 		MatcherAssert.assertThat(namespaceEntry, IsNull.notNullValue());
-		MatcherAssert.assertThat(namespaceEntry, IsSame.sameInstance(NemNamespaceEntry.getInstance(mosaicRedefinitionForkHeight)));
+		MatcherAssert.assertThat(namespaceEntry, IsSame.sameInstance(NemNamespaceEntry.getDefault()));
 	}
 
 	@Test

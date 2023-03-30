@@ -58,7 +58,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 	public NamespaceEntry get(final NamespaceId id) {
 		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
-			return NemNamespaceEntry.getInstance(this.mosaicRedefinitionForkHeight);
+			return NemNamespaceEntry.getDefault();
 		}
 
 		final RootNamespaceHistory history = this.getHistory(id);
