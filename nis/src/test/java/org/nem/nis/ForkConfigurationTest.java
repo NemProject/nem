@@ -114,7 +114,7 @@ public class ForkConfigurationTest {
 		final int version = NetworkInfos.getDefault().getVersion() << 24;
 
 		// Act +Assert:
-		assertCanReadConfiguration(version, () -> new ForkConfiguration.Builder().build());;
+		assertCanReadConfiguration(version, () -> new ForkConfiguration.Builder().build());
 	}
 
 	@Test

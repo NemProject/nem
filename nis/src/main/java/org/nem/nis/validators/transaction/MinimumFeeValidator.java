@@ -5,7 +5,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.FeeForkDto;
+import org.nem.nis.FeeFork;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
@@ -19,7 +19,7 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 	private final NetworkInfo networkInfo;
 	private final ReadOnlyNamespaceCache namespaceCache;
 	private final boolean ignoreFees;
-	private final FeeForkDto feeForkDto;
+	private final FeeFork feeFork;
 
 	/**
 	 * Creates a validator.
@@ -27,14 +27,14 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 	 * @param networkInfo The network info.
 	 * @param namespaceCache The namespace cache.
 	 * @param ignoreFees Flag indicating if transaction fees should be ignored.
-	 * @param feeForkDto The fee fork heights.
+	 * @param feeFork The fee fork heights.
 	 */
 	public MinimumFeeValidator(final NetworkInfo networkInfo, final ReadOnlyNamespaceCache namespaceCache, final boolean ignoreFees,
-			final FeeForkDto feeForkDto) {
+			final FeeFork feeFork) {
 		this.networkInfo = networkInfo;
 		this.namespaceCache = namespaceCache;
 		this.ignoreFees = ignoreFees;
-		this.feeForkDto = feeForkDto;
+		this.feeFork = feeFork;
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 				context::getBlockHeight, new BlockHeight[]{
-						this.feeForkDto.getFirstHeight(), this.feeForkDto.getSecondHeight()
+						this.feeFork.getFirstHeight(), this.feeFork.getSecondHeight()
 				});
 		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS

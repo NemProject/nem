@@ -21,7 +21,7 @@ public class ForkConfiguration {
 	private final BlockHeight mosaicsForkHeight;
 	private final BlockHeight remoteAccountForkHeight;
 	private final BlockHeight mosaicRedefinitionForkHeight;
-	private final FeeForkDto feeForkDto;
+	private final FeeFork feeFork;
 
 	private ForkConfiguration(final Builder builder) {
 		this.treasuryReissuanceForkHeight = builder.treasuryReissuanceForkHeight;
@@ -31,7 +31,7 @@ public class ForkConfiguration {
 		this.mosaicsForkHeight = builder.mosaicsForkHeight;
 		this.remoteAccountForkHeight = builder.remoteAccountForkHeight;
 		this.mosaicRedefinitionForkHeight = builder.mosaicRedefinitionForkHeight;
-		this.feeForkDto = new FeeForkDto(builder.firstFeeForkHeight, builder.secondFeeForkHeight);
+		this.feeFork = new FeeFork(builder.firstFeeForkHeight, builder.secondFeeForkHeight);
 	}
 
 	/**
@@ -102,8 +102,8 @@ public class ForkConfiguration {
 	 *
 	 * @return The fee forks.
 	 */
-	public FeeForkDto getFeeFork() {
-		return this.feeForkDto;
+	public FeeFork getFeeFork() {
+		return this.feeFork;
 	}
 
 	/**

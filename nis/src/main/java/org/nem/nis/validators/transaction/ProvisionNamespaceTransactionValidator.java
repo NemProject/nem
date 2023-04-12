@@ -6,7 +6,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
-import org.nem.nis.FeeForkDto;
+import org.nem.nis.FeeFork;
 import org.nem.nis.state.ReadOnlyNamespaceEntry;
 import org.nem.nis.validators.ValidationContext;
 
@@ -24,17 +24,17 @@ import org.nem.nis.validators.ValidationContext;
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
-	private final FeeForkDto feeForkDto;
+	private final FeeFork feeFork;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param namespaceCache The namespace cache.
-	 * @param feeForkDto The fee fork heights.
+	 * @param feeFork The fee fork heights.
 	 */
-	public ProvisionNamespaceTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final FeeForkDto feeForkDto) {
+	public ProvisionNamespaceTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final FeeFork feeFork) {
 		this.namespaceCache = namespaceCache;
-		this.feeForkDto = feeForkDto;
+		this.feeFork = feeFork;
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel()
-				? getRootNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkDto)
-				: getSubNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkDto);
+				? getRootNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeFork)
+				: getSubNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight(), this.feeFork);
 		if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
 		}
@@ -110,15 +110,15 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		return null == entry ? null : entry.getNamespace();
 	}
 
-	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height, final FeeForkDto feeForkDto) {
-		return feeForkDto.getFirstHeight().getRaw() > height.getRaw()
+	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height, final FeeFork feeFork) {
+		return feeFork.getFirstHeight().getRaw() > height.getRaw()
 				? Amount.fromNem(50000)
-				: feeForkDto.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(1500) : Amount.fromNem(100);
+				: feeFork.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(1500) : Amount.fromNem(100);
 	}
 
-	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height, final FeeForkDto feeForkDto) {
-		return feeForkDto.getFirstHeight().getRaw() > height.getRaw()
+	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height, final FeeFork feeFork) {
+		return feeFork.getFirstHeight().getRaw() > height.getRaw()
 				? Amount.fromNem(5000)
-				: feeForkDto.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(200) : Amount.fromNem(10);
+				: feeFork.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(200) : Amount.fromNem(10);
 	}
 }

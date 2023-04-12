@@ -6,7 +6,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.FeeForkDto;
+import org.nem.nis.FeeFork;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
@@ -20,17 +20,17 @@ import java.util.Objects;
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
-	private final FeeForkDto feeForkDto;
+	private final FeeFork feeFork;
 
 	/**
 	 * Creates a validator.
 	 *
 	 * @param namespaceCache The namespace cache.
-	 * @param feeForkDto The fee fork heights.
+	 * @param feeFork The fee fork heights.
 	 */
-	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final FeeForkDto feeForkDto) {
+	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final FeeFork feeFork) {
 		this.namespaceCache = namespaceCache;
-		this.feeForkDto = feeForkDto;
+		this.feeFork = feeFork;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK;
 		}
 
-		final Amount creationFee = getMosaicCreationFee(transaction.getVersion(), context.getBlockHeight(), this.feeForkDto);
+		final Amount creationFee = getMosaicCreationFee(transaction.getVersion(), context.getBlockHeight(), this.feeFork);
 		if (transaction.getCreationFee().compareTo(creationFee) < 0) {
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE;
 		}
@@ -110,9 +110,9 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		return creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), mosaicDefinition.getProperties().getDivisibility()));
 	}
 
-	private static Amount getMosaicCreationFee(final int version, final BlockHeight height, final FeeForkDto feeForkDto) {
-		return feeForkDto.getFirstHeight().getRaw() > height.getRaw()
+	private static Amount getMosaicCreationFee(final int version, final BlockHeight height, final FeeFork feeFork) {
+		return feeFork.getFirstHeight().getRaw() > height.getRaw()
 				? Amount.fromNem(50000)
-				: feeForkDto.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(500) : Amount.fromNem(10);
+				: feeFork.getSecondHeight().getRaw() > height.getRaw() ? Amount.fromNem(500) : Amount.fromNem(10);
 	}
 }
