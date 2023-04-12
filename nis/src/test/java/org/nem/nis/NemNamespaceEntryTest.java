@@ -12,6 +12,11 @@ import org.nem.nis.state.*;
 public class NemNamespaceEntryTest {
 	private static final Supply NEM_XEM_SUPPLY = Supply.fromValue(8_999_999_999L);
 
+	@After
+	public void resetDefaultNamespaceEntry() {
+		NemNamespaceEntry.resetToDefault();
+	}
+
 	// region nem namespace entry
 
 	@Test
@@ -54,6 +59,40 @@ public class NemNamespaceEntryTest {
 
 		// Assert:
 		MatcherAssert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void defaultNamespaceEntryCanBeChanged() {
+		// Arrange:
+		final NamespaceEntry entry = NemNamespaceEntry.getDefault();
+
+		// Act:
+		NemNamespaceEntry.setDefault(new BlockHeight(10));
+
+		// Assert:
+		MatcherAssert.assertThat(NemNamespaceEntry.getDefault(), IsNot.not(IsEqual.equalTo(entry)));
+	}
+
+	@Test
+	public void defaultNamespaceEntryCanBeReset() {
+		// Arrange:
+		final NamespaceEntry entry = NemNamespaceEntry.getDefault();
+		NemNamespaceEntry.setDefault(new BlockHeight(2));
+
+		// Act:
+		NemNamespaceEntry.resetToDefault();
+
+		// Assert:
+		MatcherAssert.assertThat(NemNamespaceEntry.getDefault(), IsSame.sameInstance(entry));
+	}
+
+	@Test
+	public void defaultNetworkCannotBeChangedAfterBeingSet() {
+		// Arrange:
+		NemNamespaceEntry.setDefault(new BlockHeight(20));
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> NemNamespaceEntry.setDefault(new BlockHeight(1)), IllegalStateException.class);
 	}
 
 	// endregion

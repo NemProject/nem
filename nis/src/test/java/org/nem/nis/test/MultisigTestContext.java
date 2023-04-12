@@ -18,7 +18,7 @@ public class MultisigTestContext {
 	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 	private final MultisigCosignatoryModificationValidator multisigCosignatoryModificationValidator = new MultisigCosignatoryModificationValidator(
-			this.accountStateCache, this.forkConfiguration.getmultisigMOfNForkHeight());
+			this.accountStateCache, this.forkConfiguration.getMultisigMOfNForkHeight());
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(
 			this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;

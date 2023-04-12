@@ -583,7 +583,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final NamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache,
-				forkConfiguration.getFeeForkHeight(), forkConfiguration.getSecondFeeForkHeight());
+				forkConfiguration.getFeeFork());
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
 			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {

@@ -971,7 +971,6 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void getReturnsExpectedNemNamespaceEntry() {
 		// Arrange:
 		final T cache = this.createCache();
-		final BlockHeight mosaicRedefinitionForkHeight = new ForkConfiguration.Builder().build().getMosaicRedefinitionForkHeight();
 
 		// Act:
 		final NamespaceEntry namespaceEntry = cache.get(new NamespaceId("nem"));

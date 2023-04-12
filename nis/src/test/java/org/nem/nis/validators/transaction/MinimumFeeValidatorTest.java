@@ -52,8 +52,7 @@ public class MinimumFeeValidatorTest {
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final Address signerAddress = isSignerNemesisAccount ? transaction.getSigner().getAddress() : Utils.generateRandomAddress();
 		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(signerAddress),
-				new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()), false, forkConfiguration.getFeeForkHeight(),
-				forkConfiguration.getSecondFeeForkHeight());
+				new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()), false, forkConfiguration.getFeeFork());
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction,
@@ -92,7 +91,7 @@ public class MinimumFeeValidatorTest {
 		transaction.setDeadline(new TimeInstant(1));
 
 		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(Utils.generateRandomAddress()),
-				namespaceCache, false, forkConfiguration.getFeeForkHeight(), forkConfiguration.getSecondFeeForkHeight());
+				namespaceCache, false, forkConfiguration.getFeeFork());
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction,
@@ -116,8 +115,7 @@ public class MinimumFeeValidatorTest {
 		// Arrange:
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final SingleTransactionValidator validator = new MinimumFeeValidator(createNetworkInfo(Utils.generateRandomAddress()),
-				new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()), true, forkConfiguration.getFeeForkHeight(),
-				forkConfiguration.getSecondFeeForkHeight());
+				new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()), true, forkConfiguration.getFeeFork());
 		final Collection<Transaction> transactions = TestTransactionRegistry.stream().map(entry -> {
 			final Transaction transaction = entry.createModel.get();
 			transaction.setFee(fee);

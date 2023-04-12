@@ -85,4 +85,11 @@ public class NemNamespaceEntry {
 	public static void setDefault(final BlockHeight mosaicRedefinitionForkHeight) {
 		instance.set(createNemNamespaceEntry(mosaicRedefinitionForkHeight));
 	}
+
+	/**
+	 * Resets the namespace entry for 'nem' to the default value.
+	 */
+	public static void resetToDefault() {
+		instance.set(null);
+	}
 }

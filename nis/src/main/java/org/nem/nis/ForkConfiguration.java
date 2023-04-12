@@ -19,10 +19,9 @@ public class ForkConfiguration {
 
 	private final BlockHeight multisigMOfNForkHeight;
 	private final BlockHeight mosaicsForkHeight;
-	private final BlockHeight feeForkHeight;
 	private final BlockHeight remoteAccountForkHeight;
 	private final BlockHeight mosaicRedefinitionForkHeight;
-	private final BlockHeight secondFeeForkHeight;
+	private final FeeForkDto feeForkDto;
 
 	private ForkConfiguration(final Builder builder) {
 		this.treasuryReissuanceForkHeight = builder.treasuryReissuanceForkHeight;
@@ -30,10 +29,9 @@ public class ForkConfiguration {
 		this.treasuryReissuanceForkFallbackTransactionHashes = builder.treasuryReissuanceForkFallbackTransactionHashes;
 		this.multisigMOfNForkHeight = builder.multisigMOfNForkHeight;
 		this.mosaicsForkHeight = builder.mosaicsForkHeight;
-		this.feeForkHeight = builder.feeForkHeight;
 		this.remoteAccountForkHeight = builder.remoteAccountForkHeight;
 		this.mosaicRedefinitionForkHeight = builder.mosaicRedefinitionForkHeight;
-		this.secondFeeForkHeight = builder.secondFeeForkHeight;
+		this.feeForkDto = new FeeForkDto(builder.firstFeeForkHeight, builder.secondFeeForkHeight);
 	}
 
 	/**
@@ -68,7 +66,7 @@ public class ForkConfiguration {
 	 *
 	 * @return The height of the fork.
 	 */
-	public BlockHeight getmultisigMOfNForkHeight() {
+	public BlockHeight getMultisigMOfNForkHeight() {
 		return this.multisigMOfNForkHeight;
 	}
 
@@ -79,16 +77,6 @@ public class ForkConfiguration {
 	 */
 	public BlockHeight getMosaicsForkHeight() {
 		return this.mosaicsForkHeight;
-	}
-
-	/**
-	 * Gets the height of the fee fork.
-	 *
-	 * @return The height of the fork.
-	 */
-
-	public BlockHeight getFeeForkHeight() {
-		return this.feeForkHeight;
 	}
 
 	/**
@@ -110,12 +98,12 @@ public class ForkConfiguration {
 	}
 
 	/**
-	 * Gets the height of the second fee fork.
+	 * Gets the fee forks.
 	 *
-	 * @return The height of the fork.
+	 * @return The fee forks.
 	 */
-	public BlockHeight getSecondFeeForkHeight() {
-		return this.secondFeeForkHeight;
+	public FeeForkDto getFeeFork() {
+		return this.feeForkDto;
 	}
 
 	/**
@@ -127,7 +115,7 @@ public class ForkConfiguration {
 		private List<Hash> treasuryReissuanceForkFallbackTransactionHashes;
 		private BlockHeight multisigMOfNForkHeight;
 		private BlockHeight mosaicsForkHeight;
-		private BlockHeight feeForkHeight;
+		private BlockHeight firstFeeForkHeight;
 		private BlockHeight remoteAccountForkHeight;
 		private BlockHeight mosaicRedefinitionForkHeight;
 		private BlockHeight secondFeeForkHeight;
@@ -149,6 +137,15 @@ public class ForkConfiguration {
 		}
 
 		/**
+		 * Creates a builder for a fork configuration from network info.
+		 *
+		 * @param networkInfo The network info
+		 */
+		public Builder(final NetworkInfo networkInfo) {
+			this(new NemProperties(new Properties()), networkInfo);
+		}
+
+		/**
 		 * Creates a builder for a fork configuration from nis configuration.
 		 *
 		 * @param properties nis properties.
@@ -166,7 +163,8 @@ public class ForkConfiguration {
 					properties.getOptionalLong("nis.multisigMOfNForkHeight", BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version)));
 			this.mosaicsForkHeight = new BlockHeight(
 					properties.getOptionalLong("nis.mosaicsForkHeight", BlockMarkerConstants.MOSAICS_FORK(version)));
-			this.feeForkHeight = new BlockHeight(properties.getOptionalLong("nis.feeForkHeight", BlockMarkerConstants.FEE_FORK(version)));
+			this.firstFeeForkHeight = new BlockHeight(
+					properties.getOptionalLong("nis.firstFeeForkHeight", BlockMarkerConstants.FEE_FORK(version)));
 			this.remoteAccountForkHeight = new BlockHeight(
 					properties.getOptionalLong("nis.remoteAccountForkHeight", BlockMarkerConstants.REMOTE_ACCOUNT_FORK(version)));
 			this.mosaicRedefinitionForkHeight = new BlockHeight(
@@ -235,8 +233,8 @@ public class ForkConfiguration {
 		 *
 		 * @return The fork configuration builder.
 		 */
-		public Builder feeForkHeight(final BlockHeight feeForkHeight) {
-			this.feeForkHeight = feeForkHeight;
+		public Builder firstFeeForkHeight(final BlockHeight firstFeeForkHeight) {
+			this.firstFeeForkHeight = firstFeeForkHeight;
 			return this;
 		}
 

@@ -12,7 +12,7 @@ public class TSingleTransactionValidatorTest {
 		// Arrange:
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final TSingleTransactionValidator<?> validator = new TransferTransactionValidator(forkConfiguration.getRemoteAccountForkHeight(),
-				forkConfiguration.getmultisigMOfNForkHeight());
+				forkConfiguration.getMultisigMOfNForkHeight());
 
 		// Act:
 		final String name = validator.getName();

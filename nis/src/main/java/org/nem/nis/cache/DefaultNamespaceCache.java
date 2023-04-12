@@ -21,7 +21,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	/**
 	 * Creates a new namespace cache.
 	 *
-	 * @param mosaicRedefinitionForkHeight The height at which mosaic redefinition fork.
+	 * @param mosaicRedefinitionForkHeight The height of mosaic redefinition fork.
 	 */
 	public DefaultNamespaceCache(final BlockHeight mosaicRedefinitionForkHeight) {
 		this(100, mosaicRedefinitionForkHeight);

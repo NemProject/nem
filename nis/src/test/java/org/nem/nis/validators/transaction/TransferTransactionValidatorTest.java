@@ -16,7 +16,7 @@ import org.nem.nis.validators.ValidationContext;
 public class TransferTransactionValidatorTest {
 	private static final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator(
-			forkConfiguration.getRemoteAccountForkHeight(), forkConfiguration.getmultisigMOfNForkHeight());
+			forkConfiguration.getRemoteAccountForkHeight(), forkConfiguration.getMultisigMOfNForkHeight());
 	private static final int ORIGINAL_MAX_MESSAGE_SIZE = 96;
 	private static final int MAX_MESSAGE_SIZE_MULTISIG_FORK = 160;
 	private static final int CURRENT_MAX_MESSAGE_SIZE = 1024;

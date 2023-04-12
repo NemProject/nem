@@ -315,8 +315,8 @@ public class NisAppConfig {
 		} else {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(), new BlockHeight[]{
-							nisConfiguration.getForkConfiguration().getFeeForkHeight(),
-							nisConfiguration.getForkConfiguration().getSecondFeeForkHeight()
+							nisConfiguration.getForkConfiguration().getFeeFork().getFirstHeight(),
+							nisConfiguration.getForkConfiguration().getFeeFork().getSecondHeight()
 					}));
 		}
 

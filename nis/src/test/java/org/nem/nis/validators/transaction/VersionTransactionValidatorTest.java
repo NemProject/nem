@@ -181,7 +181,7 @@ public class VersionTransactionValidatorTest {
 		// Arrange:
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final SingleTransactionValidator validator = new VersionTransactionValidator(forkConfiguration.getMosaicsForkHeight(),
-				forkConfiguration.getmultisigMOfNForkHeight());
+				forkConfiguration.getMultisigMOfNForkHeight());
 		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), ValidationStates.Throw);
 
 		// Act:
