@@ -10,6 +10,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.ValidationStates;
@@ -579,9 +580,10 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static class TestContext {
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
-		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(
-				this.namespaceCache);
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		final NamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache,
+				forkConfiguration.getFeeFork());
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
 			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {

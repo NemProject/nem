@@ -137,7 +137,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration(new BlockHeight(1234), hashes, new ArrayList<Hash>()));
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+						.treasuryReissuanceForkTransactionHashes(hashes).build());
 		context.addTransactions(transactions);
 
 		// - create accounts
@@ -170,7 +171,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration(new BlockHeight(1234), new ArrayList<Hash>(), fallbackHashes));
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+						.treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes).build());
 		context.addTransactions(transactions);
 
 		// - create accounts
@@ -209,7 +211,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// - create test context and add account
 		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
-				new ForkConfiguration(new BlockHeight(1234), hashes, fallbackHashes));
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+						.treasuryReissuanceForkTransactionHashes(hashes).treasuryReissuanceForkFallbackTransactionHashes(fallbackHashes)
+						.build());
 		context.addTransactions(transactions);
 
 		// - create accounts
@@ -541,7 +545,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 			final ProviderFactories factories = new ProviderFactories();
 			factories.validatorFactory = NisUtils.createTransactionValidatorFactory();
 			factories.blockValidatorFactory = NisUtils.createBlockValidatorFactory();
-			factories.observerFactory = new BlockTransactionObserverFactory();
+			factories.observerFactory = new BlockTransactionObserverFactory(new ForkConfiguration.Builder().build());
 			return factories;
 		}
 
@@ -599,11 +603,11 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 
 		public TestContext(final SingleTransactionValidator singleValidator) {
-			this(new ProviderFactories(singleValidator), new ForkConfiguration());
+			this(new ProviderFactories(singleValidator), new ForkConfiguration.Builder().build());
 		}
 
 		public TestContext(final ProviderFactories factories) {
-			this(factories, new ForkConfiguration());
+			this(factories, new ForkConfiguration.Builder().build());
 		}
 
 		public TestContext(final ProviderFactories factories, final ForkConfiguration forkConfiguration) {

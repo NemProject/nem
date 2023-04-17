@@ -9,11 +9,14 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
-	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
+	private static final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator(
+			forkConfiguration.getRemoteAccountForkHeight(), forkConfiguration.getMultisigMOfNForkHeight());
 	private static final int ORIGINAL_MAX_MESSAGE_SIZE = 96;
 	private static final int MAX_MESSAGE_SIZE_MULTISIG_FORK = 160;
 	private static final int CURRENT_MAX_MESSAGE_SIZE = 1024;

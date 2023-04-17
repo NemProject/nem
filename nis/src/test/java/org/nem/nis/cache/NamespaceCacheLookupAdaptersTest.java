@@ -8,6 +8,7 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 
 public class NamespaceCacheLookupAdaptersTest {
 
@@ -98,7 +99,8 @@ public class NamespaceCacheLookupAdaptersTest {
 	// endregion
 
 	private static class TestContext {
-		private final NamespaceCache cache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final NamespaceCache cache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 		private final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.cache);
 		private final MosaicLevy levy = Utils.createMosaicLevy();
 

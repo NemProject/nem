@@ -2,6 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
@@ -11,14 +12,17 @@ import org.nem.nis.state.*;
  */
 public class RemoteObserver implements BlockTransactionObserver {
 	private final AccountStateCache accountStateCache;
+	private final BlockHeight mosaicRedefinitionForkHeight;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param accountStateCache The account state cache.
+	 * @param mosaicRedefinitionForkHeight The mosaic redefinition fork height.
 	 */
-	public RemoteObserver(final AccountStateCache accountStateCache) {
+	public RemoteObserver(final AccountStateCache accountStateCache, final BlockHeight mosaicRedefinitionForkHeight) {
 		this.accountStateCache = accountStateCache;
+		this.mosaicRedefinitionForkHeight = mosaicRedefinitionForkHeight;
 	}
 
 	private RemoteLinks getRemoteLinks(final Address address) {
@@ -41,7 +45,7 @@ public class RemoteObserver implements BlockTransactionObserver {
 	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
 		final Address remoteAddress = ImportanceTransferMode.Activate == notification.getMode()
 				? notification.getLessee().getAddress()
-				: context.getHeight().getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)
+				: context.getHeight().getRaw() < this.mosaicRedefinitionForkHeight.getRaw()
 						? notification.getLessee().getAddress()
 						: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
 

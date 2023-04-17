@@ -167,7 +167,8 @@ public class DefaultUnconfirmedStateTest {
 			hashes.add(Utils.generateRandomHash());
 
 			// - create test context and add account
-			final TestContext context = new TestContext(new ForkConfiguration(new BlockHeight(1234), hashes, new ArrayList<Hash>()));
+			final TestContext context = new TestContext(new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(1234))
+					.treasuryReissuanceForkTransactionHashes(hashes).build());
 			context.prepareAccount(senderAccount, Amount.fromNem(1_000));
 
 			// Act:
@@ -641,7 +642,7 @@ public class DefaultUnconfirmedStateTest {
 		private long blockHeight = CONFIRMED_BLOCK_HEIGHT;
 
 		public TestContext(final SingleTransactionValidator... additionalValidators) {
-			this(new ForkConfiguration(), additionalValidators);
+			this(new ForkConfiguration.Builder().build(), additionalValidators);
 		}
 
 		public TestContext(final ForkConfiguration forkConfiguration, final SingleTransactionValidator... additionalValidators) {

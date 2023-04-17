@@ -6,14 +6,17 @@ import org.junit.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 
 public class NamespaceEntryTest {
+
+	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 
 	@Test
 	public void canCreateEntry() {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE);
-		final Mosaics mosaics = new Mosaics(namespace.getId());
+		final Mosaics mosaics = new Mosaics(namespace.getId(), this.forkConfiguration.getMosaicRedefinitionForkHeight());
 		mosaics.add(Utils.createMosaicDefinition(namespace.getId(), 1));
 
 		// Act:
@@ -28,7 +31,7 @@ public class NamespaceEntryTest {
 	public void canCreateEntryCopy() {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE);
-		final Mosaics mosaics = new Mosaics(namespace.getId());
+		final Mosaics mosaics = new Mosaics(namespace.getId(), this.forkConfiguration.getMosaicRedefinitionForkHeight());
 		mosaics.add(Utils.createMosaicDefinition(namespace.getId(), 1));
 		final NamespaceEntry entry = new NamespaceEntry(namespace, mosaics);
 

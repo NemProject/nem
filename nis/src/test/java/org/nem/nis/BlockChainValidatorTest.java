@@ -12,7 +12,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -251,7 +250,7 @@ public class BlockChainValidatorTest {
 	public void transactionsAtTreasuryReissuanceForkHeightDoNotNeedToVerify() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator(
-				new ForkConfiguration(new BlockHeight(100), new ArrayList<Hash>(), new ArrayList<Hash>()));
+				new ForkConfiguration.Builder().treasuryReissuanceForkHeight(new BlockHeight(100)).build());
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 98);
 		parentBlock.sign();
 
@@ -649,7 +648,7 @@ public class BlockChainValidatorTest {
 		}
 
 		public BlockChainValidator create() {
-			return create(new ForkConfiguration());
+			return create(new ForkConfiguration.Builder().build());
 		}
 
 		public BlockChainValidator create(final ForkConfiguration forkConfiguration) {
@@ -659,7 +658,7 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator() {
-		return createValidator(new ForkConfiguration());
+		return createValidator(new ForkConfiguration.Builder().build());
 	}
 
 	private static BlockChainValidator createValidator(final ForkConfiguration forkConfiguration) {

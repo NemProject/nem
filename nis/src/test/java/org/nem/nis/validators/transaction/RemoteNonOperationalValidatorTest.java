@@ -11,6 +11,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.ValidationStates;
@@ -242,7 +243,9 @@ public class RemoteNonOperationalValidatorTest {
 
 		public void assertValidationResult(final Transaction transaction, final BlockHeight height, final ValidationResult expectedResult) {
 			// Arrange:
-			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
+			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache,
+					forkConfiguration.getMosaicRedefinitionForkHeight());
 
 			// Act:
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));

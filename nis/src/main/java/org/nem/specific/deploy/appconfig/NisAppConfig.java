@@ -171,7 +171,8 @@ public class NisAppConfig {
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
 		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
-		return new BlockTransactionObserverFactory(this.observerOptions(), estimatedBlocksPerYear);
+		final ForkConfiguration forkConfiguration = this.nisConfiguration().getForkConfiguration();
+		return new BlockTransactionObserverFactory(this.observerOptions(), estimatedBlocksPerYear, forkConfiguration);
 	}
 
 	@Bean
@@ -228,7 +229,10 @@ public class NisAppConfig {
 
 	@Bean
 	public SynchronizedNamespaceCache namespaceCache() {
-		return new SynchronizedNamespaceCache(new DefaultNamespaceCache());
+		final BlockHeight mosaicRedefinitionForkHeight = this.nisConfiguration().getForkConfiguration().getMosaicRedefinitionForkHeight();
+
+		NemNamespaceEntry.setDefault(mosaicRedefinitionForkHeight);
+		return new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight));
 	}
 
 	@Bean
@@ -299,27 +303,28 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
+		final NisConfiguration nisConfiguration = this.nisConfiguration();
+
 		// initialize network info
-		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
+		NetworkInfos.setDefault(nisConfiguration.getNetworkInfo());
 
 		// initialize other globals
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
-		if (this.nisConfiguration().ignoreFees()) {
+		if (nisConfiguration.ignoreFees()) {
 			NemGlobals.setTransactionFeeCalculator(new ZeroTransactionFeeCalculator());
 		} else {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(), new BlockHeight[]{
-							new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24)),
-							new BlockHeight(
-									BlockMarkerConstants.SECOND_FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))
+							nisConfiguration.getForkConfiguration().getFeeFork().getFirstHeight(),
+							nisConfiguration.getForkConfiguration().getFeeFork().getSecondHeight()
 					}));
 		}
 
-		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
+		NemGlobals.setBlockChainConfiguration(nisConfiguration.getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
 
-		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(),
-				this.nisConfiguration(), this.blockAnalyzer(), System::exit);
+		return new NisMain(this.blockDao, this.nisCache(), this.networkHostBootstrapper(), this.nisModelToDbModelMapper(), nisConfiguration,
+				this.blockAnalyzer(), System::exit);
 	}
 
 	@SuppressWarnings("serial")
@@ -338,8 +343,9 @@ public class NisAppConfig {
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
 		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
+		final ForkConfiguration forkConfiguration = this.nisConfiguration().getForkConfiguration();
 		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer, this.nisMapperFactory(),
-				estimatedBlocksPerYear);
+				estimatedBlocksPerYear, forkConfiguration);
 	}
 
 	@Bean

@@ -10,6 +10,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
@@ -640,9 +641,11 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache(this.forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(
-				this.namespaceCache);
+				this.namespaceCache, this.forkConfiguration.getFeeFork());
 
 		private TestContext(final String parent, final String part) {
 			this(parent, part, new BlockHeight(50),

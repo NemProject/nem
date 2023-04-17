@@ -1,7 +1,9 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.validators.*;
 
 /**
@@ -9,6 +11,19 @@ import org.nem.nis.validators.*;
  * before the respective fork heights
  */
 public class VersionTransactionValidator implements SingleTransactionValidator {
+	private final BlockHeight mosaicsForkHeight;
+	private final BlockHeight multisigMOfNForkHeight;
+
+	/**
+	 * Creates a version transaction validator.
+	 *
+	 * @param mosaicsForkHeight The mosaics fork height.
+	 * @param multisigMOfNForkHeight The multisig M-of-N fork height.
+	 */
+	public VersionTransactionValidator(final BlockHeight mosaicsForkHeight, final BlockHeight multisigMOfNForkHeight) {
+		this.mosaicsForkHeight = mosaicsForkHeight;
+		this.multisigMOfNForkHeight = multisigMOfNForkHeight;
+	}
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
@@ -20,7 +35,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
 				switch (version) {
 					case 1:
-						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+						return blockHeight < this.mosaicsForkHeight.getRaw()
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
 				}
@@ -28,7 +43,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 			case TransactionTypes.TRANSFER:
 				switch (version) {
 					case 2:
-						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+						return blockHeight < this.mosaicsForkHeight.getRaw()
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
 				}
@@ -36,7 +51,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				switch (version) {
 					case 2:
-						return blockHeight < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
+						return blockHeight < this.multisigMOfNForkHeight.getRaw()
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
 				}

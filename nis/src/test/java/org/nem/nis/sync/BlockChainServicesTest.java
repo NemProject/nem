@@ -27,7 +27,8 @@ public class BlockChainServicesTest {
 		// note: createMapper() only uses the NisMapperFactory object
 		final NisMapperFactory factory = Mockito.mock(NisMapperFactory.class);
 		final AccountLookup lookup = new DefaultAccountCache();
-		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory, new ForkConfiguration());
+		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory,
+				new ForkConfiguration.Builder().build());
 
 		// Act:
 		services.createMapper(lookup);

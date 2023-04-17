@@ -39,8 +39,9 @@ public class RealBlockChainTestContext {
 			this.mapperFactory.createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao,
 			this.nisModelToDbModelMapper);
+	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 
-	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
+	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory(forkConfiguration);
 	private final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
 	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 	private final NisMapperFactory nisMapperFactory = new NisMapperFactory(this.mapperFactory);

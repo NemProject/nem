@@ -10,6 +10,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
@@ -118,7 +119,9 @@ public class MosaicSupplyChangeObserverTest {
 	private static class TestContext {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account supplier = this.mosaicDefinition.getCreator();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())
+				.copy();
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final AccountState accountState = new AccountState(this.supplier.getAddress());
 

@@ -9,6 +9,7 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.DbMosaicId;
 import org.nem.nis.state.*;
@@ -264,10 +265,12 @@ public class BlockChainHarvesterTest {
 	@Test
 	public void processBlockUpdatesBlockLessor() {
 		// Arrange:
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		final SynchronizedAccountStateCache accountStateCache = new SynchronizedAccountStateCache(new DefaultAccountStateCache());
 		final DefaultNisCache nisCache = new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()), accountStateCache,
 				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
-				new SynchronizedHashCache(new DefaultHashCache()), new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
+				new SynchronizedHashCache(new DefaultHashCache()),
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
 
 		// Setup remote harvesting

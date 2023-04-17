@@ -8,7 +8,8 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.NamespaceConstants;
+import org.nem.nis.ForkConfiguration;
+import org.nem.nis.NemNamespaceEntry;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -976,7 +977,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 		// Assert:
 		MatcherAssert.assertThat(namespaceEntry, IsNull.notNullValue());
-		MatcherAssert.assertThat(namespaceEntry, IsSame.sameInstance(NamespaceConstants.NAMESPACE_ENTRY_NEM));
+		MatcherAssert.assertThat(namespaceEntry, IsSame.sameInstance(NemNamespaceEntry.getDefault()));
 	}
 
 	@Test

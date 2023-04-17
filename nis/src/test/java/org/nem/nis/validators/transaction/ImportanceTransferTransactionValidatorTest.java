@@ -10,6 +10,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -383,8 +384,9 @@ public class ImportanceTransferTransactionValidatorTest {
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.accountStateCache,
-				this.namespaceCache);
+				this.namespaceCache, this.forkConfiguration.getRemoteAccountForkHeight());
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferMode mode) {
 			final Account signer = Utils.generateRandomAccount();
@@ -418,7 +420,8 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private void addNamespaceOwner(final Account account, final NamespaceId id) {
 			final Namespace namespace = new Namespace(id, account, new BlockHeight(123));
-			final NamespaceEntry entry = new NamespaceEntry(namespace, new Mosaics(id));
+			final NamespaceEntry entry = new NamespaceEntry(namespace,
+					new Mosaics(id, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 			Mockito.when(this.namespaceCache.getRootNamespaceIds()).thenReturn(Collections.singletonList(id));
 			Mockito.when(this.namespaceCache.get(id)).thenReturn(entry);
 		}

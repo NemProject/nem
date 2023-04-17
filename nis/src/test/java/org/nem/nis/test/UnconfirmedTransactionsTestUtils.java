@@ -44,7 +44,8 @@ public class UnconfirmedTransactionsTestUtils {
 			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(timeProvider),
 					cache -> (notification, context) -> {
-					}, timeProvider, () -> new BlockHeight(511000), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration());
+					}, timeProvider, () -> new BlockHeight(511000), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK,
+					new ForkConfiguration.Builder().build());
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

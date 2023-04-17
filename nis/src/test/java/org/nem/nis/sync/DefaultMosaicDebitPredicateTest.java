@@ -8,6 +8,7 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
@@ -63,6 +64,7 @@ public class DefaultMosaicDebitPredicateTest {
 	}
 
 	private static NamespaceCache createNamespaceCache() {
-		return new DefaultNamespaceCache().copy();
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		return new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
 	}
 }

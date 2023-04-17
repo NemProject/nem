@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -192,7 +193,9 @@ public class RemoteObserverTest {
 		private final RemoteLinks lesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final RemoteLinks fakeLesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache);
+		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache,
+				this.forkConfiguration.getMosaicRedefinitionForkHeight());
 
 		private TestContext() {
 			this.hook(this.lessor, this.lessorRemoteLinks);

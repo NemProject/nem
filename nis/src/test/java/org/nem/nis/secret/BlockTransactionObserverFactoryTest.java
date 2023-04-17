@@ -10,6 +10,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -22,33 +23,34 @@ public class BlockTransactionObserverFactoryTest {
 	private static final EnumSet<ObserverOption> OPTIONS_NO_OUTLINK_OBSERVER = EnumSet.of(ObserverOption.NoOutlinkObserver);
 	private static final EnumSet<ObserverOption> OPTIONS_NONE = EnumSet.range(ObserverOption.NoIncrementalPoi,
 			ObserverOption.NoOutlinkObserver);
+	private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 
 	// region basic - execute
 
 	@Test
 	public void createExecuteCommitObserverReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(forkConfiguration), getDefaultObserverNames());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI),
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI, forkConfiguration),
 				getObserverNamesWithoutIncrementalPoi());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER),
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER, forkConfiguration),
 				getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoOptionalObserverReturnsValidObserver() {
 		// Assert:
-		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE, forkConfiguration), getBaseObserverNames());
 	}
 
 	private static void assertExecuteCommitObserverNames(final BlockTransactionObserverFactory factory,
@@ -71,27 +73,27 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoCommitObserverReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(forkConfiguration), getDefaultObserverNames());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI),
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI, forkConfiguration),
 				getObserverNamesWithoutIncrementalPoi());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER),
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER, forkConfiguration),
 				getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoOptionalObserverReturnsValidObserver() {
 		// Assert:
-		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE, forkConfiguration), getBaseObserverNames());
 	}
 
 	private static void assertUndoCommitObserverNames(final BlockTransactionObserverFactory factory,
@@ -167,7 +169,7 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createExecuteDoesPerformIncrementalPoiWhenEnabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(forkConfiguration);
 
 		// Assert:
 		assertRecalculateImportancesIsCalled(factory::createExecuteCommitObserver, NotificationTrigger.Execute);
@@ -176,7 +178,7 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createExecuteDoesNotPerformIncrementalPoiWhenDisabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI, forkConfiguration);
 
 		// Assert:
 		assertRecalculateImportancesIsNotCalled(factory::createExecuteCommitObserver, NotificationTrigger.Execute);
@@ -185,7 +187,7 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoDoesPerformIncrementalPoiWhenEnabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(forkConfiguration);
 
 		// Assert:
 		assertRecalculateImportancesIsCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
@@ -194,7 +196,7 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoDoesNotPerformIncrementalPoiWhenDisabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI, forkConfiguration);
 
 		// Assert:
 		assertRecalculateImportancesIsNotCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
@@ -432,7 +434,7 @@ public class BlockTransactionObserverFactoryTest {
 		}
 
 		public TestContext(final EnumSet<ObserverOption> observerOptions) {
-			this.factory = new BlockTransactionObserverFactory(observerOptions);
+			this.factory = new BlockTransactionObserverFactory(observerOptions, new ForkConfiguration.Builder().build());
 		}
 
 		private MockAccountContext addAccount() {

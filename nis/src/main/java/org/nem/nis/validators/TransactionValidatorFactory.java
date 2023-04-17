@@ -3,9 +3,9 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
-import org.nem.nis.ForkConfiguration;
 
 /**
  * Factory for creating TransactionValidator objects.
@@ -68,20 +68,24 @@ public class TransactionValidatorFactory {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new DeadlineValidator());
-		builder.add(new MinimumFeeValidator(this.networkInfo, nisCache.getNamespaceCache(), ignoreFees));
-		builder.add(new VersionTransactionValidator());
+		builder.add(
+				new MinimumFeeValidator(this.networkInfo, nisCache.getNamespaceCache(), ignoreFees, this.forkConfiguration.getFeeFork()));
+		builder.add(new VersionTransactionValidator(this.forkConfiguration.getMosaicsForkHeight(),
+				this.forkConfiguration.getMultisigMOfNForkHeight()));
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator(this.forkConfiguration.getTreasuryReissuanceForkHeight()));
 		builder.add(new BalanceValidator());
 		builder.add(new TransactionNetworkValidator());
 
-		builder.add(new RemoteNonOperationalValidator(accountStateCache));
+		builder.add(new RemoteNonOperationalValidator(accountStateCache, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 		builder.add(new MultisigNonOperationalValidator(this.forkConfiguration, accountStateCache));
 
-		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new TransferTransactionValidator()));
+		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, new TransferTransactionValidator(
+				this.forkConfiguration.getRemoteAccountForkHeight(), this.forkConfiguration.getMultisigMOfNForkHeight())));
 
-		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.IMPORTANCE_TRANSFER,
-				new ImportanceTransferTransactionValidator(accountStateCache, namespaceCache)));
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(TransactionTypes.IMPORTANCE_TRANSFER, new ImportanceTransferTransactionValidator(
+						accountStateCache, namespaceCache, this.forkConfiguration.getRemoteAccountForkHeight())));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG,
 				new MultisigTransactionSignerValidator(accountStateCache)));
@@ -89,15 +93,15 @@ public class TransactionValidatorFactory {
 				new FeeSinkNonOperationalValidator(this.forkConfiguration)));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				new MultisigCosignatoryModificationValidator(accountStateCache)));
+				new MultisigCosignatoryModificationValidator(accountStateCache, this.forkConfiguration.getMultisigMOfNForkHeight())));
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				new NumCosignatoryRangeValidator(accountStateCache)));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.PROVISION_NAMESPACE,
-				new ProvisionNamespaceTransactionValidator(namespaceCache)));
+				new ProvisionNamespaceTransactionValidator(namespaceCache, this.forkConfiguration.getFeeFork())));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MOSAIC_DEFINITION_CREATION,
-				new MosaicDefinitionCreationTransactionValidator(namespaceCache)));
+				new MosaicDefinitionCreationTransactionValidator(namespaceCache, this.forkConfiguration.getFeeFork())));
 
 		builder.add(new TSingleTransactionValidatorAdapter<>(TransactionTypes.MOSAIC_SUPPLY_CHANGE,
 				new MosaicSupplyChangeTransactionValidator(namespaceCache)));

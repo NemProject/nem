@@ -11,6 +11,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.dao.ReadOnlyNamespaceDao;
@@ -61,8 +62,9 @@ public class MosaicInfoFactoryTest {
 			this.accountState.getAccountInfo().addMosaicId(mosaicId2);
 			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);
 
+			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 			final Namespace namespace = new Namespace(namespaceId1, Utils.generateRandomAccount(), BlockHeight.ONE);
-			final Mosaics mosaics = new Mosaics(namespace.getId());
+			final Mosaics mosaics = new Mosaics(namespace.getId(), forkConfiguration.getMosaicRedefinitionForkHeight());
 			mosaics.add(Utils.createMosaicDefinition(namespaceId1.toString(), mosaicId1.getName()));
 			final MosaicEntry mosaicEntry = mosaics.get(mosaicId1);
 			mosaicEntry.getBalances().incrementBalance(this.address, new Quantity(1234));
