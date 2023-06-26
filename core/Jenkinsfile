@@ -1,5 +1,7 @@
 defaultCiPipeline {
-	platform = ['ubuntu']
+	operatingSystem = ['ubuntu']
+	instanceSize = 'medium'
+
 	ciBuildDockerfile = 'java.Dockerfile'
 
 	packageId = 'nem-core'
