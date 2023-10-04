@@ -10,6 +10,13 @@ updates:
     labels: [core]
     commit-message:
       prefix: '[dependency]'
+    groups:
+      core-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: maven
     directory: /deploy
@@ -20,6 +27,13 @@ updates:
     labels: [deploy]
     commit-message:
       prefix: '[dependency]'
+    groups:
+      deploy-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: maven
     directory: /nis
@@ -30,6 +44,13 @@ updates:
     labels: [nis]
     commit-message:
       prefix: '[dependency]'
+    groups:
+      nis-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: maven
     directory: /peer
@@ -40,6 +61,13 @@ updates:
     labels: [peer]
     commit-message:
       prefix: '[dependency]'
+    groups:
+      peer-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: /
@@ -49,3 +77,10 @@ updates:
     target-branch: dev
     commit-message:
       prefix: '[dependency]'
+    groups:
+      github-action-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch

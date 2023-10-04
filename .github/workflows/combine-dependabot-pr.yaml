@@ -1,0 +1,47 @@
+name: Combine PRs
+
+'on':
+  schedule:
+    # yamllint disable-line rule:quoted-strings
+    - cron: '0 1 * * 0'  # Sunday at 01:00 AM
+  workflow_dispatch:  # allows you to manually trigger the workflow
+    inputs:
+      logLevel:
+        description: Log level
+        required: true
+        default: warning
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+
+# The minimum permissions required to run this Action
+permissions:
+  contents: write
+  pull-requests: write
+  repository-projects: write
+  checks: read
+
+jobs:
+  combine-prs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: combine dependabot prs
+        id: combine-prs
+        uses: github/combine-prs@v4.0.0
+        with:
+          pr_title: '[dependency]: Combine dependabot PRs'
+          ci_required: true
+          branch_prefix: dependabot
+          labels: dependencies
+          pr_body_header: '# Combined Dependabot PRs ➡️📦⬅️'
+
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ steps.combine-prs.outputs.pr_url }}
+        run: gh pr merge --auto --squash --subject "$PR_TITLE" "$PR_URL"
+        env:
+          PR_URL: ${{ steps.combine-prs.outputs.pr_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: '[dependency]: Combine dependabot PRs'
