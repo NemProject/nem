@@ -13,7 +13,7 @@
     <properties>
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.52.v20230823</jetty.version>
+        <jetty.version>11.0.17</jetty.version>
         <spring.version>5.3.23</spring.version>
     </properties>
 
