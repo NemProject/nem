@@ -7,5 +7,6 @@ defaultCiPipeline {
 	packageId = 'nem-peer'
 
 	codeCoverageTool = 'jacoco'
-}
 
+	discordWebHookUrlId = 'CLIENT_DISCORD_WEB_HOOK_URL_ID'
+}

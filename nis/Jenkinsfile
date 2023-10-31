@@ -11,4 +11,6 @@ defaultCiPipeline {
 	packageId = 'nem-nis'
 
 	codeCoverageTool = 'jacoco'
+
+	discordWebHookUrlId = 'CLIENT_DISCORD_WEB_HOOK_URL_ID'
 }
