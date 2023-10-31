@@ -8,5 +8,5 @@ defaultCiPipeline {
 
 	codeCoverageTool = 'jacoco'
 
-	discordWebHookUrlId = 'CLIENT_DISCORD_WEB_HOOK_URL_ID'
+	discordWebHookUrlId = 'SDK_DISCORD_WEB_HOOK_URL_ID'
 }
