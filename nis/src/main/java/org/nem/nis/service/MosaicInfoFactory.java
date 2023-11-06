@@ -72,6 +72,7 @@ public class MosaicInfoFactory {
 		return Stream.concat(Stream.of(nemXemBalance), accountState.getAccountInfo().getMosaicIds().stream()
 				.filter(mosaicId -> null != this.namespaceCache.get(mosaicId.getNamespaceId()))
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
+				.filter(Objects::nonNull)
 				.map(entry -> new Mosaic(entry.getMosaicDefinition().getId(), entry.getBalances().getBalance(accountState.getAddress()))))
 				.collect(Collectors.toList());
 	}
