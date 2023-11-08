@@ -56,10 +56,14 @@ public class MosaicInfoFactoryTest {
 		public TestContext() {
 			final NamespaceId namespaceId1 = new NamespaceId("foo");
 			final NamespaceId namespaceId2 = new NamespaceId("baz");
+			final NamespaceId namespaceIdNoMosaicId = new NamespaceId("nomosaic");
 			final MosaicId mosaicId1 = new MosaicId(namespaceId1, "bar");
 			final MosaicId mosaicId2 = new MosaicId(namespaceId2, "qux");
+			final MosaicId mosaicIdNotInNamespace = new MosaicId(namespaceIdNoMosaicId, "crash");
+
 			this.accountState.getAccountInfo().addMosaicId(mosaicId1);
 			this.accountState.getAccountInfo().addMosaicId(mosaicId2);
+			this.accountState.getAccountInfo().addMosaicId(mosaicIdNotInNamespace);
 			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);
 
 			final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
@@ -71,6 +75,12 @@ public class MosaicInfoFactoryTest {
 			final NamespaceEntry namespaceEntry = new NamespaceEntry(namespace, mosaics);
 			Mockito.when(this.namespaceCache.get(namespaceId1)).thenReturn(namespaceEntry);
 			Mockito.when(this.namespaceCache.get(namespaceId2)).thenReturn(null);
+
+			// Add regression crash for when namespace is valid but mosaic entry is not present
+			final Namespace namespaceNoMosaicIdEntry = new Namespace(namespaceId1, Utils.generateRandomAccount(), BlockHeight.ONE);
+			final Mosaics mosaicsEmpty = new Mosaics(namespaceNoMosaicIdEntry.getId(), forkConfiguration.getMosaicRedefinitionForkHeight());
+			final NamespaceEntry namespaceEntryNoMosaic = new NamespaceEntry(namespaceNoMosaicIdEntry, mosaicsEmpty);
+			Mockito.when(this.namespaceCache.get(namespaceIdNoMosaicId)).thenReturn(namespaceEntryNoMosaic);
 		}
 	}
 }
