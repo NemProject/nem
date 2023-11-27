@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: combine dependabot prs
         id: combine-prs
-        uses: github/combine-prs@v4.1.0
+        uses: github/combine-prs@v5.0.0
         with:
           pr_title: '[dependency]: Combine dependabot PRs'
           ci_required: true
