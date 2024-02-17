@@ -26,7 +26,7 @@
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.4.53.v20231009</jetty.version>
-        <spring.version>4.3.30.RELEASE</spring.version>
+        <spring.version>6.1.4</spring.version>
     </properties>
 
     <dependencies>
