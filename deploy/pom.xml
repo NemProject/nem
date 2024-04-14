@@ -14,7 +14,7 @@
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.4.52.v20230823</jetty.version>
-        <spring.version>5.3.33</spring.version>
+        <spring.version>5.3.34</spring.version>
     </properties>
 
     <dependencies>
@@ -156,7 +156,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
                 <configuration>
                     <archive>
                         <manifest>
