@@ -6,6 +6,12 @@ coverage:
       default:
         target: 90%  # overall project / repo coverage
 
+      gocrypto:
+        target: auto
+        threshold: 1%
+        flags:
+          - gocrypto
+
       nem-core:
         target: auto
         threshold: 1%
@@ -37,6 +43,11 @@ coverage:
 # monorepo.  This allows code coverage per package.
 
 flags:
+  gocrypto:
+    paths:
+      - gocrypto
+    carryforward: true
+
   nem-core:
     paths:
       - core

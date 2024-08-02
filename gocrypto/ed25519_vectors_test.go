@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"golang.org/x/crypto/sha3"
@@ -18,7 +18,7 @@ var EXPECTED_TEST_CASES_COUNT = 10000
 type runTestCase[TTestCase any] func(TTestCase) bool
 
 func RunTestVectors[TTestCase any](t *testing.T, filename string, runTestCase runTestCase[TTestCase]) {
-	content, err := ioutil.ReadFile(fmt.Sprintf("../tests/vectors/nem/crypto/%s", filename))
+	content, err := os.ReadFile(fmt.Sprintf("../tests/vectors/nem/crypto/%s", filename))
 	if nil != err {
 		t.Fatal("error when opening file: ", err)
 	}
@@ -61,8 +61,8 @@ func TestVectors_KeyConversion(t *testing.T) {
 	hasher := sha3.NewLegacyKeccak512()
 	RunTestVectors(t, "1.test-keys.json", func(testCase KeyConversionTestCase) bool {
 		// Arrange:
-		privateKey, _ := hex.DecodeString(testCase.PrivateKey);
-		expectedPublicKey, _ := hex.DecodeString(testCase.PublicKey);
+		privateKey, _ := hex.DecodeString(testCase.PrivateKey)
+		expectedPublicKey, _ := hex.DecodeString(testCase.PublicKey)
 
 		seed := make([]byte, len(privateKey))
 		copy(seed, privateKey)
