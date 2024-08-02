@@ -6,4 +6,7 @@ defaultCiPipeline {
 	environment = 'golang'
 
 	packageId = 'gocrypto'
+
+	codeCoverageTool = 'golang'
+	minimumCodeCoverage = 86
 }
