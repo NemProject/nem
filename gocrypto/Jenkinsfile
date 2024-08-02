@@ -1,0 +1,9 @@
+defaultCiPipeline {
+	// First OS is the default for CI
+	operatingSystem = ['ubuntu']
+	instanceSize = 'medium'
+
+	environment = 'golang'
+
+	packageId = 'gocrypto'
+}

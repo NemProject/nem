@@ -1,6 +1,23 @@
 version: 2
 updates:
 
+  - package-ecosystem: gomod
+    directory: /gocrpyto
+    schedule:
+      interval: weekly
+      day: saturday
+    target-branch: dev
+    labels: [gocrypto]
+    commit-message:
+      prefix: '[dependency]'
+    groups:
+      core-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+
   - package-ecosystem: maven
     directory: /core
     schedule:

@@ -1,4 +1,7 @@
 builds:
+  - name: Go Crypto
+    path: gocrypto
+
   - name: NEM Core
     path: core
 
