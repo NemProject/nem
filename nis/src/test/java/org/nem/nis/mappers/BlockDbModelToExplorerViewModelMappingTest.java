@@ -11,7 +11,7 @@ import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -29,7 +29,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 		final ExplorerBlockViewModel viewModel = context.mapping.map(context.dbBlock);
 
 		// Assert:
-		context.assertViewModel(viewModel, blockHash, 0);
+		context.assertViewModel(viewModel, blockHash, 0, 0L);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 		final ExplorerBlockViewModel viewModel = context.mapping.map(context.dbBlock);
 
 		// Assert:
-		context.assertViewModel(viewModel, blockHash, 3);
+		context.assertViewModel(viewModel, blockHash, 3, 6_000000L);
 		MatcherAssert.assertThat(getTransactionHashes(viewModel), IsEqual.equalTo(transactionHashes));
 	}
 
@@ -91,16 +91,19 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 		}
 
 		public void assertViewModel(final ExplorerBlockViewModel viewModel, final Hash expectedBlockHash,
-				final int expectedNumTransactions) {
+				final int expectedNumTransactions, final long expectedTotalFee) {
 			// Act:
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 			// Assert:
-			MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
+			MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(6));
 			MatcherAssert.assertThat(getDeserializedBlockHash((JSONObject) jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
 			MatcherAssert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(this.dbBlockHash.toString()));
 			MatcherAssert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(this.blockDifficulty.getRaw()));
 			MatcherAssert.assertThat(((JSONArray) jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
+
+			MatcherAssert.assertThat(jsonObject.get("beneficiary"), IsEqual.equalTo(this.block.getSigner().getAddress().toString()));
+			MatcherAssert.assertThat(jsonObject.get("totalFee"), IsEqual.equalTo(expectedTotalFee));
 		}
 	}
 }
