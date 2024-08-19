@@ -17,15 +17,15 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class MosaicDefinitionControllerTest {
 
 	// region getMosaicDefinition
 
-	@Test
-	public void getMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
+	private void assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
+		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -33,7 +33,7 @@ public class MosaicDefinitionControllerTest {
 		builder.setMosaicId("nem:xem");
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
+		final MosaicDefinition mosaicDefinition = getter.apply(context.controller, builder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinition(Mockito.any());
@@ -42,8 +42,8 @@ public class MosaicDefinitionControllerTest {
 		MatcherAssert.assertThat(mosaicDefinition, IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
 	}
 
-	@Test
-	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
+	private void assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
+		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
@@ -53,7 +53,7 @@ public class MosaicDefinitionControllerTest {
 		builder.setMosaicId("alice.vouchers:foo");
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
+		final MosaicDefinition mosaicDefinition = getter.apply(context.controller, builder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinition(builder.build());
@@ -62,8 +62,8 @@ public class MosaicDefinitionControllerTest {
 		MatcherAssert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers:foo"));
 	}
 
-	@Test
-	public void getMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
+	private void assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
+		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(null);
@@ -72,7 +72,26 @@ public class MosaicDefinitionControllerTest {
 		builder.setMosaicId("alice.vouchers:foo");
 
 		// Act:
-		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
+		ExceptionAssert.assertThrows(v -> getter.apply(context.controller, builder), MissingResourceException.class);
+	}
+
+
+	@Test
+	public void getMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
+		this.assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
+			(controller, builder) -> controller.getMosaicDefinition(builder));
+	}
+
+	@Test
+	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
+		this.assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
+			(controller, builder) -> controller.getMosaicDefinition(builder));
+	}
+
+	@Test
+	public void getMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
+		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
+			(controller, builder) -> controller.getMosaicDefinition(builder));
 	}
 
 	@Test
@@ -88,6 +107,49 @@ public class MosaicDefinitionControllerTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
+	}
+
+	// endregion
+
+	// region getLastMosaicDefinition
+
+	@Test
+	public void getLastMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
+		this.assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
+			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+	}
+
+	@Test
+	public void getLastMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
+		this.assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
+			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+	}
+
+	@Test
+	public void getLastMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
+		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
+			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+	}
+
+	@Test
+	public void getMosaicDefinitionReturnsMosaicDefinitionIfParentNamespaceIsInactive() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(dbMosaicDefinition);
+		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(Mockito.any(NamespaceId.class))).thenReturn(false);
+
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId("alice.vouchers:foo");
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = context.controller.getLastMosaicDefinition(builder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinition(builder.build());
+		Mockito.verify(context.mapper, Mockito.only()).map(dbMosaicDefinition, MosaicDefinition.class);
+
+		MatcherAssert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers:foo"));
 	}
 
 	// endregion
