@@ -46,13 +46,32 @@ public class MosaicDefinitionController {
 	@ClientApi
 	public MosaicDefinition getMosaicDefinition(final MosaicIdBuilder builder) {
 		final MosaicId mosaicId = builder.build();
-		if (MosaicConstants.MOSAIC_ID_XEM.equals(mosaicId)) {
-			return MosaicConstants.MOSAIC_DEFINITION_XEM;
-		}
 
 		// check if parent namespace exists
 		if (!this.mosaicInfoFactory.isNamespaceActive(mosaicId.getNamespaceId())) {
 			throw new MissingResourceException("invalid mosaic definition", MosaicDefinition.class.getName(), mosaicId.toString());
+		}
+
+		return this.getLastMosaicDefinition(builder);
+	}
+
+	// endregion
+
+	// region getLastMosaicDefinition
+
+	/**
+	 * Gets the **last** mosaic definition for a given mosaic id.
+	 * This definition might be expired.
+	 *
+	 * @param builder The mosaic id builder.
+	 * @return The mosaic definition.
+	 */
+	@RequestMapping(value = "/mosaic/definition/last", method = RequestMethod.GET)
+	@ClientApi
+	public MosaicDefinition getLastMosaicDefinition(final MosaicIdBuilder builder) {
+		final MosaicId mosaicId = builder.build();
+		if (MosaicConstants.MOSAIC_ID_XEM.equals(mosaicId)) {
+			return MosaicConstants.MOSAIC_DEFINITION_XEM;
 		}
 
 		final DbMosaicDefinition dbMosaicDefinition = this.mosaicDefinitionDao.getMosaicDefinition(mosaicId);
