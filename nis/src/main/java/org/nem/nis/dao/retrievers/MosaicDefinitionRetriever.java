@@ -23,11 +23,11 @@ public class MosaicDefinitionRetriever {
 	 */
 	public DbMosaicDefinition getMosaicDefinition(final Session session, final MosaicId mosaicId) {
 		MustBe.notNull(mosaicId, "mosaic id");
-		final String queryString = String.format(
-				"SELECT m.* FROM mosaicDefinitions m " + "WHERE namespaceId = '%s' AND NAME = '%s' " + "ORDER BY id DESC LIMIT 1",
-				mosaicId.getNamespaceId().toString(), mosaicId.getName());
+		final String queryString = "SELECT m.* FROM mosaicDefinitions m " + "WHERE namespaceId = :namespaceId AND NAME = :name ORDER BY id DESC LIMIT 1";
 		final Query query = session.createSQLQuery(queryString) // preserve-newline
-				.addEntity(DbMosaicDefinition.class);
+				.addEntity(DbMosaicDefinition.class)
+				.setParameter("namespaceId", mosaicId.getNamespaceId().toString())
+				.setParameter("name", mosaicId.getName());
 
 		return (DbMosaicDefinition) query.uniqueResult();
 	}
@@ -88,14 +88,18 @@ public class MosaicDefinitionRetriever {
 		}
 
 		if (null != namespaceId) {
-			queryString += String.format("AND namespaceId = '%s' ", namespaceId.toString());
+			queryString += "AND namespaceId = :namespaceId ";
 		}
 
 		queryString += "ORDER BY id DESC LIMIT :limit";
-		final Query query = session.createSQLQuery(queryString) // preserve-newline
+		Query query = session.createSQLQuery(queryString) // preserve-newline
 				.addEntity(DbMosaicDefinition.class) // preserve-newline
 				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("limit", limit);
+
+		if (null != namespaceId) {
+			query = query.setParameter("namespaceId", namespaceId.toString());
+		}
 
 		return HibernateUtils.listAndCast(query);
 	}
