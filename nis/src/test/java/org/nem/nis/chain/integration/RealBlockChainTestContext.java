@@ -97,6 +97,10 @@ public class RealBlockChainTestContext {
 		this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 	}
 
+	public BlockHeight getInitialBlockHeight() {
+		return this.initialBlockHeight;
+	}
+
 	// region mapping helpers
 
 	/**

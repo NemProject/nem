@@ -225,6 +225,65 @@ public class RemoteLinksTest {
 
 	// endregion
 
+	// region height dependent accessors
+
+	@Test
+	public void canAccessRemoteLinkAtHeight() {
+		// Arrange:
+		final RemoteLinks links = new RemoteLinks();
+
+		// Act:
+		final RemoteLink link1 = RemoteLinkFactory.activateRemoteHarvester(Utils.generateRandomAddress(), new BlockHeight(7));
+		final RemoteLink link2 = RemoteLinkFactory.activateHarvestingRemotely(Utils.generateRandomAddress(), new BlockHeight(9));
+		links.addLink(link1);
+		links.addLink(link2);
+
+		// Assert:
+		MatcherAssert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+
+		// - isHarvestingRemotelyAt is height dependent
+		MatcherAssert.assertThat(links.isHarvestingRemotelyAt(new BlockHeight(6)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isHarvestingRemotelyAt(new BlockHeight(7)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isHarvestingRemotelyAt(new BlockHeight(8)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isHarvestingRemotelyAt(new BlockHeight(9)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.isHarvestingRemotelyAt(new BlockHeight(10)), IsEqual.equalTo(true));
+
+		// - isRemoteHarvesterAt is height dependent
+		MatcherAssert.assertThat(links.isRemoteHarvesterAt(new BlockHeight(6)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isRemoteHarvesterAt(new BlockHeight(7)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.isRemoteHarvesterAt(new BlockHeight(8)), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(links.isRemoteHarvesterAt(new BlockHeight(9)), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(links.isRemoteHarvesterAt(new BlockHeight(10)), IsEqual.equalTo(false));
+
+		// - getActive is height dependent
+		MatcherAssert.assertThat(links.getActive(new BlockHeight(6)), IsEqual.equalTo(null));
+		MatcherAssert.assertThat(links.getActive(new BlockHeight(7)), IsEqual.equalTo(link1));
+		MatcherAssert.assertThat(links.getActive(new BlockHeight(8)), IsEqual.equalTo(link1));
+		MatcherAssert.assertThat(links.getActive(new BlockHeight(9)), IsEqual.equalTo(link2));
+		MatcherAssert.assertThat(links.getActive(new BlockHeight(10)), IsEqual.equalTo(link2));
+	}
+
+	@Test
+	public void canAccessRemoteStatusAtHeight() {
+		// Arrange:
+		final RemoteLinks links = new RemoteLinks();
+
+		// Act:
+		final RemoteLink link1 = RemoteLinkFactory.activateRemoteHarvester(Utils.generateRandomAddress(), new BlockHeight(7));
+		final RemoteLink link2 = RemoteLinkFactory.activateHarvestingRemotely(Utils.generateRandomAddress(), new BlockHeight(9));
+		links.addLink(link1);
+		links.addLink(link2);
+
+		// Assert: getRemoteStatus uses *active* remote link
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(6)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(7)), IsEqual.equalTo(RemoteStatus.REMOTE_ACTIVATING));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(8)), IsEqual.equalTo(RemoteStatus.REMOTE_ACTIVATING));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(9)), IsEqual.equalTo(RemoteStatus.OWNER_ACTIVATING));
+		MatcherAssert.assertThat(links.getRemoteStatus(new BlockHeight(10)), IsEqual.equalTo(RemoteStatus.OWNER_ACTIVATING));
+	}
+
+	// endregion
+
 	// region copy
 
 	@Test
