@@ -153,11 +153,11 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 			final AccountState state = this.findStateByAddress(address);
 			final ReadOnlyRemoteLinks remoteLinks = state.getRemoteLinks();
-			if (!remoteLinks.isRemoteHarvester()) {
+			if (!remoteLinks.isRemoteHarvesterAt(height)) {
 				return state;
 			}
 
-			final RemoteLink remoteLink = remoteLinks.getCurrent();
+			final RemoteLink remoteLink = remoteLinks.getActive(height);
 			final long settingHeight = height.subtract(remoteLink.getEffectiveHeight());
 			final int remoteHarvestingDelay = NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
 			boolean shouldUseRemote = false;
