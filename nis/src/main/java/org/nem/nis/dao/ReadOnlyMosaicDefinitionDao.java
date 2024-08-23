@@ -3,7 +3,7 @@ package org.nem.nis.dao;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.nis.dbmodel.DbMosaicDefinition;
+import org.nem.nis.dbmodel.*;
 
 import java.util.Collection;
 
@@ -18,6 +18,15 @@ public interface ReadOnlyMosaicDefinitionDao {
 	 * @return The db mosaic definition.
 	 */
 	DbMosaicDefinition getMosaicDefinition(final MosaicId mosaicId);
+
+	/**
+	 * Gets a mosaic definition and its corresponding supply at a specified height.
+	 *
+	 * @param mosaicId The mosaic id.
+	 * @param height The search height.
+	 * @return The db mosaic definition and supply, if found. \c null otherwise.
+	 */
+	DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height);
 
 	/**
 	 * Gets all mosaic definitions for the specified account, optionally confined to a specified namespace. The search is limited by a given

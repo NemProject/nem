@@ -2,12 +2,13 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyMosaicDefinitionDao;
-import org.nem.nis.dbmodel.DbMosaicDefinition;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,34 @@ public class MosaicDefinitionController {
 		}
 
 		return this.map(dbMosaicDefinition);
+	}
+
+	// endregion
+
+	// region getMosaicDefinitionWithSupply
+
+	/**
+	 * Gets the mosaic definition and supply for a given mosaic id at the specified height.
+	 *
+	 * @param builder The mosaic id builder.
+	 * @param heightBuilder The height builder.
+	 * @return The mosaic definition and supply pair (or empty if not found).
+	 */
+	@RequestMapping(value = "/local/mosaic/definition/supply", method = RequestMethod.GET)
+	@ClientApi
+	@TrustedApi
+	public SerializableList<MosaicDefinitionSupplyPair> getMosaicDefinitionWithSupply(final MosaicIdBuilder builder, final BlockHeightBuilder heightBuilder) {
+		final MosaicId mosaicId = builder.build();
+		final BlockHeight height = heightBuilder.build();
+
+		final DbMosaicDefinitionSupplyPair dbPair = this.mosaicDefinitionDao.getMosaicDefinitionWithSupply(mosaicId, height.getRaw());
+
+		final SerializableList<MosaicDefinitionSupplyPair> pairs = new SerializableList<>(1);
+		if (null != dbPair) {
+			pairs.add(new MosaicDefinitionSupplyPair(this.map(dbPair.getMosaicDefinition()), dbPair.getSupply()));
+		}
+
+		return pairs;
 	}
 
 	// endregion
