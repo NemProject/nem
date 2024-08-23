@@ -8,9 +8,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.Utils;
-import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
-import org.nem.nis.dbmodel.DbMosaicDefinition;
+import org.nem.nis.dao.retrievers.*;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
@@ -31,6 +32,25 @@ public class MosaicDefinitionDaoImplTest {
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinition(context.session, Utils.createMosaicId(2));
+	}
+
+	// endregion
+
+	// region getMosaicDefinitionWithSupply
+
+	@Test
+	public void getMosaicDefinitionWithSupplyDelegatesToRetriever() {
+		// Arrange:
+		final DbMosaicDefinitionSupplyPair retrieverResult = new DbMosaicDefinitionSupplyPair(new DbMosaicDefinition(), new Supply(3));
+		final TestContext context = new TestContext();
+		Mockito.when(context.getMosaicDefinitionWithSupplyMocked()).thenReturn(retrieverResult);
+
+		// Act:
+		final DbMosaicDefinitionSupplyPair result = context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Utils.createMosaicId(2), 123L);
+
+		// Assert:
+		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		Mockito.verify(context.supplyRetriever, Mockito.only()).getMosaicDefinitionWithSupply(context.session, Utils.createMosaicId(2), 123L);
 	}
 
 	// endregion
@@ -184,9 +204,10 @@ public class MosaicDefinitionDaoImplTest {
 		private final Address address = Utils.generateRandomAddress();
 		private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
 		private final MosaicDefinitionRetriever retriever = Mockito.mock(MosaicDefinitionRetriever.class);
+		private final MosaicSupplyRetriever supplyRetriever = Mockito.mock(MosaicSupplyRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
 		private final SQLQuery sqlQuery = Mockito.mock(SQLQuery.class);
-		private final MosaicDefinitionDaoImpl mosaicDefinitionDao = new MosaicDefinitionDaoImpl(this.sessionFactory, this.retriever);
+		private final MosaicDefinitionDaoImpl mosaicDefinitionDao = new MosaicDefinitionDaoImpl(this.sessionFactory, this.retriever, this.supplyRetriever);
 
 		private TestContext() {
 			Mockito.when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
@@ -204,6 +225,10 @@ public class MosaicDefinitionDaoImplTest {
 
 		private DbMosaicDefinition getMosaicDefinitionMocked() {
 			return this.retriever.getMosaicDefinition(Mockito.any(), Mockito.any());
+		}
+
+		private DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupplyMocked() {
+			return this.supplyRetriever.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.any(), Mockito.anyLong());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsForAccountMocked() {

@@ -4,8 +4,8 @@ import org.hibernate.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
-import org.nem.nis.dbmodel.DbMosaicDefinition;
+import org.nem.nis.dao.retrievers.*;
+import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +16,7 @@ import java.util.*;
 public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	private final SessionFactory sessionFactory;
 	private final MosaicDefinitionRetriever retriever;
+	private final MosaicSupplyRetriever supplyRetriever;
 
 	/**
 	 * Creates a mosaic definition dao implementation.
@@ -24,7 +25,7 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	 */
 	@Autowired(required = true)
 	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory) {
-		this(sessionFactory, new MosaicDefinitionRetriever());
+		this(sessionFactory, new MosaicDefinitionRetriever(), new MosaicSupplyRetriever());
 	}
 
 	/**
@@ -32,10 +33,12 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	 *
 	 * @param sessionFactory The session factory.
 	 * @param retriever The mosaic retriever.
+	 * @param supplyRetriever The mosaic supply retriever.
 	 */
-	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever) {
+	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever, final MosaicSupplyRetriever supplyRetriever) {
 		this.sessionFactory = sessionFactory;
 		this.retriever = retriever;
+		this.supplyRetriever = supplyRetriever;
 	}
 
 	private Session getCurrentSession() {
@@ -46,6 +49,12 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	@Transactional(readOnly = true)
 	public DbMosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
 		return this.retriever.getMosaicDefinition(this.getCurrentSession(), mosaicId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height) {
+		return this.supplyRetriever.getMosaicDefinitionWithSupply(this.getCurrentSession(), mosaicId, height);
 	}
 
 	@Override
