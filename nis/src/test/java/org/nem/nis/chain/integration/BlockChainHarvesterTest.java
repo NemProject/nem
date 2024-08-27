@@ -299,6 +299,61 @@ public class BlockChainHarvesterTest {
 		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
+	@Test
+	public void processBlockUpdatesBlockLessorCorrectlyWhenFutureRemoteLinksArePending() {
+		// Arrange:
+		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
+		final SynchronizedAccountStateCache accountStateCache = new SynchronizedAccountStateCache(new DefaultAccountStateCache());
+		final DefaultNisCache nisCache = new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()), accountStateCache,
+				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
+				new SynchronizedHashCache(new DefaultHashCache()),
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())));
+		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
+
+		// Setup remote harvesting, such that
+		// a. remote is active from start of block chain
+		// b. remote is deactivating at initial block height (and next block height)
+		// c. remote is (re)activating at initial block height + 1000
+		final Account account = context.createAccount(Amount.fromNem(100000));
+		final Account remoteAccount = context.createAccount(Amount.ZERO);
+
+		final RemoteLink remoteLink1a = new RemoteLink(remoteAccount.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate,
+				RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink remoteLink1b = new RemoteLink(remoteAccount.getAddress(), context.getInitialBlockHeight(),
+				ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink remoteLink1c = new RemoteLink(remoteAccount.getAddress(), new BlockHeight(context.getInitialBlockHeight().getRaw() + 100),
+				ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
+		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
+		accountState.getRemoteLinks().addLink(remoteLink1a);
+		accountState.getRemoteLinks().addLink(remoteLink1b);
+		accountState.getRemoteLinks().addLink(remoteLink1c);
+
+		final RemoteLink remoteLink2a = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink remoteLink2b = new RemoteLink(account.getAddress(), context.getInitialBlockHeight(),
+				ImportanceTransferMode.Deactivate, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink remoteLink2c = new RemoteLink(account.getAddress(), new BlockHeight(context.getInitialBlockHeight().getRaw() + 100),
+				ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
+		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
+		remoteAccountState.getRemoteLinks().addLink(remoteLink2a);
+		remoteAccountState.getRemoteLinks().addLink(remoteLink2b);
+		remoteAccountState.getRemoteLinks().addLink(remoteLink2c);
+
+		final Block block = context.createNextBlock(remoteAccount);
+		block.sign();
+
+		// Act:
+		final ValidationResult processResult = context.processBlock(block);
+
+		// Sanity:
+		MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(context.getInitialBlockHeight().next()));
+
+		// Assert:
+		MatcherAssert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		MatcherAssert.assertThat(block.getLessor(), IsNull.notNullValue());
+		MatcherAssert.assertThat(block.getLessor(), IsEqual.equalTo(account));
+	}
+
 	// endregion
 
 	// region exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering

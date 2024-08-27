@@ -58,8 +58,20 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	}
 
 	@Override
+	public boolean isHarvestingRemotelyAt(final BlockHeight height) {
+		final RemoteLink activeRemoteLink = this.getActive(height);
+		return null != activeRemoteLink && RemoteLink.Owner.HarvestingRemotely == activeRemoteLink.getOwner();
+	}
+
+	@Override
 	public boolean isRemoteHarvester() {
 		return !this.isEmpty() && RemoteLink.Owner.RemoteHarvester == this.remoteLinks.peek().getOwner();
+	}
+
+	@Override
+	public boolean isRemoteHarvesterAt(final BlockHeight height) {
+		final RemoteLink activeRemoteLink = this.getActive(height);
+		return null != activeRemoteLink && RemoteLink.Owner.RemoteHarvester == activeRemoteLink.getOwner();
 	}
 
 	@Override
@@ -68,18 +80,31 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	}
 
 	@Override
+	public RemoteLink getActive(final BlockHeight height) {
+		RemoteLink activeRemoteLink = null;
+		for (final RemoteLink remoteLink : this.remoteLinks) {
+			if (remoteLink.getEffectiveHeight().compareTo(height) < 1) {
+				activeRemoteLink = remoteLink;
+			}
+		}
+
+		return activeRemoteLink;
+	}
+
+	@Override
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {
-		if (this.isEmpty()) {
+		final RemoteLink activeRemoteLink = this.getActive(height);
+		if (null == activeRemoteLink) {
 			return RemoteStatus.NOT_SET;
 		}
 
 		// currently we can only have Activate and Deactivate, so we're ok to use single boolean for this
 
-		final boolean isActivated = ImportanceTransferMode.Activate == this.getCurrent().getMode();
-		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
+		final boolean isActivated = ImportanceTransferMode.Activate == activeRemoteLink.getMode();
+		final long heightDiff = height.subtract(activeRemoteLink.getEffectiveHeight());
 		final boolean withinLimit = heightDiff < NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
 
-		if (this.isHarvestingRemotely()) {
+		if (this.isHarvestingRemotelyAt(height)) {
 			if (isActivated) {
 				return withinLimit ? RemoteStatus.OWNER_ACTIVATING : RemoteStatus.OWNER_ACTIVE;
 			} else {
