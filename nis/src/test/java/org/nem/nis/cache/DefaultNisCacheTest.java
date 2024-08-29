@@ -18,10 +18,11 @@ public class DefaultNisCacheTest {
 		final SynchronizedPoxFacade poxFacade = Mockito.mock(SynchronizedPoxFacade.class);
 		final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
+		final SynchronizedExpiredMosaicCache expiredMosaicCache = Mockito.mock(SynchronizedExpiredMosaicCache.class);
 
 		// Act:
 		final ReadOnlyNisCache cache = new DefaultNisCache(accountCache, accountStateCache, poxFacade, transactionsHashCache,
-				namespaceCache);
+				namespaceCache, expiredMosaicCache);
 
 		// Assert:
 		MatcherAssert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
@@ -29,6 +30,7 @@ public class DefaultNisCacheTest {
 		MatcherAssert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
 		MatcherAssert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
 		MatcherAssert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
+		MatcherAssert.assertThat(cache.getExpiredMosaicCache(), IsSame.sameInstance(expiredMosaicCache));
 	}
 
 	@Test
@@ -61,18 +63,21 @@ public class DefaultNisCacheTest {
 			Mockito.verify(context.accountStateCache, Mockito.only()).copy();
 			Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
 			Mockito.verify(context.namespaceCache, Mockito.only()).copy();
+			Mockito.verify(context.expiredMosaicCache, Mockito.only()).copy();
 		} else {
 			Mockito.verify(context.accountCache, Mockito.only()).deepCopy();
 			Mockito.verify(context.accountStateCache, Mockito.only()).deepCopy();
 			Mockito.verify(context.transactionsHashCache, Mockito.only()).deepCopy();
 			Mockito.verify(context.namespaceCache, Mockito.only()).deepCopy();
+			Mockito.verify(context.expiredMosaicCache, Mockito.only()).deepCopy();
 		}
 
 		MatcherAssert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
 		MatcherAssert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
 		MatcherAssert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
-		MatcherAssert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
 		MatcherAssert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
+		MatcherAssert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
+		MatcherAssert.assertThat(copy.getExpiredMosaicCache(), IsSame.sameInstance(context2.expiredMosaicCache));
 	}
 
 	@Test
@@ -91,6 +96,7 @@ public class DefaultNisCacheTest {
 		Mockito.verify(context2.accountStateCache, Mockito.only()).commit();
 		Mockito.verify(context2.transactionsHashCache, Mockito.only()).commit();
 		Mockito.verify(context2.namespaceCache, Mockito.only()).commit();
+		Mockito.verify(context2.expiredMosaicCache, Mockito.only()).commit();
 	}
 
 	@Test
@@ -115,6 +121,8 @@ public class DefaultNisCacheTest {
 		Mockito.when(original.transactionsHashCache.deepCopy()).thenReturn(copy.transactionsHashCache);
 		Mockito.when(original.namespaceCache.copy()).thenReturn(copy.namespaceCache);
 		Mockito.when(original.namespaceCache.deepCopy()).thenReturn(copy.namespaceCache);
+		Mockito.when(original.expiredMosaicCache.copy()).thenReturn(copy.expiredMosaicCache);
+		Mockito.when(original.expiredMosaicCache.deepCopy()).thenReturn(copy.expiredMosaicCache);
 	}
 
 	private static class TestContext {
@@ -123,7 +131,8 @@ public class DefaultNisCacheTest {
 		private final SynchronizedPoxFacade poxFacade = Mockito.mock(SynchronizedPoxFacade.class);
 		private final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		private final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
+		private final SynchronizedExpiredMosaicCache expiredMosaicCache = Mockito.mock(SynchronizedExpiredMosaicCache.class);
 		private final DefaultNisCache cache = new DefaultNisCache(this.accountCache, this.accountStateCache, this.poxFacade,
-				this.transactionsHashCache, this.namespaceCache);
+				this.transactionsHashCache, this.namespaceCache, this.expiredMosaicCache);
 	}
 }

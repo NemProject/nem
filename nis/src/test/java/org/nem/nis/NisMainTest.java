@@ -47,6 +47,7 @@ public class NisMainTest {
 	private static final int HISTORICAL_ACCOUNT_DATA = 0x000000010;
 	private static final int PROOF_OF_STAKE = 0x000000020;
 	private static final int THROW_DURING_BOOT = 0x00000040;
+	private static final int TRACK_EXPIRED_MOSAICS = 0x00000080;
 
 	// region session auto-wiring
 
@@ -319,27 +320,28 @@ public class NisMainTest {
 
 	@Test
 	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
-		// Assert:
-		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA, EnumSet.of(ObserverOption.NoHistoricalDataPruning));
+		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA, EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	@Test
 	public void initUsesNoOutlinkObserverAndIncrementalPoiIfProofOfStateIsEnabled() {
-		// Assert:
-		this.assertFlagsToOptionsMapping(PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoOutlinkObserver));
+		this.assertFlagsToOptionsMapping(PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	@Test
 	public void initSupportsNoHistoricalDataPruningForProofOfStake() {
-		// Assert:
 		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE,
-				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver));
+				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
+	}
+
+	@Test
+	public void initSupportsExpiredMosaicTrackingForProofOfStake() {
+		this.assertFlagsToOptionsMapping(TRACK_EXPIRED_MOSAICS | PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoOutlinkObserver));
 	}
 
 	@Test
 	public void initUsesDefaultOptionsIfNoFeaturesAreSelected() {
-		// Assert:
-		this.assertFlagsToOptionsMapping(0, EnumSet.of(ObserverOption.NoIncrementalPoi));
+		this.assertFlagsToOptionsMapping(0, EnumSet.of(ObserverOption.NoIncrementalPoi, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	private void assertFlagsToOptionsMapping(final int flags, final EnumSet<ObserverOption> expectedOptions) {
@@ -362,7 +364,7 @@ public class NisMainTest {
 
 	private static NisConfiguration createNisConfiguration(final boolean autoBoot, final boolean supplyBootKey,
 			final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
-			final boolean proofOfStake) {
+			final boolean proofOfStake, final boolean trackExpiredMosaics) {
 		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config-default.properties",
 				true);
 		final Properties properties = new Properties();
@@ -387,6 +389,10 @@ public class NisMainTest {
 
 		if (historicalAccountData) {
 			properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
+		}
+
+		if (trackExpiredMosaics) {
+			properties.setProperty("nis.optionalFeatures", "TRACK_EXPIRED_MOSAICS");
 		}
 
 		if (proofOfStake) {
@@ -427,19 +433,19 @@ public class NisMainTest {
 		private TestContext(final BlockDao blockDao, final AccountDao accountDao, final int flags) {
 			this(blockDao, accountDao, 0 != (flags & AUTO_BOOT), 0 != (flags & SUPPLY_BOOT_KEY), 0 != (flags & SUPPLY_BOOT_NAME),
 					0 != (flags & DELAY_BLOCK_LOADING), 0 != (flags & HISTORICAL_ACCOUNT_DATA), 0 != (flags & PROOF_OF_STAKE),
-					0 != (flags & THROW_DURING_BOOT));
+					0 != (flags & THROW_DURING_BOOT), 0 != (flags & TRACK_EXPIRED_MOSAICS));
 		}
 
 		private TestContext(final BlockDao blockDao, final AccountDao accountDao, final boolean autoBoot, final boolean supplyBootKey,
 				final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
-				final boolean proofOfStake, final boolean throwDuringBoot) {
+				final boolean proofOfStake, final boolean throwDuringBoot, final boolean trackExpiredMosaics) {
 			this.blockDao = blockDao;
 			this.accountDao = accountDao;
 			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapperAccountDao(accountDao));
 
 			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
 			this.nisConfiguration = createNisConfiguration(autoBoot, supplyBootKey, supplyBootName, delayBlockLoading,
-					historicalAccountData, proofOfStake);
+					historicalAccountData, proofOfStake, trackExpiredMosaics);
 			this.nisCache = NisCacheFactory.createReal(poxFacade,
 					this.nisConfiguration.getForkConfiguration().getMosaicRedefinitionForkHeight());
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());

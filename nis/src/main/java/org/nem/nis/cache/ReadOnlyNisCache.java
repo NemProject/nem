@@ -41,6 +41,13 @@ public interface ReadOnlyNisCache {
 	ReadOnlyNamespaceCache getNamespaceCache();
 
 	/**
+	 * Gets the expired mosaic cache.
+	 *
+	 * @return The expired mosaic cache.
+	 */
+	ReadOnlyExpiredMosaicCache getExpiredMosaicCache();
+
+	/**
 	 * Creates a mutable copy of this NIS cache.
 	 *
 	 * @return The copy.

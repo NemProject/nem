@@ -23,5 +23,10 @@ public enum ObserverOption {
 	/**
 	 * No observation of outlinks.
 	 */
-	NoOutlinkObserver
+	NoOutlinkObserver,
+
+	/**
+	 * No expired mosaic tracking.
+	 */
+	NoExpiredMosaicTracking
 }
