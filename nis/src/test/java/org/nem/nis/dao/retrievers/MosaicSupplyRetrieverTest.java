@@ -110,6 +110,13 @@ public class MosaicSupplyRetrieverTest {
 		this.saveDbBlock(30L, this.createCreationTransaction(signer, "bobcat", "tokens", "nice bobcat tokens", 3000L)); // other token
 		this.saveDbBlock(35L, this.createSupplyChangeTransaction(signer, "bobcat", "tokens", MosaicSupplyType.Create, 200L));
 
+		// supply transactions are not allowed in same blocks as respective creation transactions
+		// (last creation transaction in block is effective)
+		final List<Transaction> block37Transactions = new ArrayList<>();
+		block37Transactions.add(this.createCreationTransaction(signer, "fox", "tokens", "cool fox tokens", 6000L)); // supply change (reset)
+		block37Transactions.add(this.createCreationTransaction(signer, "fox", "tokens", "cool fox tokens", 7000L)); // supply change (reset)
+		this.saveDbBlock(37L, block37Transactions);
+
 		this.saveDbBlock(40L, this.createCreationTransaction(signer, "fox", "tokens", "cool fox tokens", 4000L)); // supply change (reset)
 		this.saveDbBlock(45L, this.createSupplyChangeTransaction(signer, "fox", "tokens", MosaicSupplyType.Create, 900L));
 		this.saveDbBlock(50L, this.createCreationTransaction(signer, "fox", "tokens", "cool fox tokens", 5000L)); // supply change (reset)
@@ -164,7 +171,11 @@ public class MosaicSupplyRetrieverTest {
 	public void getSupplyReturnsHistoricalSupplyWhenHeightConstraint() {
 		this.assertFoxTokensSupplyAt(10L, 1000L, 1000L); // creation = 1000
 		this.assertFoxTokensSupplyAt(11L, 1000L, 1000L);
-		this.assertFoxTokensSupplyAt(39L, 1000L, 1000L);
+		this.assertFoxTokensSupplyAt(36L, 1000L, 1000L);
+
+		this.assertFoxTokensSupplyAt(37L, 7000L, 7000L); // creation = 7000 ([creation = 6000] preempted)
+		this.assertFoxTokensSupplyAt(38L, 7000L, 7000L);
+		this.assertFoxTokensSupplyAt(39L, 7000L, 7000L);
 
 		this.assertFoxTokensSupplyAt(40L, 4000L, 4000L); // creation = 4000
 		this.assertFoxTokensSupplyAt(41L, 4000L, 4000L);

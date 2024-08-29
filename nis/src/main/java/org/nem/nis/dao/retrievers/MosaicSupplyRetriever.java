@@ -72,6 +72,7 @@ public class MosaicSupplyRetriever {
 				.add(Restrictions.eq("mosaicDefinition.name", mosaicId.getName())) // preserve-newline
 				.add(Restrictions.le("block.height", height)) // preserve-newline
 				.addOrder(Order.desc("block.height")) // preserve-newline
+				.addOrder(Order.desc("blkIndex")) // preserve-newline
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return HibernateUtils.listAndCast(creationTransactionsCriteria);
 	}
