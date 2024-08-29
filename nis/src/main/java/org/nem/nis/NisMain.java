@@ -146,6 +146,10 @@ public class NisMain {
 			options.add(ObserverOption.NoIncrementalPoi);
 		}
 
+		if (!config.isFeatureSupported(NodeFeature.TRACK_EXPIRED_MOSAICS)) {
+			options.add(ObserverOption.NoExpiredMosaicTracking);
+		}
+
 		final BlockChainConfiguration blockChainConfiguration = config.getBlockChainConfiguration();
 		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
 			options.add(ObserverOption.NoOutlinkObserver);

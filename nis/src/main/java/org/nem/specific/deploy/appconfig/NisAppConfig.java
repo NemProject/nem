@@ -218,13 +218,13 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public SynchronizedHashCache transactionHashCache() {
-		return new SynchronizedHashCache(new DefaultHashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime()));
+	public SynchronizedPoxFacade poxFacade() {
+		return new SynchronizedPoxFacade(new DefaultPoxFacade(this.importanceCalculator()));
 	}
 
 	@Bean
-	public SynchronizedPoxFacade poxFacade() {
-		return new SynchronizedPoxFacade(new DefaultPoxFacade(this.importanceCalculator()));
+	public SynchronizedHashCache transactionHashCache() {
+		return new SynchronizedHashCache(new DefaultHashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime()));
 	}
 
 	@Bean
@@ -236,9 +236,14 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public SynchronizedExpiredMosaicCache expiredMosaicCache() {
+		return new SynchronizedExpiredMosaicCache(new DefaultExpiredMosaicCache());
+	}
+
+	@Bean
 	public ReadOnlyNisCache nisCache() {
 		return new DefaultNisCache(this.accountCache(), this.accountStateCache(), this.poxFacade(), this.transactionHashCache(),
-				this.namespaceCache());
+				this.namespaceCache(), this.expiredMosaicCache());
 	}
 
 	@Bean

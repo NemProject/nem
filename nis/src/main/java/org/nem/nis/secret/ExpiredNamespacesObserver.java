@@ -8,6 +8,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Observer that observes expired namespaces and updates the account's owned mosaic ids.
@@ -15,20 +16,26 @@ import java.util.*;
 public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 	private final NamespaceCache namespaceCache;
 	private final AccountStateCache accountStateCache;
+	private final ExpiredMosaicCache expiredMosaicCache;
 	private final int estimatedBlocksPerYear;
+	private final boolean shouldTrackExpiredMosaics;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param namespaceCache The namespace cache.
 	 * @param accountStateCache The account state cache.
+	 * @param expiredMosaicCache The expired mosaic cache.
 	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
+	 * @param shouldTrackExpiredMosaics \c true to track expired mosaics.
 	 */
 	public ExpiredNamespacesObserver(final NamespaceCache namespaceCache, final AccountStateCache accountStateCache,
-			final int estimatedBlocksPerYear) {
+			final ExpiredMosaicCache expiredMosaicCache, final int estimatedBlocksPerYear, final boolean shouldTrackExpiredMosaics) {
 		this.namespaceCache = namespaceCache;
 		this.accountStateCache = accountStateCache;
+		this.expiredMosaicCache = expiredMosaicCache;
 		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
+		this.shouldTrackExpiredMosaics = shouldTrackExpiredMosaics;
 	}
 
 	@Override
@@ -47,23 +54,31 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 					expiredNamespaces.add(rootId);
 					expiredNamespaces.addAll(this.namespaceCache.getSubNamespaceIds(rootId));
 				});
-		expiredNamespaces.stream().map(this::createMosaicIdToAddressMap).forEach(map -> {
-			map.forEach((key, value) -> value.forEach(address -> {
+
+		expiredNamespaces.stream().flatMap(this::getMosaicEntries).forEach(mosaicEntry -> {
+			final MosaicId mosaicId = mosaicEntry.getMosaicDefinition().getId();
+
+			if (this.shouldTrackExpiredMosaics) {
+				if (NotificationTrigger.Execute == context.getTrigger()) {
+					this.expiredMosaicCache.addExpiration(context.getHeight(), mosaicId, mosaicEntry.getBalances());
+				} else {
+					this.expiredMosaicCache.removeAll(context.getHeight());
+				}
+			}
+
+			mosaicEntry.getBalances().getOwners().forEach(address -> {
 				final AccountInfo info = this.accountStateCache.findStateByAddress(address).getAccountInfo();
 				if (NotificationTrigger.Execute == context.getTrigger()) {
-					info.removeMosaicId(key);
+					info.removeMosaicId(mosaicId);
 				} else {
-					info.addMosaicId(key);
+					info.addMosaicId(mosaicId);
 				}
-			}));
+			});
 		});
 	}
 
-	private Map<MosaicId, Collection<Address>> createMosaicIdToAddressMap(final NamespaceId namespaceId) {
-		final Map<MosaicId, Collection<Address>> map = new HashMap<>();
+	private Stream<ReadOnlyMosaicEntry> getMosaicEntries(final NamespaceId namespaceId) {
 		final ReadOnlyMosaics mosaics = this.namespaceCache.get(namespaceId).getMosaics();
-		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
-		mosaicIds.forEach(mosaicId -> map.put(mosaicId, mosaics.get(mosaicId).getBalances().getOwners()));
-		return map;
+		return mosaics.getMosaicIds().stream().map(mosaics::get);
 	}
 }

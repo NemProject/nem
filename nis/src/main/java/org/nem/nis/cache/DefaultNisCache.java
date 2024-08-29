@@ -9,6 +9,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private final SynchronizedPoxFacade poxFacade;
 	private final SynchronizedHashCache transactionHashCache;
 	private final SynchronizedNamespaceCache namespaceCache;
+	private final SynchronizedExpiredMosaicCache expiredMosaicCache;
 
 	/**
 	 * Creates a NIS cache from an existing account cache, a pox facade and a transaction hash cache.
@@ -18,15 +19,17 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * @param poxFacade The pox facade.
 	 * @param transactionHashCache The cache of transaction hashes.
 	 * @param namespaceCache The namespace cache.
+	 * @param expiredMosaicCache The expired mosaic cache.
 	 */
 	public DefaultNisCache(final SynchronizedAccountCache accountCache, final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoxFacade poxFacade, final SynchronizedHashCache transactionHashCache,
-			final SynchronizedNamespaceCache namespaceCache) {
+			final SynchronizedNamespaceCache namespaceCache, final SynchronizedExpiredMosaicCache expiredMosaicCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
 		this.poxFacade = poxFacade;
 		this.transactionHashCache = transactionHashCache;
 		this.namespaceCache = namespaceCache;
+		this.expiredMosaicCache = expiredMosaicCache;
 	}
 
 	@Override
@@ -55,6 +58,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
+	public ReadOnlyExpiredMosaicCache getExpiredMosaicCache() {
+		return this.expiredMosaicCache;
+	}
+
+	@Override
 	public NisCache copy() {
 		return new DefaultNisCacheCopy(this);
 	}
@@ -66,7 +74,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache deepCopy() {
 		return new DefaultNisCache(this.accountCache.deepCopy(), this.accountStateCache.deepCopy(), this.poxFacade.copy(),
-				this.transactionHashCache.deepCopy(), this.namespaceCache.deepCopy());
+				this.transactionHashCache.deepCopy(), this.namespaceCache.deepCopy(), this.expiredMosaicCache.deepCopy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {
@@ -76,6 +84,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		private final SynchronizedPoxFacade poxFacade;
 		private final SynchronizedHashCache transactionHashCache;
 		private final SynchronizedNamespaceCache namespaceCache;
+		private final SynchronizedExpiredMosaicCache expiredMosaicCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
@@ -84,6 +93,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.poxFacade = cache.poxFacade.copy();
 			this.transactionHashCache = cache.transactionHashCache.copy();
 			this.namespaceCache = cache.namespaceCache.copy();
+			this.expiredMosaicCache = cache.expiredMosaicCache.copy();
 		}
 
 		@Override
@@ -112,6 +122,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		}
 
 		@Override
+		public ExpiredMosaicCache getExpiredMosaicCache() {
+			return this.expiredMosaicCache;
+		}
+
+		@Override
 		public NisCache copy() {
 			throw new IllegalStateException("nested copies are not currently allowed");
 		}
@@ -123,6 +138,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.poxFacade.shallowCopyTo(this.cache.poxFacade);
 			this.transactionHashCache.commit();
 			this.namespaceCache.commit();
+			this.expiredMosaicCache.commit();
 		}
 	}
 }

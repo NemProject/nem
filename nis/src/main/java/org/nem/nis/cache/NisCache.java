@@ -41,6 +41,13 @@ public interface NisCache extends ReadOnlyNisCache {
 	NamespaceCache getNamespaceCache();
 
 	/**
+	 * Gets the expired mosaic cache.
+	 *
+	 * @return The expired mosaic cache.
+	 */
+	ExpiredMosaicCache getExpiredMosaicCache();
+
+	/**
 	 * Commits all changes to the "real" cache.
 	 */
 	void commit();

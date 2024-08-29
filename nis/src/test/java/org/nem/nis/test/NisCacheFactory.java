@@ -29,7 +29,8 @@ public class NisCacheFactory {
 		return new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()), new SynchronizedPoxFacade(poxFacade),
 				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight)));
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(mosaicRedefinitionForkHeight)),
+				new SynchronizedExpiredMosaicCache(new DefaultExpiredMosaicCache()));
 	}
 
 	// endregion
@@ -44,7 +45,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountCache accountCache, final AccountStateCache accountStateCache) {
-		return create(accountCache, accountStateCache, null, null, null);
+		return create(accountCache, accountStateCache, null, null, null, null);
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache) {
-		return create(null, accountStateCache, null, null, null);
+		return create(null, accountStateCache, null, null, null, null);
 	}
 
 	/**
@@ -65,11 +66,12 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoxFacade poxFacade) {
-		return create(null, accountStateCache, poxFacade, null, null);
+		return create(null, accountStateCache, poxFacade, null, null, null);
 	}
 
 	private static NisCache create(final AccountCache accountCache, final AccountStateCache accountStateCache,
-			final DefaultPoxFacade poxFacade, final DefaultHashCache hashCache, final DefaultNamespaceCache namespaceCache) {
+			final DefaultPoxFacade poxFacade, final DefaultHashCache hashCache, final DefaultNamespaceCache namespaceCache,
+			final DefaultExpiredMosaicCache expiredMosaicCache) {
 		return new NisCache() {
 			@Override
 			public AccountCache getAccountCache() {
@@ -97,6 +99,11 @@ public class NisCacheFactory {
 			}
 
 			@Override
+			public DefaultExpiredMosaicCache getExpiredMosaicCache() {
+				return null == expiredMosaicCache ? Mockito.mock(DefaultExpiredMosaicCache.class) : expiredMosaicCache;
+			}
+
+			@Override
 			public void commit() {
 			}
 
@@ -119,14 +126,15 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache) {
-		return createReadOnly(accountCache, accountStateCache, null, null, null);
+		return createReadOnly(accountCache, accountStateCache, null, null, null, null);
 	}
 
 	private static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache, final ReadOnlyPoxFacade poxFacade, final ReadOnlyNamespaceCache namespaceCache) {
+			final DefaultHashCache hashCache, final ReadOnlyPoxFacade poxFacade, final ReadOnlyNamespaceCache namespaceCache,
+			final ReadOnlyExpiredMosaicCache expiredMosaicCache) {
 		return new ReadOnlyNisCache() {
 			@Override
-			public AccountCache getAccountCache() {
+			public ReadOnlyAccountCache getAccountCache() {
 				return null == accountCache ? Mockito.mock(AccountCache.class) : accountCache;
 			}
 
@@ -141,13 +149,18 @@ public class NisCacheFactory {
 			}
 
 			@Override
-			public DefaultHashCache getTransactionHashCache() {
-				return null == hashCache ? Mockito.mock(DefaultHashCache.class) : hashCache;
+			public ReadOnlyHashCache getTransactionHashCache() {
+				return null == hashCache ? Mockito.mock(HashCache.class) : hashCache;
 			}
 
 			@Override
 			public ReadOnlyNamespaceCache getNamespaceCache() {
 				return null == namespaceCache ? Mockito.mock(NamespaceCache.class) : namespaceCache;
+			}
+
+			@Override
+			public ReadOnlyExpiredMosaicCache getExpiredMosaicCache() {
+				return null == expiredMosaicCache ? Mockito.mock(ExpiredMosaicCache.class) : expiredMosaicCache;
 			}
 
 			@Override

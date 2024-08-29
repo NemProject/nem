@@ -270,7 +270,8 @@ public class BlockChainHarvesterTest {
 		final DefaultNisCache nisCache = new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()), accountStateCache,
 				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
 				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())));
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())),
+				new SynchronizedExpiredMosaicCache(new DefaultExpiredMosaicCache()));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
 
 		// Setup remote harvesting
@@ -307,7 +308,8 @@ public class BlockChainHarvesterTest {
 		final DefaultNisCache nisCache = new DefaultNisCache(new SynchronizedAccountCache(new DefaultAccountCache()), accountStateCache,
 				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
 				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())));
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())),
+				new SynchronizedExpiredMosaicCache(new DefaultExpiredMosaicCache()));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
 
 		// Setup remote harvesting, such that
