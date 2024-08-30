@@ -19,7 +19,7 @@ public class NodeFeatureTest {
 			{
 				this.put("TRANSACTION_HASH_LOOKUP", NodeFeature.TRANSACTION_HASH_LOOKUP);
 				this.put("HISTORICAL_ACCOUNT_DATA", NodeFeature.HISTORICAL_ACCOUNT_DATA);
-				this.put("PLACEHOLDER2", NodeFeature.PLACEHOLDER2);
+				this.put("TRACK_EXPIRED_MOSAICS", NodeFeature.TRACK_EXPIRED_MOSAICS);
 			}
 		};
 
@@ -75,7 +75,7 @@ public class NodeFeatureTest {
 	@Test
 	public void canBitwiseOrTogetherMultipleFeatures() {
 		// Act:
-		final int value = NodeFeature.or(NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2);
+		final int value = NodeFeature.or(NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.TRACK_EXPIRED_MOSAICS);
 
 		// Assert:
 		MatcherAssert.assertThat(value, IsEqual.equalTo(5));
@@ -108,7 +108,7 @@ public class NodeFeatureTest {
 
 		// Assert:
 		MatcherAssert.assertThat(features, IsEqual.equalTo(new NodeFeature[]{
-				NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER2
+				NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.TRACK_EXPIRED_MOSAICS
 		}));
 	}
 

@@ -241,7 +241,7 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
-		MatcherAssert.assertThat(config.isFeatureSupported(NodeFeature.PLACEHOLDER2), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(config.isFeatureSupported(NodeFeature.TRACK_EXPIRED_MOSAICS), IsEqual.equalTo(false));
 	}
 
 	@Test
