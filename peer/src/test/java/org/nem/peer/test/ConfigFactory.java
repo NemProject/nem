@@ -78,7 +78,7 @@ public class ConfigFactory {
 	 */
 	public static Config createDefaultTestConfig() {
 		return new Config(createDefaultLocalNode(), createDefaultPeersConfig(), "2.0.0", 4, new NodeFeature[]{
-				NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.PLACEHOLDER2
+				NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.TRACK_EXPIRED_MOSAICS
 		});
 	}
 

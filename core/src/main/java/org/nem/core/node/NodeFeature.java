@@ -8,19 +8,19 @@ import java.util.*;
 public enum NodeFeature {
 
 	/**
-	 * The node supports looking up transactions by hash.
+	 * Node supports looking up transactions by hash.
 	 */
 	TRANSACTION_HASH_LOOKUP(0x00000001),
 
 	/**
-	 * The node supports supplying historical account data.
+	 * Node supports supplying historical account data.
 	 */
 	HISTORICAL_ACCOUNT_DATA(0x0000002),
 
 	/**
-	 * A placeholder value (should be replaced when there is another feature).
+	 * Node supports tracking expired mosaics.
 	 */
-	PLACEHOLDER2(0x0000004);
+	TRACK_EXPIRED_MOSAICS(0x0000004);
 
 	private final int value;
 
