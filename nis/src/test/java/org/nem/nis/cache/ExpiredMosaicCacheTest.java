@@ -43,16 +43,16 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 
 	private void addFourExpirations(ExpiredMosaicCache cache) {
 		final MosaicBalances balances1 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 10000);
-		cache.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1);
+		cache.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1, ExpiredMosaicType.Expired);
 
 		final MosaicBalances balances2 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 20000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2, ExpiredMosaicType.Expired);
 
 		final MosaicBalances balances3 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 30000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3, ExpiredMosaicType.Restored);
 
 		final MosaicBalances balances4 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 40000);
-		cache.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4);
+		cache.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4, ExpiredMosaicType.Expired);
 	}
 
 	// endregion
@@ -79,13 +79,27 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		final ExpiredMosaicCache cache = this.createCache();
 
 		final MosaicBalances balances = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 10000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(111), balances);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(111), balances, ExpiredMosaicType.Expired);
 
 		// Act:
-		Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> expirations = cache.findExpirationsAtHeight(new BlockHeight(124));
+		Collection<ExpiredMosaicEntry> expirations = cache.findExpirationsAtHeight(new BlockHeight(124));
 
 		// Assert:
 		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(0));
+	}
+
+	private static Boolean AreMosaicBalancesEqual(final ReadOnlyMosaicBalances lhs, final ReadOnlyMosaicBalances rhs) {
+		if (lhs.size() != rhs.size()) {
+			return false;
+		}
+
+		for (final Address owner : lhs.getOwners()) {
+			if (lhs.getBalance(owner).getRaw() != rhs.getBalance(owner).getRaw()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Test
@@ -94,30 +108,36 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		final ExpiredMosaicCache cache = this.createCache();
 
 		final MosaicBalances balances1 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 10000);
-		cache.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1);
+		cache.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1, ExpiredMosaicType.Expired);
 
 		final MosaicBalances balances2 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 20000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2, ExpiredMosaicType.Expired);
 
 		final MosaicBalances balances3 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 30000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3, ExpiredMosaicType.Restored);
 
 		final MosaicBalances balances4 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 40000);
-		cache.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4);
+		cache.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4, ExpiredMosaicType.Expired);
 
 		// Act: expirations are unsorted, so sort by mosaic name
-		Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> expirations = cache.findExpirationsAtHeight(new BlockHeight(123));
-		List<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> expirationsList = expirations
+		Collection<ExpiredMosaicEntry> expirations = cache.findExpirationsAtHeight(new BlockHeight(123));
+		List<ExpiredMosaicEntry> expirationsList = expirations
 			.stream()
-			.sorted((e1, e2) -> e1.getKey().getName().compareTo(e2.getKey().getName()))
+			.sorted((e1, e2) -> e1.getMosaicId().getName().compareTo(e2.getMosaicId().getName()))
 			.collect(Collectors.toList());
 
-		// Assert:
+		// Assert: balances should be copied, not same instance
 		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(2));
-		MatcherAssert.assertThat(expirationsList.get(0).getKey(), IsEqual.equalTo(Utils.createMosaicId(222)));
-		MatcherAssert.assertThat(expirationsList.get(0).getValue(), IsSame.sameInstance(balances2));
-		MatcherAssert.assertThat(expirationsList.get(1).getKey(), IsEqual.equalTo(Utils.createMosaicId(333)));
-		MatcherAssert.assertThat(expirationsList.get(1).getValue(), IsSame.sameInstance(balances3));
+
+		MatcherAssert.assertThat(expirationsList.get(0).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(222)));
+		MatcherAssert.assertThat(expirationsList.get(0).getBalances(), IsNot.not(IsSame.sameInstance(balances2)));
+		MatcherAssert.assertThat(AreMosaicBalancesEqual(expirationsList.get(0).getBalances(), balances2), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(expirationsList.get(0).getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired));
+
+		MatcherAssert.assertThat(expirationsList.get(1).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(333)));
+		MatcherAssert.assertThat(expirationsList.get(1).getBalances(), IsNot.not(IsSame.sameInstance(balances3)));
+		MatcherAssert.assertThat(AreMosaicBalancesEqual(expirationsList.get(1).getBalances(), balances3), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(expirationsList.get(1).getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Restored));
 	}
 
 	// endregion
@@ -129,11 +149,9 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		// Arrange:
 		final ExpiredMosaicCache cache = this.createCache();
 
-		final MosaicBalances balances = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 10000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(111), balances);
-
 		// Act:
-		Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> expirations = cache.findExpirationsAtHeight(new BlockHeight(123));
+		final MosaicBalances balances = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 10000);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(111), balances, ExpiredMosaicType.Expired);
 
 		// Assert:
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));
@@ -147,11 +165,12 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		// Arrange:
 		final ExpiredMosaicCache cache = this.createCache();
 
+		// Act:
 		final MosaicBalances balances1 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 20000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances1);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances1, ExpiredMosaicType.Expired);
 
 		final MosaicBalances balances2 = this.createMosaicBalancesWithSingleBalance(Utils.generateRandomAddress(), 30000);
-		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances2);
+		cache.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances2, ExpiredMosaicType.Restored);
 
 		// Assert:
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(1));

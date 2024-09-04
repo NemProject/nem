@@ -9,8 +9,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.BlockHeightBuilder;
 import org.nem.nis.controller.viewmodels.ExpiredMosaicViewModel;
-
-import org.nem.nis.state.ReadOnlyMosaicBalances;
+import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,10 +47,10 @@ public class ExpiredMosaicController {
 		}
 
 		final BlockHeight height = heightBuilder.build();
-		final Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> expirations = this.expiredMosaicCache.findExpirationsAtHeight(height);
+		final Collection<ExpiredMosaicEntry> expirations = this.expiredMosaicCache.findExpirationsAtHeight(height);
 		return new SerializableList<>(
 			expirations.stream()
-				.map(pair -> new ExpiredMosaicViewModel(pair.getKey(), pair.getValue()))
+				.map(expiration -> new ExpiredMosaicViewModel(expiration))
 				.collect(Collectors.toList())
 		);
 	}

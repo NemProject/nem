@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.delta.*;
-import org.nem.nis.state.ReadOnlyMosaicBalances;
+import org.nem.nis.state.*;
 
 import java.util.*;
 
@@ -33,18 +33,22 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 	}
 
 	@Override
-	public Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> findExpirationsAtHeight(BlockHeight height) {
+	public Collection<ExpiredMosaicEntry> findExpirationsAtHeight(BlockHeight height) {
 		final ExpiredMosaicBlockGroup group = this.map.getOrDefault(height, null);
 		return null == group ? new ArrayList<>() : group.getAll();
 	}
 
 	@Override
-	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances) {
+	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances, final ExpiredMosaicType expirationType) {
 		if (!this.map.containsKey(height)) {
 			this.map.put(height, new ExpiredMosaicBlockGroup());
 		}
 
-		this.map.get(height).addExpiredMosaic(mosaicId, balances);
+		// make a deep copy of balances to disconnect historical record (stored in this cache) from current state
+		final MosaicBalances balancesCopy = new MosaicBalances();
+		balances.getOwners().forEach(owner -> balancesCopy.incrementBalance(owner, balances.getBalance(owner)));
+
+		this.map.get(height).addExpiredMosaic(new ExpiredMosaicEntry(mosaicId, balancesCopy, expirationType));
 	}
 
 	@Override
@@ -90,25 +94,25 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 	// region ExpiredMosaicBlockGroup
 
 	private static class ExpiredMosaicBlockGroup implements Copyable<ExpiredMosaicBlockGroup> {
-		private final Map<MosaicId, ReadOnlyMosaicBalances> expiredMosaics = new HashMap<>();
+		private final List<ExpiredMosaicEntry> expiredMosaicEntries = new ArrayList<>();
 
 		public int expiredMosaicsCount() {
-			return this.expiredMosaics.size();
+			return this.expiredMosaicEntries.size();
 		}
 
-		public Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> getAll() {
-			return this.expiredMosaics.entrySet();
+		public Collection<ExpiredMosaicEntry> getAll() {
+			return this.expiredMosaicEntries;
 		}
 
-		public void addExpiredMosaic(final MosaicId mosaicId, final ReadOnlyMosaicBalances balances) {
-			this.expiredMosaics.put(mosaicId, balances);
+		public void addExpiredMosaic(final ExpiredMosaicEntry entry) {
+			this.expiredMosaicEntries.add(entry);
 		}
 
 		@Override
 		public ExpiredMosaicBlockGroup copy() {
-			// notice that both keys and values are immutable, so no additional copies are needed
+			// notice that values are immutable, so no additional copies are needed
 			final ExpiredMosaicBlockGroup copy = new ExpiredMosaicBlockGroup();
-			this.expiredMosaics.entrySet().forEach(e -> copy.expiredMosaics.put(e.getKey(), e.getValue()));
+			this.expiredMosaicEntries.forEach(entry -> copy.expiredMosaicEntries.add(entry));
 			return copy;
 		}
 	}
