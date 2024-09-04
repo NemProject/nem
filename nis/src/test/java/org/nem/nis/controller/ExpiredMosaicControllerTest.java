@@ -87,6 +87,14 @@ public class ExpiredMosaicControllerTest {
 
 		MatcherAssert.assertThat(balanceMap2.keySet(), IsEquivalent.equivalentTo(Collections.singletonList(address1)));
 		MatcherAssert.assertThat(balanceMap2.get(address1), IsEqual.equalTo(new Quantity(30000)));
+
+		// - check expired mosaic types (1 - expired, 2 - restored)
+		MatcherAssert.assertThat(
+			(Integer) jsonObject1.get("expiredMosaicType"),
+			IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 1 : 2));
+		MatcherAssert.assertThat(
+			(Integer) jsonObject2.get("expiredMosaicType"),
+			IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 2 : 1));
 	}
 
 	private MosaicId deserializeMosaicId(final JSONObject jsonObject) {
@@ -127,17 +135,17 @@ public class ExpiredMosaicControllerTest {
 			final DefaultExpiredMosaicCache copy = cache.copy();
 
 			final MosaicBalances balances1 = this.createMosaicBalancesWithSingleBalance(address1, 10000);
-			copy.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1);
+			copy.addExpiration(new BlockHeight(122), Utils.createMosaicId(111), balances1, ExpiredMosaicType.Expired);
 
 			final MosaicBalances balances2 = this.createMosaicBalancesWithSingleBalance(address1, 20000);
 			balances2.incrementBalance(address2, new Quantity(9999));
-			copy.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2);
+			copy.addExpiration(new BlockHeight(123), Utils.createMosaicId(222), balances2, ExpiredMosaicType.Expired);
 
 			final MosaicBalances balances3 = this.createMosaicBalancesWithSingleBalance(address1, 30000);
-			copy.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3);
+			copy.addExpiration(new BlockHeight(123), Utils.createMosaicId(333), balances3, ExpiredMosaicType.Restored);
 
 			final MosaicBalances balances4 = this.createMosaicBalancesWithSingleBalance(address1, 40000);
-			copy.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4);
+			copy.addExpiration(new BlockHeight(124), Utils.createMosaicId(444), balances4, ExpiredMosaicType.Expired);
 
 			copy.commit();
 			return cache;

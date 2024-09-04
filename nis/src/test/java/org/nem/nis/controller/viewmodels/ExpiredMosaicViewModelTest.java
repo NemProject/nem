@@ -19,18 +19,20 @@ public class ExpiredMosaicViewModelTest {
 	@Test
 	public void canSerializeWithoutBalances() {
 		// Arrange:
-		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(
+		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(new ExpiredMosaicEntry(
 			new MosaicId(new NamespaceId("alice"), "tokens"),
-			new MosaicBalances());
+			new MosaicBalances(),
+			ExpiredMosaicType.Restored));
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
 		MatcherAssert.assertThat(((JSONObject) jsonObject.get("mosaicId")).get("namespaceId"), IsEqual.equalTo("alice"));
 		MatcherAssert.assertThat(((JSONObject) jsonObject.get("mosaicId")).get("name"), IsEqual.equalTo("tokens"));
 		MatcherAssert.assertThat(((JSONArray) jsonObject.get("balances")).size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(((Integer) jsonObject.get("expiredMosaicType")), IsEqual.equalTo(2));
 	}
 
 	@Test
@@ -45,16 +47,22 @@ public class ExpiredMosaicViewModelTest {
 		balances.incrementBalance(address2, new Quantity(333));
 		balances.incrementBalance(address3, new Quantity(222));
 
-		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(new MosaicId(new NamespaceId("alice"), "tokens"), balances);
+		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(new ExpiredMosaicEntry(
+			new MosaicId(new NamespaceId("alice"), "tokens"),
+			balances,
+			ExpiredMosaicType.Expired));
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+
+		// - check mosaicId
 		MatcherAssert.assertThat(((JSONObject) jsonObject.get("mosaicId")).get("namespaceId"), IsEqual.equalTo("alice"));
 		MatcherAssert.assertThat(((JSONObject) jsonObject.get("mosaicId")).get("name"), IsEqual.equalTo("tokens"));
 
+		// - check balances
 		JSONArray jsonBalances = (JSONArray) jsonObject.get("balances");
 		MatcherAssert.assertThat(jsonBalances.size(), IsEqual.equalTo(3));
 
@@ -74,5 +82,8 @@ public class ExpiredMosaicViewModelTest {
 		MatcherAssert.assertThat(balanceMap.get(address1), IsEqual.equalTo(new Quantity(111)));
 		MatcherAssert.assertThat(balanceMap.get(address2), IsEqual.equalTo(new Quantity(333)));
 		MatcherAssert.assertThat(balanceMap.get(address3), IsEqual.equalTo(new Quantity(222)));
+
+		// - check expiredMosaicType
+		MatcherAssert.assertThat(((Integer) jsonObject.get("expiredMosaicType")), IsEqual.equalTo(1));
 	}
 }

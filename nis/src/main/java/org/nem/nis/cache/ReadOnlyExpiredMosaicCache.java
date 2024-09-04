@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.ReadOnlyMosaicBalances;
+import org.nem.nis.state.*;
 
 import java.util.*;
 
@@ -27,5 +27,5 @@ public interface ReadOnlyExpiredMosaicCache {
 	 * @param height Height of expiration.
 	 * @return All expiring mosaics at height.
 	 */
-	Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> findExpirationsAtHeight(BlockHeight height);
+	Collection<ExpiredMosaicEntry> findExpirationsAtHeight(BlockHeight height);
 }

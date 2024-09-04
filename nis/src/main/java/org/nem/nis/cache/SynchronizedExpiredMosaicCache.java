@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.state.ReadOnlyMosaicBalances;
+import org.nem.nis.state.*;
 
 import java.util.*;
 
@@ -37,16 +37,16 @@ public class SynchronizedExpiredMosaicCache implements ExpiredMosaicCache, DeepC
 	}
 
 	@Override
-	public Collection<Map.Entry<MosaicId, ReadOnlyMosaicBalances>> findExpirationsAtHeight(BlockHeight height) {
+	public Collection<ExpiredMosaicEntry> findExpirationsAtHeight(BlockHeight height) {
 		synchronized (this.lock) {
 			return this.cache.findExpirationsAtHeight(height);
 		}
 	}
 
 	@Override
-	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances) {
+	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances, final ExpiredMosaicType expirationType) {
 		synchronized (this.lock) {
-			this.cache.addExpiration(height, mosaicId, balances);
+			this.cache.addExpiration(height, mosaicId, balances, expirationType);
 		}
 	}
 

@@ -73,6 +73,11 @@ public class ExpiredNamespacesObserverTest {
 		// Assert: changes to expired mosaic cache because it's enabled
 		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(context.expiredMosaicCache.deepSize(), IsEqual.equalTo(2));
+
+		// - all are marked with expired
+		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
+		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(2));
+		expirations.forEach(expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
 	}
 
 	@Test
@@ -89,6 +94,11 @@ public class ExpiredNamespacesObserverTest {
 		// Assert: changes to expired mosaic cache because it's enabled
 		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(1));
 		MatcherAssert.assertThat(context.expiredMosaicCache.deepSize(), IsEqual.equalTo(3));
+
+		// - all are marked with expired
+		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
+		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(3));
+		expirations.forEach(expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
 	}
 
 	// endregion
@@ -266,9 +276,9 @@ public class ExpiredNamespacesObserverTest {
 		}
 
 		private void addExpiredMosaics(final BlockHeight height) {
-			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition1.getId(), new MosaicBalances());
-			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition2.getId(), new MosaicBalances());
-			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition3.getId(), new MosaicBalances());
+			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition1.getId(), new MosaicBalances(), ExpiredMosaicType.Expired);
+			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition2.getId(), new MosaicBalances(), ExpiredMosaicType.Restored);
+			this.expiredMosaicCache.addExpiration(height, this.mosaicDefinition3.getId(), new MosaicBalances(), ExpiredMosaicType.Expired);
 		}
 	}
 }

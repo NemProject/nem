@@ -60,7 +60,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 
 			if (this.shouldTrackExpiredMosaics) {
 				if (NotificationTrigger.Execute == context.getTrigger()) {
-					this.expiredMosaicCache.addExpiration(context.getHeight(), mosaicId, mosaicEntry.getBalances());
+					this.expiredMosaicCache.addExpiration(context.getHeight(), mosaicId, mosaicEntry.getBalances(), ExpiredMosaicType.Expired);
 				} else {
 					this.expiredMosaicCache.removeAll(context.getHeight());
 				}

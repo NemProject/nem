@@ -15,24 +15,26 @@ import java.util.stream.Collectors;
 public class ExpiredMosaicViewModel implements SerializableEntity {
 	private final MosaicId mosaicId;
 	private final List<AddressBalancePair> balances;
+	private final ExpiredMosaicType expiredMosaicType;
 
 	/**
 	 * Creates a new expired mosaic view model.
 	 *
-	 * @param mosaicId Expired mosaic id.
-	 * @param mosaicBalances Balances at time of expiration.
+	 * @param entry Expired mosaic entry.
 	 */
-	public ExpiredMosaicViewModel(final MosaicId mosaicId, final ReadOnlyMosaicBalances mosaicBalances) {
-		this.mosaicId = mosaicId;
-		this.balances = mosaicBalances.getOwners()
+	public ExpiredMosaicViewModel(final ExpiredMosaicEntry entry) {
+		this.mosaicId = entry.getMosaicId();
+		this.balances = entry.getBalances().getOwners()
 			.stream()
-			.map(address -> new AddressBalancePair(address, mosaicBalances.getBalance(address)))
+			.map(address -> new AddressBalancePair(address, entry.getBalances().getBalance(address)))
 			.collect(Collectors.toList());
+		this.expiredMosaicType = entry.getExpiredMosaicType();
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("mosaicId", this.mosaicId);
+		serializer.writeInt("expiredMosaicType", this.expiredMosaicType.value());
 		serializer.writeObjectArray("balances", this.balances);
 	}
 
