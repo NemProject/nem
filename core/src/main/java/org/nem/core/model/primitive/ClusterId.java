@@ -1,8 +1,6 @@
 package org.nem.core.model.primitive;
 
-/**
- * Represents a cluster's id used in POI graph clustering.
- */
+/** Represents a cluster's id used in POI graph clustering. */
 public class ClusterId extends AbstractPrimitive<ClusterId, Integer> {
 
 	/**

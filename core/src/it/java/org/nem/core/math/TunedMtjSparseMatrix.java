@@ -1,21 +1,15 @@
 package org.nem.core.math;
 
+import java.util.*;
 import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
-import java.util.*;
-
-/**
- * A Matrix implementation that uses CompRowMatrix from MTJ.
- */
+/** A Matrix implementation that uses CompRowMatrix from MTJ. */
 public class TunedMtjSparseMatrix extends Matrix {
 
 	private final CompRowMatrix matrix;
 
-	public TunedMtjSparseMatrix(
-			final int numRows,
-			final int numCols,
-			final CompRowMatrix matrix) {
+	public TunedMtjSparseMatrix(final int numRows, final int numCols, final CompRowMatrix matrix) {
 		super(numRows, numCols);
 		this.matrix = matrix;
 	}
@@ -38,11 +32,7 @@ public class TunedMtjSparseMatrix extends Matrix {
 	@Override
 	protected void forEach(final ElementVisitorFunction func) {
 		for (final MatrixEntry entry : this.matrix) {
-			func.visit(
-					entry.row(),
-					entry.column(),
-					entry.get(),
-					entry::set);
+			func.visit(entry.row(), entry.column(), entry.get(), entry::set);
 		}
 	}
 

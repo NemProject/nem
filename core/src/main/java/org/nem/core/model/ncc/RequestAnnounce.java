@@ -2,9 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents an announce request.
- */
+/** Represents an announce request. */
 public class RequestAnnounce implements SerializableEntity {
 	private final byte[] data;
 	private final byte[] signature;

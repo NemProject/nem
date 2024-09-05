@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlockedHarvesterPublicKeysTest {
 	private static final int EXPECTED_SET_SIZE = 6 + 4 * 26;

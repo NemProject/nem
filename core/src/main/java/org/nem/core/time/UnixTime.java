@@ -3,9 +3,7 @@ package org.nem.core.time;
 import java.text.*;
 import java.util.*;
 
-/**
- * Helper class for converting TimeInstant to and from Unix time.
- */
+/** Helper class for converting TimeInstant to and from Unix time. */
 public class UnixTime {
 	private final TimeInstant timeInstant;
 

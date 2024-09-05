@@ -1,22 +1,14 @@
 package org.nem.core.model;
 
-/**
- * Enum containing mosaic supply types.
- */
+/** Enum containing mosaic supply types. */
 public enum MosaicSupplyType {
-	/**
-	 * An unknown mode.
-	 */
+	/** An unknown mode. */
 	Unknown(0),
 
-	/**
-	 * Create new mosaics.
-	 */
+	/** Create new mosaics. */
 	Create(1),
 
-	/**
-	 * Delete existing mosaics.
-	 */
+	/** Delete existing mosaics. */
 	Delete(2);
 
 	private final int value;

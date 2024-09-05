@@ -2,9 +2,7 @@ package org.nem.core.crypto.secp256k1;
 
 import org.nem.core.crypto.*;
 
-/**
- * Class that wraps the SECP256K1 specific implementation.
- */
+/** Class that wraps the SECP256K1 specific implementation. */
 public class SecP256K1CryptoEngine implements CryptoEngine {
 
 	@Override

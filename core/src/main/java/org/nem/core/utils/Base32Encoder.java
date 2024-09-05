@@ -2,9 +2,7 @@ package org.nem.core.utils;
 
 import org.apache.commons.codec.binary.Base32;
 
-/**
- * Static class that contains utility functions for converting Base32 strings to and from bytes.
- */
+/** Static class that contains utility functions for converting Base32 strings to and from bytes. */
 public class Base32Encoder {
 
 	/**

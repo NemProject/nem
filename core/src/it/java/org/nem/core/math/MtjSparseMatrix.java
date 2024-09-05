@@ -3,18 +3,13 @@ package org.nem.core.math;
 import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
-/**
- * A Matrix implementation that uses CompRowMatrix from MTJ.
- */
+/** A Matrix implementation that uses CompRowMatrix from MTJ. */
 @SuppressWarnings("unused")
 public class MtjSparseMatrix extends Matrix {
 
 	private final CompRowMatrix matrix;
 
-	public MtjSparseMatrix(
-			final int numRows,
-			final int numCols,
-			final CompRowMatrix matrix) {
+	public MtjSparseMatrix(final int numRows, final int numCols, final CompRowMatrix matrix) {
 		super(numRows, numCols);
 		this.matrix = matrix;
 	}
@@ -37,11 +32,7 @@ public class MtjSparseMatrix extends Matrix {
 	@Override
 	protected void forEach(final ElementVisitorFunction func) {
 		for (final MatrixEntry entry : this.matrix) {
-			func.visit(
-					entry.row(),
-					entry.column(),
-					entry.get(),
-					entry::set);
+			func.visit(entry.row(), entry.column(), entry.get(), entry::set);
 		}
 	}
 

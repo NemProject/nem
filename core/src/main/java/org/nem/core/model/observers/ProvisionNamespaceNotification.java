@@ -3,9 +3,7 @@ package org.nem.core.model.observers;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 
-/**
- * A notification that a namespace has been provisioned.
- */
+/** A notification that a namespace has been provisioned. */
 public class ProvisionNamespaceNotification extends Notification {
 	private final Account owner;
 	private final NamespaceId namespaceId;

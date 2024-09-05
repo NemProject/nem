@@ -1,13 +1,10 @@
 package org.nem.core.crypto;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
 
-import java.util.Arrays;
-
-/**
- * Represents a public key.
- */
+/** Represents a public key. */
 public class PublicKey implements SerializableEntity {
 	private final byte[] value;
 

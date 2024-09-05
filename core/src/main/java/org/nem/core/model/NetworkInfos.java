@@ -1,15 +1,12 @@
 package org.nem.core.model;
 
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.utils.SetOnce;
 
-import java.util.Arrays;
-
-/**
- * Central class responsible for providing access to network information.
- */
+/** Central class responsible for providing access to network information. */
 public class NetworkInfos {
 	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
 	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();

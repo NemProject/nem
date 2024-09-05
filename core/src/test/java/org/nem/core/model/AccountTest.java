@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -7,8 +8,6 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.math.BigInteger;
 
 public class AccountTest {
 
@@ -299,7 +298,8 @@ public class AccountTest {
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
-		// - since the private key is never serialized, it will only be present when it is in the cache (and isPublicKeyInCache is true)
+		// - since the private key is never serialized, it will only be present when it is in the
+		// cache (and isPublicKeyInCache is true)
 		MatcherAssert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
 		MatcherAssert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
 		MatcherAssert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(isPublicKeyInCache));

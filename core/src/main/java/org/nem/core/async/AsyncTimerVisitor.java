@@ -1,18 +1,12 @@
 package org.nem.core.async;
 
-/**
- * A visitor that is called by the AsyncTimer.
- */
+/** A visitor that is called by the AsyncTimer. */
 public interface AsyncTimerVisitor {
 
-	/**
-	 * Called to indicate that a user operation is starting.
-	 */
+	/** Called to indicate that a user operation is starting. */
 	void notifyOperationStart();
 
-	/**
-	 * Called to indicate that a user operation has completed (successfully).
-	 */
+	/** Called to indicate that a user operation has completed (successfully). */
 	void notifyOperationComplete();
 
 	/**
@@ -29,9 +23,7 @@ public interface AsyncTimerVisitor {
 	 */
 	void notifyDelay(int delay);
 
-	/**
-	 * Called to indicate that the timer has stopped.
-	 */
+	/** Called to indicate that the timer has stopped. */
 	void notifyStop();
 
 	/**

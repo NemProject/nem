@@ -1,11 +1,10 @@
 package org.nem.core.utils;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
 
 public class AbstractTwoLevelMapTest {
 

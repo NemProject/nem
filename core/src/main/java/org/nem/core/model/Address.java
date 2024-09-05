@@ -1,14 +1,11 @@
 package org.nem.core.model;
 
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
-import java.util.Arrays;
-
-/**
- * A NEM address.
- */
+/** A NEM address. */
 public class Address implements Comparable<Address> {
 	private static final int NUM_CHECKSUM_BYTES = 4;
 	private static final int NUM_DECODED_BYTES_LENGTH = 40;

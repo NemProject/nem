@@ -1,8 +1,6 @@
 package org.nem.core.model.observers;
 
-/**
- * A notification.
- */
+/** A notification. */
 public abstract class Notification {
 	private final NotificationType type;
 

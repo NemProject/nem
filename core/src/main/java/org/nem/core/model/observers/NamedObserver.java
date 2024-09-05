@@ -1,8 +1,6 @@
 package org.nem.core.model.observers;
 
-/**
- * Interface for observers that have a name.
- */
+/** Interface for observers that have a name. */
 public interface NamedObserver {
 
 	/**

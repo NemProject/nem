@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.HashMap;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-
-import java.util.HashMap;
 
 public class HashMetaDataPairTest {
 

@@ -2,9 +2,7 @@ package org.nem.core.time;
 
 import org.nem.core.model.primitive.TimeOffset;
 
-/**
- * Interface that provides time-related information.
- */
+/** Interface that provides time-related information. */
 public interface TimeProvider {
 
 	/**

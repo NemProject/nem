@@ -1,12 +1,9 @@
 package org.nem.core.model.primitive;
 
+import java.math.BigInteger;
 import org.nem.core.serialization.*;
 
-import java.math.BigInteger;
-
-/**
- * Represents a NEM block difficulty.
- */
+/** Represents a NEM block difficulty. */
 public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 
 	/**
@@ -16,14 +13,10 @@ public class BlockDifficulty extends AbstractPrimitive<BlockDifficulty, Long> {
 	 */
 	public static final BlockDifficulty INITIAL_DIFFICULTY = new BlockDifficulty(100_000_000_000_000L, false);
 
-	/**
-	 * Minimum value for difficulty.
-	 */
+	/** Minimum value for difficulty. */
 	private static final long MIN_DIFFICULTY = INITIAL_DIFFICULTY.getRaw() / 10L;
 
-	/**
-	 * Maximum value for difficulty.
-	 */
+	/** Maximum value for difficulty. */
 	private static final long MAX_DIFFICULTY = INITIAL_DIFFICULTY.getRaw() * 10L;
 
 	/**

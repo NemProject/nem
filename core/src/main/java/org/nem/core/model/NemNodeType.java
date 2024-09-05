@@ -1,22 +1,14 @@
 package org.nem.core.model;
 
-/**
- * Types of NEM nodes.
- */
+/** Types of NEM nodes. */
 public enum NemNodeType {
 
-	/**
-	 * A NIS node.
-	 */
+	/** A NIS node. */
 	NIS,
 
-	/**
-	 * A NCC node.
-	 */
+	/** A NCC node. */
 	NCC,
 
-	/**
-	 * A Servant node.
-	 */
+	/** A Servant node. */
 	Servant
 }

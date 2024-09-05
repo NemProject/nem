@@ -1,8 +1,6 @@
 package org.nem.core.connect;
 
-/**
- * An exception that is thrown when peer communication fails because a peer is busy.
- */
+/** An exception that is thrown when peer communication fails because a peer is busy. */
 @SuppressWarnings("serial")
 public class BusyPeerException extends RuntimeException {
 

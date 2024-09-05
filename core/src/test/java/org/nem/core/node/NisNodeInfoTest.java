@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.time.*;
-
-import java.util.*;
 
 public class NisNodeInfoTest {
 

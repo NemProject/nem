@@ -8,15 +8,11 @@ import org.nem.core.serialization.*;
  */
 public class BlockFactory {
 
-	/**
-	 * An object deserializer for verifiable blocks that wraps this factory.
-	 */
+	/** An object deserializer for verifiable blocks that wraps this factory. */
 	public static final ObjectDeserializer<Block> VERIFIABLE = deserializer -> deserialize(
 			VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
-	/**
-	 * An object deserializer for non-verifiable blocks that wraps this factory.
-	 */
+	/** An object deserializer for non-verifiable blocks that wraps this factory. */
 	public static final ObjectDeserializer<Block> NON_VERIFIABLE = deserializer -> deserialize(
 			VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 

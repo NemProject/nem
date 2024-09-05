@@ -5,18 +5,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
-/**
- * Static class containing test utilities for creating blocks and transactions.
- */
+/** Static class containing test utilities for creating blocks and transactions. */
 public class BlockUtils {
-	/**
-	 * The previous hash used in created blocks.
-	 */
+	/** The previous hash used in created blocks. */
 	public static final Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
 
-	/**
-	 * The generation hash used in created blocks.
-	 */
+	/** The generation hash used in created blocks. */
 	public static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 
 	/**

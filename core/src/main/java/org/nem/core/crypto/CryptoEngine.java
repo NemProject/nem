@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Represents a cryptographic engine that is a factory of crypto-providers.
- */
+/** Represents a cryptographic engine that is a factory of crypto-providers. */
 public interface CryptoEngine {
 
 	/**

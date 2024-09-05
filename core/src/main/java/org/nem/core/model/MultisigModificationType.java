@@ -1,17 +1,11 @@
 package org.nem.core.model;
 
-/**
- * Enum containing types of multisig modifications.
- */
+/** Enum containing types of multisig modifications. */
 public enum MultisigModificationType {
-	/**
-	 * An unknown mode.
-	 */
+	/** An unknown mode. */
 	Unknown(0),
 
-	/**
-	 * When adding cosignatory to multisig account.
-	 */
+	/** When adding cosignatory to multisig account. */
 	AddCosignatory(1),
 
 	/**

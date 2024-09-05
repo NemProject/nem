@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
 import org.nem.core.model.primitive.Amount;
 
-/**
- * Implementation for calculating and validating transaction fees after the first fee fork.
- */
+/** Implementation for calculating and validating transaction fees after the first fee fork. */
 public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final int FEE_MULTIPLIER = 3;

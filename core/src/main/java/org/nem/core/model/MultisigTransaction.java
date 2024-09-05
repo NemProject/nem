@@ -1,16 +1,13 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-/**
- * A multisig transaction.
- */
+/** A multisig transaction. */
 public class MultisigTransaction extends Transaction {
 	private final Transaction otherTransaction;
 	private final Hash otherTransactionHash;

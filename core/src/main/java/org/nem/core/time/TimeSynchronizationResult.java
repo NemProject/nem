@@ -3,9 +3,7 @@ package org.nem.core.time;
 import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.serialization.*;
 
-/**
- * Information about the result of a time synchronization with other nodes.
- */
+/** Information about the result of a time synchronization with other nodes. */
 public class TimeSynchronizationResult implements SerializableEntity {
 
 	private final TimeInstant timeStamp;

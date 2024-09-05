@@ -4,9 +4,7 @@ import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.math.ec.ECPoint;
 import org.nem.core.crypto.*;
 
-/**
- * Utility class for SECP256K1.
- */
+/** Utility class for SECP256K1. */
 public class SecP256K1Utils {
 
 	/**

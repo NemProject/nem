@@ -6,9 +6,7 @@ import org.nem.core.serialization.*;
  * Represents a quantity that can be used by any class which needs to handle non-negative quantities.
  */
 public class Quantity extends AbstractQuantity<Quantity> {
-	/**
-	 * Quantity representing 0.
-	 */
+	/** Quantity representing 0. */
 	public static final Quantity ZERO = new Quantity(0);
 
 	/**

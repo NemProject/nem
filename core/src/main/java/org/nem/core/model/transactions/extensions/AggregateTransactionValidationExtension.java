@@ -1,8 +1,7 @@
 package org.nem.core.model.transactions.extensions;
 
-import org.nem.core.model.Transaction;
-
 import java.util.Collection;
+import org.nem.core.model.Transaction;
 
 /**
  * An aggregate transaction validation extension.

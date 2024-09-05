@@ -2,9 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a prepare request.
- */
+/** Represents a prepare request. */
 public class RequestPrepare implements SerializableEntity {
 	private final byte[] data;
 

@@ -2,6 +2,9 @@ package org.nem.core.connect;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.*;
+import java.net.URL;
+import java.util.concurrent.CancellationException;
+import java.util.function.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -14,11 +17,6 @@ import org.mockito.Mockito;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.net.URL;
-import java.util.Arrays;
-import java.util.concurrent.CancellationException;
-import java.util.function.*;
 
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
@@ -100,7 +98,6 @@ public class HttpMethodClientTest {
 				MatcherAssert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
 				MatcherAssert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
 			});
-
 		}
 
 		@Test
@@ -139,7 +136,8 @@ public class HttpMethodClientTest {
 		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
 			this.runTestWithTimeoutService((mockService, requestUrl) -> {
 				// Arrange:
-				// - stop the service so that it's no longer running and will reject connections
+				// - stop the service so that it's no longer running and will reject
+				// connections
 				mockService.stop();
 				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
 

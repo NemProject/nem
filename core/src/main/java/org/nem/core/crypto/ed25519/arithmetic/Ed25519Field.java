@@ -1,19 +1,15 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import java.math.BigInteger;
 import org.nem.core.utils.*;
 
-import java.math.BigInteger;
-
-/**
- * Represents the underlying finite field for Ed25519. The field has p = 2^255 - 19 elements.
- */
+/** Represents the underlying finite field for Ed25519. The field has p = 2^255 - 19 elements. */
 public class Ed25519Field {
 
-	/**
-	 * P: 2^255 - 19
-	 */
+	/** P: 2^255 - 19 */
 	public static final BigInteger P = new BigInteger(
 			HexEncoder.getBytes("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed"));
+
 	public static final Ed25519FieldElement ZERO = getFieldElement(0);
 	public static final Ed25519FieldElement ONE = getFieldElement(1);
 	public static final Ed25519FieldElement TWO = getFieldElement(2);
@@ -22,9 +18,7 @@ public class Ed25519Field {
 	public static final byte[] ZERO_SHORT = new byte[32];
 	public static final byte[] ZERO_LONG = new byte[64];
 
-	/**
-	 * I ^ 2 = -1
-	 */
+	/** I ^ 2 = -1 */
 	public static final Ed25519FieldElement I = new Ed25519EncodedFieldElement(
 			HexEncoder.getBytes("b0a00e4a271beec478e42fad0618432fa7d7fb3d99004d2b0bdfc14f8024832b")).decode();
 

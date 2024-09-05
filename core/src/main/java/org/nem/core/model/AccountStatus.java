@@ -2,23 +2,15 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-/**
- * Possible account statuses.
- */
+/** Possible account statuses. */
 public enum AccountStatus {
-	/**
-	 * The account status is unknown (needed for ncc).
-	 */
+	/** The account status is unknown (needed for ncc). */
 	UNKNOWN("UNKNOWN"),
 
-	/**
-	 * The account is locked.
-	 */
+	/** The account is locked. */
 	LOCKED("LOCKED"),
 
-	/**
-	 * The account is unlocked.
-	 */
+	/** The account is unlocked. */
 	UNLOCKED("UNLOCKED");
 
 	private final String status;

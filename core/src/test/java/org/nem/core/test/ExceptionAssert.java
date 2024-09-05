@@ -1,16 +1,13 @@
 package org.nem.core.test;
 
+import java.util.concurrent.CompletionException;
+import java.util.function.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.serialization.MissingRequiredPropertyException;
 
-import java.util.concurrent.CompletionException;
-import java.util.function.*;
-
-/**
- * Helper class that contains functions for asserting that specific exceptions are thrown.
- */
+/** Helper class that contains functions for asserting that specific exceptions are thrown. */
 public class ExceptionAssert {
 
 	/**

@@ -3,9 +3,7 @@ package org.nem.core.messages;
 import org.nem.core.model.*;
 import org.nem.core.serialization.Deserializer;
 
-/**
- * Factory class that can deserialize all known messages.
- */
+/** Factory class that can deserialize all known messages. */
 public class MessageFactory {
 
 	/**

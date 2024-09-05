@@ -1,5 +1,10 @@
 package org.nem.core.connect;
 
+import java.io.Closeable;
+import java.net.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
@@ -10,12 +15,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.io.Closeable;
-import java.net.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.logging.Logger;
 
 /**
  * Helper class that wraps an HttpClient.
@@ -31,9 +30,7 @@ public class HttpMethodClient<T> implements Closeable {
 	private final CloseableHttpAsyncClient httpClient;
 	private final int requestTimeout;
 
-	/**
-	 * Creates a new HTTP method client with default timeouts.
-	 */
+	/** Creates a new HTTP method client with default timeouts. */
 	public HttpMethodClient() {
 		this(5000, 10000, 3 * 60000);
 	}
@@ -162,9 +159,7 @@ public class HttpMethodClient<T> implements Closeable {
 			return ExceptionUtils.propagate(() -> this.getFuture().get());
 		}
 
-		/**
-		 * Aborts the HTTP operation.
-		 */
+		/** Aborts the HTTP operation. */
 		public void abort() {
 			this.request.abort();
 		}

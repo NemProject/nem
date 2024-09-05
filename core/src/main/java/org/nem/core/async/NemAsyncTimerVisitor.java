@@ -1,13 +1,10 @@
 package org.nem.core.async;
 
+import java.util.logging.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 
-import java.util.logging.*;
-
-/**
- * An async timer visitor implementation used by NIS.
- */
+/** An async timer visitor implementation used by NIS. */
 public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEntity {
 	private static final Logger LOGGER = Logger.getLogger(NemAsyncTimerVisitor.class.getName());
 

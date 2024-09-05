@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import java.util.stream.Stream;
 
-/**
- * Static helper class for dealing with blocks.
- */
+/** Static helper class for dealing with blocks. */
 public class BlockExtensions {
 
 	/**

@@ -1,12 +1,11 @@
 package org.nem.core.serialization.primitive;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer, T> {
 	private final SerializationPolicy<TSerializer, TDeserializer> policy;
@@ -163,7 +162,8 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 	@Test
 	public void truncationLimitIsNotAppliedPerObjectArray() {
-		// Arrange: write <numFields> array elements each containing a single field equal to the limit
+		// Arrange: write <numFields> array elements each containing a single field equal to the
+		// limit
 		final int numFields = 3;
 		final int limit = this.getDefaultLimit();
 		final List<T> originalValues = new ArrayList<>();

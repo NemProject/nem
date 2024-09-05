@@ -1,19 +1,18 @@
 package org.nem.core.math;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.sparse.CompRowMatrix;
-import org.junit.Test;
-
 import java.security.SecureRandom;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
+import org.junit.Test;
 
 public class SparseMatrixPerfITCase {
 	private static final Logger LOGGER = Logger.getLogger(SparseMatrixPerfITCase.class.getName());
 
 	private static final double NONZERO_ELEMENT_VALUE = 3.0;
 
-	//region timeNormalizeColumns
+	// region timeNormalizeColumns
 
 	@Test
 	public void timeNormalizeColumnsFewRepetitions() {
@@ -25,9 +24,9 @@ public class SparseMatrixPerfITCase {
 		timeAction("normalizeColumns", numRows, numTries, maxEntriesPerRow, MatrixTestAdapter::normalizeColumns);
 	}
 
-	//endregion
+	// endregion
 
-	//region timeMatrixVectorMultiply
+	// region timeMatrixVectorMultiply
 
 	@Test
 	public void timeMatrixVectorMultiplyFewRepetitions() {
@@ -39,13 +38,9 @@ public class SparseMatrixPerfITCase {
 		timeAction("multiply", numRows, numTries, maxEntriesPerRow, MatrixTestAdapter::multiply);
 	}
 
-	//endregion
+	// endregion
 
-	private static void timeAction(
-			final String actionName,
-			final int numRows,
-			final int numTries,
-			final int maxEntriesPerRow,
+	private static void timeAction(final String actionName, final int numRows, final int numTries, final int maxEntriesPerRow,
 			final Consumer<MatrixTestAdapter> action) {
 		final MatrixTestAdapterFactory[] factories = createTestAdapterFactories();
 		for (int numEntriesPerRow = 1; numEntriesPerRow <= maxEntriesPerRow; numEntriesPerRow++) {
@@ -63,12 +58,8 @@ public class SparseMatrixPerfITCase {
 
 				final long stop = System.currentTimeMillis();
 
-				final String message = String.format(
-						"%s with (%d) entries, %s needed %d ms",
-						testAdapter.getName(),
-						numRows * numEntriesPerRow,
-						actionName,
-						(stop - start) / numTries);
+				final String message = String.format("%s with (%d) entries, %s needed %d ms", testAdapter.getName(),
+						numRows * numEntriesPerRow, actionName, (stop - start) / numTries);
 				LOGGER.info(message);
 			}
 
@@ -81,9 +72,9 @@ public class SparseMatrixPerfITCase {
 		MatrixTestAdapter create(int numRows, int numEntriesPerRow, byte[] bytes);
 	}
 
-	//region MatrixTestAdapter
+	// region MatrixTestAdapter
 
-	private static abstract class MatrixTestAdapter {
+	private abstract static class MatrixTestAdapter {
 
 		private final String name;
 		private final ColumnVector columnVector;
@@ -117,9 +108,9 @@ public class SparseMatrixPerfITCase {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region NemMatrixTestAdapter
+	// region NemMatrixTestAdapter
 
 	public static class NemMatrixTestAdapter extends MatrixTestAdapter {
 
@@ -149,9 +140,9 @@ public class SparseMatrixPerfITCase {
 		}
 	}
 
-	//endregion
+	// endregion
 
-	//region MtjMatrixTestAdapter
+	// region MtjMatrixTestAdapter
 
 	public static class MtjMatrixTestAdapter extends MatrixTestAdapter {
 
@@ -187,29 +178,27 @@ public class SparseMatrixPerfITCase {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	private static MatrixTestAdapterFactory[] createTestAdapterFactories() {
-		return new MatrixTestAdapterFactory[] {
+		return new MatrixTestAdapterFactory[]{
 				(rows, entriesPerRow, bytes) -> {
 					final Matrix matrix = new TunedSparseMatrix(rows, rows, entriesPerRow);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "TunedSparseMatrix");
-				},
-				(rows, entriesPerRow, bytes) -> {
+				}, (rows, entriesPerRow, bytes) -> {
 					final Matrix matrix = new SparseMatrix(rows, rows, entriesPerRow);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "SparseMatrix");
 				},
-				//				(rows, entriesPerRow, bytes) -> {
-				//					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
-				//					final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
-				//					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
-				//				},
+				// (rows, entriesPerRow, bytes) -> {
+				// final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
+				// final Matrix matrix = new MtjSparseMatrix(rows, rows, mtjMatrix);
+				// return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "MtjSparseMatrix");
+				// },
 				(rows, entriesPerRow, bytes) -> {
 					final CompRowMatrix mtjMatrix = createMtjMatrix(rows, entriesPerRow, bytes);
 					final Matrix matrix = new TunedMtjSparseMatrix(rows, rows, mtjMatrix);
 					return new NemMatrixTestAdapter(matrix, entriesPerRow, bytes, "TunedMtjSparseMatrix");
-				},
-				(rows, entriesPerRow, bytes) -> new MtjMatrixTestAdapter(rows, entriesPerRow, bytes, "DirectMtjMatrix")
+				}, (rows, entriesPerRow, bytes) -> new MtjMatrixTestAdapter(rows, entriesPerRow, bytes, "DirectMtjMatrix")
 		};
 	}
 

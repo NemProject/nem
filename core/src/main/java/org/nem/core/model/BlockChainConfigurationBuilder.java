@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.utils.MustBe;
 
-/**
- * Builder used for creating block chain configuration.
- */
+/** Builder used for creating block chain configuration. */
 public class BlockChainConfigurationBuilder {
 	private int maxTransactionsPerSyncAttempt = 10000;
 	private int maxTransactionsPerBlock = 120;

@@ -1,13 +1,10 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.serialization.*;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.nem.core.serialization.*;
 
-/**
- * Represents a fully qualified namespace name (immutable).
- */
+/** Represents a fully qualified namespace name (immutable). */
 public class NamespaceId {
 	public static final int MAX_ROOT_LENGTH = 16;
 	public static final int MAX_SUBLEVEL_LENGTH = 64;

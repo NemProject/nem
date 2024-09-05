@@ -2,19 +2,13 @@ package org.nem.core.model.primitive;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a NEM block height.
- */
+/** Represents a NEM block height. */
 public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements SerializableEntity {
 
-	/**
-	 * Value representing initial height.
-	 */
+	/** Value representing initial height. */
 	public static final BlockHeight ONE = new BlockHeight(1);
 
-	/**
-	 * Value representing max height.
-	 */
+	/** Value representing max height. */
 	public static final BlockHeight MAX = new BlockHeight(Long.MAX_VALUE);
 
 	/**

@@ -4,12 +4,11 @@ import java.util.Arrays;
 
 /**
  * Represents a element of the finite field with p=2^255-19 elements.
+ *
  * <p>
  * values[0] ... values[9], represent the integer <br>
  * values[0] + 2^26 * values[1] + 2^51 * values[2] + 2^77 * values[3] + 2^102 * values[4] + ... + 2^230 * values[9]. <br>
- * Bounds on each values[i] vary depending on context.
- * </p>
- * This implementation is based on the ref10 implementation of SUPERCOP.
+ * Bounds on each values[i] vary depending on context. This implementation is based on the ref10 implementation of SUPERCOP.
  */
 public class Ed25519FieldElement {
 	private final int[] values;
@@ -312,7 +311,6 @@ public class Ed25519FieldElement {
 		 * |h1| <= (1.65*1.65*2^51*(1+1+19+19+19+19+19+19+19+19)) <br>
 		 * i.e. |h1| <= 1.7*2^59; narrower ranges for h3, h5, h7, h9
 		 */
-
 		carry0 = (h0 + (long) (1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;

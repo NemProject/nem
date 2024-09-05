@@ -1,11 +1,10 @@
 package org.nem.core.math;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.*;
 
 public abstract class MatrixTest<TMatrix extends Matrix> {
 

@@ -1,39 +1,26 @@
 package org.nem.core.test;
 
-import org.nem.core.model.*;
-
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.*;
+import org.nem.core.model.*;
 
-/**
- * A transaction registry used by test code.
- */
+/** A transaction registry used by test code. */
 public class TestTransactionRegistry {
 
-	/**
-	 * A registry entry.
-	 */
+	/** A registry entry. */
 	public static class Entry<TModel extends Transaction> {
 
-		/**
-		 * The transaction type.
-		 */
+		/** The transaction type. */
 		public final int type;
 
-		/**
-		 * The transaction class
-		 */
+		/** The transaction class */
 		public final Class<TModel> modelClass;
 
-		/**
-		 * Creates a transaction of the specified type.
-		 */
+		/** Creates a transaction of the specified type. */
 		public final Supplier<TModel> createModel;
 
-		/**
-		 * The db table name.
-		 */
+		/** The db table name. */
 		public final String tableName;
 
 		private Entry(final int type, final Class<TModel> modelClass, final Supplier<TModel> createModel, final String tableName) {

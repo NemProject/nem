@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.model.mosaic.MosaicTransferFeeCalculator;
 
-/**
- * Additional state provided to transaction execute / undo operations.
- */
+/** Additional state provided to transaction execute / undo operations. */
 public class TransactionExecutionState {
 	private final MosaicTransferFeeCalculator mosaicTransferFeeCalculator;
 

@@ -1,12 +1,11 @@
 package org.nem.core.crypto;
 
+import java.util.Arrays;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class HashesTest {
 	private static final HashTester SHA3_256_TESTER = new HashTester(Hashes::sha3_256, 32);

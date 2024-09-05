@@ -2,9 +2,7 @@ package org.nem.core.model.mosaic;
 
 import org.nem.core.model.primitive.*;
 
-/**
- * Static class containing mosaic helper functions.
- */
+/** Static class containing mosaic helper functions. */
 public class MosaicUtils {
 
 	/**

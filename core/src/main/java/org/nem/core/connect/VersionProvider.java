@@ -1,17 +1,14 @@
 package org.nem.core.connect;
 
+import java.net.URL;
+import java.util.logging.Logger;
 import org.nem.core.metadata.MetaDataFactory;
 import org.nem.core.node.NodeVersion;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.net.URL;
-import java.util.logging.Logger;
-
-/**
- * Helper class for getting version information.
- */
+/** Helper class for getting version information. */
 public class VersionProvider {
 	private static final Logger LOGGER = Logger.getLogger(VersionProvider.class.getName());
 

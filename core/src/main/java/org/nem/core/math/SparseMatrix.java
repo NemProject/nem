@@ -1,13 +1,10 @@
 package org.nem.core.math;
 
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import org.nem.core.utils.FormatUtils;
 
-/**
- * Represents a sparse matrix.
- */
+/** Represents a sparse matrix. */
 public class SparseMatrix extends Matrix {
 
 	private static final double REALLOC_MULTIPLIER = 1.6;
@@ -15,10 +12,9 @@ public class SparseMatrix extends Matrix {
 	private final int numRows;
 	private final int initialCapacityPerRow;
 
-	/**
-	 * The rows of the matrix
-	 */
+	/** The rows of the matrix */
 	private double[][] values = null;
+
 	private int[][] cols = null;
 	private int[] maxIndices = null;
 
@@ -58,7 +54,8 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
-		// keep the columns sorted in ascending order (needed for SparseBitmap in NodeNeighborhoodMap ctor)
+		// keep the columns sorted in ascending order (needed for SparseBitmap in
+		// NodeNeighborhoodMap ctor)
 
 		if (val == 0.0) {
 			for (int i = 0; i < this.maxIndices[row]; ++i) {

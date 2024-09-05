@@ -1,17 +1,12 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-
 import java.util.Objects;
 import java.util.regex.*;
+import org.nem.core.serialization.*;
 
-/**
- * Represents a node version.
- */
+/** Represents a node version. */
 public class NodeVersion {
-	/**
-	 * Zero version.
-	 */
+	/** Zero version. */
 	public static final NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");

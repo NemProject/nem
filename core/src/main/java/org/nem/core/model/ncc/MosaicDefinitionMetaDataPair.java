@@ -3,9 +3,7 @@ package org.nem.core.model.ncc;
 import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.serialization.Deserializer;
 
-/**
- * Pair containing a mosaic definition and meta data.
- */
+/** Pair containing a mosaic definition and meta data. */
 public class MosaicDefinitionMetaDataPair extends AbstractMetaDataPair<MosaicDefinition, DefaultMetaData> {
 
 	/**

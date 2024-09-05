@@ -1,17 +1,14 @@
 package org.nem.core.test;
 
+import java.util.*;
+import java.util.function.Consumer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
-import java.util.function.Consumer;
-
-/**
- * A mock Transaction implementation.
- */
+/** A mock Transaction implementation. */
 public class MockTransaction extends Transaction {
 	private static final int TYPE = 124;
 	private static final int VERSION = 1;
@@ -29,9 +26,7 @@ public class MockTransaction extends Transaction {
 	private final List<Notification> notifications = new ArrayList<>();
 	private int numTransferCalls;
 
-	/**
-	 * Creates a mock transaction.
-	 */
+	/** Creates a mock transaction. */
 	public MockTransaction() {
 		this(Utils.generateRandomAccount());
 	}

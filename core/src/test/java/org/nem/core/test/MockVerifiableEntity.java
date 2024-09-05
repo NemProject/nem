@@ -4,9 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-/**
- * A mock VerifiableEntity implementation.
- */
+/** A mock VerifiableEntity implementation. */
 public class MockVerifiableEntity extends VerifiableEntity {
 	public static final int TYPE = 12;
 	public static final int VERSION = 24;

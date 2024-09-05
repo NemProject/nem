@@ -1,13 +1,10 @@
 package org.nem.core.crypto;
 
+import java.math.BigInteger;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
 
-import java.math.BigInteger;
-
-/**
- * Represents a private key.
- */
+/** Represents a private key. */
 public class PrivateKey implements SerializableEntity {
 
 	private final BigInteger value;

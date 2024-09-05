@@ -32,7 +32,6 @@ public class SerializableAccountId extends AccountId implements SerializableEnti
 	 *
 	 * @param deserializer The deserializer.
 	 */
-
 	public SerializableAccountId(final Deserializer deserializer) {
 		super(deserializer);
 	}

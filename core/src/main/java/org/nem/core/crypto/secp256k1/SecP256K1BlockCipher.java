@@ -9,9 +9,7 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.IESParameters;
 import org.nem.core.crypto.*;
 
-/**
- * Implementation of the block cipher for SECP256K1.
- */
+/** Implementation of the block cipher for SECP256K1. */
 public class SecP256K1BlockCipher implements BlockCipher {
 
 	private static final IESParameters IES_PARAMETERS;

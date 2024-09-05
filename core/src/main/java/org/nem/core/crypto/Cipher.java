@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Wraps IES encryption and decryption logic.
- */
+/** Wraps IES encryption and decryption logic. */
 public class Cipher implements BlockCipher {
 	private final BlockCipher cipher;
 

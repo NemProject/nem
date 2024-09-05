@@ -3,9 +3,7 @@ package org.nem.core.connect;
 import net.minidev.json.JSONObject;
 import org.nem.core.serialization.*;
 
-/**
- * A union that will either contain an error response or a deserializer.
- */
+/** A union that will either contain an error response or a deserializer. */
 public class ErrorResponseDeserializerUnion {
 	private static final int HTTP_OK = 200;
 

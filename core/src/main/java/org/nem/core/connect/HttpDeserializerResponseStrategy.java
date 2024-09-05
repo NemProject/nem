@@ -1,16 +1,13 @@
 package org.nem.core.connect;
 
+import java.io.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.*;
 
-import java.io.*;
-
-/**
- * Strategy for coercing an HTTP response into a Deserializer.
- */
+/** Strategy for coercing an HTTP response into a Deserializer. */
 public abstract class HttpDeserializerResponseStrategy implements HttpResponseStrategy<Deserializer> {
 
 	@Override

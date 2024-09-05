@@ -3,9 +3,7 @@ package org.nem.core.test;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.NodeIdentity;
 
-/**
- * A weak node identity that uses a name as an identifier.
- */
+/** A weak node identity that uses a name as an identifier. */
 public class WeakNodeIdentity extends NodeIdentity {
 	private final String name;
 

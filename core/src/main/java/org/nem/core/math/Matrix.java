@@ -149,9 +149,7 @@ public abstract class Matrix {
 		return zeroColumns;
 	}
 
-	/**
-	 * Sets all negative values to zero.
-	 */
+	/** Sets all negative values to zero. */
 	public void removeNegatives() {
 		this.removeLessThan(0);
 	}

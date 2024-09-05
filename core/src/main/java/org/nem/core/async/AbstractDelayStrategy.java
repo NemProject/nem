@@ -1,16 +1,12 @@
 package org.nem.core.async;
 
-/**
- * An abstract strategy for providing delays.
- */
+/** An abstract strategy for providing delays. */
 public abstract class AbstractDelayStrategy {
 
 	private final Integer maxDelays;
 	private int numDelays;
 
-	/**
-	 * Creates a new abstract delay strategy.
-	 */
+	/** Creates a new abstract delay strategy. */
 	protected AbstractDelayStrategy() {
 		this.maxDelays = null;
 	}

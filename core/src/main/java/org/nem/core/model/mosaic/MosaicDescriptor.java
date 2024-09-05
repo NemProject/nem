@@ -3,9 +3,7 @@ package org.nem.core.model.mosaic;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-/**
- * The mosaic description.
- */
+/** The mosaic description. */
 public class MosaicDescriptor {
 	private static final int MAX_DESCRIPTION_LENGTH = 512;
 	private final String description;

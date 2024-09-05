@@ -2,9 +2,7 @@ package org.nem.core.crypto;
 
 import java.math.BigInteger;
 
-/**
- * Interface for getting information for a curve.
- */
+/** Interface for getting information for a curve. */
 public interface Curve {
 
 	/**

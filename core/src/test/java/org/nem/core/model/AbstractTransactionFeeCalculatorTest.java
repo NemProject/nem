@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.IntStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.IntStream;
 
 public class AbstractTransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;
@@ -155,7 +154,7 @@ public class AbstractTransactionFeeCalculatorTest {
 
 	// region calculateMinimumFee - other transactions
 
-	private static abstract class DefaultMinimumFeeCalculation {
+	private abstract static class DefaultMinimumFeeCalculation {
 		private static long DEFAULT_FEE = 6_000_000;
 
 		@Test
@@ -260,7 +259,7 @@ public class AbstractTransactionFeeCalculatorTest {
 
 	// region isFeeValid
 
-	private static abstract class DefaultIsValidCalculation {
+	private abstract static class DefaultIsValidCalculation {
 
 		@Test
 		public void feeBelowMinimumFeeIsNotValid() {

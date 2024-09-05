@@ -1,15 +1,12 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.crypto.*;
-import org.nem.core.utils.ArrayUtils;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import org.nem.core.crypto.*;
+import org.nem.core.utils.ArrayUtils;
 
-/**
- * Utility class to help with calculations.
- */
+/** Utility class to help with calculations. */
 public class MathUtils {
 	private static final int[] EXPONENTS = {
 			0, 26, 26 + 25, 2 * 26 + 25, 2 * 26 + 2 * 25, 3 * 26 + 2 * 25, 3 * 26 + 3 * 25, 4 * 26 + 3 * 25, 4 * 26 + 4 * 25,

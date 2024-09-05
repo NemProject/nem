@@ -1,15 +1,14 @@
 package org.nem.core.async;
 
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class AsyncTimerTest {
 
@@ -401,7 +400,6 @@ public class AsyncTimerTest {
 			++this.numCalls;
 			throw new RuntimeException("CountableExceptionFuture");
 		}
-
 	}
 
 	private static class MockDelayStrategy extends AbstractDelayStrategy {

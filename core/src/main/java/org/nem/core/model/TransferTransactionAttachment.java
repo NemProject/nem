@@ -1,21 +1,16 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.Quantity;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-/**
- * An attachment that can be attached to a transfer transaction.
- */
+/** An attachment that can be attached to a transfer transaction. */
 public class TransferTransactionAttachment {
 	private final Map<MosaicId, Quantity> mosaicTransfers = new HashMap<>();
 	private Message message;
 
-	/**
-	 * Creates an empty attachment.
-	 */
+	/** Creates an empty attachment. */
 	public TransferTransactionAttachment() {
 	}
 

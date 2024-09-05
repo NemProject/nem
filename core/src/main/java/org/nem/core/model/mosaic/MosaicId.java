@@ -1,14 +1,11 @@
 package org.nem.core.model.mosaic;
 
+import java.util.regex.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-import java.util.regex.*;
-
-/**
- * The (case-insensitive) mosaic unique identifier.
- */
+/** The (case-insensitive) mosaic unique identifier. */
 public class MosaicId implements SerializableEntity {
 	private static final String NAME_PATTERN_STRING = "[a-z0-9][a-z0-9'_-]*( [a-z0-9'_-]+)*";
 	private static final Pattern NAME_PATTERN = Pattern.compile(String.format("^%s$", NAME_PATTERN_STRING));

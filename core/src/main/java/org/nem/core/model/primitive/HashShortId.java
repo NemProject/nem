@@ -2,9 +2,7 @@ package org.nem.core.model.primitive;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a hash's short id.
- */
+/** Represents a hash's short id. */
 public class HashShortId extends AbstractPrimitive<HashShortId, Long> implements SerializableEntity {
 
 	/**

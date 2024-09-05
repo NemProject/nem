@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.model.primitive.*;
 
-/**
- * Interface for calculating and validating transaction fees.
- */
+/** Interface for calculating and validating transaction fees. */
 public interface TransactionFeeCalculator {
 
 	/**

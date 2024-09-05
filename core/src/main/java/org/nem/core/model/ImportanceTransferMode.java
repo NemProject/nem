@@ -1,23 +1,15 @@
 package org.nem.core.model;
 
-/**
- * Enum containing modes of importance transfers
- */
+/** Enum containing modes of importance transfers */
 public enum ImportanceTransferMode {
 
-	/**
-	 * An unknown mode.
-	 */
+	/** An unknown mode. */
 	Unknown(0),
 
-	/**
-	 * When announcing importance transfer.
-	 */
+	/** When announcing importance transfer. */
 	Activate(1),
 
-	/**
-	 * When canceling association between account and importance transfer.
-	 */
+	/** When canceling association between account and importance transfer. */
 	Deactivate(2);
 
 	private final int value;

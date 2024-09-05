@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.*;
-
 import java.util.Arrays;
+import org.nem.core.utils.*;
 
 /**
  * Represents a field element of the finite field with p=2^255-19 elements. The value of the field element is held in 2^8 bit
@@ -188,19 +187,16 @@ public class Ed25519EncodedFieldElement {
 		/**
 		 * Lots of magic numbers :) <br>
 		 * To understand what's going on below, note that <br>
-		 *
 		 * (1) q = 2^252 + q0 where q0 = 27742317777372353535851937790883648493. <br>
 		 * (2) s11 is the coefficient of 2^(11*21), s23 is the coefficient of 2^(^23*21) and 2^252 = 2^((23-11) * 21)). <br>
 		 * (3) 2^252 congruent -q0 modulo q. <br>
 		 * (4) -q0 = 666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21) <br>
-		 *
 		 * Thus <br>
 		 * s23 * 2^(23*11) = s23 * 2^(12*21) * 2^(11*21) = s3 * 2^252 * 2^(11*21) congruent <br>
 		 * s23 * (666643 * 2^0 + 470296 * 2^21 + 654183 * 2^(2*21) - 997805 * 2^(3*21) + 136657 * 2^(4*21) - 683901 * 2^(5*21)) * 2^(11*21)
 		 * modulo q = <br>
 		 * s23 * (666643 * 2^(11*21) + 470296 * 2^(12*21) + 654183 * 2^(13*21) - 997805 * 2^(14*21) + 136657 * 2^(15*21) - 683901 *
 		 * 2^(16*21)). <br>
-		 *
 		 * The same procedure is then applied for s22,...,s18.
 		 */
 		s11 += s23 * 666643;
@@ -245,9 +241,7 @@ public class Ed25519EncodedFieldElement {
 		s10 += s18 * 136657;
 		s11 -= s18 * 683901;
 
-		/**
-		 * Time to reduce the coefficient in order not to get an overflow.
-		 */
+		/** Time to reduce the coefficient in order not to get an overflow. */
 		carry6 = (s6 + (1 << 20)) >> 21;
 		s7 += carry6;
 		s6 -= carry6 << 21;
@@ -283,9 +277,7 @@ public class Ed25519EncodedFieldElement {
 		s16 += carry15;
 		s15 -= carry15 << 21;
 
-		/**
-		 * Continue with above procedure.
-		 */
+		/** Continue with above procedure. */
 		s5 += s17 * 666643;
 		s6 += s17 * 470296;
 		s7 += s17 * 654183;
@@ -329,9 +321,7 @@ public class Ed25519EncodedFieldElement {
 		s5 -= s12 * 683901;
 		s12 = 0;
 
-		/**
-		 * Reduce coefficients again.
-		 */
+		/** Reduce coefficients again. */
 		carry0 = (s0 + (1 << 20)) >> 21;
 		s1 += carry0;
 		s0 -= carry0 << 21;

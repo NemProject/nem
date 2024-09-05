@@ -6,9 +6,7 @@ import org.junit.*;
 
 public class MathUtilsTest {
 
-	/**
-	 * Simple test for verifying that the MathUtils code works as expected.
-	 */
+	/** Simple test for verifying that the MathUtils code works as expected. */
 	@Test
 	public void mathUtilsWorkAsExpected() {
 		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE,

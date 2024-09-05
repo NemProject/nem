@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Exception that is used when a cryptographic operation fails.
- */
+/** Exception that is used when a cryptographic operation fails. */
 @SuppressWarnings("serial")
 public class CryptoException extends RuntimeException {
 

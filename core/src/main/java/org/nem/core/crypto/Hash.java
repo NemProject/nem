@@ -1,23 +1,16 @@
 package org.nem.core.crypto;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
-import java.util.Arrays;
-
-/**
- * A hash.
- */
+/** A hash. */
 public class Hash implements SerializableEntity {
 
-	/**
-	 * An empty hash.
-	 */
+	/** An empty hash. */
 	public static final Hash ZERO = new Hash(new byte[32]);
 
-	/**
-	 * An object deserializer that can be used to deserialize hashes.
-	 */
+	/** An object deserializer that can be used to deserialize hashes. */
 	public static final ObjectDeserializer<Hash> DESERIALIZER = Hash::new;
 
 	private final byte[] data;

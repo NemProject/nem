@@ -1,8 +1,6 @@
 package org.nem.core.model.observers;
 
-/**
- * An observer that notifies listeners when transactions are made.
- */
+/** An observer that notifies listeners when transactions are made. */
 public interface TransactionObserver extends NamedObserver {
 
 	/**

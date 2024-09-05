@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import java.util.Arrays;
 
-/**
- * Class that encapsulates block chain configuration data.
- */
+/** Class that encapsulates block chain configuration data. */
 public interface BlockChainConfiguration {
 
 	// region transactions per sync

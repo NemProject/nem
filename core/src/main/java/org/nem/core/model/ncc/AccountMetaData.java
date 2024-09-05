@@ -1,13 +1,10 @@
 package org.nem.core.model.ncc;
 
+import java.util.List;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-import java.util.List;
-
-/**
- * Class for holding additional information about an account required by ncc.
- */
+/** Class for holding additional information about an account required by ncc. */
 public class AccountMetaData implements SerializableEntity {
 	private final AccountStatus status;
 	private final AccountRemoteStatus remoteStatus;

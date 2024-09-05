@@ -5,9 +5,7 @@ import java.security.CodeSource;
 import java.security.cert.*;
 import java.util.logging.Logger;
 
-/**
- * A facade around a code source.
- */
+/** A facade around a code source. */
 public class CodeSourceFacade {
 	private static final Logger LOGGER = Logger.getLogger(CodeSourceFacade.class.getName());
 

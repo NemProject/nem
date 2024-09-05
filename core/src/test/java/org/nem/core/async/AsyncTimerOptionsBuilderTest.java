@@ -1,12 +1,11 @@
 package org.nem.core.async;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class AsyncTimerOptionsBuilderTest {
 	private static final int TIME_UNIT = 60;
@@ -99,7 +98,8 @@ public class AsyncTimerOptionsBuilderTest {
 		Thread.sleep(2 * TIME_UNIT);
 		triggerFuture.complete(null);
 
-		// Assert: 2.0 - trigger is completed but sleep is not, so the initial trigger should not be done
+		// Assert: 2.0 - trigger is completed but sleep is not, so the initial trigger should not be
+		// done
 		MatcherAssert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
@@ -130,7 +130,8 @@ public class AsyncTimerOptionsBuilderTest {
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 		new AsyncTimerOptionsBuilder().setInitialDelay(TIME_HALF_UNIT).setTrigger(triggerFuture).setVisitor(visitor).create();
 
-		// Assert: 0 - the visitor should not be notified (the delay happens after the trigger fires)
+		// Assert: 0 - the visitor should not be notified (the delay happens after the trigger
+		// fires)
 		Mockito.verify(visitor, Mockito.never()).notifyDelay(Mockito.anyInt());
 
 		// Act:

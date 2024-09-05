@@ -1,8 +1,6 @@
 package org.nem.core.connect;
 
-/**
- * A fatal (non-recoverable) peer exception.
- */
+/** A fatal (non-recoverable) peer exception. */
 @SuppressWarnings("serial")
 public class FatalPeerException extends RuntimeException {
 

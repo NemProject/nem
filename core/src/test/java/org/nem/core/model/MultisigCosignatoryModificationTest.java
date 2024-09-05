@@ -1,14 +1,13 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.function.Consumer;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public class MultisigCosignatoryModificationTest {
 	// region creation

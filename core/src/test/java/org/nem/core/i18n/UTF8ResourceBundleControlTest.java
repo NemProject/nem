@@ -1,10 +1,9 @@
 package org.nem.core.i18n;
 
+import java.util.ResourceBundle;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-
-import java.util.ResourceBundle;
 
 public class UTF8ResourceBundleControlTest {
 	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("test", new UTF8ResourceBundleControl());

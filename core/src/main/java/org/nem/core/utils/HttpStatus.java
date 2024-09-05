@@ -143,7 +143,8 @@ public enum HttpStatus {
 	 * {@code 302 Moved Temporarily}.
 	 *
 	 * @see <a href="http://tools.ietf.org/html/rfc1945#section-9.3">HTTP/1.0, section 9.3</a>
-	 * @deprecated In favor of {@link #FOUND} which will be returned from {@code HttpStatus.valueOf(302)}
+	 * @deprecated In favor of {@link #FOUND} which will be returned from {@code
+	 *     HttpStatus.valueOf(302)}
 	 */
 	@Deprecated
 	MOVED_TEMPORARILY(302, "Moved Temporarily"),
@@ -271,7 +272,8 @@ public enum HttpStatus {
 	 * {@code 413 Request Entity Too Large}.
 	 *
 	 * @see <a href="http://tools.ietf.org/html/rfc2616#section-10.4.14">HTTP/1.1, section 10.4.14</a>
-	 * @deprecated In favor of {@link #PAYLOAD_TOO_LARGE} which will be returned from {@code HttpStatus.valueOf(413)}
+	 * @deprecated In favor of {@link #PAYLOAD_TOO_LARGE} which will be returned from {@code
+	 *     HttpStatus.valueOf(413)}
 	 */
 	@Deprecated
 	REQUEST_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
@@ -286,7 +288,8 @@ public enum HttpStatus {
 	 * {@code 414 Request-URI Too Long}.
 	 *
 	 * @see <a href="http://tools.ietf.org/html/rfc2616#section-10.4.15">HTTP/1.1, section 10.4.15</a>
-	 * @deprecated In favor of {@link #URI_TOO_LONG} which will be returned from {@code HttpStatus.valueOf(414)}
+	 * @deprecated In favor of {@link #URI_TOO_LONG} which will be returned from {@code
+	 *     HttpStatus.valueOf(414)}
 	 */
 	@Deprecated
 	REQUEST_URI_TOO_LONG(414, "Request-URI Too Long"),
@@ -431,9 +434,7 @@ public enum HttpStatus {
 	 * @see <a href="http://tools.ietf.org/html/rfc5842#section-7.2">WebDAV Binding Extensions</a>
 	 */
 	LOOP_DETECTED(508, "Loop Detected"),
-	/**
-	 * {@code 509 Bandwidth Limit Exceeded}
-	 */
+	/** {@code 509 Bandwidth Limit Exceeded} */
 	BANDWIDTH_LIMIT_EXCEEDED(509, "Bandwidth Limit Exceeded"),
 	/**
 	 * {@code 510 Not Extended}
@@ -457,23 +458,17 @@ public enum HttpStatus {
 		this.reasonPhrase = reasonPhrase;
 	}
 
-	/**
-	 * Return the integer value of this status code.
-	 */
+	/** Return the integer value of this status code. */
 	public int value() {
 		return this.value;
 	}
 
-	/**
-	 * Return the reason phrase of this status code.
-	 */
+	/** Return the reason phrase of this status code. */
 	public String getReasonPhrase() {
 		return this.reasonPhrase;
 	}
 
-	/**
-	 * Return a string representation of this status code.
-	 */
+	/** Return a string representation of this status code. */
 	@Override
 	public String toString() {
 		return Integer.toString(this.value);

@@ -3,9 +3,7 @@ package org.nem.core.model.ncc;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.Deserializer;
 
-/**
- * View model that represents an account id information.
- */
+/** View model that represents an account id information. */
 public class AccountId {
 	private final Address address;
 

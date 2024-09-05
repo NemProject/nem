@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -10,9 +12,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class TransactionTest {
 
@@ -343,7 +342,8 @@ public class TransactionTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setTransferAction(to -> {
-			// for the account to say in the black, the debit (reverse credit) must occur before the credit (reverse debit)
+			// for the account to say in the black, the debit (reverse credit) must occur
+			// before the credit (reverse debit)
 			NotificationUtils.notifyCredit(to, account1, Amount.fromNem(9));
 			NotificationUtils.notifyDebit(to, account1, Amount.fromNem(11));
 		});

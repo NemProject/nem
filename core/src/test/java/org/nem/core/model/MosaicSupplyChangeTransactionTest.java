@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -12,8 +13,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
 
 public class MosaicSupplyChangeTransactionTest {
 	private static final long MAX_QUANTITY = MosaicConstants.MAX_QUANTITY;

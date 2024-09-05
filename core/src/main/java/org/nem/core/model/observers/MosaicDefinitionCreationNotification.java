@@ -2,9 +2,7 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.mosaic.MosaicDefinition;
 
-/**
- * A notification that represents the creation of a new mosaic definition.
- */
+/** A notification that represents the creation of a new mosaic definition. */
 public class MosaicDefinitionCreationNotification extends Notification {
 	private final MosaicDefinition mosaicDefinition;
 

@@ -2,9 +2,7 @@ package org.nem.core.serialization;
 
 import java.util.Collection;
 
-/**
- * Helper class for storing lists of serializable entities
- */
+/** Helper class for storing lists of serializable entities */
 public class SerializableList<T extends SerializableEntity> extends DeserializableList<T> implements SerializableEntity {
 
 	// region constructors

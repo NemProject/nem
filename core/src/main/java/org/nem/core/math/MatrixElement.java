@@ -1,8 +1,6 @@
 package org.nem.core.math;
 
-/**
- * Represents a matrix element consisting of row, a column, and a value.
- */
+/** Represents a matrix element consisting of row, a column, and a value. */
 public class MatrixElement {
 	private final int row;
 	private final int col;

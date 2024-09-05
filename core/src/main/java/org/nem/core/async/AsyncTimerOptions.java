@@ -3,9 +3,7 @@ package org.nem.core.async;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-/**
- * Async timer options.
- */
+/** Async timer options. */
 public interface AsyncTimerOptions {
 
 	/**

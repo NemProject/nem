@@ -2,9 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.PublicKey;
 
-/**
- * Builder that is used by Spring to create a PublicKey from a GET request.
- */
+/** Builder that is used by Spring to create a PublicKey from a GET request. */
 public class PublicKeyBuilder {
 	private String publicKey;
 

@@ -4,9 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
-/**
- * Class for holding additional information about transaction required by ncc.
- */
+/** Class for holding additional information about transaction required by ncc. */
 public class TransactionMetaData implements SerializableEntity {
 	private final BlockHeight height;
 	private final Long id;

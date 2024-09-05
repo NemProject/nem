@@ -1,8 +1,6 @@
 package org.nem.core.model.mosaic;
 
-/**
- * Interface for calculating mosaic transfer fees.
- */
+/** Interface for calculating mosaic transfer fees. */
 @FunctionalInterface
 public interface MosaicTransferFeeCalculator {
 

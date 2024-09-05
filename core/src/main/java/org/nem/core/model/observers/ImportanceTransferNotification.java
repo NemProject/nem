@@ -2,9 +2,7 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
 
-/**
- * A notification that one account has transferred its importance to another account.
- */
+/** A notification that one account has transferred its importance to another account. */
 public class ImportanceTransferNotification extends Notification {
 	private final Account lessor;
 	private final Account lessee;

@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import java.util.*;
 
-/**
- * Static class containing transaction type constants.
- */
+/** Static class containing transaction type constants. */
 @SuppressWarnings("unused")
 public class TransactionTypes {
 	private static final int TRANSFER_TYPE = 0x0100;
@@ -15,64 +13,40 @@ public class TransactionTypes {
 	private static final int NAMESPACE_TYPE = 0x2000;
 	private static final int MOSAIC_TYPE = 0x4000;
 
-	/**
-	 * A transfer transaction.
-	 */
+	/** A transfer transaction. */
 	public static final int TRANSFER = TRANSFER_TYPE | 0x01;
 
-	/**
-	 * Importance transfer transaction.
-	 */
+	/** Importance transfer transaction. */
 	public static final int IMPORTANCE_TRANSFER = IMPORTANCE_TYPE | 0x01;
 
-	/**
-	 * A new asset transaction.
-	 */
+	/** A new asset transaction. */
 	public static final int ASSET_NEW = ASSET_TYPE | 0x01;
 
-	/**
-	 * An asset ask transaction.
-	 */
+	/** An asset ask transaction. */
 	public static final int ASSET_ASK = ASSET_TYPE | 0x02;
 
-	/**
-	 * An asset bid transaction.
-	 */
+	/** An asset bid transaction. */
 	public static final int ASSET_BID = ASSET_TYPE | 0x03;
 
-	/**
-	 * A snapshot transaction.
-	 */
+	/** A snapshot transaction. */
 	public static final int SNAPSHOT = SNAPSHOT_TYPE | 0x01;
 
-	/**
-	 * A multisig change transaction (e.g. announce an account as multi-sig).
-	 */
+	/** A multisig change transaction (e.g. announce an account as multi-sig). */
 	public static final int MULTISIG_AGGREGATE_MODIFICATION = MULTISIG_TYPE | 0x01;
 
-	/**
-	 * A multisig signature transaction.
-	 */
+	/** A multisig signature transaction. */
 	public static final int MULTISIG_SIGNATURE = MULTISIG_TYPE | 0x02;
 
-	/**
-	 * A multisig transaction.
-	 */
+	/** A multisig transaction. */
 	public static final int MULTISIG = MULTISIG_TYPE | 0x04;
 
-	/**
-	 * A provision namespace transaction.
-	 */
+	/** A provision namespace transaction. */
 	public static final int PROVISION_NAMESPACE = NAMESPACE_TYPE | 0x01;
 
-	/**
-	 * A mosaic definition creation transaction.
-	 */
+	/** A mosaic definition creation transaction. */
 	public static final int MOSAIC_DEFINITION_CREATION = MOSAIC_TYPE | 0x01;
 
-	/**
-	 * A mosaic supply change transaction.
-	 */
+	/** A mosaic supply change transaction. */
 	public static final int MOSAIC_SUPPLY_CHANGE = MOSAIC_TYPE | 0x02;
 
 	/**

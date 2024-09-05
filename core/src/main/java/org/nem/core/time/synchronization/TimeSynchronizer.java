@@ -2,9 +2,7 @@ package org.nem.core.time.synchronization;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Synchronizes the network time with other nodes.
- */
+/** Synchronizes the network time with other nodes. */
 public interface TimeSynchronizer {
 
 	/**

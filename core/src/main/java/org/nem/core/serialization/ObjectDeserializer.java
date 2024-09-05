@@ -1,8 +1,6 @@
 package org.nem.core.serialization;
 
-/**
- * An interface for activating an object.
- */
+/** An interface for activating an object. */
 public interface ObjectDeserializer<T> {
 
 	/**

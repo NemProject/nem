@@ -5,9 +5,7 @@ import java.net.URL;
 import java.util.jar.*;
 import java.util.logging.Logger;
 
-/**
- * A facade around a JAR.
- */
+/** A facade around a JAR. */
 public class JarFacade {
 	private static final Logger LOGGER = Logger.getLogger(JarFacade.class.getName());
 

@@ -1,15 +1,12 @@
 package org.nem.core.crypto.ed25519;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.utils.ArrayUtils;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
-/**
- * Implementation of the DSA signer for Ed25519.
- */
+/** Implementation of the DSA signer for Ed25519. */
 public class Ed25519DsaSigner implements DsaSigner {
 
 	private final KeyPair keyPair;
@@ -53,7 +50,8 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final Ed25519EncodedGroupElement encodedR = R.encode();
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
-		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
+		// encodedR and encodedA are the little endian encodings of the group element R and the
+		// public key A and
 		// a is the lower 32 bytes of hash after clamping.
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(
 				Hashes.sha3_512(encodedR.getRaw(), this.getKeyPair().getPublicKey().getRaw(), data));

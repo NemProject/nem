@@ -1,17 +1,12 @@
 package org.nem.core.model.primitive;
 
+import java.math.BigInteger;
 import org.nem.core.serialization.*;
 
-import java.math.BigInteger;
-
-/**
- * Represents a score for an entire block chain.
- */
+/** Represents a score for an entire block chain. */
 public class BlockChainScore extends AbstractPrimitive<BlockChainScore, BigInteger> implements SerializableEntity {
 
-	/**
-	 * Value representing initial score.
-	 */
+	/** Value representing initial score. */
 	public static final BlockChainScore ZERO = new BlockChainScore(BigInteger.ZERO);
 
 	/**

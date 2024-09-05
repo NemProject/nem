@@ -1,16 +1,13 @@
 package org.nem.core.math;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-import java.util.*;
-import java.util.stream.*;
-
-/**
- * Test for SparseBitmap, our wrapper for EWAHCompressedBitmap.
- */
+/** Test for SparseBitmap, our wrapper for EWAHCompressedBitmap. */
 public class SparseBitmapTest {
 
 	// region createEmpty

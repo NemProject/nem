@@ -2,19 +2,16 @@ package org.nem.core.math;
 
 import java.util.*;
 
-/**
- * BloodyRookie's initial implementation of normalizeColumns and multiply.
- */
+/** BloodyRookie's initial implementation of normalizeColumns and multiply. */
 public class TunedSparseMatrix extends Matrix {
 
 	private final int numRows;
 	private final int numCols;
 	private final int initialCapacityPerRow;
 
-	/**
-	 * The rows of the matrix
-	 */
+	/** The rows of the matrix */
 	private double[][] values = null;
+
 	private int[][] cols = null;
 	private int[] maxIndices = null;
 
@@ -40,7 +37,7 @@ public class TunedSparseMatrix extends Matrix {
 		}
 	}
 
-	//region Matrix abstract functions
+	// region Matrix abstract functions
 
 	@Override
 	protected final Matrix create(final int numRows, final int numCols) {
@@ -112,7 +109,7 @@ public class TunedSparseMatrix extends Matrix {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public Collection<Integer> normalizeColumns() {

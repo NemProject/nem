@@ -4,9 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-/**
- * Class defining a mosaic definition (immutable).
- */
+/** Class defining a mosaic definition (immutable). */
 public class MosaicDefinition implements SerializableEntity {
 	private final Account creator;
 	private final MosaicId id;

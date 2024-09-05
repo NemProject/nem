@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.ArrayUtils;
-
 import java.util.Arrays;
+import org.nem.core.utils.ArrayUtils;
 
 public class Ed25519EncodedGroupElement {
 

@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 
-/**
- * Simple key pair view model.
- */
+/** Simple key pair view model. */
 public class KeyPairViewModel implements SerializableEntity {
 	private final KeyPair keyPair;
 	private final byte networkVersion;

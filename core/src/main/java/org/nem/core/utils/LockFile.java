@@ -3,9 +3,7 @@ package org.nem.core.utils;
 import java.io.*;
 import java.nio.channels.*;
 
-/**
- * Static class that exposes functions for interacting with lock files.
- */
+/** Static class that exposes functions for interacting with lock files. */
 public class LockFile {
 
 	/**

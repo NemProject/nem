@@ -3,9 +3,7 @@ package org.nem.core.crypto;
 import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import org.nem.core.crypto.secp256k1.SecP256K1CryptoEngine;
 
-/**
- * Static class that exposes crypto engines.
- */
+/** Static class that exposes crypto engines. */
 public class CryptoEngines {
 
 	private static final CryptoEngine SECP256K1_ENGINE;

@@ -3,9 +3,7 @@ package org.nem.core.model.observers;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 
-/**
- * A notification that one account has transferred part of its balance to another account.
- */
+/** A notification that one account has transferred part of its balance to another account. */
 public class BalanceTransferNotification extends Notification {
 	private final Account sender;
 	private final Account recipient;

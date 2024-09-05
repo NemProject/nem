@@ -24,9 +24,7 @@ public class ReverseTransactionObserver implements TransactionObserver {
 		this.pendingNotifications.add(reverse(notification));
 	}
 
-	/**
-	 * Commits all notifications by replaying them in reverse order.
-	 */
+	/** Commits all notifications by replaying them in reverse order. */
 	public void commit() {
 		// apply the transfers in reverse order because order might be important for some observers
 		for (int i = this.pendingNotifications.size() - 1; i >= 0; --i) {

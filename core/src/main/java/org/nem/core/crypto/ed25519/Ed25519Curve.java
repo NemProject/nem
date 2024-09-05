@@ -1,12 +1,9 @@
 package org.nem.core.crypto.ed25519;
 
+import java.math.BigInteger;
 import org.nem.core.crypto.ed25519.arithmetic.Ed25519Group;
 
-import java.math.BigInteger;
-
-/**
- * Class that wraps the elliptic curve Ed25519.
- */
+/** Class that wraps the elliptic curve Ed25519. */
 public class Ed25519Curve implements org.nem.core.crypto.Curve {
 
 	private static final Ed25519Curve ED25519;

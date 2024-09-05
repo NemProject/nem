@@ -1,13 +1,12 @@
 package org.nem.core.connect;
 
+import java.io.UnsupportedEncodingException;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.MockSerializableEntity;
-
-import java.io.UnsupportedEncodingException;
 
 public class HttpJsonPostRequestTest {
 

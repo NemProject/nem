@@ -3,9 +3,7 @@ package org.nem.core.model.namespace;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Class that filters namespaces that users are not allowed to claim.
- */
+/** Class that filters namespaces that users are not allowed to claim. */
 public class ReservedNamespaceFilter {
 	private static final String[] RESERVED_ROOTS = {
 			"nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info"

@@ -1,18 +1,12 @@
 package org.nem.core.model.mosaic;
 
-/**
- * Class enumerating all mosaic transfer fee types.
- */
+/** Class enumerating all mosaic transfer fee types. */
 public enum MosaicTransferFeeType {
 
-	/**
-	 * Fee represents an absolute value.
-	 */
+	/** Fee represents an absolute value. */
 	Absolute(1),
 
-	/**
-	 * Fee is proportional to a percentile of the transferred mosaic.
-	 */
+	/** Fee is proportional to a percentile of the transferred mosaic. */
 	Percentile(2);
 
 	private final int value;

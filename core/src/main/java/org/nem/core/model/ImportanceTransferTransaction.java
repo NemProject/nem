@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
 
 /**
  * A transaction which describes cancellation or creation of transfer of importance from signer to remote account.

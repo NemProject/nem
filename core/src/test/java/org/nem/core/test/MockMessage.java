@@ -3,9 +3,7 @@ package org.nem.core.test;
 import org.nem.core.model.Message;
 import org.nem.core.serialization.*;
 
-/**
- * A mock Message implementation.
- */
+/** A mock Message implementation. */
 public class MockMessage extends Message {
 
 	public static final int TYPE = 19;

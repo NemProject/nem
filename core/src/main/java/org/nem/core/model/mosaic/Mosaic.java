@@ -4,9 +4,7 @@ import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-/**
- * A pair comprised of a mosaic id and a quantity.
- */
+/** A pair comprised of a mosaic id and a quantity. */
 public class Mosaic implements SerializableEntity {
 	private final MosaicId mosaicId;
 	private final Quantity quantity;

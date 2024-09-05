@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -7,11 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
 
-import java.util.*;
-
-/**
- * A transaction that creates a mosaic definition.
- */
+/** A transaction that creates a mosaic definition. */
 public class MosaicDefinitionCreationTransaction extends Transaction {
 	private final MosaicDefinition mosaicDefinition;
 	private final Account creationFeeSink;

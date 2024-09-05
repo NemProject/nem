@@ -1,8 +1,6 @@
 package org.nem.core.model.ncc;
 
-/**
- * Builder that is used by Spring to create an AccountId from a GET request.
- */
+/** Builder that is used by Spring to create an AccountId from a GET request. */
 public class AccountIdBuilder {
 	private String address;
 

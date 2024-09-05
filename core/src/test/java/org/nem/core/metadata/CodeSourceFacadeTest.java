@@ -1,13 +1,12 @@
 package org.nem.core.metadata;
 
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.cert.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-
-import java.net.URL;
-import java.security.CodeSource;
-import java.security.cert.*;
 
 public class CodeSourceFacadeTest {
 

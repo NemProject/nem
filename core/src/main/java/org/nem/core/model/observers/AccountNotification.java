@@ -2,9 +2,7 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
 
-/**
- * A notification that represents the announcement of a potentially new account.
- */
+/** A notification that represents the announcement of a potentially new account. */
 public class AccountNotification extends Notification {
 	private final Account account;
 

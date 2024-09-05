@@ -1,15 +1,12 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
-
-/**
- * A NEM block. The harvester is an alias for the signer. The harvester proof is the signature.
- */
+/** A NEM block. The harvester is an alias for the signer. The harvester proof is the signature. */
 public class Block extends VerifiableEntity {
 	private static final int BLOCK_VERSION = 1;
 

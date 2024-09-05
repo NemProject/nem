@@ -1,11 +1,10 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Ed25519GroupElementTest {
 
@@ -517,7 +516,8 @@ public class Ed25519GroupElementTest {
 		MatcherAssert.assertThat(basePoint, IsEqual.equalTo(g));
 	}
 
-	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
+	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the
+	// result.
 	@Test
 	public void scalarMultiplyBasePointReturnsExpectedResult() {
 		for (int i = 0; i < 100; i++) {
@@ -534,7 +534,8 @@ public class Ed25519GroupElementTest {
 		}
 	}
 
-	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
+	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the
+	// result.
 	@Test
 	public void doubleScalarMultiplyVariableTimeReturnsExpectedResult() {
 		for (int i = 0; i < 50; i++) {

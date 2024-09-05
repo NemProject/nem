@@ -1,5 +1,8 @@
 package org.nem.core.connect.client;
 
+import java.io.ByteArrayInputStream;
+import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 import net.minidev.json.JSONObject;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -13,10 +16,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.io.ByteArrayInputStream;
-import java.net.URL;
-import java.util.concurrent.CompletableFuture;
 
 public class DefaultAsyncNemConnectorTest {
 

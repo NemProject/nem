@@ -3,17 +3,13 @@ package org.nem.core.utils;
 import java.util.concurrent.*;
 import java.util.function.Function;
 
-/**
- * Static class that contains helper functions for dealing with exceptions.
- */
+/** Static class that contains helper functions for dealing with exceptions. */
 public class ExceptionUtils {
 
 	private ExceptionUtils() {
 	}
 
-	/**
-	 * Interface that mimics Runnable but can additionally throw checked exceptions.
-	 */
+	/** Interface that mimics Runnable but can additionally throw checked exceptions. */
 	public interface CheckedRunnable {
 
 		/**

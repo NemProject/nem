@@ -1,13 +1,10 @@
 package org.nem.core.connect;
 
+import java.nio.charset.Charset;
 import net.minidev.json.JSONObject;
 import org.nem.core.serialization.*;
 
-import java.nio.charset.Charset;
-
-/**
- * Creates a new JSON HTTP POST request.
- */
+/** Creates a new JSON HTTP POST request. */
 public class HttpJsonPostRequest implements HttpPostRequest {
 	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");
 

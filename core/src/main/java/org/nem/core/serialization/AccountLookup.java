@@ -1,12 +1,9 @@
 package org.nem.core.serialization;
 
+import java.util.function.Predicate;
 import org.nem.core.model.*;
 
-import java.util.function.Predicate;
-
-/**
- * An interface for looking up accounts.
- */
+/** An interface for looking up accounts. */
 public interface AccountLookup extends SimpleAccountLookup {
 
 	/**

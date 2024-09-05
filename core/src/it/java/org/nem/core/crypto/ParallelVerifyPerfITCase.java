@@ -1,14 +1,13 @@
 package org.nem.core.crypto;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.RandomTransactionFactory;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.*;
 
 public class ParallelVerifyPerfITCase {
 	private static final Logger LOGGER = Logger.getLogger(ParallelVerifyPerfITCase.class.getName());
@@ -46,8 +45,7 @@ public class ParallelVerifyPerfITCase {
 	}
 
 	private static Collection<Transaction> createTransactions(final int count) {
-		final Collection<Transaction> transactions = IntStream.range(0, count)
-				.mapToObj(i -> RandomTransactionFactory.createTransfer())
+		final Collection<Transaction> transactions = IntStream.range(0, count).mapToObj(i -> RandomTransactionFactory.createTransfer())
 				.collect(Collectors.toList());
 		transactions.forEach(VerifiableEntity::sign);
 		return transactions;

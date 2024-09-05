@@ -2,9 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.serialization.*;
 
-/**
- * Class for holding additional information about an object required by ncc.
- */
+/** Class for holding additional information about an object required by ncc. */
 public class DefaultMetaData implements SerializableEntity {
 	private final Long id;
 

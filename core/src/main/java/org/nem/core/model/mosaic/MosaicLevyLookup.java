@@ -1,8 +1,6 @@
 package org.nem.core.model.mosaic;
 
-/**
- * An interface for looking up mosaic levy information.
- */
+/** An interface for looking up mosaic levy information. */
 @FunctionalInterface
 public interface MosaicLevyLookup {
 

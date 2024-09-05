@@ -1,15 +1,12 @@
 package org.nem.core.math;
 
-import org.apache.commons.math3.stat.descriptive.rank.Median;
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.function.*;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
+import org.nem.core.utils.FormatUtils;
 
-/**
- * Represents a linear algebra vector.
- */
+/** Represents a linear algebra vector. */
 public class ColumnVector {
 
 	private final int size;
@@ -400,9 +397,7 @@ public class ColumnVector {
 
 	// region setNegativesToZero
 
-	/**
-	 * Sets all negative values to zero.
-	 */
+	/** Sets all negative values to zero. */
 	public void removeNegatives() {
 		this.matrix.removeNegatives();
 	}

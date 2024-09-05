@@ -1,13 +1,12 @@
 package org.nem.core.model.ncc;
 
+import java.util.function.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.function.*;
 
 public abstract class AbstractMetaDataPairTest<TEntity extends SerializableEntity, TMetaData extends SerializableEntity> {
 	private final Function<Account, TEntity> createEntity;

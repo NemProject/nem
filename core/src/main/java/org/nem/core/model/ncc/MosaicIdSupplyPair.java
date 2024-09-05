@@ -5,9 +5,7 @@ import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-/**
- * Pair containing a mosaic id and the corresponding mosaic supply.
- */
+/** Pair containing a mosaic id and the corresponding mosaic supply. */
 public class MosaicIdSupplyPair implements SerializableEntity {
 	private final MosaicId mosaicId;
 	private final Supply supply;

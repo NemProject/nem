@@ -3,9 +3,7 @@ package org.nem.core.time;
 import org.nem.core.model.primitive.AbstractPrimitive;
 import org.nem.core.serialization.*;
 
-/**
- * Represents an time stamp in the NEM network in ms.
- */
+/** Represents an time stamp in the NEM network in ms. */
 public class NetworkTimeStamp extends AbstractPrimitive<NetworkTimeStamp, Long> {
 
 	/**

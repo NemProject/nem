@@ -13,7 +13,7 @@ public class MosaicUtilsTest {
 
 	// region add / tryAdd
 
-	private static abstract class AddBaseTest {
+	private abstract static class AddBaseTest {
 
 		@Test
 		public void canAddUpToMaxSupplyWhenDivisibilityIsZero() {

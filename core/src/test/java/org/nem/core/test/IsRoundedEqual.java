@@ -2,9 +2,7 @@ package org.nem.core.test;
 
 import org.hamcrest.core.IsEqual;
 
-/**
- * Matcher that checks the that two double values are equal within an epsilon value.
- */
+/** Matcher that checks the that two double values are equal within an epsilon value. */
 public class IsRoundedEqual extends org.hamcrest.BaseMatcher<Double> {
 	private final Double lhs;
 	private final int numPlaces;

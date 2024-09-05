@@ -1,15 +1,12 @@
 package org.nem.core.model.mosaic;
 
+import java.util.Properties;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
-import java.util.Properties;
-
-/**
- * Common place to have Mosaic-related constants accessible from all modules.
- */
+/** Common place to have Mosaic-related constants accessible from all modules. */
 public class MosaicConstants {
 	// TODO 20150813 J-*: we need to make these accounts multisig before moving to mainnet
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey
@@ -17,34 +14,22 @@ public class MosaicConstants {
 	private static final PublicKey MOSAIC_CREATION_FEE_SINK_KEY = PublicKey
 			.fromHexString("53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3");
 
-	/**
-	 * The maximum allowable quantity of a mosaic.
-	 */
+	/** The maximum allowable quantity of a mosaic. */
 	public static final long MAX_QUANTITY = 9_000_000_000_000_000L;
 
-	/**
-	 * The 'nem' namespace owner.
-	 */
+	/** The 'nem' namespace owner. */
 	public static Account NAMESPACE_OWNER_NEM;
 
-	/**
-	 * The 'nem' namespace id.
-	 */
+	/** The 'nem' namespace id. */
 	public static final NamespaceId NAMESPACE_ID_NEM = new NamespaceId("nem");
 
-	/**
-	 * The 'nem' namespace.
-	 */
+	/** The 'nem' namespace. */
 	public static Namespace NAMESPACE_NEM;
 
-	/**
-	 * The mosaic creation fee sink.
-	 */
+	/** The mosaic creation fee sink. */
 	public static Account MOSAIC_CREATION_FEE_SINK;
 
-	/**
-	 * The xem mosaic id.
-	 */
+	/** The xem mosaic id. */
 	public static final MosaicId MOSAIC_ID_XEM = new MosaicId(NAMESPACE_ID_NEM, "xem");
 
 	static {
@@ -52,9 +37,7 @@ public class MosaicConstants {
 		setAccounts();
 	}
 
-	/**
-	 * The 'nem.xem' mosaic definition.
-	 */
+	/** The 'nem.xem' mosaic definition. */
 	public static MosaicDefinition MOSAIC_DEFINITION_XEM;
 
 	private static MosaicDefinition createXemMosaicDefinition() {

@@ -1,8 +1,7 @@
 package org.nem.core.test;
 
-import org.hamcrest.core.IsEqual;
-
 import java.util.*;
+import org.hamcrest.core.IsEqual;
 
 /**
  * Matcher that checks the equivalency of a collection to another collection or array.

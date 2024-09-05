@@ -2,14 +2,10 @@ package org.nem.core.model.primitive;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a non-negative amount of blocks.
- */
+/** Represents a non-negative amount of blocks. */
 public class BlockAmount extends AbstractPrimitive<BlockAmount, Long> {
 
-	/**
-	 * Value representing initial height.
-	 */
+	/** Value representing initial height. */
 	public static final BlockAmount ZERO = new BlockAmount(0);
 
 	/**

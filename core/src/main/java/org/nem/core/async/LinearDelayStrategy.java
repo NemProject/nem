@@ -1,8 +1,6 @@
 package org.nem.core.async;
 
-/**
- * DelayStrategy that linearly increases a delay from a minimum value to a maximum value.
- */
+/** DelayStrategy that linearly increases a delay from a minimum value to a maximum value. */
 public class LinearDelayStrategy extends AbstractDelayStrategy {
 
 	private final int minDelay;

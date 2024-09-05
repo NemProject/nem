@@ -4,23 +4,15 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-/**
- * Base class for all entities that need to be verified (e.g. blocks and transactions).
- */
+/** Base class for all entities that need to be verified (e.g. blocks and transactions). */
 public abstract class VerifiableEntity implements SerializableEntity {
 
-	/**
-	 * Enumeration of deserialization options.
-	 */
+	/** Enumeration of deserialization options. */
 	public enum DeserializationOptions {
-		/**
-		 * The serialized data includes a signature and is verifiable.
-		 */
+		/** The serialized data includes a signature and is verifiable. */
 		VERIFIABLE,
 
-		/**
-		 * The serialized data does not include a signature and is not verifiable.
-		 */
+		/** The serialized data does not include a signature and is not verifiable. */
 		NON_VERIFIABLE
 	}
 
@@ -178,13 +170,12 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param includeNonVerifiableData true if non-verifiable data should be included.
 	 */
 	protected void serializeImpl(final Serializer serializer, final boolean includeNonVerifiableData) {
-		// since most derived classes don't have non-verifiable data, the default implementation of this function ignore the flag
+		// since most derived classes don't have non-verifiable data, the default implementation of
+		// this function ignore the flag
 		this.serializeImpl(serializer);
 	}
 
-	/**
-	 * Signs this entity with the owner's private key.
-	 */
+	/** Signs this entity with the owner's private key. */
 	public void sign() {
 		this.signBy(this.signer);
 	}

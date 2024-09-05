@@ -5,9 +5,7 @@ import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-/**
- * Pair containing a mosaic definition and the corresponding mosaic supply.
- */
+/** Pair containing a mosaic definition and the corresponding mosaic supply. */
 public class MosaicDefinitionSupplyPair implements SerializableEntity {
 	private final MosaicDefinition mosaicDefinition;
 	private final Supply supply;

@@ -1,13 +1,10 @@
 package org.nem.core.math;
 
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.function.DoubleConsumer;
+import org.nem.core.utils.FormatUtils;
 
-/**
- * Represents a dense matrix.
- */
+/** Represents a dense matrix. */
 public final class DenseMatrix extends Matrix {
 	private final int numCols;
 	private final double[] values;

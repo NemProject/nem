@@ -1,8 +1,6 @@
 package org.nem.core.serialization;
 
-/**
- * Base class for all exceptions that indicate an invalid serialization property.
- */
+/** Base class for all exceptions that indicate an invalid serialization property. */
 @SuppressWarnings("serial")
 public class InvalidPropertyException extends SerializationException {
 	private final String propertyName;

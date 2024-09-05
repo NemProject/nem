@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Interface to analyze keys.
- */
+/** Interface to analyze keys. */
 public interface KeyAnalyzer {
 
 	/**

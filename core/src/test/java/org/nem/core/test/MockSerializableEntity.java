@@ -2,18 +2,14 @@ package org.nem.core.test;
 
 import org.nem.core.serialization.*;
 
-/**
- * A mock SerializableEntity implementation.
- */
+/** A mock SerializableEntity implementation. */
 public class MockSerializableEntity implements SerializableEntity {
 
 	private final int intValue;
 	private final String stringValue;
 	private final long longValue;
 
-	/**
-	 * Creates a new MockSerializableEntity object.
-	 */
+	/** Creates a new MockSerializableEntity object. */
 	public MockSerializableEntity() {
 		this(1, "a", 2);
 	}
@@ -69,9 +65,7 @@ public class MockSerializableEntity implements SerializableEntity {
 		return String.format("int: %d; string: %s; long: %d", this.intValue, this.stringValue, this.longValue);
 	}
 
-	/**
-	 * ObjectDeserializer implementation that can activate MockSerializableEntity objects.
-	 */
+	/** ObjectDeserializer implementation that can activate MockSerializableEntity objects. */
 	public static class Activator implements ObjectDeserializer<MockSerializableEntity> {
 
 		private DeserializationContext lastContext;

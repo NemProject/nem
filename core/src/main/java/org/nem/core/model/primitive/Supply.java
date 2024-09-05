@@ -6,9 +6,7 @@ import org.nem.core.serialization.*;
  * Represents a supply that can be used by any class which needs to handle non-negative supplies.
  */
 public class Supply extends AbstractQuantity<Supply> {
-	/**
-	 * Supply representing 0.
-	 */
+	/** Supply representing 0. */
 	public static final Supply ZERO = new Supply(0);
 
 	/**

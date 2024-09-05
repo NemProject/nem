@@ -1,13 +1,10 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.nem.core.serialization.*;
 
-/**
- * Represents a collection of nodes.
- */
+/** Represents a collection of nodes. */
 @SuppressWarnings("serial")
 public class NodeCollection implements SerializableEntity {
 	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(NodeStatus.ACTIVE, NodeStatus.BUSY, NodeStatus.INACTIVE,
@@ -27,9 +24,7 @@ public class NodeCollection implements SerializableEntity {
 
 	private final Set<Node> pruneCandidates = createSet();
 
-	/**
-	 * Creates a node collection.
-	 */
+	/** Creates a node collection. */
 	public NodeCollection() {
 	}
 

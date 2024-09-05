@@ -1,13 +1,10 @@
 package org.nem.core.test;
 
-import org.nem.core.model.Transaction;
-
 import java.util.*;
 import java.util.stream.*;
+import org.nem.core.model.Transaction;
 
-/**
- * Static class containing helper functions for dealing with mock transactions.
- */
+/** Static class containing helper functions for dealing with mock transactions. */
 public class MockTransactionUtils {
 
 	/**

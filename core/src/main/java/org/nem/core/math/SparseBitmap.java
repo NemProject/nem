@@ -1,12 +1,9 @@
 package org.nem.core.math;
 
 import com.googlecode.javaewah.EWAHCompressedBitmap;
-
 import java.util.*;
 
-/**
- * This is a wrapper for the EWAHCompressedBitmap.
- */
+/** This is a wrapper for the EWAHCompressedBitmap. */
 public class SparseBitmap implements java.lang.Iterable<Integer> {
 	private final EWAHCompressedBitmap bitmap;
 
@@ -55,7 +52,8 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * Gets the value of the bit at the given index.
 	 *
 	 * @param bitToGet The index of the bit to get.
-	 * @return true if the bit is set, false if the bit is not set at the given <code>bitToGet</code> index.
+	 * @return true if the bit is set, false if the bit is not set at the given <code>bitToGet
+	 *     </code> index.
 	 */
 	public boolean get(final int bitToGet) {
 		return this.bitmap.get(bitToGet);
@@ -90,9 +88,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 	// region clear
 
-	/**
-	 * Clears all the bits in this sparse bitmap.
-	 */
+	/** Clears all the bits in this sparse bitmap. */
 	public void clear() {
 		this.bitmap.clear();
 	}

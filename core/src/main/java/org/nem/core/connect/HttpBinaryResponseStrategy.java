@@ -2,9 +2,7 @@ package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
 
-/**
- * Strategy for coercing an HTTP binary response into a deserializer.
- */
+/** Strategy for coercing an HTTP binary response into a deserializer. */
 public class HttpBinaryResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	private final DeserializationContext context;

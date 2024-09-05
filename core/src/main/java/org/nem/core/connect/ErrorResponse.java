@@ -1,14 +1,11 @@
 package org.nem.core.connect;
 
+import java.util.logging.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.HttpStatus;
 
-import java.util.logging.*;
-
-/**
- * Response that is returned when an action fails.
- */
+/** Response that is returned when an action fails. */
 public class ErrorResponse implements SerializableEntity {
 	private static final Logger LOGGER = Logger.getLogger(ErrorResponse.class.getName());
 

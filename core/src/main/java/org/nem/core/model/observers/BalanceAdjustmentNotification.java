@@ -3,9 +3,7 @@ package org.nem.core.model.observers;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 
-/**
- * A notification that one account a unilateral balance adjustment.
- */
+/** A notification that one account a unilateral balance adjustment. */
 public class BalanceAdjustmentNotification extends Notification {
 	private final Account account;
 	private final Amount amount;

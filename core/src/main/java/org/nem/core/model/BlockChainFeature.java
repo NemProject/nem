@@ -2,30 +2,22 @@ package org.nem.core.model;
 
 import java.util.*;
 
-/**
- * An enumeration of block chain features.
- */
+/** An enumeration of block chain features. */
 public enum BlockChainFeature {
 
 	// region pox
 
-	/**
-	 * The block chain uses the proof of importance consensus algorithm.
-	 */
+	/** The block chain uses the proof of importance consensus algorithm. */
 	PROOF_OF_IMPORTANCE(0x00000001),
 
-	/**
-	 * The block chain uses the proof of stake consensus algorithm.
-	 */
+	/** The block chain uses the proof of stake consensus algorithm. */
 	PROOF_OF_STAKE(0x00000002),
 
 	// endregion
 
 	// region weighted balances
 
-	/**
-	 * The block chain uses a time-based vesting of balances.
-	 */
+	/** The block chain uses a time-based vesting of balances. */
 	WB_TIME_BASED_VESTING(0x00000004),
 
 	/**
@@ -38,9 +30,7 @@ public enum BlockChainFeature {
 
 	// region other
 
-	/**
-	 * Gaps between blocks should be more stable.
-	 */
+	/** Gaps between blocks should be more stable. */
 	STABILIZE_BLOCK_TIMES(0x00000010);
 
 	// endregion

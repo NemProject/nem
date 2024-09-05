@@ -3,9 +3,7 @@ package org.nem.core.model.ncc;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.Deserializer;
 
-/**
- * Pair containing a namespace and meta data.
- */
+/** Pair containing a namespace and meta data. */
 public class NamespaceMetaDataPair extends AbstractMetaDataPair<Namespace, DefaultMetaData> {
 
 	/**

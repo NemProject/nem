@@ -1,13 +1,12 @@
 package org.nem.core.node;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-
-import java.util.*;
 
 public class NodeMetaDataTest {
 

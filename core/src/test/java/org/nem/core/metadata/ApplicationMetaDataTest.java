@@ -1,14 +1,13 @@
 package org.nem.core.metadata;
 
+import java.security.cert.X509Certificate;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-
-import java.security.cert.X509Certificate;
-import java.util.*;
 
 public class ApplicationMetaDataTest {
 

@@ -264,32 +264,26 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>2.43.0</version>
                 <configuration>
-                    <formats>
-                        <format>
-                            <includes>
-                                <include>src/**</include>
-                            </includes>
-                            <excludes>
-                                <exclude>src/main/resources/**</exclude>
-                            </excludes>
-                            <trimTrailingWhitespace/>
-                            <endWithNewline/>
-                        </format>
-                    </formats>
                     <java>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>src/it/java/**/*.java</include>
+                        </includes>
+
+                        <importOrder />
+                        <removeUnusedImports />
+
                         <eclipse>
-                          <version>4.9.0</version>
+                          <version>4.9</version>
                           <file>${project.basedir}/eclipse-formatter.xml</file>
                         </eclipse>
+
+                        <indent>
+                            <tabs>true</tabs>
+                        </indent>
                     </java>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

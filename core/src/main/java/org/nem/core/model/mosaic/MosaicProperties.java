@@ -1,12 +1,9 @@
 package org.nem.core.model.mosaic;
 
+import java.util.Collection;
 import org.nem.core.model.NemProperty;
 
-import java.util.Collection;
-
-/**
- * Interface for reading mosaic properties.
- */
+/** Interface for reading mosaic properties. */
 public interface MosaicProperties {
 
 	/**

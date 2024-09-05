@@ -3,9 +3,7 @@ package org.nem.core.utils;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-/**
- * Static class that contains utility functions for converting hex strings to and from bytes.
- */
+/** Static class that contains utility functions for converting hex strings to and from bytes. */
 public class HexEncoder {
 
 	/**

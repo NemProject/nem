@@ -3,9 +3,7 @@ package org.nem.core.utils;
 import java.text.*;
 import java.util.Arrays;
 
-/**
- * Static class containing helper functions for formatting.
- */
+/** Static class containing helper functions for formatting. */
 public class FormatUtils {
 
 	/**

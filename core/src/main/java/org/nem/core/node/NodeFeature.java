@@ -2,24 +2,16 @@ package org.nem.core.node;
 
 import java.util.*;
 
-/**
- * An enumeration of optional features that a node can support.
- */
+/** An enumeration of optional features that a node can support. */
 public enum NodeFeature {
 
-	/**
-	 * Node supports looking up transactions by hash.
-	 */
+	/** Node supports looking up transactions by hash. */
 	TRANSACTION_HASH_LOOKUP(0x00000001),
 
-	/**
-	 * Node supports supplying historical account data.
-	 */
+	/** Node supports supplying historical account data. */
 	HISTORICAL_ACCOUNT_DATA(0x0000002),
 
-	/**
-	 * Node supports tracking expired mosaics.
-	 */
+	/** Node supports tracking expired mosaics. */
 	TRACK_EXPIRED_MOSAICS(0x0000004);
 
 	private final int value;

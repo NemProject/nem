@@ -5,9 +5,7 @@ import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
-/**
- * Represents a node identity that uniquely identifies a node.
- */
+/** Represents a node identity that uniquely identifies a node. */
 public class NodeIdentity implements SerializableEntity {
 	private static final byte[] CHALLENGE_PREFIX = StringEncoder.getBytes("nem trust challenge:");
 	private final KeyPair keyPair;

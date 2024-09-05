@@ -1,14 +1,11 @@
 package org.nem.core.crypto;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
-/**
- * A EC signature.
- */
+/** A EC signature. */
 public class Signature {
 	private static final BigInteger MAXIMUM_VALUE = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
 

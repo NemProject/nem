@@ -3,9 +3,7 @@ package org.nem.core.async;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-/**
- * A builder for creating async timer options.
- */
+/** A builder for creating async timer options. */
 public class AsyncTimerOptionsBuilder {
 	private Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private AbstractDelayStrategy delayStrategy;

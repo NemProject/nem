@@ -2,9 +2,7 @@ package org.nem.core.crypto.ed25519;
 
 import org.nem.core.crypto.*;
 
-/**
- * Class that wraps the Ed25519 specific implementation.
- */
+/** Class that wraps the Ed25519 specific implementation. */
 public class Ed25519CryptoEngine implements CryptoEngine {
 
 	@Override

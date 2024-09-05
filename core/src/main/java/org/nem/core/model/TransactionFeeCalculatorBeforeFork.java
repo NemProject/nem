@@ -1,13 +1,10 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 
-import java.math.BigInteger;
-
-/**
- * Implementation for calculating and validating transaction fees before the fee fork.
- */
+/** Implementation for calculating and validating transaction fees before the fee fork. */
 public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
@@ -15,9 +12,7 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 
 	private final MosaicFeeInformationLookup mosaicFeeInformationLookup;
 
-	/**
-	 * Creates a default transaction fee calculator.
-	 */
+	/** Creates a default transaction fee calculator. */
 	public TransactionFeeCalculatorBeforeFork() {
 		this(id -> null);
 	}
@@ -106,12 +101,15 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 	@Override
 	public boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
 		final Amount minimumFee = this.calculateMinimumFee(transaction);
-		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
+		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the
+		// cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
 				// minimumFee <= multisig signatures fee <= 1000
-				// reason: during spam attack cosignatories must be able to get their signature into the cache.
-				// it is limited in order for the last cosignatory not to be able to drain the multisig account
+				// reason: during spam attack cosignatories must be able to get their signature into
+				// the cache.
+				// it is limited in order for the last cosignatory not to be able to drain the
+				// multisig account
 				return 0 <= transaction.getFee().compareTo(minimumFee) && 0 >= transaction.getFee().compareTo(maxCacheFee);
 		}
 

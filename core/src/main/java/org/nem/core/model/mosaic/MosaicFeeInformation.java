@@ -2,9 +2,7 @@ package org.nem.core.model.mosaic;
 
 import org.nem.core.model.primitive.Supply;
 
-/**
- * Information that is required to calculate the appropriate mosaic transfer fee.
- */
+/** Information that is required to calculate the appropriate mosaic transfer fee. */
 public class MosaicFeeInformation {
 	private final Supply supply;
 	private final int divisibility;

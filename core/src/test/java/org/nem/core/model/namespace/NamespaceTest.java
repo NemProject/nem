@@ -1,5 +1,6 @@
 package org.nem.core.model.namespace;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -8,8 +9,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class NamespaceTest {
 	private static final long BLOCKS_PER_YEAR = 1440 * 365;

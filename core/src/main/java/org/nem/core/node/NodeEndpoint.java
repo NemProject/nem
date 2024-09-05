@@ -1,14 +1,11 @@
 package org.nem.core.node;
 
+import java.net.*;
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.StringUtils;
 
-import java.net.*;
-import java.util.Arrays;
-
-/**
- * The endpoint of a node in the NEM network.
- */
+/** The endpoint of a node in the NEM network. */
 public class NodeEndpoint implements SerializableEntity {
 	private final String protocol;
 	private final String host;

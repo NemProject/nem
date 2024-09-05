@@ -1,14 +1,11 @@
 package org.nem.core.messages;
 
+import java.util.Arrays;
 import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-import java.util.Arrays;
-
-/**
- * A secure, encrypted message.
- */
+/** A secure, encrypted message. */
 public class SecureMessage extends Message {
 
 	private final SecureMessagePayload payload;
@@ -98,7 +95,7 @@ public class SecureMessage extends Message {
 
 	// region SecureMessagePayload
 
-	private static abstract class SecureMessagePayload {
+	private abstract static class SecureMessagePayload {
 		private final Address senderAddress;
 		private final Address recipientAddress;
 		private final byte[] payload;

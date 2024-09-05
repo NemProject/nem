@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a nem name-value pair.
- */
+/** Represents a nem name-value pair. */
 public class NemProperty implements SerializableEntity {
 	private final String name;
 	private final String value;

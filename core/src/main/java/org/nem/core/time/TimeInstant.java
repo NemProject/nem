@@ -2,16 +2,12 @@ package org.nem.core.time;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents an instant in time.
- */
+/** Represents an instant in time. */
 public class TimeInstant implements Comparable<TimeInstant> {
 
 	private final int time;
 
-	/**
-	 * TimeInstant representing time 0.
-	 */
+	/** TimeInstant representing time 0. */
 	public static final TimeInstant ZERO = new TimeInstant(0);
 
 	/**

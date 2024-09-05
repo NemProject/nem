@@ -2,9 +2,7 @@ package org.nem.core.crypto.secp256k1;
 
 import org.nem.core.crypto.*;
 
-/**
- * Implementation of the key analyzer for SECP256K1.
- */
+/** Implementation of the key analyzer for SECP256K1. */
 public class SecP256K1KeyAnalyzer implements KeyAnalyzer {
 
 	private static final int COMPRESSED_KEY_SIZE = 33;

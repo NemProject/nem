@@ -1,16 +1,13 @@
 package org.nem.core.test;
 
+import java.io.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.Deserializer;
 
-import java.io.*;
-
-/**
- * Static class containing test utilities shared across the connect package.
- */
+/** Static class containing test utilities shared across the connect package. */
 public class ConnectUtils {
 
 	/**

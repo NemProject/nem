@@ -1,8 +1,6 @@
 package org.nem.core.async;
 
-/**
- * DelayStrategy that produces a uniform delay.
- */
+/** DelayStrategy that produces a uniform delay. */
 public class UniformDelayStrategy extends AbstractDelayStrategy {
 
 	private final int delay;

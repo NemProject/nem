@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 
-/**
- * A NEM account.
- */
+/** A NEM account. */
 public class Account {
 	private final KeyPair keyPair;
 	private final Address address;
@@ -170,8 +168,8 @@ public class Account {
 	 */
 	public Cipher createCipher(final Account other, final boolean encrypt) {
 		if (!this.hasPrivateKey() && !other.hasPrivateKey() || !this.hasPublicKey() || !other.hasPublicKey()) {
-			throw new CryptoException(
-					"in order to create a cipher, at least one account must have a private key and both accounts must have a public key");
+			throw new CryptoException("in order to create a cipher, at least one account must have a private key and"
+					+ " both accounts must have a public key");
 		}
 
 		final KeyPair keyPairWithPrivateKey = this.hasPrivateKey() ? this.keyPair : other.keyPair;

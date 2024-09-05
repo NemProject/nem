@@ -2,9 +2,7 @@ package org.nem.core.time.synchronization;
 
 import org.nem.core.node.Node;
 
-/**
- * Represents a sample in the time synchronization process.
- */
+/** Represents a sample in the time synchronization process. */
 public class TimeSynchronizationSample implements Comparable<TimeSynchronizationSample> {
 
 	private final Node node;

@@ -2,9 +2,7 @@ package org.nem.core.connect;
 
 import org.nem.core.serialization.Deserializer;
 
-/**
- * Strategy for coercing an HTTP response into a null Deserializer.
- */
+/** Strategy for coercing an HTTP response into a null Deserializer. */
 public class HttpVoidResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	@Override

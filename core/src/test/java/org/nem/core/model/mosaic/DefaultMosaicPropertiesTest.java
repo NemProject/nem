@@ -1,12 +1,11 @@
 package org.nem.core.model.mosaic;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.NemProperty;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class DefaultMosaicPropertiesTest {
 
@@ -238,7 +237,8 @@ public class DefaultMosaicPropertiesTest {
 	private static boolean isDiffExpected(final String propertyName) {
 		switch (propertyName) {
 			case "default":
-			case "one-more-property": // note that the "extra" property is masked out, so the remaining properties are equal
+			case "one-more-property": // note that the "extra" property is masked out, so the
+				// remaining properties are equal
 				return false;
 		}
 

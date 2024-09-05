@@ -1,15 +1,12 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
-
-/**
- * Tests rely on the BigInteger class.
- */
+/** Tests rely on the BigInteger class. */
 public class Ed25519FieldElementTest {
 
 	// region constructor

@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -14,9 +16,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 public class TransferTransactionTest {
@@ -67,7 +66,7 @@ public class TransferTransactionTest {
 
 	// endregion
 
-	private static abstract class AbstractTransferTransactionTest {
+	private abstract static class AbstractTransferTransactionTest {
 		protected static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
 
 		protected static void setupGlobalsBase() {
@@ -503,7 +502,8 @@ public class TransferTransactionTest {
 
 		@BeforeClass
 		public static void setupGlobals() {
-			// this is required for the mosaic deserialization tests because they serialize a v2 transaction (with mosaics)
+			// this is required for the mosaic deserialization tests because they serialize a v2
+			// transaction (with mosaics)
 			// and attempt to deserialize it as a v1 transaction (without mosaics)
 			setupGlobalsBase();
 		}
@@ -681,7 +681,8 @@ public class TransferTransactionTest {
 
 		// region execute /undo
 
-		// note: in the following execute/undo tests, mosaic transfers with mosaic id 7 do not trigger an additional transfer fee
+		// note: in the following execute/undo tests, mosaic transfers with mosaic id 7 do not
+		// trigger an additional transfer fee
 		// notification
 
 		@Test

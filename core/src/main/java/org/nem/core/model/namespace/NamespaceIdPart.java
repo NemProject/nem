@@ -1,12 +1,9 @@
 package org.nem.core.model.namespace;
 
+import java.util.regex.Pattern;
 import org.nem.core.utils.MustBe;
 
-import java.util.regex.Pattern;
-
-/**
- * Represents a part of a namespace id
- */
+/** Represents a part of a namespace id */
 public class NamespaceIdPart {
 	private final String id;
 	private static final Pattern ID_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9_-]*");

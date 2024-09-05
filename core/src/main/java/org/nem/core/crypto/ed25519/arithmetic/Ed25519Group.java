@@ -1,21 +1,18 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import java.math.BigInteger;
 import org.nem.core.utils.HexEncoder;
 
-import java.math.BigInteger;
-
-/**
- * Represents the underlying group for Ed25519.
- */
+/** Represents the underlying group for Ed25519. */
 public class Ed25519Group {
 
-	/**
-	 * 2^252 - 27742317777372353535851937790883648493
-	 */
+	/** 2^252 - 27742317777372353535851937790883648493 */
 	public static final BigInteger GROUP_ORDER = BigInteger.ONE.shiftLeft(252)
 			.add(new BigInteger("27742317777372353535851937790883648493"));
 
 	/**
+	 *
+	 *
 	 * <pre>
 	 * {@code
 	 * (x, 4/5); x > 0

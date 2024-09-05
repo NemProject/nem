@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 
-/**
- * Static class that provides hashing utilities.
- */
+/** Static class that provides hashing utilities. */
 public abstract class HashUtils {
 
 	/**

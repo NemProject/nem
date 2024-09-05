@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a multisig cosignatory modification.
- */
+/** Represents a multisig cosignatory modification. */
 public class MultisigCosignatoryModification implements SerializableEntity, Comparable<MultisigCosignatoryModification> {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;

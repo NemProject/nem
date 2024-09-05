@@ -2,9 +2,7 @@ package org.nem.core.utils;
 
 import java.math.BigInteger;
 
-/**
- * Static class that contains a handful of array helper functions.
- */
+/** Static class that contains a handful of array helper functions. */
 public class ArrayUtils {
 
 	/**

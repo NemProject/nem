@@ -4,9 +4,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-/**
- * Contains information about a harvested block.
- */
+/** Contains information about a harvested block. */
 public class HarvestInfo implements SerializableEntity {
 	private final Long blockId;
 	private final BlockHeight height;

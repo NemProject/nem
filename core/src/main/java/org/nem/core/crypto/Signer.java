@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Wraps DSA signing and verification logic.
- */
+/** Wraps DSA signing and verification logic. */
 public class Signer implements DsaSigner {
 	private final DsaSigner signer;
 

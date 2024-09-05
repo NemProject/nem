@@ -1,8 +1,6 @@
 package org.nem.core.math;
 
-/**
- * Interface for iterating through the nonzero elements of a matrix row.
- */
+/** Interface for iterating through the nonzero elements of a matrix row. */
 public interface MatrixNonZeroElementRowIterator {
 
 	/**

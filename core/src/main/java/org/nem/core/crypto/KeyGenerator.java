@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Interface for generating keys.
- */
+/** Interface for generating keys. */
 public interface KeyGenerator {
 
 	/**

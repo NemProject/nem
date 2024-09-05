@@ -1,11 +1,10 @@
 package org.nem.core.utils;
 
+import java.text.DecimalFormat;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-
-import java.text.DecimalFormat;
-import java.util.function.Function;
 
 public class FormatUtilsTest {
 

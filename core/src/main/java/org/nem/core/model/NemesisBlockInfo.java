@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.Amount;
 
-/**
- * Represents information about a nemesis block.
- */
+/** Represents information about a nemesis block. */
 public class NemesisBlockInfo {
 	private final Hash generationHash;
 	private final Address address;

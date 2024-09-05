@@ -1,8 +1,6 @@
 package org.nem.core.model.mosaic;
 
-/**
- * An interface for looking up mosaic fee information.
- */
+/** An interface for looking up mosaic fee information. */
 @FunctionalInterface
 public interface MosaicFeeInformationLookup {
 

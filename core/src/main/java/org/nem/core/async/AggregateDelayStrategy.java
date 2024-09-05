@@ -2,9 +2,7 @@ package org.nem.core.async;
 
 import java.util.List;
 
-/**
- * An aggregate delay strategy.
- */
+/** An aggregate delay strategy. */
 public class AggregateDelayStrategy extends AbstractDelayStrategy {
 
 	private final List<AbstractDelayStrategy> strategies;

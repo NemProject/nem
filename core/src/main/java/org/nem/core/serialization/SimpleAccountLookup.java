@@ -2,9 +2,7 @@ package org.nem.core.serialization;
 
 import org.nem.core.model.*;
 
-/**
- * A simpler interface for looking up accounts.
- */
+/** A simpler interface for looking up accounts. */
 public interface SimpleAccountLookup {
 
 	/**

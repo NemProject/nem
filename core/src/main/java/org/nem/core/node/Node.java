@@ -2,9 +2,7 @@ package org.nem.core.node;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a node in the NEM network. Each Node is uniquely identified by its endpoint.
- */
+/** Represents a node in the NEM network. Each Node is uniquely identified by its endpoint. */
 public class Node implements SerializableEntity {
 	private final NodeIdentity identity;
 	private NodeEndpoint endpoint;

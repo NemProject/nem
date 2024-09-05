@@ -1,8 +1,6 @@
 package org.nem.core.node;
 
-/**
- * Exception that is used when an invalid NodeEndpoint is attempted to be created.
- */
+/** Exception that is used when an invalid NodeEndpoint is attempted to be created. */
 @SuppressWarnings("serial")
 public class InvalidNodeEndpointException extends RuntimeException {
 

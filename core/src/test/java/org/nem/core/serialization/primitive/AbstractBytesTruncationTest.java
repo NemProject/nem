@@ -1,9 +1,8 @@
 package org.nem.core.serialization.primitive;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-
-import java.util.Arrays;
 
 public abstract class AbstractBytesTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
 		extends

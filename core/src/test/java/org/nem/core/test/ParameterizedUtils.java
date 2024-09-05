@@ -3,9 +3,7 @@ package org.nem.core.test;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/**
- * Static helper class for writing parameterized tests.
- */
+/** Static helper class for writing parameterized tests. */
 public class ParameterizedUtils {
 
 	/**

@@ -6,9 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-/**
- * Timer that executes a future given on an interval.
- */
+/** Timer that executes a future given on an interval. */
 public class AsyncTimer implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(NemAsyncTimerVisitor.class.getName());
 

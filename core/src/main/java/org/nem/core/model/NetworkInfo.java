@@ -1,8 +1,6 @@
 package org.nem.core.model;
 
-/**
- * Represents information about a network.
- */
+/** Represents information about a network. */
 public class NetworkInfo {
 	private final byte version;
 	private final char addressStartChar;

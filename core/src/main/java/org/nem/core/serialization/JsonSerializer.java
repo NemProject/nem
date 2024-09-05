@@ -1,15 +1,12 @@
 package org.nem.core.serialization;
 
-import net.minidev.json.*;
-import org.nem.core.utils.*;
-
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import net.minidev.json.*;
+import org.nem.core.utils.*;
 
-/**
- * A json serializer that supports forward-only serialization.
- */
+/** A json serializer that supports forward-only serialization. */
 public class JsonSerializer extends Serializer {
 
 	public static final String PROPERTY_ORDER_ARRAY_NAME = "_propertyOrderArray";
@@ -17,9 +14,7 @@ public class JsonSerializer extends Serializer {
 	private final JSONArray propertyOrderArray;
 	private final JSONObject object;
 
-	/**
-	 * Creates a default json serializer that does not enforce forward-only reads.
-	 */
+	/** Creates a default json serializer that does not enforce forward-only reads. */
 	public JsonSerializer() {
 		this(null);
 	}

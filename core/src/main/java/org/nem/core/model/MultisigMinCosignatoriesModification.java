@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a multisig minimum cosignatories modification.
- */
+/** Represents a multisig minimum cosignatories modification. */
 public class MultisigMinCosignatoriesModification implements SerializableEntity {
 	private final int relativeChange;
 

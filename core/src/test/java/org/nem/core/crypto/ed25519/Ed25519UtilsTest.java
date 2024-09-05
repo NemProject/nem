@@ -1,12 +1,11 @@
 package org.nem.core.crypto.ed25519;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.test.Utils;
-
-import java.math.BigInteger;
 
 public class Ed25519UtilsTest {
 

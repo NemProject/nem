@@ -1,33 +1,21 @@
 package org.nem.core.model.observers;
 
-/**
- * Known notification types.
- */
+/** Known notification types. */
 public enum NotificationType {
 
-	/**
-	 * The notification represents a transfer of XEM.
-	 */
+	/** The notification represents a transfer of XEM. */
 	BalanceTransfer,
 
-	/**
-	 * The notification represents a credit of XEM.
-	 */
+	/** The notification represents a credit of XEM. */
 	BalanceCredit,
 
-	/**
-	 * The notification represents a debit of XEM.
-	 */
+	/** The notification represents a debit of XEM. */
 	BalanceDebit,
 
-	/**
-	 * The notification represents an importance transfer.
-	 */
+	/** The notification represents an importance transfer. */
 	ImportanceTransfer,
 
-	/**
-	 * The notification represents the announcement of a potentially new account.
-	 */
+	/** The notification represents the announcement of a potentially new account. */
 	Account,
 
 	/**
@@ -35,38 +23,24 @@ public enum NotificationType {
 	 */
 	BlockHarvest,
 
-	/**
-	 * The notification represents appearance/disappearance of transaction hashes.
-	 */
+	/** The notification represents appearance/disappearance of transaction hashes. */
 	TransactionHashes,
 
-	/**
-	 * The notification represents a cosigner change.
-	 */
+	/** The notification represents a cosigner change. */
 	CosignatoryModification,
 
-	/**
-	 * The notification represents a minimum cosignatories change.
-	 */
+	/** The notification represents a minimum cosignatories change. */
 	MinCosignatoriesModification,
 
-	/**
-	 * The notification represents a namespace provision.
-	 */
+	/** The notification represents a namespace provision. */
 	ProvisionNamespace,
 
-	/**
-	 * The notification represents the creation of a mosaic definition.
-	 */
+	/** The notification represents the creation of a mosaic definition. */
 	MosaicDefinitionCreation,
 
-	/**
-	 * The notification represents a supply change for a mosaic.
-	 */
+	/** The notification represents a supply change for a mosaic. */
 	MosaicSupplyChange,
 
-	/**
-	 * The notification represents a transfer of a mosaic.
-	 */
+	/** The notification represents a transfer of a mosaic. */
 	MosaicTransfer
 }

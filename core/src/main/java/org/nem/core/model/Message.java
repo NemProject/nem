@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-/**
- * Base class for all messages.
- */
+/** Base class for all messages. */
 public abstract class Message implements SerializableEntity {
 
 	private final int type;

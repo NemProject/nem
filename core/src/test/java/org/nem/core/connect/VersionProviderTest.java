@@ -1,5 +1,7 @@
 package org.nem.core.connect;
 
+import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -7,9 +9,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.NodeVersion;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.net.URL;
-import java.util.concurrent.CompletableFuture;
 
 public class VersionProviderTest {
 
@@ -90,6 +89,7 @@ public class VersionProviderTest {
 	private static class TestContext {
 		@SuppressWarnings("unchecked")
 		private final HttpMethodClient<ErrorResponseDeserializerUnion> client = Mockito.mock(HttpMethodClient.class);
+
 		private final VersionProvider provider = new VersionProvider(this.client);
 
 		public void setHttpResult(final ErrorResponseDeserializerUnion result) {

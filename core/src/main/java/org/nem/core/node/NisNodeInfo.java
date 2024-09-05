@@ -3,9 +3,7 @@ package org.nem.core.node;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.serialization.*;
 
-/**
- * Information about a node that is returned by NIS.
- */
+/** Information about a node that is returned by NIS. */
 public class NisNodeInfo implements SerializableEntity {
 	private final Node node;
 	private final ApplicationMetaData appMetaData;

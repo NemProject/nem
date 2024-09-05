@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Supply;
@@ -7,11 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
 
-import java.util.*;
-
-/**
- * A transaction that increases or decreases the supply of a mosaic.
- */
+/** A transaction that increases or decreases the supply of a mosaic. */
 public class MosaicSupplyChangeTransaction extends Transaction {
 	private final MosaicId mosaicId;
 	private final MosaicSupplyType supplyType;

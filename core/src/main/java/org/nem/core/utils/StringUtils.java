@@ -1,8 +1,6 @@
 package org.nem.core.utils;
 
-/**
- * Static class that contains string utility functions.
- */
+/** Static class that contains string utility functions. */
 public class StringUtils {
 
 	/**

@@ -1,10 +1,9 @@
 package org.nem.core.utils;
 
-import org.junit.Test;
-import org.nem.core.test.ExceptionAssert;
-
 import java.util.*;
 import java.util.regex.Pattern;
+import org.junit.Test;
+import org.nem.core.test.ExceptionAssert;
 
 public class MustBeTest {
 

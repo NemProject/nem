@@ -1,5 +1,8 @@
 package org.nem.core.test;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Properties;
 import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
@@ -11,13 +14,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Properties;
-
-/**
- * Static class containing test utilities.
- */
+/** Static class containing test utilities. */
 public class Utils {
 
 	/**
@@ -622,17 +619,13 @@ public class Utils {
 
 	// region nem globals
 
-	/**
-	 * Sets up nem globals for testing.
-	 */
+	/** Sets up nem globals for testing. */
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(id -> feeInfo));
 	}
 
-	/**
-	 * Resets nem globals.
-	 */
+	/** Resets nem globals. */
 	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
 		NemGlobals.setBlockChainConfiguration(null);

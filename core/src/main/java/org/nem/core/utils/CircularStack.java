@@ -64,9 +64,7 @@ public class CircularStack<E> implements Iterable<E> {
 		return this.elements.get(this.elements.size() - 1);
 	}
 
-	/**
-	 * Removes most recently added element.
-	 */
+	/** Removes most recently added element. */
 	public void pop() {
 		this.elements.remove(this.elements.size() - 1);
 	}

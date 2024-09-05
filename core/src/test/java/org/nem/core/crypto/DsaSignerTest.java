@@ -1,12 +1,11 @@
 package org.nem.core.crypto;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.Utils;
-
-import java.math.BigInteger;
 
 public abstract class DsaSignerTest {
 

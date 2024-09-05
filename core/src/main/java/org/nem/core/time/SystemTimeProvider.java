@@ -1,12 +1,9 @@
 package org.nem.core.time;
 
+import java.util.*;
 import org.nem.core.model.primitive.TimeOffset;
 
-import java.util.*;
-
-/**
- * Time provider that uses the System time.
- */
+/** Time provider that uses the System time. */
 public class SystemTimeProvider implements TimeProvider {
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;

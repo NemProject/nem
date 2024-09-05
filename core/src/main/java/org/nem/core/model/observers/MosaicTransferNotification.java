@@ -4,9 +4,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.Quantity;
 
-/**
- * A notification that one account has transferred a quantity of a mosaic to another account.
- */
+/** A notification that one account has transferred a quantity of a mosaic to another account. */
 public class MosaicTransferNotification extends Notification {
 	private final Account sender;
 	private final Account recipient;

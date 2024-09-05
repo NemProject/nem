@@ -3,33 +3,21 @@ package org.nem.core.model.ncc;
 import org.nem.core.model.ValidationResult;
 import org.nem.core.serialization.*;
 
-/**
- * Result for NEM request.
- */
+/** Result for NEM request. */
 public class NemRequestResult implements SerializableEntity {
-	/**
-	 * Result type indicating a validation result
-	 */
+	/** Result type indicating a validation result */
 	public static final int TYPE_VALIDATION_RESULT = 0x00000001;
 
-	/**
-	 * Result type indicating a heartbeat.
-	 */
+	/** Result type indicating a heartbeat. */
 	public static final int TYPE_HEARTBEAT = 0x00000002;
 
-	/**
-	 * Result type indicating the status.
-	 */
+	/** Result type indicating the status. */
 	public static final int TYPE_STATUS = 0x00000004;
 
-	/**
-	 * Special code representing a neutral result.
-	 */
+	/** Special code representing a neutral result. */
 	public static final int CODE_NEUTRAL = 0x00000000;
 
-	/**
-	 * Special code representing a successful result.
-	 */
+	/** Special code representing a successful result. */
 	public static final int CODE_SUCCESS = 0x00000001;
 
 	private final int type;

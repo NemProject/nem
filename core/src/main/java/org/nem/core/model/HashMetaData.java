@@ -3,9 +3,7 @@ package org.nem.core.model;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 
-/**
- * Class holding additional information about a hash.
- */
+/** Class holding additional information about a hash. */
 public class HashMetaData {
 	private final BlockHeight height;
 	private final TimeInstant timeStamp;

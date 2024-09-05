@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Interface for encryption and decryption of data.
- */
+/** Interface for encryption and decryption of data. */
 public interface BlockCipher {
 
 	/**

@@ -1,12 +1,11 @@
 package org.nem.core.time;
 
+import java.lang.reflect.Field;
+import java.util.function.Consumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.TimeOffset;
-
-import java.lang.reflect.Field;
-import java.util.function.Consumer;
 
 public class SystemTimeProviderTest {
 	private static final long EPOCH_TIME = 1427587585000L;

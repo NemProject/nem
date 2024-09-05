@@ -1,13 +1,10 @@
 package org.nem.core.crypto;
 
+import java.security.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.security.*;
-
-/**
- * Static class that exposes hash functions.
- */
+/** Static class that exposes hash functions. */
 public class Hashes {
 
 	static {

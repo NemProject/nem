@@ -1,13 +1,10 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 
-import java.math.BigInteger;
-
-/**
- * Partial implementation for calculating and validating transaction fees.
- */
+/** Partial implementation for calculating and validating transaction fees. */
 public abstract class AbstractTransactionFeeCalculator implements TransactionFeeCalculator {
 	protected final MosaicFeeInformationLookup mosaicFeeInformationLookup;
 
@@ -79,12 +76,15 @@ public abstract class AbstractTransactionFeeCalculator implements TransactionFee
 	@Override
 	public boolean isFeeValid(Transaction transaction, BlockHeight blockHeight) {
 		final Amount minimumFee = this.calculateMinimumFee(transaction);
-		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
+		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the
+		// cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
 				// minimumFee <= multisig signatures fee <= 1000
-				// reason: during spam attack cosignatories must be able to get their signature into the cache.
-				// it is limited in order for the last cosignatory not to be able to drain the multisig account
+				// reason: during spam attack cosignatories must be able to get their signature into
+				// the cache.
+				// it is limited in order for the last cosignatory not to be able to drain the
+				// multisig account
 				return 0 <= transaction.getFee().compareTo(minimumFee) && 0 >= transaction.getFee().compareTo(maxCacheFee);
 		}
 

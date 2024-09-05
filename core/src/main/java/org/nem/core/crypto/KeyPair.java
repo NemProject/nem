@@ -5,9 +5,7 @@ public class KeyPair {
 	private final PrivateKey privateKey;
 	private final PublicKey publicKey;
 
-	/**
-	 * Creates a random key pair.
-	 */
+	/** Creates a random key pair. */
 	public KeyPair() {
 		final KeyGenerator generator = CryptoEngines.defaultEngine().createKeyGenerator();
 		final KeyPair pair = generator.generateKeyPair();

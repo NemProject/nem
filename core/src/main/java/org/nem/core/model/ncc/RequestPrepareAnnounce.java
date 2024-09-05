@@ -4,9 +4,7 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
-/**
- * Represents a prepare announce request that is used to prepare and announce a transaction.
- */
+/** Represents a prepare announce request that is used to prepare and announce a transaction. */
 public class RequestPrepareAnnounce implements SerializableEntity {
 	private final Transaction transaction;
 	private final PrivateKey privateKey;

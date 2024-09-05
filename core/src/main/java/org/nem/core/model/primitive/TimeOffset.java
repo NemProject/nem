@@ -2,9 +2,7 @@ package org.nem.core.model.primitive;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents a time offset in ms.
- */
+/** Represents a time offset in ms. */
 public class TimeOffset extends AbstractPrimitive<TimeOffset, Long> {
 
 	/**

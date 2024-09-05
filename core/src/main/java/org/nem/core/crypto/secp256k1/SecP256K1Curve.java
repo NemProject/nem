@@ -1,15 +1,12 @@
 package org.nem.core.crypto.secp256k1;
 
+import java.math.BigInteger;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.nem.core.crypto.Curve;
 
-import java.math.BigInteger;
-
-/**
- * Class that wraps the elliptic curve SECP256K1.
- */
+/** Class that wraps the elliptic curve SECP256K1. */
 public class SecP256K1Curve implements Curve {
 	private static final SecP256K1Curve SECP256K1;
 	private final ECDomainParameters params;

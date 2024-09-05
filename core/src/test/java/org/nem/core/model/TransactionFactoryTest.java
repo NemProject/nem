@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.Collection;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -9,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class TransactionFactoryTest {

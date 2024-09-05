@@ -3,9 +3,7 @@ package org.nem.core.utils;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-/**
- * Helper class for validating parameters.
- */
+/** Helper class for validating parameters. */
 public class MustBe {
 
 	/**
@@ -30,7 +28,7 @@ public class MustBe {
 	 */
 	public static void notWhitespace(final String str, final String name, final int maxLength) {
 		if (StringUtils.isNullOrWhitespace(str) || str.length() > maxLength) {
-			final String message = String.format("%s cannot be null, empty, or whitespace, or have length greater than %d", name,
+			final String message = String.format("%s cannot be null, empty, or whitespace, or have length greater than" + " %d", name,
 					maxLength);
 			throw new IllegalArgumentException(message);
 		}

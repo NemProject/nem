@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.ByteUtils;
-
 import java.io.Serializable;
+import org.nem.core.utils.ByteUtils;
 
 /**
  * A point on the ED25519 curve which represents a group element. <br>
@@ -20,23 +19,23 @@ import java.io.Serializable;
 public class Ed25519GroupElement implements Serializable {
 
 	private final CoordinateSystem coordinateSystem;
+
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement X;
+
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Y;
+
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Z;
+
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement T;
 
-	/**
-	 * Precomputed table for a single scalar multiplication.
-	 */
+	/** Precomputed table for a single scalar multiplication. */
 	private Ed25519GroupElement[][] precomputedForSingle;
 
-	/**
-	 * Precomputed table for a double scalar multiplication
-	 */
+	/** Precomputed table for a double scalar multiplication */
 	private Ed25519GroupElement[] precomputedForDouble;
 
 	// region constructors
@@ -327,9 +326,7 @@ public class Ed25519GroupElement implements Serializable {
 		}
 	}
 
-	/**
-	 * Precomputes the group elements needed to speed up a scalar multiplication.
-	 */
+	/** Precomputes the group elements needed to speed up a scalar multiplication. */
 	public void precomputeForScalarMultiplication() {
 		if (null != this.precomputedForSingle) {
 			return;
@@ -354,9 +351,7 @@ public class Ed25519GroupElement implements Serializable {
 		}
 	}
 
-	/**
-	 * Precomputes the group elements used to speed up a double scalar multiplication.
-	 */
+	/** Precomputes the group elements used to speed up a double scalar multiplication. */
 	public void precomputeForDoubleScalarMultiplication() {
 		if (null != this.precomputedForDouble) {
 			return;

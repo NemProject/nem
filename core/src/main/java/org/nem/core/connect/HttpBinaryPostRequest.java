@@ -2,9 +2,7 @@ package org.nem.core.connect;
 
 import org.nem.core.serialization.*;
 
-/**
- * Creates a new binary HTTP POST request.
- */
+/** Creates a new binary HTTP POST request. */
 public class HttpBinaryPostRequest implements HttpPostRequest {
 	private final byte[] entityBytes;
 

@@ -1,8 +1,6 @@
 package org.nem.core.crypto;
 
-/**
- * Interface that supports signing and verification of arbitrarily sized message.
- */
+/** Interface that supports signing and verification of arbitrarily sized message. */
 public interface DsaSigner {
 
 	/**

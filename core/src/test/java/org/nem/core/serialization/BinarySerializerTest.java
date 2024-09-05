@@ -1,14 +1,13 @@
 package org.nem.core.serialization;
 
+import java.math.BigInteger;
+import java.nio.*;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.primitive.*;
 import org.nem.core.test.MockSerializableEntity;
-
-import java.math.BigInteger;
-import java.nio.*;
-import java.util.*;
 
 @SuppressWarnings({
 		"serial", "try"

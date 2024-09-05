@@ -4,9 +4,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 
-/**
- * A class that contains information about the special fee when transferring mosaics.
- */
+/** A class that contains information about the special fee when transferring mosaics. */
 public class MosaicLevy implements SerializableEntity {
 	private final MosaicTransferFeeType type;
 	private final Account recipient;

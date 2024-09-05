@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
+import java.util.stream.IntStream;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-
-import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
 public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionFeeCalculatorTest {
@@ -125,11 +124,13 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 
 		// region mosaic transfers
 
-		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
+		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility =
+		// 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
 		// divisibility ratio = 1_000_000 / 1_000 = 1000
 		// 1000 / 90 = 11.11..., so transferring a quantity of 12 is roughly like transferring 1 xem
-		// In comparison to a xem transfer, equivalent mosaic transfers have 25% higher fees (rounded)
+		// In comparison to a xem transfer, equivalent mosaic transfers have 25% higher fees
+		// (rounded)
 
 		// note that xem as a mosaic transfer is also 25% higher than a regular xem transfer because
 		// it takes up more space in the db; this is validated by
@@ -218,7 +219,8 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));
 
 			// Assert:
-			// - zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem = 12 xem
+			// - zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem
+			// = 12 xem
 			assertTransactionFee(transaction, Amount.fromNem(12));
 		}
 

@@ -1,12 +1,9 @@
 package org.nem.core.node;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 
-import java.util.Arrays;
-
-/**
- * Meta data about a node.
- */
+/** Meta data about a node. */
 public class NodeMetaData implements SerializableEntity {
 	private final String platform;
 	private final String application;

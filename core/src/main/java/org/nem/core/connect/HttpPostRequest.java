@@ -1,8 +1,6 @@
 package org.nem.core.connect;
 
-/**
- * An interface specifying information about an HttpPost request.
- */
+/** An interface specifying information about an HttpPost request. */
 public interface HttpPostRequest {
 
 	/**

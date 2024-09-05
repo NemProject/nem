@@ -2,9 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.Hash;
 
-/**
- * Pair consisting of a hash and metadata.
- */
+/** Pair consisting of a hash and metadata. */
 public class HashMetaDataPair {
 	private final Hash hash;
 	private final HashMetaData metaData;

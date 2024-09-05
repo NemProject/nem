@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.function.Consumer;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -12,9 +14,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 @RunWith(Enclosed.class)
 public class MultisigAggregateModificationTransactionTest {
@@ -159,7 +158,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	// region v1 + v2
 
-	private static abstract class AbstractMultisigAggregateModificationTransactionTest {
+	private abstract static class AbstractMultisigAggregateModificationTransactionTest {
 		protected abstract MultisigModificationType getModification();
 
 		protected abstract MultisigAggregateModificationTransaction createTransaction(final Account sender,
@@ -428,7 +427,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	// region v1
 
-	private static abstract class AbstractMultisigAggregateModificationTransactionV1Test
+	private abstract static class AbstractMultisigAggregateModificationTransactionV1Test
 			extends
 				AbstractMultisigAggregateModificationTransactionTest {
 
@@ -566,7 +565,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	// region v2
 
-	private static abstract class AbstractMultisigAggregateModificationTransactionV2Test
+	private abstract static class AbstractMultisigAggregateModificationTransactionV2Test
 			extends
 				AbstractMultisigAggregateModificationTransactionTest {
 

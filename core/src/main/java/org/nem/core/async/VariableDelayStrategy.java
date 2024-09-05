@@ -2,9 +2,7 @@ package org.nem.core.async;
 
 import java.util.function.Supplier;
 
-/**
- * DelayStrategy that produces variable delays produced by an external supplier.
- */
+/** DelayStrategy that produces variable delays produced by an external supplier. */
 public class VariableDelayStrategy extends AbstractDelayStrategy {
 
 	private final Supplier<Integer> delaySupplier;

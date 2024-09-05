@@ -3,9 +3,7 @@ package org.nem.core.model;
 import java.util.*;
 import java.util.stream.Stream;
 
-/**
- * Static helper class for dealing with transactions.
- */
+/** Static helper class for dealing with transactions. */
 public class TransactionExtensions {
 
 	/**

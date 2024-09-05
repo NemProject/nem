@@ -2,9 +2,7 @@ package org.nem.core.connect.client;
 
 import org.nem.core.connect.ErrorResponse;
 
-/**
- * Strategy for dealing with client connection errors.
- */
+/** Strategy for dealing with client connection errors. */
 @FunctionalInterface
 public interface ErrorResponseStrategy {
 

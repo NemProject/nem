@@ -1,8 +1,6 @@
 package org.nem.core.model.primitive;
 
-/**
- * Represents the age of a node with respect to time synchronization.
- */
+/** Represents the age of a node with respect to time synchronization. */
 public class NodeAge extends AbstractPrimitive<NodeAge, Long> {
 
 	/**

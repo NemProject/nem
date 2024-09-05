@@ -1,10 +1,9 @@
 package org.nem.core.serialization;
 
-import net.minidev.json.*;
-import org.nem.core.utils.HexEncoder;
-
 import java.math.*;
 import java.util.*;
+import net.minidev.json.*;
+import org.nem.core.utils.HexEncoder;
 
 /**
  * A json deserializer that supports label-based lookup in addition to forward-only deserialization.

@@ -1,12 +1,9 @@
 package org.nem.core.test;
 
+import java.util.*;
 import org.nem.core.model.NemProperties;
 
-import java.util.*;
-
-/**
- * Mock NemProperties that captures the required and optional property names.
- */
+/** Mock NemProperties that captures the required and optional property names. */
 public class MockNemProperties extends NemProperties {
 	private final Set<String> requiredPropertyNames = new HashSet<>();
 	private final Set<String> optionalPropertyNames = new HashSet<>();

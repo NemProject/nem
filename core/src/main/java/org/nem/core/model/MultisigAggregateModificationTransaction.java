@@ -1,12 +1,11 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A transaction that describes the addition or removal of one or more cosignatories to or from a multisig account. Additionally the minimum
@@ -43,12 +42,12 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 				@Override
 				public void validate(final MultisigAggregateModificationTransaction transaction) {
 					if (transaction.cosignatoryModifications.isEmpty()) {
-						throw new IllegalArgumentException("Cosignatory modifications cannot be empty");
+						throw new IllegalArgumentException("Cosignatory modifications cannot be" + " empty");
 					}
 
 					if (null != transaction.minCosignatoriesModification) {
 						final String message = String.format(
-								"min cosignatory modification cannot be attached to transaction with version %d",
+								"min cosignatory modification" + " cannot be attached to" + " transaction with version" + " %d",
 								transaction.getEntityVersion());
 						throw new IllegalArgumentException(message);
 					}
@@ -63,7 +62,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 				public void validate(final MultisigAggregateModificationTransaction transaction) {
 					if (transaction.cosignatoryModifications.isEmpty() && null == transaction.minCosignatoriesModification) {
 						throw new IllegalArgumentException(
-								"Either cosignatory modifications or change of minimum cosignatories must be present");
+								"Either cosignatory modifications or" + " change of minimum cosignatories" + " must be present");
 					}
 				}
 			}));

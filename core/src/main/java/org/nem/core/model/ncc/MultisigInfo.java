@@ -2,9 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.nem.core.serialization.*;
 
-/**
- * Represents additional data about multisig account
- */
+/** Represents additional data about multisig account */
 public class MultisigInfo implements SerializableEntity {
 	private final int cosignatoriesCount;
 	private final int minCosignatories;

@@ -1,13 +1,9 @@
 package org.nem.core.model.primitive;
 
-/**
- * Represents a referencer counter. This class is immutable.
- */
+/** Represents a referencer counter. This class is immutable. */
 public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {
 
-	/**
-	 * Value representing initial referenceCount.
-	 */
+	/** Value representing initial referenceCount. */
 	public static final ReferenceCount ZERO = new ReferenceCount(0);
 
 	/**

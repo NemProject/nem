@@ -4,9 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.Supply;
 
-/**
- * A notification that represents a supply change for a mosaic.
- */
+/** A notification that represents a supply change for a mosaic. */
 public class MosaicSupplyChangeNotification extends Notification {
 	private final Account supplier;
 	private final MosaicId mosaicId;

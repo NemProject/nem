@@ -2,9 +2,7 @@ package org.nem.core.utils;
 
 import java.nio.charset.Charset;
 
-/**
- * Static class that contains utility functions for converting strings to and from UTF-8 bytes.
- */
+/** Static class that contains utility functions for converting strings to and from UTF-8 bytes. */
 public class StringEncoder {
 
 	private static final Charset ENCODING_CHARSET = Charset.forName("UTF-8");

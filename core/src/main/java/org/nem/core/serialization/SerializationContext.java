@@ -1,8 +1,6 @@
 package org.nem.core.serialization;
 
-/**
- * Class that contains external state necessary for serialization of some objects.
- */
+/** Class that contains external state necessary for serialization of some objects. */
 public class SerializationContext {
 
 	/**

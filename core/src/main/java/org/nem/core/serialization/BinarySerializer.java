@@ -1,14 +1,11 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringEncoder;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Collection;
+import org.nem.core.utils.StringEncoder;
 
-/**
- * A binary serializer that supports forward-only serialization.
- */
+/** A binary serializer that supports forward-only serialization. */
 public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	/**
@@ -18,9 +15,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	private final ByteArrayOutputStream stream;
 
-	/**
-	 * Creates a new binary serializer.
-	 */
+	/** Creates a new binary serializer. */
 	public BinarySerializer() {
 		this(null);
 	}

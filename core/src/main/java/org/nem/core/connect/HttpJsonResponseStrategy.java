@@ -3,9 +3,7 @@ package org.nem.core.connect;
 import net.minidev.json.*;
 import org.nem.core.serialization.*;
 
-/**
- * Strategy for coercing an HTTP JSON response into a deserializer.
- */
+/** Strategy for coercing an HTTP JSON response into a deserializer. */
 public class HttpJsonResponseStrategy extends HttpDeserializerResponseStrategy {
 
 	private final DeserializationContext context;

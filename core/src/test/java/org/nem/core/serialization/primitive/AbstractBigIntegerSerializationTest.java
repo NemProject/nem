@@ -1,11 +1,10 @@
 package org.nem.core.serialization.primitive;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
-
-import java.math.BigInteger;
 
 public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
 		extends

@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
+import java.util.function.Supplier;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.BlockHeight;
-
-import java.util.function.Supplier;
 
 public class DefaultTransactionFeeCalculatorTest {
 

@@ -1,16 +1,13 @@
 package org.nem.core.crypto.secp256k1;
 
+import java.security.SecureRandom;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.math.ec.ECPoint;
 import org.nem.core.crypto.*;
 
-import java.security.SecureRandom;
-
-/**
- * Implementation of the key generator for SECP256K1.
- */
+/** Implementation of the key generator for SECP256K1. */
 public class SecP256K1KeyGenerator implements KeyGenerator {
 
 	private static final SecureRandom RANDOM = new SecureRandom();
