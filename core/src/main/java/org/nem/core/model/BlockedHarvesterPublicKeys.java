@@ -27,8 +27,8 @@ public class BlockedHarvesterPublicKeys {
 			// Contributors without addresses fund: NCONTRLFKPO6YVXO5WUIJ4SWSCSKBJIPV456RSCL
 			this.add(PublicKey.fromHexString("1ef1ba8f753b4931bfceab0ad6a08892f1735f304f6c33ce04b41d66fa10cb4b"));
 
-			// Additional public keys with corresponding addresses starting with NAFUNDA -
-			// NAFUNDZ
+			// Additional public keys with corresponding addresses starting with
+			// NAFUNDA - NAFUNDZ
 			this.add(PublicKey.fromHexString("6ab8401388e67b995139c7d1ddd3ea704245ca887b81f956edc5453c7869aac8"));
 			this.add(PublicKey.fromHexString("ac4b53284650c8d3a2c5b56dbf8fce9f65cda411a07d7e24cea1cdc867cbbc9d"));
 			this.add(PublicKey.fromHexString("f07caa65d1ee756ca41f019a43e4861cc0abc0cf26f9bacb792aa1e269d6f2ce"));
@@ -56,8 +56,8 @@ public class BlockedHarvesterPublicKeys {
 			this.add(PublicKey.fromHexString("897825b75e12aea7863486140775a6be93e810921a5988a64cd0f2ae49202a76"));
 			this.add(PublicKey.fromHexString("73bc5557f69f87532f6a37579d8833144602cbe98d9cf6b5dd517c079ca7f9a5"));
 
-			// Additional public keys with corresponding addresses starting with NBFUNDA -
-			// NBFUNDZ
+			// Additional public keys with corresponding addresses starting with
+			// NBFUNDA - NBFUNDZ
 			this.add(PublicKey.fromHexString("9bb55ba153ce6e0a42914fd39dc11aa0e553a17be1e0bf72f90d91287e7ea520"));
 			this.add(PublicKey.fromHexString("882afdc37e991f2924b39cc84b1ef03eee762947395d7ff528a8c308ddc94eae"));
 			this.add(PublicKey.fromHexString("a70d076b73440b1c78a6b239337cf6266a77864a51ad5ca1175f7465f987e3f6"));
@@ -85,8 +85,8 @@ public class BlockedHarvesterPublicKeys {
 			this.add(PublicKey.fromHexString("98a15955414f44edd806db23aecac2ac60236ffa70752de1aa793f1b00621d59"));
 			this.add(PublicKey.fromHexString("e06f1cbba59b07a9e82e090865ce319f06bc6adc975ce9df36812c19de1a6933"));
 
-			// Additional public keys with corresponding addresses starting with NCFUNDA -
-			// NCFUNDZ
+			// Additional public keys with corresponding addresses starting with
+			// NCFUNDA - NCFUNDZ
 			this.add(PublicKey.fromHexString("1ebc7ac04d41e6481a2a614afbd6c7a2bd11619acf8d5bec2d227c54621ce20e"));
 			this.add(PublicKey.fromHexString("5b5735628238b17fb673a07fd71f25c76e4ba486b740f1a6ba84e1f3e8e2f0ec"));
 			this.add(PublicKey.fromHexString("921c08b4871938205dd3828063f64f7dd3e82ecef82d2eb60e023ad99e88f2c0"));
@@ -114,8 +114,8 @@ public class BlockedHarvesterPublicKeys {
 			this.add(PublicKey.fromHexString("6a3a4c9076dc7bf85bb939328180223b3946a25c36fd4e0cc0ea32ee3e5862e2"));
 			this.add(PublicKey.fromHexString("a5a833f11b940d67d871040970eab1dd61267a240bee0adba2116484db9bb22a"));
 
-			// Additional public keys with corresponding addresses starting with NDFUNDA -
-			// NDFUNDZ
+			// Additional public keys with corresponding addresses starting with
+			// NDFUNDA - NDFUNDZ
 			this.add(PublicKey.fromHexString("389211df83774be63ddd6fd72bbbc918ecd44e2574c72cc27f51952f3ce74964"));
 			this.add(PublicKey.fromHexString("c3c169cbc88b97d50317cb53af63152ba82be86db5c060877979dcc8b3d19f11"));
 			this.add(PublicKey.fromHexString("a40e91ee22e8fb42b16b91858c55132d7d5ae08b7339be8d23d3edbce66c417d"));

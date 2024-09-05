@@ -137,7 +137,7 @@ public class HttpMethodClientTest {
 			this.runTestWithTimeoutService((mockService, requestUrl) -> {
 				// Arrange:
 				// - stop the service so that it's no longer running and will reject
-				// connections
+				//   connections
 				mockService.stop();
 				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
 

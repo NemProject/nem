@@ -51,8 +51,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
 		// encodedR and encodedA are the little endian encodings of the group element R and the
-		// public key A and
-		// a is the lower 32 bytes of hash after clamping.
+		// public key A and a is the lower 32 bytes of hash after clamping.
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(
 				Hashes.sha3_512(encodedR.getRaw(), this.getKeyPair().getPublicKey().getRaw(), data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();

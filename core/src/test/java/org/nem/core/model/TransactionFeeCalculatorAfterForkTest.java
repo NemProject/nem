@@ -40,7 +40,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		@Test
 		public void feeIsCalculatedCorrectlyNearTransferStepIncreases() {
 			// Assert: fee is initially 1 and increased every 10k xem until is reaches a max fee of
-			// 25 xem
+			//         25 xem
 			final long step = 10_000;
 			for (int i = 0; i < 26; ++i) {
 				final long amount = i * step;
@@ -158,8 +158,8 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 
 		// region other mosaics
 
-		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility =
-		// 3
+		// mosaic definition data used for the following tests:
+		// supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
 		// divisibility ratio = 1_000_000 / 1_000 = 1000
 		// 1000 / 90 = 11.11..., so transferring a quantity of 12 is roughly like transferring 1 xem

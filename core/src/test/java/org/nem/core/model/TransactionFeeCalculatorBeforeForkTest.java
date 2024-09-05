@@ -124,8 +124,8 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 
 		// region mosaic transfers
 
-		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility =
-		// 3
+		// mosaic definition data used for the following tests:
+		// supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
 		// divisibility ratio = 1_000_000 / 1_000 = 1000
 		// 1000 / 90 = 11.11..., so transferring a quantity of 12 is roughly like transferring 1 xem
@@ -220,7 +220,7 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 
 			// Assert:
 			// - zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem
-			// = 12 xem
+			//   = 12 xem
 			assertTransactionFee(transaction, Amount.fromNem(12));
 		}
 

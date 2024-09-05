@@ -475,7 +475,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 		// - reading "Bar" after "Foo" throws because "Bar" was never written
 		// - for the binary serializer this means that no sentinel value was written and the end of
-		// stream would be passed
+		//   stream would be passed
 		// - "optional" here means "can be null" vs "can be present"
 		// - ("optional" values must be present for binary serialization to work)
 		ExceptionAssert.assertThrows(v -> deserializer.readOptionalInt("Bar"), IllegalArgumentException.class);

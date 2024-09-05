@@ -237,7 +237,8 @@ public class DefaultMosaicPropertiesTest {
 	private static boolean isDiffExpected(final String propertyName) {
 		switch (propertyName) {
 			case "default":
-			case "one-more-property": // note that the "extra" property is masked out, so the
+			case "one-more-property":
+				// note that the "extra" property is masked out, so the
 				// remaining properties are equal
 				return false;
 		}
