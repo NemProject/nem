@@ -2,8 +2,9 @@ package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.nem.core.model.MosaicSupplyType;
+import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
@@ -15,19 +16,38 @@ import java.util.stream.Collectors;
  * Class for for retrieving mosaic supplies.
  */
 public class MosaicSupplyRetriever {
+	final private int namespaceLifetime;
+
+	/**
+	 * Creates a retriever with default settings.
+	 */
+	public MosaicSupplyRetriever() {
+		this(NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay() * (365 + 30 + 1));
+	}
+
+	/**
+	 * Creates a retriever with custom namespace lifetime.
+	 *
+	 * @param namespaceLifetime Number of blocks a namespace is active before being pruned (includes grace period).
+	 */
+	public MosaicSupplyRetriever(final int namespaceLifetime) {
+		this.namespaceLifetime = namespaceLifetime;
+	}
+
 	/**
 	 * Gets a mosaic definition and its corresponding supply at a specified height.
 	 *
 	 * @param session The session.
 	 * @param mosaicId The mosaic id.
 	 * @param height The search height.
-	 * @return The db mosaic definition and supply, if found. \c null otherwise.
+	 * @return The db mosaic definition and supply tuple, if found. \c null otherwise.
 	 */
-	public DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupply(final Session session, final MosaicId mosaicId, final Long height) {
+	public DbMosaicDefinitionSupplyTuple getMosaicDefinitionWithSupply(final Session session, final MosaicId mosaicId, final Long height) {
 		final List<DbMosaicDefinitionCreationTransaction> creationTransactions = MosaicSupplyRetriever.queryCreationTransactions(session, mosaicId, height);
 
 		Long supply = 0L;
 		Long firstCreationHeight = 0L;
+		Long lastCreationHeight = 0L;
 		DbMosaicDefinition matchingMosaicDefinition = null;
 		final Collection<Long> dbMosaicDefinitionIds = new HashSet<>();
 		for (final DbMosaicDefinitionCreationTransaction transaction : creationTransactions) {
@@ -40,6 +60,7 @@ public class MosaicSupplyRetriever {
 				final DbMosaicProperty mosaicProperty = MosaicSupplyRetriever.findPropertyByName(mosaicDefinition, "initialSupply");
 				supply = Long.parseLong(mosaicProperty.getValue(), 10);
 				matchingMosaicDefinition = mosaicDefinition;
+				lastCreationHeight = transaction.getBlock().getHeight();
 			}
 
 			firstCreationHeight = transaction.getBlock().getHeight();
@@ -60,7 +81,9 @@ public class MosaicSupplyRetriever {
 			}
 		}
 
-		return new DbMosaicDefinitionSupplyPair(matchingMosaicDefinition, new Supply(supply));
+		final Long expirationHeight = this.findExpirationHeight(session, matchingMosaicDefinition.getNamespaceId(), lastCreationHeight);
+
+		return new DbMosaicDefinitionSupplyTuple(matchingMosaicDefinition, new Supply(supply), new BlockHeight(expirationHeight));
 	}
 
 	private static List<DbMosaicDefinitionCreationTransaction> queryCreationTransactions(final Session session, final MosaicId mosaicId, final Long height) {
@@ -88,6 +111,46 @@ public class MosaicSupplyRetriever {
 				.addOrder(Order.desc("block.height")) // preserve-newline
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return HibernateUtils.listAndCast(supplyChangeTransactionCriteria);
+	}
+
+	private static DbNamespace queryLastRootNamespace(final Session session, final String namespaceId, final Long maxHeight) {
+		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
+		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline
+				.add(Restrictions.eq("fullName", rootNamespaceId.toString())) // preserve-newline
+				.add(Restrictions.lt("height", maxHeight)) // preserve-newline
+				.addOrder(Order.desc("height")) // preserve-newline
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY) // preserve-newline
+				.setMaxResults(1);
+		final List<DbNamespace> namespaces = HibernateUtils.listAndCast(namespaceCriteria);
+		return namespaces.get(0);
+	}
+
+	private static List<DbNamespace> querySubsequentRootNamespaces(final Session session, final String namespaceId, final Long minHeight) {
+		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
+		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline
+				.add(Restrictions.eq("fullName", rootNamespaceId.toString())) // preserve-newline
+				.add(Restrictions.gt("height", minHeight)) // preserve-newline
+				.addOrder(Order.asc("height")) // preserve-newline
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY); // preserve-newline
+		return HibernateUtils.listAndCast(namespaceCriteria);
+	}
+
+	private Long findExpirationHeight(final Session session, final String namespaceId, final Long height) {
+		final DbNamespace lastRootNamespace = MosaicSupplyRetriever.queryLastRootNamespace(session, namespaceId, height);
+		final List<DbNamespace> subsequentRootNamespaces = MosaicSupplyRetriever.querySubsequentRootNamespaces(session, namespaceId, height);
+
+		DbNamespace activeRootNamespace = lastRootNamespace;
+		for (final DbNamespace subsequentRootNamespace : subsequentRootNamespaces) {
+			if (subsequentRootNamespace.getHeight() > activeRootNamespace.getHeight() + this.namespaceLifetime) {
+				// subsequentRootNamespace was registered after grace period expiration and pruning
+				// so it should be treated as distinct
+				break;
+			}
+
+			activeRootNamespace = subsequentRootNamespace;
+		}
+
+		return activeRootNamespace.getHeight() + this.namespaceLifetime;
 	}
 
 	private static DbMosaicProperty findPropertyByName(final DbMosaicDefinition mosaicDefinition, final String name) {

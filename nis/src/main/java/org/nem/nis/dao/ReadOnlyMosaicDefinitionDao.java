@@ -24,9 +24,9 @@ public interface ReadOnlyMosaicDefinitionDao {
 	 *
 	 * @param mosaicId The mosaic id.
 	 * @param height The search height.
-	 * @return The db mosaic definition and supply, if found. \c null otherwise.
+	 * @return The db mosaic definition and supply tuple, if found. \c null otherwise.
 	 */
-	DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height);
+	DbMosaicDefinitionSupplyTuple getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height);
 
 	/**
 	 * Gets all mosaic definitions for the specified account, optionally confined to a specified namespace. The search is limited by a given
