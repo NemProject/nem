@@ -7,11 +7,12 @@ import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Supply;
+import org.nem.core.model.primitive.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyMosaicDefinitionDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
@@ -171,13 +172,13 @@ public class MosaicDefinitionControllerTest {
 		heightBuilder.setHeight("1234");
 
 		// Act:
-		final SerializableList<MosaicDefinitionSupplyPair> pairs = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
+		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinition(Mockito.any());
 		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(), Mockito.eq(MosaicDefinition.class));
 
-		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(0));
+		MatcherAssert.assertThat(tuples.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -186,8 +187,8 @@ public class MosaicDefinitionControllerTest {
 		final TestContext context = new TestContext();
 
 		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
-		final DbMosaicDefinitionSupplyPair dbMosaicDefinitionSupplyPair = new DbMosaicDefinitionSupplyPair(dbMosaicDefinition, new Supply(111));
-		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.anyLong())).thenReturn(dbMosaicDefinitionSupplyPair);
+		final DbMosaicDefinitionSupplyTuple dbMosaicDefinitionSupplyTuple = new DbMosaicDefinitionSupplyTuple(dbMosaicDefinition, new Supply(111), new BlockHeight(234));
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.anyLong())).thenReturn(dbMosaicDefinitionSupplyTuple);
 
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
 		builder.setMosaicId("alice.vouchers:foo");
@@ -196,17 +197,18 @@ public class MosaicDefinitionControllerTest {
 		heightBuilder.setHeight("1234");
 
 		// Act:
-		final SerializableList<MosaicDefinitionSupplyPair> pairs = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
+		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionWithSupply(builder.build(), 1234L);
 		Mockito.verify(context.mapper, Mockito.only()).map(dbMosaicDefinition, MosaicDefinition.class);
 
-		MatcherAssert.assertThat(pairs.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(tuples.size(), IsEqual.equalTo(1));
 
-		final MosaicDefinitionSupplyPair pair = pairs.get(0);
-		MatcherAssert.assertThat(pair.getMosaicDefinition().toString(), IsEqual.equalTo("alice.vouchers:foo"));
-		MatcherAssert.assertThat(pair.getSupply(), IsEqual.equalTo(new Supply(111)));
+		final MosaicDefinitionSupplyTuple tuple = tuples.get(0);
+		MatcherAssert.assertThat(tuple.getMosaicDefinition().toString(), IsEqual.equalTo("alice.vouchers:foo"));
+		MatcherAssert.assertThat(tuple.getSupply(), IsEqual.equalTo(new Supply(111)));
+		MatcherAssert.assertThat(tuple.getExpirationHeight(), IsEqual.equalTo(new BlockHeight(234)));
 	}
 
 	// endregion

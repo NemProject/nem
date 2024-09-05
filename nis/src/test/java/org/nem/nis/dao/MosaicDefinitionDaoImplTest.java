@@ -8,7 +8,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Supply;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
@@ -41,12 +41,12 @@ public class MosaicDefinitionDaoImplTest {
 	@Test
 	public void getMosaicDefinitionWithSupplyDelegatesToRetriever() {
 		// Arrange:
-		final DbMosaicDefinitionSupplyPair retrieverResult = new DbMosaicDefinitionSupplyPair(new DbMosaicDefinition(), new Supply(3));
+		final DbMosaicDefinitionSupplyTuple retrieverResult = new DbMosaicDefinitionSupplyTuple(new DbMosaicDefinition(), new Supply(3), new BlockHeight(7));
 		final TestContext context = new TestContext();
 		Mockito.when(context.getMosaicDefinitionWithSupplyMocked()).thenReturn(retrieverResult);
 
 		// Act:
-		final DbMosaicDefinitionSupplyPair result = context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Utils.createMosaicId(2), 123L);
+		final DbMosaicDefinitionSupplyTuple result = context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Utils.createMosaicId(2), 123L);
 
 		// Assert:
 		MatcherAssert.assertThat(result, IsSame.sameInstance(retrieverResult));
@@ -227,7 +227,7 @@ public class MosaicDefinitionDaoImplTest {
 			return this.retriever.getMosaicDefinition(Mockito.any(), Mockito.any());
 		}
 
-		private DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupplyMocked() {
+		private DbMosaicDefinitionSupplyTuple getMosaicDefinitionWithSupplyMocked() {
 			return this.supplyRetriever.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.any(), Mockito.anyLong());
 		}
 

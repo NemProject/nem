@@ -7,6 +7,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyMosaicDefinitionDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
@@ -97,18 +98,18 @@ public class MosaicDefinitionController {
 	@RequestMapping(value = "/local/mosaic/definition/supply", method = RequestMethod.GET)
 	@ClientApi
 	@TrustedApi
-	public SerializableList<MosaicDefinitionSupplyPair> getMosaicDefinitionWithSupply(final MosaicIdBuilder builder, final BlockHeightBuilder heightBuilder) {
+	public SerializableList<MosaicDefinitionSupplyTuple> getMosaicDefinitionWithSupply(final MosaicIdBuilder builder, final BlockHeightBuilder heightBuilder) {
 		final MosaicId mosaicId = builder.build();
 		final BlockHeight height = heightBuilder.build();
 
-		final DbMosaicDefinitionSupplyPair dbPair = this.mosaicDefinitionDao.getMosaicDefinitionWithSupply(mosaicId, height.getRaw());
+		final DbMosaicDefinitionSupplyTuple dbTuple = this.mosaicDefinitionDao.getMosaicDefinitionWithSupply(mosaicId, height.getRaw());
 
-		final SerializableList<MosaicDefinitionSupplyPair> pairs = new SerializableList<>(1);
-		if (null != dbPair) {
-			pairs.add(new MosaicDefinitionSupplyPair(this.map(dbPair.getMosaicDefinition()), dbPair.getSupply()));
+		final SerializableList<MosaicDefinitionSupplyTuple> tuples = new SerializableList<>(1);
+		if (null != dbTuple) {
+			tuples.add(new MosaicDefinitionSupplyTuple(this.map(dbTuple.getMosaicDefinition()), dbTuple.getSupply(), dbTuple.getExpirationHeight()));
 		}
 
-		return pairs;
+		return tuples;
 	}
 
 	// endregion

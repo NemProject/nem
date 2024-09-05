@@ -53,7 +53,7 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public DbMosaicDefinitionSupplyPair getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height) {
+	public DbMosaicDefinitionSupplyTuple getMosaicDefinitionWithSupply(final MosaicId mosaicId, final Long height) {
 		return this.supplyRetriever.getMosaicDefinitionWithSupply(this.getCurrentSession(), mosaicId, height);
 	}
 
