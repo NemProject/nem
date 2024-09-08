@@ -42,16 +42,22 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 	private void notify(final ProvisionNamespaceNotification notification, final BlockNotificationContext context) {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			final Namespace namespace = new Namespace(notification.getNamespaceId(), notification.getOwner(), context.getHeight());
+
+			// need to check isActive before adding to cache
+			final boolean isRoot = namespace.getId().isRoot();
+			final boolean isActive = isRoot && this.namespaceCache.isActive(namespace.getId(), context.getHeight());
+
 			this.namespaceCache.add(namespace);
-			if (namespace.getId().isRoot()) {
-				this.updateAccountStates(namespace.getId(), context.getHeight());
+
+			if (isRoot) {
+				this.updateAccountStates(namespace.getId(), context.getHeight(), isActive);
 			}
 		} else {
 			this.namespaceCache.remove(notification.getNamespaceId());
 		}
 	}
 
-	private void updateAccountStates(final NamespaceId namespaceId, final BlockHeight height) {
+	private void updateAccountStates(final NamespaceId namespaceId, final BlockHeight height, final boolean isActive) {
 		final Collection<NamespaceId> ids = new ArrayList<>();
 		ids.add(namespaceId);
 		ids.addAll(this.namespaceCache.getSubNamespaceIds(namespaceId));
@@ -63,7 +69,9 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 				mosaicBalances.getOwners().forEach(owner ->
 					this.accountStateCache.findStateByAddress(owner).getAccountInfo().addMosaicId(mosaicId));
 
-				this.expiredMosaicCache.addExpiration(height, mosaicId, mosaicBalances, ExpiredMosaicType.Restored);
+				if (!isActive) {
+					this.expiredMosaicCache.addExpiration(height, mosaicId, mosaicBalances, ExpiredMosaicType.Restored);
+				}
 			});
 		});
 	}
