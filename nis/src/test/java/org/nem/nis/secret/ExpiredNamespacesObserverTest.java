@@ -152,7 +152,6 @@ public class ExpiredNamespacesObserverTest {
 		notify(observer, NotificationTrigger.Undo);
 
 		// Assert: changes to expired mosaic cache because it's enabled
-		//         [notice specific mosaicId(s) don't matter, only those expirations at matching height are removed]
 		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(2));
 		MatcherAssert.assertThat(context.expiredMosaicCache.deepSize(), IsEqual.equalTo(6));
 	}

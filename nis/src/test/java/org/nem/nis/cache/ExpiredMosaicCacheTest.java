@@ -142,7 +142,7 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 
 	// endregion
 
-	// region addExpiration / removeAll
+	// region addExpiration
 
 	@Test
 	public void canAddSingleExpirationAtSingleHeight() {
@@ -196,15 +196,43 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(124)).size(), IsEqual.equalTo(1));
 	}
 
+	// endregion
+
+	// region removeExpiration
+
 	@Test
-	public void canRemoveAllExpirationsAtHeight() {
+	public void canRemoveSingleExpirationAtHeight() {
 		// Arrange:
 		final ExpiredMosaicCache cache = this.createCache();
 
 		this.addFourExpirations(cache);
 
 		// Act:
-		cache.removeAll(new BlockHeight(123));
+		cache.removeExpiration(new BlockHeight(123), Utils.createMosaicId(222));
+
+		// Assert:
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(3));
+
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(122)).size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(123)).size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(124)).size(), IsEqual.equalTo(1));
+
+		// - only the other (unremoved) expired mosaic entry remains
+		List<ExpiredMosaicEntry> expirationsListAt123 = cache.findExpirationsAtHeight(new BlockHeight(123)).stream().collect(Collectors.toList());
+		MatcherAssert.assertThat(expirationsListAt123.get(0).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(333)));
+	}
+
+	@Test
+	public void canRemoveAllExpirationsIndividuallyAtHeight() {
+		// Arrange:
+		final ExpiredMosaicCache cache = this.createCache();
+
+		this.addFourExpirations(cache);
+
+		// Act:
+		cache.removeExpiration(new BlockHeight(123), Utils.createMosaicId(222));
+		cache.removeExpiration(new BlockHeight(123), Utils.createMosaicId(333));
 
 		// Assert:
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(2));
@@ -216,15 +244,35 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 	}
 
 	@Test
-	public void removeAllAtHeightWithoutExpirationsDoesNotChangeState() {
+	public void removeAtHeightWithoutExpirationsDoesNotChangeState() {
 		// Arrange:
 		final ExpiredMosaicCache cache = this.createCache();
 
 		this.addFourExpirations(cache);
 
 		// Act:
-		cache.removeAll(new BlockHeight(121));
-		cache.removeAll(new BlockHeight(125));
+		cache.removeExpiration(new BlockHeight(121), Utils.createMosaicId(222));
+		cache.removeExpiration(new BlockHeight(125), Utils.createMosaicId(222));
+
+		// Assert: no state changes
+		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
+		MatcherAssert.assertThat(cache.deepSize(), IsEqual.equalTo(4));
+
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(122)).size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(123)).size(), IsEqual.equalTo(2));
+		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(124)).size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void removeAtHeightWithoutMatchingMosaicExpirationDoesNotChangeState() {
+		// Arrange:
+		final ExpiredMosaicCache cache = this.createCache();
+
+		this.addFourExpirations(cache);
+
+		// Act:
+		cache.removeExpiration(new BlockHeight(123), Utils.createMosaicId(111));
+		cache.removeExpiration(new BlockHeight(123), Utils.createMosaicId(444));
 
 		// Assert: no state changes
 		MatcherAssert.assertThat(cache.size(), IsEqual.equalTo(3));
@@ -259,7 +307,8 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		cache.shallowCopyTo(copy);
 
 		// Act: remove expirations
-		copy.removeAll(new BlockHeight(123));
+		copy.removeExpiration(new BlockHeight(123), Utils.createMosaicId(222));
+		copy.removeExpiration(new BlockHeight(123), Utils.createMosaicId(333));
 
 		// Assert: the expirations should be removed from only the copy but not the original
 		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(123)).size(), IsEqual.equalTo(2));
@@ -281,7 +330,8 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		final T copy = cache.copy();
 
 		// Act: remove expirations
-		copy.removeAll(new BlockHeight(123));
+		copy.removeExpiration(new BlockHeight(123), Utils.createMosaicId(222));
+		copy.removeExpiration(new BlockHeight(123), Utils.createMosaicId(333));
 
 		// Assert: the expirations should be removed from only the copy but not the original
 		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(123)).size(), IsEqual.equalTo(2));
@@ -302,7 +352,8 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		// Act: remove expirations
 		final T copy = cache.deepCopy();
 		final T copyMutable = copy.copy();
-		copyMutable.removeAll(new BlockHeight(123));
+		copyMutable.removeExpiration(new BlockHeight(123), Utils.createMosaicId(222));
+		copyMutable.removeExpiration(new BlockHeight(123), Utils.createMosaicId(333));
 		copyMutable.commit();
 
 		// Assert: the expirations should be removed from only the copy but not the original

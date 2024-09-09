@@ -52,8 +52,15 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 	}
 
 	@Override
-	public void removeAll(final BlockHeight height) {
-		this.map.remove(height);
+	public void removeExpiration(final BlockHeight height, final MosaicId mosaicId) {
+		final ExpiredMosaicBlockGroup group = this.map.getOrDefault(height, null);
+		if (null != group) {
+			group.removeExpiredMosaic(mosaicId);
+
+			if (0 == group.expiredMosaicsCount()) {
+				this.map.remove(height);
+			}
+		}
 	}
 
 	// region DeepCopyableCache
@@ -106,6 +113,10 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 
 		public void addExpiredMosaic(final ExpiredMosaicEntry entry) {
 			this.expiredMosaicEntries.add(entry);
+		}
+
+		public void removeExpiredMosaic(final MosaicId mosaicId) {
+			this.expiredMosaicEntries.removeIf(entry -> entry.getMosaicId().equals(mosaicId));
 		}
 
 		@Override
