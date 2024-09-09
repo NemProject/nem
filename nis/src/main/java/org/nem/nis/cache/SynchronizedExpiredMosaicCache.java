@@ -51,9 +51,9 @@ public class SynchronizedExpiredMosaicCache implements ExpiredMosaicCache, DeepC
 	}
 
 	@Override
-	public void removeAll(final BlockHeight height) {
+	public void removeExpiration(final BlockHeight height, final MosaicId mosaicId) {
 		synchronized (this.lock) {
-			this.cache.removeAll(height);
+			this.cache.removeExpiration(height, mosaicId);
 		}
 	}
 
