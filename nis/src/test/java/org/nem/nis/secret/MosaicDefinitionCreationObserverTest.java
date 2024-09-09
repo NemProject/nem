@@ -12,7 +12,7 @@ import org.nem.core.test.Utils;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.MosaicEntry;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.Arrays;
@@ -70,8 +70,9 @@ public class MosaicDefinitionCreationObserverTest {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(0L));
 
 		// Assert: since the supply is 0 the balances are empty
-		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0));
-		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0));
+		// [notice this should be prevented by validator unless owner owns whole supply]
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0, 1));
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0, 0));
 	}
 
 	@Test
@@ -79,9 +80,11 @@ public class MosaicDefinitionCreationObserverTest {
 		// Arrange:
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
 				Utils.createMosaicLevy());
+
 		// Assert:
-		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
-		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
+		// [notice this should be prevented by validator unless owner owns whole supply]
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1, 1));
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1, 0));
 	}
 
 	@Test
@@ -91,7 +94,7 @@ public class MosaicDefinitionCreationObserverTest {
 				new MosaicDescriptor("This is a new description"));
 
 		// Assert:
-		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1, 1));
 	}
 
 	@Test
@@ -101,11 +104,11 @@ public class MosaicDefinitionCreationObserverTest {
 				new MosaicDescriptor("This is a new description"));
 
 		// Assert:
-		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 15L, 2));
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 15L, 2, 0));
 	}
 
 	private void assertMosaicRedefinitionBehavior(final MosaicDefinition mosaicDefinition, final long height, final long expectedSupply,
-			final int expectedBalancesSize) {
+			final int expectedBalancesSize, final int expectedExpiredMosaicCacheSize) {
 		// Arrange: initial supply is 5
 		final TestContext context = new TestContext();
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
@@ -121,12 +124,56 @@ public class MosaicDefinitionCreationObserverTest {
 
 		// Assert:
 		assertMosaicEntry(context, expectedSupply, expectedBalancesSize);
+
+		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(expectedExpiredMosaicCacheSize));
 	}
 
 	private static void assertMosaicEntry(final TestContext context, final Long supply, final int numBalances) {
 		MosaicEntry entry = context.getMosaicEntry();
 		MatcherAssert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(supply)));
 		MatcherAssert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numBalances));
+	}
+
+	@Test
+	public void notifyUndoRemovesExpirationsBeforeFork() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
+				new MosaicDescriptor("This is a new description"));
+
+		// Assert: before fork removeExpiration should be called
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionUndoBehavior(mosaicDefinition, height, 0));
+	}
+
+	@Test
+	public void notifyUndoDoesNotRemoveExpirationsAfterFork() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(5L),
+				new MosaicDescriptor("This is a new description"));
+
+		// Assert: at and after fork removeExpiration should NOT be called
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionUndoBehavior(mosaicDefinition, height, 1));
+	}
+
+	private void assertMosaicRedefinitionUndoBehavior(final MosaicDefinition mosaicDefinition, final long height, final int expectedExpiredMosaicCacheSize) {
+		// Arrange: initial supply is 5
+		final TestContext context = new TestContext();
+		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
+		final Address address = Utils.generateRandomAddress();
+		context.increaseSupply(10L);
+		context.incrementBalance(address, 8L);
+
+		context.expiredMosaicCache.addExpiration(new BlockHeight(height), mosaicDefinition.getId(), new MosaicBalances(), ExpiredMosaicType.Expired);
+
+		// Sanity:
+		assertMosaicEntry(context, 15L, 2);
+		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(1));
+
+		// Act:
+		this.notifyMosaicDefinitionCreation(context, mosaicDefinition, height, NotificationTrigger.Undo);
+
+		// Assert:
+		MatcherAssert.assertThat(context.getMosaicEntry(), IsEqual.equalTo(null));
+		MatcherAssert.assertThat(context.expiredMosaicCache.size(), IsEqual.equalTo(expectedExpiredMosaicCacheSize));
 	}
 
 	// endregion
@@ -171,6 +218,7 @@ public class MosaicDefinitionCreationObserverTest {
 				Utils.createMosaicPropertiesWithInitialSupply(5L));
 		final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight()).copy();
+		private final ExpiredMosaicCache expiredMosaicCache = new DefaultExpiredMosaicCache().copy();
 
 		public TestContext() {
 			this.namespaceCache.add(
@@ -203,7 +251,7 @@ public class MosaicDefinitionCreationObserverTest {
 		}
 
 		public MosaicDefinitionCreationObserver createObserver() {
-			return new MosaicDefinitionCreationObserver(this.namespaceCache);
+			return new MosaicDefinitionCreationObserver(this.namespaceCache, this.expiredMosaicCache, this.forkConfiguration.getMosaicRedefinitionForkHeight());
 		}
 	}
 }
