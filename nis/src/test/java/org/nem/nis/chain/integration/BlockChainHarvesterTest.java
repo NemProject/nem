@@ -323,8 +323,9 @@ public class BlockChainHarvesterTest {
 				RemoteLink.Owner.HarvestingRemotely);
 		final RemoteLink remoteLink1b = new RemoteLink(remoteAccount.getAddress(), context.getInitialBlockHeight(),
 				ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely);
-		final RemoteLink remoteLink1c = new RemoteLink(remoteAccount.getAddress(), new BlockHeight(context.getInitialBlockHeight().getRaw() + 100),
-				ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink remoteLink1c = new RemoteLink(remoteAccount.getAddress(),
+				new BlockHeight(context.getInitialBlockHeight().getRaw() + 100), ImportanceTransferMode.Activate,
+				RemoteLink.Owner.HarvestingRemotely);
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getRemoteLinks().addLink(remoteLink1a);
 		accountState.getRemoteLinks().addLink(remoteLink1b);
@@ -334,8 +335,9 @@ public class BlockChainHarvesterTest {
 				RemoteLink.Owner.RemoteHarvester);
 		final RemoteLink remoteLink2b = new RemoteLink(account.getAddress(), context.getInitialBlockHeight(),
 				ImportanceTransferMode.Deactivate, RemoteLink.Owner.RemoteHarvester);
-		final RemoteLink remoteLink2c = new RemoteLink(account.getAddress(), new BlockHeight(context.getInitialBlockHeight().getRaw() + 100),
-				ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink remoteLink2c = new RemoteLink(account.getAddress(),
+				new BlockHeight(context.getInitialBlockHeight().getRaw() + 100), ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
 		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2a);
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2b);

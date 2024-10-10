@@ -26,7 +26,7 @@ public class BasicNodeSelectorITCase {
 		// Arrange:
 		LOGGER.info(String.format("Generating test context with %d nodes...", NUM_NODES));
 		final ColumnVector trustVector = new ColumnVector(NUM_NODES);
-		trustVector.setAll(1.0 / (double)NUM_NODES);
+		trustVector.setAll(1.0 / (double) NUM_NODES);
 		final TestContext context = new TestContext(trustVector);
 
 		// Act:
@@ -39,7 +39,7 @@ public class BasicNodeSelectorITCase {
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)(NUM_TRIES * NUM_NODES_SELECTED) / (double)NUM_NODES;
+		final double expectedValue = (double) (NUM_TRIES * NUM_NODES_SELECTED) / (double) NUM_NODES;
 		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
@@ -55,13 +55,13 @@ public class BasicNodeSelectorITCase {
 		LOGGER.info(String.format("Selecting (%d) random values ...", NUM_TRIES));
 		final long[] observed = new long[NUM_NODES];
 		for (int i = 0; i < NUM_TRIES; ++i) {
-			final int value = (int)(random.nextDouble() * NUM_NODES);
+			final int value = (int) (random.nextDouble() * NUM_NODES);
 			++observed[value];
 		}
 
 		// Assuming a discrete uniform distribution
 		LOGGER.info("Calculating chiSquare...");
-		final double expectedValue = (double)NUM_TRIES / (double)NUM_NODES;
+		final double expectedValue = (double) NUM_TRIES / (double) NUM_NODES;
 		final double chiSquare = calculateChiSquare(observed, expectedValue);
 
 		// Assert:
@@ -87,8 +87,12 @@ public class BasicNodeSelectorITCase {
 
 	private static void assertRandomness(final double chiSquare) {
 		double probability = 0;
-		final double[] chiSquareTable = { 61.98, 67.33, 70.06, 77.93, 82.36, 90.13, 99.33, 109.14, 118.50, 124.34, 129.56, 135.81, 140.17, 149.45 };
-		final double[] oneMinusAlpha = { 0.001, 0.005, 0.01, 0.05, 0.100, 0.250, 0.500, 0.750, 0.900, 0.950, 0.975, 0.990, 0.995, 0.999 };
+		final double[] chiSquareTable = {
+				61.98, 67.33, 70.06, 77.93, 82.36, 90.13, 99.33, 109.14, 118.50, 124.34, 129.56, 135.81, 140.17, 149.45
+		};
+		final double[] oneMinusAlpha = {
+				0.001, 0.005, 0.01, 0.05, 0.100, 0.250, 0.500, 0.750, 0.900, 0.950, 0.975, 0.990, 0.995, 0.999
+		};
 		for (int i = chiSquareTable.length - 1; i >= 0; i--) {
 			if (chiSquare > chiSquareTable[i]) {
 				probability = oneMinusAlpha[i] * 100;
@@ -98,7 +102,8 @@ public class BasicNodeSelectorITCase {
 		}
 
 		if (0 == probability) {
-			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0] * 100) + "% certainty.");
+			LOGGER.info("Hypothesis of randomness of node selection can be rejected with less than " + (oneMinusAlpha[0] * 100)
+					+ "% certainty.");
 		}
 
 		MatcherAssert.assertThat(probability <= 75.0, IsEqual.equalTo(true));

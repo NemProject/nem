@@ -216,7 +216,8 @@ public class AccountInfoMosaicIdsObserverTest {
 		private BlockTransactionObserver createObserver() {
 			// note that this observer is dependent on MosaicDefinitionCreationObserver and MosaicTransferObserver
 			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-			builder.add(new MosaicDefinitionCreationObserver(this.namespaceCache, this.expiredMosaicCache, this.forkConfiguration.getMosaicRedefinitionForkHeight()));
+			builder.add(new MosaicDefinitionCreationObserver(this.namespaceCache, this.expiredMosaicCache,
+					this.forkConfiguration.getMosaicRedefinitionForkHeight()));
 			builder.add(new MosaicTransferObserver(this.namespaceCache));
 			builder.add(new AccountInfoMosaicIdsObserver(this.namespaceCache, this.accountStateCache));
 			return builder.build();

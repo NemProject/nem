@@ -9,7 +9,11 @@ import java.util.*;
 /**
  * A synchronized ExpiredMosaicCache implementation.
  */
-public class SynchronizedExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyableCache<SynchronizedExpiredMosaicCache>, CommittableCache {
+public class SynchronizedExpiredMosaicCache
+		implements
+			ExpiredMosaicCache,
+			DeepCopyableCache<SynchronizedExpiredMosaicCache>,
+			CommittableCache {
 	private final DefaultExpiredMosaicCache cache;
 	private final Object lock = new Object();
 
@@ -44,7 +48,8 @@ public class SynchronizedExpiredMosaicCache implements ExpiredMosaicCache, DeepC
 	}
 
 	@Override
-	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances, final ExpiredMosaicType expirationType) {
+	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances,
+			final ExpiredMosaicType expirationType) {
 		synchronized (this.lock) {
 			this.cache.addExpiration(height, mosaicId, balances, expirationType);
 		}

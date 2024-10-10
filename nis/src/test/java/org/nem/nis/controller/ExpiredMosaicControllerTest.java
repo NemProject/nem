@@ -73,13 +73,14 @@ public class ExpiredMosaicControllerTest {
 		final MosaicId mosaicId1 = deserializeMosaicId(jsonObject1);
 		final MosaicId mosaicId2 = deserializeMosaicId(jsonObject2);
 
-		MatcherAssert.assertThat(
-			Arrays.asList(mosaicId1, mosaicId2),
-			IsEquivalent.equivalentTo(Arrays.asList(Utils.createMosaicId(222), Utils.createMosaicId(333))));
+		MatcherAssert.assertThat(Arrays.asList(mosaicId1, mosaicId2),
+				IsEquivalent.equivalentTo(Arrays.asList(Utils.createMosaicId(222), Utils.createMosaicId(333))));
 
 		// - ensure balanceMap1 => mosaicId 222 and balanceMap2 => mosaicId 333
-		final Map<Address, Quantity> balanceMap1 = this.deserializeBalanceMap(mosaicId1.equals(Utils.createMosaicId(222)) ? jsonObject1 : jsonObject2);
-		final Map<Address, Quantity> balanceMap2 = this.deserializeBalanceMap(mosaicId1.equals(Utils.createMosaicId(222)) ? jsonObject2 : jsonObject1);
+		final Map<Address, Quantity> balanceMap1 = this
+				.deserializeBalanceMap(mosaicId1.equals(Utils.createMosaicId(222)) ? jsonObject1 : jsonObject2);
+		final Map<Address, Quantity> balanceMap2 = this
+				.deserializeBalanceMap(mosaicId1.equals(Utils.createMosaicId(222)) ? jsonObject2 : jsonObject1);
 
 		MatcherAssert.assertThat(balanceMap1.keySet(), IsEquivalent.equivalentTo(Arrays.asList(address1, address2)));
 		MatcherAssert.assertThat(balanceMap1.get(address1), IsEqual.equalTo(new Quantity(20000)));
@@ -89,29 +90,22 @@ public class ExpiredMosaicControllerTest {
 		MatcherAssert.assertThat(balanceMap2.get(address1), IsEqual.equalTo(new Quantity(30000)));
 
 		// - check expired mosaic types (1 - expired, 2 - restored)
-		MatcherAssert.assertThat(
-			(Integer) jsonObject1.get("expiredMosaicType"),
-			IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 1 : 2));
-		MatcherAssert.assertThat(
-			(Integer) jsonObject2.get("expiredMosaicType"),
-			IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 2 : 1));
+		MatcherAssert.assertThat((Integer) jsonObject1.get("expiredMosaicType"),
+				IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 1 : 2));
+		MatcherAssert.assertThat((Integer) jsonObject2.get("expiredMosaicType"),
+				IsEqual.equalTo(mosaicId1.equals(Utils.createMosaicId(222)) ? 2 : 1));
 	}
 
 	private MosaicId deserializeMosaicId(final JSONObject jsonObject) {
-		return new MosaicId(
-			new NamespaceId((String) ((JSONObject) jsonObject.get("mosaicId")).get("namespaceId")),
-			(String) ((JSONObject) jsonObject.get("mosaicId")).get("name")
-		);
+		return new MosaicId(new NamespaceId((String) ((JSONObject) jsonObject.get("mosaicId")).get("namespaceId")),
+				(String) ((JSONObject) jsonObject.get("mosaicId")).get("name"));
 	}
 
 	private Map<Address, Quantity> deserializeBalanceMap(final JSONObject jsonObject) {
 		JSONArray jsonBalances = (JSONArray) jsonObject.get("balances");
-		return jsonBalances.stream()
-				.map(obj -> (JSONObject) obj)
-				.collect(Collectors.toMap(
-					jsonBalance -> Address.fromEncoded((String) jsonBalance.get("address")),
-					jsonBalance -> new Quantity((Long) jsonBalance.get("quantity"))
-			));
+		return jsonBalances.stream().map(obj -> (JSONObject) obj)
+				.collect(Collectors.toMap(jsonBalance -> Address.fromEncoded((String) jsonBalance.get("address")),
+						jsonBalance -> new Quantity((Long) jsonBalance.get("quantity"))));
 	}
 
 	private static class TestContext {

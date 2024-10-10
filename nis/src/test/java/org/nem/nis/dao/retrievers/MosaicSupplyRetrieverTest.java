@@ -67,7 +67,8 @@ public class MosaicSupplyRetrieverTest {
 		Utils.resetGlobals();
 	}
 
-	private Transaction createCreationTransaction(final Account account, final String namespaceId, final String name, final String description, final Long supply) {
+	private Transaction createCreationTransaction(final Account account, final String namespaceId, final String name,
+			final String description, final Long supply) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, name);
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(account, mosaicId, new MosaicDescriptor(description),
 				Utils.createMosaicPropertiesWithInitialSupply(supply), null);
@@ -77,16 +78,18 @@ public class MosaicSupplyRetrieverTest {
 		return transaction;
 	}
 
-	private Transaction createSupplyChangeTransaction(final Account account, final String namespaceId, final String name, final MosaicSupplyType supplyType, final Long supply) {
+	private Transaction createSupplyChangeTransaction(final Account account, final String namespaceId, final String name,
+			final MosaicSupplyType supplyType, final Long supply) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, name);
-		final Transaction transaction = new MosaicSupplyChangeTransaction(new TimeInstant(1), account, mosaicId, supplyType, Supply.fromValue(supply));
+		final Transaction transaction = new MosaicSupplyChangeTransaction(new TimeInstant(1), account, mosaicId, supplyType,
+				Supply.fromValue(supply));
 		transaction.sign();
 		return transaction;
 	}
 
 	private Transaction createNamespaceTransaction(final Account account, final String namespaceId, final String parentNamespaceId) {
 		final Transaction transaction = new ProvisionNamespaceTransaction(new TimeInstant(1), account, new NamespaceIdPart(namespaceId),
-			null == parentNamespaceId ? null : new NamespaceId(parentNamespaceId));
+				null == parentNamespaceId ? null : new NamespaceId(parentNamespaceId));
 		transaction.sign();
 		return transaction;
 	}
@@ -115,9 +118,9 @@ public class MosaicSupplyRetrieverTest {
 		this.saveDbBlock(6L, this.createNamespaceTransaction(signer, "fox", null));
 		this.saveDbBlock(8L, this.createNamespaceTransaction(signer, "fox", "kit"));
 
-		this.saveDbBlock(10L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool fox tokens", 1000L)); // supply change (create)
+		this.saveDbBlock(10L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool", 1000L)); // supply change (create)
 
-		this.saveDbBlock(20L, this.createCreationTransaction(signer, "fox.kit", "nuggets", "nice fox tokens", 2000L)); // other token
+		this.saveDbBlock(20L, this.createCreationTransaction(signer, "fox.kit", "nuggets", "nice", 2000L)); // other token
 		this.saveDbBlock(25L, this.createSupplyChangeTransaction(signer, "fox.kit", "nuggets", MosaicSupplyType.Create, 100L));
 
 		this.saveDbBlock(26L, this.createNamespaceTransaction(signer, "fox", null)); // lifetime extended (within 30 blocks of previous)
@@ -129,25 +132,25 @@ public class MosaicSupplyRetrieverTest {
 		// supply transactions are not allowed in same blocks as respective creation transactions
 		// (last creation transaction in block is effective)
 		final List<Transaction> block37Transactions = new ArrayList<>();
-		block37Transactions.add(this.createCreationTransaction(signer, "fox.kit", "tokens", "cool fox tokens", 6000L)); // supply change (reset)
-		block37Transactions.add(this.createCreationTransaction(signer, "fox.kit", "tokens", "cool fox tokens", 7000L)); // supply change (reset)
+		block37Transactions.add(this.createCreationTransaction(signer, "fox.kit", "tokens", "cool", 6000L)); // supply change (reset)
+		block37Transactions.add(this.createCreationTransaction(signer, "fox.kit", "tokens", "cool", 7000L)); // supply change (reset)
 		this.saveDbBlock(37L, block37Transactions);
 
-		this.saveDbBlock(40L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool fox tokens", 4000L)); // supply change (reset)
+		this.saveDbBlock(40L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool", 4000L)); // supply change (reset)
 		this.saveDbBlock(45L, this.createSupplyChangeTransaction(signer, "fox.kit", "tokens", MosaicSupplyType.Create, 900L));
-		this.saveDbBlock(50L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool fox tokens", 5000L)); // supply change (reset)
+		this.saveDbBlock(50L, this.createCreationTransaction(signer, "fox.kit", "tokens", "cool", 5000L)); // supply change (reset)
 
 		this.saveDbBlock(52L, this.createNamespaceTransaction(signer, "fox", null)); // lifetime extended (within 30 blocks of previous)
 		this.saveDbBlock(54L, this.createNamespaceTransaction(signer, "fox", "kit"));
 
 		this.saveDbBlock(55L, this.createSupplyChangeTransaction(signer, "fox.kit", "tokens", MosaicSupplyType.Create, 800L));
-		this.saveDbBlock(60L, this.createCreationTransaction(signer, "fox.kit", "tokens", "coolest fox tokens", 5000L)); // description only change (reuse)
+		this.saveDbBlock(60L, this.createCreationTransaction(signer, "fox.kit", "tokens", "coolest", 5000L)); // desc only change (reuse)
 		this.saveDbBlock(65L, this.createSupplyChangeTransaction(signer, "fox.kit", "tokens", MosaicSupplyType.Delete, 700L));
 
 		this.saveDbBlock(140L, this.createNamespaceTransaction(signer, "fox", null)); // lifetime reset (outside 30 blocks of previous)
 		this.saveDbBlock(145L, this.createNamespaceTransaction(signer, "fox", "kit"));
 
-		this.saveDbBlock(150L, this.createCreationTransaction(signer, "fox.kit", "tokens", "coolest fox tokens", 8000L)); // supply change (reset)
+		this.saveDbBlock(150L, this.createCreationTransaction(signer, "fox.kit", "tokens", "coolest", 8000L)); // supply change (reset)
 		this.saveDbBlock(151L, this.createSupplyChangeTransaction(signer, "fox.kit", "tokens", MosaicSupplyType.Create, 700L));
 		this.saveDbBlock(152L, this.createSupplyChangeTransaction(signer, "fox.kit", "tokens", MosaicSupplyType.Delete, 500L));
 
@@ -161,18 +164,18 @@ public class MosaicSupplyRetrieverTest {
 
 	private Long getInitialBalancePropertyValue(final DbMosaicDefinition mosaicDefinition) {
 		final DbMosaicProperty mosaicProperty = mosaicDefinition.getProperties().stream()
-				.filter(property -> property.getName() == "initialSupply")
-				.findFirst()
-				.get();
+				.filter(property -> property.getName() == "initialSupply").findFirst().get();
 		return Long.parseLong(mosaicProperty.getValue(), 10);
 	}
 
-	void assertFoxTokensSupplyAt(final Long height, final Long expectedInitialSupply, final Long expectedSupply, final Long expectedExpirationHeight) {
+	void assertFoxTokensSupplyAt(final Long height, final Long expectedInitialSupply, final Long expectedSupply,
+			final Long expectedExpirationHeight) {
 		// Arrange:
 		final MosaicSupplyRetriever retriever = new MosaicSupplyRetriever(30);
 
 		// Act:
-		final DbMosaicDefinitionSupplyTuple tuple = retriever.getMosaicDefinitionWithSupply(this.session, Utils.createMosaicId("fox.kit", "tokens"), height);
+		final DbMosaicDefinitionSupplyTuple tuple = retriever.getMosaicDefinitionWithSupply(this.session,
+				Utils.createMosaicId("fox.kit", "tokens"), height);
 
 		// Assert:
 		MatcherAssert.assertThat(tuple, IsNot.not(IsEqual.equalTo(null)));
@@ -187,7 +190,8 @@ public class MosaicSupplyRetrieverTest {
 		final MosaicSupplyRetriever retriever = new MosaicSupplyRetriever(30);
 
 		// Act:
-		final DbMosaicDefinitionSupplyTuple tuple = retriever.getMosaicDefinitionWithSupply(this.session, Utils.createMosaicId("fox.kit", "tokens"), 9L);
+		final DbMosaicDefinitionSupplyTuple tuple = retriever.getMosaicDefinitionWithSupply(this.session,
+				Utils.createMosaicId("fox.kit", "tokens"), 9L);
 
 		// Assert:
 		MatcherAssert.assertThat(tuple, IsEqual.equalTo(null));

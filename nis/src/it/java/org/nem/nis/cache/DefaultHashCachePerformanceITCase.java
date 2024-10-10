@@ -170,7 +170,8 @@ public class DefaultHashCachePerformanceITCase {
 		private List<HashMetaDataPair> createPairs(final int count) {
 			final List<HashMetaDataPair> pairs = new ArrayList<>();
 			for (int i = 0; i < count; i++) {
-				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(BlockHeight.ONE, Utils.generateRandomTimeStamp())));
+				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(),
+						new HashMetaData(BlockHeight.ONE, Utils.generateRandomTimeStamp())));
 			}
 
 			return pairs;

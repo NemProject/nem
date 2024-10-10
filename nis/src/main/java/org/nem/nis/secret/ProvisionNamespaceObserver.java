@@ -66,8 +66,8 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 				final ReadOnlyMosaicEntry mosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, mosaicId);
 				final ReadOnlyMosaicBalances mosaicBalances = mosaicEntry.getBalances();
 
-				mosaicBalances.getOwners().forEach(owner ->
-					this.accountStateCache.findStateByAddress(owner).getAccountInfo().addMosaicId(mosaicId));
+				mosaicBalances.getOwners()
+						.forEach(owner -> this.accountStateCache.findStateByAddress(owner).getAccountInfo().addMosaicId(mosaicId));
 
 				if (!isActive) {
 					this.expiredMosaicCache.addExpiration(height, mosaicId, mosaicBalances, ExpiredMosaicType.Restored);

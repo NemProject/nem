@@ -46,7 +46,8 @@ public class TransferControllerITCase {
 
 		// Assert:
 		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(404));
-		MatcherAssert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address 'BAD RECIPIENT' (org.nem.core.model.Address)"));
+		MatcherAssert.assertThat(result.getError().getMessage(),
+				IsEqual.equalTo("invalid address 'BAD RECIPIENT' (org.nem.core.model.Address)"));
 	}
 
 	@Test
@@ -100,8 +101,7 @@ public class TransferControllerITCase {
 
 		// Assert:
 		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		MatcherAssert.assertThat(
-				result.getError().getMessage(),
+		MatcherAssert.assertThat(result.getError().getMessage(),
 				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character G at index 11"));
 	}
 
@@ -118,8 +118,7 @@ public class TransferControllerITCase {
 
 		// Assert:
 		MatcherAssert.assertThat(result.getStatus(), IsEqual.equalTo(400));
-		MatcherAssert.assertThat(
-				result.getError().getMessage(),
+		MatcherAssert.assertThat(result.getError().getMessage(),
 				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character   at index 3"));
 	}
 

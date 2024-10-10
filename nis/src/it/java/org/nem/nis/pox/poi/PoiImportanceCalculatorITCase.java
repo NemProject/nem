@@ -18,16 +18,17 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * If someone can manipulate their importance so that they can often or at-will
- * be chosen to harvest, then things like double-spend attacks become possible.
- * Thus the tests considered here focus on verifying that a user cannot
- * arbitrarily manipulate their importance to cause them to be chosen to harvest.
- * <br>
+ * If someone can manipulate their importance so that they can often or at-will be chosen to harvest, then things like double-spend attacks
+ * become possible. Thus the tests considered here focus on verifying that a user cannot arbitrarily manipulate their importance to cause
+ * them to be chosen to harvest. <br>
  * Some tests we consider:
+ *
+ * <pre>
  * - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
  * boost score)
  * - infinite loop attack (sending XEM around in a loop to boost their score)
+ * </pre>
  */
 public class PoiImportanceCalculatorITCase {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorITCase.class.getName());
@@ -54,16 +55,17 @@ public class PoiImportanceCalculatorITCase {
 	private static final long TOTAL_OUTLINK_40M = TOTAL_OUTLINK_400K * 100;
 
 	/**
-	 * Four nodes (A, B, C, D) are owned by one person with 400000 NEM who
-	 * distributed the NEM
-	 * between the nodes and cycled the NEM around. The other three nodes are
-	 * independent and have 400000 NEM each.
+	 * Four nodes (A, B, C, D) are owned by one person with 400000 NEM who distributed the NEM between the nodes and cycled the NEM around.
+	 * The other three nodes are independent and have 400000 NEM each.
+	 *
+	 * <pre>
 	 * The following transactions occur (transaction fees are assumed to be 0):
 	 * A, E, F, G all start with 400000 NEM; ABCD are all controlled by actor A.
 	 * A sends all 400 NEM to B, who sends 300000 NEM to C, who sends 200000 NEM to D,
 	 * who sends 100000 to A.
 	 * E starts with 400000 NEM and sends 100000 to G.
 	 * G starts with 400000 NEM, gets 100000 from E, and sends 100000 to F.
+	 * </pre>
 	 */
 	@Test
 	public void fourNodeSimpleLoopAttack() {
@@ -83,10 +85,10 @@ public class PoiImportanceCalculatorITCase {
 		// A sends all 400000 NEM to B,
 		this.addVestedOutlink(a, b, blockHeight, 400000);
 
-		//who sends 300000 NEM to C,
+		// who sends 300000 NEM to C,
 		this.addVestedOutlink(b, c, blockHeight, 300000);
 
-		//who sends 200000 NEM to D,
+		// who sends 200000 NEM to D,
 		this.addVestedOutlink(c, d, blockHeight, 200000);
 
 		// who sends 100000 to A.
@@ -207,9 +209,10 @@ public class PoiImportanceCalculatorITCase {
 		// Note that this test fails for the following reason:
 		// 1) each of the accounts has the same page rank of 0.1 (which is multiplied by 0.1337 to give 0.01337)
 		// 2) without the huge account the outlink weight is dominating the importance and thus there is no big difference
-		//    when splitting 1 account into 8 small accounts. But when the huge account is present the first account's outlink weight
-		//    drops to only 0.01 which is about the same size as the page rank.
-		// So in the latter case the overall importance for the first account is only about twice the importance of each of the 8 small accounts.
+		// when splitting 1 account into 8 small accounts. But when the huge account is present the first account's outlink weight
+		// drops to only 0.01 which is about the same size as the page rank.
+		// So in the latter case the overall importance for the first account is only about twice the importance of each of the 8 small
+		// accounts.
 		// This could only be "fixed" by giving the page rank a lower weight which is not wanted.
 		// The users are allowed to game the importance calculation up to a certain degree (limited by 13.37% influence of the page rank)
 		final List<AccountState> accounts = new ArrayList<>();
@@ -232,7 +235,8 @@ public class PoiImportanceCalculatorITCase {
 		}
 
 		// Assert
-		LOGGER.info(String.format("The ratio changed from %.03f (without huge account) to %.03f (with huge account).", ratios[0], ratios[1]));
+		LOGGER.info(
+				String.format("The ratio changed from %.03f (without huge account) to %.03f (with huge account).", ratios[0], ratios[1]));
 		Assert.assertTrue(ratios[0] > 0.75);
 		Assert.assertTrue(ratios[1] < 0.25);
 	}
@@ -415,12 +419,12 @@ public class PoiImportanceCalculatorITCase {
 
 		// Assert
 		// > context setup needs 646ms
-		//   - AccountProcessor ctor needs 127ms
-		//   - setup vested balance vector needs 24ms
-		//   - add reverse links to allow net calculation needed 95ms
-		//   - update the matrix with all net outflows needed 281ms
-		//   - removeLessThan and normalizeColumns needed 12ms
-		//   - buildInterLevelProximityMatrix needed 107ms
+		// - - AccountProcessor ctor needs 127ms
+		// - - setup vested balance vector needs 24ms
+		// - - add reverse links to allow net calculation needed 95ms
+		// - - update the matrix with all net outflows needed 281ms
+		// - - removeLessThan and normalizeColumns needed 12ms
+		// - - buildInterLevelProximityMatrix needed 107ms
 		// > clustering needs about 110ms.
 		// > POI iterator needs 30ms.
 		// So the context setup is the most expensive step.
@@ -459,8 +463,7 @@ public class PoiImportanceCalculatorITCase {
 
 			if (prevTimeDiff > 0) {
 				final double ratio = prevTimeDiff * 2. / currTimeDiff;
-				LOGGER.info("Prev time: " + prevTimeDiff
-						+ "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
+				LOGGER.info("Prev time: " + prevTimeDiff + "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
 
 				Assert.assertTrue(ratio > 0.75);
 				Assert.assertTrue(currTimeDiff / 1000. < 1000);
@@ -522,24 +525,21 @@ public class PoiImportanceCalculatorITCase {
 		}
 	}
 
-	private List<AccountState> createUserAccounts(
-			final long blockHeight,
-			final int numAccounts,
-			final long totalVestedBalance,
-			final int numOutlinksPerAccount,
-			final long totalOutlinkStrength,
-			final int outlinkStrategy) {
+	private List<AccountState> createUserAccounts(final long blockHeight, final int numAccounts, final long totalVestedBalance,
+			final int numOutlinksPerAccount, final long totalOutlinkStrength, final int outlinkStrategy) {
 		final List<AccountState> accounts = new ArrayList<>();
 
 		for (int i = 0; i < numAccounts; ++i) {
 			if (outlinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
 				if (0 == i) {
-					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
+					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight,
+							totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
 				} else {
 					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, 1));
 				}
 			} else {
-				accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, (totalVestedBalance - totalOutlinkStrength) / numAccounts));
+				accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight,
+						(totalVestedBalance - totalOutlinkStrength) / numAccounts));
 			}
 		}
 
@@ -567,8 +567,8 @@ public class PoiImportanceCalculatorITCase {
 				}
 
 				final Amount vested = account.getWeightedBalances().getVested(new BlockHeight(blockHeight));
-				final long outlinkStrength =
-						(vested.getNumNem() * totalOutlinkStrength) / ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
+				final long outlinkStrength = (vested.getNumNem() * totalOutlinkStrength)
+						/ ((totalVestedBalance - totalOutlinkStrength) * numOutlinksPerAccount);
 				this.addOutlink(account, otherAccount, BlockHeight.ONE, outlinkStrength);
 			}
 		}
@@ -590,13 +590,10 @@ public class PoiImportanceCalculatorITCase {
 		return state;
 	}
 
-	private static ColumnVector getAccountImportances(
-			final BlockHeight blockHeight,
-			final Collection<AccountState> accounts) {
+	private static ColumnVector getAccountImportances(final BlockHeight blockHeight, final Collection<AccountState> accounts) {
 		final ImportanceCalculator importanceCalculator = NisUtils.createImportanceCalculator();
 		importanceCalculator.recalculate(blockHeight, accounts);
-		final List<Double> importances = accounts.stream()
-				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
+		final List<Double> importances = accounts.stream().map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());
 
 		final ColumnVector importancesVector = new ColumnVector(importances.size());
@@ -607,17 +604,10 @@ public class PoiImportanceCalculatorITCase {
 		return importancesVector;
 	}
 
-	private static void outputComparison(
-			final String title,
-			final double importance1,
-			final double importance2) {
+	private static void outputComparison(final String title, final double importance1, final double importance2) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		final String message = String.format(
-				"%s: User1 importance is %s, User2 importance is %s, ratio is %s",
-				title,
-				format.format(importance1),
-				format.format(importance2),
-				format.format(importance1 / importance2));
+		final String message = String.format("%s: User1 importance is %s, User2 importance is %s, ratio is %s", title,
+				format.format(importance1), format.format(importance2), format.format(importance1 / importance2));
 		LOGGER.info(message);
 	}
 }

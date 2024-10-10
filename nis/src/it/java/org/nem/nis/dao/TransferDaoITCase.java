@@ -32,10 +32,7 @@ public class TransferDaoITCase {
 	private void getTransactionsForAccountSpeedTest(final int numRounds) {
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < numRounds; i++) {
-			this.transferDao.getTransactionsForAccountUsingId(
-					this.database.getRandomAccount(),
-					null,
-					ReadOnlyTransferDao.TransferType.ALL,
+			this.transferDao.getTransactionsForAccountUsingId(this.database.getRandomAccount(), null, ReadOnlyTransferDao.TransferType.ALL,
 					25);
 		}
 

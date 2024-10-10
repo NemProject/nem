@@ -19,10 +19,8 @@ public class ExpiredMosaicViewModelTest {
 	@Test
 	public void canSerializeWithoutBalances() {
 		// Arrange:
-		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(new ExpiredMosaicEntry(
-			new MosaicId(new NamespaceId("alice"), "tokens"),
-			new MosaicBalances(),
-			ExpiredMosaicType.Restored));
+		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(
+				new ExpiredMosaicEntry(new MosaicId(new NamespaceId("alice"), "tokens"), new MosaicBalances(), ExpiredMosaicType.Restored));
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
@@ -47,10 +45,8 @@ public class ExpiredMosaicViewModelTest {
 		balances.incrementBalance(address2, new Quantity(333));
 		balances.incrementBalance(address3, new Quantity(222));
 
-		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(new ExpiredMosaicEntry(
-			new MosaicId(new NamespaceId("alice"), "tokens"),
-			balances,
-			ExpiredMosaicType.Expired));
+		final ExpiredMosaicViewModel viewModel = new ExpiredMosaicViewModel(
+				new ExpiredMosaicEntry(new MosaicId(new NamespaceId("alice"), "tokens"), balances, ExpiredMosaicType.Expired));
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
@@ -71,12 +67,9 @@ public class ExpiredMosaicViewModelTest {
 		});
 
 		// - balances array is unordered, so read it into a map for further inspection
-		final Map<Address, Quantity> balanceMap = jsonBalances.stream()
-				.map(obj -> (JSONObject) obj)
-				.collect(Collectors.toMap(
-					jsonBalance -> Address.fromEncoded((String) jsonBalance.get("address")),
-					jsonBalance -> new Quantity((Long) jsonBalance.get("quantity"))
-			));
+		final Map<Address, Quantity> balanceMap = jsonBalances.stream().map(obj -> (JSONObject) obj)
+				.collect(Collectors.toMap(jsonBalance -> Address.fromEncoded((String) jsonBalance.get("address")),
+						jsonBalance -> new Quantity((Long) jsonBalance.get("quantity"))));
 
 		MatcherAssert.assertThat(balanceMap.keySet(), IsEquivalent.equivalentTo(Arrays.asList(address1, address2, address3)));
 		MatcherAssert.assertThat(balanceMap.get(address1), IsEqual.equalTo(new Quantity(111)));

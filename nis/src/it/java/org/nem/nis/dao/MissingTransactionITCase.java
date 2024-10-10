@@ -34,18 +34,13 @@ public class MissingTransactionITCase {
 		this.assertNoTransactionIsMissing(4984, 5400, 1, 250_000);
 	}
 
-	private void assertNoTransactionIsMissing(
-			final long startHeight,
-			final long endHeight,
-			final long startAmount,
-			final long endAmount) throws Exception {
+	private void assertNoTransactionIsMissing(final long startHeight, final long endHeight, final long startAmount, final long endAmount)
+			throws Exception {
 		final H2Database db = new H2Database("nis5_mijinnet");
 		final long startId = this.getBlockId(db, startHeight);
 		final long endId = this.getBlockId(db, endHeight);
 		final Set<Long> amounts = LongStream.range(startAmount, endAmount + 1).boxed().collect(Collectors.toSet());
-		final String sql = String.format("SELECT amount FROM transfers WHERE blockId >= %d AND blockId <= %d",
-				startId,
-				endId);
+		final String sql = String.format("SELECT amount FROM transfers WHERE blockId >= %d AND blockId <= %d", startId, endId);
 		final ResultSet rs = db.executeQuery(sql);
 		while (rs.next()) {
 			amounts.remove(rs.getLong("amount"));
@@ -55,11 +50,7 @@ public class MissingTransactionITCase {
 		LOGGER.info(String.format("%d transactions are missing", amounts.size()));
 		if (!amounts.isEmpty()) {
 			LOGGER.info("The first 10 missing transactions have amounts:");
-			LOGGER.info(amounts.stream()
-					.sorted(Long::compareTo)
-					.limit(10)
-					.map(a -> Long.toString((a)))
-					.collect(Collectors.joining(", ")));
+			LOGGER.info(amounts.stream().sorted(Long::compareTo).limit(10).map(a -> Long.toString((a))).collect(Collectors.joining(", ")));
 		}
 
 		db.close();

@@ -17,7 +17,8 @@ public class DbMosaicDefinitionSupplyTuple {
 	 * @param supply Mosaic supply.
 	 * @param expirationHeight Creation height of owning namespace.
 	 */
-	public DbMosaicDefinitionSupplyTuple(final DbMosaicDefinition mosaicDefinition, final Supply supply, final BlockHeight expirationHeight) {
+	public DbMosaicDefinitionSupplyTuple(final DbMosaicDefinition mosaicDefinition, final Supply supply,
+			final BlockHeight expirationHeight) {
 		this.mosaicDefinition = mosaicDefinition;
 		this.supply = supply;
 		this.expirationHeight = expirationHeight;

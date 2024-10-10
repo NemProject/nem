@@ -121,10 +121,8 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 
 		// Act: expirations are unsorted, so sort by mosaic name
 		Collection<ExpiredMosaicEntry> expirations = cache.findExpirationsAtHeight(new BlockHeight(123));
-		List<ExpiredMosaicEntry> expirationsList = expirations
-			.stream()
-			.sorted((e1, e2) -> e1.getMosaicId().getName().compareTo(e2.getMosaicId().getName()))
-			.collect(Collectors.toList());
+		List<ExpiredMosaicEntry> expirationsList = expirations.stream()
+				.sorted((e1, e2) -> e1.getMosaicId().getName().compareTo(e2.getMosaicId().getName())).collect(Collectors.toList());
 
 		// Assert: balances should be copied, not same instance
 		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(2));
@@ -219,7 +217,8 @@ public abstract class ExpiredMosaicCacheTest<T extends ExpiredMosaicCache & Deep
 		MatcherAssert.assertThat(cache.findExpirationsAtHeight(new BlockHeight(124)).size(), IsEqual.equalTo(1));
 
 		// - only the other (unremoved) expired mosaic entry remains
-		List<ExpiredMosaicEntry> expirationsListAt123 = cache.findExpirationsAtHeight(new BlockHeight(123)).stream().collect(Collectors.toList());
+		List<ExpiredMosaicEntry> expirationsListAt123 = cache.findExpirationsAtHeight(new BlockHeight(123)).stream()
+				.collect(Collectors.toList());
 		MatcherAssert.assertThat(expirationsListAt123.get(0).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(333)));
 	}
 

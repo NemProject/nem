@@ -154,7 +154,8 @@ public class MosaicDefinitionCreationObserverTest {
 		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionUndoBehavior(mosaicDefinition, height, 1));
 	}
 
-	private void assertMosaicRedefinitionUndoBehavior(final MosaicDefinition mosaicDefinition, final long height, final int expectedExpiredMosaicCacheSize) {
+	private void assertMosaicRedefinitionUndoBehavior(final MosaicDefinition mosaicDefinition, final long height,
+			final int expectedExpiredMosaicCacheSize) {
 		// Arrange: initial supply is 5
 		final TestContext context = new TestContext();
 		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
@@ -162,7 +163,8 @@ public class MosaicDefinitionCreationObserverTest {
 		context.increaseSupply(10L);
 		context.incrementBalance(address, 8L);
 
-		context.expiredMosaicCache.addExpiration(new BlockHeight(height), mosaicDefinition.getId(), new MosaicBalances(), ExpiredMosaicType.Expired);
+		context.expiredMosaicCache.addExpiration(new BlockHeight(height), mosaicDefinition.getId(), new MosaicBalances(),
+				ExpiredMosaicType.Expired);
 
 		// Sanity:
 		assertMosaicEntry(context, 15L, 2);
@@ -251,7 +253,8 @@ public class MosaicDefinitionCreationObserverTest {
 		}
 
 		public MosaicDefinitionCreationObserver createObserver() {
-			return new MosaicDefinitionCreationObserver(this.namespaceCache, this.expiredMosaicCache, this.forkConfiguration.getMosaicRedefinitionForkHeight());
+			return new MosaicDefinitionCreationObserver(this.namespaceCache, this.expiredMosaicCache,
+					this.forkConfiguration.getMosaicRedefinitionForkHeight());
 		}
 	}
 }

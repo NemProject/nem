@@ -29,14 +29,12 @@ public class TimeSynchronizationITCase {
 	private static final double TOLERABLE_MEAN_TIME_SHIFT_PER_DAY = 50;
 
 	/**
-	 * Value indicating how much a node's network time is allowed to deviate
-	 * from the mean network time before it is considered as faulty.
+	 * Value indicating how much a node's network time is allowed to deviate from the mean network time before it is considered as faulty.
 	 */
 	private static final long TOLERABLE_MAX_DEVIATION_FROM_MEAN = 5000;
 
 	/**
-	 * Value indicating how much the network time is allowed to change
-	 * when new nodes join before it is considered as faulty.
+	 * Value indicating how much the network time is allowed to change when new nodes join before it is considered as faulty.
 	 */
 	private static final double TOLERABLE_CHANGE_IN_MEAN = 500;
 
@@ -65,14 +63,8 @@ public class TimeSynchronizationITCase {
 
 	private void assertNetworkTimeConvergesInFriendlyAndIdealEnvironment(final int networkSize, final int viewSize) {
 		Network.log(String.format("Setting up network: %d nodes, each node queries %d partners.", networkSize, viewSize));
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = this.setupNetwork("network", networkSize, viewSize, settings);
 		network.advanceInTime(15 * Network.MINUTE, Network.MINUTE);
 		MatcherAssert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
@@ -83,27 +75,15 @@ public class TimeSynchronizationITCase {
 	 */
 	@Test
 	public void asymmetricChannelsDoNotProduceShiftInFriendlyEnvironment() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		this.assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
 	@Test
 	public void remoteReceiveSendDelayDoesNotProduceShiftInFriendlyEnvironment() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		this.assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 2 * Network.HOUR, 10 * Network.MINUTE);
 	}
 
@@ -112,47 +92,27 @@ public class TimeSynchronizationITCase {
 	public void unstableClockWithoutPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
 		// this test usually fails for an obvious reason:
 		// without node clocks getting periodically adjusted there will always be a net shift in one or the other direction.
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		this.assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
 	@Test
 	public void unstableClockTogetherWithPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				UNSTABLE_CLOCK,
-				CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				UNSTABLE_CLOCK, CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		this.assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
 	@Test
 	public void realisticFriendlyEnvironmentDoesNotProduceShift() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				REMOTE_RECEIVE_SEND_DELAY,
-				ASYMMETRIC_CHANNELS,
-				UNSTABLE_CLOCK,
-				CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, REMOTE_RECEIVE_SEND_DELAY, ASYMMETRIC_CHANNELS,
+				UNSTABLE_CLOCK, CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		this.assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(settings, 30 * Network.DAY, Network.DAY);
 	}
 
-	private void assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(
-			final NodeSettings settings,
-			final long timeInterval,
-			final long loggingInterval) {
+	private void assertNetworkTimeConvergesAndDoesNotShiftInFriendlyButRealisticEnvironment(final NodeSettings settings,
+			final long timeInterval, final long loggingInterval) {
 		final Network network = this.setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(timeInterval / 2, loggingInterval);
 		final double mean = network.calculateMean();
@@ -186,18 +146,10 @@ public class TimeSynchronizationITCase {
 		this.assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(4 * Network.HOUR, 5 * Network.MINUTE, 300);
 	}
 
-	private void assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(
-			final long timeInterval,
-			final long loggingInterval,
+	private void assertNewNodesDoNotHaveBigInfluenceOnNetworkTime(final long timeInterval, final long loggingInterval,
 			final int percentageOfNewNodes) {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network = this.setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(timeInterval / 2, 0);
 		Network.log("Matured network statistics:");
@@ -217,19 +169,13 @@ public class TimeSynchronizationITCase {
 	}
 
 	/**
-	 * Tests to assure that if there are several sub-networks which have different network times and
-	 * those networks finally join, the resulting network will converge to a common network time.
+	 * Tests to assure that if there are several sub-networks which have different network times and those networks finally join, the
+	 * resulting network will converge to a common network time.
 	 */
 	@Test
 	public void networkTimeConvergesToCommonNetworkTimeWhenTwoNetworksJoin() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
 		final Network network1 = this.setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		final Network network2 = this.setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 
@@ -255,16 +201,9 @@ public class TimeSynchronizationITCase {
 
 	@Test
 	public void networkTimeConvergesToCommonNetworkTimeWhenFiveNetworksJoin() {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				NO_EVIL_NODES,
-				EVIL_NODES_ZERO_IMPORTANCE);
-		final List<Network> networks = Arrays.asList(
-				this.setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, NO_EVIL_NODES, EVIL_NODES_ZERO_IMPORTANCE);
+		final List<Network> networks = Arrays.asList(this.setupNetwork("network1", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
 				this.setupNetwork("network2", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
 				this.setupNetwork("network3", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
 				this.setupNetwork("network4", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings),
@@ -324,14 +263,8 @@ public class TimeSynchronizationITCase {
 	}
 
 	private void assertAttackersDoNotInfluenceNetworkTime(final int percentageEvilNodes) {
-		final NodeSettings settings = this.createNodeSettings(
-				INITIAL_TIME_SPREAD,
-				!REMOTE_RECEIVE_SEND_DELAY,
-				!ASYMMETRIC_CHANNELS,
-				!UNSTABLE_CLOCK,
-				!CLOCK_ADJUSTMENT,
-				percentageEvilNodes,
-				DEFAULT_EVIL_NODES_CUMULATIVE_IMPORTANCE);
+		final NodeSettings settings = this.createNodeSettings(INITIAL_TIME_SPREAD, !REMOTE_RECEIVE_SEND_DELAY, !ASYMMETRIC_CHANNELS,
+				!UNSTABLE_CLOCK, !CLOCK_ADJUSTMENT, percentageEvilNodes, DEFAULT_EVIL_NODES_CUMULATIVE_IMPORTANCE);
 		final Network network = this.setupNetwork("network", STANDARD_NETWORK_SIZE, MEDIUM_VIEW_SIZE, settings);
 		network.advanceInTime(Network.DAY, 4 * Network.HOUR);
 		final double mean = network.calculateMean();
@@ -343,29 +276,14 @@ public class TimeSynchronizationITCase {
 		MatcherAssert.assertThat(Math.abs(shiftPerDay) < TOLERABLE_MEAN_TIME_SHIFT_PER_DAY, IsEqual.equalTo(true));
 	}
 
-	private Network setupNetwork(
-			final String name,
-			final int numberOfNodes,
-			final int viewSize,
-			final NodeSettings nodeSettings) {
+	private Network setupNetwork(final String name, final int numberOfNodes, final int viewSize, final NodeSettings nodeSettings) {
 		return new Network(name, numberOfNodes, viewSize, nodeSettings);
 	}
 
-	private NodeSettings createNodeSettings(
-			final int timeOffsetSpread,
-			final boolean delayCommunication,
-			final boolean asymmetricChannels,
-			final boolean unstableClock,
-			final boolean clockAdjustment,
-			final int percentageEvilNodes,
+	private NodeSettings createNodeSettings(final int timeOffsetSpread, final boolean delayCommunication, final boolean asymmetricChannels,
+			final boolean unstableClock, final boolean clockAdjustment, final int percentageEvilNodes,
 			final double evilNodesCumulativeImportance) {
-		return new NodeSettings(
-				timeOffsetSpread,
-				delayCommunication,
-				asymmetricChannels,
-				unstableClock,
-				clockAdjustment,
-				percentageEvilNodes,
-				evilNodesCumulativeImportance);
+		return new NodeSettings(timeOffsetSpread, delayCommunication, asymmetricChannels, unstableClock, clockAdjustment,
+				percentageEvilNodes, evilNodesCumulativeImportance);
 	}
 }

@@ -21,9 +21,7 @@ public class MosaicDefinitionCreationObserver implements BlockTransactionObserve
 	 * @param expiredMosaicCache Expired mosaic cache.
 	 * @param mosaicRedefinitionForkHeight Mosaic redefinition fork height.
 	 */
-	public MosaicDefinitionCreationObserver(
-			final NamespaceCache namespaceCache,
-			final ExpiredMosaicCache expiredMosaicCache,
+	public MosaicDefinitionCreationObserver(final NamespaceCache namespaceCache, final ExpiredMosaicCache expiredMosaicCache,
 			final BlockHeight mosaicRedefinitionForkHeight) {
 		this.namespaceCache = namespaceCache;
 		this.expiredMosaicCache = expiredMosaicCache;
@@ -48,7 +46,8 @@ public class MosaicDefinitionCreationObserver implements BlockTransactionObserve
 			if (context.getHeight().compareTo(this.mosaicRedefinitionForkHeight) < 0) {
 				final MosaicEntry mosaicEntry = mosaics.get(mosaicId);
 				if (null != mosaicEntry) {
-					this.expiredMosaicCache.addExpiration(context.getHeight(), mosaicId, mosaicEntry.getBalances(), ExpiredMosaicType.Expired);
+					this.expiredMosaicCache.addExpiration(context.getHeight(), mosaicId, mosaicEntry.getBalances(),
+							ExpiredMosaicType.Expired);
 				}
 			}
 

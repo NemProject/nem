@@ -19,10 +19,8 @@ public class MosaicDefinitionSupplyTupleTest {
 	@Test
 	public void canCreate() {
 		// Act:
-		final MosaicDefinitionSupplyTuple tuple = new MosaicDefinitionSupplyTuple(
-			Utils.createMosaicDefinition("foo", "bar"),
-			new Supply(123),
-			new BlockHeight(999));
+		final MosaicDefinitionSupplyTuple tuple = new MosaicDefinitionSupplyTuple(Utils.createMosaicDefinition("foo", "bar"),
+				new Supply(123), new BlockHeight(999));
 
 		// Assert:
 		MatcherAssert.assertThat(Utils.createMosaicId("foo", "bar"), IsEqual.equalTo(tuple.getMosaicDefinition().getId()));
@@ -33,10 +31,8 @@ public class MosaicDefinitionSupplyTupleTest {
 	@Test
 	public void canSerialize() {
 		// Act:
-		final MosaicDefinitionSupplyTuple tuple = new MosaicDefinitionSupplyTuple(
-			Utils.createMosaicDefinition("foo", "bar"),
-			new Supply(123),
-			new BlockHeight(999));
+		final MosaicDefinitionSupplyTuple tuple = new MosaicDefinitionSupplyTuple(Utils.createMosaicDefinition("foo", "bar"),
+				new Supply(123), new BlockHeight(999));
 
 		// Act:
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(tuple);

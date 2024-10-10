@@ -43,7 +43,8 @@ public class MosaicSupplyRetriever {
 	 * @return The db mosaic definition and supply tuple, if found. \c null otherwise.
 	 */
 	public DbMosaicDefinitionSupplyTuple getMosaicDefinitionWithSupply(final Session session, final MosaicId mosaicId, final Long height) {
-		final List<DbMosaicDefinitionCreationTransaction> creationTransactions = MosaicSupplyRetriever.queryCreationTransactions(session, mosaicId, height);
+		final List<DbMosaicDefinitionCreationTransaction> creationTransactions = MosaicSupplyRetriever.queryCreationTransactions(session,
+				mosaicId, height);
 
 		Long supply = 0L;
 		Long firstCreationHeight = 0L;
@@ -70,8 +71,8 @@ public class MosaicSupplyRetriever {
 		if (0L == firstCreationHeight)
 			return null;
 
-		final List<DbMosaicSupplyChangeTransaction> supplyChangeTransactions = MosaicSupplyRetriever.querySupplyChangeTransactions(
-			session, dbMosaicDefinitionIds, firstCreationHeight, height);
+		final List<DbMosaicSupplyChangeTransaction> supplyChangeTransactions = MosaicSupplyRetriever.querySupplyChangeTransactions(session,
+				dbMosaicDefinitionIds, firstCreationHeight, height);
 
 		for (final DbMosaicSupplyChangeTransaction transaction : supplyChangeTransactions) {
 			if (MosaicSupplyType.Create.value() == transaction.getSupplyType()) {
@@ -86,7 +87,8 @@ public class MosaicSupplyRetriever {
 		return new DbMosaicDefinitionSupplyTuple(matchingMosaicDefinition, new Supply(supply), new BlockHeight(expirationHeight));
 	}
 
-	private static List<DbMosaicDefinitionCreationTransaction> queryCreationTransactions(final Session session, final MosaicId mosaicId, final Long height) {
+	private static List<DbMosaicDefinitionCreationTransaction> queryCreationTransactions(final Session session, final MosaicId mosaicId,
+			final Long height) {
 		final Criteria creationTransactionsCriteria = session.createCriteria(DbMosaicDefinitionCreationTransaction.class, "transaction") // preserve-newline
 				.setFetchMode("sender", FetchMode.JOIN) // preserve-newline
 				.createAlias("transaction.block", "block") // preserve-newline
@@ -137,7 +139,8 @@ public class MosaicSupplyRetriever {
 
 	private Long findExpirationHeight(final Session session, final String namespaceId, final Long height) {
 		final DbNamespace lastRootNamespace = MosaicSupplyRetriever.queryLastRootNamespace(session, namespaceId, height);
-		final List<DbNamespace> subsequentRootNamespaces = MosaicSupplyRetriever.querySubsequentRootNamespaces(session, namespaceId, height);
+		final List<DbNamespace> subsequentRootNamespaces = MosaicSupplyRetriever.querySubsequentRootNamespaces(session, namespaceId,
+				height);
 
 		DbNamespace activeRootNamespace = lastRootNamespace;
 		for (final DbNamespace subsequentRootNamespace : subsequentRootNamespaces) {
@@ -166,12 +169,11 @@ public class MosaicSupplyRetriever {
 		}
 
 		// check other properties
-		return
-			lhs.getCreator().getId() == rhs.getCreator().getId()
-			&& lhs.getFeeType() == rhs.getFeeType()
-			&& lhs.getFeeDbMosaicId() == rhs.getFeeDbMosaicId()
-			&& lhs.getFeeQuantity() == rhs.getFeeQuantity()
-			&& (null == lhs.getFeeRecipient()) == (null == rhs.getFeeRecipient())
-			&& (null == lhs.getFeeRecipient() || lhs.getFeeRecipient().getId() == rhs.getFeeRecipient().getId());
+		return lhs.getCreator().getId() == rhs.getCreator().getId() // preserve-newline
+				&& lhs.getFeeType() == rhs.getFeeType() // preserve-newline
+				&& lhs.getFeeDbMosaicId() == rhs.getFeeDbMosaicId() // preserve-newline
+				&& lhs.getFeeQuantity() == rhs.getFeeQuantity() // preserve-newline
+				&& (null == lhs.getFeeRecipient()) == (null == rhs.getFeeRecipient())
+				&& (null == lhs.getFeeRecipient() || lhs.getFeeRecipient().getId() == rhs.getFeeRecipient().getId());
 	}
 }

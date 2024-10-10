@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan(
-		basePackages = "org.nem.nis.dao",
-		excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
+@ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
 @EnableTransactionManagement
 public class TestConfHardDisk extends TestConf {
 	@Bean

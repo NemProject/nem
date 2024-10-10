@@ -27,7 +27,7 @@ public class MosaicDefinitionControllerTest {
 	// region getMosaicDefinition
 
 	private void assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
-		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
+			final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -45,7 +45,7 @@ public class MosaicDefinitionControllerTest {
 	}
 
 	private void assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
-		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
+			final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
@@ -65,7 +65,7 @@ public class MosaicDefinitionControllerTest {
 	}
 
 	private void assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
-		final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
+			final BiFunction<MosaicDefinitionController, MosaicIdBuilder, MosaicDefinition> getter) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(null);
@@ -77,23 +77,21 @@ public class MosaicDefinitionControllerTest {
 		ExceptionAssert.assertThrows(v -> getter.apply(context.controller, builder), MissingResourceException.class);
 	}
 
-
 	@Test
 	public void getMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
 		this.assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
-			(controller, builder) -> controller.getMosaicDefinition(builder));
+				(controller, builder) -> controller.getMosaicDefinition(builder));
 	}
 
 	@Test
 	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
 		this.assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
-			(controller, builder) -> controller.getMosaicDefinition(builder));
+				(controller, builder) -> controller.getMosaicDefinition(builder));
 	}
 
 	@Test
 	public void getMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
-		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
-			(controller, builder) -> controller.getMosaicDefinition(builder));
+		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown((controller, builder) -> controller.getMosaicDefinition(builder));
 	}
 
 	@Test
@@ -118,19 +116,18 @@ public class MosaicDefinitionControllerTest {
 	@Test
 	public void getLastMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
 		this.assertMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao(
-			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+				(controller, builder) -> controller.getLastMosaicDefinition(builder));
 	}
 
 	@Test
 	public void getLastMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
 		this.assertMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown(
-			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+				(controller, builder) -> controller.getLastMosaicDefinition(builder));
 	}
 
 	@Test
 	public void getLastMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
-		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown(
-			(controller, builder) -> controller.getLastMosaicDefinition(builder));
+		this.assertMosaicDefinitionThrowsIfMosaicIdIsUnknown((controller, builder) -> controller.getLastMosaicDefinition(builder));
 	}
 
 	@Test
@@ -172,7 +169,8 @@ public class MosaicDefinitionControllerTest {
 		heightBuilder.setHeight("1234");
 
 		// Act:
-		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
+		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder,
+				heightBuilder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinition(Mockito.any());
@@ -187,8 +185,10 @@ public class MosaicDefinitionControllerTest {
 		final TestContext context = new TestContext();
 
 		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
-		final DbMosaicDefinitionSupplyTuple dbMosaicDefinitionSupplyTuple = new DbMosaicDefinitionSupplyTuple(dbMosaicDefinition, new Supply(111), new BlockHeight(234));
-		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.anyLong())).thenReturn(dbMosaicDefinitionSupplyTuple);
+		final DbMosaicDefinitionSupplyTuple dbMosaicDefinitionSupplyTuple = new DbMosaicDefinitionSupplyTuple(dbMosaicDefinition,
+				new Supply(111), new BlockHeight(234));
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionWithSupply(Mockito.any(), Mockito.anyLong()))
+				.thenReturn(dbMosaicDefinitionSupplyTuple);
 
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
 		builder.setMosaicId("alice.vouchers:foo");
@@ -197,7 +197,8 @@ public class MosaicDefinitionControllerTest {
 		heightBuilder.setHeight("1234");
 
 		// Act:
-		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder, heightBuilder);
+		final SerializableList<MosaicDefinitionSupplyTuple> tuples = context.controller.getMosaicDefinitionWithSupply(builder,
+				heightBuilder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionWithSupply(builder.build(), 1234L);

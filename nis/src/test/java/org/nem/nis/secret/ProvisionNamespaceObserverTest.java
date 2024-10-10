@@ -106,21 +106,22 @@ public class ProvisionNamespaceObserverTest {
 			MatcherAssert.assertThat(expiredMosaicCache.deepSize(), IsEqual.equalTo(2));
 
 			final Collection<ExpiredMosaicEntry> expirations = expiredMosaicCache.findExpirationsAtHeight(new BlockHeight(blockHeight));
-			final List<ExpiredMosaicEntry> expirationsList = expirations
-				.stream()
-				.sorted((e1, e2) -> e1.getMosaicId().getName().compareTo(e2.getMosaicId().getName()))
-				.collect(Collectors.toList());
+			final List<ExpiredMosaicEntry> expirationsList = expirations.stream()
+					.sorted((e1, e2) -> e1.getMosaicId().getName().compareTo(e2.getMosaicId().getName())).collect(Collectors.toList());
 
 			MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(2));
 			MatcherAssert.assertThat(expirationsList.get(0).getMosaicId(), IsEqual.equalTo(createMosaicId("foo.bar", "coins")));
 			MatcherAssert.assertThat(expirationsList.get(0).getBalances().getOwners().size(), IsEqual.equalTo(2));
-			MatcherAssert.assertThat(expirationsList.get(0).getBalances().getBalance(namespaceOwner.getAddress()), IsEqual.equalTo(new Quantity(6)));
+			MatcherAssert.assertThat(expirationsList.get(0).getBalances().getBalance(namespaceOwner.getAddress()),
+					IsEqual.equalTo(new Quantity(6)));
 			MatcherAssert.assertThat(expirationsList.get(0).getBalances().getBalance(coinsOwners.get(0)), IsEqual.equalTo(new Quantity(5)));
 			MatcherAssert.assertThat(expirationsList.get(0).getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Restored));
 			MatcherAssert.assertThat(expirationsList.get(1).getMosaicId(), IsEqual.equalTo(createMosaicId("foo", "tokens")));
 			MatcherAssert.assertThat(expirationsList.get(1).getBalances().getOwners().size(), IsEqual.equalTo(2));
-			MatcherAssert.assertThat(expirationsList.get(1).getBalances().getBalance(namespaceOwner.getAddress()), IsEqual.equalTo(new Quantity(2)));
-			MatcherAssert.assertThat(expirationsList.get(1).getBalances().getBalance(tokensOwners.get(0)), IsEqual.equalTo(new Quantity(1)));
+			MatcherAssert.assertThat(expirationsList.get(1).getBalances().getBalance(namespaceOwner.getAddress()),
+					IsEqual.equalTo(new Quantity(2)));
+			MatcherAssert.assertThat(expirationsList.get(1).getBalances().getBalance(tokensOwners.get(0)),
+					IsEqual.equalTo(new Quantity(1)));
 			MatcherAssert.assertThat(expirationsList.get(1).getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Restored));
 		} else {
 			// - expired mosaics are not restored
@@ -139,8 +140,7 @@ public class ProvisionNamespaceObserverTest {
 	public void notifyExecuteAddsExistingMosaicsToOwnersAndRestoresBalancesWhenRootNamespaceIsInctive() {
 		// block height is more than one year of blocks away from namespace activation at block 1
 		this.runNotifyExecuteAddsExistingMosaicsToOwnersTest(
-			NOTIFY_BLOCK_HEIGHT + NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear(),
-			true);
+				NOTIFY_BLOCK_HEIGHT + NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear(), true);
 	}
 
 	private static void addMosaic(final NamespaceCache cache, final String namespaceName, final String mosaicName) {
@@ -158,7 +158,8 @@ public class ProvisionNamespaceObserverTest {
 	private static void addOwners(final NamespaceCache cache, final MosaicId mosaicId, final Collection<Address> owners, final int seed) {
 		int value = seed;
 		for (final Address owner : owners) {
-			cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner, Quantity.fromValue(value++));
+			cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner,
+					Quantity.fromValue(value++));
 		}
 	}
 

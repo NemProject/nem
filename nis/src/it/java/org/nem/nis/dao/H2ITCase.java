@@ -22,7 +22,8 @@ public class H2ITCase {
 				LOGGER.info(String.format("round %d", j + 1));
 			}
 			final int randomInt = new SecureRandom().nextInt(range);
-			final String ids = StringUtils.join(IntStream.range(1, 19000 + randomInt).mapToObj(Long::new).collect(Collectors.toList()), ",");
+			final String ids = StringUtils.join(IntStream.range(1, 19000 + randomInt).mapToObj(Long::new).collect(Collectors.toList()),
+					",");
 			final String sql = "SELECT a.* FROM accounts a WHERE a.id in (" + ids + ")";
 			final ResultSet rs = db.executeQuery(sql);
 

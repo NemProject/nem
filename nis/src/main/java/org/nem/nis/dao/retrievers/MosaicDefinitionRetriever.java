@@ -23,10 +23,11 @@ public class MosaicDefinitionRetriever {
 	 */
 	public DbMosaicDefinition getMosaicDefinition(final Session session, final MosaicId mosaicId) {
 		MustBe.notNull(mosaicId, "mosaic id");
-		final String queryString = "SELECT m.* FROM mosaicDefinitions m " + "WHERE namespaceId = :namespaceId AND NAME = :name ORDER BY id DESC LIMIT 1";
+		final String queryString = "SELECT m.* FROM mosaicDefinitions m "
+				+ "WHERE namespaceId = :namespaceId AND NAME = :name ORDER BY id DESC LIMIT 1";
 		final Query query = session.createSQLQuery(queryString) // preserve-newline
-				.addEntity(DbMosaicDefinition.class)
-				.setParameter("namespaceId", mosaicId.getNamespaceId().toString())
+				.addEntity(DbMosaicDefinition.class) // preserve-newline
+				.setParameter("namespaceId", mosaicId.getNamespaceId().toString()) // preserve-newline
 				.setParameter("name", mosaicId.getName());
 
 		return (DbMosaicDefinition) query.uniqueResult();

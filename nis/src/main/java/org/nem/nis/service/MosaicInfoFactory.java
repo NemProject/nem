@@ -71,8 +71,8 @@ public class MosaicInfoFactory {
 				Quantity.fromValue(accountState.getAccountInfo().getBalance().getNumMicroNem()));
 		return Stream.concat(Stream.of(nemXemBalance), accountState.getAccountInfo().getMosaicIds().stream()
 				.filter(mosaicId -> null != this.namespaceCache.get(mosaicId.getNamespaceId()))
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
-				.filter(Objects::nonNull)
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId)) // preserve-newline
+				.filter(Objects::nonNull) // preserve-newline
 				.map(entry -> new Mosaic(entry.getMosaicDefinition().getId(), entry.getBalances().getBalance(accountState.getAddress()))))
 				.collect(Collectors.toList());
 	}

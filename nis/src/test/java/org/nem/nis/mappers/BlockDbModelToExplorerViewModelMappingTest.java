@@ -90,8 +90,8 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 			return hashes;
 		}
 
-		public void assertViewModel(final ExplorerBlockViewModel viewModel, final Hash expectedBlockHash,
-				final int expectedNumTransactions, final long expectedTotalFee) {
+		public void assertViewModel(final ExplorerBlockViewModel viewModel, final Hash expectedBlockHash, final int expectedNumTransactions,
+				final long expectedTotalFee) {
 			// Act:
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 

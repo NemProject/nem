@@ -29,7 +29,8 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 
 	@Override
 	public int deepSize() {
-		return this.map.readOnlyEntrySet().stream().map(Map.Entry::getValue).map(group -> group.expiredMosaicsCount()).reduce(0, Integer::sum);
+		return this.map.readOnlyEntrySet().stream().map(Map.Entry::getValue).map(group -> group.expiredMosaicsCount()).reduce(0,
+				Integer::sum);
 	}
 
 	@Override
@@ -39,7 +40,8 @@ public class DefaultExpiredMosaicCache implements ExpiredMosaicCache, DeepCopyab
 	}
 
 	@Override
-	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances, final ExpiredMosaicType expirationType) {
+	public void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances,
+			final ExpiredMosaicType expirationType) {
 		if (!this.map.containsKey(height)) {
 			this.map.put(height, new ExpiredMosaicBlockGroup());
 		}

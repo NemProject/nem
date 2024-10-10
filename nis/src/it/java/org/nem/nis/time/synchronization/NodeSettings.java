@@ -23,13 +23,8 @@ public class NodeSettings {
 	 * @param clockAdjustment Value indicating whether the node's clock is adjusted from time to time.
 	 * @param percentageEvilNodes Value indicating what percentage of all nodes is evil.
 	 */
-	public NodeSettings(
-			final int timeOffsetSpread,
-			final boolean delayCommunication,
-			final boolean asymmetricChannels,
-			final boolean unstableClock,
-			final boolean clockAdjustment,
-			final int percentageEvilNodes,
+	public NodeSettings(final int timeOffsetSpread, final boolean delayCommunication, final boolean asymmetricChannels,
+			final boolean unstableClock, final boolean clockAdjustment, final int percentageEvilNodes,
 			final double evilNodesCumulativeImportance) {
 		this.timeOffsetSpread = timeOffsetSpread;
 		this.delayCommunication = delayCommunication;

@@ -78,19 +78,11 @@ public class TestDatabase {
 		return file.exists();
 	}
 
-	private void populateDatabase(
-			final int numBlocks,
-			final int numTransactionsPerBlock,
-			final AccountDaoLookup accountDaoLookup) {
+	private void populateDatabase(final int numBlocks, final int numTransactionsPerBlock, final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
 		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, this.accounts);
 		for (int i = 0; i < numBlocks; i++) {
-			final DbBlock dbBlock = this.createBlock(
-					i,
-					numTransactionsPerBlock,
-					this.getRandomAccount(),
-					accountSets,
-					accountDaoLookup);
+			final DbBlock dbBlock = this.createBlock(i, numTransactionsPerBlock, this.getRandomAccount(), accountSets, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 			if ((i + 1) % 100 == 0) {
 				LOGGER.warning(String.format("Block %d", i + 1));
@@ -104,46 +96,27 @@ public class TestDatabase {
 		session.close();
 	}
 
-	private DbBlock createBlock(
-			final int round,
-			final int numTransactions,
-			final Account harvester,
-			final List<TransactionAccountSet> accountSets,
-			final AccountDaoLookup accountDaoLookup) {
+	private DbBlock createBlock(final int round, final int numTransactions, final Account harvester,
+			final List<TransactionAccountSet> accountSets, final AccountDaoLookup accountDaoLookup) {
 		final SecureRandom random = new SecureRandom();
-		final Block block = new Block(
-				harvester,
-				Hash.ZERO,
-				Hash.ZERO,
-				new TimeInstant(round * 123),
-				new BlockHeight(round + 1));
+		final Block block = new Block(harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(round * 123), new BlockHeight(round + 1));
 		for (int j = 0; j < numTransactions; j++) {
 			// distribution of transactions:
 			// 80% transfer transactions
 			// 15% multisig transfer transactions
-			//  5% importance transfer transactions
+			// 05% importance transfer transactions
 			final TransactionAccountSet accountSet = this.getRandomAccountSet(accountSets);
 			final int type = random.nextInt(100);
 			if (80 > type) {
-				final TransferTransaction transferTransaction = this.createTransferTransaction(
-						accountSet.transferSender,
-						accountSet.transferRecipient,
-						numTransactions * round + j);
+				final TransferTransaction transferTransaction = this.createTransferTransaction(accountSet.transferSender,
+						accountSet.transferRecipient, numTransactions * round + j);
 				block.addTransaction(transferTransaction);
 			} else if (95 > type) {
-				block.addTransaction(this.createMultisigTransferTransaction(
-						accountSet.transferSender,
-						accountSet.transferRecipient,
-						accountSet.multisigSender,
-						accountSet.cosignatory1,
-						accountSet.cosignatory2,
-						numTransactions * round + j));
+				block.addTransaction(this.createMultisigTransferTransaction(accountSet.transferSender, accountSet.transferRecipient,
+						accountSet.multisigSender, accountSet.cosignatory1, accountSet.cosignatory2, numTransactions * round + j));
 			} else {
-				block.addTransaction(this.createImportanceTransferTransaction(
-						accountSet.transferSender,
-						accountSet.transferRecipient,
-						ImportanceTransferMode.Activate,
-						numTransactions * round + j));
+				block.addTransaction(this.createImportanceTransferTransaction(accountSet.transferSender, accountSet.transferRecipient,
+						ImportanceTransferMode.Activate, numTransactions * round + j));
 			}
 		}
 		block.sign();
@@ -163,13 +136,11 @@ public class TestDatabase {
 		session.flush();
 		session.clear();
 		session.close();
-		final List<Account> accounts = dbAccounts.stream()
-				.map(dbAccount -> {
-					final Account account = new Account(new KeyPair(dbAccount.getPublicKey()));
-					this.addMapping(mockAccountDao, account);
-					return account;
-				})
-				.collect(Collectors.toList());
+		final List<Account> accounts = dbAccounts.stream().map(dbAccount -> {
+			final Account account = new Account(new KeyPair(dbAccount.getPublicKey()));
+			this.addMapping(mockAccountDao, account);
+			return account;
+		}).collect(Collectors.toList());
 		LOGGER.warning("reading accounts finishes");
 		return accounts;
 	}
@@ -206,49 +177,25 @@ public class TestDatabase {
 		return accountSets.get(random.nextInt(accountSets.size()));
 	}
 
-	private TransferTransaction createTransferTransaction(
-			final Account sender,
-			final Account recipient,
-			final int i) {
+	private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final int i) {
 		// Arrange:
-		final TransferTransaction transaction = new TransferTransaction(
-				new TimeInstant(i),
-				sender,
-				recipient,
-				Amount.fromNem(123),
-				null);
+		final TransferTransaction transaction = new TransferTransaction(new TimeInstant(i), sender, recipient, Amount.fromNem(123), null);
 		transaction.sign();
 		return transaction;
 	}
 
-	private ImportanceTransferTransaction createImportanceTransferTransaction(
-			final Account sender,
-			final Account recipient,
-			final ImportanceTransferMode mode,
-			final int i) {
+	private ImportanceTransferTransaction createImportanceTransferTransaction(final Account sender, final Account recipient,
+			final ImportanceTransferMode mode, final int i) {
 		// Arrange:
-		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(
-				new TimeInstant(i),
-				sender,
-				mode,
-				recipient);
+		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(new TimeInstant(i), sender, mode, recipient);
 		transaction.sign();
 		return transaction;
 	}
 
-	private MultisigTransaction createMultisigTransferTransaction(
-			final Account transferSender,
-			final Account transferRecipient,
-			final Account multisigSender,
-			final Account cosignatory1,
-			final Account cosignatory2,
-			final int i) {
-		final TransferTransaction otherTransaction = new TransferTransaction(
-				new TimeInstant(i),
-				transferSender,
-				transferRecipient,
-				Amount.fromNem(123),
-				null);
+	private MultisigTransaction createMultisigTransferTransaction(final Account transferSender, final Account transferRecipient,
+			final Account multisigSender, final Account cosignatory1, final Account cosignatory2, final int i) {
+		final TransferTransaction otherTransaction = new TransferTransaction(new TimeInstant(i), transferSender, transferRecipient,
+				Amount.fromNem(123), null);
 		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, multisigSender, otherTransaction);
 		this.addSignature(cosignatory1, transaction);
 		this.addSignature(cosignatory2, transaction);
@@ -257,11 +204,8 @@ public class TestDatabase {
 	}
 
 	private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				signatureSigner,
-				multisigTransaction.getOtherTransaction().getSigner(),
-				multisigTransaction.getOtherTransaction());
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner,
+				multisigTransaction.getOtherTransaction().getSigner(), multisigTransaction.getOtherTransaction());
 		signatureTransaction.sign();
 		multisigTransaction.addSignature(signatureTransaction);
 	}

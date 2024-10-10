@@ -16,7 +16,8 @@ public interface ExpiredMosaicCache extends ReadOnlyExpiredMosaicCache {
 	 * @param balances Expiring mosaic balances.
 	 * @param expirationType Type of expiration.
 	 */
-	void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances, final ExpiredMosaicType expirationType);
+	void addExpiration(final BlockHeight height, final MosaicId mosaicId, final ReadOnlyMosaicBalances balances,
+			final ExpiredMosaicType expirationType);
 
 	/**
 	 * Removes a mosaic expiration.

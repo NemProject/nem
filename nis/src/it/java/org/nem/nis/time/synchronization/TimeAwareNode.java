@@ -39,19 +39,11 @@ public class TimeAwareNode {
 	 * @param clockInaccuracy The value to add to the time offset every hour.
 	 * @param type The node's type (friendly or evil).
 	 */
-	public TimeAwareNode(
-			final int id,
-			final NodeAge nodeAge,
-			final TimeSynchronizationStrategy syncStrategy,
-			final TimeOffset initialTimeOffset,
-			final TimeOffset communicationDelay,
-			final double channelAsymmetry,
-			final TimeOffset clockInaccuracy,
-			final int type) {
-		this.node = new Node(
-				new NodeIdentity(new KeyPair(), String.format("node%d", id)),
-				new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12),
-				null);
+	public TimeAwareNode(final int id, final NodeAge nodeAge, final TimeSynchronizationStrategy syncStrategy,
+			final TimeOffset initialTimeOffset, final TimeOffset communicationDelay, final double channelAsymmetry,
+			final TimeOffset clockInaccuracy, final int type) {
+		this.node = new Node(new NodeIdentity(new KeyPair(), String.format("node%d", id)),
+				new NodeEndpoint("http", String.format("10.10.%d.%d", id / 256, id % 256), 12), null);
 		this.syncStrategy = syncStrategy;
 		this.timeOffset = initialTimeOffset;
 		this.communicationDelay = communicationDelay;
@@ -194,15 +186,15 @@ public class TimeAwareNode {
 	 */
 	public CommunicationTimeStamps createCommunicationTimeStamps(final int roundTripTime) {
 		if (this.isEvil()) {
-			return new CommunicationTimeStamps(
-					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000),
+			return new CommunicationTimeStamps(new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000),
 					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000));
 		}
 
 		return new CommunicationTimeStamps(
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry) +
-						this.communicationDelay.getRaw()),
-				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long)(roundTripTime * this.channelAsymmetry)));
+				new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + (long) (roundTripTime * this.channelAsymmetry)
+						+ this.communicationDelay.getRaw()),
+				new NetworkTimeStamp(
+						System.currentTimeMillis() + this.timeOffset.getRaw() + (long) (roundTripTime * this.channelAsymmetry)));
 	}
 
 	/**

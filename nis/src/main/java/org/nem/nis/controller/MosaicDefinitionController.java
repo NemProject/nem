@@ -62,8 +62,7 @@ public class MosaicDefinitionController {
 	// region getLastMosaicDefinition
 
 	/**
-	 * Gets the **last** mosaic definition for a given mosaic id.
-	 * This definition might be expired.
+	 * Gets the **last** mosaic definition for a given mosaic id. This definition might be expired.
 	 *
 	 * @param builder The mosaic id builder.
 	 * @return The mosaic definition.
@@ -98,7 +97,8 @@ public class MosaicDefinitionController {
 	@RequestMapping(value = "/local/mosaic/definition/supply", method = RequestMethod.GET)
 	@ClientApi
 	@TrustedApi
-	public SerializableList<MosaicDefinitionSupplyTuple> getMosaicDefinitionWithSupply(final MosaicIdBuilder builder, final BlockHeightBuilder heightBuilder) {
+	public SerializableList<MosaicDefinitionSupplyTuple> getMosaicDefinitionWithSupply(final MosaicIdBuilder builder,
+			final BlockHeightBuilder heightBuilder) {
 		final MosaicId mosaicId = builder.build();
 		final BlockHeight height = heightBuilder.build();
 
@@ -106,7 +106,8 @@ public class MosaicDefinitionController {
 
 		final SerializableList<MosaicDefinitionSupplyTuple> tuples = new SerializableList<>(1);
 		if (null != dbTuple) {
-			tuples.add(new MosaicDefinitionSupplyTuple(this.map(dbTuple.getMosaicDefinition()), dbTuple.getSupply(), dbTuple.getExpirationHeight()));
+			tuples.add(new MosaicDefinitionSupplyTuple(this.map(dbTuple.getMosaicDefinition()), dbTuple.getSupply(),
+					dbTuple.getExpirationHeight()));
 		}
 
 		return tuples;

@@ -21,7 +21,8 @@ public class AcceptanceTestConstants {
 	/**
 	 * The test account private key.
 	 */
-	public static final PrivateKey PRIVATE_KEY = PrivateKey.fromHexString("4d08c419bbc0191bc750f74a6912910b71d741eb621641d29705058df157804a");
+	public static final PrivateKey PRIVATE_KEY = PrivateKey
+			.fromHexString("4d08c419bbc0191bc750f74a6912910b71d741eb621641d29705058df157804a");
 
 	/**
 	 * The second test account address.

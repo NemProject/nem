@@ -66,9 +66,7 @@ public class H2StorageSpeedITCase {
 		}
 
 		final long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("Saving %d accounts to db needed %d ms (%d μs/account)",
-				accounts.size(),
-				stop - start,
+		LOGGER.info(String.format("Saving %d accounts to db needed %d ms (%d μs/account)", accounts.size(), stop - start,
 				(stop - start) * 1000 / accounts.size()));
 	}
 
@@ -105,9 +103,7 @@ public class H2StorageSpeedITCase {
 		}
 
 		final long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("Saving %d transactions to db needed %d ms (%d μs/transaction)",
-				transactions.size(),
-				stop - start,
+		LOGGER.info(String.format("Saving %d transactions to db needed %d ms (%d μs/transaction)", transactions.size(), stop - start,
 				(stop - start) * 1000 / transactions.size()));
 	}
 
@@ -116,9 +112,9 @@ public class H2StorageSpeedITCase {
 	}
 
 	private static String createPreparedStatementForTransactionInsert() {
-		return "INSERT INTO transfers (blockId, id, transferHash, version, fee, timestamp, deadline, senderId, senderProof" +
-				", recipientId, blkIndex, amount, referencedTransaction, messageType, messagePayload) VALUES " +
-				"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		return "INSERT INTO transfers (blockId, id, transferHash, version, fee, timestamp, deadline, senderId, senderProof"
+				+ ", recipientId, blkIndex, amount, referencedTransaction, messageType, messagePayload) VALUES "
+				+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	}
 
 	private static List<Account> createAccounts(final int count) {
@@ -127,25 +123,20 @@ public class H2StorageSpeedITCase {
 
 	private static List<TransferTransaction> createTransactions(final int count, final List<Account> accounts) {
 		final TimeProvider timeProvider = new SystemTimeProvider();
-		return IntStream.range(0, count)
-				.mapToObj(i -> {
-					final TransferTransaction transaction = new TransferTransaction(
-							timeProvider.getCurrentTime(),
-							accounts.get(RANDOM.nextInt(accounts.size())),
-							accounts.get(RANDOM.nextInt(accounts.size())),
-							Amount.fromNem(RANDOM.nextInt(100000)),
-							null);
-					transaction.setDeadline(timeProvider.getCurrentTime().addHours(1));
-					transaction.setFee(Amount.fromNem(1000));
-					transaction.sign();
-					return transaction;
-				})
-				.collect(Collectors.toList());
+		return IntStream.range(0, count).mapToObj(i -> {
+			final TransferTransaction transaction = new TransferTransaction(timeProvider.getCurrentTime(),
+					accounts.get(RANDOM.nextInt(accounts.size())), accounts.get(RANDOM.nextInt(accounts.size())),
+					Amount.fromNem(RANDOM.nextInt(100000)), null);
+			transaction.setDeadline(timeProvider.getCurrentTime().addHours(1));
+			transaction.setFee(Amount.fromNem(1000));
+			transaction.sign();
+			return transaction;
+		}).collect(Collectors.toList());
 	}
 
 	private static void insertBlock() {
-		final String sql =  "INSERT INTO blocks (id, version, prevBlockHash, blockHash, generationHash, timestamp, harvesterId" +
-				", harvesterProof, HarvestedInName, height, totalFee, difficulty) VALUES (1, 2, '', '', '', 1, 1, '', 1, 1, 1, 1)";
+		final String sql = "INSERT INTO blocks (id, version, prevBlockHash, blockHash, generationHash, timestamp, harvesterId"
+				+ ", harvesterProof, HarvestedInName, height, totalFee, difficulty) VALUES (1, 2, '', '', '', 1, 1, '', 1, 1, 1, 1)";
 		DB.execute(sql);
 		DB.commit();
 	}

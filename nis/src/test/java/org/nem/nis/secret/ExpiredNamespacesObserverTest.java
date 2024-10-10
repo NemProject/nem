@@ -39,9 +39,8 @@ public class ExpiredNamespacesObserverTest {
 
 		// Sanity:
 		assertAccountOwnsMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
-		assertAccountOwnsMosaics(
-			context.accountInfo2,
-			Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId(), context.mosaicDefinition3.getId()));
+		assertAccountOwnsMosaics(context.accountInfo2,
+				Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId(), context.mosaicDefinition3.getId()));
 
 		// Act:
 		// namespace 2 will expire, namespace 1 not.
@@ -75,9 +74,11 @@ public class ExpiredNamespacesObserverTest {
 		MatcherAssert.assertThat(context.expiredMosaicCache.deepSize(), IsEqual.equalTo(2));
 
 		// - all are marked with expired
-		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
+		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache
+				.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
 		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(2));
-		expirations.forEach(expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
+		expirations.forEach(
+				expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
 	}
 
 	@Test
@@ -96,9 +97,11 @@ public class ExpiredNamespacesObserverTest {
 		MatcherAssert.assertThat(context.expiredMosaicCache.deepSize(), IsEqual.equalTo(3));
 
 		// - all are marked with expired
-		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
+		final Collection<ExpiredMosaicEntry> expirations = context.expiredMosaicCache
+				.findExpirationsAtHeight(new BlockHeight(NOTIFY_BLOCK_HEIGHT));
 		MatcherAssert.assertThat(expirations.size(), IsEqual.equalTo(3));
-		expirations.forEach(expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
+		expirations.forEach(
+				expiration -> MatcherAssert.assertThat(expiration.getExpiredMosaicType(), IsEqual.equalTo(ExpiredMosaicType.Expired)));
 	}
 
 	// endregion
@@ -169,11 +172,8 @@ public class ExpiredNamespacesObserverTest {
 
 		// Sanity:
 		assertAccountOwnsMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
-		assertAccountOwnsMosaics(context.accountInfo2, Arrays.asList(
-			context.mosaicDefinition1.getId(),
-			context.mosaicDefinition2.getId(),
-			context.mosaicDefinition3.getId()
-		));
+		assertAccountOwnsMosaics(context.accountInfo2,
+				Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId(), context.mosaicDefinition3.getId()));
 
 		// Act:
 		notify(context, notificationTrigger);
@@ -195,11 +195,8 @@ public class ExpiredNamespacesObserverTest {
 		// 2 and 3 have same namespace
 		private final MosaicDefinition mosaicDefinition1 = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final MosaicDefinition mosaicDefinition2 = Utils.createMosaicDefinition(2, createMosaicProperties());
-		private final MosaicDefinition mosaicDefinition3 = Utils.createMosaicDefinition(
-			mosaicDefinition2.getCreator(),
-			new MosaicId(mosaicDefinition2.getId().getNamespaceId(), "name3"),
-			createMosaicProperties()
-		);
+		private final MosaicDefinition mosaicDefinition3 = Utils.createMosaicDefinition(mosaicDefinition2.getCreator(),
+				new MosaicId(mosaicDefinition2.getId().getNamespaceId(), "name3"), createMosaicProperties());
 
 		private final ForkConfiguration forkConfiguration = new ForkConfiguration.Builder().build();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache(forkConfiguration.getMosaicRedefinitionForkHeight())
@@ -244,10 +241,8 @@ public class ExpiredNamespacesObserverTest {
 		}
 
 		private ExpiredNamespacesObserver createObserver(final boolean shouldTrackExpiredMosaics) {
-			return new ExpiredNamespacesObserver(
-				this.namespaceCache, this.accountStateCache, this.expiredMosaicCache, ESTIMATED_BLOCKS_PER_YEAR,
-				shouldTrackExpiredMosaics
-			);
+			return new ExpiredNamespacesObserver(this.namespaceCache, this.accountStateCache, this.expiredMosaicCache,
+					ESTIMATED_BLOCKS_PER_YEAR, shouldTrackExpiredMosaics);
 		}
 
 		private void addMosaicsToNamespaceMosaicsBalances() {

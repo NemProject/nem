@@ -71,11 +71,7 @@ public class Network {
 	 * @param viewSize The view size of the nodes in the network.
 	 * @param nodeSettings The node settings.
 	 */
-	public Network(
-			final String name,
-			final int networkSize,
-			final int viewSize,
-			final NodeSettings nodeSettings) {
+	public Network(final String name, final int networkSize, final int viewSize, final NodeSettings nodeSettings) {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
@@ -95,10 +91,8 @@ public class Network {
 		this.initialize();
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-			log(String.format(
-					"%s: mean clock inaccuracy per day: %s ms.",
-					this.getName(),
-					format.format(24.0 * (double)cumulativeInaccuracy / (double)this.nodes.size())));
+			log(String.format("%s: mean clock inaccuracy per day: %s ms.", this.getName(),
+					format.format(24.0 * (double) cumulativeInaccuracy / (double) this.nodes.size())));
 		}
 		if (numberOfEvilNodes > 0) {
 			log(String.format("%d%% of all nodes are evil.", (100 * numberOfEvilNodes) / this.nodes.size()));
@@ -133,11 +127,10 @@ public class Network {
 	}
 
 	private TimeSynchronizationStrategy createSynchronizationStrategy() {
-		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(
-				new ResponseDelayDetectionFilter(),
-				new ClampingFilter(),
-				new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, this.poxFacade, this.accountStateCache, (o, s) -> { });
+		final SynchronizationFilter filter = new AggregateSynchronizationFilter(
+				Arrays.asList(new ResponseDelayDetectionFilter(), new ClampingFilter(), new AlphaTrimmedMeanFilter()));
+		return new DefaultTimeSynchronizationStrategy(filter, this.poxFacade, this.accountStateCache, (o, s) -> {
+		});
 	}
 
 	/**
@@ -146,15 +139,15 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode() {
-		return new TimeAwareNode(
-				this.nodeId++,
-				new NodeAge(0),
-				this.syncStrategy,
-				new TimeOffset(this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2),
+		return new TimeAwareNode(this.nodeId++, new NodeAge(0), this.syncStrategy,
+				new TimeOffset(
+						this.random.nextInt(this.nodeSettings.getTimeOffsetSpread() + 1) - this.nodeSettings.getTimeOffsetSpread() / 2),
 				this.nodeSettings.doesDelayCommunication() ? new TimeOffset(this.random.nextInt(100)) : new TimeOffset(0),
 				this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
 				this.nodeSettings.hasUnstableClock() ? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
-				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
+				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes()
+						? TimeAwareNode.NODE_TYPE_EVIL
+						: TimeAwareNode.NODE_TYPE_FRIENDLY);
 	}
 
 	/**
@@ -164,14 +157,8 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode(final TimeAwareNode oldNode) {
-		return new TimeAwareNode(
-				this.nodeId++,
-				oldNode.getAge(),
-				this.syncStrategy,
-				oldNode.getTimeOffset(),
-				oldNode.getCommunicationDelay(),
-				oldNode.getChannelAsymmetry(),
-				oldNode.getClockInaccuary(),
+		return new TimeAwareNode(this.nodeId++, oldNode.getAge(), this.syncStrategy, oldNode.getTimeOffset(),
+				oldNode.getCommunicationDelay(), oldNode.getChannelAsymmetry(), oldNode.getClockInaccuary(),
 				oldNode.isEvil() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
 	}
 
@@ -182,10 +169,10 @@ public class Network {
 	 * @param loggingInterval The logging interval.
 	 */
 	public void advanceInTime(final long timeInterval, final long loggingInterval) {
-		final int numberOfTicks = (int)(timeInterval / TICK_INTERVAL);
-		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVAL);
-		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVAL / this.nodes.size() / TICK_INTERVAL);
-		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVAL);
+		final int numberOfTicks = (int) (timeInterval / TICK_INTERVAL);
+		final int ticksUntilLog = (int) (loggingInterval / TICK_INTERVAL);
+		final int ticksUntilClockAdjustment = (int) (CLOCK_ADJUSTMENT_INTERVAL / this.nodes.size() / TICK_INTERVAL);
+		final int ticksUntilClockInaccuracy = (int) (HOUR / TICK_INTERVAL);
 		for (int i = 0; i < numberOfTicks; i++) {
 			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
 				this.updateStatistics();
@@ -240,9 +227,9 @@ public class Network {
 			return UPDATE_INTERVAL_START;
 		}
 		final long ageToUse = age.getRaw() - START_UPDATE_INTERVAL_ELONGATION_AFTER_ROUND;
-		return (long)Math.min(UPDATE_INTERVAL_START +
-				(UPDATE_INTERVAL_MAXIMUM - UPDATE_INTERVAL_START) *
-						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
+		return (long) Math.min(
+				UPDATE_INTERVAL_START + (UPDATE_INTERVAL_MAXIMUM - UPDATE_INTERVAL_START) * ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH,
+				UPDATE_INTERVAL_MAXIMUM);
 	}
 
 	private void resetCache() {
@@ -263,9 +250,9 @@ public class Network {
 		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
 		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
 		for (final TimeAwareNode node : this.nodes) {
-			final double importance = node.isEvil() ?
-					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
-					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
+			final double importance = node.isEvil()
+					? this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes
+					: (1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
 			final AccountState state = this.accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
@@ -289,7 +276,7 @@ public class Network {
 	 */
 	public void grow(final double percentage) {
 		this.resetCache();
-		final int numberOfNewNodes = (int)(this.nodes.size() * percentage / 100);
+		final int numberOfNewNodes = (int) (this.nodes.size() * percentage / 100);
 		for (int i = 1; i <= numberOfNewNodes; i++) {
 			this.nodes.add(this.createNode());
 		}
@@ -318,9 +305,8 @@ public class Network {
 	}
 
 	/**
-	 * Selects a set of nodes as communication partners  for a given node.
-	 * The algorithm is different from the one used by ImportanceAwareNodeSelector.
-	 * It does not used trust values, only importances.
+	 * Selects a set of nodes as communication partners for a given node. The algorithm is different from the one used by
+	 * ImportanceAwareNodeSelector. It does not used trust values, only importances.
 	 *
 	 * @param node The node to select partners for.
 	 * @return The set of communication partners.
@@ -374,9 +360,7 @@ public class Network {
 			final NetworkTimeStamp localSend = node.getNetworkTime();
 			final NetworkTimeStamp localReceive = new NetworkTimeStamp(
 					node.getNetworkTime().getRaw() + partner.getCommunicationDelay().getRaw() + roundTripTime);
-			samples.add(new TimeSynchronizationSample(
-					partner.getNode(),
-					new CommunicationTimeStamps(localSend, localReceive),
+			samples.add(new TimeSynchronizationSample(partner.getNode(), new CommunicationTimeStamps(localSend, localReceive),
 					partner.createCommunicationTimeStamps(roundTripTime)));
 		}
 
@@ -384,8 +368,8 @@ public class Network {
 	}
 
 	/**
-	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
-	 * We assume here that this happens about every day.
+	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then. We assume here that this
+	 * happens about every day.
 	 */
 	private void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {
@@ -409,7 +393,8 @@ public class Network {
 	 * @return The standard deviation.
 	 */
 	private double calculateStandardDeviation() {
-		return Math.sqrt(this.nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / this.nodes.size());
+		return Math
+				.sqrt(this.nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / this.nodes.size());
 	}
 
 	/**
@@ -439,10 +424,7 @@ public class Network {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final String entry = String.format(
 				"%s : %s mean offset to real time: %sms, standard deviation: %sms, max. deviation from mean: %sms",
-				this.getRealTimeString(),
-				this.getName(),
-				format.format(this.mean),
-				format.format(this.standardDeviation),
+				this.getRealTimeString(), this.getName(), format.format(this.mean), format.format(this.standardDeviation),
 				format.format(this.maxDeviationFromMean));
 		log(entry);
 	}
@@ -458,13 +440,11 @@ public class Network {
 	public void outputOutOfRangeNodes(final long maxTolerableDeviationFromMean) {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final List<TimeAwareNode> outOfRangeNodes = this.nodes.stream()
-				.filter(n -> Math.abs(this.mean - n.getTimeOffset().getRaw()) > maxTolerableDeviationFromMean)
-				.collect(Collectors.toList());
+				.filter(n -> Math.abs(this.mean - n.getTimeOffset().getRaw()) > maxTolerableDeviationFromMean).collect(Collectors.toList());
 		if (!outOfRangeNodes.isEmpty()) {
 			log("Detected nodes with out of allowed range network time:");
-			outOfRangeNodes.stream().forEach(n -> log(String.format("%s: time offset from mean=%s",
-					n.getName(),
-					format.format(this.mean - n.getTimeOffset().getRaw()))));
+			outOfRangeNodes.stream().forEach(n -> log(
+					String.format("%s: time offset from mean=%s", n.getName(), format.format(this.mean - n.getTimeOffset().getRaw()))));
 		}
 	}
 

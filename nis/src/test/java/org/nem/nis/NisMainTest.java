@@ -320,18 +320,20 @@ public class NisMainTest {
 
 	@Test
 	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
-		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA, EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoExpiredMosaicTracking));
+		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA,
+				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	@Test
 	public void initUsesNoOutlinkObserverAndIncrementalPoiIfProofOfStateIsEnabled() {
-		this.assertFlagsToOptionsMapping(PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
+		this.assertFlagsToOptionsMapping(PROOF_OF_STAKE,
+				EnumSet.of(ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	@Test
 	public void initSupportsNoHistoricalDataPruningForProofOfStake() {
-		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE,
-				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
+		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoHistoricalDataPruning,
+				ObserverOption.NoOutlinkObserver, ObserverOption.NoExpiredMosaicTracking));
 	}
 
 	@Test
@@ -363,8 +365,8 @@ public class NisMainTest {
 	}
 
 	private static NisConfiguration createNisConfiguration(final boolean autoBoot, final boolean supplyBootKey,
-			final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData,
-			final boolean proofOfStake, final boolean trackExpiredMosaics) {
+			final boolean supplyBootName, final boolean delayBlockLoading, final boolean historicalAccountData, final boolean proofOfStake,
+			final boolean trackExpiredMosaics) {
 		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config-default.properties",
 				true);
 		final Properties properties = new Properties();

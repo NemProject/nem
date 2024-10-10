@@ -26,9 +26,7 @@ import java.util.logging.Logger;
 public class HttpConnectorITCase {
 	private static final Logger LOGGER = Logger.getLogger(HttpConnectorITCase.class.getName());
 
-	private final Communicator communicator = new HttpCommunicator(
-			new HttpMethodClient<>(),
-			CommunicationMode.JSON,
+	private final Communicator communicator = new HttpCommunicator(new HttpMethodClient<>(), CommunicationMode.JSON,
 			new DeserializationContext(new DefaultAccountCache()));
 	private final HttpConnector connector = new HttpConnector(this.communicator);
 
@@ -52,27 +50,19 @@ public class HttpConnectorITCase {
 		final Node node = createNemNinjaNode(publicKey);
 
 		// Act:
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> this.connector.getInfo(node).join(),
-				ImpersonatingPeerException.class);
+		ExceptionAssert.assertThrowsCompletionException(v -> this.connector.getInfo(node).join(), ImpersonatingPeerException.class);
 	}
 
 	private static Node createNemNinjaNode(final PublicKey publicKey) {
 		final Address address = Address.fromPublicKey(publicKey);
-		return new Node(
-				new NodeIdentity(new KeyPair(address.getPublicKey())),
-				NodeEndpoint.fromHost("alice2.nem.ninja"));
+		return new Node(new NodeIdentity(new KeyPair(address.getPublicKey())), NodeEndpoint.fromHost("alice2.nem.ninja"));
 	}
 
 	@Test
 	public void analyzePreTrustedPeers() {
 		// Arrange:
-		final Config config = new Config(
-				new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
-				loadJsonObject("peers-config_testnet.json"),
-				CommonStarter.META_DATA.getVersion(),
-				0,
-				new NodeFeature[] {});
+		final Config config = new Config(new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
+				loadJsonObject("peers-config_testnet.json"), CommonStarter.META_DATA.getVersion(), 0, new NodeFeature[]{});
 
 		// Act:
 		final boolean result = this.analyzeNodes(config.getPreTrustedNodes().getNodes());
@@ -82,10 +72,7 @@ public class HttpConnectorITCase {
 	}
 
 	private enum NodeStatus {
-		ONLINE,
-		IMPERSONATING,
-		TIMED_OUT,
-		FAILED
+		ONLINE, IMPERSONATING, TIMED_OUT, FAILED
 	}
 
 	private boolean analyzeNodes(final Collection<Node> nodes) {
@@ -132,7 +119,7 @@ public class HttpConnectorITCase {
 					throw new FatalConfigException(String.format("Configuration file <%s> not available", configFileName));
 				}
 
-				return (JSONObject)JSONValue.parse(fin);
+				return (JSONObject) JSONValue.parse(fin);
 			}
 		} catch (final Exception e) {
 			throw new FatalConfigException("Exception encountered while loading config", e);

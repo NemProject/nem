@@ -35,7 +35,8 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	 * @param retriever The mosaic retriever.
 	 * @param supplyRetriever The mosaic supply retriever.
 	 */
-	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever, final MosaicSupplyRetriever supplyRetriever) {
+	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever,
+			final MosaicSupplyRetriever supplyRetriever) {
 		this.sessionFactory = sessionFactory;
 		this.retriever = retriever;
 		this.supplyRetriever = supplyRetriever;

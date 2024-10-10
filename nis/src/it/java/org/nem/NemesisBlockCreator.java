@@ -15,7 +15,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class NemesisBlockCreator {
-	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
+	private static final PrivateKey NEMESIS_KEY = PrivateKey
+			.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
 	private static final Hash GENERATION_HASH = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 
 	private static final String USER_STAKES = "nemesisData/user-stakes.csv";
@@ -74,38 +75,30 @@ public class NemesisBlockCreator {
 				.forEach(address -> block.addTransaction(this.createTransferTransaction(address, nemesisAccountMap.get(address))));
 
 		// not actually needed, one coin is left on nemesis acct
-		//block.addTransaction(this.burnOneCoin());
+		// block.addTransaction(this.burnOneCoin());
 
-		multisigMap.keySet().stream()
-				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
+		multisigMap.keySet().stream().forEach(account -> block
+				.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
 
-		final long xemGiven = block.getTransactions().stream()
-				.filter(t -> t.getType() == TransactionTypes.TRANSFER)
-				.map(t -> ((TransferTransaction)t).getAmount().getNumMicroNem())
-				.reduce(0L, Long::sum);
+		final long xemGiven = block.getTransactions().stream().filter(t -> t.getType() == TransactionTypes.TRANSFER)
+				.map(t -> ((TransferTransaction) t).getAmount().getNumMicroNem()).reduce(0L, Long::sum);
 		final long xemFees = block.getTotalFee().getNumMicroNem();
 
 		if (xemGiven - xemFees != EXPECTED_CUMULATIVE_AMOUNT) {
-			throw new RuntimeException(String.format(
-					"invalid total number of XEM expected %d but got %d (%d - %d)",
-					EXPECTED_CUMULATIVE_AMOUNT,
-					xemGiven - xemFees, xemGiven, xemFees));
+			throw new RuntimeException(String.format("invalid total number of XEM expected %d but got %d (%d - %d)",
+					EXPECTED_CUMULATIVE_AMOUNT, xemGiven - xemFees, xemGiven, xemFees));
 		}
 
 		// check cumulative amount
 		if (cumulativeAmount != EXPECTED_CUMULATIVE_AMOUNT) {
-			throw new RuntimeException(String.format(
-					"wrong cumulative amount: expected %d but got %d",
-					EXPECTED_CUMULATIVE_AMOUNT,
-					cumulativeAmount));
+			throw new RuntimeException(
+					String.format("wrong cumulative amount: expected %d but got %d", EXPECTED_CUMULATIVE_AMOUNT, cumulativeAmount));
 		}
 
 		// check number of multisig accounts
 		if (numMultisigAccounts != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
-			throw new RuntimeException(String.format(
-					"wrong number of multisig accounts: expected %d but got %d",
-					EXPECTED_NUM_MULTISIG_ACCOUNTS,
-					numMultisigAccounts));
+			throw new RuntimeException(String.format("wrong number of multisig accounts: expected %d but got %d",
+					EXPECTED_NUM_MULTISIG_ACCOUNTS, numMultisigAccounts));
 		}
 
 		block.sign();
@@ -162,7 +155,7 @@ public class NemesisBlockCreator {
 				}
 
 				final Amount oldAmount = map.getOrDefault(address, Amount.ZERO);
-				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
+				final Amount amount = Amount.fromMicroNem((long) (Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
 				map.put(address, amount.add(oldAmount));
 				cumulativeAmount += amount.getNumMicroNem();
 			}
@@ -189,14 +182,11 @@ public class NemesisBlockCreator {
 
 				final Amount oldAmount = map.getOrDefault(address, Amount.ZERO);
 
-				final Optional<Account> multisigAccount = multisigMap.keySet().stream()
-						.filter(a -> a.getAddress().compareTo(address) == 0)
+				final Optional<Account> multisigAccount = multisigMap.keySet().stream().filter(a -> a.getAddress().compareTo(address) == 0)
 						.findFirst();
 
-				final MultisigAggregateModificationTransaction transaction = this.createMultisigModificationTransaction(
-						map,
-						multisigAccount.get(),
-						multisigMap.get(multisigAccount.get()));
+				final MultisigAggregateModificationTransaction transaction = this.createMultisigModificationTransaction(map,
+						multisigAccount.get(), multisigMap.get(multisigAccount.get()));
 				final Amount amount = transaction.getFee();
 				map.put(address, amount.add(oldAmount));
 			}
@@ -208,11 +198,7 @@ public class NemesisBlockCreator {
 	private TransferTransaction createTransferTransaction(final Address address, final Amount amount) {
 		final Account account = new Account(address);
 		final Message message = new PlainMessage("Good luck!".getBytes());
-		final TransferTransaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				creator,
-				account,
-				amount,
+		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, creator, account, amount,
 				new TransferTransactionAttachment(message));
 		transaction.sign();
 		return transaction;
@@ -276,25 +262,19 @@ public class NemesisBlockCreator {
 		}
 	}
 
-	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(
-			final HashMap<Address, Amount> nemesisAccountMap,
-			final Account multisig,
-			final List<Account> cosignatories) {
+	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final HashMap<Address, Amount> nemesisAccountMap,
+			final Account multisig, final List<Account> cosignatories) {
 		final List<MultisigCosignatoryModification> modifications = cosignatories.stream()
-				.map(c -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, c))
-				.collect(Collectors.toList());
-		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
+				.map(c -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, c)).collect(Collectors.toList());
+		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO,
+				multisig, modifications);
 		transaction.sign();
 
-		System.out.println(String.format("%s : %d modifications, %d fee",
-				multisig.getAddress().getEncoded(),
-				transaction.getCosignatoryModifications().size(),
-				transaction.getFee().getNumNem()));
+		System.out.println(String.format("%s : %d modifications, %d fee", multisig.getAddress().getEncoded(),
+				transaction.getCosignatoryModifications().size(), transaction.getFee().getNumNem()));
 		if (nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).compareTo(transaction.getFee()) < 0) {
-			throw new RuntimeException(String.format(
-					"%s has not enough funds to create multisig: expected at least %d but got %d",
-					multisig.getAddress().getEncoded(),
-					transaction.getFee().getNumMicroNem(),
+			throw new RuntimeException(String.format("%s has not enough funds to create multisig: expected at least %d but got %d",
+					multisig.getAddress().getEncoded(), transaction.getFee().getNumMicroNem(),
 					nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).getNumMicroNem()));
 		}
 		return transaction;
@@ -354,9 +334,9 @@ public class NemesisBlockCreator {
 
 			private void visit(final Object object, final int indent) {
 				if (object instanceof JSONArray) {
-					this.visit((JSONArray)object, indent);
+					this.visit((JSONArray) object, indent);
 				} else if (object instanceof JSONObject) {
-					this.visit((JSONObject)object, indent);
+					this.visit((JSONObject) object, indent);
 				} else {
 					if (object instanceof String) {
 						this.write("\"" + object + "\"", 0);

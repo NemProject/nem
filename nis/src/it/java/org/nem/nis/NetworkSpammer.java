@@ -24,7 +24,8 @@ import java.util.stream.*;
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
 	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
-	private static final PrivateKey PRIVATE_KEY = PrivateKey.fromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+	private static final PrivateKey PRIVATE_KEY = PrivateKey
+			.fromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
 	private static final NodeIdentity IDENTITY = new NodeIdentity(new KeyPair(PRIVATE_KEY), "Alice");
 
 	static {
@@ -32,25 +33,18 @@ public class NetworkSpammer {
 	}
 
 	private static final int MAX_AMOUNT = 100_000;
-	private static final List<String> HEX_STRINGS = Arrays.asList(
-			"5051363f9c72f068b32d121a28ea34747d4892416dcd6488bbbd3f2bc31ed685",
+	private static final List<String> HEX_STRINGS = Arrays.asList("5051363f9c72f068b32d121a28ea34747d4892416dcd6488bbbd3f2bc31ed685",
 			"7206c8e0d997701ca9b41ee2449f1dda00f8c16dd1f83b3354f4de22f8abb2b5",
 			"07e38011514bcce7cbc0d80aa1e29e1666183eb144bcc175f89a818e80454536",
 			"4d6bcee45a4416c5c63de19bfabe5301aa59fe84b7eb9aed6c703b1c68c971f9",
 			"d0f77aca106aa070523dd9ef0ef9fdf91d594c557e54a4894ba94ab26f804a18");
 
-	private static final List<Node> NODES_50 = Arrays.asList(
-			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
+	private static final List<Node> NODES_50 = Arrays.asList(new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "108.61.247.91", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
-			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895))
-	);
-	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
-			.map(PrivateKey::fromHexString)
-			.collect(Collectors.toList());
-	private static final List<Address> ADDRESSES = PRIVATE_KEYS.stream()
-			.map(p -> new KeyPair(p).getPublicKey())
-			.map(Address::fromPublicKey)
+			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895)));
+	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream().map(PrivateKey::fromHexString).collect(Collectors.toList());
+	private static final List<Address> ADDRESSES = PRIVATE_KEYS.stream().map(p -> new KeyPair(p).getPublicKey()).map(Address::fromPublicKey)
 			.collect(Collectors.toList());
 	private static final PeerConnector PEER_CONNECTOR = createPeerConnector();
 
@@ -74,11 +68,8 @@ public class NetworkSpammer {
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
 		final TimeInstant curTime = TIME_PROVIDER.getCurrentTime();
-		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
-				curTime.addSeconds((i - 1) / transactionsPerSecond),
-				random.nextInt(5),
-				random.nextInt(5),
-				i)));
+		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions
+				.add(createTransaction(curTime.addSeconds((i - 1) / transactionsPerSecond), random.nextInt(5), random.nextInt(5), i)));
 		final int numNodes = nodes.size();
 		final int transactionsPerNode = transactionsPerSecond / numNodes;
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
@@ -94,9 +85,7 @@ public class NetworkSpammer {
 						}
 						final Transaction transaction = transactions.remove(0);
 						pendingTransactions.add(transaction);
-						final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(
-								transaction,
-								IDENTITY);
+						final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(transaction, IDENTITY);
 						entities.add(secureEntity);
 					}
 
@@ -133,25 +122,14 @@ public class NetworkSpammer {
 	}
 
 	private CompletableFuture<?> send(final Node node, final SerializableEntity entity) {
-		return PEER_CONNECTOR.announce(
-				node,
-				NisPeerId.REST_PUSH_TRANSACTIONS,
-				entity);
+		return PEER_CONNECTOR.announce(node, NisPeerId.REST_PUSH_TRANSACTIONS, entity);
 	}
 
-	private static Transaction createTransaction(
-			final TimeInstant timeInstant,
-			final int senderIndex,
-			final int recipientIndex,
+	private static Transaction createTransaction(final TimeInstant timeInstant, final int senderIndex, final int recipientIndex,
 			final long amount) {
 		final Account sender = new Account(new KeyPair(PRIVATE_KEYS.get(senderIndex)));
 		final Account recipient = new Account(ADDRESSES.get(recipientIndex));
-		final TransferTransaction transaction = new TransferTransaction(
-				1,
-				timeInstant,
-				sender,
-				recipient,
-				Amount.fromMicroNem(amount),
+		final TransferTransaction transaction = new TransferTransaction(1, timeInstant, sender, recipient, Amount.fromMicroNem(amount),
 				null);
 		transaction.setFee(Amount.fromNem(10));
 		transaction.setDeadline(timeInstant.addHours(23));

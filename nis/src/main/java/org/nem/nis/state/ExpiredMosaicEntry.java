@@ -19,7 +19,8 @@ public class ExpiredMosaicEntry {
 	 * @param mosaicBalances Mosaic balances.
 	 * @param expiredMosaicType Expired mosaic type.
 	 */
-	public ExpiredMosaicEntry(final MosaicId mosaicId, final ReadOnlyMosaicBalances mosaicBalances, final ExpiredMosaicType expiredMosaicType) {
+	public ExpiredMosaicEntry(final MosaicId mosaicId, final ReadOnlyMosaicBalances mosaicBalances,
+			final ExpiredMosaicType expiredMosaicType) {
 		this.mosaicId = mosaicId;
 		this.mosaicBalances = mosaicBalances;
 		this.expiredMosaicType = expiredMosaicType;

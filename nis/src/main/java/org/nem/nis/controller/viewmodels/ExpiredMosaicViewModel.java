@@ -24,10 +24,8 @@ public class ExpiredMosaicViewModel implements SerializableEntity {
 	 */
 	public ExpiredMosaicViewModel(final ExpiredMosaicEntry entry) {
 		this.mosaicId = entry.getMosaicId();
-		this.balances = entry.getBalances().getOwners()
-			.stream()
-			.map(address -> new AddressBalancePair(address, entry.getBalances().getBalance(address)))
-			.collect(Collectors.toList());
+		this.balances = entry.getBalances().getOwners().stream()
+				.map(address -> new AddressBalancePair(address, entry.getBalances().getBalance(address))).collect(Collectors.toList());
 		this.expiredMosaicType = entry.getExpiredMosaicType();
 	}
 

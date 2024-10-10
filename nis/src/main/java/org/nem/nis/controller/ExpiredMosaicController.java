@@ -49,10 +49,7 @@ public class ExpiredMosaicController {
 		final BlockHeight height = heightBuilder.build();
 		final Collection<ExpiredMosaicEntry> expirations = this.expiredMosaicCache.findExpirationsAtHeight(height);
 		return new SerializableList<>(
-			expirations.stream()
-				.map(expiration -> new ExpiredMosaicViewModel(expiration))
-				.collect(Collectors.toList())
-		);
+				expirations.stream().map(expiration -> new ExpiredMosaicViewModel(expiration)).collect(Collectors.toList()));
 	}
 
 	// endregion

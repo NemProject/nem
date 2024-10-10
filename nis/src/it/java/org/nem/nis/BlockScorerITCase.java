@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 public class BlockScorerITCase {
 	private static final Logger LOGGER = Logger.getLogger(BlockScorerITCase.class.getName());
 
-	private static final byte[] HASH_BYTES = new byte[] {
-			(byte)0xF7, (byte)0xF6, (byte)0xF5, (byte)0xF4, (byte)0xF3, (byte)0xF2, (byte)0xF1, (byte)0xF0,
-			(byte)0xE7, (byte)0xE6, (byte)0xE5, (byte)0xE4, (byte)0xE3, (byte)0xE2, (byte)0xE1, (byte)0xE0,
-			(byte)0xD7, (byte)0xD6, (byte)0xD5, (byte)0xD4, (byte)0xD3, (byte)0xD2, (byte)0xD1, (byte)0xD0,
-			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
+	private static final byte[] HASH_BYTES = new byte[]{
+			(byte) 0xF7, (byte) 0xF6, (byte) 0xF5, (byte) 0xF4, (byte) 0xF3, (byte) 0xF2, (byte) 0xF1, (byte) 0xF0, // preserve-newline
+			(byte) 0xE7, (byte) 0xE6, (byte) 0xE5, (byte) 0xE4, (byte) 0xE3, (byte) 0xE2, (byte) 0xE1, (byte) 0xE0, // preserve-newline
+			(byte) 0xD7, (byte) 0xD6, (byte) 0xD5, (byte) 0xD4, (byte) 0xD3, (byte) 0xD2, (byte) 0xD1, (byte) 0xD0, // preserve-newline
+			(byte) 0xC7, (byte) 0xC6, (byte) 0xC5, (byte) 0xC4, (byte) 0xC3, (byte) 0xC2, (byte) 0xC1, (byte) 0xC0
 	};
 
 	@After
@@ -32,10 +32,10 @@ public class BlockScorerITCase {
 	}
 
 	private static void setupCustomBlockChainConfiguration() {
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder()
-				.setBlockGenerationTargetTime(15)
-				.setBlockChainRewriteLimit(360)
-				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES });
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder().setBlockGenerationTargetTime(15)
+				.setBlockChainRewriteLimit(360).setBlockChainFeatures(new BlockChainFeature[]{
+						BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES
+				});
 		NemGlobals.setBlockChainConfiguration(builder.build());
 	}
 
@@ -83,16 +83,13 @@ public class BlockScorerITCase {
 		for (int i = 1; i < numRounds; i++) {
 			// Don't know creation time yet, so construct helper block
 			block = new Block(harvesterAccounts[0], blocks[i - 1], new TimeInstant(1));
-			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(
-					this.createDifficultiesList(historicalBlocks),
+			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
 					this.createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j = 0; j < numHarvesters; j++) {
 				final Block temporaryDummy = new Block(harvesterAccounts[j], blocks[i - 1], new TimeInstant(1));
 				final BigInteger hit = scorer.calculateHit(temporaryDummy);
-				final int seconds = getTimeForNextBlock(
-						hit,
-						block.getDifficulty().asBigInteger(),
+				final int seconds = getTimeForNextBlock(hit, block.getDifficulty().asBigInteger(),
 						BigInteger.valueOf(harvesterAccounts[j].getInfo().getBalance().getNumNem()));
 				if (seconds < secondsBetweenBlocks[i]) {
 					secondsBetweenBlocks[i] = seconds;
@@ -106,9 +103,7 @@ public class BlockScorerITCase {
 
 			final int slot = secondsBetweenBlocks[i] >= 1000 ? 999 : secondsBetweenBlocks[i];
 			slots[slot]++;
-			blocks[i] = new Block(
-					harvesterAccounts[index],
-					blocks[i - 1],
+			blocks[i] = new Block(harvesterAccounts[index], blocks[i - 1],
 					new TimeInstant(blocks[i - 1].getTimeStamp().getRawTime() + secondsBetweenBlocks[i]));
 			blocks[i].setDifficulty(block.getDifficulty());
 			historicalBlocks.add(blocks[i]);
@@ -131,7 +126,8 @@ public class BlockScorerITCase {
 		LOGGER.info("Minimum time between blocks: " + minTime + " seconds.");
 		LOGGER.info("Maximum time between blocks: " + maxTime + " seconds.");
 		LOGGER.info("Average time between blocks: " + averageTime + " seconds.");
-		Assert.assertTrue("Average time between blocks not within reasonable range!", targetTime * 0.9 < averageTime && averageTime < targetTime * 1.1);
+		Assert.assertTrue("Average time between blocks not within reasonable range!",
+				targetTime * 0.9 < averageTime && averageTime < targetTime * 1.1);
 	}
 
 	private static int getTimeForNextBlock(final BigInteger hit, final BigInteger difficulty, final BigInteger balance) {
@@ -157,19 +153,16 @@ public class BlockScorerITCase {
 
 	private static BigInteger getTarget(final int timeDiff, final BigInteger difficulty, final BigInteger balance) {
 		final BigInteger multiplier = getMultiplierAt(timeDiff);
-		return BigInteger.valueOf(timeDiff)
-				.multiply(balance)
-				.multiply(multiplier)
-				.divide(difficulty);
+		return BigInteger.valueOf(timeDiff).multiply(balance).multiply(multiplier).divide(difficulty);
 	}
 
 	private static BigInteger getMultiplierAt(final int timeDiff) {
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double targetTime = (double) configuration.getBlockGenerationTargetTime();
 		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
 				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
 				: 1.0;
-		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
+		return BigInteger.valueOf((long) (BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	@Test
@@ -197,40 +190,39 @@ public class BlockScorerITCase {
 		final int numRounds = 20;
 		final int numBlocks = 100;
 		final int timeInterval = numBlocks * 60;
-		//  1% attack: 10 rounds with approximately 100 blocks each
+		// 1% attack: 10 rounds with approximately 100 blocks each
 		// NOTE: Since the attacker has a balance considerably lower than 200 million,
-		//       his the average time between blocks is considerably higher than 60 seconds!
-		//       That's why the normal harvester wins this time.
+		// his the average time between blocks is considerably higher than 60 seconds!
+		// That's why the normal harvester wins this time.
 		selfishHarvesterWins[0] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_960_000_000L, 40_000_000L);
 
-		//  5% attack: numRounds rounds with approximately numBlocks blocks each
+		// 5% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins[1] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_800_000_000L, 200_000_000L);
 
-		//  10% attack: numRounds rounds with approximately numBlocks blocks each
+		// 10% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins[2] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_700_000_000L, 300_000_000L);
 
-		//  20% attack: numRounds rounds with approximately numBlocks blocks each
+		// 20% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins[3] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_000_000_000L, 500_000_000L);
 
-		//  30% attack: numRounds rounds with approximately numBlocks blocks each
+		// 30% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins[4] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_400_000_000L, 600_000_000L);
 
-		//  40% attack: numRounds rounds with approximately numBlocks blocks each
+		// 40% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins[5] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_500_000_000L, 1_000_000_000L);
 
-		//  45% attack: numRounds rounds with approximately numBlocks blocks each
-		//  Due to variance the selfish harvester sometimes wins
+		// 45% attack: numRounds rounds with approximately numBlocks blocks each
+		// Due to variance the selfish harvester sometimes wins
 		selfishHarvesterWins[6] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
 		// Assert:
-		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
+		final float[] thresholdWins = new float[]{
+				0, 0, 0, 0, 0, 0, 0.01f
+		};
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
-			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
+			final int maxWins = (int) Math.floor(numRounds * thresholdWins[i]);
 			final int actualWins = selfishHarvesterWins[i];
-			final String message = String.format(
-					"Selfish harvester(%d) created better chain! (actual: %d, max: %d)",
-					i,
-					actualWins,
+			final String message = String.format("Selfish harvester(%d) created better chain! (actual: %d, max: %d)", i, actualWins,
 					maxWins);
 			MatcherAssert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
 		}
@@ -273,12 +265,12 @@ public class BlockScorerITCase {
 	}
 
 	/**
-	 * I have been doing more extensive tests to see if there is something wrong but i tend to say it's just variance.
-	 * Even when both have 50% coins you can see the outcome can be quite different.
-	 * In each run the competitors played 50 rounds. About 1.2 million blocks were harvested per run.
-	 * So both parties were harvesting very long chains before comparing the results (numBlocks = 10000).
-	 * That is why the win percentage for the selfish harvester is a lot lower than in the usual tests where we have numBlocks = 100.
-	 * <br>
+	 * I have been doing more extensive tests to see if there is something wrong but i tend to say it's just variance. Even when both have
+	 * 50% coins you can see the outcome can be quite different. In each run the competitors played 50 rounds. About 1.2 million blocks were
+	 * harvested per run. So both parties were harvesting very long chains before comparing the results (numBlocks = 10000). That is why the
+	 * win percentage for the selfish harvester is a lot lower than in the usual tests where we have numBlocks = 100. <br>
+	 *
+	 * <pre>
 	 * Selfish harvester with 40%:
 	 * ---------------------------
 	 * selfish harvester (535677 blocks) vs x random (614974 blocks) : 0% : 100%
@@ -307,6 +299,7 @@ public class BlockScorerITCase {
 	 * selfish harvester (678180 blocks) vs x random (676547 blocks) : 56% : 44%
 	 * selfish harvester (640489 blocks) vs x random (640088 blocks) : 46% : 54%
 	 * selfish harvester (617941 blocks) vs x random (618577 blocks) : 52% : 48%
+	 * </pre>
 	 */
 
 	@Test
@@ -338,14 +331,14 @@ public class BlockScorerITCase {
 		selfishHarvesterWins[4] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
 
 		// Assert:
-		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };
+		final float[] thresholdWins = new float[]{
+				0, 0, 0, 0.10f, 0.25f
+		};
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
-			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
+			final int maxWins = (int) Math.floor(numRounds * thresholdWins[i]);
 			final int actualWins = selfishHarvesterWins[i];
 			final String message = String.format(
-					"Selfish harvester(%d) vs multiple normal (random): created better chain! (actual: %d, max: %d)",
-					i,
-					actualWins,
+					"Selfish harvester(%d) vs multiple normal (random): created better chain! (actual: %d, max: %d)", i, actualWins,
 					maxWins);
 			MatcherAssert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
 		}
@@ -388,7 +381,8 @@ public class BlockScorerITCase {
 		MatcherAssert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 
-	private int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance,
+			final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -438,11 +432,13 @@ public class BlockScorerITCase {
 
 		final long selfishHarvesterBalancePercent = (selfishHarvesterBalance * 100L) / (normalHarvesterBalance + selfishHarvesterBalance);
 		final int selfishHarvesterWinsPercent = (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvesterWins);
-		LOGGER.info("selfish harvester (" + selfishHarvesterBalancePercent + "% of all nem) wins in:   " + selfishHarvesterWinsPercent + "%.");
+		LOGGER.info(
+				"selfish harvester (" + selfishHarvesterBalancePercent + "% of all nem) wins in:   " + selfishHarvesterWinsPercent + "%.");
 		return selfishHarvesterWins;
 	}
 
-	private int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
+	private int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester,
+			final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -497,13 +493,15 @@ public class BlockScorerITCase {
 			}
 		}
 
-		LOGGER.info(selfishCount + " selfish harvester vs " + count + " (" +
-				(selfishCount * selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishCount * selfishHarvesterBalance) +
-				"% of all nem) wins in:   " + (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
+		LOGGER.info(selfishCount + " selfish harvester vs " + count + " ("
+				+ (selfishCount * selfishHarvesterBalance * 100L)
+						/ (count * normalHarvesterBalance + selfishCount * selfishHarvesterBalance)
+				+ "% of all nem) wins in:   " + (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	private int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count,
+			final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -553,17 +551,13 @@ public class BlockScorerITCase {
 			}
 		}
 
-		LOGGER.info("selfish harvester vs " + count + " (" +
-				(selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishHarvesterBalance) + "% of all nem) wins in:   " +
-				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
+		LOGGER.info("selfish harvester vs " + count + " ("
+				+ (selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishHarvesterBalance)
+				+ "% of all nem) wins in:   " + (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	private int normalXRandomHarvesterVersusSelfishHarvester(
-			final int numRounds,
-			final int maxTime,
-			final int percentage,
-			final int count,
+	private int normalXRandomHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int percentage, final int count,
 			final long normalHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
@@ -616,8 +610,8 @@ public class BlockScorerITCase {
 			}
 		}
 
-		LOGGER.info("selfish harvester (" + percentage + "% of all nems) vs x random wins in:   " +
-				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
+		LOGGER.info("selfish harvester (" + percentage + "% of all nems) vs x random wins in:   "
+				+ (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
@@ -655,8 +649,8 @@ public class BlockScorerITCase {
 
 		final long numHarvestedBlocks = harvesters[count].getInfo().getHarvestedBlocks().getRaw();
 		final long percentage = (numHarvestedBlocks * 100) / (numHarvestedBlocks + manyHarvestersNumBlocks);
-		LOGGER.info("One harvester created  " + numHarvestedBlocks + " blocks (" + percentage + "%), " + count + " harvesters created " +
-				manyHarvestersNumBlocks + " blocks.");
+		LOGGER.info("One harvester created  " + numHarvestedBlocks + " blocks (" + percentage + "%), " + count + " harvesters created "
+				+ manyHarvestersNumBlocks + " blocks.");
 		return percentage;
 	}
 
@@ -673,19 +667,18 @@ public class BlockScorerITCase {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block generateNextBlock(final AccountWithInfo harvester, final List<Block> blocks, final BlockScorer scorer, final boolean randomizeTime) {
+	private Block generateNextBlock(final AccountWithInfo harvester, final List<Block> blocks, final BlockScorer scorer,
+			final boolean randomizeTime) {
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 		Block block = new Block(harvester, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
 
-		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
-		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
-				this.createDifficultiesList(historicalBlocks),
+		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)),
+				blocks.size());
+		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(this.createDifficultiesList(historicalBlocks),
 				this.createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
-		int seconds = getTimeForNextBlock(
-				hit,
-				block.getDifficulty().asBigInteger(),
+		int seconds = getTimeForNextBlock(hit, block.getDifficulty().asBigInteger(),
 				BigInteger.valueOf(harvester.getInfo().getBalance().getNumNem()));
 		if (seconds == 0) {
 			// This will not happen in our network
@@ -701,10 +694,7 @@ public class BlockScorerITCase {
 		return block;
 	}
 
-	private Block generateNextBlockMultiple(
-			final AccountWithInfo[] harvesters,
-			final List<Block> blocks,
-			final BlockScorer scorer,
+	private Block generateNextBlockMultiple(final AccountWithInfo[] harvesters, final List<Block> blocks, final BlockScorer scorer,
 			final boolean randomizeTime) {
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 

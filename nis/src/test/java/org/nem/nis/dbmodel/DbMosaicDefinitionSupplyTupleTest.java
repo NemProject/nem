@@ -16,7 +16,8 @@ public class DbMosaicDefinitionSupplyTupleTest {
 		final DbMosaicDefinition mosaicDefinition = new DbMosaicDefinition();
 
 		// Act:
-		final DbMosaicDefinitionSupplyTuple tuple = new DbMosaicDefinitionSupplyTuple(mosaicDefinition, new Supply(123L), new BlockHeight(999L));
+		final DbMosaicDefinitionSupplyTuple tuple = new DbMosaicDefinitionSupplyTuple(mosaicDefinition, new Supply(123L),
+				new BlockHeight(999L));
 
 		// Assert:
 		MatcherAssert.assertThat(tuple.getMosaicDefinition(), IsEqual.equalTo(mosaicDefinition));

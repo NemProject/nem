@@ -19,7 +19,7 @@ public class MosaicDefinitionSupplyTuple implements SerializableEntity {
 	 * @param supply Mosaic supply.
 	 * @param expirationHeight Expiration height of owning namespace.
 	 */
-	public MosaicDefinitionSupplyTuple(final MosaicDefinition mosaicDefinition, final Supply supply, final BlockHeight expirationHeight){
+	public MosaicDefinitionSupplyTuple(final MosaicDefinition mosaicDefinition, final Supply supply, final BlockHeight expirationHeight) {
 		this.mosaicDefinition = mosaicDefinition;
 		this.supply = supply;
 		this.expirationHeight = expirationHeight;

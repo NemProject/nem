@@ -379,8 +379,10 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 		final AccountState state = this.addToCache(cache.copy(), address);
 
-		final RemoteLink link1 = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(1000), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
-		final RemoteLink link2 = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(2000), ACTIVATE, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink link1 = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(1000), ACTIVATE,
+				RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(2000), ACTIVATE,
+				RemoteLink.Owner.HarvestingRemotely);
 		state.getRemoteLinks().addLink(link1);
 		state.getRemoteLinks().addLink(link2);
 
