@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import java.io.*;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -8,8 +9,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.utils.StringEncoder;
 import org.springframework.http.MediaType;
-
-import java.io.*;
 
 public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 

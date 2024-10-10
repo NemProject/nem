@@ -1,5 +1,7 @@
 package org.nem.deploy;
 
+import java.io.*;
+import javax.servlet.http.*;
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ErrorHandler;
@@ -8,9 +10,6 @@ import org.nem.core.connect.ErrorResponse;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.time.TimeProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.*;
-import java.io.*;
 
 /**
  * Custom error handler that returns JSON error responses in the same format as the ExceptionControllerAdvice.

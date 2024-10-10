@@ -1,12 +1,11 @@
 package org.nem.deploy;
 
+import java.io.InputStream;
 import net.minidev.json.*;
 import org.apache.commons.io.IOUtils;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 import org.springframework.http.MediaType;
-
-import java.io.InputStream;
 
 /**
  * A json serialization policy.

@@ -1,10 +1,9 @@
 package org.nem.deploy;
 
-import org.nem.core.time.*;
-
 import java.time.Instant;
 import java.util.TimeZone;
 import java.util.logging.*;
+import org.nem.core.time.*;
 
 /**
  * Formatter adds network time to logs.

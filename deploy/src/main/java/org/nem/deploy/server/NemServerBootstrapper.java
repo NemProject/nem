@@ -1,14 +1,13 @@
 package org.nem.deploy.server;
 
+import javax.servlet.*;
+import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServlet;
 import org.eclipse.jetty.server.*;
 import org.nem.deploy.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-
-import javax.servlet.*;
-import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServlet;
 
 /**
  * A bootstrapper for booting a nem server.

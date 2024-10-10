@@ -1,14 +1,12 @@
 package org.nem.deploy;
 
+import java.io.InputStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.springframework.web.servlet.HandlerMapping;
-
-import java.io.InputStream;
 
 /**
  * Base class for SerializationPolicy tests.

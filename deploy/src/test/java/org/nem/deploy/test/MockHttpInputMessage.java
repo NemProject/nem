@@ -1,9 +1,8 @@
 package org.nem.deploy.test;
 
+import java.io.*;
 import net.minidev.json.JSONObject;
 import org.springframework.http.*;
-
-import java.io.*;
 
 /**
  * A mock HttpInputMessage implementation.

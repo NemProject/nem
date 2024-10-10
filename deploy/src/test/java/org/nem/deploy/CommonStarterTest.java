@@ -1,11 +1,10 @@
 package org.nem.deploy;
 
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-
-import java.util.concurrent.CompletableFuture;
 
 public class CommonStarterTest {
 

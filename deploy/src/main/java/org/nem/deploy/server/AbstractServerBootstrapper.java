@@ -1,5 +1,6 @@
 package org.nem.deploy.server;
 
+import javax.servlet.ServletContextListener;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -7,8 +8,6 @@ import org.eclipse.jetty.util.thread.*;
 import org.eclipse.jetty.webapp.Configuration;
 import org.nem.deploy.*;
 import org.springframework.web.context.ContextLoaderListener;
-
-import javax.servlet.ServletContextListener;
 
 /**
  * Abstract class for booting a server.

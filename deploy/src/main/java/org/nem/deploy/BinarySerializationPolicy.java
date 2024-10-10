@@ -1,11 +1,10 @@
 package org.nem.deploy;
 
+import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.springframework.http.MediaType;
-
-import java.io.InputStream;
 
 /**
  * A binary serialization policy.

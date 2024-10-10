@@ -1,5 +1,11 @@
 package org.nem.deploy;
 
+import java.io.*;
+import java.net.*;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.*;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.server.Server;
@@ -9,13 +15,6 @@ import org.nem.core.time.*;
 import org.nem.core.utils.*;
 import org.nem.deploy.server.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.io.*;
-import java.net.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.*;
 
 /**
  * Simple jetty bootstrapper using the Servlet API 3.x with programmatic configuration.

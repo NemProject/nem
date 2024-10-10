@@ -1,9 +1,8 @@
 package org.nem.deploy.test;
 
+import java.io.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.springframework.http.*;
-
-import java.io.*;
 
 /**
  * A mock HttpOutputMessage implementation.

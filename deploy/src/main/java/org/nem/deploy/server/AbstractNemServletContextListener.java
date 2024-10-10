@@ -1,13 +1,12 @@
 package org.nem.deploy.server;
 
+import java.io.IOException;
+import java.util.EnumSet;
+import javax.servlet.*;
+import javax.servlet.http.*;
 import org.eclipse.jetty.http.MimeTypes;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.IOException;
-import java.util.EnumSet;
 
 /**
  * Abstract servlet context listener used to implement nem listeners.

@@ -1,11 +1,10 @@
 package org.nem.deploy;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
-
-import java.util.*;
 
 /**
  * Class responsible for holding all common configuration settings. A reboot is required for configuration changes to take effect.

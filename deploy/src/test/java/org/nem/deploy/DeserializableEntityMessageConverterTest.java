@@ -1,5 +1,7 @@
 package org.nem.deploy;
 
+import java.io.IOException;
+import java.util.List;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -9,9 +11,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.deploy.test.*;
 import org.springframework.http.MediaType;
-
-import java.io.IOException;
-import java.util.List;
 
 public class DeserializableEntityMessageConverterTest {
 

@@ -1,11 +1,10 @@
 package org.nem.deploy;
 
-import org.hamcrest.core.IsEqual;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.*;
 
 public class PropertiesExtensionsTest {
 

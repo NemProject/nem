@@ -1,11 +1,10 @@
 package org.nem.deploy;
 
+import java.io.IOException;
 import org.nem.core.serialization.Deserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
-
-import java.io.IOException;
 
 /**
  * An HttpMessageConverter that maps application/json requests to Deserializer objects.

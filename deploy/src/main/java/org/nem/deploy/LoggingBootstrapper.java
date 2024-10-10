@@ -1,10 +1,9 @@
 package org.nem.deploy;
 
-import org.nem.core.utils.*;
-
 import java.io.*;
 import java.util.Properties;
 import java.util.logging.*;
+import org.nem.core.utils.*;
 
 /**
  * Static class that is used to bootstrap the logging subsystem.

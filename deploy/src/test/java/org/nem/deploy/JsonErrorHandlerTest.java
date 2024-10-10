@@ -1,18 +1,17 @@
 package org.nem.deploy;
 
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
 import net.minidev.json.*;
 import org.eclipse.jetty.server.*;
-import org.hamcrest.core.*;
 import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.ErrorResponse;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
 
 public class JsonErrorHandlerTest {
 	private static final TimeInstant CURRENT_TIME = new TimeInstant(84);

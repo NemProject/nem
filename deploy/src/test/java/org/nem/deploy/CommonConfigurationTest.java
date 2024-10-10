@@ -1,5 +1,7 @@
 package org.nem.deploy;
 
+import java.nio.file.Paths;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.*;
-
-import java.nio.file.Paths;
-import java.util.*;
 
 public class CommonConfigurationTest {
 	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",

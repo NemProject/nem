@@ -1,9 +1,8 @@
 package org.nem.deploy;
 
+import java.io.InputStream;
 import org.nem.core.serialization.*;
 import org.springframework.http.MediaType;
-
-import java.io.InputStream;
 
 /**
  * Represents a serialization policy.

@@ -1,12 +1,11 @@
 package org.nem.deploy;
 
+import java.io.IOException;
+import java.lang.reflect.*;
 import org.nem.core.serialization.Deserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.*;
-
-import java.io.IOException;
-import java.lang.reflect.*;
 
 public class DeserializableEntityMessageConverter extends AbstractHttpMessageConverter<Object> {
 	private final DeserializerHttpMessageConverter deserializerMessageConverter;
