@@ -46,8 +46,7 @@ public class ParallelVerifyPerfITCase {
 	}
 
 	private static Collection<Transaction> createTransactions(final int count) {
-		final Collection<Transaction> transactions = IntStream.range(0, count)
-				.mapToObj(i -> RandomTransactionFactory.createTransfer())
+		final Collection<Transaction> transactions = IntStream.range(0, count).mapToObj(i -> RandomTransactionFactory.createTransfer())
 				.collect(Collectors.toList());
 		transactions.forEach(VerifiableEntity::sign);
 		return transactions;

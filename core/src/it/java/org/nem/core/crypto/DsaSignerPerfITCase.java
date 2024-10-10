@@ -16,10 +16,7 @@ public class DsaSignerPerfITCase {
 		assertVerifySpeed(CryptoEngines.secp256k1Engine(), 500, 500, 5000);
 	}
 
-	private static void assertVerifySpeed(
-			final CryptoEngine engine,
-			final int numWarmUpIterations,
-			final int numTimedIterations,
+	private static void assertVerifySpeed(final CryptoEngine engine, final int numWarmUpIterations, final int numTimedIterations,
 			final int threshold) {
 		// Arrange:
 		final KeyPair keyPair = KeyPair.random(engine);

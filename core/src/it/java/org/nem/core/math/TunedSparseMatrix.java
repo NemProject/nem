@@ -40,7 +40,7 @@ public class TunedSparseMatrix extends Matrix {
 		}
 	}
 
-	//region Matrix abstract functions
+	// region Matrix abstract functions
 
 	@Override
 	protected final Matrix create(final int numRows, final int numCols) {
@@ -112,7 +112,7 @@ public class TunedSparseMatrix extends Matrix {
 		}
 	}
 
-	//endregion
+	// endregion
 
 	@Override
 	public Collection<Integer> normalizeColumns() {
