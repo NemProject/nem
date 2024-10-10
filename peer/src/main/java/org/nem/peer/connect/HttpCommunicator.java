@@ -1,10 +1,9 @@
 package org.nem.peer.connect;
 
-import org.nem.core.connect.*;
-import org.nem.core.serialization.*;
-
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import org.nem.core.connect.*;
+import org.nem.core.serialization.*;
 
 /**
  * HTTP JSON-base communicator implementation.

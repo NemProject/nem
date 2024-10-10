@@ -1,5 +1,8 @@
 package org.nem.peer.services;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,10 +15,6 @@ import org.nem.peer.*;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.*;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.*;
 
 public class NodeExperiencesUpdaterTest {
 

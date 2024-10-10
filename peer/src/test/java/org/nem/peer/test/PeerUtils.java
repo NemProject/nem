@@ -1,10 +1,9 @@
 package org.nem.peer.test;
 
+import java.util.*;
 import org.nem.core.node.Node;
 import org.nem.core.test.NodeUtils;
 import org.nem.peer.trust.score.NodeExperience;
-
-import java.util.*;
 
 /**
  * Static class containing helper functions for creating objects used in peer tests.

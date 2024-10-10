@@ -1,10 +1,9 @@
 package org.nem.peer.node;
 
+import java.util.logging.Logger;
 import org.nem.core.crypto.Signature;
 import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.*;
-
-import java.util.logging.Logger;
 
 /**
  * Authenticated NIS response that can be used to authenticate the local node.

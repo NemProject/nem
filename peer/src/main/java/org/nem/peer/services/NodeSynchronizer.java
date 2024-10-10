@@ -1,11 +1,10 @@
 package org.nem.peer.services;
 
+import java.util.logging.Logger;
 import org.nem.core.node.Node;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
 import org.nem.peer.trust.NodeSelector;
-
-import java.util.logging.Logger;
 
 /**
  * Helper class used to implement network synchronization logic.

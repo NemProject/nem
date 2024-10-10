@@ -1,11 +1,10 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.ColumnVector;
-import org.nem.core.node.Node;
-
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.*;
+import org.nem.core.math.ColumnVector;
+import org.nem.core.node.Node;
 
 /**
  * A basic node selector implementation.

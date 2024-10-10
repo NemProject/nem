@@ -1,9 +1,8 @@
 package org.nem.peer.trust;
 
+import java.util.function.Predicate;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
-
-import java.util.function.Predicate;
 
 /**
  * TrustProvider decorator that filters out the trust values of inactive and local nodes.

@@ -1,14 +1,13 @@
 package org.nem.peer.trust;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class TrustProviderMaskDecoratorTest {
 

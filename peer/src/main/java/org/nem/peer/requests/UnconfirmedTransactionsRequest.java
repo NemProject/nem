@@ -1,11 +1,10 @@
 package org.nem.peer.requests;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.HashShortId;
 import org.nem.core.serialization.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Request that specifies partial hashes of unconfirmed transactions which should NOT be included.

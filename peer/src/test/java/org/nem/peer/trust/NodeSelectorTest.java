@@ -1,5 +1,6 @@
 package org.nem.peer.trust;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,8 +9,6 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.trust.score.NodeExperiences;
-
-import java.util.*;
 
 /**
  * Interface test for NodeSelector

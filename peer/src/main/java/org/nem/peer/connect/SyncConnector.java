@@ -1,13 +1,12 @@
 package org.nem.peer.connect;
 
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.peer.requests.*;
-
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface that is used to sync blocks and transactions across peers.

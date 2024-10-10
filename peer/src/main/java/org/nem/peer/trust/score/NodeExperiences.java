@@ -1,12 +1,11 @@
 package org.nem.peer.trust.score;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.math.*;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.AbstractTwoLevelMap;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Contains experiences for a set of nodes.

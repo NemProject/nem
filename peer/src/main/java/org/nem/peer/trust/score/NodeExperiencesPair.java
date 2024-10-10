@@ -1,9 +1,8 @@
 package org.nem.peer.trust.score;
 
+import java.util.List;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
-
-import java.util.List;
 
 /**
  * A Node and List &lt;NodeExperiencePair&gt; pair.

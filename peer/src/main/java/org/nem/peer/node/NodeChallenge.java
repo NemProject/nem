@@ -1,9 +1,8 @@
 package org.nem.peer.node;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
-
-import java.util.Arrays;
 
 /**
  * A challenge that can be used for authenticating nodes.

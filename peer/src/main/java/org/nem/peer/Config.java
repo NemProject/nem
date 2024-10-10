@@ -1,13 +1,12 @@
 package org.nem.peer;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.minidev.json.JSONObject;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.trust.*;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Represents peer configuration.

@@ -1,9 +1,8 @@
 package org.nem.peer.trust;
 
-import org.nem.core.node.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.node.*;
 
 /**
  * Node selector that is aware of pre-trusted nodes.

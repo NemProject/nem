@@ -1,13 +1,12 @@
 package org.nem.peer;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.*;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkBroadcastBufferTest {
 

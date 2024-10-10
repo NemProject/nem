@@ -1,5 +1,7 @@
 package org.nem.peer.services;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -10,9 +12,6 @@ import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.test.PeerUtils;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class NodeBroadcasterTest {
 

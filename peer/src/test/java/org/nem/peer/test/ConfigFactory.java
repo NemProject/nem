@@ -1,13 +1,12 @@
 package org.nem.peer.test;
 
+import java.math.BigInteger;
 import net.minidev.json.*;
 import org.nem.core.crypto.*;
 import org.nem.core.node.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base64Encoder;
 import org.nem.peer.Config;
-
-import java.math.BigInteger;
 
 /**
  * Static class containing utility functions for creating Config objects.

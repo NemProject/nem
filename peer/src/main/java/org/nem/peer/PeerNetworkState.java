@@ -1,14 +1,13 @@
 package org.nem.peer;
 
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
 import org.nem.core.time.*;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 /**
  * Encapsulates information about the state of a peer network.

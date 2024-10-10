@@ -1,5 +1,8 @@
 package org.nem.peer.services;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,10 +15,6 @@ import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.test.*;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 
 public class NodeRefresherTest {
 	private static final int DEFAULT_SLEEP = 300;

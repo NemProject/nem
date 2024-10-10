@@ -1,9 +1,8 @@
 package org.nem.peer.trust.score;
 
-import org.nem.core.node.Node;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.nem.core.node.Node;
 
 /**
  * A collection of TrustScore objects.

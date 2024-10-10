@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,9 +9,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class BroadcastBufferTest {
 

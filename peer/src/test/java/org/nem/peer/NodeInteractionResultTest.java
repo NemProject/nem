@@ -1,11 +1,10 @@
 package org.nem.peer;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.ValidationResult;
-
-import java.util.*;
 
 public class NodeInteractionResultTest {
 

@@ -1,8 +1,7 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.*;
-
 import java.util.logging.Logger;
+import org.nem.core.math.*;
 
 /**
  * A convergence policy for the Eigentrust algorithm based on the PowerIteration.

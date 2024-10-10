@@ -1,12 +1,11 @@
 package org.nem.peer.trust;
 
-import org.nem.core.node.Node;
-import org.nem.core.time.*;
-
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.nem.core.node.Node;
+import org.nem.core.time.*;
 
 /**
  * TrustProvider decorator that caches trust calculation results for a specified period of time.

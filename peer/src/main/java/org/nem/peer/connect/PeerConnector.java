@@ -1,10 +1,9 @@
 package org.nem.peer.connect;
 
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.peer.trust.score.NodeExperiencesPair;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A interface that is used to request information from nodes.

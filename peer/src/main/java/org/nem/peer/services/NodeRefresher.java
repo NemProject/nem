@@ -1,14 +1,13 @@
 package org.nem.peer.services;
 
-import org.nem.core.connect.*;
-import org.nem.core.node.*;
-import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.NodeCompatibilityChecker;
-
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.nem.core.connect.*;
+import org.nem.core.node.*;
+import org.nem.peer.connect.PeerConnector;
+import org.nem.peer.node.NodeCompatibilityChecker;
 
 /**
  * Helper class used to implement network refreshing logic.

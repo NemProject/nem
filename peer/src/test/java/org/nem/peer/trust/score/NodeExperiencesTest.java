@@ -1,5 +1,6 @@
 package org.nem.peer.trust.score;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,8 +9,6 @@ import org.nem.core.node.Node;
 import org.nem.core.test.NodeUtils;
 import org.nem.core.time.TimeInstant;
 import org.nem.peer.test.PeerUtils;
-
-import java.util.*;
 
 public class NodeExperiencesTest {
 	private static final int RETENTION_TIME = 24;

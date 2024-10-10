@@ -1,13 +1,12 @@
 package org.nem.peer.trust.simulation;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.MatcherAssert;
-import org.junit.*;
-import org.nem.peer.trust.*;
-
 import java.net.URL;
 import java.util.*;
 import java.util.logging.*;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
+import org.nem.peer.trust.*;
 
 public class NetworkSimulatorITCase {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulatorITCase.class.getName());

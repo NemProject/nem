@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -11,8 +12,6 @@ import org.nem.core.time.*;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
-
-import java.util.*;
 
 public class PeerNetworkStateTest {
 

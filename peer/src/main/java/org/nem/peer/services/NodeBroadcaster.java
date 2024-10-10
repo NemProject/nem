@@ -1,12 +1,11 @@
 package org.nem.peer.services;
 
-import org.nem.core.node.*;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.peer.connect.PeerConnector;
-
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.nem.core.node.*;
+import org.nem.core.serialization.SerializableEntity;
+import org.nem.peer.connect.PeerConnector;
 
 /**
  * Helper class used to implement node broadcasting logic.

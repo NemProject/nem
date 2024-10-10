@@ -1,14 +1,13 @@
 package org.nem.peer.services;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeProvider;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 /**
  * Class that pulls node experiences from remote nodes and updates the local node's node experiences.

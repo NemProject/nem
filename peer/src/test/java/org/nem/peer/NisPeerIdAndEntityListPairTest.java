@@ -1,5 +1,6 @@
 package org.nem.peer;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class NisPeerIdAndEntityListPairTest {
 

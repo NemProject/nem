@@ -1,8 +1,7 @@
 package org.nem.peer.trust;
 
-import org.nem.core.node.Node;
-
 import java.util.List;
+import org.nem.core.node.Node;
 
 /**
  * Interface for selecting a node.

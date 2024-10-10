@@ -1,5 +1,7 @@
 package org.nem.peer.services;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
 import org.nem.peer.connect.PeerConnector;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class LocalNodeEndpointUpdaterTest {
 

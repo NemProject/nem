@@ -1,13 +1,12 @@
 package org.nem.peer.trust;
 
+import java.util.HashSet;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.nem.core.node.Node;
 import org.nem.core.test.NodeUtils;
 import org.nem.peer.trust.score.NodeExperiences;
-
-import java.util.HashSet;
 
 public class TrustContextTest {
 

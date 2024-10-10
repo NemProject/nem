@@ -1,10 +1,9 @@
 package org.nem.peer;
 
-import org.nem.core.node.NisPeerId;
-import org.nem.core.serialization.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.node.NisPeerId;
+import org.nem.core.serialization.*;
 
 /**
  * A class that buffers entities that will be broadcast in the future.

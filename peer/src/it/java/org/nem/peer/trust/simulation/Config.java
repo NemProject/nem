@@ -1,11 +1,10 @@
 package org.nem.peer.trust.simulation;
 
-import org.nem.core.node.*;
-import org.nem.core.test.NodeUtils;
-
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 
 /**
  * Network simulator configuration.

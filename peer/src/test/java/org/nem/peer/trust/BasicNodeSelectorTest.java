@@ -1,8 +1,7 @@
 package org.nem.peer.trust;
 
-import org.nem.core.math.ColumnVector;
-
 import java.util.Random;
+import org.nem.core.math.ColumnVector;
 
 public class BasicNodeSelectorTest extends NodeSelectorTest {
 

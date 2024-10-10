@@ -1,5 +1,7 @@
 package org.nem.peer;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -8,9 +10,6 @@ import org.nem.core.node.*;
 import org.nem.core.test.*;
 import org.nem.peer.test.ConfigFactory;
 import org.nem.peer.trust.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ConfigTest {
 	private static final String DEFAULT_LOCAL_NODE_HOST = ConfigFactory.DEFAULT_LOCAL_NODE_HOST;

@@ -1,5 +1,9 @@
 package org.nem.peer.trust;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -10,11 +14,6 @@ import org.nem.core.node.Node;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.peer.trust.score.NodeExperiences;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class CachedTrustProviderTest {
 	private static final Logger LOGGER = Logger.getLogger(CachedTrustProviderTest.class.getName());

@@ -1,11 +1,10 @@
 package org.nem.peer.test;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.nem.core.node.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Static class containing asserts that are used to validate NodeCollection objects.

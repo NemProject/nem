@@ -1,9 +1,8 @@
 package org.nem.peer.trust;
 
+import java.util.Set;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.Node;
-
-import java.util.Set;
 
 /**
  * Represents information about pre-trusted nodes.

@@ -1,11 +1,10 @@
 package org.nem.peer;
 
-import org.nem.core.node.NisPeerId;
-import org.nem.core.serialization.SerializableEntity;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.nem.core.node.NisPeerId;
+import org.nem.core.serialization.SerializableEntity;
 
 /**
  * Combines a peer network with a broadcast buffer.

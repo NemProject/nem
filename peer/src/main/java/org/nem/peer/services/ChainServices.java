@@ -1,10 +1,9 @@
 package org.nem.peer.services;
 
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.node.Node;
-
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.Node;
 
 /**
  * Interface containing higher-level functions around accessing information about the NIS block chain of other nodes.

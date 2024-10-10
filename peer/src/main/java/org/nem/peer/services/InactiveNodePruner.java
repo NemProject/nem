@@ -1,8 +1,7 @@
 package org.nem.peer.services;
 
-import org.nem.core.node.NodeCollection;
-
 import java.util.logging.Logger;
+import org.nem.core.node.NodeCollection;
 
 /**
  * Helper class used to implement inactive node pruning.

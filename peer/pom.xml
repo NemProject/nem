@@ -186,10 +186,8 @@
                             <include>src/**/*.java</include>
                         </includes>
 
-                        <!--
                         <importOrder />
                         <removeUnusedImports />
-                        -->
                         <trimTrailingWhitespace/>
                         <endWithNewline/>
 
