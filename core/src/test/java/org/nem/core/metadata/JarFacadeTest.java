@@ -1,12 +1,11 @@
 package org.nem.core.metadata;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.IsEqual;
-import org.junit.*;
-
 import java.io.*;
 import java.net.URL;
 import java.util.jar.*;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 
 public class JarFacadeTest {
 

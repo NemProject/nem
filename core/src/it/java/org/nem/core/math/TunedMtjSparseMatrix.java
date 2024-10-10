@@ -1,9 +1,8 @@
 package org.nem.core.math;
 
+import java.util.*;
 import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
-
-import java.util.*;
 
 /**
  * A Matrix implementation that uses CompRowMatrix from MTJ.

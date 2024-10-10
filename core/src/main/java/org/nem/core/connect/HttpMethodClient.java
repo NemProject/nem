@@ -1,5 +1,10 @@
 package org.nem.core.connect;
 
+import java.io.Closeable;
+import java.net.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
@@ -10,12 +15,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.io.Closeable;
-import java.net.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.logging.Logger;
 
 /**
  * Helper class that wraps an HttpClient.

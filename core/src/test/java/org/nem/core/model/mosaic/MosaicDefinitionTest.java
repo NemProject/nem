@@ -1,5 +1,6 @@
 package org.nem.core.model.mosaic;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -9,8 +10,6 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class MosaicDefinitionTest {
 

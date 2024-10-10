@@ -1,8 +1,7 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-
 import java.util.Arrays;
+import org.nem.core.serialization.*;
 
 /**
  * Meta data about a node.

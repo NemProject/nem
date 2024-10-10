@@ -1,12 +1,11 @@
 package org.nem.core.utils;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.*;
-import org.junit.*;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.*;
+import org.junit.*;
 
 public class ExceptionUtilsTest {
 

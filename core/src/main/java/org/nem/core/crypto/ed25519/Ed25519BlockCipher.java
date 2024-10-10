@@ -1,16 +1,15 @@
 package org.nem.core.crypto.ed25519;
 
+import java.security.SecureRandom;
+import java.util.Arrays;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.*;
 import org.bouncycastle.crypto.params.*;
-import org.nem.core.crypto.BlockCipher;
 import org.nem.core.crypto.*;
+import org.nem.core.crypto.BlockCipher;
 import org.nem.core.crypto.ed25519.arithmetic.*;
-
-import java.security.SecureRandom;
-import java.util.Arrays;
 
 /**
  * Implementation of the block cipher for Ed25519.

@@ -1,9 +1,8 @@
 package org.nem.core.crypto;
 
-import org.nem.core.serialization.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.nem.core.serialization.*;
 
 /**
  * Helper class for storing list of hashes. Wraps List of ByteArray objects.

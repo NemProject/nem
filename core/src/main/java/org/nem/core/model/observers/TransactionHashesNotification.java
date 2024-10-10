@@ -1,8 +1,7 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.HashMetaDataPair;
-
 import java.util.List;
+import org.nem.core.model.HashMetaDataPair;
 
 /**
  * A notification that transaction hashes appeared or disappeared from the blockchain.

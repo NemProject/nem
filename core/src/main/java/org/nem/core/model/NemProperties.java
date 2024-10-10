@@ -1,8 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.utils.StringUtils;
-
 import java.util.Properties;
+import org.nem.core.utils.StringUtils;
 
 /**
  * A strongly typed NEM property bag.

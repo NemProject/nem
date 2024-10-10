@@ -1,13 +1,12 @@
 package org.nem.core.crypto.secp256k1;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.*;
-
-import java.math.BigInteger;
 
 public class SecP256K1DsaSignerTest extends DsaSignerTest {
 

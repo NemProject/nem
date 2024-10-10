@@ -1,11 +1,10 @@
 package org.nem.core.math;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 

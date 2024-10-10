@@ -1,8 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.PublicKey;
-
 import java.util.*;
+import org.nem.core.crypto.PublicKey;
 
 /**
  * Class holding all public keys of accounts that are blocked from harvesting.

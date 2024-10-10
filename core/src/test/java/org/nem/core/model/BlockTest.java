@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.math.BigInteger;
-import java.util.*;
 
 public class BlockTest {
 

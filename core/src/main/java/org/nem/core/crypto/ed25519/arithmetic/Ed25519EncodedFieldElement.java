@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.*;
-
 import java.util.Arrays;
+import org.nem.core.utils.*;
 
 /**
  * Represents a field element of the finite field with p=2^255-19 elements. The value of the field element is held in 2^8 bit

@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.HexEncoder;
-
 import java.math.BigInteger;
+import org.nem.core.utils.HexEncoder;
 
 /**
  * Represents the underlying group for Ed25519.

@@ -1,13 +1,12 @@
 package org.nem.core.test;
 
+import java.util.Collections;
+import java.util.stream.IntStream;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.Collections;
-import java.util.stream.IntStream;
 
 /**
  * Factory class used to create random (concrete) transactions.

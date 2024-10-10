@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.ByteUtils;
-
 import java.io.Serializable;
+import org.nem.core.utils.ByteUtils;
 
 /**
  * A point on the ED25519 curve which represents a group element. <br>

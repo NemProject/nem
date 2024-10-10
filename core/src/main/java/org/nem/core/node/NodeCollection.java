@@ -1,9 +1,8 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a collection of nodes.

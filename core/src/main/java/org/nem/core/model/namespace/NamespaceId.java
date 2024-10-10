@@ -1,9 +1,8 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.serialization.*;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a fully qualified namespace name (immutable).

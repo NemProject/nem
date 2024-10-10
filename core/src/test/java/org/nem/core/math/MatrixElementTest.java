@@ -1,10 +1,9 @@
 package org.nem.core.math;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.util.*;
 
 public class MatrixElementTest {
 

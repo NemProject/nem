@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
+import java.util.stream.IntStream;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-
-import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
 public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionFeeCalculatorTest {

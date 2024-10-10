@@ -1,14 +1,13 @@
 package org.nem.core.model;
 
+import java.util.List;
+import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 public class BlockExtensionsTest {
 

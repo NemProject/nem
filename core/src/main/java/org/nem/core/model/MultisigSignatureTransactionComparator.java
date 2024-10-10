@@ -1,8 +1,7 @@
 package org.nem.core.model;
 
-import org.nem.core.utils.ArrayUtils;
-
 import java.util.Comparator;
+import org.nem.core.utils.ArrayUtils;
 
 /**
  * A custom comparator for comparing MultisigSignatureTransaction objects. <br>

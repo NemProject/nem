@@ -1,9 +1,8 @@
 package org.nem.core.model;
 
-import org.nem.core.serialization.*;
-
 import java.util.*;
 import java.util.function.BiFunction;
+import org.nem.core.serialization.*;
 
 /**
  * Factory class that can deserialize all known transactions.

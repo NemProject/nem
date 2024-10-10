@@ -1,10 +1,9 @@
 package org.nem.core.async;
 
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-
-import java.util.concurrent.CompletableFuture;
 
 public class SleepFutureTest {
 

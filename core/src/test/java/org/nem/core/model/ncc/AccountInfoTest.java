@@ -1,5 +1,8 @@
 package org.nem.core.model.ncc;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Function;
 
 public class AccountInfoTest {
 

@@ -1,5 +1,8 @@
 package org.nem.core.serialization;
 
+import java.math.*;
+import java.util.*;
+import java.util.function.Supplier;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -7,10 +10,6 @@ import org.junit.*;
 import org.nem.core.serialization.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.StringEncoder;
-
-import java.math.*;
-import java.util.*;
-import java.util.function.Supplier;
 
 public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {
 

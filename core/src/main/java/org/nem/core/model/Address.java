@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
-
-import java.util.Arrays;
 
 /**
  * A NEM address.

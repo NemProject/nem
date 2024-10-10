@@ -1,11 +1,10 @@
 package org.nem.core.model;
 
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.utils.SetOnce;
-
-import java.util.Arrays;
 
 /**
  * Central class responsible for providing access to network information.

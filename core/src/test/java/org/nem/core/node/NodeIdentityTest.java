@@ -1,5 +1,6 @@
 package org.nem.core.node;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -8,8 +9,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ArrayUtils;
-
-import java.util.*;
 
 public class NodeIdentityTest {
 

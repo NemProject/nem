@@ -1,5 +1,6 @@
 package org.nem.core.connect;
 
+import java.io.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.hamcrest.MatcherAssert;
@@ -9,8 +10,6 @@ import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.io.*;
 
 public class HttpErrorResponseDeserializerUnionStrategyTest {
 

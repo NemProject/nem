@@ -1,14 +1,13 @@
 package org.nem.core.crypto;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.RandomTransactionFactory;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.*;
 
 public class ParallelVerifyPerfITCase {
 	private static final Logger LOGGER = Logger.getLogger(ParallelVerifyPerfITCase.class.getName());

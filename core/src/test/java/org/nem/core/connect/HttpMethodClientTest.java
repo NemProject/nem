@@ -2,6 +2,9 @@ package org.nem.core.connect;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.*;
+import java.net.URL;
+import java.util.concurrent.CancellationException;
+import java.util.function.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -14,11 +17,6 @@ import org.mockito.Mockito;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.net.URL;
-import java.util.Arrays;
-import java.util.concurrent.CancellationException;
-import java.util.function.*;
 
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {

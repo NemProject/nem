@@ -1,12 +1,11 @@
 package org.nem.core.node;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class NodeTest {
 

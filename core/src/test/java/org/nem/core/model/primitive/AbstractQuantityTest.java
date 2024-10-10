@@ -1,13 +1,12 @@
 package org.nem.core.model.primitive;
 
+import java.util.function.BiFunction;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.function.BiFunction;
 
 /**
  * Base class for AbstractTDerived tests.

@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
 
 /**
  * A transaction that provisions a namespace.

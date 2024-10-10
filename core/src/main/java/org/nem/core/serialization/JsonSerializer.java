@@ -1,11 +1,10 @@
 package org.nem.core.serialization;
 
-import net.minidev.json.*;
-import org.nem.core.utils.*;
-
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import net.minidev.json.*;
+import org.nem.core.utils.*;
 
 /**
  * A json serializer that supports forward-only serialization.

@@ -1,10 +1,9 @@
 package org.nem.core.model.ncc;
 
+import java.util.Collections;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-import java.util.Collections;
 
 public class AccountMetaDataPairTest extends AbstractMetaDataPairTest<AccountInfo, AccountMetaData> {
 

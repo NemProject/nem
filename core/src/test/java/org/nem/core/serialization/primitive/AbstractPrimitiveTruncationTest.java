@@ -1,12 +1,11 @@
 package org.nem.core.serialization.primitive;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer, T> {
 	private final SerializationPolicy<TSerializer, TDeserializer> policy;

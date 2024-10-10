@@ -1,9 +1,8 @@
 package org.nem.core.async;
 
+import java.util.logging.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
-
-import java.util.logging.*;
 
 /**
  * An async timer visitor implementation used by NIS.

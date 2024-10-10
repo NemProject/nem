@@ -1,8 +1,7 @@
 package org.nem.core.model.primitive;
 
-import org.nem.core.serialization.*;
-
 import java.math.BigInteger;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a NEM block difficulty.

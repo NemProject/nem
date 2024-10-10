@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.primitive.Quantity;
 
 /**
  * An attachment that can be attached to a transfer transaction.

@@ -1,13 +1,12 @@
 package org.nem.core.serialization;
 
+import java.util.*;
+import java.util.function.Function;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class SerializableListTest {
 

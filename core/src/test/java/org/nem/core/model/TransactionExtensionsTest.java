@@ -1,12 +1,11 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.stream.*;
 
 public class TransactionExtensionsTest {
 

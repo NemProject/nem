@@ -1,12 +1,11 @@
 package org.nem.core.serialization.primitive;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.MockSerializableEntity;
-
-import java.util.*;
 
 public abstract class AbstractObjectArraySerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer>
 		extends

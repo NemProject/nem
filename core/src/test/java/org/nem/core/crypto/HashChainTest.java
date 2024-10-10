@@ -1,13 +1,12 @@
 package org.nem.core.crypto;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class HashChainTest {
 

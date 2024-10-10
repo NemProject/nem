@@ -1,11 +1,10 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringEncoder;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Supplier;
+import org.nem.core.utils.StringEncoder;
 
 /**
  * A binary deserializer that supports forward-only deserialization.

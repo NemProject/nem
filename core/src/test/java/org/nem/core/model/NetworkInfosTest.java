@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,8 +9,6 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.*;
 
 @RunWith(Enclosed.class)
 @SuppressWarnings("serial")

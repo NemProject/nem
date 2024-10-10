@@ -1,12 +1,11 @@
 package org.nem.core.connect.client;
 
+import java.net.*;
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.connect.*;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.net.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A default AsyncNemConnector implementation

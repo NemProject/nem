@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -7,8 +8,6 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.math.BigInteger;
 
 public class AccountTest {
 

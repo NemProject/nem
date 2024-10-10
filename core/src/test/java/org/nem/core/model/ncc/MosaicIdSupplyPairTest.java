@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -7,8 +8,6 @@ import org.junit.*;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
 
 public class MosaicIdSupplyPairTest {
 

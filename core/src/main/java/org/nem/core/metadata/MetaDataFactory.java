@@ -1,8 +1,7 @@
 package org.nem.core.metadata;
 
-import org.nem.core.time.TimeProvider;
-
 import java.security.CodeSource;
+import org.nem.core.time.TimeProvider;
 
 /**
  * Static class that is able to load meta data from various sources.

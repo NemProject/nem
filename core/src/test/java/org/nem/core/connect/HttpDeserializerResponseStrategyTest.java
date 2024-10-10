@@ -1,12 +1,11 @@
 package org.nem.core.connect;
 
+import java.io.ByteArrayInputStream;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.test.ConnectUtils;
-
-import java.io.ByteArrayInputStream;
 
 public class HttpDeserializerResponseStrategyTest {
 

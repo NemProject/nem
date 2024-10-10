@@ -1,10 +1,9 @@
 package org.nem.core.metadata;
 
-import org.nem.core.serialization.*;
-import org.nem.core.time.*;
-
 import java.security.cert.X509Certificate;
 import java.util.Objects;
+import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
 /**
  * Meta data information about the application.

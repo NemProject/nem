@@ -1,13 +1,12 @@
 package org.nem.core.model;
 
+import java.util.Properties;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.Properties;
 
 @RunWith(Enclosed.class)
 public class NemPropertiesTest {

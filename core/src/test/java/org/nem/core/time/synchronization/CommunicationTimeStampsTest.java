@@ -1,12 +1,11 @@
 package org.nem.core.time.synchronization;
 
+import java.util.HashMap;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.NetworkTimeStamp;
-
-import java.util.HashMap;
 
 public class CommunicationTimeStampsTest {
 

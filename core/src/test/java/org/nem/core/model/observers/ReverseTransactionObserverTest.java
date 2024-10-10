@@ -1,5 +1,7 @@
 package org.nem.core.model.observers;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,9 +9,6 @@ import org.mockito.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class ReverseTransactionObserverTest {
 

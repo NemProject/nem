@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.IntStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.IntStream;
 
 public class AbstractTransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;

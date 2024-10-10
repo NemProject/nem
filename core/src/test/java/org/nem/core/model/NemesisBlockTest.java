@@ -1,5 +1,9 @@
 package org.nem.core.model;
 
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
@@ -12,11 +16,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class NemesisBlockTest {

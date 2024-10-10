@@ -1,5 +1,6 @@
 package org.nem.core.model.ncc;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
-
-import java.util.*;
 
 public class AccountMetaDataTest {
 

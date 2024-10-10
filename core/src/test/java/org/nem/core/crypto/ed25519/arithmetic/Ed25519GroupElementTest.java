@@ -1,11 +1,10 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Ed25519GroupElementTest {
 

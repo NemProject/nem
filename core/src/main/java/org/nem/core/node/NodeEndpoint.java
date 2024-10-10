@@ -1,10 +1,9 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-import org.nem.core.utils.StringUtils;
-
 import java.net.*;
 import java.util.Arrays;
+import org.nem.core.serialization.*;
+import org.nem.core.utils.StringUtils;
 
 /**
  * The endpoint of a node in the NEM network.

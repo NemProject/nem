@@ -1,13 +1,12 @@
 package org.nem.core.connect;
 
+import java.io.IOException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.io.IOException;
 
 /**
  * Base class for tests of classes deriving from HttpDeserializerResponseStrategy that deserialize entities.

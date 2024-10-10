@@ -1,12 +1,11 @@
 package org.nem.core.math;
 
-import no.uib.cipr.matrix.DenseVector;
-import no.uib.cipr.matrix.sparse.CompRowMatrix;
-import org.junit.Test;
-
 import java.security.SecureRandom;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
+import org.junit.Test;
 
 public class SparseMatrixPerfITCase {
 	private static final Logger LOGGER = Logger.getLogger(SparseMatrixPerfITCase.class.getName());

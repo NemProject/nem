@@ -1,11 +1,10 @@
 package org.nem.core.model.mosaic;
 
+import java.util.Properties;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
-
-import java.util.Properties;
 
 /**
  * Common place to have Mosaic-related constants accessible from all modules.

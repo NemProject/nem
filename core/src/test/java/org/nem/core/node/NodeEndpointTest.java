@@ -1,12 +1,11 @@
 package org.nem.core.node;
 
+import java.math.BigInteger;
+import java.net.URL;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
-
-import java.math.BigInteger;
-import java.net.URL;
 
 public class NodeEndpointTest {
 

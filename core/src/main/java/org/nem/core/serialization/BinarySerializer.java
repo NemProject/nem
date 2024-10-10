@@ -1,10 +1,9 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringEncoder;
-
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Collection;
+import org.nem.core.utils.StringEncoder;
 
 /**
  * A binary serializer that supports forward-only serialization.

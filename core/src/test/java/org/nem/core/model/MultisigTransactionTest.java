@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -11,10 +14,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 public class MultisigTransactionTest {
 	private static final Amount EXPECTED_FEE = Amount.fromNem(6);

@@ -1,11 +1,10 @@
 package org.nem.core.utils;
 
+import java.io.*;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.io.*;
 
 public class LockFileTest {
 

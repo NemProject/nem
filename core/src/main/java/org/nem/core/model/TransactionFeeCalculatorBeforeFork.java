@@ -1,9 +1,8 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
-
-import java.math.BigInteger;
 
 /**
  * Implementation for calculating and validating transaction fees before the fee fork.

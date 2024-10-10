@@ -1,10 +1,9 @@
 package org.nem.core.serialization;
 
-import org.nem.core.utils.StringUtils;
-
 import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
+import org.nem.core.utils.StringUtils;
 
 /**
  * An abstract class for forward-only deserialization of primitive data types. Implementations may use or ignore label parameters but

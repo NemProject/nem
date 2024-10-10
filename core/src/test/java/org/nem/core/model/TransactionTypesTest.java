@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
 
 public class TransactionTypesTest {
 

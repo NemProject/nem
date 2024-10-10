@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,9 +9,6 @@ import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class TransferTransactionAttachmentTest {
 

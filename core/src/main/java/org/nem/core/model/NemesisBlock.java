@@ -1,10 +1,9 @@
 package org.nem.core.model;
 
+import java.io.*;
 import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.nem.core.serialization.*;
-
-import java.io.*;
 
 /**
  * Represents the nemesis block.

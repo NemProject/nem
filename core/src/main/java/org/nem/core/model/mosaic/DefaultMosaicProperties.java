@@ -1,10 +1,9 @@
 package org.nem.core.model.mosaic;
 
+import java.util.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.utils.MustBe;
-
-import java.util.*;
 
 /**
  * Class holding properties of a mosaic.

@@ -1,9 +1,8 @@
 package org.nem.core.math;
 
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import org.nem.core.utils.FormatUtils;
 
 /**
  * Represents a sparse matrix.

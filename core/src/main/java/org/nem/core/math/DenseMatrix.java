@@ -1,9 +1,8 @@
 package org.nem.core.math;
 
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.function.DoubleConsumer;
+import org.nem.core.utils.FormatUtils;
 
 /**
  * Represents a dense matrix.

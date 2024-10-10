@@ -1,8 +1,7 @@
 package org.nem.core.model.transactions.extensions;
 
-import org.nem.core.serialization.*;
-
 import java.util.Collection;
+import org.nem.core.serialization.*;
 
 /**
  * An aggregate transaction serialization extension.

@@ -1,10 +1,9 @@
 package org.nem.core.connect.client;
 
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.connect.HttpPostRequest;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.serialization.Deserializer;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * An asynchronous NEM connector that can be used to connect to both NCC and NIS nodes.

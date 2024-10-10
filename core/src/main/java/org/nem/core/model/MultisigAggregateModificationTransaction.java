@@ -1,12 +1,11 @@
 package org.nem.core.model;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A transaction that describes the addition or removal of one or more cosignatories to or from a multisig account. Additionally the minimum

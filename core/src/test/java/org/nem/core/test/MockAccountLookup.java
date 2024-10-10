@@ -1,10 +1,9 @@
 package org.nem.core.test;
 
-import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
-
 import java.util.*;
 import java.util.function.Predicate;
+import org.nem.core.model.*;
+import org.nem.core.serialization.AccountLookup;
 
 /**
  * A mock AccountLookup implementation.

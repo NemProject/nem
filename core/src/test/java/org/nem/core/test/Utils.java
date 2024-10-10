@@ -1,5 +1,8 @@
 package org.nem.core.test;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Properties;
 import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
@@ -10,10 +13,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Properties;
 
 /**
  * Static class containing test utilities.

@@ -1,9 +1,8 @@
 package org.nem.core.model;
 
+import java.util.function.Supplier;
 import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
 import org.nem.core.model.primitive.*;
-
-import java.util.function.Supplier;
 
 /**
  * Default implementation for calculating and validating transaction fees.

@@ -1,13 +1,12 @@
 package org.nem.core.connect;
 
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import net.minidev.json.JSONValue;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 /**
  * Strategy for coercing an HTTP response into an ErrorResponseDeserializerUnion.

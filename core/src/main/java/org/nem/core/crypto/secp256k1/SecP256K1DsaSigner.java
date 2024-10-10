@@ -1,12 +1,11 @@
 package org.nem.core.crypto.secp256k1;
 
+import java.math.BigInteger;
 import org.bouncycastle.crypto.digests.KeccakDigest;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.signers.*;
 import org.bouncycastle.math.ec.ECPoint;
 import org.nem.core.crypto.*;
-
-import java.math.BigInteger;
 
 /**
  * Implementation of the DSA signer for SECP256K1.

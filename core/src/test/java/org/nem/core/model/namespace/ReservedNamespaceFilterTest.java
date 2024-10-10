@@ -1,12 +1,11 @@
 package org.nem.core.model.namespace;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class ReservedNamespaceFilterTest {
 	private static final String[] EXPECTED_RESERVED_ROOTS = {

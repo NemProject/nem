@@ -1,12 +1,11 @@
 package org.nem.core.model.transactions.extensions;
 
+import java.util.*;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Transaction;
 import org.nem.core.serialization.*;
 import org.nem.core.test.RandomTransactionFactory;
-
-import java.util.*;
 
 public class AggregateTransactionSerializationExtensionTest {
 

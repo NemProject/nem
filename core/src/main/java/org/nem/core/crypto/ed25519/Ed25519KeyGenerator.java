@@ -1,10 +1,9 @@
 package org.nem.core.crypto.ed25519;
 
+import java.security.SecureRandom;
 import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.utils.ArrayUtils;
-
-import java.security.SecureRandom;
 
 /**
  * Implementation of the key generator for Ed25519.

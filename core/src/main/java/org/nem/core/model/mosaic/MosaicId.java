@@ -1,10 +1,9 @@
 package org.nem.core.model.mosaic;
 
+import java.util.regex.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
-
-import java.util.regex.*;
 
 /**
  * The (case-insensitive) mosaic unique identifier.

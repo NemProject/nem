@@ -1,10 +1,9 @@
 package org.nem.core.crypto;
 
+import java.math.BigInteger;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.test.Utils;
-
-import java.math.BigInteger;
 
 public class SignerTest {
 

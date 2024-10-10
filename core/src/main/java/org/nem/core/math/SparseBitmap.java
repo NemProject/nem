@@ -1,7 +1,6 @@
 package org.nem.core.math;
 
 import com.googlecode.javaewah.EWAHCompressedBitmap;
-
 import java.util.*;
 
 /**

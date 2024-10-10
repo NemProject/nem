@@ -1,9 +1,8 @@
 package org.nem.core.crypto;
 
+import java.util.Arrays;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
-
-import java.util.Arrays;
 
 /**
  * A hash.

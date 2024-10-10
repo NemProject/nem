@@ -1,9 +1,8 @@
 package org.nem.core.messages;
 
+import java.util.Arrays;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-
-import java.util.Arrays;
 
 /**
  * A plain, unencrypted message.

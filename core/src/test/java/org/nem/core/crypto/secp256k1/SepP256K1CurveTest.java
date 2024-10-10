@@ -1,11 +1,10 @@
 package org.nem.core.crypto.secp256k1;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.CryptoEngines;
-
-import java.math.BigInteger;
 
 public class SepP256K1CurveTest {
 

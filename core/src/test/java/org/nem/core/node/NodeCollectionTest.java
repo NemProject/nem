@@ -1,13 +1,12 @@
 package org.nem.core.node;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class NodeCollectionTest {
 

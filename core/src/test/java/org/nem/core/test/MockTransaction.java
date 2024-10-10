@@ -1,13 +1,12 @@
 package org.nem.core.test;
 
+import java.util.*;
+import java.util.function.Consumer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * A mock Transaction implementation.

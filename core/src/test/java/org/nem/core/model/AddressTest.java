@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -8,10 +11,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.Base32Encoder;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.*;
 
 public class AddressTest {
 

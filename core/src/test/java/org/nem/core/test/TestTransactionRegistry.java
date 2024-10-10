@@ -1,10 +1,9 @@
 package org.nem.core.test;
 
-import org.nem.core.model.*;
-
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.*;
+import org.nem.core.model.*;
 
 /**
  * A transaction registry used by test code.

@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A transaction that represents the exchange of funds/mosaics and/or a message between a sender and a recipient.

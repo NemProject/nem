@@ -1,8 +1,7 @@
 package org.nem.core.time;
 
-import org.nem.core.model.primitive.TimeOffset;
-
 import java.util.*;
+import org.nem.core.model.primitive.TimeOffset;
 
 /**
  * Time provider that uses the System time.

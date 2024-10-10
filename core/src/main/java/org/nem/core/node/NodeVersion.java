@@ -1,9 +1,8 @@
 package org.nem.core.node;
 
-import org.nem.core.serialization.*;
-
 import java.util.Objects;
 import java.util.regex.*;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a node version.

@@ -1,8 +1,7 @@
 package org.nem.core.serialization;
 
-import org.nem.core.model.*;
-
 import java.util.function.Predicate;
+import org.nem.core.model.*;
 
 /**
  * An interface for looking up accounts.

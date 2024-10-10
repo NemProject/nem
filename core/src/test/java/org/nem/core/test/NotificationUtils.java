@@ -1,5 +1,6 @@
 package org.nem.core.test;
 
+import java.util.Collection;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.nem.core.model.*;
@@ -7,8 +8,6 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-
-import java.util.Collection;
 
 /**
  * Static class providing helper functions for creating and validating notifications.

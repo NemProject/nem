@@ -1,12 +1,11 @@
 package org.nem.core.async;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class AsyncTimerOptionsBuilderTest {
 	private static final int TIME_UNIT = 60;

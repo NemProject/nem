@@ -1,8 +1,7 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.*;
-
 import java.math.BigInteger;
+import org.nem.core.utils.*;
 
 /**
  * Represents the underlying finite field for Ed25519. The field has p = 2^255 - 19 elements.

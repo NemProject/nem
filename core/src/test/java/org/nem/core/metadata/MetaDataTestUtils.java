@@ -1,12 +1,11 @@
 package org.nem.core.metadata;
 
-import org.mockito.Mockito;
-
-import javax.security.auth.x500.X500Principal;
 import java.io.*;
 import java.net.*;
 import java.security.cert.X509Certificate;
 import java.util.jar.*;
+import javax.security.auth.x500.X500Principal;
+import org.mockito.Mockito;
 
 /**
  * Static class containing helper functions for meta data tests.

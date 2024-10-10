@@ -1,8 +1,7 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.utils.MustBe;
-
 import java.util.regex.Pattern;
+import org.nem.core.utils.MustBe;
 
 /**
  * Represents a part of a namespace id

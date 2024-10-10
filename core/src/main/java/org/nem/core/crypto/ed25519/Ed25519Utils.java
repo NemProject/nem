@@ -1,10 +1,9 @@
 package org.nem.core.crypto.ed25519;
 
+import java.util.Arrays;
 import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import org.nem.core.utils.ArrayUtils;
-
-import java.util.Arrays;
 
 /**
  * Utility methods for Ed25519.
