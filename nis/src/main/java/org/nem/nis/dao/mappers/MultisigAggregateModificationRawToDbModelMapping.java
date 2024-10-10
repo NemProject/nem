@@ -1,9 +1,8 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.HashSet;
 import org.nem.nis.dbmodel.DbMultisigAggregateModificationTransaction;
 import org.nem.nis.mappers.IMapper;
-
-import java.util.HashSet;
 
 /**
  * A mapping that is able to map raw multisig signer modification transaction data to a db multisig signer modification transfer.

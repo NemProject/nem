@@ -1,9 +1,8 @@
 package org.nem.nis.time.synchronization.filter;
 
+import java.util.List;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
-import java.util.List;
 
 /**
  * Aggregate synchronization filter.

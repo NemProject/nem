@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import java.util.Arrays;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -14,8 +15,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.Arrays;
 
 public class MosaicDefinitionCreationObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;

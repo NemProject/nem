@@ -1,13 +1,12 @@
 package org.nem.nis;
 
+import java.util.*;
+import java.util.logging.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 public class BlockDifficultyScorerTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockDifficultyScorerTest.class.getName());

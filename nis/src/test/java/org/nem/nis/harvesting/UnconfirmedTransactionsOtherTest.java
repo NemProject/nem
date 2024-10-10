@@ -1,5 +1,9 @@
 package org.nem.nis.harvesting;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
+
+import java.util.*;
+import java.util.function.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,16 +12,11 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.function.*;
-
-import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
 
 public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;

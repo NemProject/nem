@@ -1,9 +1,9 @@
 package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.validators.block.*;
-import org.nem.nis.ForkConfiguration;
 
 /**
  * Factory for creating BlockValidator objects.

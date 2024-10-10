@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.nem.core.model.Address;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbAccount;
-
-import java.util.*;
 
 /**
  * Adapts an AccountDao to an AccountDaoLookup.

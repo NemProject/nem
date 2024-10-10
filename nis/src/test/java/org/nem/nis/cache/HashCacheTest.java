@@ -1,5 +1,7 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & CommittableCache> {
 	private static final int RETENTION_TIME = 36 * 60 * 60;

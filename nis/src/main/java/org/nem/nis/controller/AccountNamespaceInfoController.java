@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
@@ -8,8 +9,6 @@ import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 /**
  * REST API for retrieving account namespace related information

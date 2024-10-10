@@ -1,8 +1,7 @@
 package org.nem.nis.visitors;
 
-import org.nem.core.model.Block;
-
 import java.util.List;
+import org.nem.core.model.Block;
 
 /**
  * Aggregate block visitor.

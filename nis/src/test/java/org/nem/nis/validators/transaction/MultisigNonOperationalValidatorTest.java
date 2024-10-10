@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,10 +9,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.MultisigTestContext;
 import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
+import org.nem.nis.test.MultisigTestContext;
 
 public class MultisigNonOperationalValidatorTest {
 

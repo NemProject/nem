@@ -1,13 +1,12 @@
 package org.nem.nis.state;
 
+import java.util.Collection;
+import java.util.stream.IntStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
-
-import java.util.Collection;
-import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 

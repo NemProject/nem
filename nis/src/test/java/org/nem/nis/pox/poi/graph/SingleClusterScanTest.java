@@ -1,14 +1,13 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.NisUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SingleClusterScanTest {
 

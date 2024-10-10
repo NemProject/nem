@@ -1,9 +1,8 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.Arrays;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
-
-import java.util.Arrays;
 
 /**
  * A mapping that is able to map raw mosaic definition creation transaction data to a db mosaic definition creation transaction.

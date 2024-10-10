@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -24,10 +27,6 @@ import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class AccountInfoControllerTest {

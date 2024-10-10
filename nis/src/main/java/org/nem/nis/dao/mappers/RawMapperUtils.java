@@ -1,9 +1,8 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
-
-import java.math.BigInteger;
 
 /**
  * Static class exposing utility functions used by raw mappers.

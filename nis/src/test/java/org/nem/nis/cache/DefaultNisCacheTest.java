@@ -1,12 +1,11 @@
 package org.nem.nis.cache;
 
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.function.Function;
 
 public class DefaultNisCacheTest {
 

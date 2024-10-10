@@ -1,12 +1,11 @@
 package org.nem.nis.time.synchronization.filter;
 
+import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
-import java.util.List;
 
 public class AlphaTrimmedMeanFilterTest {
 

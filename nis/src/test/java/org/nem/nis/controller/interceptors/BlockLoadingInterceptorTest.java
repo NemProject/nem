@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import javax.servlet.http.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,8 +10,6 @@ import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.NisUtils;
 import org.springframework.web.method.HandlerMethod;
-
-import javax.servlet.http.*;
 
 public class BlockLoadingInterceptorTest {
 

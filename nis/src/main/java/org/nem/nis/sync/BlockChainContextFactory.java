@@ -1,5 +1,6 @@
 package org.nem.nis.sync;
 
+import java.util.Collection;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.cache.ReadOnlyNisCache;
@@ -7,8 +8,6 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-
-import java.util.Collection;
 
 /**
  * Helper class for creating contexts used during block synchronization.

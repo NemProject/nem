@@ -1,11 +1,10 @@
 package org.nem.nis;
 
+import java.math.BigInteger;
+import java.util.List;
 import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * Strategy for calculating block difficulties.

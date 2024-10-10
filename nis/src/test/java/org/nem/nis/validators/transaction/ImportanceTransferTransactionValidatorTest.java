@@ -1,5 +1,7 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.Collections;
+import java.util.function.BiConsumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -15,9 +17,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.Collections;
-import java.util.function.BiConsumer;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);

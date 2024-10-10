@@ -1,5 +1,11 @@
 package org.nem.nis.pox.poi;
 
+import java.lang.management.*;
+import java.security.SecureRandom;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Address;
@@ -9,13 +15,6 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-
-import java.lang.management.*;
-import java.security.SecureRandom;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * If someone can manipulate their importance so that they can often or at-will be chosen to harvest, then things like double-spend attacks

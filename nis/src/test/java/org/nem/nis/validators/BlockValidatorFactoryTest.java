@@ -1,13 +1,12 @@
 package org.nem.nis.validators;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
 
 public class BlockValidatorFactoryTest {
 

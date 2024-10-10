@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.mockito.Mockito;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.math.BigInteger;
 
 public class MultisigSignatureRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbMultisigSignatureTransaction> {
 

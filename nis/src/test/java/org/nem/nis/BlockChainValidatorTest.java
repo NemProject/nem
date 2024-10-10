@@ -1,5 +1,8 @@
 package org.nem.nis;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,10 +15,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Function;
 
 public class BlockChainValidatorTest {
 

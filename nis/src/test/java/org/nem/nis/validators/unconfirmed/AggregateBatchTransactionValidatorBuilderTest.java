@@ -1,11 +1,10 @@
 package org.nem.nis.validators.unconfirmed;
 
+import java.util.*;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.model.ValidationResult;
 import org.nem.nis.validators.*;
-
-import java.util.*;
 
 public class AggregateBatchTransactionValidatorBuilderTest
 		extends

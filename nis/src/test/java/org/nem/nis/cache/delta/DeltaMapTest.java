@@ -1,10 +1,9 @@
 package org.nem.nis.cache.delta;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-
-import java.util.*;
 
 public abstract class DeltaMapTest<TMap extends DeltaMap<Integer, String> & CopyableDeltaMap<TMap>> {
 

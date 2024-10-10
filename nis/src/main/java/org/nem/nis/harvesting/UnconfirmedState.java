@@ -1,12 +1,11 @@
 package org.nem.nis.harvesting;
 
+import java.util.Collection;
+import java.util.List;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A store of unconfirmed NIS state.

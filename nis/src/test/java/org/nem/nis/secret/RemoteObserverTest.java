@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import java.util.Arrays;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -11,8 +12,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
-
-import java.util.Arrays;
 
 public class RemoteObserverTest {
 	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION = new BlockHeight(

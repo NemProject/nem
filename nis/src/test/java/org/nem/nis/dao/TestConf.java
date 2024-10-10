@@ -1,5 +1,9 @@
 package org.nem.nis.dao;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.function.Function;
+import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.model.Address;
@@ -8,11 +12,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.function.Function;
 
 @Configuration
 @ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))

@@ -1,8 +1,8 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;

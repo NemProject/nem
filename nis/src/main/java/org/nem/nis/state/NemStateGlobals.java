@@ -1,8 +1,7 @@
 package org.nem.nis.state;
 
-import org.nem.core.utils.SetOnce;
-
 import java.util.function.Supplier;
+import org.nem.core.utils.SetOnce;
 
 /**
  * Helper class for storing NEM globals related to behavior of nem state. <br>

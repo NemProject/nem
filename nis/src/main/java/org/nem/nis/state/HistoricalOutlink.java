@@ -1,8 +1,7 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.primitive.BlockHeight;
-
 import java.util.LinkedList;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Represents a historical outlink.

@@ -1,14 +1,13 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.NemNamespaceEntry;
 import org.nem.nis.cache.delta.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * General class for holding namespaces. Note that the namespace with id "nem" is handled in a special way.

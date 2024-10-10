@@ -1,12 +1,11 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.DbMultisigMinCosignatoriesModification;
 import org.nem.nis.mappers.IMapping;
-
-import java.math.BigInteger;
 
 public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 

@@ -1,17 +1,16 @@
 package org.nem.nis.test;
 
+import java.util.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
 
 public class MultisigTestContext {
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);

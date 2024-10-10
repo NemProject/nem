@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.NodeId;
-
 import java.util.ArrayList;
+import org.nem.core.model.primitive.NodeId;
 
 /**
  * Trivial clustering: Do not scan at all but build one outlier cluster for each node.

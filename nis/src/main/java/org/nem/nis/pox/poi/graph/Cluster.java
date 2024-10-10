@@ -1,9 +1,8 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.primitive.*;
 
 /**
  * A cluster represents a set of nodes that share certain similarity (i.e. are closely connected).

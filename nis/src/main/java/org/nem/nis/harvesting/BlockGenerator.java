@@ -1,5 +1,8 @@
 package org.nem.nis.harvesting;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.logging.Logger;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
@@ -8,10 +11,6 @@ import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.BlockValidator;
-
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Service for generating a new block.

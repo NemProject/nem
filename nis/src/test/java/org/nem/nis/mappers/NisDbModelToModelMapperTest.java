@@ -1,5 +1,8 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 public class NisDbModelToModelMapperTest {
 

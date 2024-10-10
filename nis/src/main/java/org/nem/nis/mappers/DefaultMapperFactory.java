@@ -1,5 +1,7 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.function.BiFunction;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
@@ -7,9 +9,6 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.function.BiFunction;
 
 /**
  * Factory for creating a mapper.

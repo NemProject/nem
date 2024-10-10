@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -15,10 +18,6 @@ import org.nem.nis.dao.ReadOnlyNamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class NamespaceControllerTest {
 

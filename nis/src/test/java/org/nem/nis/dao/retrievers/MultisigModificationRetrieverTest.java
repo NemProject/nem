@@ -1,8 +1,7 @@
 package org.nem.nis.dao.retrievers;
 
-import org.nem.core.model.primitive.BlockHeight;
-
 import java.util.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 public class MultisigModificationRetrieverTest extends TransactionRetrieverTest {
 

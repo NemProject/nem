@@ -1,10 +1,9 @@
 package org.nem.nis.cache;
 
+import java.util.Collection;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.ReadOnlyNamespaceEntry;
-
-import java.util.Collection;
 
 /**
  * A readonly namespace cache.

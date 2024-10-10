@@ -1,5 +1,9 @@
 package org.nem.nis.boot;
 
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.model.NetworkInfos;
@@ -18,11 +22,6 @@ import org.nem.peer.services.*;
 import org.nem.peer.trust.TrustProvider;
 import org.nem.peer.trust.score.NodeExperiences;
 import org.nem.specific.deploy.*;
-
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The NIS peer network host.

@@ -1,10 +1,9 @@
 package org.nem.nis.validators.unconfirmed;
 
-import org.nem.core.model.ValidationResult;
-import org.nem.nis.validators.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.ValidationResult;
+import org.nem.nis.validators.*;
 
 /**
  * Builder for building an aggregate BatchTransactionValidator.

@@ -1,12 +1,11 @@
 package org.nem.nis.connect;
 
+import java.security.SecureRandom;
 import org.nem.nis.cache.*;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.security.SecureRandom;
 
 /**
  * A node selector factory used by the peer network.

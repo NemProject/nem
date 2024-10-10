@@ -1,5 +1,6 @@
 package org.nem.nis.websocket;
 
+import java.util.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
@@ -18,8 +19,6 @@ import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 public class MessagingService implements BlockListener, UnconfirmedTransactionListener {

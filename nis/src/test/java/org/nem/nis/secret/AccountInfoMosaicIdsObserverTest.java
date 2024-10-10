@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import java.util.Collections;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -13,8 +14,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountInfo;
 import org.nem.nis.test.NisUtils;
-
-import java.util.Collections;
 
 public class AccountInfoMosaicIdsObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;

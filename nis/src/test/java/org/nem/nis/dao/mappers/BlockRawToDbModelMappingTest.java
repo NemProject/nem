@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,8 +9,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.math.BigInteger;
 
 public class BlockRawToDbModelMappingTest {
 

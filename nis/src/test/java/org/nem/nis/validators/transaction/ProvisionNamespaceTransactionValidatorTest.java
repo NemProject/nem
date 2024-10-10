@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -14,8 +15,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.*;
 
 public class ProvisionNamespaceTransactionValidatorTest {
 	private static final int BLOCKS_PER_YEAR = NisTestConstants.ESTIMATED_BLOCKS_PER_YEAR;

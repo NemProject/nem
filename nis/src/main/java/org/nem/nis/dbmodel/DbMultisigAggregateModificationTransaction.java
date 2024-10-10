@@ -1,13 +1,12 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.*;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.*;
-import javax.persistence.Table;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import org.hibernate.annotations.*;
 
 /**
  * Multisig Signer Modification db entity <br>

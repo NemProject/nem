@@ -1,9 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.Collection;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
-
-import java.util.Collection;
 
 /**
  * A mutable facade on top of pox.

@@ -1,17 +1,15 @@
 package org.nem.nis;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.chain.BlockProcessor;
-import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
-
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.chain.BlockProcessor;
+import org.nem.nis.validators.*;
 
 /**
  * Helper class for validating a block chain.

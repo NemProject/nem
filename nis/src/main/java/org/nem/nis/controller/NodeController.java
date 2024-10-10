@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
@@ -13,10 +16,6 @@ import org.nem.peer.services.ChainServices;
 import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST node controller.

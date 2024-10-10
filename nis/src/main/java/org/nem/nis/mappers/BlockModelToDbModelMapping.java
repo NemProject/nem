@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 /**
  * A mapping that is able to map a model block to a db block.

@@ -1,10 +1,9 @@
 package org.nem.nis.harvesting;
 
+import java.util.Collection;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.HashShortId;
 import org.nem.core.time.TimeInstant;
-
-import java.util.Collection;
 
 /**
  * An interface for filtering unconfirmed transactions.

@@ -1,5 +1,7 @@
 package org.nem.nis.connect;
 
+import java.net.*;
+import java.util.concurrent.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.connect.Communicator;
-
-import java.net.*;
-import java.util.concurrent.*;
 
 public class AuditedCommunicatorTest {
 

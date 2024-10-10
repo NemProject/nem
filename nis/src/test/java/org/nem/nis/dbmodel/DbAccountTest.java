@@ -1,5 +1,6 @@
 package org.nem.nis.dbmodel;
 
+import java.util.*;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -7,8 +8,6 @@ import org.junit.*;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
-
-import java.util.*;
 
 public class DbAccountTest {
 

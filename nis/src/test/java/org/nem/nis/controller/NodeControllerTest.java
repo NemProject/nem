@@ -1,5 +1,9 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import javax.servlet.http.HttpServletRequest;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -17,11 +21,6 @@ import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.services.ChainServices;
 import org.nem.peer.trust.score.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class NodeControllerTest {
 	private static int MAX_EXPERIENCES = 100;

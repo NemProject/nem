@@ -1,5 +1,10 @@
 package org.nem.nis.chain.integration;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -14,12 +19,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.DbMosaicId;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 // TODO 20151124 J-B: i think we broke the handshaking in these tests again :/
 public class BlockChainHarvesterTest {

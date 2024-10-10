@@ -1,5 +1,9 @@
 package org.nem.nis.harvesting;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,11 +12,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
 public class DefaultUnconfirmedTransactionsFilterTest {
 

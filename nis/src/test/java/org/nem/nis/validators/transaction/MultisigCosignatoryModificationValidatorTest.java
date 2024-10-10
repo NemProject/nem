@@ -1,5 +1,8 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class MultisigCosignatoryModificationValidatorTest {
 	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants

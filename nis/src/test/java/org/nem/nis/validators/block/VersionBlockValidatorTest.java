@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -11,8 +12,6 @@ import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
-
-import java.util.*;
 
 @RunWith(Parameterized.class)
 public class VersionBlockValidatorTest {

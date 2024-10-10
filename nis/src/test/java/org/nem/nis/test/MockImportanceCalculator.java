@@ -1,10 +1,9 @@
 package org.nem.nis.test;
 
+import java.util.Collection;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
-
-import java.util.Collection;
 
 /**
  * A mock ImportanceCalculator implementation.

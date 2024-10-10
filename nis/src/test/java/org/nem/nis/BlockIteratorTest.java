@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.*;
 import org.nem.nis.visitors.BlockVisitor;
-
-import java.util.*;
 
 public class BlockIteratorTest {
 

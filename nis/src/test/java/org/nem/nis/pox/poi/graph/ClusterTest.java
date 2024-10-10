@@ -1,13 +1,12 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
 
 /**
  * Tests for the Cluster class.

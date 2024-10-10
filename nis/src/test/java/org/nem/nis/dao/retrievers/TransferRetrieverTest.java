@@ -1,5 +1,7 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.nem.core.model.TransferTransaction;
@@ -9,9 +11,6 @@ import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class TransferRetrieverTest extends TransactionRetrieverTest {
 

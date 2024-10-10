@@ -1,5 +1,7 @@
 package org.nem.nis.controller.interceptors;
 
+import java.lang.reflect.Method;
+import javax.servlet.http.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,9 +10,6 @@ import org.nem.core.test.ExceptionAssert;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.controller.annotations.TrustedApi;
 import org.springframework.web.method.HandlerMethod;
-
-import javax.servlet.http.*;
-import java.lang.reflect.Method;
 
 public class LocalHostInterceptorTest {
 	private static final String LOCAL_ADDRESS = "127.0.0.1";

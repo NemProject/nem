@@ -1,12 +1,11 @@
 package org.nem.nis.validators.unconfirmed;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyHashCache;
 import org.nem.nis.validators.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A batch transaction validator that ensures all transaction hashes are unique.

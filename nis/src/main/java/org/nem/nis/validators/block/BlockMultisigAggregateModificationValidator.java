@@ -1,10 +1,9 @@
 package org.nem.nis.validators.block;
 
-import org.nem.core.model.*;
-import org.nem.nis.validators.BlockValidator;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.*;
+import org.nem.nis.validators.BlockValidator;
 
 /**
  * A block validator that validates a block contains no more than one AggregateMultisigModification affecting any multisig account.

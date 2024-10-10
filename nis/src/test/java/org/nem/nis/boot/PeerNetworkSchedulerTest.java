@@ -1,5 +1,7 @@
 package org.nem.nis.boot;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,9 +11,6 @@ import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.peer.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class PeerNetworkSchedulerTest {
 

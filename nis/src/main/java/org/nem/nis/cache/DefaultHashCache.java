@@ -1,11 +1,10 @@
 package org.nem.nis.cache;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.delta.*;
-
-import java.util.*;
 
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.

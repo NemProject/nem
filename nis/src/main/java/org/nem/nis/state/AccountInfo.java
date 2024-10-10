@@ -1,9 +1,8 @@
 package org.nem.nis.state;
 
+import java.util.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
-
-import java.util.*;
 
 /**
  * Information about an account.

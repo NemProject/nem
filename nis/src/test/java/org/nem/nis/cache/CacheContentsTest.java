@@ -1,13 +1,12 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.*;
 
 public class CacheContentsTest {
 

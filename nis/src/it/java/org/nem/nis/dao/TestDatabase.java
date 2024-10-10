@@ -1,5 +1,10 @@
 package org.nem.nis.dao;
 
+import java.io.*;
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.logging.*;
+import java.util.stream.Collectors;
 import org.hibernate.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
@@ -12,12 +17,6 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.io.*;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.logging.*;
-import java.util.stream.Collectors;
 
 @ContextConfiguration(classes = TestConfHardDisk.class)
 public class TestDatabase {

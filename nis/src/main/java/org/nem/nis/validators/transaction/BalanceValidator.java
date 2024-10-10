@@ -1,11 +1,10 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.nis.validators.*;
-
-import java.util.*;
 
 /**
  * A validator that checks whether or not all debited accounts have sufficient balance.

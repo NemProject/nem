@@ -1,11 +1,10 @@
 package org.nem.nis.dao;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dbmodel.AbstractBlockTransfer;
 import org.nem.nis.mappers.TransactionRegistry;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Helper class used by the block loader that contains maps of ids to (inner) multisig transactions.

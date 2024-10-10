@@ -1,5 +1,10 @@
 package org.nem.nis;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
+import java.util.stream.*;
 import org.junit.Test;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.crypto.*;
@@ -14,12 +19,6 @@ import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.nis.connect.HttpConnectorPool;
 import org.nem.peer.SecureSerializableEntity;
 import org.nem.peer.connect.*;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Logger;
-import java.util.stream.*;
 
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());

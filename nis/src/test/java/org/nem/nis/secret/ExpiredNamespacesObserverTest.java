@@ -1,5 +1,8 @@
 package org.nem.nis.secret;
 
+import static org.nem.core.test.Utils.createMosaicProperties;
+
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -14,10 +17,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
-
-import static org.nem.core.test.Utils.createMosaicProperties;
 
 public class ExpiredNamespacesObserverTest {
 	private static final int ESTIMATED_BLOCKS_PER_YEAR = 1234;

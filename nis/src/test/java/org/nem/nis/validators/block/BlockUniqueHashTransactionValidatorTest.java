@@ -1,18 +1,16 @@
 package org.nem.nis.validators.block;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.DefaultHashCache;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlockUniqueHashTransactionValidatorTest {
 	@Test

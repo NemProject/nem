@@ -1,5 +1,7 @@
 package org.nem.nis.validators.integration;
 
+import java.math.BigInteger;
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -11,15 +13,12 @@ import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.chain.BlockExecuteProcessor;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.NisUtils;
-import org.nem.nis.ForkConfiguration;
-
-import java.math.BigInteger;
-import java.util.*;
 
 public abstract class AbstractBlockChainValidatorTransactionValidationTest extends AbstractTransactionValidationTest {
 

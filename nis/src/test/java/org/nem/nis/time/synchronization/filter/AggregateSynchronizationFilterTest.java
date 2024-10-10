@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization.filter;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.mockito.*;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
-import java.util.*;
 
 public class AggregateSynchronizationFilterTest {
 

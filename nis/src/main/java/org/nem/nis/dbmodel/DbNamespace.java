@@ -1,8 +1,7 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.Cascade;
-
 import javax.persistence.*;
+import org.hibernate.annotations.Cascade;
 
 /**
  * Namespace db entity <br>

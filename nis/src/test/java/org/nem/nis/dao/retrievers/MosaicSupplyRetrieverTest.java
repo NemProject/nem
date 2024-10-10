@@ -1,11 +1,12 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
 import org.nem.core.model.mosaic.*;
@@ -17,15 +18,10 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.*;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -1,12 +1,11 @@
 package org.nem.nis.test;
 
+import java.math.BigInteger;
+import java.util.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
-
-import java.math.BigInteger;
-import java.util.*;
 
 /**
  * A mock BlockScorer implementation.

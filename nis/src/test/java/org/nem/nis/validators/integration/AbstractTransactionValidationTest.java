@@ -1,5 +1,7 @@
 package org.nem.nis.validators.integration;
 
+import java.util.*;
+import java.util.function.Function;
 import net.minidev.json.JSONObject;
 import org.junit.*;
 import org.nem.core.model.*;
@@ -13,9 +15,6 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisCacheFactory;
-
-import java.util.*;
-import java.util.function.Function;
 
 @SuppressWarnings("serial")
 public abstract class AbstractTransactionValidationTest {

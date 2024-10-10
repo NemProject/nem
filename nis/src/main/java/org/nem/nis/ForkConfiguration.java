@@ -1,13 +1,12 @@
 package org.nem.nis;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.NemProperties;
 import org.nem.core.model.NetworkInfo;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Class that encapsulates fork configuration data.

@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +10,8 @@ import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.controller.requests.*;
@@ -17,10 +20,6 @@ import org.nem.nis.dao.ReadOnlyMosaicDefinitionDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 public class MosaicDefinitionControllerTest {
 

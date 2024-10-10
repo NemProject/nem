@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -13,9 +15,6 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class HarvesterTest {
 

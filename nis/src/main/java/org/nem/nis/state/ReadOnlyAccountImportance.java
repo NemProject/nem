@@ -1,9 +1,8 @@
 package org.nem.nis.state;
 
+import java.util.Iterator;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableEntity;
-
-import java.util.Iterator;
 
 public interface ReadOnlyAccountImportance extends SerializableEntity {
 	/**

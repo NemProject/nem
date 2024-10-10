@@ -1,11 +1,10 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.NemGlobals;
-import org.nem.core.model.primitive.*;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.nem.core.model.NemGlobals;
+import org.nem.core.model.primitive.*;
 
 /**
  * WeightedBalances implementation that converts balances from unvested to vested as time passes.

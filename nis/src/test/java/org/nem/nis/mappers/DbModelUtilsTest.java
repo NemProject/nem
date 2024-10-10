@@ -1,12 +1,11 @@
 package org.nem.nis.mappers;
 
+import java.util.function.BiConsumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.function.BiConsumer;
 
 public class DbModelUtilsTest {
 

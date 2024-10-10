@@ -1,5 +1,8 @@
 package org.nem.nis.service;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -16,10 +19,6 @@ import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.test.NisUtils;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class AccountIoAdapterTest {
 

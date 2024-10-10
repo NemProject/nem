@@ -1,12 +1,11 @@
 package org.nem.nis.test;
 
+import java.util.*;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.sync.BlockLookup;
-
-import java.util.*;
 
 /**
  * A mock BlockLookup implementation.

@@ -1,16 +1,14 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.Objects;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.*;
 import org.nem.nis.FeeFork;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.Objects;
 
 /**
  * A single transaction validator implementation that validates mosaic definition creation transaction.<br>

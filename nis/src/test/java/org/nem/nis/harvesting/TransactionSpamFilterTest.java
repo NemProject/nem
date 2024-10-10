@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,9 +14,6 @@ import org.nem.core.test.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisTestConstants;
-
-import java.util.*;
-import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 public class TransactionSpamFilterTest {

@@ -1,5 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.*;
+import java.util.logging.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,9 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.pox.poi.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 public abstract class ScanGraphClusteringTest {
 	private static final Logger LOGGER = Logger.getLogger(ScanGraphClusteringTest.class.getName());

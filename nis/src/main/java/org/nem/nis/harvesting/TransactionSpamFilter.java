@@ -1,12 +1,11 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.state.ReadOnlyAccountImportance;
-
-import java.util.*;
-import java.util.stream.*;
 
 /**
  * A filter that filters unconfirmed transactions depending on sender and fill level of the unconfirmed transaction cache. The class limits

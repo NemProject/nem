@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.Collection;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.*;
@@ -9,8 +10,6 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
 
 /**
  * Controller used by NEM ecosystem services, including the block explorer.

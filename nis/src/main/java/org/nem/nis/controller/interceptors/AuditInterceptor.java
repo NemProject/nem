@@ -1,11 +1,10 @@
 package org.nem.nis.controller.interceptors;
 
-import org.nem.nis.audit.AuditCollection;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import javax.servlet.http.*;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.servlet.http.*;
+import org.nem.nis.audit.AuditCollection;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * Interceptor that audits requests.

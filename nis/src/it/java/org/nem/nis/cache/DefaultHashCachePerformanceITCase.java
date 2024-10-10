@@ -1,5 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,10 +10,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class DefaultHashCachePerformanceITCase {
 	private static final Logger LOGGER = Logger.getLogger(DefaultHashCachePerformanceITCase.class.getName());

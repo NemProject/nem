@@ -1,12 +1,11 @@
 package org.nem.nis.validators.block;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyHashCache;
 import org.nem.nis.validators.BlockValidator;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A block transaction validator that ensures all transaction hashes in the block are not known.

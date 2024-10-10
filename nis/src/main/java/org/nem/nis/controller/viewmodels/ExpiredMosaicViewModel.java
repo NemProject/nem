@@ -1,13 +1,12 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * View model composed of information about an expired mosaic, including all balances at time of expiry.

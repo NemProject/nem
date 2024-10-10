@@ -1,13 +1,12 @@
 package org.nem.nis.harvesting;
 
+import java.util.function.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.validators.TransactionValidatorFactory;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.function.*;
 
 /**
  * Factory for creating unconfirmed state.

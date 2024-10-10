@@ -1,5 +1,6 @@
 package org.nem.nis.controller.acceptance;
 
+import java.net.MalformedURLException;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -8,8 +9,6 @@ import org.nem.core.connect.ErrorResponseDeserializerUnion;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.LocalHostConnector;
-
-import java.net.MalformedURLException;
 
 public class BlockControllerITCase {
 

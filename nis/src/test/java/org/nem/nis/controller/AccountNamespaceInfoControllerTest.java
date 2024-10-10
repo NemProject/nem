@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -9,9 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class AccountNamespaceInfoControllerTest {
 

@@ -1,11 +1,10 @@
 package org.nem.nis.controller.interceptors;
 
+import java.util.Arrays;
+import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
 import org.springframework.validation.*;
-
-import java.util.Arrays;
-import java.util.logging.Logger;
 
 /**
  * A spring validator used to lock down private key request arguments such that requests with non-configured harvester private keys are

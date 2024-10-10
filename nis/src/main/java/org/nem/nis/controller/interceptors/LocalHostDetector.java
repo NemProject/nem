@@ -1,10 +1,9 @@
 package org.nem.nis.controller.interceptors;
 
-import org.nem.core.utils.ExceptionUtils;
-
-import javax.servlet.http.HttpServletRequest;
 import java.net.*;
 import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import org.nem.core.utils.ExceptionUtils;
 
 /**
  * Predicate for determining whether a request is local or remote.

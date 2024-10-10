@@ -1,5 +1,6 @@
 package org.nem.nis.validators.integration;
 
+import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -10,8 +11,6 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.List;
 
 public class MultiBlockBlockChainValidatorTransactionValidationTest extends AbstractBlockChainValidatorTransactionValidationTest {
 

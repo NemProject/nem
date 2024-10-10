@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.Collection;
+import java.util.logging.Logger;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -17,9 +19,6 @@ import org.nem.peer.node.*;
 import org.nem.peer.requests.ChainRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.logging.Logger;
 
 @RestController
 public class ChainController {

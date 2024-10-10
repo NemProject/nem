@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -21,8 +22,6 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {

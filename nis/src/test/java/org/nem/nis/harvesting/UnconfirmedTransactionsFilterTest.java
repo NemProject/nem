@@ -1,5 +1,11 @@
 package org.nem.nis.harvesting;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.createMockTransactions;
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.createMockTransactionsWithRandomTimeStamp;
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,13 +15,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.test.UnconfirmedTransactionsTestUtils;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
-import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.createMockTransactions;
-import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.createMockTransactionsWithRandomTimeStamp;
 
 public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;

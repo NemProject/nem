@@ -1,18 +1,17 @@
 package org.nem.nis;
 
+import java.util.logging.Logger;
 import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.websocket.BlockListener;
 import org.nem.nis.sync.BlockChainUpdater;
+import org.nem.nis.websocket.BlockListener;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.logging.Logger;
 
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());

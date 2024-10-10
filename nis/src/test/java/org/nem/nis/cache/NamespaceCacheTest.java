@@ -1,5 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,13 +11,8 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.ForkConfiguration;
 import org.nem.nis.NemNamespaceEntry;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 
 public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	private static final Account[] OWNERS = {

@@ -1,10 +1,9 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.math.SparseBitmap;
-import org.nem.core.model.primitive.NodeId;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.math.SparseBitmap;
+import org.nem.core.model.primitive.NodeId;
 
 /**
  * Represents a set of neighbors for a node.

@@ -1,13 +1,12 @@
 package org.nem.nis.controller.interceptors;
 
+import java.util.Collections;
+import javax.servlet.http.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.nis.audit.AuditCollection;
-
-import javax.servlet.http.*;
-import java.util.Collections;
 
 public class AuditInterceptorTest {
 

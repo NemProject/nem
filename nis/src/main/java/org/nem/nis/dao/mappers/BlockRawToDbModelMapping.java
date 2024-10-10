@@ -1,10 +1,9 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.ArrayList;
 import org.nem.core.crypto.Hash;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.util.ArrayList;
 
 /**
  * A mapping that is able to map raw block data to an empty db block.

@@ -1,10 +1,9 @@
 package org.nem.nis.time.synchronization.filter;
 
-import org.nem.core.model.primitive.NodeAge;
-import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.nem.core.model.primitive.NodeAge;
+import org.nem.core.time.synchronization.TimeSynchronizationSample;
 
 /**
  * A filter that filters samples that indicate an unexpected delay in the response (e.g. due to garbage collection).

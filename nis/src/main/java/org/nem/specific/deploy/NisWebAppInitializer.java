@@ -1,5 +1,6 @@
 package org.nem.specific.deploy;
 
+import java.util.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.deploy.*;
 import org.nem.nis.boot.NisPeerNetworkHost;
@@ -10,8 +11,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import java.util.*;
 
 /**
  * Class supplying Spring MVC configuration.

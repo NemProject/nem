@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.*;
-
 import java.util.ArrayList;
+import org.nem.core.model.primitive.*;
 
 /**
  * Trivial clustering: Do not scan at all but build one cluster with all nodes in it. Using this clusterer the NCD-aware algorithm equals

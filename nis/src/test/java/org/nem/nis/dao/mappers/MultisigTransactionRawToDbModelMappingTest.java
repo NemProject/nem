@@ -1,5 +1,7 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
+import java.util.Collection;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -13,9 +15,6 @@ import org.nem.nis.dao.MultisigTransferMap;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.DbTestUtils;
-
-import java.math.BigInteger;
-import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class MultisigTransactionRawToDbModelMappingTest {

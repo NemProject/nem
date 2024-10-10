@@ -1,5 +1,9 @@
 package org.nem.nis.connect;
 
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.CompletionException;
+import java.util.logging.Logger;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -17,11 +21,6 @@ import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.peer.Config;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.ImpersonatingPeerException;
-
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.CompletionException;
-import java.util.logging.Logger;
 
 public class HttpConnectorITCase {
 	private static final Logger LOGGER = Logger.getLogger(HttpConnectorITCase.class.getName());

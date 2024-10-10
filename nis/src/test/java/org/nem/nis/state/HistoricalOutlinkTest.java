@@ -1,12 +1,11 @@
 package org.nem.nis.state;
 
+import java.util.NoSuchElementException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-import java.util.NoSuchElementException;
 
 public class HistoricalOutlinkTest {
 	@Test

@@ -1,5 +1,7 @@
 package org.nem.nis.sync;
 
+import java.util.*;
+import java.util.logging.Logger;
 import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -16,9 +18,6 @@ import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Facade for updating a block chain.

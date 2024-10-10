@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -18,10 +21,6 @@ import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class AccountControllerTest {
 

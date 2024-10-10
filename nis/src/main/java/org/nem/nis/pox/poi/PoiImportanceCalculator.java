@@ -1,14 +1,13 @@
 package org.nem.nis.pox.poi;
 
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.logging.Logger;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.pox.poi.graph.InterLevelProximityMatrix;
 import org.nem.nis.state.AccountState;
-
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.logging.Logger;
 
 /**
  * This is a first draft implementation of the POI importance calculation. Because a lot of the infrastructure is not yet in place, I am

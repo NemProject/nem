@@ -1,13 +1,12 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.*;
-
-import java.util.*;
 
 public class InterLevelProximityMatrixTest {
 

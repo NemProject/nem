@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.ncc.MosaicIdSupplyPair;
 import org.nem.core.serialization.*;
@@ -9,9 +11,6 @@ import org.nem.nis.controller.requests.MosaicIdBuilder;
 import org.nem.nis.state.ReadOnlyMosaicEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST mosaic controller.

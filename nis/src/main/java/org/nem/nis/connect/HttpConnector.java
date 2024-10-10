@@ -1,5 +1,8 @@
 package org.nem.nis.connect;
 
+import java.net.URL;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -12,10 +15,6 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.requests.*;
 import org.nem.peer.trust.score.NodeExperiencesPair;
-
-import java.net.URL;
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * An HTTP-based PeerConnector and SyncConnector implementation.

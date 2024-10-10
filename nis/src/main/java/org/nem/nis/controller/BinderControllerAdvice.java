@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.interceptors.*;
 import org.nem.specific.deploy.NisConfiguration;
@@ -7,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 
 /**
  * ControllerAdvice-annotated class that initializes request parameter validators.

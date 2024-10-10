@@ -1,11 +1,10 @@
 package org.nem.nis.pox.poi;
 
+import java.util.Arrays;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
-
-import java.util.Arrays;
 
 public class PoiUtilsTest {
 

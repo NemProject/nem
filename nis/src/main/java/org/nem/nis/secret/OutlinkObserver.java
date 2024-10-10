@@ -1,12 +1,11 @@
 package org.nem.nis.secret;
 
+import java.math.BigInteger;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
-
-import java.math.BigInteger;
 
 /**
  * A block transaction observer that updates outlink information.

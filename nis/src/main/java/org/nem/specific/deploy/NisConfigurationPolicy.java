@@ -1,9 +1,8 @@
 package org.nem.specific.deploy;
 
+import javax.servlet.http.HttpServlet;
 import org.nem.deploy.*;
 import org.nem.specific.deploy.appconfig.NisAppConfig;
-
-import javax.servlet.http.HttpServlet;
 
 /**
  * Class for supplying addition NIS configuration information.

@@ -1,12 +1,11 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.HibernateUtils;
 import org.nem.nis.dbmodel.DbNamespace;
-
-import java.util.*;
 
 /**
  * Class for for retrieving namespaces for a given account.

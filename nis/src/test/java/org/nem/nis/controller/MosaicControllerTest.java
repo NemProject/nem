@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,9 +14,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.controller.requests.MosaicIdBuilder;
 import org.nem.nis.test.MosaicTestContext;
-
-import java.util.*;
-import java.util.stream.*;
 
 public class MosaicControllerTest {
 

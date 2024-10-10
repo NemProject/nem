@@ -1,10 +1,9 @@
 package org.nem.nis.secret;
 
+import java.util.EnumSet;
 import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.pruning.*;
-
-import java.util.EnumSet;
 
 /**
  * Factory for creating BlockTransactionObserver objects.

@@ -1,10 +1,9 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.primitive.*;
-import org.nem.nis.pox.poi.graph.*;
-
 import java.util.*;
 import java.util.stream.IntStream;
+import org.nem.core.model.primitive.*;
+import org.nem.nis.pox.poi.graph.*;
 
 /**
  * Static factory class that exposes functions for creating expected clusters for well-known graph types.

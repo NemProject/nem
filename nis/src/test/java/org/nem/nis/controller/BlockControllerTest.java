@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.function.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -15,8 +16,6 @@ import org.nem.nis.service.BlockIo;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-
-import java.util.function.*;
 
 public class BlockControllerTest {
 

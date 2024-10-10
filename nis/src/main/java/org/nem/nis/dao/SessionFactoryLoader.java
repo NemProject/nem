@@ -1,15 +1,14 @@
 package org.nem.nis.dao;
 
+import java.io.IOException;
+import java.util.Properties;
+import java.util.function.Predicate;
+import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.specific.deploy.appconfig.NisAppConfig;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.function.Predicate;
 
 /**
  * Helper class for loading a SessionFactory.

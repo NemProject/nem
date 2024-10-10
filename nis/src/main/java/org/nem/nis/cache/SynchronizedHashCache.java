@@ -1,10 +1,9 @@
 package org.nem.nis.cache;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
 
 /**
  * A synchronized hash cache implementation.

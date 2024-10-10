@@ -1,5 +1,7 @@
 package org.nem.nis;
 
+import java.util.*;
+import java.util.logging.Logger;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
@@ -16,9 +18,6 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * Loads and analyzes blocks from the database.

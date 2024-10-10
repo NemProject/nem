@@ -1,12 +1,11 @@
 package org.nem.nis.harvesting;
 
+import java.util.logging.Logger;
 import org.nem.core.model.Block;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
 import org.nem.peer.*;
-
-import java.util.logging.Logger;
 
 /**
  * A harvesting task.

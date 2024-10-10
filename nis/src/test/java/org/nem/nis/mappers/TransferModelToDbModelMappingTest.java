@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -11,8 +12,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 public class TransferModelToDbModelMappingTest
 		extends

@@ -1,11 +1,10 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.util.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-
-import java.util.*;
 
 /**
  * A block view model that is used by NIS services like the block explorer.

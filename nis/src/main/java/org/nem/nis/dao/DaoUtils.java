@@ -1,11 +1,10 @@
 package org.nem.nis.dao;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.nem.core.model.Address;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * Helper class containing functions to facilitate working with dao classes.

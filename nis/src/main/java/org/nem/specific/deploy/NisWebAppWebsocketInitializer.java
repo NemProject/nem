@@ -1,5 +1,10 @@
 package org.nem.specific.deploy;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -16,12 +21,6 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.sockjs.frame.AbstractSockJsMessageCodec;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 @Configuration
 @ComponentScan("org.nem.nis.websocket")

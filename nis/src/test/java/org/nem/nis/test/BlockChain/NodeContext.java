@@ -1,5 +1,8 @@
 package org.nem.nis.test.BlockChain;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
@@ -19,10 +22,6 @@ import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 public class NodeContext {
 	private static final Logger LOGGER = Logger.getLogger(NodeContext.class.getName());

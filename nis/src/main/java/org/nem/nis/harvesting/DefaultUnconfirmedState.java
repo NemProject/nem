@@ -1,21 +1,20 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 /**
  * A default implementation of UnconfirmedState.

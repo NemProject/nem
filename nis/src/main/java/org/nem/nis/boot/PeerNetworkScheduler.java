@@ -1,14 +1,13 @@
 package org.nem.nis.boot;
 
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
 import org.nem.core.async.*;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.peer.*;
-
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.Supplier;
 
 /**
  * Scheduler that keeps track of all scheduled, recurring timers.

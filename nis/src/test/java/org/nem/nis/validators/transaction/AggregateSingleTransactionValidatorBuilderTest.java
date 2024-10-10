@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,8 +10,6 @@ import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
-
-import java.util.*;
 
 public class AggregateSingleTransactionValidatorBuilderTest
 		extends

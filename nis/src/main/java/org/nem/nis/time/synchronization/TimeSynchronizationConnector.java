@@ -1,9 +1,8 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.concurrent.CompletableFuture;
 import org.nem.core.node.Node;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface that is used to request network time stamps from other nodes.

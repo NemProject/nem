@@ -1,5 +1,8 @@
 package org.nem.nis.websocket;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -25,10 +28,6 @@ import org.nem.nis.service.AccountInfoFactory;
 import org.nem.nis.service.AccountMetaDataFactory;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
 public class MessagingServiceTest {

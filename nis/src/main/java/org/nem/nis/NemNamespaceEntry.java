@@ -1,12 +1,11 @@
 package org.nem.nis;
 
+import java.util.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.utils.SetOnce;
 import org.nem.nis.state.*;
-
-import java.util.*;
 
 /**
  * Nem namespace related classes.

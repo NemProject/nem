@@ -1,13 +1,12 @@
 package org.nem.nis.cache.delta;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
 
 // TODO 20151124 J-J,B: should probably finish these tests
 public class SkipListDeltaMapTest {

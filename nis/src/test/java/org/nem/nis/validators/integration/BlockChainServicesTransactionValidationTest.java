@@ -1,11 +1,13 @@
 package org.nem.nis.validators.integration;
 
+import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.pox.poi.GroupedHeight;
@@ -13,9 +15,6 @@ import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainServices;
 import org.nem.nis.test.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.List;
 
 public class BlockChainServicesTransactionValidationTest extends AbstractTransactionValidationTest {
 

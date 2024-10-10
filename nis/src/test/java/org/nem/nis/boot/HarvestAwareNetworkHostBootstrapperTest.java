@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.*;
@@ -9,8 +10,6 @@ import org.nem.core.node.*;
 import org.nem.core.test.*;
 import org.nem.nis.harvesting.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.concurrent.CompletableFuture;
 
 public class HarvestAwareNetworkHostBootstrapperTest {
 

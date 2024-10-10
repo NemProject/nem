@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi;
 
-import org.nem.core.math.ColumnVector;
-
 import java.util.logging.Logger;
+import org.nem.core.math.ColumnVector;
 
 /**
  * An abstract implementation of power iteration algorithm.

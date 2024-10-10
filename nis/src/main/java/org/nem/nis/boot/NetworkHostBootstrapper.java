@@ -1,8 +1,7 @@
 package org.nem.nis.boot;
 
-import org.nem.core.node.Node;
-
 import java.util.concurrent.CompletableFuture;
+import org.nem.core.node.Node;
 
 /**
  * Interface that exposes a function for booting a network.

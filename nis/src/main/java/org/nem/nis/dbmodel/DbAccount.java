@@ -1,10 +1,9 @@
 package org.nem.nis.dbmodel;
 
+import java.util.Objects;
+import javax.persistence.*;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Address;
-
-import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * DbAccount entity. <br>

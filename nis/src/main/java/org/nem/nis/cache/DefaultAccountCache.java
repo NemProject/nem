@@ -1,11 +1,10 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
-import org.nem.nis.cache.delta.*;
-
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.*;
+import org.nem.nis.cache.delta.*;
 
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts by their addresses.

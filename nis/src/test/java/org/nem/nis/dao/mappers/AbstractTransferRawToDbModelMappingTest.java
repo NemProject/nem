@@ -1,5 +1,6 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,8 +10,6 @@ import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.math.BigInteger;
 
 public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends AbstractTransfer> {
 	private static final int RAW_SIZE = 10 + TransactionTypes.getBlockEmbeddableTypes().size();

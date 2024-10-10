@@ -1,17 +1,16 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Provider of transactions for a new block.

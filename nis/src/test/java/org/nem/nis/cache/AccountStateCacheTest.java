@@ -1,5 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,10 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisTestConstants;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<T>> {
 	private static final ImportanceTransferMode UNKNOWN = ImportanceTransferMode.Unknown;

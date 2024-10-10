@@ -1,12 +1,11 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
-import org.nem.nis.dao.retrievers.*;
-import org.nem.nis.dbmodel.*;
-
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+import org.nem.core.model.*;
+import org.nem.nis.dao.retrievers.*;
+import org.nem.nis.dbmodel.*;
 
 /**
  * Contains transaction mapping metadata.

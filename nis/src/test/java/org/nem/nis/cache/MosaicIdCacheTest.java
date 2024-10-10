@@ -1,14 +1,13 @@
 package org.nem.nis.cache;
 
+import java.util.Arrays;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.DbMosaicId;
-
-import java.util.Arrays;
-import java.util.stream.*;
 
 public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 

@@ -1,5 +1,8 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.hibernate.*;
@@ -22,10 +25,6 @@ import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.*;
 
 /**
  * Note that these tests are retrieving transactions by providing a topmost id, which means they depend on the order in which hibernate

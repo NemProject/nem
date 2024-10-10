@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.FeeFork;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;

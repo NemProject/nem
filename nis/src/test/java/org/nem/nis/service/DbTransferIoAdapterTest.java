@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import java.util.MissingResourceException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,8 +13,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.*;
-
-import java.util.MissingResourceException;
 
 public class DbTransferIoAdapterTest {
 	private static final long VALID_BLOCK_HEIGHT = 5;

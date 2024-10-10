@@ -1,5 +1,8 @@
 package org.nem.nis.service;
 
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
@@ -13,10 +16,6 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.*;
 
 // TODO 20151124 J-G: i like this refactoring, but tests ^^
 @Service

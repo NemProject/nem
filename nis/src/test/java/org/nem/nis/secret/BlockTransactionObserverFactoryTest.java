@@ -1,5 +1,7 @@
 package org.nem.nis.secret;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -14,9 +16,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class BlockTransactionObserverFactoryTest {
 	private static final EnumSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = EnumSet.of(ObserverOption.NoIncrementalPoi);

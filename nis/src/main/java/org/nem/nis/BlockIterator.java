@@ -1,11 +1,10 @@
 package org.nem.nis;
 
+import java.util.Collection;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.sync.BlockLookup;
 import org.nem.nis.visitors.BlockVisitor;
-
-import java.util.Collection;
 
 /**
  * Static class that provides functions for iterating over a chain of blocks.

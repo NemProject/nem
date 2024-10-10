@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.math.BigInteger;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -15,9 +17,6 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
-
-import java.math.BigInteger;
-import java.util.*;
 
 public class BlockGeneratorTest {
 

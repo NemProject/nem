@@ -1,14 +1,13 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
-
-import java.util.*;
-import java.util.stream.*;
 
 /**
  * Class for for retrieving multisig transactions.

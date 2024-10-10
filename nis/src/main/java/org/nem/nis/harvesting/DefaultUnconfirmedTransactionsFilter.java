@@ -1,12 +1,11 @@
 package org.nem.nis.harvesting;
 
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.HashShortId;
-import org.nem.core.time.TimeInstant;
-
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.HashShortId;
+import org.nem.core.time.TimeInstant;
 
 /**
  * Default implementation of unconfirmed transaction filtering.

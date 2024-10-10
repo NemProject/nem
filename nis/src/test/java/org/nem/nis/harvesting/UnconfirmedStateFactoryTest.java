@@ -6,10 +6,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.test.*;
-import org.nem.nis.ForkConfiguration;
 
 public class UnconfirmedStateFactoryTest {
 

@@ -1,14 +1,13 @@
 package org.nem.nis.boot;
 
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.node.Node;
 import org.nem.nis.harvesting.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 /**
  * A network host bootstrapper that supports auto harvesting.

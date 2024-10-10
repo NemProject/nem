@@ -1,5 +1,10 @@
 package org.nem.nis;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,12 +14,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.DefaultAccountStateCache;
 import org.nem.nis.state.AccountInfo;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class BlockScorerITCase {
 	private static final Logger LOGGER = Logger.getLogger(BlockScorerITCase.class.getName());

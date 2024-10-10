@@ -1,12 +1,11 @@
 package org.nem.nis.controller.interceptors;
 
+import javax.servlet.http.HttpServletRequest;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class LocalHostDetectorTest {
 

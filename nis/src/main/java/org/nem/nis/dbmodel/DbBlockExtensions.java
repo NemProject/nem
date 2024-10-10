@@ -1,8 +1,7 @@
 package org.nem.nis.dbmodel;
 
-import org.nem.nis.mappers.TransactionRegistry;
-
 import java.util.List;
+import org.nem.nis.mappers.TransactionRegistry;
 
 /**
  * Static helper class for dealing with db blocks.

@@ -1,5 +1,6 @@
 package org.nem.nis.test.BlockChain;
 
+import java.util.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -17,8 +18,6 @@ import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.MapperUtils;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
 
 public class BlockChainDelegationContext {
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();

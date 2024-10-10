@@ -1,10 +1,8 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.mosaic.MosaicId;
+import java.util.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
-
-import java.util.*;
 
 public interface ReadOnlyExpiredMosaicCache {
 	/**

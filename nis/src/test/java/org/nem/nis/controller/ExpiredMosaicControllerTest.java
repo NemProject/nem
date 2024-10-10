@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -12,14 +14,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.DefaultExpiredMosaicCache;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.ExpiredMosaicViewModel;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import org.nem.specific.deploy.NisConfiguration;
 
 public class ExpiredMosaicControllerTest {
 	@Test

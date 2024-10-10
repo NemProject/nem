@@ -1,8 +1,7 @@
 package org.nem.nis.dao;
 
-import org.hibernate.*;
-
 import java.util.List;
+import org.hibernate.*;
 
 /**
  * Helper class containing hibernate utility functions.

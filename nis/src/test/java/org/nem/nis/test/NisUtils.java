@@ -1,5 +1,8 @@
 package org.nem.nis.test;
 
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.nem.core.crypto.Hash;
@@ -9,6 +12,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
@@ -18,12 +22,7 @@ import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
 import org.nem.peer.trust.*;
-
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Static class containing NIS test helper functions.

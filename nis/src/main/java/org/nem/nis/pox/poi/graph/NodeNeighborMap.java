@@ -1,10 +1,9 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.math.*;
-import org.nem.core.model.primitive.NodeId;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.math.*;
+import org.nem.core.model.primitive.NodeId;
 
 /**
  * Maintains a mapping of node ids to neighbor node ids.

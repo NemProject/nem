@@ -1,9 +1,8 @@
 package org.nem.nis.harvesting;
 
+import java.util.Collection;
 import org.nem.core.model.Transaction;
 import org.nem.core.time.TimeInstant;
-
-import java.util.Collection;
 
 /**
  * A collection of unconfirmed transactions.

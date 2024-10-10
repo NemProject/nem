@@ -1,13 +1,12 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.delta.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * A repository of all mutable NEM account state.

@@ -1,5 +1,6 @@
 package org.nem.nis.controller.requests;
 
+import java.util.Collections;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.peer.node.*;
 import org.nem.peer.requests.UnconfirmedTransactionsRequest;
-
-import java.util.Collections;
 
 public class AuthenticatedUnconfirmedTransactionsRequestTest {
 

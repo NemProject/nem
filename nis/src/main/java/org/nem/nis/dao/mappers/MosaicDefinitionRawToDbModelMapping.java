@@ -1,9 +1,8 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.HashSet;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.util.HashSet;
 
 /**
  * A mapping that is able to map raw mosaic definition data to a db mosaic definition.

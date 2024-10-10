@@ -1,5 +1,8 @@
 package org.nem.nis;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.logging.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,10 +12,6 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.logging.Logger;
 
 public class BasicNodeSelectorITCase {
 	private static final Logger LOGGER = Logger.getLogger(BasicNodeSelectorITCase.class.getName());

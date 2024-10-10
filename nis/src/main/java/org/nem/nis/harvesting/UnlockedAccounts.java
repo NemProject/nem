@@ -1,5 +1,8 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
@@ -7,10 +10,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Manages a collection of accounts eligible for harvesting.

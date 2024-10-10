@@ -1,17 +1,16 @@
 package org.nem.nis.validators.integration;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.test.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
 
 public class DefaultNewBlockTransactionsProviderTransactionValidationTest extends AbstractTransactionValidationTest {
 

@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
@@ -11,8 +12,6 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
 import org.nem.nis.dbmodel.DbNamespace;
-
-import java.util.*;
 
 public class NamespaceDaoTest {
 

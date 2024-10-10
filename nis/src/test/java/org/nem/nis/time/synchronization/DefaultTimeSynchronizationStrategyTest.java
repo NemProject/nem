@@ -1,5 +1,7 @@
 package org.nem.nis.time.synchronization;
 
+import java.lang.reflect.Field;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,9 +13,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.time.synchronization.filter.*;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 public class DefaultTimeSynchronizationStrategyTest {
 

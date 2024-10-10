@@ -1,8 +1,7 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.Transaction;
-
 import java.util.*;
+import org.nem.core.model.Transaction;
 
 /**
  * A pair comprised of a validation context and a list of transactions.

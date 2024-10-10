@@ -1,10 +1,9 @@
 package org.nem.nis.cache;
 
+import java.util.Collection;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.NamespaceEntry;
-
-import java.util.Collection;
 
 /**
  * A synchronized namespace cache implementation.

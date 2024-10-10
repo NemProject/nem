@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import java.util.*;
 import org.hibernate.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.MosaicId;
@@ -9,8 +10,6 @@ import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Repository
 public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {

@@ -1,12 +1,11 @@
 package org.nem.nis.time.synchronization;
 
+import java.text.DecimalFormat;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.utils.FormatUtils;
-
-import java.text.DecimalFormat;
-import java.util.*;
 
 @SuppressWarnings("PointlessBooleanExpression")
 public class TimeSynchronizationITCase {

@@ -1,12 +1,11 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.*;
-
+import java.util.Set;
+import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.*;
 import javax.persistence.Table;
-import java.util.Set;
+import org.hibernate.annotations.*;
 
 /**
  * Mosaic definition db entity. <br>

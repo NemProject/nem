@@ -1,5 +1,7 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,9 +11,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 

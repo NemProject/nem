@@ -1,5 +1,8 @@
 package org.nem.nis.connect;
 
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,10 +14,6 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.WeakNodeIdentity;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.services.ChainServices;
-
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 public class DefaultChainServicesTest {
 

@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
@@ -12,8 +13,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 public class MosaicDefinitionDaoImplTest {
 

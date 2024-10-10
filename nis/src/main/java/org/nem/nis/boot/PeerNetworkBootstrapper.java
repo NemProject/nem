@@ -1,12 +1,11 @@
 package org.nem.nis.boot;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.peer.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.specific.deploy.IpDetectionMode;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Helper class for booting a PeerNetwork.

@@ -1,5 +1,6 @@
 package org.nem.nis.controller.interceptors;
 
+import javax.servlet.http.HttpServletRequest;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,8 +13,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.RemoteLinkFactory;
 import org.springframework.validation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class InsecurePrivateKeyValidatorTest {
 

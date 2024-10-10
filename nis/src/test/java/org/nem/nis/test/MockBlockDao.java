@@ -1,15 +1,14 @@
 package org.nem.nis.test;
 
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A mock BlockDao implementation.

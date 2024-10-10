@@ -1,8 +1,7 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.Address;
-
 import java.util.Collection;
+import org.nem.core.model.Address;
 
 /**
  * Container of readonly multisig state information.

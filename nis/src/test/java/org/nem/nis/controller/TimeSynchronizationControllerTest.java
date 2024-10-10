@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -11,8 +12,6 @@ import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-
-import java.util.function.Function;
 
 public class TimeSynchronizationControllerTest {
 

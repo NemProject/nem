@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -10,10 +13,6 @@ import org.nem.nis.controller.interceptors.*;
 import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class BinderControllerAdviceTest {
 

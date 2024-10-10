@@ -1,9 +1,8 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.NodeId;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.primitive.NodeId;
 
 /**
  * Represents a neighborhood of nodes.

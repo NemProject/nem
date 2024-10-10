@@ -1,11 +1,10 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.HashSet;
 import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dao.MultisigTransferMap;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.util.HashSet;
 
 /**
  * A mapping that is able to map raw multisig transaction data to a db multisig transaction.

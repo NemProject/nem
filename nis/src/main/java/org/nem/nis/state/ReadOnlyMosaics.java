@@ -1,8 +1,7 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.mosaic.MosaicId;
-
 import java.util.Collection;
+import org.nem.core.model.mosaic.MosaicId;
 
 /**
  * A read-only mosaics container.

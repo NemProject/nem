@@ -1,12 +1,11 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.List;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.time.synchronization.*;
-
-import java.util.List;
 
 /**
  * Represents a time aware node in the network.

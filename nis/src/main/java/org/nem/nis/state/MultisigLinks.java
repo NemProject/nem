@@ -1,8 +1,7 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.Address;
-
 import java.util.*;
+import org.nem.core.model.Address;
 
 /**
  * A collection of multisig information associated with an account.

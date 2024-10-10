@@ -1,17 +1,16 @@
 package org.nem.nis.test;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.function.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.function.*;
 
 public class UnconfirmedTransactionsTestUtils {
 	public static final int CURRENT_TIME = 10_000;

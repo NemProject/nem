@@ -1,5 +1,10 @@
 package org.nem.nis.pox.poi;
 
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,12 +16,6 @@ import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
-
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class PoiImportanceCalculatorTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorTest.class.getName());

@@ -1,12 +1,11 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.nis.test.MultisigTestContext;
-
-import java.util.function.Function;
 
 public class MultisigTransactionSignerValidatorTest {
 

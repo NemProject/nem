@@ -1,16 +1,15 @@
 package org.nem.nis.state;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-
-import java.util.*;
-import java.util.stream.*;
-
-import static org.hamcrest.core.IsEqual.equalTo;
 
 public class HistoricalOutlinksTest {
 	@Test

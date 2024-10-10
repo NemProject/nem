@@ -1,13 +1,12 @@
 package org.nem.nis.state;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
-
-import java.util.*;
 
 public class RemoteLinkTest {
 	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;

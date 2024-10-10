@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi;
 
-import org.nem.core.math.ColumnVector;
-
 import java.util.List;
+import org.nem.core.math.ColumnVector;
 
 /**
  * Static class containing POI utility functions.

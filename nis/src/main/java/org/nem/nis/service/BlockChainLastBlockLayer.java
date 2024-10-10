@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import java.util.logging.Logger;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.BlockDao;
@@ -7,8 +8,6 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.logging.Logger;
 
 /**
  * This is intermediate layer between blockchain or harvesting and actual Dao.

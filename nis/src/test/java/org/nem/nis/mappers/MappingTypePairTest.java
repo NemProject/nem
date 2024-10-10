@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-
-import java.util.*;
 
 @SuppressWarnings("rawtypes")
 public class MappingTypePairTest {

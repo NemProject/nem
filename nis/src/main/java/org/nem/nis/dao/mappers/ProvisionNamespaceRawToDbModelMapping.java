@@ -1,9 +1,8 @@
 package org.nem.nis.dao.mappers;
 
+import java.util.Arrays;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
-
-import java.util.Arrays;
 
 /**
  * A mapping that is able to map raw provision namespace transaction data to a db provision namespace transaction.

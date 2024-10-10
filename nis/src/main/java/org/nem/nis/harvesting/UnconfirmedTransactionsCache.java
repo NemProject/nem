@@ -1,11 +1,10 @@
 package org.nem.nis.harvesting;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
-
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.*;
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
 
 /**
  * A cache of all unconfirmed transactions. <br>

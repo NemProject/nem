@@ -1,11 +1,10 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
-import org.nem.nis.dbmodel.*;
-
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.nem.core.model.*;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A NIS mapper facade for mapping db model types to model types.

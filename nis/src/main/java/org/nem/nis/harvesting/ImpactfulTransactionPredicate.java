@@ -1,10 +1,9 @@
 package org.nem.nis.harvesting;
 
+import java.util.function.BiPredicate;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
-
-import java.util.function.BiPredicate;
 
 /**
  * A bi-predicate that tests whether or not a transaction impacts an account.

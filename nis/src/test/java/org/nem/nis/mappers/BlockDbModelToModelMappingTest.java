@@ -1,5 +1,8 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -14,10 +17,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.DbTestUtils;
-
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 @SuppressWarnings("rawtypes")

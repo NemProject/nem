@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import java.util.MissingResourceException;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.ReadOnlyBlockDao;
@@ -7,8 +8,6 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.MissingResourceException;
 
 @Service
 public class DbBlockIoAdapter implements BlockIo {

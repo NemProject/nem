@@ -1,5 +1,9 @@
 package org.nem.specific.deploy;
 
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,11 +13,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 import org.nem.nis.ForkConfiguration;
-
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class NisConfigurationTest {
 	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",

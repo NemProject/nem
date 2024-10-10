@@ -1,15 +1,14 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.logging.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.logging.*;
 
 /**
  * The default implementation for the synchronization strategy based on the thesis Algorithms and Services for Peer-to-Peer Internal Clock

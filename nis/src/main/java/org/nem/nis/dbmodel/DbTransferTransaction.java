@@ -1,12 +1,11 @@
 package org.nem.nis.dbmodel;
 
+import java.util.*;
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
-
-import javax.persistence.Entity;
-import javax.persistence.*;
-import javax.persistence.Table;
-import java.util.*;
 
 /**
  * Transfer Db entity. <br>

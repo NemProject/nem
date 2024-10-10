@@ -1,12 +1,11 @@
 package org.nem.nis.secret;
 
+import java.util.Collection;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.*;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.AccountState;
-
-import java.util.Collection;
 
 /**
  * An observer that recalculates POI importances.

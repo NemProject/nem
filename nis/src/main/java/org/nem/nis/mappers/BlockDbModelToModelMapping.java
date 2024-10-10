@@ -1,13 +1,12 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.stream.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.stream.*;
 
 /**
  * A mapping that is able to map a db block to a model block.

@@ -1,13 +1,12 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.nem.core.model.mosaic.*;
 import org.nem.nis.dbmodel.DbMosaicId;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 /**
  * Cache which holds a bidirectional MosaicId <--> DbMosaicId map.

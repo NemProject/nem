@@ -1,5 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,9 +9,6 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.NodeId;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class NeighborhoodTest {
 	private static final double DEFAULT_EPSILON = 0.65;

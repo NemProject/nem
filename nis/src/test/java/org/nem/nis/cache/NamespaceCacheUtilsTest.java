@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -10,8 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.ForkConfiguration;
 import org.nem.nis.state.ReadOnlyMosaicEntry;
-
-import java.util.*;
 
 public class NamespaceCacheUtilsTest {
 

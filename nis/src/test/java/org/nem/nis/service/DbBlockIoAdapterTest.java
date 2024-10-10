@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import java.util.MissingResourceException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -10,8 +11,6 @@ import org.nem.core.test.MockAccountLookup;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.test.*;
-
-import java.util.MissingResourceException;
 
 public class DbBlockIoAdapterTest {
 	private static final long VALID_BLOCK_HEIGHT = 5;

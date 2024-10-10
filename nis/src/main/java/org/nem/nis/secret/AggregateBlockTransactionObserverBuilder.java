@@ -1,9 +1,8 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.observers.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.observers.*;
 
 /**
  * Builder for building an aggregate BlockTransactionObserver.

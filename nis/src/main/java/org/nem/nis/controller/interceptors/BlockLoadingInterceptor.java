@@ -1,13 +1,12 @@
 package org.nem.nis.controller.interceptors;
 
+import java.util.*;
+import java.util.logging.Logger;
+import javax.servlet.http.*;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import javax.servlet.http.*;
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * An interceptor that prevents access to most NIS functions while the block chain is loading.

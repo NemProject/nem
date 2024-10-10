@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.util.function.Consumer;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -10,8 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.function.Consumer;
 
 public class ExplorerBlockViewModelTest {
 

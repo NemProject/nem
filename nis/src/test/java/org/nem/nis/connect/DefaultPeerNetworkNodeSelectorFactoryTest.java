@@ -1,5 +1,7 @@
 package org.nem.nis.connect;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -15,9 +17,6 @@ import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class DefaultPeerNetworkNodeSelectorFactoryTest {
 

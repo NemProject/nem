@@ -1,9 +1,8 @@
 package org.nem.nis.pox.poi.graph;
 
+import java.util.*;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
-
-import java.util.*;
 
 /**
  * Container for the R and A sparse matrices that make up the inter-level proximity matrix. From the NCDawareRank paper by Nikolakopoulos

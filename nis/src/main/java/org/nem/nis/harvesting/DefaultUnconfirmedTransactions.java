@@ -1,15 +1,14 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.

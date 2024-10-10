@@ -1,5 +1,6 @@
 package org.nem.nis.chain;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -13,8 +14,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisCacheFactory;
-
-import java.util.*;
 
 @RunWith(Enclosed.class)
 public class BlockExecutorTest {

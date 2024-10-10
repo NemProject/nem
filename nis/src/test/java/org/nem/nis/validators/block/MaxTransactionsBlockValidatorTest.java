@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
-
-import java.util.*;
 
 public class MaxTransactionsBlockValidatorTest {
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;

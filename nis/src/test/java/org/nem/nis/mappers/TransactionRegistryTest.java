@@ -1,5 +1,7 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,9 +11,6 @@ import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 @SuppressWarnings("rawtypes")

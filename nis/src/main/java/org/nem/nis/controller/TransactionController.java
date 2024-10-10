@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.Collection;
+import java.util.function.Supplier;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
@@ -19,9 +21,6 @@ import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
-import java.util.function.Supplier;
 
 @RestController
 public class TransactionController {

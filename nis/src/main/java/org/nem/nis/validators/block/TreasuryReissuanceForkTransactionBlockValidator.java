@@ -1,13 +1,12 @@
 package org.nem.nis.validators.block;
 
-import org.nem.core.crypto.*;
-import org.nem.core.model.*;
-import org.nem.nis.validators.BlockValidator;
-import org.nem.nis.ForkConfiguration;
-
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.nem.core.crypto.*;
+import org.nem.core.model.*;
+import org.nem.nis.ForkConfiguration;
+import org.nem.nis.validators.BlockValidator;
 
 /**
  * Validator that checks that all treasury reissuance transactions are present at fork height.

@@ -1,8 +1,9 @@
 package org.nem.nis.service;
 
+import java.util.List;
+import java.util.function.Supplier;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -17,9 +18,6 @@ import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.dao.ReadOnlyNamespaceDao;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.state.*;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 public class MosaicInfoFactoryTest {
 

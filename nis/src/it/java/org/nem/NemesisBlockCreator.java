@@ -1,5 +1,8 @@
 package org.nem;
 
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
@@ -9,10 +12,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey

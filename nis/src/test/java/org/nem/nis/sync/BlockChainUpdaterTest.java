@@ -1,5 +1,9 @@
 package org.nem.nis.sync;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.logging.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -10,15 +14,10 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.cache.DefaultNisCache;
-import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.*;
+import org.nem.nis.test.BlockChain.*;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class BlockChainUpdaterTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdaterTest.class.getName());

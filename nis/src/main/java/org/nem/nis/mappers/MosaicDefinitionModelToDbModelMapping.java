@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.mosaic.*;
-import org.nem.nis.dbmodel.*;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.nem.core.model.mosaic.*;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a model mosaic definition to a db mosaic definition.

@@ -1,10 +1,9 @@
 package org.nem.nis.harvesting;
 
+import java.util.List;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
-
-import java.util.List;
 
 /**
  * Provider of transactions for a new block.

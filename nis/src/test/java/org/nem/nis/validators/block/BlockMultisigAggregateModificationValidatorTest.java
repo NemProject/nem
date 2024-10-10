@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import java.util.Collections;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,8 +9,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
-
-import java.util.Collections;
 
 public class BlockMultisigAggregateModificationValidatorTest {
 	private static final BlockValidator VALIDATOR = new BlockMultisigAggregateModificationValidator();

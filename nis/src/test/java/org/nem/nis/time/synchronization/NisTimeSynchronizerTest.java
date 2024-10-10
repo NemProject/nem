@@ -1,5 +1,7 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
@@ -8,9 +10,6 @@ import org.nem.core.time.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class NisTimeSynchronizerTest {
 	private static final long CLOCK_ADJUSTMENT_THRESHOLD = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD;

@@ -1,10 +1,9 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.nem.core.model.Address;
+import org.nem.core.model.primitive.*;
 
 /**
  * A collection of historical outlinks.

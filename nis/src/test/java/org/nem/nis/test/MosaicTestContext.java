@@ -1,5 +1,7 @@
 package org.nem.nis.test;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.mockito.Mockito;
@@ -13,9 +15,6 @@ import org.nem.nis.dao.ReadOnlyNamespaceDao;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class MosaicTestContext {
 	private final Map<Address, AccountState> stateMap = new HashMap<>();

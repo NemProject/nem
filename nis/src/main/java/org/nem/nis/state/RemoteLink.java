@@ -1,9 +1,8 @@
 package org.nem.nis.state;
 
+import java.util.Objects;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-
-import java.util.Objects;
 
 /**
  * Represents a link between an account and a remote account.

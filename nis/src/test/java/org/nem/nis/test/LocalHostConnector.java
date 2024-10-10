@@ -1,12 +1,11 @@
 package org.nem.nis.test;
 
+import java.net.URL;
 import net.minidev.json.JSONObject;
 import org.nem.core.connect.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.core.utils.ExceptionUtils;
-
-import java.net.URL;
 
 /**
  * A helper class that connects to an NIS instance running on the local machine.

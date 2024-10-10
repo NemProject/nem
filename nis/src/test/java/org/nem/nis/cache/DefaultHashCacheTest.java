@@ -1,13 +1,12 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.HashMetaDataPair;
 import org.nem.core.test.Utils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DefaultHashCacheTest extends HashCacheTest<DefaultHashCache> {
 

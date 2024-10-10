@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,8 +8,6 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 public class MultisigAggregateModificationDbModelToModelMappingTest
 		extends

@@ -1,12 +1,11 @@
 package org.nem.specific.deploy;
 
+import java.util.*;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.deploy.CommonConfiguration;
 import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
 
 /**
  * Class responsible for holding all NIS configuration settings. A NIS reboot is required for configuration changes to take effect.

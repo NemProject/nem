@@ -1,5 +1,7 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
@@ -10,9 +12,6 @@ import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 

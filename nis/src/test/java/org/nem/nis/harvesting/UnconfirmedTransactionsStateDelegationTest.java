@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.function.BiFunction;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,9 +13,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.UnconfirmedTransactionsTestUtils;
-
-import java.util.*;
-import java.util.function.BiFunction;
 
 public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 

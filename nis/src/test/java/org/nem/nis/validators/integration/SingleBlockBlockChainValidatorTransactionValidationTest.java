@@ -1,9 +1,8 @@
 package org.nem.nis.validators.integration;
 
+import java.util.List;
 import org.nem.core.model.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.List;
 
 public class SingleBlockBlockChainValidatorTransactionValidationTest extends AbstractBlockChainValidatorTransactionValidationTest {
 

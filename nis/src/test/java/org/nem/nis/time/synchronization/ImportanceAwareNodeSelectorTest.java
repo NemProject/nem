@@ -1,5 +1,7 @@
 package org.nem.nis.time.synchronization;
 
+import java.lang.reflect.Field;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -13,9 +15,6 @@ import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 

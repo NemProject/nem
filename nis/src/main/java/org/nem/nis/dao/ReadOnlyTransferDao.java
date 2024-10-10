@@ -1,11 +1,10 @@
 package org.nem.nis.dao;
 
+import java.util.Collection;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.TransferBlockPair;
-
-import java.util.Collection;
 
 /**
  * Read-only DAO for accessing DbTransferTransaction objects.

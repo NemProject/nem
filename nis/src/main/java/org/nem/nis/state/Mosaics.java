@@ -1,14 +1,11 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.NetworkInfos;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * A writable mosaics container.

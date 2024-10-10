@@ -1,5 +1,8 @@
 package org.nem.nis.sync;
 
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -13,10 +16,6 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.visitors.PartialWeightedScoreVisitor;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Somewhat messy class that actually updates the local chain as appropriate.

@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,15 +11,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.stream.*;
 
 public class DefaultNewBlockTransactionsProviderTest {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;

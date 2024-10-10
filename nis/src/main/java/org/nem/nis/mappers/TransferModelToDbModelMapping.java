@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
-import org.nem.nis.dbmodel.*;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.nem.core.model.*;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a model transfer transaction to a db transfer.

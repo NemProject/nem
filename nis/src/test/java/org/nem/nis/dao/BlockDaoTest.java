@@ -1,5 +1,8 @@
 package org.nem.nis.dao;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
@@ -23,10 +26,6 @@ import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.*;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 @SuppressWarnings("rawtypes")

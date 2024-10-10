@@ -1,9 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.Collection;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.HashMetaData;
-
-import java.util.Collection;
 
 /**
  * A readonly transaction hash cache.

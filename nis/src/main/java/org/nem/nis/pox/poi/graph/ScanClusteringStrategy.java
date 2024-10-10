@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.*;
-
 import java.util.*;
+import org.nem.core.model.primitive.*;
 
 /**
  * Implementation of the initial SCAN algorithm, from this paper: Xu, X., Yuruk, N., Feng, Z., &amp; Schweiger, T. A. (2007, August),

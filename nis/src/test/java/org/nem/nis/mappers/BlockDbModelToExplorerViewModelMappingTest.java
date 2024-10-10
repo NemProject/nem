@@ -1,5 +1,7 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -13,9 +15,6 @@ import org.nem.core.test.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlockDbModelToExplorerViewModelMappingTest {
 

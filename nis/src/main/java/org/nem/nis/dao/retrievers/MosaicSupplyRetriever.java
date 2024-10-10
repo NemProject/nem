@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.nem.core.model.*;
@@ -8,9 +9,6 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Class for for retrieving mosaic supplies.

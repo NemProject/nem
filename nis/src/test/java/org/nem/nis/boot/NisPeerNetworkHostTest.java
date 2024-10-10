@@ -1,5 +1,8 @@
 package org.nem.nis.boot;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -19,10 +22,6 @@ import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.ChainServices;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class NisPeerNetworkHostTest {
 

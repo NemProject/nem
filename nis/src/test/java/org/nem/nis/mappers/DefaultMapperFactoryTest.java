@@ -1,5 +1,7 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -16,9 +18,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DefaultMapperFactoryTest {
 

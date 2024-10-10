@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,8 +12,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.*;
 
 public class NumCosignatoryRangeValidatorTest {
 	private static final int MAX_COSIGNERS = BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT;

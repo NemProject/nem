@@ -1,5 +1,8 @@
 package org.nem.nis.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.ncc.AccountMetaData;
@@ -11,10 +14,6 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.state.RemoteStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 // TODO 20151124 J-G: i like this refactoring, but tests ^^
 @Service

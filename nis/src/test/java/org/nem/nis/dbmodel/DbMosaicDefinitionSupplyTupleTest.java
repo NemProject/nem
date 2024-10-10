@@ -1,12 +1,10 @@
 package org.nem.nis.dbmodel;
 
-import org.hamcrest.Matcher;
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
-
-import java.util.*;
 
 public class DbMosaicDefinitionSupplyTupleTest {
 

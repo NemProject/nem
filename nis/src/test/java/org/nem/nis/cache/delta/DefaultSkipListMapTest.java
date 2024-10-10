@@ -1,15 +1,14 @@
 package org.nem.nis.cache.delta;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.stream.*;
 
 public class DefaultSkipListMapTest {
 

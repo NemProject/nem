@@ -1,13 +1,12 @@
 package org.nem.nis.chain;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountState;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Base class for block processors.

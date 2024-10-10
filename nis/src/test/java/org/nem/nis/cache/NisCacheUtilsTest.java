@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -11,8 +12,6 @@ import org.nem.core.test.Utils;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.NisCacheFactory;
 import org.nem.nis.validators.ValidationState;
-
-import java.util.function.Function;
 
 public class NisCacheUtilsTest {
 

@@ -1,12 +1,11 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.Arrays;
+import java.util.logging.Logger;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicConstants;
-import org.nem.nis.validators.ValidationContext;
 import org.nem.nis.ForkConfiguration;
-
-import java.util.logging.Logger;
-import java.util.Arrays;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * A transaction validator that validates that none of the fee sink accounts can initiate a transaction.

@@ -1,10 +1,9 @@
 package org.nem.nis.test;
 
+import java.util.HashSet;
 import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
-
-import java.util.HashSet;
 
 /**
  * Factory class used to create random (concrete) db transactions.

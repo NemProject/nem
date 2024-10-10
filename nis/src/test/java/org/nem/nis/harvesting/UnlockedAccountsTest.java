@@ -1,5 +1,7 @@
 package org.nem.nis.harvesting;
 
+import java.util.*;
+import java.util.stream.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -12,9 +14,6 @@ import org.nem.core.test.*;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
-
-import java.util.*;
-import java.util.stream.*;
 
 public class UnlockedAccountsTest {
 	private static final int MAX_UNLOCKED_ACCOUNTS = 3;

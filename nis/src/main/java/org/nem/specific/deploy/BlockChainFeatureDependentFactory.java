@@ -1,9 +1,8 @@
 package org.nem.specific.deploy;
 
-import org.nem.core.model.*;
-
 import java.util.Map;
 import java.util.function.Supplier;
+import org.nem.core.model.*;
 
 /**
  * Helper class for creating feature-dependent objects.

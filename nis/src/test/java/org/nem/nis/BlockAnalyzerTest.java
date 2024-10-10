@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -17,8 +18,6 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
-
-import java.util.*;
 
 public class BlockAnalyzerTest {
 	private static final EnumSet<ObserverOption> DEFAULT_OPTIONS = EnumSet.of(ObserverOption.NoIncrementalPoi);

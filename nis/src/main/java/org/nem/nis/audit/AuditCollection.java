@@ -1,10 +1,9 @@
 package org.nem.nis.audit;
 
-import org.nem.core.serialization.*;
-import org.nem.core.time.TimeProvider;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.nem.core.serialization.*;
+import org.nem.core.time.TimeProvider;
 
 /**
  * A collection of audit entries.

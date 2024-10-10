@@ -1,5 +1,8 @@
 package org.nem.nis.controller;
 
+import java.util.Collection;
+import java.util.stream.*;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
@@ -12,10 +15,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.service.PushService;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.SecureSerializableEntity;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.stream.*;
 
 public class PushControllerTest {
 

@@ -7,9 +7,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
 
 public class FeeSinkNonOperationalValidatorTest {
 

@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import java.util.MissingResourceException;
 import org.nem.core.connect.ErrorResponse;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.NisIllegalStateException;
@@ -7,8 +8,6 @@ import org.nem.nis.controller.interceptors.UnauthorizedAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.MissingResourceException;
 
 /**
  * ControllerAdvice-annotated class that maps thrown exceptions to JSON errors.

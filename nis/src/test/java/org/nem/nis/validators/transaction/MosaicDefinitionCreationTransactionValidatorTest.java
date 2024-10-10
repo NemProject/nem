@@ -1,5 +1,7 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -15,9 +17,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();

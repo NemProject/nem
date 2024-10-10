@@ -1,9 +1,8 @@
 package org.nem.nis.mappers;
 
+import java.util.*;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 /**
  * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.

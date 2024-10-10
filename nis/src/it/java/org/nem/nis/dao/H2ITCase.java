@@ -1,12 +1,11 @@
 package org.nem.nis.dao;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.*;
-
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.logging.Logger;
 import java.util.stream.*;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.*;
 
 public class H2ITCase {
 	private static final Logger LOGGER = Logger.getLogger(H2ITCase.class.getName());

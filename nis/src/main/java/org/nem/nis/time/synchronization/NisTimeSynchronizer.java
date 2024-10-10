@@ -1,15 +1,14 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.node.Node;
 import org.nem.core.time.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 /**
  * NIS time synchronization with other NIS nodes.

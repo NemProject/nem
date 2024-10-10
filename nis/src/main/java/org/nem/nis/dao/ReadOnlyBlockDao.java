@@ -1,12 +1,11 @@
 package org.nem.nis.dao;
 
+import java.util.*;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbBlock;
-
-import java.util.*;
 
 /**
  * Read-only DAO for accessing DbBlock objects.

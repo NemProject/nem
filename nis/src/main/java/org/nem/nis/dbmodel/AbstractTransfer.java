@@ -1,9 +1,8 @@
 package org.nem.nis.dbmodel;
 
+import javax.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.nem.core.crypto.Hash;
-
-import javax.persistence.*;
 
 /**
  * Base class for all transfer db entities.

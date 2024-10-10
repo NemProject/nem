@@ -1,5 +1,7 @@
 package org.nem.nis.sync;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -7,15 +9,12 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.mappers.NisMapperFactory;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.MapperUtils;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
 

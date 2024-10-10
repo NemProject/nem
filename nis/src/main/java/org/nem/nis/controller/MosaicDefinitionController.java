@@ -1,9 +1,12 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
@@ -14,10 +17,6 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * REST mosaic definition controller.

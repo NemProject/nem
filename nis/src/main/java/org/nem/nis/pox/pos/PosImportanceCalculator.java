@@ -1,10 +1,9 @@
 package org.nem.nis.pox.pos;
 
+import java.util.Collection;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.*;
-
-import java.util.Collection;
 
 /**
  * Class that implements POS (proof of stake).

@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,8 +10,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-
-import java.util.*;
 
 public class TransactionHashesObserverTest {
 

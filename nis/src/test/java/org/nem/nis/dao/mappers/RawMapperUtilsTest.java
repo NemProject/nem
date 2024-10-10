@@ -1,14 +1,13 @@
 package org.nem.nis.dao.mappers;
 
+import java.math.BigInteger;
+import java.util.function.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
-
-import java.math.BigInteger;
-import java.util.function.*;
 
 public class RawMapperUtilsTest {
 

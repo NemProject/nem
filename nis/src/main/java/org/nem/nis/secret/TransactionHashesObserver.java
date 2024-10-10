@@ -1,10 +1,9 @@
 package org.nem.nis.secret;
 
+import java.util.stream.Collectors;
 import org.nem.core.model.HashMetaDataPair;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.HashCache;
-
-import java.util.stream.Collectors;
 
 /**
  * BlockTransactionObserver that updates the transaction hash cache.

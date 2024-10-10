@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
@@ -10,9 +12,6 @@ import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DebugControllerTest {
 

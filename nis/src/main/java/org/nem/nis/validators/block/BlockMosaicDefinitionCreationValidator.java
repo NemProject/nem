@@ -1,12 +1,11 @@
 package org.nem.nis.validators.block;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.validators.BlockValidator;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A block validator that validates:<br>

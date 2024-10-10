@@ -1,5 +1,6 @@
 package org.nem.nis.validators.block;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,11 +9,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
 
 public class TreasuryReissuanceForkTransactionBlockValidatorTest {
 

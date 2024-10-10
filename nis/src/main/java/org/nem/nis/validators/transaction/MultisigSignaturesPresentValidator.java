@@ -1,12 +1,11 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A transaction validator that validates that a multisig transaction has all required signatures.<br>

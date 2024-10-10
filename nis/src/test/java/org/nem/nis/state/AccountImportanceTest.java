@@ -1,13 +1,12 @@
 package org.nem.nis.state;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
 
 public class AccountImportanceTest {
 	private static final long OUTLINK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH;

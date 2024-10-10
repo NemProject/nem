@@ -1,5 +1,8 @@
 package org.nem.nis.service;
 
+import java.util.*;
+import java.util.function.*;
+import java.util.logging.Logger;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.node.*;
@@ -11,10 +14,6 @@ import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.logging.Logger;
 
 /**
  * Spring service that provides functions for pushing entities

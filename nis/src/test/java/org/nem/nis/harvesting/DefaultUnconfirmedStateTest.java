@@ -1,5 +1,10 @@
 package org.nem.nis.harvesting;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
+
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -13,19 +18,13 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
-import org.nem.nis.ForkConfiguration;
-
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.Collectors;
-
-import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
 
 @RunWith(Enclosed.class)
 public class DefaultUnconfirmedStateTest {

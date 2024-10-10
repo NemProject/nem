@@ -1,5 +1,8 @@
 package org.nem.nis;
 
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -14,10 +17,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class BlockScorerTest {
 

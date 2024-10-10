@@ -1,11 +1,10 @@
 package org.nem.nis.pox.poi;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Account information used by poi.

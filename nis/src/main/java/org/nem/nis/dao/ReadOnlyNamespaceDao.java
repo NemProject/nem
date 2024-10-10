@@ -1,10 +1,9 @@
 package org.nem.nis.dao;
 
+import java.util.Collection;
 import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dbmodel.DbNamespace;
-
-import java.util.Collection;
 
 /**
  * Read-only DAO for accessing DbNamespace objects.

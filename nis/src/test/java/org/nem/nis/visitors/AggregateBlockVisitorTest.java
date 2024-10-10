@@ -1,13 +1,12 @@
 package org.nem.nis.visitors;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Block;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
 
 public class AggregateBlockVisitorTest {
 

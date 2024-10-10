@@ -1,5 +1,7 @@
 package org.nem.nis.chain.integration;
 
+import java.util.Collections;
+import java.util.function.Consumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.nem.core.model.*;
@@ -22,9 +24,6 @@ import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.Collections;
-import java.util.function.Consumer;
 
 /**
  * A test context for testing an almost real block-chain. The only mocks are the daos.

@@ -1,5 +1,7 @@
 package org.nem.nis.controller.requests;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -7,8 +9,6 @@ import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
-
-import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
 
 public class HistoricalDataRequestTest {
 	private static JSONObject createValidJsonObject(long startHeight, long endHeight, long increment) {

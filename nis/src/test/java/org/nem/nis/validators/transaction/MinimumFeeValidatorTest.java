@@ -1,5 +1,7 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -15,9 +17,6 @@ import org.nem.nis.ForkConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class MinimumFeeValidatorTest {
 

@@ -1,13 +1,12 @@
 package org.nem.specific.deploy;
 
+import java.util.*;
+import java.util.function.Supplier;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.ExceptionAssert;
-
-import java.util.*;
-import java.util.function.Supplier;
 
 public class BlockChainFeatureDependentFactoryTest {
 

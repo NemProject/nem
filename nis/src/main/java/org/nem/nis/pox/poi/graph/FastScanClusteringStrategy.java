@@ -1,9 +1,8 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.nem.core.model.primitive.*;
 
 /**
  * Implementation of Shiokawa et al., 2014, "構造的類似度に基づくグラフクラスタリングの高速化 (Fast Structural Similarity Graph Clustering),"

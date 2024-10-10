@@ -1,9 +1,8 @@
 package org.nem.nis.time.synchronization;
 
+import java.util.List;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
-import java.util.List;
 
 /**
  * Calculates the offset in time between the local computer clock and the the network time base on the list of synchronization samples.

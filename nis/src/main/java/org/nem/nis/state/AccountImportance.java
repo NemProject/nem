@@ -1,12 +1,11 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.*;
-import org.nem.core.utils.FormatUtils;
-
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.logging.Logger;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.*;
+import org.nem.core.utils.FormatUtils;
 
 /**
  * Encapsulates management of an account's importance.

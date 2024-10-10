@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.util.function.BiFunction;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -8,8 +9,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.function.BiFunction;
 
 public class ExplorerTransferViewModelTest {
 

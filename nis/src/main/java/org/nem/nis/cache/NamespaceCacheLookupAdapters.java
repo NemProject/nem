@@ -1,9 +1,8 @@
 package org.nem.nis.cache;
 
+import java.util.function.Function;
 import org.nem.core.model.mosaic.*;
 import org.nem.nis.state.ReadOnlyMosaicEntry;
-
-import java.util.function.Function;
 
 /**
  * Helper class that adapts ReadOnlyNamespaceCache to lookups used by nem.core.

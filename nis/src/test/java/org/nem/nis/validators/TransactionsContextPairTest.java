@@ -1,13 +1,12 @@
 package org.nem.nis.validators;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Transaction;
 import org.nem.core.test.IsEquivalent;
-
-import java.util.*;
 
 public class TransactionsContextPairTest {
 

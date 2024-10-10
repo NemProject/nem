@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -21,9 +23,6 @@ import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.util.*;
-import java.util.function.Function;
 
 public class TransactionControllerTest {
 	private static final BlockHeight CURRENT_HEIGHT = new BlockHeight(12345);

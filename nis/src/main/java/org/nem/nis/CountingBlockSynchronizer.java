@@ -1,10 +1,9 @@
 package org.nem.nis;
 
+import java.util.concurrent.*;
 import org.nem.core.node.Node;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
-
-import java.util.concurrent.*;
 
 /**
  * Decorator that counts the number of times each remote node was interacted with.

@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Address;
 import org.nem.core.model.ncc.*;
@@ -16,9 +18,6 @@ import org.nem.nis.state.*;
 import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST API for retrieving account related information

@@ -1,9 +1,8 @@
 package org.nem.nis.state;
 
+import java.util.Collection;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Quantity;
-
-import java.util.Collection;
 
 /**
  * A read-only mapping of mosaic balances.

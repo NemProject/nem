@@ -1,5 +1,7 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -15,9 +17,6 @@ import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BlockExplorerControllerTest {
 	private static final int BLOCKS_LIMIT = 10;

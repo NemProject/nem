@@ -1,11 +1,10 @@
 package org.nem.nis.pox.poi;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-
-import java.util.*;
 
 public class GroupedHeightTest {
 

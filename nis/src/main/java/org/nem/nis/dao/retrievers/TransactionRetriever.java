@@ -1,10 +1,9 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.Collection;
 import org.hibernate.Session;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.TransferBlockPair;
-
-import java.util.Collection;
 
 /**
  * Interface for retrieving transfers of a specific type.

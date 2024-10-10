@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import java.util.function.Consumer;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,8 +10,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
-
-import java.util.function.Consumer;
 
 public class WeightedBalancesObserverTest {
 

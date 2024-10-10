@@ -1,5 +1,8 @@
 package org.nem.nis.dao;
 
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.model.TransactionTypes;
@@ -7,10 +10,6 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 /**
  * Class that loads blocks from the database. <br>

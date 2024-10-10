@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import java.util.concurrent.CompletableFuture;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -15,8 +16,6 @@ import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.specific.deploy.IpDetectionMode;
-
-import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkBootstrapperTest {
 	private static final IpDetectionMode REQUIRE_ACK = IpDetectionMode.AutoRequired;

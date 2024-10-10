@@ -1,18 +1,17 @@
 package org.nem.nis.dao;
 
-import org.junit.Test;
-import org.nem.core.crypto.*;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.time.*;
-import org.nem.deploy.CommonStarter;
-
 import java.io.*;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.List;
 import java.util.logging.*;
 import java.util.stream.*;
+import org.junit.Test;
+import org.nem.core.crypto.*;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.time.*;
+import org.nem.deploy.CommonStarter;
 
 // NOTE: you need to create the database h2_speed_test in order to be able to run the test.
 public class H2StorageSpeedITCase {

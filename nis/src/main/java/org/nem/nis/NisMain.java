@@ -1,5 +1,10 @@
 package org.nem.nis;
 
+import java.util.EnumSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.node.*;
@@ -13,12 +18,6 @@ import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.secret.ObserverOption;
 import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
-import java.util.EnumSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());

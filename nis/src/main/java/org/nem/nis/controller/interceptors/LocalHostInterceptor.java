@@ -1,13 +1,12 @@
 package org.nem.nis.controller.interceptors;
 
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
+import javax.servlet.http.*;
 import org.nem.nis.controller.annotations.TrustedApi;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.*;
-import java.lang.reflect.Method;
-import java.util.logging.Logger;
 
 /**
  * Interceptor that rejects remote calls to client APIs.

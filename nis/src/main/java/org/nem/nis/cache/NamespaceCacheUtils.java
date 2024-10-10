@@ -1,11 +1,10 @@
 package org.nem.nis.cache;
 
+import java.util.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.state.*;
-
-import java.util.*;
 
 /**
  * Static class containing namespace cache helper functions.

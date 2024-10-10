@@ -1,8 +1,7 @@
 package org.nem.nis.dao;
 
-import org.nem.core.utils.ExceptionUtils;
-
 import java.sql.*;
+import org.nem.core.utils.ExceptionUtils;
 
 @SuppressWarnings("try")
 public class H2Database implements AutoCloseable {

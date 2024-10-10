@@ -1,5 +1,8 @@
 package org.nem.nis;
 
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -9,10 +12,6 @@ import org.nem.core.model.NetworkInfo;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class ForkConfigurationTest {
 	// region test helpers

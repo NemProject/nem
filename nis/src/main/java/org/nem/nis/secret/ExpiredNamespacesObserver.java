@@ -1,14 +1,13 @@
 package org.nem.nis.secret;
 
+import java.util.*;
+import java.util.stream.Stream;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Observer that observes expired namespaces and updates the account's owned mosaic ids.

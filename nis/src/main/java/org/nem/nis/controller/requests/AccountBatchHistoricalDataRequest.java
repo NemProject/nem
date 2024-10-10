@@ -1,12 +1,11 @@
 package org.nem.nis.controller.requests;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
+import java.util.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
-
-import java.util.*;
-
-import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
 
 /**
  * Model that contains data for requesting batch historical account data.

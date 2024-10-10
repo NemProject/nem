@@ -1,5 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
+import java.util.*;
 import net.minidev.json.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
@@ -11,9 +12,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class MosaicDefinitionSupplyTupleTest {
 	@Test

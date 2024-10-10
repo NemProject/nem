@@ -1,5 +1,8 @@
 package org.nem.nis.controller.requests;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
+import java.util.*;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -8,10 +11,6 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-
-import java.util.*;
-
-import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
 
 public class AccountBatchHistoricalDataRequestTest {
 

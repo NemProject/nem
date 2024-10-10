@@ -1,12 +1,11 @@
 package org.nem.nis.sync;
 
+import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.peer.NodeInteractionResult;
-
-import java.util.*;
 
 public class ComparisonResultTest {
 

@@ -1,9 +1,8 @@
 package org.nem.nis.pox;
 
+import java.util.Collection;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
-
-import java.util.Collection;
 
 /**
  * Interface for calculating the importance of a collection of accounts at a specific block height.

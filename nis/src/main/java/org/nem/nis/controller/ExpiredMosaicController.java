@@ -1,20 +1,19 @@
 package org.nem.nis.controller;
 
+import java.util.*;
+import java.util.stream.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.SerializableList;
-import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.BlockHeightBuilder;
 import org.nem.nis.controller.viewmodels.ExpiredMosaicViewModel;
 import org.nem.nis.state.*;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.stream.*;
 
 /**
  * REST expired mosaic controller.

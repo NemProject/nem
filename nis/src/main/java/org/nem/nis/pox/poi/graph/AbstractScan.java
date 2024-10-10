@@ -1,8 +1,7 @@
 package org.nem.nis.pox.poi.graph;
 
-import org.nem.core.model.primitive.*;
-
 import java.util.*;
+import org.nem.core.model.primitive.*;
 
 /**
  * Abstract base class shared by Scan and FastScan implementations

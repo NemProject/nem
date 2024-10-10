@@ -1,14 +1,13 @@
 package org.nem.nis.connect;
 
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.services.ChainServices;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * This class provides higher-level functions around accessing information about the NIS block chain of other nodes.

@@ -1,5 +1,9 @@
 package org.nem.nis.test.BlockChain;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -19,11 +23,6 @@ import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.specific.deploy.NisConfiguration;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Note that mockito is only used for mocking the daos and spying real objects.

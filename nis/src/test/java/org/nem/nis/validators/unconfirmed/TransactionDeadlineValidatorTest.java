@@ -1,13 +1,12 @@
 package org.nem.nis.validators.unconfirmed;
 
+import java.util.Collections;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-
-import java.util.Collections;
 
 public class TransactionDeadlineValidatorTest {
 

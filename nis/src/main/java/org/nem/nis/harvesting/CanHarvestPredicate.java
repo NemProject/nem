@@ -1,9 +1,8 @@
 package org.nem.nis.harvesting;
 
+import java.util.function.Function;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.state.ReadOnlyAccountState;
-
-import java.util.function.Function;
 
 /**
  * Predicate class that can be used to check if an account is eligible for harvesting.

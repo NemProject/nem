@@ -1,5 +1,12 @@
 package org.nem.nis.time.synchronization;
 
+import java.lang.reflect.Field;
+import java.security.SecureRandom;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.time.synchronization.*;
@@ -8,14 +15,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.time.synchronization.filter.*;
-
-import java.lang.reflect.Field;
-import java.security.SecureRandom;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());

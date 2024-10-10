@@ -1,13 +1,12 @@
 package org.nem.nis.cache;
 
+import java.util.*;
+import java.util.function.Function;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
-
-import java.util.*;
-import java.util.function.Function;
 
 public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 

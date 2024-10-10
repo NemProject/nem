@@ -1,5 +1,6 @@
 package org.nem.nis.validators.transaction;
 
+import java.util.Collection;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
@@ -15,8 +16,6 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.ForkConfiguration;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
-
-import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class VersionTransactionValidatorTest {

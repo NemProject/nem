@@ -1,12 +1,11 @@
 package org.nem.nis.secret;
 
+import java.util.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-
-import java.util.*;
 
 /**
  * An observer that updates namespace information.

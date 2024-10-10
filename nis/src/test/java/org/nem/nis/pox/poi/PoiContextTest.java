@@ -1,5 +1,7 @@
 package org.nem.nis.pox.poi;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -9,9 +11,6 @@ import org.nem.core.test.*;
 import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class PoiContextTest {
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();

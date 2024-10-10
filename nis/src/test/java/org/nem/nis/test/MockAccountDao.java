@@ -1,11 +1,10 @@
 package org.nem.nis.test;
 
+import java.util.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.ReferenceCount;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
 
 /**
  * A mock AccountDao implementation.

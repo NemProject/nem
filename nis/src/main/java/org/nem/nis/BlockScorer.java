@@ -1,12 +1,11 @@
 package org.nem.nis;
 
+import java.math.BigInteger;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
-
-import java.math.BigInteger;
 
 /**
  * Provides functions for scoring block hits and targets.

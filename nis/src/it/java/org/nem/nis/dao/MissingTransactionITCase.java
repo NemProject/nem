@@ -1,15 +1,14 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.IsEqual;
-import org.junit.*;
-import org.nem.deploy.CommonStarter;
-
 import java.io.*;
 import java.sql.*;
 import java.util.Set;
 import java.util.logging.*;
 import java.util.stream.*;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
+import org.nem.deploy.CommonStarter;
 
 public class MissingTransactionITCase {
 	private static final Logger LOGGER = Logger.getLogger(MissingTransactionITCase.class.getName());

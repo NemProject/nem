@@ -1,10 +1,9 @@
 package org.nem.nis.time.synchronization.filter;
 
-import org.nem.core.model.primitive.NodeAge;
-import org.nem.core.time.synchronization.TimeSynchronizationSample;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.nem.core.model.primitive.NodeAge;
+import org.nem.core.time.synchronization.TimeSynchronizationSample;
 
 /**
  * Filters out a given percentage of samples at the upper and lower bound of time offset.

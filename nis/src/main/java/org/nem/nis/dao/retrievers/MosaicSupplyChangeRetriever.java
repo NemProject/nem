@@ -1,12 +1,11 @@
 package org.nem.nis.dao.retrievers;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Class for for retrieving mosaic supply change transactions.
