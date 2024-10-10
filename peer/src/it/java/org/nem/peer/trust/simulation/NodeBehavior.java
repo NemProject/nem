@@ -29,7 +29,8 @@ public class NodeBehavior {
 	 */
 	private final boolean collusive;
 
-	public NodeBehavior(final boolean evil, final double honestDataProbability, final double honestFeedbackProbability, final boolean leech, final boolean collusive) {
+	public NodeBehavior(final boolean evil, final double honestDataProbability, final double honestFeedbackProbability, final boolean leech,
+			final boolean collusive) {
 		this.evil = evil;
 		this.honestDataProbability = honestDataProbability;
 		this.honestFeedbackProbability = honestFeedbackProbability;

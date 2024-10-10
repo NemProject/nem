@@ -44,12 +44,8 @@ public class NetworkSimulatorITCase {
 			MatcherAssert.assertThat(result, IsEqual.equalTo(true));
 			MatcherAssert.assertThat(trust.getNumComputations(), IsEqual.equalTo(trust.getNumConvergences()));
 			builder.append(System.lineSeparator());
-			builder.append(
-					String.format(
-							"Honest: %02d%% --> %06.3f%% failed; %04d ms",
-							i * 10,
-							simulator.getFailedPercentage(),
-							stopTime - startTime));
+			builder.append(String.format("Honest: %02d%% --> %06.3f%% failed; %04d ms", i * 10, simulator.getFailedPercentage(),
+					stopTime - startTime));
 		}
 
 		LOGGER.log(Level.INFO, builder.toString());

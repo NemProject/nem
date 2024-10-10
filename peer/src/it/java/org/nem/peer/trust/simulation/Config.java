@@ -59,23 +59,12 @@ public class Config {
 		final NodeBehavior behavior;
 		final Node node;
 
-		public Entry(
-				final String address,
-				final boolean isEvil,
-				final boolean isPreTrusted,
-				final double honestDataProbability,
-				final double honestFeedbackProbability,
-				final boolean isLeech,
-				final boolean isCollusive) {
+		public Entry(final String address, final boolean isEvil, final boolean isPreTrusted, final double honestDataProbability,
+				final double honestFeedbackProbability, final boolean isLeech, final boolean isCollusive) {
 
 			this.isPreTrusted = isPreTrusted;
 
-			this.behavior = new NodeBehavior(
-					isEvil,
-					honestDataProbability,
-					honestFeedbackProbability,
-					isLeech,
-					isCollusive);
+			this.behavior = new NodeBehavior(isEvil, honestDataProbability, honestFeedbackProbability, isLeech, isCollusive);
 
 			this.node = NodeUtils.createNodeWithHost(address);
 		}

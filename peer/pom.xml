@@ -173,26 +173,36 @@
                     <formats>
                         <format>
                             <includes>
-                                <include>src/**</include>
+                                <include>src/**/*.properties</include>
+                                <include>src/**/*.xml</include>
                             </includes>
+
                             <trimTrailingWhitespace/>
                             <endWithNewline/>
                         </format>
                     </formats>
                     <java>
+                        <includes>
+                            <include>src/**/*.java</include>
+                        </includes>
+
+                        <!--
+                        <importOrder />
+                        <removeUnusedImports />
+                        -->
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+
                         <eclipse>
-                          <version>4.13.0</version>
+                          <version>4.13</version>
                           <file>${project.basedir}/eclipse-formatter.xml</file>
                         </eclipse>
+
+                        <indent>
+                            <tabs>true</tabs>
+                        </indent>
                     </java>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

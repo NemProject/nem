@@ -14,9 +14,8 @@ public class NetworkSimulator {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSimulator.class.getName());
 
 	/**
-	 * When node A has only little experience with node B (number of data exchanges is below MIN_COMMUNICATION),
-	 * node A picks node B as communication partner with a chance of 30%.
-	 * Thus new nodes get a chance to participate in the network communication.
+	 * When node A has only little experience with node B (number of data exchanges is below MIN_COMMUNICATION), node A picks node B as
+	 * communication partner with a chance of 30%. Thus new nodes get a chance to participate in the network communication.
 	 */
 	private static final int MIN_COMMUNICATION = 30;
 
@@ -63,13 +62,8 @@ public class NetworkSimulator {
 		this.config = config;
 		this.trustProvider = trustProvider;
 
-		final org.nem.peer.Config peerConfig = new org.nem.peer.Config(
-				config.getLocalNode(),
-				new PreTrustedNodes(config.getPreTrustedNodes()),
-				null,
-				"0.0.0",
-				0,
-				new NodeFeature[] {});
+		final org.nem.peer.Config peerConfig = new org.nem.peer.Config(config.getLocalNode(),
+				new PreTrustedNodes(config.getPreTrustedNodes()), null, "0.0.0", 0, new NodeFeature[]{});
 
 		this.trustContext = new PeerNetworkState(peerConfig, new NodeExperiences(), config.getNodes()).getTrustContext();
 	}
@@ -80,8 +74,7 @@ public class NetworkSimulator {
 	}
 
 	/**
-	 * Runs the network simulation.
-	 * After each round the global trust for the local peer is calculated.
+	 * Runs the network simulation. After each round the global trust for the local peer is calculated.
 	 *
 	 * @param outputFile path to the output file (contains trusts in nodes)
 	 * @param numIterations number of rounds for the simulation
@@ -118,9 +111,7 @@ public class NetworkSimulator {
 	}
 
 	/**
-	 * In each round all peers communicate with other peers.
-	 * The communication can be successful or not.
-	 * Evil peers might fake the feedback.
+	 * In each round all peers communicate with other peers. The communication can be successful or not. Evil peers might fake the feedback.
 	 *
 	 * @param peers array of peers
 	 */
@@ -181,11 +172,9 @@ public class NetworkSimulator {
 	}
 
 	/**
-	 * Given a node, the method chooses a partner node.
-	 * Nodes with which the given node has little experience get chosen quite often.
-	 * This ensures that unknown nodes get a chance to prove themselves.
-	 * When choosing from the set of already known nodes, the chance for a node to be chosen is roughly
-	 * proportional to the trust in it.
+	 * Given a node, the method chooses a partner node. Nodes with which the given node has little experience get chosen quite often. This
+	 * ensures that unknown nodes get a chance to prove themselves. When choosing from the set of already known nodes, the chance for a node
+	 * to be chosen is roughly proportional to the trust in it.
 	 *
 	 * @param node the node that needs a partner
 	 * @param peers array of peers to choose from
@@ -198,12 +187,8 @@ public class NetworkSimulator {
 			nodeCollection.update(peer, NodeStatus.ACTIVE);
 		}
 
-		final TrustContext trustContext = new TrustContext(
-				peers,
-				node,
-				this.trustContext.getNodeExperiences(),
-				this.trustContext.getPreTrustedNodes(),
-				this.trustContext.getParams());
+		final TrustContext trustContext = new TrustContext(peers, node, this.trustContext.getNodeExperiences(),
+				this.trustContext.getPreTrustedNodes(), this.trustContext.getParams());
 
 		final NodeSelector basicNodeSelector = new BasicNodeSelector(10, this.globalTrustVector, trustContext.getNodes());
 
@@ -211,8 +196,7 @@ public class NetworkSimulator {
 	}
 
 	/**
-	 * Writes trust values to an output file.
-	 * The percentage of failed calls is written too.
+	 * Writes trust values to an output file. The percentage of failed calls is written too.
 	 *
 	 * @param out writer object
 	 * @param round the number of rounds already elapsed
