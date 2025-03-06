@@ -1,27 +1,38 @@
 {
-  "_info": "this file contains a list of all trusted peers and can be shared",
-  "knownPeers": [
-    {
-      "endpoint": {
-        "host": "95.216.73.243",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name": "HugeTestAlice2",
-        "public-key": "9822cf9571a5551ec19720b87a567a20797b75ec4b6711387643fc352fef704e"
-      }
-    },
-    {
-      "endpoint": {
-        "host": "18.179.168.59",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name":"ol-test",
-        "public-key":"775e2f0bd79ad47ad6f365d3216663a1f7178244faf9c37ca912303906bd80f6"
-      }
-    }
-  ]
+    "_info": "this file contains a list of all trusted peers and can be shared",
+    "knownPeers": [
+        {
+            "endpoint": {
+                "host": "libertalia.nemtest.net",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "libertalia",
+                "public-key": "7C814B3B44B1A98B917D223D81A9FF36A3EBA9DC784634FA93627A29B56C235D"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "ocracoke.nemtest.net",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "ocracoke",
+                "public-key": "95BA0E864CD5EDB3EC03B6486B5D64B4E3125D9085A4898AEB5748B88A010EF4"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "tortuga.nemtest.net",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "tortuga",
+                "public-key": "5451F450416D214B14F0375CE06C3451EEB784F7BCD25AE1072BA7E403940A58"
+            }
+        }
+    ]
 }

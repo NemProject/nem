@@ -132,10 +132,10 @@ public class NetworkInfos {
 	private static NetworkInfo createTestNetworkInfo() {
 		final byte version = (byte) 0x98;
 		final Address nemesisAddress = Address.fromPublicKey(version,
-				PublicKey.fromHexString("e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"));
+				PublicKey.fromHexString("d8e06b38d4ce227fe735eb64bec55d6b9708cf91bcbcbe7e09f36ffd8b97763d"));
 		return new NetworkInfo((byte) 0x98, 'T',
-				new NemesisBlockInfo(Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"), nemesisAddress,
-						Amount.fromNem(8000000000L), "nemesis-testnet.bin"));
+				new NemesisBlockInfo(Hash.fromHexString("33496b75b6e5827cd11f50070df2dd38b31e20398b166cb719dd544d4844ed59"), nemesisAddress,
+						Amount.fromNem(9000000000L), "nemesis-testnet.bin"));
 	}
 
 	private static NetworkInfo createMijinNetworkInfo() {
