@@ -49,7 +49,7 @@ public class NemesisBlockTest {
 			MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(EXPECTED_VERSION));
 			MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-			// 2 multisig aggregate transactions
+			// no multisig aggregate transactions
 			MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE));
 			MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 			MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
