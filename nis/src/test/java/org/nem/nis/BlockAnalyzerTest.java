@@ -22,9 +22,9 @@ import org.nem.nis.test.*;
 public class BlockAnalyzerTest {
 	private static final EnumSet<ObserverOption> DEFAULT_OPTIONS = EnumSet.of(ObserverOption.NoIncrementalPoi);
 	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey
-			.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
-	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
-	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
+			.fromHexString("a19b6703da86ea9b09fba1d1f5be83f0f77dae11d946d4b4175845225e0254d0");
+	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TANPK2RGLCOXYNGLGEY2JYPWVJIDFMAEUAKRVPKU");
+	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBL364GNFERPUN3BRYNHNLCHKRMHB2QQGOYG62ZG");
 
 	@After
 	public void resetNetwork() {
@@ -45,7 +45,7 @@ public class BlockAnalyzerTest {
 		// Assert:
 		MatcherAssert.assertThat(nemesisBlock.getGenerationHash(), IsEqual.equalTo(nemesisBlockInfo.getGenerationHash()));
 		MatcherAssert.assertThat(nemesisBlock.getSigner().getAddress(), IsEqual.equalTo(nemesisBlockInfo.getAddress()));
-		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(162));
+		MatcherAssert.assertThat(nemesisBlock.getTransactions().size(), IsEqual.equalTo(20));
 	}
 
 	@Test
