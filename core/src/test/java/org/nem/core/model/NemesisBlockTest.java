@@ -20,8 +20,8 @@ import org.nem.core.time.TimeInstant;
 @RunWith(Enclosed.class)
 public class NemesisBlockTest {
 	private static final NemesisBlockInfo NEMESIS_BLOCK_INFO = NetworkInfos.getDefault().getNemesisBlockInfo();
-	private static final int NUM_NEMESIS_TRANSACTIONS = 162;
-	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
+	private static final int NUM_NEMESIS_TRANSACTIONS = 20;
+	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.ZERO; // no cosigners in the new testnet
 	private static final int EXPECTED_VERSION = 0x98000001;
 
 	@BeforeClass
@@ -49,8 +49,8 @@ public class NemesisBlockTest {
 			MatcherAssert.assertThat(block.getVersion(), IsEqual.equalTo(EXPECTED_VERSION));
 			MatcherAssert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-			// 2 multisig aggregate transactions
-			MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE.multiply(2)));
+			// no multisig aggregate transactions
+			MatcherAssert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE));
 			MatcherAssert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 			MatcherAssert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 			MatcherAssert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
