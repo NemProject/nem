@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.nis</groupId>
     <artifactId>nem-infrastructure-server</artifactId>
-    <version>0.6.101</version>
+    <version>0.6.102</version>
     <name>NEM Infrastructure Server</name>
     <organization>
         <name>NEM - New Economy Movement</name>
