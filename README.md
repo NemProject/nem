@@ -54,6 +54,28 @@ java -Xms6G -Xmx6G -cp ./staging:./nis/target/libs/*:./nis/target/* org.nem.depl
 
 Read the [NEM node documentation](https://nemproject.github.io/nem-docs/pages/Guides/node-operation/docs.en.html) to know more about handling NIS nodes.
 
+### Running a testnet node
+Create a `config-user.properties` with the following properties
+
+```bash
+# update <ReplaceWithYourName> value below
+cat >> staging/config-user.properties << EOF
+nis.bootName = <ReplaceWithYourName>
+
+nem.network = testnet
+
+nis.treasuryReissuanceForkHeight = 1
+nis.treasuryReissuanceForkTransactionHashes =
+nis.treasuryReissuanceForkFallbackTransactionHashes =
+nis.multisigMOfNForkHeight = 1
+nis.mosaicsForkHeight = 1
+nis.firstFeeForkHeight = 1
+nis.secondFeeForkHeight = 1
+nis.remoteAccountForkHeight = 1
+nis.mosaicRedefinitionForkHeight = 1
+EOF
+```
+
 ## Contributing
 
 Before contributing please [read the CONTRIBUTING instructions](CONTRIBUTING.md).
