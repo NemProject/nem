@@ -184,7 +184,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.4.3.Final</version>
+            <version>6.2.0.Final</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -328,12 +328,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.5.4</version>
                 <configuration>
                     <testSourceDirectory>src/integrationtest/java</testSourceDirectory>
                     <failIfNoTests>true</failIfNoTests>
