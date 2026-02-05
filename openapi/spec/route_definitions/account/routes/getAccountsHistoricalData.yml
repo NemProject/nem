@@ -1,0 +1,74 @@
+tags:
+  - Account
+summary: Retrieve historical account data for multiple accounts
+description: |
+  Retrieves historical balance and importance information for a collection of accounts.
+  
+  ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
+  
+  The request returns historical data points for each requested account between the given block heights.
+  
+  The total number of returned data points across **all accounts** must not exceed **10,000**.
+operationId: getAccountHistoricalDataBatch
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - accounts
+          - startHeight
+          - endHeight
+          - incrementBy
+        properties:
+          accounts:
+            type: array
+            minItems: 1
+            description: List of account identifiers.
+            items:
+              $ref: "../../../schemas/AccountId.yml"
+          startHeight:
+            $ref: "../../../schemas/BlockHeight.yml"
+            description: The block height from which the data should be supplied.
+          endHeight:
+            $ref: "../../../schemas/BlockHeight.yml"
+            description: The block height up to which the data should be supplied.
+          incrementBy:
+            type: integer
+            format: int64
+            minimum: 1
+            description: |
+              The increment between consecutive block heights.
+              The total number of returned data points across all accounts must not exceed **10,000**.
+            examples:
+              - 1
+      examples:
+        default:
+          value:
+            accounts:
+              - account: "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ"
+              - account: "NDZQI4MPLUCFVWQY5P6LD5LFLH2NVDYOQ347DATW"
+            startHeight: 17590
+            endHeight: 17592
+            incrementBy: 1
+responses:
+  '200':
+    description: Successfully retrieved historical account data for all requested accounts.
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/AccountHistoricalDataList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

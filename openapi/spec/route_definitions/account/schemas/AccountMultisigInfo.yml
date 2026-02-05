@@ -1,0 +1,19 @@
+type: object
+description: |
+  Additional multisig account information.
+
+  If the account is not a multisig account, this object is empty.
+  If the account is a multisig account, it contains cosignatory details.
+properties:
+  cosignatoriesCount:
+    type: integer
+    format: int32
+    description: Number of cosignatories for the multisig account.
+    examples:
+      - 3
+  minCosignatories:
+    type: integer
+    format: int32
+    description: Minimum number of cosignatories required to approve a transaction.
+    examples:
+      - 2

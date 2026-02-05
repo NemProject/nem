@@ -1,0 +1,21 @@
+type: object
+description: >
+  A extended block data used by NIS services such as the block explorer.
+required:
+  - block
+  - hash
+  - difficulty
+  - txes
+properties:
+  difficulty:
+    $ref: "../../../schemas/BlockDifficulty.yml"
+  txes:
+    type: array
+    description: List of transactions contained in the block along with their corresponding transaction hashes.
+    items:
+      $ref: "../../transaction/schemas/TransactionWithHash.yml"
+  block:
+    $ref: "./Block.yml"
+  hash:
+    $ref: "../../../schemas/Hash.yml"
+    description: Block hash.

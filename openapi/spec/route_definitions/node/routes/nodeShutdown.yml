@@ -1,0 +1,18 @@
+tags:
+  - Node
+summary: Shut down NIS server
+description: |
+  Stops the currently running NIS server instance.
+  After shutdown, the node must be restarted manually.
+
+  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+operationId: nodeShutdown
+responses:
+  '200':
+    description: Indicates that server shutdown was initiated successfully. No response body is returned.
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

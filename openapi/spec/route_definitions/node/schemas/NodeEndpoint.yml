@@ -1,0 +1,26 @@
+type: object
+description: Network endpoint used by the node for communication.
+required:
+  - protocol
+  - host
+  - port
+properties:
+  protocol:
+    type: string
+    description: The protocol used for the communication (http or https).
+    enum:
+      - http
+      - https
+    examples:
+      - http
+  host:
+    type: string
+    description: Hostname or IP address of the node.
+    examples:
+      - 81.224.224.156
+  port:
+    type: integer
+    format: int32
+    description: Port used for communication.
+    examples:
+      - 7890

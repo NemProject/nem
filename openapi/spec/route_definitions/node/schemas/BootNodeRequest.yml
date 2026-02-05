@@ -1,0 +1,15 @@
+type: object
+description: |
+  Object is used to transfer the relevant data for booting a local node to NIS. 
+  With the boot data NIS can create the local node object and connect to the network.
+required:
+  - metaData
+  - endpoint
+  - identity
+properties:
+  metaData:
+    $ref: "./BootNodeMetaData.yml"
+  endpoint:
+    $ref: "./NodeEndpoint.yml"
+  identity:
+    $ref: "./BootNodeIdentity.yml"

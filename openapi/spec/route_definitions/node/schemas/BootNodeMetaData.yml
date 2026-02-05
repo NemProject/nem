@@ -1,0 +1,6 @@
+type: object
+description: Boot node meta data.
+properties:
+  application:
+    type: string
+    description: Application name.

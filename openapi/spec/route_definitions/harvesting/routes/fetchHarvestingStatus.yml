@@ -1,0 +1,33 @@
+tags:
+  - Harvesting
+summary: Check if account is unlocked
+description: |
+  Checks whether the account corresponding to the given private key is currently unlocked for harvesting.
+
+  ⚠️ **Security warning:** This endpoint requires sending a private key over the network and is intended for trusted and local use only.
+operationId: fetchAccountHarvestingStatus
+requestBody:
+  $ref: "../../../request_bodies/privateKey.yml"
+responses:
+  '200':
+    description: Returns the account harvesting status (unlocked or locked).
+    content:
+      text/plain:
+        schema:
+          type: string
+          enum:
+            - ok
+            - nope
+        examples:
+          unlocked:
+            value: "ok"
+          locked:
+            value: "nope"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

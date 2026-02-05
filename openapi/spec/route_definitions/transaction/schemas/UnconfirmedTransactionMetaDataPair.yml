@@ -1,0 +1,13 @@
+type: object
+description: |
+  Pair containing an unconfirmed transaction and its associated metadata.
+required:
+  - meta
+  - transaction
+properties:
+  meta:
+    $ref: "./UnconfirmedTransactionMetaData.yml"
+    description: The transaction meta data object.
+  transaction:
+    $ref: "./Transaction.yml"
+    description: The transaction data object.

@@ -1,0 +1,28 @@
+tags:
+  - Account
+summary: Request original account data for delegated account
+description: |
+  Given the address of a delegated account, returns the account data of the
+  original account for which the given address is acting as a delegate.
+
+  If the provided address belongs to a delegated account, the response
+  contains the original account’s information.
+  
+  If the provided address does not belong to a delegated account, the response
+  contains the account information for the given address itself.
+operationId: getAccountByForwardedAddress
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+responses:
+  '200':
+    description: Account information successfully fetched.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AccountMetaDataPair.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

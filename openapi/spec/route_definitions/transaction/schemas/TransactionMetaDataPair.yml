@@ -1,0 +1,13 @@
+type: object
+description: |
+  Pair containing a transaction and its associated metadata.
+required:
+  - transaction
+  - meta
+properties:
+  transaction:
+    $ref: "./Transaction.yml"
+    description: The transaction object.
+  meta:
+    $ref: "./TransactionMetaData.yml"
+    description: Additional metadata about the transaction.

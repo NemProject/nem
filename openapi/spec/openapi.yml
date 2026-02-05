@@ -1,0 +1,18 @@
+openapi: 3.1.0
+info:
+  "$ref": "./info.yml"
+tags:
+  "$ref": "./tags.yml"
+paths:
+  "$ref": "./routes.yml"
+# No authentication required for NIS API; empty requirement satisfies security-defined rule.
+security:
+  - {}
+externalDocs:
+  description: NEM technical documentation
+  url: https://nemproject.github.io/
+servers:
+  - url: http://libertalia.nemtest.net:7890
+    description: Testnet node
+  - url: http://portobelo.nemmain.net:7890
+    description: Mainnet node

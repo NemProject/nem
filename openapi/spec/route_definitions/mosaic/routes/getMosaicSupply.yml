@@ -1,0 +1,24 @@
+tags:
+  - Mosaic
+summary: Return mosaic supply
+description: |
+  Returns the current supply for a given mosaic identifier.
+  The mosaic id is provided as a request parameter and parsed by the server into a MosaicId object.
+operationId: getMosaicSupply
+parameters:
+  - $ref: "../../../parameters/query/mosaicId.yml"
+responses:
+  '200':
+    description: Mosaic supply successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/MosaicIdSupplyPair.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,33 @@
+description: The request is unauthorized.
+content:
+  application/json:
+    schema:
+      description: Unauthorized response body.
+      allOf:
+        - $ref: "../schemas/ModelError.yml"
+        - type: object
+          properties:
+            error:
+              description: The value is always `Unauthorized`.
+              const: "Unauthorized"
+              examples:
+                - "Unauthorized"
+            status:
+              description: The HTTP status code of the response. Always `401`.
+              const: 401
+              examples:
+                - 401
+            message:
+              description: |
+                Detailed error message describing the failure. Examples:
+                - `remote ... attempted to call local /node/boot` - Local API was called from a remote address.
+                - `remote ... attempted to call local /account/unlock with non-remote address ...` - Start harvesting was called with a non-delegated key from a remote address.
+    examples:
+      unauthorizedError:
+        summary: Unauthorized request
+        description: The request was rejected because the client is not authorized to access the endpoint.
+        value:
+          timeStamp: 342379944
+          error: "Unauthorized"
+          message: "remote 217.97.103.110 attempted to call local /account/generate"
+          status: 401

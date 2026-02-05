@@ -1,0 +1,9 @@
+type: object
+description: List of transaction metadata pairs.
+required:
+  - data
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./TransactionMetaDataPair.yml"

@@ -1,0 +1,15 @@
+type: object
+required:
+  - data
+  - signature
+properties:
+  data:
+    type: string
+    description: |
+      Hex-encoded transaction byte array.
+      Created by serializing the transaction and converting to hexadecimal.
+    pattern: "^[0-9a-fA-F]+$"
+  signature:
+    type: string
+    description: Hex-encoded transaction signature.
+    pattern: "^[0-9a-fA-F]+$"

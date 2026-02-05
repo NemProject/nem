@@ -1,0 +1,9 @@
+name: mosaicId
+in: query
+required: true
+description: Mosaic identifier.
+schema:
+  type: string
+examples:
+  default:
+    value: "nem:xem"

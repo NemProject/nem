@@ -1,0 +1,24 @@
+tags:
+  - Mosaic
+summary: Return mosaic definition
+description: |
+  Returns the mosaic definition for the given mosaic identifier.
+  The parent namespace of the mosaic must be active; otherwise an error is returned.
+operationId: getMosaicDefinition
+parameters:
+  - $ref: "../../../parameters/query/mosaicId.yml"
+responses:
+  '200':
+    description: Mosaic definition successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../../transaction/schemas/MosaicDefinition.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

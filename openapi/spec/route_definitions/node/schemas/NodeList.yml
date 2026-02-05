@@ -1,0 +1,10 @@
+type: object
+description: Wrapped object used to return a list of nodes.
+required:
+  - data
+properties:
+  data:
+    type: array
+    description: List of nodes.
+    items:
+      $ref: "./Node.yml"

@@ -1,0 +1,8 @@
+name: namespace
+in: query
+description: Namespace identifier.
+schema:
+  $ref: "../../schemas/NamespaceId.yml"
+examples:
+  default:
+    value: "makoto.metal.coins"

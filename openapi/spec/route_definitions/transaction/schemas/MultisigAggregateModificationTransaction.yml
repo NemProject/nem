@@ -1,0 +1,20 @@
+description: |
+  Multisig aggregate modification transactions are part of the NEM's multisig account system. 
+  A multisig aggregate modification transaction holds an array of multisig cosignatory modifications and 
+  a single multisig minimum cosignatories modification inside the transaction. 
+  A multisig aggregate modification transaction can be wrapped by a multisig transaction. 
+  Aggregate modification transactions that use the minCosignatories field need to have 
+  version 0x68000002 (decimal 1744830466) for mainnet, 0x98000002 (decimal -1744830462) for testnet.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    required:
+      - modifications
+    properties:
+      modifications:
+        type: array
+        description: Array of multisig modifications.
+        items:
+          $ref: "./MultisigCosignatoryModification.yml"
+      minCosignatories:
+        $ref: "./MultisigMinCosignatoriesModification.yml"

@@ -1,0 +1,26 @@
+tags:
+  - Block
+summary: Return block by height
+description: |
+  Returns the block at the given block height.
+  The request body must contain a BlockHeight object.
+
+  Returns an error if the block with the specified height cannot be found in the database.
+operationId: getBlockAtHeight
+requestBody:
+  $ref: "../../../request_bodies/blockHeight.yml"
+responses:
+  '200':
+    description: Block successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/Block.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

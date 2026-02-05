@@ -1,0 +1,43 @@
+type: object
+description: Basic account information.
+required:
+  - address
+  - balance
+  - vestedBalance
+  - importance
+  - harvestedBlocks
+properties:
+  address:
+    $ref: "../../../schemas/Address.yml"
+  balance:
+    $ref: "../../../schemas/Amount.yml"
+    description: |
+      Account balance as a non-negative integer in micro XEM. For example, 123456789 means 123.456789 XEM.
+      For transfers, only the balance (not vested balance) is used.
+  vestedBalance:
+    $ref: "../../../schemas/Amount.yml"
+    description: |
+      Vested balance of the account in micro XEM, used for importance calculation.
+  importance:
+    $ref: "../../../schemas/Importance.yml"
+  publicKey:
+    oneOf:
+      - $ref: "../../../schemas/PublicKey.yml"
+      - type: "null"
+    description: Public key of the account, or null if the account has not yet published a transaction.
+  label:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: Reserved; currently unused and always null.
+    examples:
+      - null
+  harvestedBlocks:
+    type: integer
+    format: int64
+    description: |
+      Number of blocks harvested by this account (0 for new accounts). Harvesting is the process of creating new blocks.
+    examples:
+      - 645
+  multisigInfo:
+    $ref: "./AccountMultisigInfo.yml"

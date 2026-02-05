@@ -1,0 +1,41 @@
+tags:
+  - Transaction
+summary: Prepare and announce transaction
+description: |
+  Creates, signs, and broadcasts a transaction to the NEM network.
+  
+  ⚠️ **Security warning:** This endpoint requires the sender's private key and must only be used with trusted, local NIS nodes.
+  The transaction is signed by NIS and then announced to the network.
+operationId: prepareAnnounceTransaction
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/PrepareAnnounceRequest.yml"
+responses:
+  '200':
+    description: Transaction successfully announced.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AnnounceResult.yml"
+        examples:
+          success:
+            summary: Transaction signed and announced
+            value:
+              type: 1
+              code: 1
+              message: "SUCCESS"
+              transactionHash:
+                data: "c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+              innerTransactionHash:
+                data: "cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

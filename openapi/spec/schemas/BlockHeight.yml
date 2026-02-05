@@ -1,0 +1,7 @@
+type: integer
+format: int64
+description: |
+  Position of a block in the blockchain. The first block has height 1; each new block increments by one.
+minimum: 1
+examples:
+  - 17592

@@ -1,0 +1,14 @@
+name: address
+in: query
+required: true
+description: |
+  Filter by address. An address is involved when the account is the sender or recipient of the transaction.
+schema:
+  $ref: "../../schemas/Address.yml"
+examples:
+  default:
+    summary: Testnet address
+    value: "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+  mainnet:
+    summary: Mainnet address
+    value: "NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK"

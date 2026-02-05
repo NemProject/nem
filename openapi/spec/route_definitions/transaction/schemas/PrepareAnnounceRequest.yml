@@ -1,0 +1,15 @@
+type: object
+required:
+  - transaction
+  - privateKey
+properties:
+  transaction:
+    $ref: "../../transaction/schemas/Transaction.yml"
+  privateKey:
+    $ref: "../../../schemas/PrivateKey.yml"
+    type: string
+    description: >
+      Hex-encoded private key used by NIS to sign the transaction.
+      ⚠️ **Security warning:** Send only to a trusted local node.
+    examples:
+      - 68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0

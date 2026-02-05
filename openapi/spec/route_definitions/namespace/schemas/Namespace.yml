@@ -1,0 +1,17 @@
+type: object
+required:
+  - fqn
+  - owner
+  - height
+properties:
+  fqn:
+    type: string
+    description: Fully qualified namespace name.
+    examples:
+      - "makoto.metal.coins"
+  owner:
+    $ref: "../../../schemas/Address.yml"
+    description: Address of the namespace owner.
+  height:
+    $ref: "../../../schemas/BlockHeight.yml"
+    description: Block height at which ownership begins.

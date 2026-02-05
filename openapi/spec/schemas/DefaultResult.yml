@@ -1,0 +1,18 @@
+type: object
+description: Generic result wrapper containing type, code, and message.
+required:
+  - type
+  - code
+  - message
+properties:
+  type:
+    type: integer
+    format: int32
+    description: Result type identifier.
+  code:
+    type: integer
+    format: int32
+    description: Result code of the operation.
+  message:
+    type: string
+    description: Human-readable result message.

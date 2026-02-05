@@ -1,0 +1,7 @@
+type: string
+description: 256-bit public key encoded as a hexadecimal string (64 hex characters).
+minLength: 64
+maxLength: 64
+pattern: '^[0-9a-fA-F]{64}$'
+examples:
+  - "18e4f79f886927de698df1f857de2aada41ccca6617e56bb0d61623b35b08cc0"

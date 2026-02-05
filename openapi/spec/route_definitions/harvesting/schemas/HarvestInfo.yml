@@ -1,0 +1,23 @@
+type: object
+description: An object contains information about a block that an account harvested.
+properties:
+  id:
+    $ref: "../../../schemas/DatabaseId.yml"
+    description: The database id for the harvested block.
+  height:
+    $ref: "../../../schemas/BlockHeight.yml"
+    description: The height of the harvested block.
+  timeStamp:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: Timestamp of harvested block.
+  totalFee:
+    $ref: "../../../schemas/Amount.yml"
+    description: The total fee collected by harvesting the block.
+  difficulty:
+    $ref: "../../../schemas/BlockDifficulty.yml"
+required:
+  - id
+  - height
+  - timeStamp
+  - totalFee
+  - difficulty

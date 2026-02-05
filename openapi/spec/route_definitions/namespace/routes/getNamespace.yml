@@ -1,0 +1,31 @@
+tags:
+  - Namespace
+summary: Return namespace information
+description: |
+  Retrieves information about a namespace with the given fully qualified namespace id (FQN).
+  The namespace must exist and be active, otherwise an error is returned.
+operationId: getNamespace
+parameters:
+  - $ref: "../../../parameters/query/namespace.yml"
+responses:
+  '200':
+    description: Namespace information retrieved successfully.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/Namespace.yml"
+        examples:
+          default:
+            summary: Namespace with FQN and owner
+            value:
+              fqn: "makoto.metal.coins"
+              owner: "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH"
+              height: 13465
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

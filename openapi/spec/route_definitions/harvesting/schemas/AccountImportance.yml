@@ -1,0 +1,32 @@
+type: object
+description: |
+  Account importance information.
+
+  If isSet is 0, importance is not available and no additional fields are present.
+  If isSet is 1, importance-related fields such as score, ev, and height are included.
+required:
+  - isSet
+properties:
+  isSet:
+   type: integer
+   format: int32
+   enum:
+    - 0
+    - 1
+   description: |
+     Indicates if the fields "score", "ev" and "height" are available.
+     "isSet" can have the values 0 or 1. In case isSet is 0 the following fields are not available.
+   examples:
+    - 1
+  score:
+    $ref: "../../../schemas/Importance.yml"
+  ev:
+    type: number
+    format: double
+    description: |
+      The page rank portion of the importance. The page rank ranges between 0 and 1.
+    examples:
+      - 0.004252356221747241
+  height:
+    $ref: "../../../schemas/BlockHeight.yml"
+    description: The height at which the importance calculation was performed.

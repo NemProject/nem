@@ -1,0 +1,29 @@
+tags:
+  - Account
+summary: Retrieve historical account data
+description: |
+  Retrieves historical balance and importance information for an account.
+  
+  ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
+  
+  The request returns historical data points between the given block heights.
+  The number of returned data points must not exceed **1000**.
+operationId: getAccountHistoricalData
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+  - $ref: "../../../parameters/query/startHeight.yml"
+  - $ref: "../../../parameters/query/endHeight.yml"
+  - $ref: "../../../parameters/query/increment.yml"
+responses:
+  '200':
+    description: Successfully retrieved historical account data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AccountHistoricalDataList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

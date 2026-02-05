@@ -1,0 +1,9 @@
+type: string
+description: |
+  Represents a unique account address. The first character indicates the network (T for testnet, N for mainnet).
+  Addresses are always 40 characters long and Base32-encoded.
+minLength: 40
+maxLength: 40
+pattern: '^[A-Z2-7]{40}$'
+examples:
+  - "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"

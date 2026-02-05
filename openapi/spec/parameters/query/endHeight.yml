@@ -1,0 +1,11 @@
+name: endHeight
+in: query
+required: true
+description: |
+  Block height up to which to return data (inclusive).
+  Must be greater than or equal to the start height.
+schema:
+  $ref: "../../schemas/BlockHeight.yml"
+examples:
+  default:
+    value: 17592

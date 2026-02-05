@@ -1,0 +1,29 @@
+tags:
+  - Harvesting
+summary: Retrieve unlock info (unlocked accounts)
+description: |
+  Retrieves information about the number of currently unlocked accounts (harvesters)
+  and the maximum number of accounts that are allowed to harvest on this node.
+  
+  Each node can be configured to allow a limited number of delegated harvesters.
+  The returned information reflects the current usage and configured limit.
+operationId: retrieveUnlockedInfo
+responses:
+  '200':
+    description: Successfully returned unlocked accounts.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/HarvestingStats.yml"
+        examples:
+          default:
+            summary: Unlock capacity and current count
+            value:
+              num-unlocked: 2
+              max-unlocked: 3
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

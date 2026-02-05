@@ -1,0 +1,26 @@
+description: |
+  Accounts can rent a namespace for one year and after a year renew the contract. 
+  This is done via a ProvisionNamespaceTransaction.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Provision Namespace Transaction object.
+    required:
+      - rentalFeeSink
+      - rentalFee
+      - newPart
+    properties:
+      rentalFeeSink:
+        $ref: "../../../schemas/PublicKey.yml"
+        description: The public key of the account to which the rental fee is transferred.
+      rentalFee:
+        $ref: "../../../schemas/Amount.yml"
+        description: The fee for renting the namespace.
+      newPart:
+        type: string
+        description: The new part which is concatenated to the parent with a '.' as separator.
+      parent:
+        oneOf:
+          - type: string
+          - type: "null"
+        description: The parent namespace. This can be null if the transaction rents a root namespace.

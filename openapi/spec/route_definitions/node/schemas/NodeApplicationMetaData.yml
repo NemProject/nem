@@ -1,0 +1,31 @@
+type: object
+description: Metadata about the running NIS application.
+required:
+  - application
+  - version
+  - startTime
+  - currentTime
+properties:
+  application:
+    type: string
+    description: Application name.
+    examples:
+      - NEM Deploy
+  version:
+    type: string
+    description: Application version string.
+    examples:
+      - 0.6.102
+  signer:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: Signer of the certificate used by the application.
+    examples:
+      - CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD
+  startTime:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: Network time at which the application was started.
+  currentTime:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: Current network time (seconds since the nemesis block).

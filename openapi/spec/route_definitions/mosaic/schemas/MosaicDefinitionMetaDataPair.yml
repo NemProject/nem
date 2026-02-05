@@ -1,0 +1,9 @@
+type: object
+required:
+  - mosaic
+  - meta
+properties:
+  mosaic:
+    $ref: "../../transaction/schemas/MosaicDefinition.yml"
+  meta:
+    $ref: "./MosaicMetaData.yml"

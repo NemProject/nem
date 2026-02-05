@@ -1,0 +1,24 @@
+tags:
+  - Mosaic
+summary: Return last mosaic definition
+description: |
+  Returns the last known mosaic definition for the given mosaic identifier.
+  The returned definition may be expired. For the native XEM mosaic, a predefined static definition is returned.
+operationId: getLastMosaicDefinition
+parameters:
+  - $ref: "../../../parameters/query/mosaicId.yml"
+responses:
+  '200':
+    description: Last mosaic definition successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../../transaction/schemas/MosaicDefinition.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

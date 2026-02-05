@@ -1,0 +1,38 @@
+tags:
+  - Transaction
+summary: Return transaction by hash
+description: |
+  Returns the transaction associated with the specified transaction hash, including its metadata.
+
+  ⚠️ **Transaction lookup retention**
+
+  Transactions can be searched by hash only for a limited period of time.
+  A node keeps recently seen transaction hashes in memory for a configurable
+  duration defined by the `nis.transactionHashRetentionTime` setting.
+
+  Once this retention period expires, the transaction hash is removed from
+  the node’s in-memory cache and the transaction can no longer be retrieved
+  using this endpoint, even if the transaction has already been included
+  in a block.
+
+  The actual availability window therefore depends on the node configuration
+  and may vary between nodes.
+
+  This endpoint is available only if the node supports transaction lookup by hash.  
+  If the feature is not supported or the hash cannot be found, an error is returned.
+operationId: getTransactionByHash
+parameters:
+  - $ref: "../../../parameters/query/hash.yml"
+responses:
+  '200':
+    description: Successfully returned transaction data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/TransactionMetaDataPair.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,7 @@
+type: object
+description: Identifier of an account.
+required:
+  - account
+properties:
+  account:
+    $ref: "./Address.yml"

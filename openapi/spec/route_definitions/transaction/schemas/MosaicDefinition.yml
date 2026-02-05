@@ -1,0 +1,27 @@
+type: object
+description: A mosaic definition describes an asset type on the network.
+required:
+  - creator
+  - id
+  - description
+  - properties
+properties:
+  creator:
+    $ref: "../../../schemas/PublicKey.yml"
+    description: Public key of the mosaic creator.
+  id:
+    $ref: "../../../schemas/MosaicId.yml"
+    description: The mosaic identifier.
+  description:
+    type: string
+    minLength: 1
+    maxLength: 512
+    description: |
+      Mosaic description. Must be non-empty and at most 512 characters.
+  properties:
+    description: Mosaic properties.
+    type: array
+    items:
+      $ref: "./MosaicProperty.yml"
+  levy:
+    $ref: "./MosaicLevy.yml"

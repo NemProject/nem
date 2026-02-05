@@ -1,0 +1,30 @@
+tags:
+  - Mosaic
+summary: Return mosaic definitions (paged)
+description: |
+  Returns all known mosaic definitions using pagination.
+  Each entry contains a mosaic definition together with associated metadata.
+operationId: getMosaicDefinitionPage
+parameters:
+  - $ref: "../../../parameters/query/pageSize.yml"
+  - $ref: "../../../parameters/query/id.yml"
+responses:
+  '200':
+    description: Mosaic definitions successfully retrieved.
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/MosaicDefinitionMetaDataPair.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

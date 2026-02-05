@@ -1,0 +1,11 @@
+type: object
+description: |
+  A mosaic describes an instance of a mosaic definition. Mosaics can be transferred by means of a transfer transaction.
+properties:
+  mosaicId:
+    $ref: "./MosaicId.yml"
+  quantity:
+    type: integer
+    description: |
+      The mosaic quantity. The quantity is always given in smallest units for the mosaic, i.e. 
+      if it has a divisibility of 3 the quantity is given in millis.

@@ -1,0 +1,67 @@
+type: object
+description: Base NEM transaction object.
+required:
+  - type
+  - version
+  - timeStamp
+  - deadline
+  - signer
+properties:
+  timeStamp:
+    type: integer
+    description: |
+      The number of seconds elapsed since the creation of the nemesis block. Future timestamps are not allowed. 
+      Transaction validation detects future timestamps and returns an error in that case. 
+      Network time synchronization ensures that any NEM software component will use valid timestamps when creating transactions.
+  signature:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: |
+      The transaction signature. 
+      The transaction signature is validated using the supplied public key in the field signer. 
+      If the signature is not valid, an error is returned from validation.
+  fee:
+    $ref: "../../../schemas/Amount.yml"
+    description: |
+      The fee for the transaction. The higher the fee, the higher is the priority of the transaction. 
+      Transactions with high priority get included in a block before transactions with lower priority. 
+      If the sender does not have enough funds the validation will result in an error.
+  type:
+    type: integer
+    description: |
+      Transaction type identifier. The following types are supported:
+      - 257   - Transfer Transaction
+      - 2049  - Importance Transfer Transaction
+      - 4097  - Multisig Aggregate Modification Transaction
+      - 4098  - Multisig Signature Transaction
+      - 4100  - Multisig Transaction
+      - 8193  - Provision Namespace Transaction
+      - 16385 - Mosaic Definition Creation Transaction
+      - 16386 - Mosaic Supply Change Transaction
+  deadline:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: |
+      The deadline of the transaction.
+      The deadline is given as the number of seconds elapsed since the creation of the nemesis block.
+      If a transaction does not get included in a block before the deadline is reached, it is deleted.
+  version:
+    type: integer
+    description: |
+      The version of the structure. The following version are currently support.
+      1744830465 - mainnet network version
+      -1744830463 - testnet mainnet version
+  signer:
+    $ref: "../../../schemas/PublicKey.yml"
+    description: The public key of the account that created the transaction.
+discriminator:
+  propertyName: type
+  mapping:
+    "257": "./TransferTransaction.yml"
+    "2049": "./ImportanceTransferTransaction.yml"
+    "4097": "./MultisigAggregateModificationTransaction.yml"
+    "4098": "./MultisigSignatureTransaction.yml"
+    "4100": "./MultisigTransaction.yml"
+    "8193": "./ProvisionNamespaceTransaction.yml"
+    "16385": "./MosaicDefinitionCreationTransaction.yml"
+    "16386": "./MosaicSupplyChangeTransaction.yml"

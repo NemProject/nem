@@ -1,0 +1,50 @@
+type: object
+description: Additional metadata describing the node.
+required:
+  - version
+  - networkId
+  - features
+properties:
+  features:
+    type: integer
+    format: int32
+    description: |
+      Bitmask of enabled node features. The value is calculated using a bitwise OR (`|`) of supported feature flags.
+      Known feature flags:
+      - 0x1 - transactions by hash lookup
+      - 0x2 - historical account data
+      - 0x4 - tracking expired mosaics
+      Example:
+      If a node supports both `0x1` and `0x2`, the resulting bitmask value is:
+      `0x1 | 0x2 = 0x3`
+    examples:
+      - 3
+  networkId:
+    type: integer
+    format: int32
+    description: |
+      Network identifier. Supported values:
+      * 104  (0x68) – main network
+      * -104 (0x98) – test network
+      * 96   (0x60) – mijin network
+    examples:
+      - -104
+  application:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: Name of the application running the node.
+    examples:
+      - NIS
+  version:
+    type: string
+    description: Version of the node software.
+    examples:
+      - 0.6.100
+  platform:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: Underlying platform (OS and Java version).
+    examples:
+      - Oracle Corporation (1.8.0_151) on Linux

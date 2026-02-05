@@ -1,0 +1,11 @@
+type: object
+description: |
+  Object includes information for an account and additional information about its state.
+required:
+  - account
+  - meta
+properties:
+  account:
+    $ref: "./AccountInfo.yml"
+  meta:
+    $ref: "./AccountMetaData.yml"

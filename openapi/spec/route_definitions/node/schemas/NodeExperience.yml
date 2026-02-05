@@ -1,0 +1,16 @@
+type: object
+description: |
+  Aggregated communication results between the local node and a remote node.
+  Only successful and failed calls are tracked.
+properties:
+  s:
+    type: integer
+    format: int64
+    description: Number of successful communications.
+  f:
+    type: integer
+    format: int64
+    description: Number of failed communications.
+required:
+  - s
+  - f

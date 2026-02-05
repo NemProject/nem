@@ -1,0 +1,38 @@
+type: object
+description: Information about a single audited request.
+required:
+  - id
+  - host
+  - path
+  - start-time
+  - elapsed-time
+properties:
+  id:
+    type: integer
+    format: int32
+    description: The unique id of the request.
+    examples:
+      - 797725
+  host:
+    type: string
+    description: The host which initiated the request.
+    examples:
+      - 86.124.91.183
+  path:
+    type: string
+    description: The relative URL path.
+    examples:
+      - /chain/score
+  start-time:
+    type: integer
+    format: int64
+    description: >
+      The number of seconds elapsed since the creation of the nemesis block.
+    examples:
+      - 9020618
+  elapsed-time:
+    type: integer
+    format: int32
+    description: The time in seconds that has elapsed since the request was received.
+    examples:
+      - 5

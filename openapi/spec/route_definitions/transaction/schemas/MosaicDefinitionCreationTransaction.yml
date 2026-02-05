@@ -1,0 +1,21 @@
+description: |
+  Before a mosaic can be created or transferred, a corresponding definition of the mosaic has 
+  to be created and published to the network. This is done via a mosaic definition creation transaction.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Mosaic Definition Creation Transaction object.
+    required:
+      - mosaicDefinition
+      - creationFee
+      - creationFeeSink
+    properties:
+      mosaicDefinition:
+        $ref: "./MosaicDefinition.yml"
+        description: The mosaic definition to be created.
+      creationFee:
+        $ref: "../../../schemas/Amount.yml"
+        description: The fee for the creation of the mosaic.
+      creationFeeSink:
+        $ref: "../../../schemas/PublicKey.yml"
+        description: The public key of the account to which the creation fee is transferred.

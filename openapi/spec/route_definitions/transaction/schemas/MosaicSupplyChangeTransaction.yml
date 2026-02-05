@@ -1,0 +1,30 @@
+description: |
+  A mosaic supply change transaction increases or decreases the supply of a mosaic.
+  This transaction can only be executed by the creator of the mosaic definition
+  if the mosaic property `supplyMutable` is set to true.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Mosaic Supply Change Transaction object.
+    required:
+      - mosaicId
+      - supplyType
+      - delta
+    properties:
+      mosaicId:
+        $ref: "../../../schemas/MosaicId.yml"
+        description: The mosaic identifier whose supply is being modified.
+      supplyType:
+        type: integer
+        enum:
+          - 1
+          - 2
+        description: |
+          Supply change type:
+          - 1: Increase the mosaic supply
+          - 2: Decrease the mosaic supply
+      delta:
+        type: integer
+        description: |
+          Amount by which the mosaic supply is changed.
+          The value represents the number of mosaic units to increase or decrease.

@@ -1,0 +1,48 @@
+description: |
+  Transfer transactions contain data about transfers of XEM or mosaics to another account.
+  There are two versions of transfer transactions, version 1 and version 2. 
+  Version 1 transfer transactions are only capable of transferring XEM and a message 
+  while version 2 transfer transactions additionally can transfer a set of mosaics.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Transfer transaction object.
+    required:
+      - recipient
+      - amount
+    properties:
+      recipient:
+        $ref: "../../../schemas/Address.yml"
+        description: The address of the recipient.
+      amount:
+        $ref: "../../../schemas/Amount.yml"
+        description: |
+          The amount of micro XEM that is transferred from sender to recipient for version 1 type.
+          For version 2 transaction types amount field acts as multiplier for mosaic array.
+          Please check examples available here https://docs.nem.io/pages/Exchanges/integration/examples/docs.en.html.
+      message:
+        oneOf:
+          - type: object
+          - type: "null"
+        description: |
+          Optionally a transaction can contain a message. 
+          In this case the transaction contains a message substructure. If not the field is null.
+        properties:
+          payload:
+            type: string
+            description: |
+              The payload is the actual (possibly encrypted) message data.
+          type:
+            type: integer
+            description: |
+              The field holds the message type information. Possible message types are:
+              - 1: The message is not encrypted.
+              - 2: The message is encrypted.
+            enum:
+              - 1
+              - 2
+      mosaics:
+        type: array
+        description: The array of transferred mosaics.
+        items:
+          $ref: "../../../schemas/Mosaic.yml"

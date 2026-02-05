@@ -1,0 +1,31 @@
+tags:
+  - Account
+summary: Request account data for multiple accounts
+description: |
+  Retrieves a list of account data objects for multiple accounts.
+
+  The request body contains a list of account identifiers.
+operationId: getAccountsBatch
+requestBody:
+  $ref: "../../../request_bodies/accounts.yml"
+responses:
+  '200':
+    description: Successfully fetched list of account data.
+    content:
+      application/json:
+        schema:
+          type: object
+          description: List of account data.
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/AccountMetaDataPair.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

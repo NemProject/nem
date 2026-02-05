@@ -1,0 +1,22 @@
+tags:
+  - Harvesting
+summary: Stop harvesting (lock account)
+description: |
+  Stops harvesting for the specified account.
+
+  ⚠️ **Security warning:** For non-local network calls, the private key used in the request must always be the private key of the delegated account.
+  For trusted and local network calls, it is possible, but not recommended, to use the private key of the main account.
+operationId: stopHarvesting
+requestBody:
+  $ref: "../../../request_bodies/privateKey.yml"
+responses:
+  '200':
+    description: Indicates success. No response body is returned.
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

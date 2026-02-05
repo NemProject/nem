@@ -1,0 +1,20 @@
+- name: Account
+  description: Account data, metadata, and batch operations.
+- name: Block
+  description: Block data retrieval.
+- name: Chain
+  description: Blockchain score, height, and last block.
+- name: Debug
+  description: Debug timers, connections, and time synchronization.
+- name: Harvesting
+  description: Harvesting unlock, lock, and importance data.
+- name: Mosaic
+  description: Mosaic supply, definitions, and ownership.
+- name: Namespace
+  description: Namespace and root namespace operations.
+- name: Node
+  description: Node info, peer lists, boot, and shutdown.
+- name: Time synchronization
+  description: Network time and communication timestamps.
+- name: Transaction
+  description: Transaction retrieval, announcement, and preparation.

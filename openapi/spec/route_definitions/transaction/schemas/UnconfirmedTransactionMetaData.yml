@@ -1,0 +1,11 @@
+type: object
+description: |
+  Metadata for an unconfirmed transaction.
+  For multisig transactions this contains the hash of the inner transaction.
+properties:
+  data:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: |
+      The hash of the inner transaction or null if the transaction is not a multisig transaction.

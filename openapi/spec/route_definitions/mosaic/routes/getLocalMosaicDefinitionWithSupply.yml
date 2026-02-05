@@ -1,0 +1,32 @@
+tags:
+  - Mosaic
+summary: Return mosaic definition and supply at a given block height
+description: |
+  Returns the mosaic definition along with its current supply and
+  the expiration height of the owning namespace at the specified block height.
+  If the mosaic does not exist at that height, an empty list is returned.
+  
+   ⚠️️ **Security warning:** This endpoint is intended for trusted and local use only.
+operationId: getMosaicDefinitionWithSupply
+parameters:
+  - $ref: "../../../parameters/query/mosaicId.yml"
+  - $ref: "../../../parameters/query/height.yml"
+responses:
+  '200':
+    description: Mosaic definition and supply (empty list if not found).
+    content:
+      application/json:
+        schema:
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/MosaicDefinitionSupplyTuple.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

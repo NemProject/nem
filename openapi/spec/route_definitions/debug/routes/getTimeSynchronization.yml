@@ -1,0 +1,18 @@
+tags:
+  - Debug
+summary: Return time synchronization results
+description: Returns time synchronization results for monitoring changes in network time.
+operationId: getDebugTimeSynchronization
+responses:
+  '200':
+    description: Time synchronization results returned successfully.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/TimeSynchronizationResultList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

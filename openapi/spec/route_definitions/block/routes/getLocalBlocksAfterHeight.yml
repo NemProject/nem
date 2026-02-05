@@ -1,0 +1,26 @@
+tags:
+  - Block
+summary: Return blocks after block height
+description: |
+  Returns up to 10 blocks from the blockchain that come after the given block height.
+  If the database contains fewer than 10 blocks after the specified height, all available blocks are returned.
+
+  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+operationId: getLocalBlocksAfterHeight
+requestBody:
+  $ref: "../../../request_bodies/blockHeight.yml"
+responses:
+  '200':
+    description: List of extended blocks data successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExtendedBlockList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

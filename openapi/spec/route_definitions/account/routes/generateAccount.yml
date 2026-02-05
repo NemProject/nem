@@ -1,0 +1,29 @@
+tags:
+  - Account
+summary: Generate new account data
+description: |
+  Generates a new random account key pair and returns the private key, public key, and address.
+
+  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+  It returns sensitive cryptographic material and MUST NOT be exposed publicly.
+operationId: generateAccount
+responses:
+  '200':
+    description: Account successfully generated.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/GeneratedAccount.yml"
+        examples:
+          default:
+            summary: New key pair and address
+            value:
+              privateKey: "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f"
+              address: "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+              publicKey: "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,9 @@
+type: object
+description: Historical account data list.
+required:
+  - data
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./AccountHistoricalData.yml"

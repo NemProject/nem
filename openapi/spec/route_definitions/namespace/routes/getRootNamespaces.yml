@@ -1,0 +1,23 @@
+tags:
+  - Namespace
+summary: Retrieve root namespaces
+description: |
+  Gets root namespaces in a paged manner.
+  Each returned item contains namespace information together with a database id used for keyset pagination.
+operationId: getRootNamespaces
+parameters:
+  - $ref: "../../../parameters/query/id.yml"
+  - $ref: "../../../parameters/query/pageSize.yml"
+responses:
+  '200':
+    description: List of root namespaces retrieved successfully.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/NamespaceMetaDataPairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

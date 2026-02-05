@@ -1,0 +1,5 @@
+type: integer
+format: int64
+description: Number of seconds since the creation of the nemesis block.
+examples:
+  - 9108808

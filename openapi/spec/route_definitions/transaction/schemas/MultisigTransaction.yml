@@ -1,0 +1,22 @@
+description: |
+  Multisig transaction are the only way to make transaction from a multisig account to another account. 
+  A multisig transaction carries another transaction inside (often referred to as "inner" transaction). 
+  The inner transaction can be for example a transfer, an importance transfer or an aggregate modification transaction. 
+  A multisig transaction also has multisig signature transactions from the cosignatories of the multisig account inside.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Multisig Transaction object.
+    required:
+      - otherTrans
+    properties:
+      otherTrans:
+        $ref: "./NonMultisigTransaction.yml"
+        description: | 
+          The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction 
+          or a multisig aggregate modification transaction. The inner transaction does not have a valid signature.
+      signatures:
+        type: array
+        items:
+          $ref: "./MultisigSignatureTransaction.yml"
+        description: The array of signatures.

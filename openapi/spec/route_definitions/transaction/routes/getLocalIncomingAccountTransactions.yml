@@ -1,0 +1,30 @@
+tags:
+  - Transaction
+summary: Return incoming transactions with decoded messages
+description: |
+  Returns incoming transactions for an account, including decoded transaction messages.
+  
+  This endpoint behaves like `/account/transfers/incoming`, but if a transaction contains an encrypted message, 
+  the message is decrypted before being returned.
+  
+  ⚠️ **Security warning:** This endpoint requires the **private key** of the account and must only be used when NIS is running locally.
+operationId: getLocalIncomingAccountTransactions
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/AccountPrivateKeyTransactionsPage.yml"
+responses:
+  '200':
+    description: Successfully returned transaction data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/TransactionMetaDataPairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

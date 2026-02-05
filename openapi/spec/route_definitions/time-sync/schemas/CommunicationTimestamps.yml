@@ -1,0 +1,13 @@
+type: object
+description: |
+  Represents network timestamps for sending and receiving a time synchronization request or response.
+required:
+  - sendTimeStamp
+  - receiveTimeStamp
+properties:
+  sendTimeStamp:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: The network time (in milliseconds) at the moment the reply was sent.
+  receiveTimeStamp:
+    $ref: "../../../schemas/TimeStamp.yml"
+    description: The network time (in milliseconds) at the moment the request was received.

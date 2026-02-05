@@ -1,0 +1,9 @@
+type: object
+description: Uniquely identifies a mosaic definition.
+properties:
+  namespaceId:
+    type: string
+    description: The namespace containing this mosaic.
+  name:
+    type: string
+    description: The mosaic name.

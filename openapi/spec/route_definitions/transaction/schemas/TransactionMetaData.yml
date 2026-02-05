@@ -1,0 +1,22 @@
+type: object
+description: |
+  Additional information about a transaction.
+required:
+  - height
+  - id
+  - hash
+properties:
+  height:
+    $ref: "../../../schemas/BlockHeight.yml"
+    description: Block height in which the transaction was included.
+  id:
+    type: integer
+    description: Internal (database) transaction identifier.
+  hash:
+    $ref: "../../../schemas/HashReference.yml"
+    description: The hash of the transaction.
+  innerHash:
+    oneOf:
+      - $ref: "../../../schemas/HashReference.yml"
+      - type: "null"
+    description: Hash of the inner transaction in case of multisig transactions.

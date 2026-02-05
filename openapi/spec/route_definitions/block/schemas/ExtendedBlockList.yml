@@ -1,0 +1,10 @@
+type: object
+description: >
+  A list of extended block data returned by the node. The list contains up to 10 blocks.
+required:
+  - data
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./ExtendedBlock.yml"

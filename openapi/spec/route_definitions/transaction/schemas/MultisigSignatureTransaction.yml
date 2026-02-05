@@ -1,0 +1,18 @@
+description: |
+  Multisig signature transactions are part of the NEM's multisig account system. 
+  Multisig signature transactions are included in the corresponding multisig transaction and are the way a cosignatory 
+  of a multisig account can sign a multisig transaction for that account.
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    description: Multisig Signature Transaction object.
+    required:
+      - otherHash
+      - otherAccount
+    properties:
+      otherHash:
+        $ref: "../../../schemas/Hash.yml"
+        description: The hash of the inner transaction of the corresponding multisig transaction.
+      otherAccount:
+        $ref: "../../../schemas/Address.yml"
+        description: The address of the corresponding multisig account.

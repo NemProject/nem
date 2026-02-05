@@ -1,0 +1,22 @@
+tags:
+  - Debug
+summary: Return debug timers
+description: |
+  Returns an array of task monitor structures for monitoring statistics of periodic tasks.
+operationId: getDebugTimers
+responses:
+  '200':
+    description: Debug timers returned successfully.
+    content:
+      application/json:
+        schema:
+          type: array
+          description: Array of debug timer entries.
+          items:
+            $ref: "../schemas/TimerInformation.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

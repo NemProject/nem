@@ -1,0 +1,5 @@
+type: number
+format: double
+description: PageRank value associated with the account.
+examples:
+  - 0.0007605047835049349

@@ -1,0 +1,12 @@
+type: string
+description: |
+  The harvesting status of a queried account.
+  
+  The harvesting status can be one of the following values:
+  - **UNKNOWN**: The harvesting status of the account is not known.
+  - **LOCKED**: The account is not harvesting.
+  - **UNLOCKED**: The account is harvesting.
+enum:
+  - UNKNOWN
+  - LOCKED
+  - UNLOCKED

@@ -1,0 +1,20 @@
+type: object
+description: |
+  Information about the number of currently unlocked accounts (harvesters)
+  and the maximum number of accounts that are allowed to harvest on this node.
+required:
+  - num-unlocked
+  - max-unlocked
+properties:
+  num-unlocked:
+    type: integer
+    format: int32
+    description: The number of currently unlocked (active) harvesting accounts on this node.
+    examples:
+      - 2
+  max-unlocked:
+    type: integer
+    format: int32
+    description: The maximum number of harvesting accounts allowed on this node.
+    examples:
+      - 3

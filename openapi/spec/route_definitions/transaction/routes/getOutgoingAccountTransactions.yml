@@ -1,0 +1,32 @@
+tags:
+  - Transaction
+summary: Return outgoing transactions for account
+description: |
+  Gets an array of transactions for which the specified account is the sender of the transaction.
+  
+  Transactions are sorted in descending order by insertion time.
+
+  By default, up to **25** transactions are returned.
+  The number of returned items can be increased up to **100** by using the `pageSize` query parameter.
+  
+  Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
+  before the referenced transaction.
+operationId: getOutgoingAccountTransactions
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+  - $ref: "../../../parameters/query/hashFilter.yml"
+  - $ref: "../../../parameters/query/id.yml"
+  - $ref: "../../../parameters/query/pageSize.yml"
+responses:
+  '200':
+    description: Successfully returned outgoing transaction data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/TransactionMetaDataPairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

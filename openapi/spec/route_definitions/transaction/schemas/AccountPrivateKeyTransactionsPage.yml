@@ -1,0 +1,30 @@
+type: object
+description: |
+  Request object used to retrieve transaction data for an account with decoded messages.  
+  This request requires the **private key** of the account and should only be used when NIS is running locally.
+  
+  Fields `hash`, `id`, and `pageSize` are optional and are used for pagination.
+required:
+  - value
+properties:
+  value:
+    $ref: "../../../schemas/PrivateKey.yml"
+    description: |
+      Private key of the account as a hexadecimal string.
+      Used to derive the account address and to decrypt messages.
+  hash:
+    oneOf:
+      - $ref: "../../../schemas/Hash.yml"
+      - type: "null"
+    description: |
+      Optional transaction hash. When supplied, transactions returned appeared before this transaction.
+  id:
+    type: string
+    description: Optional transaction identifier. Used as an alternative pagination cursor.
+    examples:
+      - "100"
+  pageSize:
+    oneOf:
+      - $ref: "../../../schemas/PageSize.yml"
+      - type: "null"
+    description: Optional page size. Defaults to 25. Maximum allowed value is 100.

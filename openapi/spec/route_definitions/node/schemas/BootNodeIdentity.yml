@@ -1,0 +1,13 @@
+type: object
+description: |
+  Object is used to transfer the relevant data for booting a local node to NIS. 
+  With the boot data NIS can create the local node object and connect to the network.
+required:
+  - private-key
+properties:
+  private-key:
+    $ref: "../../../schemas/PrivateKey.yml"
+    description: Private key used to create the identity.
+  name:
+    type: string
+    description: Name of the node.

@@ -1,0 +1,21 @@
+tags:
+  - Node
+summary: Return node experiences
+description: |
+  Returns an array of node experiences collected by the node.
+  Each entry represents the communication experience with a remote node
+  and is used to assess node trustworthiness.
+operationId: getNodeExperiences
+responses:
+  '200':
+    description: Successfully retrieved node experiences.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExtendedNodeExperiencePairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"
