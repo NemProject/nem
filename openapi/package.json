@@ -10,13 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NemProject/nem-openapi.git"
+    "url": "git+https://github.com/NemProject/nem.git"
   },
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/NemProject/nem/issues"
   },
-  "homepage": "https://github.com/NemProject/nem-openapi#readme",
+  "homepage": "https://github.com/NemProject/nem/tree/dev/openapi",
   "dependencies": {},
   "devDependencies": {
     "@redocly/cli": "2.15.0"

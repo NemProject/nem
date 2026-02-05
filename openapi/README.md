@@ -1,6 +1,5 @@
-# nem-openapi
-
-OpenAPI specification for **NEM Infrastructure Server (NIS)** API. The API is implemented in [NemProject/nem](https://github.com/NemProject/nem/tree/dev/nis).
+OpenAPI specification for **NEM Infrastructure Server (NIS)** REST API.
+The API is implemented in the [`nis`](../nis) module in this repository.
 
 **Canonical API documentation:** [https://nemproject.github.io/](https://nemproject.github.io/) — use it for endpoint descriptions and verification. See also [docs/DOCUMENTATION_SOURCE.md](docs/DOCUMENTATION_SOURCE.md).
 
@@ -8,17 +7,12 @@ OpenAPI specification for **NEM Infrastructure Server (NIS)** API. The API is im
 
 * Node.js 20 LTS
 
-## Installation
+## Installation (in the monorepo)
 
-1. Clone the ``nem-openapi`` repository.
+From the root of the `nem` repository:
 
-```
-git clone https://github.com/nem/nem-openapi.git
-```
-
-2. Install dependencies.
-
-```
+```bash
+cd openapi
 npm install
 ```
 
@@ -26,10 +20,10 @@ npm install
 
 ### Build
 
-Compile the specification.
-The generated output is saved under ``_build`` directory.
+Compile the OpenAPI specification.
+The generated output is saved under the `_build` directory.
 
-```
+```bash
 npm run build
 ```
 
@@ -37,6 +31,6 @@ npm run build
 
 Check if the specification is valid.
 
-```
+```bash
 npm run test
 ```
