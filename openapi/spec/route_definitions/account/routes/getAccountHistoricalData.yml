@@ -18,7 +18,7 @@ description: |
   **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`. 
   The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**. 
   For example, `startHeight=100`, `endHeight=199`, `increment=1` gives 100 points; the same range with `increment=10` gives 10 points. 
-  This value must not exceed **1,000**; otherwise the request fails with an error (400 Bad Request). 
+  This value must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request). 
   To stay under the limit, use a larger `increment` and/or a smaller height range.
 operationId: getAccountHistoricalData
 parameters:

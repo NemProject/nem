@@ -1,13 +1,13 @@
 tags:
   - Mosaic
-summary: Return current mosaic definition
+summary: Return last known mosaic definition
 description: |
-  Returns the **current** mosaic definition (latest version) for the given mosaic identifier.
+  Returns the last known mosaic definition (latest version) for the given mosaic identifier.
 
   Mosaic definitions can be updated over time. If multiple definitions exist for the same `mosaicId`, this endpoint always returns the
   most recent version known to the node (highest internal database id), regardless of whether the mosaic or its owning namespace has expired.
 
-  This endpoint **does not perform any height-based or expiry checks**:
+  This endpoint does not perform any height-based or expiry checks:
   it simply returns the latest stored definition. For the native XEM mosaic, a predefined static definition is returned.
 
   To check whether a mosaic is still active at a specific block height, use one of the following:

@@ -30,7 +30,7 @@ properties:
   type:
     type: integer
     description: |
-      Transaction type identifier. The following types are supported:
+      Transaction type identifier. The following types (as decimal integer) are supported:
       - `257`: Transfer Transaction
       - `2049`: Importance Transfer Transaction
       - `4097`: Multisig Aggregate Modification Transaction

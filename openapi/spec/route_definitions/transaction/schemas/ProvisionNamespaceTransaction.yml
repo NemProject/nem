@@ -17,7 +17,12 @@ allOf:
           Use the value provided by the SDK or network docs for the network you are using.
       rentalFee:
         $ref: "../../../schemas/Amount.yml"
-        description: The fee (in micro XEM) for renting the namespace.
+        description: |
+          The fee (in micro XEM) for renting the namespace.
+          Must be at least the network-defined minimum for the given namespace type (root vs. sub-namespace); 
+          transactions with a lower value are rejected with `FAILURE_NAMESPACE_INVALID_RENTAL_FEE`.
+          The exact minimum is defined in the network configuration / fork schedule and can change over time,
+          so clients should use values provided by the SDK or network documentation rather than hardcoding them.
       newPart:
         type: string
         description: The new part which is concatenated to the parent with a '.' as separator.
