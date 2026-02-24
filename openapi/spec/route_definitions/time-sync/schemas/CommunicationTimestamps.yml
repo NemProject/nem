@@ -6,8 +6,12 @@ required:
   - receiveTimeStamp
 properties:
   sendTimeStamp:
-    $ref: "../../../schemas/TimeStamp.yml"
-    description: The network time (in milliseconds) at the moment the reply was sent.
+    $ref: "../../../schemas/NetworkTimeStampMilliseconds.yml"
+    description: |
+      Network timestamp in milliseconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at the moment the reply was sent.
   receiveTimeStamp:
-    $ref: "../../../schemas/TimeStamp.yml"
-    description: The network time (in milliseconds) at the moment the request was received.
+    $ref: "../../../schemas/NetworkTimeStampMilliseconds.yml"
+    description: |
+      Network timestamp in milliseconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at the moment the request was received.

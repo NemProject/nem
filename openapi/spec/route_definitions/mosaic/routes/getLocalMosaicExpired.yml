@@ -1,0 +1,34 @@
+tags:
+  - Mosaic
+summary: List expired mosaics at a block height
+description: |
+  Returns mosaics that expired or were restored at the specified block height.
+  Each entry includes the mosaic id, the type of event (expired vs restored), and the balances
+  held by each account at the time of expiry.
+
+  **Requirements:**
+  - The node must support the `TRACK_EXPIRED_MOSAICS` feature (see `GET /node/info`, `metaData.features`).
+  - If the feature is not supported, the server returns HTTP 500 with message
+    `this node does not support tracking expired mosaics`.
+
+  If the `height` parameter is omitted, the server uses the maximum block height
+  (effectively returning expirations recorded at the highest processed height).
+
+   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+   By default, it is available only from the machine where the REST server is running (localhost).
+   You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+parameters:
+  - $ref: "../../../parameters/query/height.yml"
+responses:
+  '200':
+    description: List of expired/restored mosaics at the given height (empty array if none).
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExpiredMosaicList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

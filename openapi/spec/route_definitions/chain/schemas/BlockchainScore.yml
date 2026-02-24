@@ -1,13 +1,16 @@
 type: object
 description: |
-  The block chain score is a measure how good the blockchain is. 
-  The higher the score, the better the blockchain is.
+  The blockchain score is a measure of how good the blockchain is; the higher the score, the better the chain.
+
+  It is the sum of per-block scores over the chain. Each block contributes `(difficulty − time since previous block)`:
+  higher block difficulty and/or shorter time between blocks increase the chain score. It is used by nodes to choose the best
+  chain when multiple chains exist (e.g. after a network split).
 required:
   - score
 properties:
   score:
     type: string
     description: |
-      Blockchain score represented as a hexadecimal string.
-      Internally stored as a non-negative BigInteger.
+      Blockchain score as a hexadecimal string representing a non-negative integer (BigInteger).
+      The numeric value is used for comparison; the API uses hex to avoid precision loss for large numbers.
     pattern: '^[0-9a-fA-F]+$'

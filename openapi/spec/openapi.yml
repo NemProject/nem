@@ -5,7 +5,7 @@ tags:
   "$ref": "./tags.yml"
 paths:
   "$ref": "./routes.yml"
-# No authentication required for NIS API; empty requirement satisfies security-defined rule.
+# No authentication required for NEM client API; empty requirement satisfies security-defined rule.
 security:
   - {}
 externalDocs:

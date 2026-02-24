@@ -10,7 +10,7 @@ properties:
     $ref: "../../../schemas/Hash.yml"
     description: Transaction hash.
   innerHash:
-    oneOf:
-      - $ref: "../../../schemas/Hash.yml"
-      - type: "null"
-    description: Inner transaction hash (for multisig transactions).
+    $ref: "../../../schemas/Hash.yml"
+    description: |
+      Hash of the inner transaction embedded inside a multisig transaction (the `otherTransaction` of a multisig).
+      Present only when `tx` is a multisig transaction; the property is absent when the transaction is not multisig.

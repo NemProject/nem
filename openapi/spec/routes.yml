@@ -114,6 +114,9 @@
 "/local/mosaic/definition/supply":
   get:
     $ref: "./route_definitions/mosaic/routes/getLocalMosaicDefinitionWithSupply.yml"
+"/local/mosaics/expired":
+  get:
+    $ref: "./route_definitions/mosaic/routes/getLocalMosaicExpired.yml"
 
 # Namespace
 "/namespace/root/page":

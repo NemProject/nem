@@ -15,7 +15,7 @@ allOf:
         description: The mosaic definition to be created.
       creationFee:
         $ref: "../../../schemas/Amount.yml"
-        description: The fee for the creation of the mosaic.
+        description: The fee (in micro XEM) for the creation of the mosaic.
       creationFeeSink:
         $ref: "../../../schemas/PublicKey.yml"
         description: The public key of the account to which the creation fee is transferred.

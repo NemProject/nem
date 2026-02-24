@@ -20,9 +20,9 @@ content:
             message:
               description: |
                 Detailed error message describing the failure. Examples:
-                - `NIS_ILLEGAL_STATE_LOADING_CHAIN` - NIS is loading the blockchain.
-                - `NIS_ILLEGAL_STATE_NOT_BOOTED` - NIS is not booted.
-                - `NIS_ILLEGAL_STATE_ALREADY_BOOTED` - NIS has already been booted.
+                - `NIS_ILLEGAL_STATE_LOADING_CHAIN`: NEM client is loading the blockchain.
+                - `NIS_ILLEGAL_STATE_NOT_BOOTED`: NEM client is not booted.
+                - `NIS_ILLEGAL_STATE_ALREADY_BOOTED`: NEM client has already been booted.
     examples:
       serviceUnavailable:
         summary: Service is temporarily unavailable

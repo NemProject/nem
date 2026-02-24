@@ -7,5 +7,5 @@ properties:
   quantity:
     type: integer
     description: |
-      The mosaic quantity. The quantity is always given in smallest units for the mosaic, i.e. 
-      if it has a divisibility of 3 the quantity is given in millis.
+      The mosaic quantity. The quantity is always given in smallest units for the mosaic.
+      E.g., if it has a divisibility of 3, the quantity is given in thousandths.

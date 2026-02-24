@@ -4,7 +4,7 @@ summary: Return active broadcast nodes in neighborhood
 description: |
   Gets a list of **active nodes selected for broadcasts** in the neighborhood.
 
-  These nodes are a subset of reachable nodes and are used by the running node to 
+  These nodes are a subset of reachable nodes and are used by the queried node to 
   broadcast data (e.g. transactions and blocks) across the network.
 operationId: getActiveNodePeerList
 responses:

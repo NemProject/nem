@@ -3,9 +3,21 @@ tags:
 summary: Generate new account data
 description: |
   Generates a new random account key pair and returns the private key, public key, and address.
+  Key pairs can also be generated client-side using Symbol SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+  [Python](https://pypi.org/project/symbol-sdk-python/)), without calling this endpoint.
 
-  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
-  It returns sensitive cryptographic material and MUST NOT be exposed publicly.
+  **How the account is generated:** The key pair is generated using the Ed25519 curve. The private key is 32 random bytes 
+  produced by the JVM's `java.security.SecureRandom` (a cryptographically secure pseudorandom number generator). 
+  The public key is derived from the private key. No custom or weak RNG is used.
+
+  **Security:** For typical use (wallets, client applications), this is considered secure: `SecureRandom` is backed by
+  the operating system's entropy source (e.g. `/dev/urandom` on Linux) and is appropriate for key generation. 
+  If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could theoretically be weaker; 
+  the application does not check or supplement entropy.
+  
+  ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: generateAccount
 responses:
   '200':

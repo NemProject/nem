@@ -1,7 +1,7 @@
 type: object
 description: |
   Request object used to retrieve transaction data for an account with decoded messages.  
-  This request requires the **private key** of the account and should only be used when NIS is running locally.
+  This request requires the **private key** of the account and should only be used when the NEM client is running locally.
   
   Fields `hash`, `id`, and `pageSize` are optional and are used for pagination.
 required:
@@ -10,21 +10,27 @@ properties:
   value:
     $ref: "../../../schemas/PrivateKey.yml"
     description: |
-      Private key of the account as a hexadecimal string.
-      Used to derive the account address and to decrypt messages.
+      256-bit private key encoded as a hexadecimal string (64 hex characters). Private key of the account;
+      used to derive the account address and to decrypt messages.
   hash:
     oneOf:
       - $ref: "../../../schemas/Hash.yml"
       - type: "null"
     description: |
-      Optional transaction hash. When supplied, transactions returned appeared before this transaction.
+      256-bit SHA3 hash encoded as a hexadecimal string (64 characters).
+      Optional pagination cursor: when supplied, the list returns transactions that appeared **before** this transaction.
+      Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention 
+      window (`nis.transactionHashRetentionTime`); after that time the hash is removed from the node's cache and the request will fail. 
+      Obtain this from `meta.hash` of a transaction in a previous response.
   id:
     type: string
-    description: Optional transaction identifier. Used as an alternative pagination cursor.
+    description: |
+      Optional pagination cursor: node database identifier of the transaction. When supplied, the list returns transactions 
+      that appeared **before** this transaction. Works on all nodes. Obtain this from `meta.id` of a transaction in a previous response.
     examples:
       - "100"
   pageSize:
     oneOf:
       - $ref: "../../../schemas/PageSize.yml"
       - type: "null"
-    description: Optional page size. Defaults to 25. Maximum allowed value is 100.
+    description: Number of entries to return. Optional; defaults to 25. Maximum allowed value is 100.

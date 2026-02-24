@@ -1,5 +1,7 @@
 type: object
-description: Information about a single audited request.
+description: |
+  Information about a single **audited request**: a request that was recorded by the node for inspection.
+  "Audit" means the request is tracked (who, which path, when, how long) for debug/trace purposes - not a security or compliance audit.
 required:
   - id
   - host
@@ -15,7 +17,7 @@ properties:
       - 797725
   host:
     type: string
-    description: The host which initiated the request.
+    description: Remote host (for incoming audits the caller's address; for outgoing audits the peer being called).
     examples:
       - 86.124.91.183
   path:
@@ -27,7 +29,7 @@ properties:
     type: integer
     format: int64
     description: >
-      The number of seconds elapsed since the creation of the nemesis block.
+      Time when the request was received, in number of seconds elapsed since the creation of the nemesis block.
     examples:
       - 9020618
   elapsed-time:

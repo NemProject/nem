@@ -20,9 +20,9 @@ content:
             message:
               description: |
                 Detailed error message describing the failure. Examples:
-                - `Request method 'GET' not supported` - The endpoint expects POST, not GET.
-                - `this node does not support historical account data retrieval` - The node does not provide historical account data.
-                - `this node does not support transaction hash lookup` - The node does not support transaction lookup by hash.
+                - `Request method 'GET' not supported`: The endpoint expects POST, not GET.
+                - `this node does not support historical account data retrieval`: The node does not provide historical account data.
+                - `this node does not support transaction hash lookup`: The node does not support transaction lookup by hash.
     examples:
       internalServerError:
         summary: Internal server error

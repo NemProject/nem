@@ -7,7 +7,7 @@ required:
   - status
 properties:
   timeStamp:
-    $ref: "./TimeStamp.yml"
+    $ref: "./NetworkTimeStamp.yml"
   error:
     type: string
     description: Short error type identifier.

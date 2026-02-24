@@ -1,6 +1,6 @@
 tags:
   - Mosaic
-summary: Return mosaics owned by an account
+summary: Returns the mosaic balances owned by an account
 description: |
   Returns a list of mosaics (mosaic ID and quantity) owned by the specified account address.
 operationId: getMosaicOwned

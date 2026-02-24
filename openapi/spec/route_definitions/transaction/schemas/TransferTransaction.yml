@@ -21,12 +21,11 @@ allOf:
           For version 2 transaction types amount field acts as multiplier for mosaic array.
           Please check examples available here https://docs.nem.io/pages/Exchanges/integration/examples/docs.en.html.
       message:
-        oneOf:
-          - type: object
-          - type: "null"
+        type: object
         description: |
-          Optionally a transaction can contain a message. 
-          In this case the transaction contains a message substructure. If not the field is null.
+          Optional message. The value is always an object, never null.
+          When the transaction contains a message, the object has `payload` and `type`.
+          When there is no message, the object is empty `{}`.
         properties:
           payload:
             type: string

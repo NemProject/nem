@@ -2,8 +2,8 @@ tags:
   - Node
 summary: Return maximum chain height from active peers
 description: |
-  Requests the blockchain height from every node in the active peer list and returns the maximum height observed.
-  This endpoint is typically used to determine the highest known chain height in the active neighborhood.
+  Makes the queried node request the blockchain height from every node in its active peer list, and returns the maximum height observed
+  (the highest known chain height in the active neighborhood).
 operationId: getActivePeersMaxChainHeight
 responses:
   '200':

@@ -1,5 +1,5 @@
 type: object
-description: Identifier of an account.
+description: Wrapper for an account address.
 required:
   - account
 properties:

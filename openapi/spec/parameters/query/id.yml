@@ -1,9 +1,11 @@
 name: id
 in: query
 description: |
-  The NIS database identifier of the object (e.g., block, transaction, namespace) used for pagination.
+  The node database identifier of the object (e.g., block, transaction, namespace) used for pagination.
   When supplied, the request returns objects that appeared directly before the object with this identifier,
   in the order defined by the request criteria.
+
+  For account transaction list endpoints, this is the value from `meta.id` of a transaction in a previous response.
 schema:
   $ref: "../../schemas/DatabaseId.yml"
 examples:

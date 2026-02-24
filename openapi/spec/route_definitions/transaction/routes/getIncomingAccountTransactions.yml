@@ -1,6 +1,6 @@
 tags:
   - Transaction
-summary: Return incoming transactions for account
+summary: Return incoming transactions for an account
 description: |
   Gets an array of transaction metadata pairs for which the specified account is the recipient of the transaction.
   
@@ -11,6 +11,9 @@ description: |
   
   Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
   before the referenced transaction.
+  Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only 
+  when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within 
+  the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail. See the `hash` and `id` parameter descriptions for details.
 operationId: getIncomingAccountTransactions
 parameters:
   - $ref: "../../../parameters/query/address.yml"

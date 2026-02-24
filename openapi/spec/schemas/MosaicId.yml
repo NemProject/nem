@@ -2,8 +2,7 @@ type: object
 description: Uniquely identifies a mosaic definition.
 properties:
   namespaceId:
-    type: string
-    description: The namespace containing this mosaic.
+    $ref: "./NamespaceId.yml"
   name:
     type: string
     description: The mosaic name.

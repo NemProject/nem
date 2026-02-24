@@ -1,10 +1,10 @@
 tags:
   - Harvesting
-summary: Retrieve importance data for accounts
+summary: Retrieve importance data for all accounts
 description: |
   Gets an array of account importance objects.
 
-  Each entry contains the account address and its importance information.
+  Each entry contains an account address and its importance information.
   Importance data may be unset for accounts that are not eligible for harvesting.
 operationId: getImportanceData
 responses:

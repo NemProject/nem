@@ -2,7 +2,7 @@ tags:
   - Account
 summary: Request account data by public key
 description: |
-  Retrieves account data for a given public key.
+  Retrieves account data given the account's public key.
   The response contains both account information and additional metadata such as harvesting and multisig state.
 operationId: getAccountByPublicKey
 parameters:

@@ -1,7 +1,7 @@
 description: |
   A mosaic supply change transaction increases or decreases the supply of a mosaic.
-  This transaction can only be executed by the creator of the mosaic definition
-  if the mosaic property `supplyMutable` is set to true.
+  This transaction can only be executed by the creator of the mosaic definition,
+  and only if the mosaic property `supplyMutable` is set to `true`.
 allOf:
   - $ref: "./Transaction.yml"
   - type: object
@@ -26,5 +26,5 @@ allOf:
       delta:
         type: integer
         description: |
-          Amount by which the mosaic supply is changed.
-          The value represents the number of mosaic units to increase or decrease.
+          Amount by which the mosaic supply is changed, in **whole units** of the mosaic (not smallest units).
+          For example, with divisibility 2, a delta of `100` increases or decreases supply by 100.00 units.

@@ -9,24 +9,25 @@ properties:
     type: integer
     format: int32
     description: |
-      Bitmask of enabled node features. The value is calculated using a bitwise OR (`|`) of supported feature flags.
-      Known feature flags:
-      - 0x1 - transactions by hash lookup
-      - 0x2 - historical account data
-      - 0x4 - tracking expired mosaics
-      Example:
-      If a node supports both `0x1` and `0x2`, the resulting bitmask value is:
-      `0x1 | 0x2 = 0x3`
+      Bitmask of optional features this node supports. Built by bitwise OR of the feature flags below.
+      Clients can test support with a bitwise AND (e.g. `(features & 0x2) !== 0` for historical account data).
+      Known flags:
+      - `0x1`: Transaction hash lookup. Node can look up transactions by hash (e.g. `/transaction/get`).
+      - `0x2`: Historical account data. Node exposes historical account state.
+      - `0x4`: Track expired mosaics. Node tracks and can list expired mosaics.
+      Example: value `3` means `0x1 | 0x2`, i.e. transaction hash lookup and historical account data.
     examples:
       - 3
   networkId:
     type: integer
     format: int32
     description: |
-      Network identifier. Supported values:
-      * 104  (0x68) – main network
-      * -104 (0x98) – test network
-      * 96   (0x60) – mijin network
+      Network identifier. Identifies which blockchain the node is running on. Nodes with different `networkId`
+      values are on different networks and are not compatible. Peers only connect to nodes with
+      the same `networkId`.
+      Known values:
+      - `104`: Main network (public NEM mainnet)
+      - `-104`: Test network (public testnet)
     examples:
       - -104
   application:
@@ -47,4 +48,4 @@ properties:
       - type: "null"
     description: Underlying platform (OS and Java version).
     examples:
-      - Oracle Corporation (1.8.0_151) on Linux
+      - "Oracle Corporation (1.8.0_151) on Linux"

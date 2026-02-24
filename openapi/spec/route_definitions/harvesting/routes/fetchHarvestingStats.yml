@@ -1,16 +1,14 @@
 tags:
   - Harvesting
-summary: Retrieve unlock info (unlocked accounts)
+summary: Retrieve information about the harvesting capacity of this node
 description: |
-  Retrieves information about the number of currently unlocked accounts (harvesters)
-  and the maximum number of accounts that are allowed to harvest on this node.
-  
-  Each node can be configured to allow a limited number of delegated harvesters.
-  The returned information reflects the current usage and configured limit.
+  Retrieves the current and maximum number of harvesters on this node.
+  Each node can be configured to allow a limited number of harvesters. These correspond to accounts unlocked for harvesting.
+  The returned information reflects the current usage and the configured limit.
 operationId: retrieveUnlockedInfo
 responses:
   '200':
-    description: Successfully returned unlocked accounts.
+    description: Harvesting statistics returned successfully.
     content:
       application/json:
         schema:

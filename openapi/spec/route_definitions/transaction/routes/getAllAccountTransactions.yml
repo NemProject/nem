@@ -1,6 +1,6 @@
 tags:
   - Transaction
-summary: Return all transactions for account
+summary: Return all transactions to or from an account
 description: |
   Gets an array of transaction metadata pairs for which the specified account is either the sender or the recipient.
   
@@ -10,7 +10,10 @@ description: |
   The number of returned items can be increased up to **100** by using the `pageSize` query parameter.
 
   Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
-  before the referenced transaction.
+  before the referenced transaction.   
+  Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only 
+  when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within 
+  the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail. See the `hash` and `id` parameter descriptions for details.
 operationId: getAllAccountTransactions
 parameters:
   - $ref: "../../../parameters/query/address.yml"

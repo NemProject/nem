@@ -1,11 +1,14 @@
 tags:
   - Transaction
-summary: Prepare and announce transaction
+summary: Prepare and announce a transaction
 description: |
   Creates, signs, and broadcasts a transaction to the NEM network.
   
-  ⚠️ **Security warning:** This endpoint requires the sender's private key and must only be used with trusted, local NIS nodes.
-  The transaction is signed by NIS and then announced to the network.
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  
+  This endpoint requires the sender’s private key, which the NEM client uses to sign the transaction before announcing it to the network.
 operationId: prepareAnnounceTransaction
 requestBody:
   required: true

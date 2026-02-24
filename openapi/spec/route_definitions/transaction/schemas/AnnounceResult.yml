@@ -10,77 +10,95 @@ allOf:
         description: |
           Result code (0 = NEUTRAL, 1 = SUCCESS, others = error).
           Possible result codes:
-          - `0` - `NEUTRAL` - Transaction announced successfully, but already known.
-          - `1` - `SUCCESS` - Transaction announced successfully.
-          - `2` - `FAILURE_UNKNOWN` - Validation failed for an unknown reason.
-          - `3` - `FAILURE_PAST_DEADLINE` - Validation failed because the deadline passed.
-          - `4` - `FAILURE_FUTURE_DEADLINE` - Validation failed because the deadline is too far in the future.
-          - `5` - `FAILURE_INSUFFICIENT_BALANCE` - Validation failed because the account had an insufficient balance.
-          - `6` - `FAILURE_MESSAGE_TOO_LARGE` - Validation failed because the message is too large.
-          - `7` - `FAILURE_HASH_EXISTS` - Validation failed because the transaction hash is already known.
-          - `8` - `FAILURE_SIGNATURE_NOT_VERIFIABLE` - Validation failed because the verification of the signature failed.
-          - `9` - `FAILURE_TIMESTAMP_TOO_FAR_IN_PAST` - Validation failed because the time stamp is too far in the past.
-          - `10` - `FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE` - Validation failed because the time stamp is too far in the future.
-          - `11` - `FAILURE_INELIGIBLE_BLOCK_SIGNER` - Validation failed because the block had an ineligible signer. This usually occurs when delegated harvesting is in the process of being activated or deactivated.
-          - `12` - `FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC` - Validation failed because the entity cannot be used because the nodes are out of sync. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.
-          - `13` - `FAILURE_CHAIN_SCORE_INFERIOR` - Validation failed because the chain score is inferior to our score.
-          - `14` - `FAILURE_CHAIN_INVALID` - Validation failed because the chain could not be validated.
-          - `15` - `FAILURE_TOO_MANY_TRANSACTIONS` - Validation failed because there are too many transactions in a block.
-          - `16` - `FAILURE_SELF_SIGNED_TRANSACTION` - Validation failed because a block contained a self-signed transaction.
-          - `17` - `FAILURE_INSUFFICIENT_FEE` - Validation failed because a transaction has an insufficient fee.
-          - `18` - `FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK` - Validation failed because a transaction originated from the nemesis account after the nemesis block.
-          - `19` - `FAILURE_TRANSACTION_CACHE_TOO_FULL` - Transaction was rejected because the debtor is not allowed to put another transaction into the cache. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.
-          - `20` - `FAILURE_WRONG_NETWORK` - Entity was rejected because it has the wrong network specified.
-          - `21` - `FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT` - Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).
-          - `22` - `FAILURE_ENTITY_INVALID_VERSION` - Validation failed because an entity had an invalid version.
-          - `41` - `FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK` - Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
-          - `42` - `FAILURE_TRANSACTION_BEFORE_SECOND_FORK` - Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic) are not allowed before the second fork height.
-          - `62` - `FAILURE_DESTINATION_ACCOUNT_IN_USE` - Validation failed because delegated harvesting account has a pre-existing balance transfer.
-          - `63` - `FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS` - Validation failed because previous importance transfer change is in progress
-          - `64` - `FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED` - Validation failed because importance transfer activation was attempted while already activated.
-          - `65` - `FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE` - Validation failed because importance transfer deactivation was attempted while already deactivated.
-          - `66` - `FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE` - Validation failed because transaction is using delegated account in an improper way.
-          - `71` - `FAILURE_MULTISIG_NOT_A_COSIGNER` - Validation failed because signer is not a cosigner of given multisig account.
-          - `72` - `FAILURE_MULTISIG_INVALID_COSIGNERS` - Validation failed because the cosignatories attached to a multisig transaction were invalid.
-          - `73` - `FAILURE_MULTISIG_NO_MATCHING_MULTISIG` - Validation failed because a multisig signature was not associated with any known multisig transaction.
-          - `74` - `FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG` - Validation failed because multisig account tried to make transaction that is not allowed. Multisig accounts are not allowed to initiate any transaction (only cosignatories are allowed to do so).
-          - `75` - `FAILURE_MULTISIG_ALREADY_A_COSIGNER` - Validation failed because signer is already a cosigner of given multisig account.
-          - `76` - `FAILURE_MULTISIG_MISMATCHED_SIGNATURE` - Validation failed because a multisig signature is attached to an incorrect multisig transaction.
-          - `77` - `FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES` - Validation failed because a multisig modification contained multiple deletes. It is only allowed to remove one cosignatory at a time.
-          - `78` - `FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS` - Validation failed because a multisig modification contained redundant cosignatory modifications. This can happen if a transaction tries to add the same cosignatory twice.
-          - `79` - `FAILURE_CONFLICTING_MULTISIG_MODIFICATION` - Validation failed because conflicting multisig modification is present. This can for instance happen if a transaction tries to add and then delete the same cosignatory.
-          - `80` - `FAILURE_TOO_MANY_MULTISIG_COSIGNERS` - Validation failed because a multisig modification would result in a multisig account having too many cosigners.
-          - `81` - `FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER` - Validation failed because a multisig modification would result in a multisig account being a cosigner.
-          - `82` - `FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE` - Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
-          - `101` - `FAILURE_MAX_CHAIN_SIZE_EXCEEDED` - Validation failed because received chain has too many blocks.
-          - `102` - `FAILURE_BLOCK_UNEXPECTED_HEIGHT` - Validation failed because a block was received with an unexpected height.
-          - `103` - `FAILURE_BLOCK_UNVERIFIABLE` - Validation failed because an unverifiable block was received.
-          - `104` - `FAILURE_BLOCK_NOT_HIT` - Validation failed because a block was received that is not a hit.
-          - `105` - `FAILURE_TRANSACTION_UNVERIFIABLE` - Validation failed because an unverifiable transaction was received.
-          - `106` - `FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN` - Validation failed because an incoming chain contained a transaction more than once.
-          - `121` - `FAILURE_NAMESPACE_UNKNOWN` - Validation failed because the namespace is unknown.
-          - `122` - `FAILURE_NAMESPACE_ALREADY_EXISTS` - Validation failed because the namespace already exists.
-          - `123` - `FAILURE_NAMESPACE_EXPIRED` - Validation failed because the namespace has expired.
-          - `124` - `FAILURE_NAMESPACE_OWNER_CONFLICT` - Validation failed because the transaction signer is not the owner of the namespace.
-          - `125` - `FAILURE_NAMESPACE_INVALID_NAME` - Validation failed because the name for the namespace is invalid.
-          - `126` - `FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK` - Validation failed because the specified namespace rental fee sink is invalid.
-          - `127` - `FAILURE_NAMESPACE_INVALID_RENTAL_FEE` - Validation failed because the specified rental fee is invalid.
-          - `128` - `FAILURE_NAMESPACE_PROVISION_TOO_EARLY` - Validation failed because the provision was done too early.
-          - `129` - `FAILURE_NAMESPACE_NOT_CLAIMABLE` - Validation failed because the namespace contains a reserved part and is not claimable.
-          - `141` - `FAILURE_MOSAIC_UNKNOWN` - Validation failed because the mosaic is unknown.
-          - `142` - `FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED` - Validation failed because the modification of the existing mosaic is not allowed.
-          - `143` - `FAILURE_MOSAIC_CREATOR_CONFLICT` - Validation failed because the transaction signer is not the creator of the mosaic.
-          - `144` - `FAILURE_MOSAIC_SUPPLY_IMMUTABLE` - Validation failed because the mosaic supply is immutable.
-          - `145` - `FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED` - Validation failed because the maximum overall mosaic supply is exceeded.
-          - `146` - `FAILURE_MOSAIC_SUPPLY_NEGATIVE` - Validation failed because the resulting mosaic supply would be negative.
-          - `147` - `FAILURE_MOSAIC_NOT_TRANSFERABLE` - Validation failed because the mosaic is not transferable.
-          - `148` - `FAILURE_MOSAIC_DIVISIBILITY_VIOLATED` - Validation failed because the divisibility of the mosaic is violated.
-          - `149` - `FAILURE_CONFLICTING_MOSAIC_CREATION` - Validation failed because conflicting mosaic creation is present.
-          - `150` - `FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK` - Validation failed because the mosaic creation fee sink is invalid.
-          - `151` - `FAILURE_MOSAIC_INVALID_CREATION_FEE` - Validation failed because the specified creation fee is invalid.
-          - `152` - `FAILURE_TOO_MANY_MOSAIC_TRANSFERS` - Validation failed because a transfer transaction had too many attached mosaic transfers.
-          - `153` - `FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE` - Validation failed because the mosaic levy is not transferable.
-          - `154` - `FAILURE_MOSAIC_LEVY_UNKNOWN` - Validation failed because the mosaic levy is unknown.
+          - `0` (`NEUTRAL`): Transaction announced successfully, but already known.
+          - `1` (`SUCCESS`): Transaction announced successfully.
+          - `2` (`FAILURE_UNKNOWN`): Validation failed for an unknown reason.
+          - `3` (`FAILURE_PAST_DEADLINE`): Validation failed because the deadline passed.
+          - `4` (`FAILURE_FUTURE_DEADLINE`): Validation failed because the deadline is too far in the future. The deadline must be at most **24 hours** (1 day) after the transaction timestamp.
+          - `5` (`FAILURE_INSUFFICIENT_BALANCE`): Validation failed because the account had an insufficient balance.
+          - `6` (`FAILURE_MESSAGE_TOO_LARGE`): Validation failed because the message is too large.
+          - `7` (`FAILURE_HASH_EXISTS`): Validation failed because the transaction hash is already known.
+          - `8` (`FAILURE_SIGNATURE_NOT_VERIFIABLE`): Validation failed because the verification of the signature failed. The most common cause is that the signature was not produced by the same account as in the signer field; it can also indicate a corrupted or malformed signature, or transaction data that was modified after signing.
+          - `9` (`FAILURE_TIMESTAMP_TOO_FAR_IN_PAST`): Validation failed because the time stamp is too far in the past.
+          - `10` (`FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE`): Validation failed because the time stamp is too far in the future.
+          - `11` (`FAILURE_INELIGIBLE_BLOCK_SIGNER`): Validation failed because the block had an ineligible signer. This usually occurs when delegated harvesting is in the process of being activated or deactivated.
+          - `12` (`FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC`): Validation failed because the entity cannot be used because the nodes are out of sync. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.
+          - `13` (`FAILURE_CHAIN_SCORE_INFERIOR`): Validation failed because the incoming chain's score (from the peer) is inferior to the local node's chain score; the node keeps its current chain. This result is returned during **block chain synchronization** (when the node receives a chain from a peer), not when announcing a transaction.
+          - `14` (`FAILURE_CHAIN_INVALID`): Validation failed because the chain could not be validated.
+          - `15` (`FAILURE_TOO_MANY_TRANSACTIONS`): Validation failed because there are too many transactions in a block.
+          - `16` (`FAILURE_SELF_SIGNED_TRANSACTION`): Validation failed because a block contained a self-signed transaction.
+          - `17` (`FAILURE_INSUFFICIENT_FEE`): Validation failed because a transaction has an insufficient fee.
+          - `18` (`FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK`): Validation failed because a transaction originated from the nemesis account after the nemesis block.
+          - `19` (`FAILURE_TRANSACTION_CACHE_TOO_FULL`): Transaction was rejected because the debtor is not allowed to put another transaction into the cache. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.
+          - `20` (`FAILURE_WRONG_NETWORK`): Entity was rejected because it has the wrong network specified.
+          - `21` (`FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT`): Block was rejected because it was harvested by a blocked account (e.g. a reserved NEM fund).
+          - `22` (`FAILURE_ENTITY_INVALID_VERSION`): Validation failed because an entity had an invalid version.
+          - `41` (`FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK`): Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
+          - `42` (`FAILURE_TRANSACTION_BEFORE_SECOND_FORK`): Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic) are not allowed before the second fork height.
+          - `62` (`FAILURE_DESTINATION_ACCOUNT_IN_USE`): Validation failed because the delegated (harvesting) account is not eligible. The account must have balance zero (no XEM). It must also have no mosaics, own no namespaces, and must not be a multisig or cosignatory.
+          - `63` (`FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS`): Validation failed because previous importance transfer change is in progress
+          - `64` (`FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED`): Validation failed because importance transfer activation was attempted while already activated.
+          - `65` (`FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE`): Validation failed because importance transfer deactivation was attempted while already deactivated.
+          - `66` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE`): Validation failed because transaction is using delegated account in an improper way.
+          - `71` (`FAILURE_MULTISIG_NOT_A_COSIGNER`): Validation failed because signer is not a cosigner of given multisig account.
+          - `72` (`FAILURE_MULTISIG_INVALID_COSIGNERS`): Validation failed because the cosignatories attached to a multisig transaction were invalid.
+          - `73` (`FAILURE_MULTISIG_NO_MATCHING_MULTISIG`): Validation failed because a multisig signature was not associated with any known multisig transaction.
+          - `74` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG`): Validation failed because multisig account tried to make transaction that is not allowed. Multisig accounts are not allowed to initiate any transaction (only cosignatories are allowed to do so).
+          - `75` (`FAILURE_MULTISIG_ALREADY_A_COSIGNER`): Validation failed because signer is already a cosigner of given multisig account.
+          - `76` (`FAILURE_MULTISIG_MISMATCHED_SIGNATURE`): Validation failed because a multisig signature is attached to an incorrect multisig transaction.
+          - `77` (`FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES`): Validation failed because a multisig modification contained multiple deletes. It is only allowed to remove one cosignatory at a time.
+          - `78` (`FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS`): Validation failed because a multisig modification contained redundant cosignatory modifications. This can happen if a transaction tries to add the same cosignatory twice.
+          - `79` (`FAILURE_CONFLICTING_MULTISIG_MODIFICATION`): Validation failed because conflicting multisig modification is present. This can for instance happen if a transaction tries to add and then delete the same cosignatory.
+          - `80` (`FAILURE_TOO_MANY_MULTISIG_COSIGNERS`): Validation failed because a multisig modification would result in a multisig account having too many cosigners.
+          - `81` (`FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER`): Validation failed because a multisig modification would result in a multisig account being a cosigner.
+          - `82` (`FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE`): Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
+          - `101` (`FAILURE_MAX_CHAIN_SIZE_EXCEEDED`): Validation failed because received chain has too many blocks.
+          - `102` (`FAILURE_BLOCK_UNEXPECTED_HEIGHT`): Validation failed because a block was received with an unexpected height.
+          - `103` (`FAILURE_BLOCK_UNVERIFIABLE`): Validation failed because an unverifiable block was received.
+          - `104` (`FAILURE_BLOCK_NOT_HIT`): Validation failed because a block was received that is not a hit.
+          - `105` (`FAILURE_TRANSACTION_UNVERIFIABLE`): Validation failed because an unverifiable transaction was received.
+          - `106` (`FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN`): Validation failed because an incoming chain contained a transaction more than once.
+          - `121` (`FAILURE_NAMESPACE_UNKNOWN`): Validation failed because the namespace is unknown.
+          - `122` (`FAILURE_NAMESPACE_ALREADY_EXISTS`): Validation failed because the namespace already exists.
+          - `123` (`FAILURE_NAMESPACE_EXPIRED`): Validation failed because the namespace has expired.
+          - `124` (`FAILURE_NAMESPACE_OWNER_CONFLICT`): Validation failed because the transaction signer is not the owner of the namespace.
+          - `125` (`FAILURE_NAMESPACE_INVALID_NAME`): Validation failed because the name for the namespace is invalid.
+          - `126` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`): Validation failed because the specified namespace rental fee sink is invalid.
+          - `127` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE`): Validation failed because the specified rental fee is invalid.
+          - `128` (`FAILURE_NAMESPACE_PROVISION_TOO_EARLY`): Validation failed because the provision was done too early.
+          - `129` (`FAILURE_NAMESPACE_NOT_CLAIMABLE`): Validation failed because the namespace contains a reserved part and is not claimable.
+          - `141` (`FAILURE_MOSAIC_UNKNOWN`): Validation failed because the mosaic is unknown.
+          - `142` (`FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED`): Validation failed because the modification of the existing mosaic is not allowed.
+          - `143` (`FAILURE_MOSAIC_CREATOR_CONFLICT`): Validation failed because the transaction signer is not the creator of the mosaic.
+          - `144` (`FAILURE_MOSAIC_SUPPLY_IMMUTABLE`): Validation failed because the mosaic supply is immutable.
+          - `145` (`FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED`): Validation failed because the maximum overall mosaic supply is exceeded.
+          - `146` (`FAILURE_MOSAIC_SUPPLY_NEGATIVE`): Validation failed because the resulting mosaic supply would be negative.
+          - `147` (`FAILURE_MOSAIC_NOT_TRANSFERABLE`): Validation failed because the mosaic is not transferable.
+          - `148` (`FAILURE_MOSAIC_DIVISIBILITY_VIOLATED`): Validation failed because the divisibility of the mosaic is violated.
+          - `149` (`FAILURE_CONFLICTING_MOSAIC_CREATION`): Validation failed because conflicting mosaic creation is present.
+          - `150` (`FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK`): Validation failed because the mosaic creation fee sink is invalid.
+          - `151` (`FAILURE_MOSAIC_INVALID_CREATION_FEE`): Validation failed because the specified creation fee is invalid.
+          - `152` (`FAILURE_TOO_MANY_MOSAIC_TRANSFERS`): Validation failed because a transfer transaction had too many attached mosaic transfers.
+          - `153` (`FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE`): Validation failed because the mosaic levy is not transferable.
+          - `154` (`FAILURE_MOSAIC_LEVY_UNKNOWN`): Validation failed because the mosaic levy is unknown.
+      transactionHash:
+        type: object
+        description: |
+          Hash of the announced transaction. The value is always an object, never null.
+          When the announcement was successful (code 0 or 1), the object has a `data` property with the hash (hex string).
+          When the hash is not available (e.g. validation failed), the object is empty `{}`.
+        properties:
+          data:
+            $ref: "../../../schemas/Hash.yml"
+      innerTransactionHash:
+        type: object
+        description: |
+          Hash of the inner transaction for multisig transactions. The value is always an object, never null.
+          When the transaction is multisig and the announcement was successful, the object has a `data` property with the inner transaction hash.
+          Otherwise (non-multisig or failure), the object is empty `{}`.
+        properties:
+          data:
+            $ref: "../../../schemas/Hash.yml"
       message:
         description: Validation result message.
         enum:

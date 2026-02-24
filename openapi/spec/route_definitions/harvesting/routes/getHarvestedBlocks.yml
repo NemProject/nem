@@ -1,6 +1,6 @@
 tags:
   - Harvesting
-summary: Retrieve harvest information for account
+summary: Retrieve the list of blocks harvested by an account
 description: |
   Gets an array of harvested block information objects for the specified account.
 

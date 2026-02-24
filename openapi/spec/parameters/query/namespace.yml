@@ -1,6 +1,7 @@
 name: namespace
 in: query
-description: Namespace identifier.
+required: true
+description: Fully-qualified namespace identifier (e.g. `makoto.metal.coins`).
 schema:
   $ref: "../../schemas/NamespaceId.yml"
 examples:

@@ -1,6 +1,6 @@
 type: integer
 format: int64
-description: Unique identifier of the object (e.g., block, transaction) in the NIS database.
+description: Unique identifier of the object (e.g., block, transaction) in the node database.
 examples:
   - 5646403
 minimum: 1

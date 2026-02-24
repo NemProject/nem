@@ -7,7 +7,11 @@ description: |
   This endpoint behaves like `/account/transfers/all`, but if a transaction contains an encrypted message, 
   the message is decrypted before being returned.
   
-  ⚠️ **Security warning:** This endpoint requires the **private key** of the account and must only be used when NIS is running locally.
+  Transactions are sorted in descending order by insertion time.
+  
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: getLocalAllAccountTransactions
 requestBody:
   required: true

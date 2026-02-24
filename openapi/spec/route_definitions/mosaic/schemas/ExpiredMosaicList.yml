@@ -1,0 +1,8 @@
+type: object
+description: Response wrapper for the list of mosaics that expired or were restored at a given block height.
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./ExpiredMosaic.yml"
+    description: List of expired/restored mosaic entries (one per mosaic id at that height).

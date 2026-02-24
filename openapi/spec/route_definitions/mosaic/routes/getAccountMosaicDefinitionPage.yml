@@ -1,8 +1,8 @@
 tags:
   - Mosaic
-summary: Return mosaic definitions created by account (paged)
+summary: Returns mosaic definitions created by an account
 description: |
-  Returns mosaic definitions created by a specific account.
+  Returns mosaic definitions for mosaics created by the specified account (the account is the creator of the definition).
   Results can be optionally filtered by a parent namespace and retrieved in pages using a cursor-based pagination mechanism.
 operationId: getAccountMosaicDefinitionPage
 parameters:

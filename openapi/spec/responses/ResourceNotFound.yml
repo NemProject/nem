@@ -20,8 +20,8 @@ content:
             message:
               description: |
                 Detailed error message describing the failure. Examples:
-                - `transaction not found in the db` - The requested transaction was not found.
-                - `block not found in the db` - The requested block was not found.
+                - `transaction not found in the db`: The requested transaction was not found.
+                - `block not found in the db`: The requested block was not found.
     examples:
       resourceNotFound:
         summary: Resource not found

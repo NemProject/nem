@@ -1,0 +1,10 @@
+type: object
+properties:
+  address:
+    $ref: "../../../schemas/Address.yml"
+  quantity:
+    $ref: "../../../schemas/Amount.yml"
+    description: Mosaic quantity held at expiry. Token amount in smallest unit (no decimals).
+required:
+  - address
+  - quantity

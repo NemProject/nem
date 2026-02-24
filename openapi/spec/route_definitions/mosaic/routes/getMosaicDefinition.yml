@@ -3,7 +3,8 @@ tags:
 summary: Return mosaic definition
 description: |
   Returns the mosaic definition for the given mosaic identifier.
-  The parent namespace of the mosaic must be active; otherwise an error is returned.
+
+  The parent namespace of the mosaic must be **active**; otherwise the request fails with HTTP `404 Not Found`.
 operationId: getMosaicDefinition
 parameters:
   - $ref: "../../../parameters/query/mosaicId.yml"

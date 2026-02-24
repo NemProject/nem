@@ -3,9 +3,19 @@ tags:
 summary: Boot node
 description: |
   Boots the local node and assigns an identity to it.
-  Returns an error if the node has already been booted.
 
-  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+  This endpoint is used when you do not want to store the boot private key in the NEM client configuration file.
+  You start the NEM client with `nis.shouldAutoBoot = false` (and without `nis.bootKey`), then call this endpoint from a
+  trusted host to provide the private key and node name at runtime.
+
+  Boot state is **not persisted**: after restarting the NEM client process, the node must be booted again, either via
+  configuration (auto-boot) or by calling this endpoint.
+
+  If you call this endpoint when the node is already booted, the request fails with HTTP `503 Service Unavailable` and message `NIS_ILLEGAL_STATE_ALREADY_BOOTED`.
+
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: bootNode
 requestBody:
   required: true
@@ -15,7 +25,7 @@ requestBody:
         $ref: "../schemas/BootNodeRequest.yml"
       examples:
         default:
-          summary: Boot local NIS node
+          summary: Boot local NEM client node
           value:
             metaData:
               application: "NIS"

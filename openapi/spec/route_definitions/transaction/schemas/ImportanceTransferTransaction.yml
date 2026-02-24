@@ -1,5 +1,5 @@
 description: |
-  NIS has the ability to transfer the importance of one account to another account for harvesting.
+  The NEM client has the ability to transfer the importance of one account to another account for harvesting.
   The account receiving the importance is called the delegated account.
   Importance transfer transactions are part of the secure harvesting feature of NEM.
   Once an importance transfer transaction has been included in a block,
@@ -23,4 +23,5 @@ allOf:
           - 2: Deactivate delegated harvesting
       remoteAccount:
         $ref: "../../../schemas/PublicKey.yml"
-        description: The public key of the delegated (remote) account.
+        description: |
+          The public key (256-bit encoded as a hexadecimal string - 64 characters) of the delegated (remote) account. 

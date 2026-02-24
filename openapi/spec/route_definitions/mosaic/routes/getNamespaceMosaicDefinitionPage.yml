@@ -2,7 +2,11 @@ tags:
   - Mosaic
 summary: Return mosaic definitions for namespace (paged)
 description: |
-  Returns mosaic definitions belonging to a specific namespace.
+  Returns mosaic definitions for mosaics whose `namespaceId` matches the specified namespace exactly.
+  A single namespace can define multiple mosaics (for example, `alice.drinks:beer` and `alice.drinks:juice` both belong to the
+  namespace `alice.drinks`); this endpoint lists one definition for each such mosaic.
+  It does not include mosaics from child namespaces (e.g., `alice.drinks.premium:*`).
+  If the namespace is inactive or does not exist, the response is 200 with an empty list.
   The request supports cursor-based paging. Each returned item contains a mosaic definition and associated metadata.
 operationId: getNamespaceMosaicDefinitionPage
 parameters:

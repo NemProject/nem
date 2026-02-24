@@ -1,16 +1,18 @@
 tags:
   - Harvesting
-summary: Check if account is unlocked
+summary: Check if account is harvesting
 description: |
-  Checks whether the account corresponding to the given private key is currently unlocked for harvesting.
+  Checks whether the account corresponding to the given private key is currently harvesting.
 
-  ⚠️ **Security warning:** This endpoint requires sending a private key over the network and is intended for trusted and local use only.
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: fetchAccountHarvestingStatus
 requestBody:
   $ref: "../../../request_bodies/privateKey.yml"
 responses:
   '200':
-    description: Returns the account harvesting status (unlocked or locked).
+    description: Returns whether the account is harvesting (`ok`) or not (`nope`).
     content:
       text/plain:
         schema:

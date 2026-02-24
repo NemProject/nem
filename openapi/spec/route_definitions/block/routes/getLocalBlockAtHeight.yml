@@ -3,9 +3,11 @@ tags:
 summary: Return extended block data by height
 description: |
   Returns detailed information about a block at the given block height.
-  The response includes the block, its hash, difficulty, and a list of transactions with their hashes (txes).
+  The response includes the block, its hash, difficulty, and a list of transactions with their hashes.
 
-  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: getLocalBlockAtHeight
 requestBody:
   $ref: "../../../request_bodies/blockHeight.yml"

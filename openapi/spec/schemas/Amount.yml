@@ -1,6 +1,6 @@
 type: integer
 format: int64
-description: Token amount in smallest unit.
+description: Token amount in smallest unit (no decimals).
 minimum: 0
 examples:
   - 408676852850

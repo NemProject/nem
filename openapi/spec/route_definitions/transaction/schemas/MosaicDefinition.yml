@@ -8,10 +8,8 @@ required:
 properties:
   creator:
     $ref: "../../../schemas/PublicKey.yml"
-    description: Public key of the mosaic creator.
   id:
     $ref: "../../../schemas/MosaicId.yml"
-    description: The mosaic identifier.
   description:
     type: string
     minLength: 1

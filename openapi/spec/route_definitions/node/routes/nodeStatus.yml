@@ -1,10 +1,10 @@
 tags:
   - Node
-summary: Return NIS status
+summary: Return node status
 operationId: getNodeStatus
 responses:
   '200':
-    description: Returns the NIS status.
+    description: Returns the node status.
     content:
       application/json:
         schema:

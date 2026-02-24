@@ -6,7 +6,7 @@ required:
 properties:
   fqn:
     type: string
-    description: Fully qualified namespace name.
+    description: Fully-qualified namespace name.
     examples:
       - "makoto.metal.coins"
   owner:

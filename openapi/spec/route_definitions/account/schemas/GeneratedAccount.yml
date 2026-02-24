@@ -1,6 +1,6 @@
 type: object
 description: |
-  An object contains information about a newly generated account.
+  An object containing information about a newly generated account.
   It includes the private key, the public key, and the derived address.
 required:
   - privateKey

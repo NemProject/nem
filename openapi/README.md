@@ -1,7 +1,7 @@
 OpenAPI specification for **NEM Infrastructure Server (NIS)** REST API.
 The API is implemented in the [`nis`](../nis) module in this repository.
 
-**Canonical API documentation:** [https://nemproject.github.io/](https://nemproject.github.io/) — use it for endpoint descriptions and verification. See also [docs/DOCUMENTATION_SOURCE.md](docs/DOCUMENTATION_SOURCE.md).
+**Canonical API documentation:** [https://nemproject.github.io/](https://nemproject.github.io/) — use it for endpoint descriptions and verification.
 
 ## Requirements
 

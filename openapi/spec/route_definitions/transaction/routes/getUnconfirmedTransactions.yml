@@ -1,9 +1,10 @@
 tags:
   - Transaction
-summary: Return unconfirmed transactions for account
+summary: Return unconfirmed transactions for an account
 description: |
   Returns a list of unconfirmed transactions where the given account is either the sender or the recipient.
   Only the most recent 25 unconfirmed transactions are returned.
+  Transactions remain in this list until they are either accepted (included in a block) or expire.
 operationId: getUnconfirmedTransactions
 parameters:
   - $ref: "../../../parameters/query/address.yml"

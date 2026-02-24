@@ -1,6 +1,5 @@
 description: |
-  Accounts can rent a namespace for one year and after a year renew the contract. 
-  This is done via a ProvisionNamespaceTransaction.
+  Used both to **register** (rent) a new namespace and to **renew** (extend) an existing root namespace for another year.
 allOf:
   - $ref: "./Transaction.yml"
   - type: object
@@ -12,10 +11,13 @@ allOf:
     properties:
       rentalFeeSink:
         $ref: "../../../schemas/PublicKey.yml"
-        description: The public key of the account to which the rental fee is transferred.
+        description: |
+          Public key (256-bit encoded as a hexadecimal string - 64 hex characters) of the **rental fee sink**: the network-designated account that receives the rental fee.
+          Must be the sink defined for this network (mainnet, testnet, etc.); otherwise validation fails with `FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`.
+          Use the value provided by the SDK or network docs for the network you are using.
       rentalFee:
         $ref: "../../../schemas/Amount.yml"
-        description: The fee for renting the namespace.
+        description: The fee (in micro XEM) for renting the namespace.
       newPart:
         type: string
         description: The new part which is concatenated to the parent with a '.' as separator.

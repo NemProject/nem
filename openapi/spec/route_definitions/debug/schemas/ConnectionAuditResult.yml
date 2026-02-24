@@ -1,21 +1,20 @@
 type: object
 description: |
-  An audit collection consists of two arrays, containing information
-  about incoming requests from other nodes. The first array contains
-  information about outstanding (not yet processed) requests and the
-  second array contains information about the most recent requests.
-  The audit collection is intended for debug purposes.
+  Two collections of audited requests (each entry is a recorded request; see connection audit entry).
+  - outstanding: requests currently in progress (not yet completed).
+  - most-recent: sliding window of the most recently recorded requests.
+  Intended for debug purposes.
 required:
   - outstanding
   - most-recent
 properties:
   outstanding:
     type: array
-    description: Outstanding (not yet processed) audit entries.
+    description: Audited requests currently in progress.
     items:
       $ref: "./ConnectionAuditEntry.yml"
   most-recent:
     type: array
-    description: Most recent audit entries.
+    description: Most recently recorded audited requests (sliding window).
     items:
       $ref: "./ConnectionAuditEntry.yml"

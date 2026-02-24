@@ -2,9 +2,14 @@ tags:
   - Mosaic
 summary: Return mosaic definitions owned by multiple accounts
 description: |
-  Returns a list of mosaic definitions created (owned) by the specified accounts.
-  The request body contains a list of account identifiers. Mosaic definitions
+  Returns a list of mosaic definitions for mosaics currently owned by the specified accounts.
+  The request body contains a list of account identifiers. For each account, the node looks at mosaics that
+  the account holds (plus XEM and first‑level levy mosaics) and collects their definitions. Mosaic definitions
   are aggregated across all accounts and deduplicated in the response.
+
+  This is useful when you manage or query many accounts at once (for example, a service that tracks several customers' accounts) 
+  and want to fetch each mosaic definition only once: even if the same mosaic is owned by multiple accounts in the request, 
+  its definition appears only a single time in the response.
 operationId: getMosaicOwnedDefinitionBatch
 requestBody:
   required: true

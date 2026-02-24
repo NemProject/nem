@@ -1,5 +1,6 @@
 type: object
-description: Metadata about the running NIS application.
+description: |
+  Metadata about the NEM client application (the server software running on this node).
 required:
   - application
   - version
@@ -24,8 +25,12 @@ properties:
     examples:
       - CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD
   startTime:
-    $ref: "../../../schemas/TimeStamp.yml"
-    description: Network time at which the application was started.
+    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    description: |
+      Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at which the application was started.
   currentTime:
-    $ref: "../../../schemas/TimeStamp.yml"
-    description: Current network time (seconds since the nemesis block).
+    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    description: |
+      Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Current network time.

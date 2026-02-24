@@ -1,7 +1,6 @@
-name: blockHeight
+name: height
 in: query
-required: true
-description: Block height at which the data are queried.
+description: Block height at which the data is queried.
 schema:
   $ref: "../../schemas/BlockHeight.yml"
 examples:

@@ -7,7 +7,7 @@ properties:
     type: array
     description: |
       Nodes that have this status can be successfully communicated with. 
-      Whenever a node is selecting a node for communication, it will pick a node from the set of active nodes.
+      Whenever a node is selecting another node for communication, it will pick one from this list.
     items:
       $ref: "./Node.yml"
   busy:

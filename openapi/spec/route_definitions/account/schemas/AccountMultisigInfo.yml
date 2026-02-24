@@ -1,9 +1,8 @@
 type: object
 description: |
-  Additional multisig account information.
-
-  If the account is not a multisig account, this object is empty.
-  If the account is a multisig account, it contains cosignatory details.
+  Additional multisig account information. The value is always an object, never null.
+  If the account is not a multisig account, the object is empty `{}`.
+  If the account is a multisig account, the object contains `cosignatoriesCount` and `minCosignatories`.
 properties:
   cosignatoriesCount:
     type: integer

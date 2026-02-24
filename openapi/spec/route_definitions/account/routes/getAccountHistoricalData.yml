@@ -3,11 +3,23 @@ tags:
 summary: Retrieve historical account data
 description: |
   Retrieves historical balance and importance information for an account.
-  
+
   ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
-  
-  The request returns historical data points between the given block heights.
-  The number of returned data points must not exceed **1000**.
+
+  **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`). 
+  The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`; 
+  the node supports this endpoint if that bit is set.
+
+  **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
+  For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
+
+  The request returns historical data points between the given block heights (inclusive).
+
+  **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`. 
+  The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**. 
+  For example, `startHeight=100`, `endHeight=199`, `increment=1` gives 100 points; the same range with `increment=10` gives 10 points. 
+  This value must not exceed **1,000**; otherwise the request fails with an error (400 Bad Request). 
+  To stay under the limit, use a larger `increment` and/or a smaller height range.
 operationId: getAccountHistoricalData
 parameters:
   - $ref: "../../../parameters/query/address.yml"

@@ -1,20 +1,103 @@
 - name: Account
-  description: Account data, metadata, and batch operations.
+  description: |
+    Account data, metadata, status, and batch operations. Endpoints return balance, importance,
+    and other account state for one or more accounts, identified by address or public key.
+
+    - **Account**: identified by an **address** (derived from public key) or by **public key**.
+    - **Account status**: `UNLOCKED` or `LOCKED` for harvesting on the queried node.
+    - **Delegated account**: when requesting by delegated account key, the node resolves the main account
+      that delegated to the given key (used for delegated harvesting flows).
+    
+    Local-only endpoints (e.g. generation, historical batch) are restricted by configuration (`nis.additionalLocalIps`).
 - name: Block
-  description: Block data retrieval.
+  description: |
+    Block data retrieval. Blocks are the units of the blockchain; each block contains a list of
+    transactions and is signed by a harvester.
+
+    Endpoints: last block, block at a given height, and (local-only) block or block range by height.
 - name: Chain
-  description: Blockchain score, height, and last block.
+  description: |
+    Blockchain score and height. The chain is the ordered sequence of blocks accepted by the node.
+
+    - **Chain height**: the number of blocks in the chain (last block height).
+    - **Chain score**: a numeric measure of the chain used by nodes to choose the best chain when
+      multiple exist (e.g. after a network split). Higher score means a "better" chain; applications
+      rarely need to interpret this value.
 - name: Debug
-  description: Debug timers, connections, and time synchronization.
+  description: |
+    Debug and diagnostics: timers, connection audits, and time synchronization results. Intended
+    for operators and troubleshooting, not for typical application logic.
+
+    - **Timers**: periodic tasks run by the NEM client (e.g. sync, harvesting); each timer exposes
+      execution count, success/failure, and last run time.
+    - **Connection audits**: request traces (incoming and outgoing) with caller/destination host,
+      path, and elapsed time - useful to inspect load and slow endpoints.
+    - **Time synchronization**: results of the node's time sync with the network.
 - name: Harvesting
-  description: Harvesting unlock, lock, and importance data.
+  description: |
+    Harvesting is the process by which blocks are created and fees are earned on the network.
+
+    - **Harvester**: An account participating in block harvesting.
+    - **Delegated harvester**: A remote (delegated) account that harvests on behalf
+      of a main account, after importance has been transferred and the remote key
+      has been unlocked on a node.
+    - **Unlocked account**: An account whose private key is unlocked on a node
+      (via a harvesting/unlock operation) and is therefore currently eligible to harvest.
+    - **Unlocked slot**: A node-level capacity unit allowing one harvester (unlocked account).
+      Nodes can be configured (via `nis.unlockedLimit`) to allow only a limited number of
+      unlocked accounts simultaneously.
+
+    Node operators can further control who is allowed to harvest on a given node:
+    - `nis.allowedHarvesterAddresses`: optional list of account addresses that are allowed to use
+      this node for harvesting. When set, harvesting/unlock requests with other addresses are rejected.
+    - `nis.additionalHarvesterPrivateKeys`: optional list of private keys that should automatically
+      start harvesting on boot (subject to `nis.unlockedLimit` and other eligibility checks).
 - name: Mosaic
-  description: Mosaic supply, definitions, and ownership.
+  description: |
+    Mosaic supply, definitions, and ownership. Mosaics are custom assets on the NEM network;
+    each is identified by a mosaic id (namespace + name) and has a definition and a current supply.
+
+    - **Mosaic id**: identifier consisting of **namespace id** (e.g. `makoto.metal.coins`) and **name**
+      (e.g. `nem`); together they form a human-readable mosaic identifier.
+    - **Mosaic definition**: metadata (divisibility, levy, properties).
+    - **Mosaic supply**: the total number of units of the mosaic that exist (or existed at a given block height).
+      Expressed in the mosaic's smallest unit (same as token amounts; see divisibility in the definition).
+      Set at creation via `initialSupply`; the creator can later increase or decrease it only if the definition has `supplyMutable: true`.
 - name: Namespace
-  description: Namespace and root namespace operations.
+  description: |
+    Namespace and root namespace operations. Namespaces provide a hierarchical naming scheme for
+    mosaics (e.g. `makoto.metal.coins`).
+
+    - **Fully-qualified namespace**: the full dot-separated path (e.g. `makoto.metal.coins`), not
+      just the leaf segment. Use this when querying namespace or mosaic endpoints by namespace.
+    - **Root namespace**: top-level namespace (no parent); sub-namespaces are children of a root.
 - name: Node
-  description: Node info, peer lists, boot, and shutdown.
+  description: |
+    Node info, peer lists, boot, shutdown, and status.
+
+    - **Node**: a NEM node, identified by its `identity` (public key + name) and `endpoint` (host, port, protocol).
+    - **Reachable node**: a node that is currently reachable and responds to node info / peer list requests. Shown in peer lists and
+      used as a base set for further selection (e.g., broadcast nodes).
+    - **Broadcast node** (active broadcast node): a reachable node selected by the peer network as a target for broadcasting data
+      (e.g., transactions and blocks). Returned by `/node/peer-list/active`.
+    - **Node status**: categorical health/status of a node, as reported by the peer network:
+      - `ACTIVE`: node is reachable and the last request succeeded.
+      - `BUSY`: node is reachable but returned a busy signal for the last request.
+      - `INACTIVE`: node is offline or unreachable.
+      - `FAILURE`: node is reachable but the last request failed with a server error.
+      - `UNKNOWN`: node is in an unknown state (no reliable status yet).
 - name: Time synchronization
-  description: Network time and communication timestamps.
+  description: |
+    Network time and communication timestamps. NEM uses a fixed **network epoch** (29 March 2015,
+    00:06:25 UTC); timestamps are expressed in seconds or milliseconds since that epoch.
 - name: Transaction
-  description: Transaction retrieval, announcement, and preparation.
+  description: |
+    Transaction retrieval, announcement, and preparation. Transactions are signed by the sender and
+    broadcast to the network.
+
+    - **Transaction hash**: unique identifier of a transaction; lookup by hash requires the
+      `TRANSACTION_HASH_LOOKUP` node feature and is subject to `nis.transactionHashRetentionTime`.
+    - **Unconfirmed transaction**: a transaction that has been broadcast but not yet included in any block.
+    - **Confirmed transaction**: a transaction that has been included in a block. Endpoints in this tag
+      return only confirmed transactions unless the endpoint name explicitly indicates otherwise (e.g. unconfirmed list).
+    Local (trusted) endpoints may return full transaction data; public ones may omit sensitive fields.

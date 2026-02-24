@@ -1,5 +1,6 @@
 name: hash
 in: query
+required: true
 description: |
   The 256-bit SHA3 hash of the transaction (64 hexadecimal characters).
 schema:

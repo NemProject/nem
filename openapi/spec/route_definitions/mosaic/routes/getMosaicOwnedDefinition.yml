@@ -2,7 +2,7 @@ tags:
   - Mosaic
 summary: Return mosaic definitions owned by an account
 description: |
-  Returns a list of mosaic definitions created (owned) by the specified account.
+  Returns a list of mosaic definitions for mosaics currently owned by the specified account.
   The account is identified by its address, which is provided as a query parameter.
 operationId: getMosaicOwnedDefinition
 parameters:

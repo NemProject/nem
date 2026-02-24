@@ -1,8 +1,8 @@
 tags:
   - Node
-summary: Return reachable (active) nodes in neighborhood
+summary: Return the list of reachable (active) nodes in the neighborhood of the queried node
 description: |
-  Gets a list of all nodes currently known by the running node that have status **ACTIVE**.
+  Returns a list of all nodes currently known by the queried node that have status **ACTIVE**.
   Only nodes that are reachable and respond in a timely manner are returned.
 operationId: getReachableNodePeerList
 responses:

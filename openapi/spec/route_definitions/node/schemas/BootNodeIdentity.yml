@@ -1,13 +1,19 @@
 type: object
 description: |
-  Object is used to transfer the relevant data for booting a local node to NIS. 
-  With the boot data NIS can create the local node object and connect to the network.
+  Object is used to transfer the relevant data for booting a local node to the NEM client.
+  With the boot data the NEM client can create the local node object and connect to the network.
+
+  The `private-key` is the node boot key (the key pair that identifies this node in the P2P network).
+  Do not transmit this key over the network unless the request is to localhost (or another trusted IP).
+  The boot endpoint is restricted to trusted IPs for this reason.
 required:
   - private-key
 properties:
   private-key:
     $ref: "../../../schemas/PrivateKey.yml"
-    description: Private key used to create the identity.
+    description: |
+      Node boot key (private key) used to create the local node identity. Transmit only to localhost or a trusted host.
+      Format: 256-bit private key encoded as a hexadecimal string (64 hex characters).
   name:
     type: string
     description: Name of the node.

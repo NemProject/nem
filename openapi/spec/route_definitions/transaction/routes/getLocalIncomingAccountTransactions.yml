@@ -1,13 +1,15 @@
 tags:
   - Transaction
-summary: Return incoming transactions with decoded messages
+summary: Return incoming transactions for an account with decoded messages
 description: |
-  Returns incoming transactions for an account, including decoded transaction messages.
+  Gets an array of transaction metadata pairs for which the specified account is the recipient of the transaction.
+  If a transaction contains an encrypted message, the message is decrypted before being returned.
   
-  This endpoint behaves like `/account/transfers/incoming`, but if a transaction contains an encrypted message, 
-  the message is decrypted before being returned.
+  Transactions are sorted in descending order by insertion time.
   
-  ⚠️ **Security warning:** This endpoint requires the **private key** of the account and must only be used when NIS is running locally.
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: getLocalIncomingAccountTransactions
 requestBody:
   required: true

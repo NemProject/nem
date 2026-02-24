@@ -1,17 +1,19 @@
 type: object
 description: |
-  Optional levy applied when transferring mosaics.
+  Optional levy applied when transferring mosaics. The value is always an object, never null.
   A levy defines a fee that is transferred to a recipient whenever the mosaic is moved.
-  If the mosaic has no levy defined, this object is empty.
+  If the mosaic has no levy defined, the object is empty `{}`.
+  If a levy is defined, the object has `type`, `recipient`, `mosaicId`, and `fee`.
 properties:
   type:
     type: integer
     description: |
       Levy type:
-      - 1: Absolute fee - The fee is specified as absolute quantity and thus does not depend on the quantity 
+      - `1`: Absolute fee: The fee is specified as absolute quantity and thus does not depend on the quantity 
         that is transferred.
-      - 2: Percentage fee - The fee is specified as a percentage of the quantity transferred.
+      - `2`: Percentage fee: The fee is specified as a percentage of the quantity transferred.
         The fee increases linearly with the transferred mosaic quantity.
+        For this type, `fee` is in **basis points** (1/100 of a percent): **10000 = 100%**, 1000 = 10%, 100 = 1%.
     enum:
       - 1
       - 2
@@ -25,4 +27,7 @@ properties:
       For fees in XEM, use the mosaic ID `nem:xem`.
   fee:
     $ref: "../../../schemas/Amount.yml"
-    description: Fee amount. Interpretation depends on the levy type (see above).
+    description: |
+      Fee value. Interpretation depends on `type`:
+      - Type `1` (Absolute): fee is the exact quantity to charge (same units as the levy mosaic).
+      - Type `2` (Percentage): fee is in basis points; 10000 = 100%, 1000 = 10%, 100 = 1%.

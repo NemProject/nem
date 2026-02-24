@@ -6,10 +6,14 @@ properties:
   data:
     type: string
     description: |
-      Hex-encoded transaction byte array.
-      Created by serializing the transaction and converting to hexadecimal.
+      Hex-encoded transaction byte array. Serialize the transaction to bytes and convert to hexadecimal.
+      To obtain this value, use your SDK's transaction serialization. See the announce endpoint description for more SDK links.
     pattern: "^[0-9a-fA-F]+$"
   signature:
     type: string
-    description: Hex-encoded transaction signature.
-    pattern: "^[0-9a-fA-F]+$"
+    description: |
+      Hex-encoded transaction signature. Fixed length: 64 bytes (128 hexadecimal characters). The signature is produced by signing the serialized transaction payload (the same bytes as `data` before hex encoding) with the signer's private key.
+      To obtain this value, use your SDK's signing method (e.g. Symbol SDK - sign the transaction payload and encode the resulting 64-byte signature to hex). The signer must match the transaction's `signer` (public key) field.
+    pattern: "^[0-9a-fA-F]{128}$"
+    minLength: 128
+    maxLength: 128

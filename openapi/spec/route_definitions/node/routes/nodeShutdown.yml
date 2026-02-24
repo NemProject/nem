@@ -1,11 +1,13 @@
 tags:
   - Node
-summary: Shut down NIS server
+summary: Shut down NEM client
 description: |
-  Stops the currently running NIS server instance.
-  After shutdown, the node must be restarted manually.
+  Stops the currently running NEM client instance.
+  After shutdown, the node must be restarted manually. No further responses will be returned by this server until it is restarted.
 
-  ⚠️ **Security warning:** This endpoint is intended for trusted and local use only.
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
 operationId: nodeShutdown
 responses:
   '200':

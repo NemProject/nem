@@ -2,9 +2,10 @@ tags:
   - Node
 summary: Return node experiences
 description: |
-  Returns an array of node experiences collected by the node.
-  Each entry represents the communication experience with a remote node
-  and is used to assess node trustworthiness.
+  Returns an array of node experiences collected by the local node (success/failure counts per peer).
+  This data is used internally by the P2P layer for trust scoring and node selection. For API clients,
+  the endpoint is mainly useful as a diagnostics and monitoring tool e.g. to see how the node is
+  doing with its peers or to troubleshoot connectivity.
 operationId: getNodeExperiences
 responses:
   '200':

@@ -2,8 +2,14 @@ tags:
   - Namespace
 summary: Return namespace information
 description: |
-  Retrieves information about a namespace with the given fully qualified namespace id (FQN).
-  The namespace must exist and be active, otherwise an error is returned.
+  Retrieves information about the namespace identified by the given fully-qualified name.
+  A fully-qualified namespace is the **full dot-separated path** from the root namespace down to the target namespace,
+  for example:
+  - `alice` (root namespace)
+  - `alice.drinks` (child of `alice`)
+  - `alice.drinks.premium` (child of `alice.drinks`)
+
+  The namespace must exist and be active; otherwise the request fails with HTTP `404 Not Found` (`ResourceNotFound`).
 operationId: getNamespace
 parameters:
   - $ref: "../../../parameters/query/namespace.yml"
@@ -16,7 +22,7 @@ responses:
           $ref: "../schemas/Namespace.yml"
         examples:
           default:
-            summary: Namespace with FQN and owner
+            summary: Namespace with fully-qualified name and owner
             value:
               fqn: "makoto.metal.coins"
               owner: "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH"

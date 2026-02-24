@@ -2,9 +2,8 @@ tags:
   - Account
 summary: Request account status
 description: |
-  Retrieves the account metadata for a given account address.
-  The response contains account status information such as harvesting status, delegated harvesting status,
-  and multisig relationships.
+  Retrieves only the account metadata for a given address: harvesting status, delegated harvesting status, and multisig relationships (cosignatories).
+  It does **not** return account info such as balance, importance, or public key.
 operationId: getAccountStatus
 parameters:
   - $ref: "../../../parameters/query/address.yml"

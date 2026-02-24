@@ -2,7 +2,8 @@ tags:
   - Namespace
 summary: Retrieve root namespaces
 description: |
-  Gets root namespaces in a paged manner.
+  Gets root namespaces in a paged manner. A **root namespace** is a namespace without a parent (e.g. `alice`); 
+  sub-namespaces (e.g. `alice.vouchers`) have a parent and are not returned by this endpoint.
   Each returned item contains namespace information together with a database id used for keyset pagination.
 operationId: getRootNamespaces
 parameters:

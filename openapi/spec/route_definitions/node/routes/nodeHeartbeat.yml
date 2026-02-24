@@ -2,7 +2,7 @@ tags:
   - Node
 summary: Return node heartbeat
 description: |
-  Determines whether the NIS node is up and responsive.
+  Determines whether the node is up and responsive.
   If this request does not return a response, the node is either not running or is unable to serve requests.
 operationId: nodeHeartbeat
 responses:

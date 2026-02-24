@@ -11,12 +11,12 @@ properties:
     description: |
       Name of the mosaic property.
       Supported values:
-      - divisibility - Number of decimal places for sub-units (0–6). A divisibility of 3 means the smallest
+      - `divisibility`: Number of decimal places for sub-units (0–6). A divisibility of 3 means the smallest
         unit is 0.001 (e.g. 1000 = 1.000 mosaic). Transfer quantities are in these smallest units. Default "0".
-      - initialSupply - Initial supply when creating the mosaic, in whole units (not smallest sub-units).
-        Must be between 0 and 9,000,000,000. Default "1000".
-      - supplyMutable - Whether the mosaic supply can be changed later. Values "true" or "false". Default "false".
-      - transferable - Whether the mosaic can be transferred by any account. If "false", only the creator
+      - `initialSupply`: Initial supply when creating the mosaic, in whole units (not smallest sub-units).
+        Must be between 0 and 9,000,000,000. Default "1,000".
+      - `supplyMutable`: Whether the mosaic supply can be changed later. Values "true" or "false". Default "false".
+      - `transferable`: Whether the mosaic can be transferred by any account. If "false", only the creator
         can be sender or recipient. Values "true" or "false". Default "true".
     enum:
       - divisibility
@@ -27,7 +27,7 @@ properties:
     type: string
     description: |
       Property value, always a string. Interpretation depends on the property name:
-      - divisibility: integer (0–6)
-      - initialSupply: integer (max 9,000,000,000)
-      - supplyMutable: "true" or "false"
-      - transferable: "true" or "false"
+      - `divisibility`: integer (0–6)
+      - `initialSupply`: integer (max 9,000,000,000)
+      - `supplyMutable`: "true" or "false"
+      - `transferable`: "true" or "false"
