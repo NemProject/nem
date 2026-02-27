@@ -19,7 +19,7 @@ properties:
       - 2
   recipient:
     $ref: "../../../schemas/Address.yml"
-    description: Recipient of the levy. This can be any account.
+    description: Recipient (40 characters, Base32-encoded, checksum-validated) of the levy. This can be any account.
   mosaicId:
     $ref: "../../../schemas/MosaicId.yml"
     description: |

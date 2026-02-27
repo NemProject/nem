@@ -13,7 +13,7 @@ allOf:
     properties:
       recipient:
         $ref: "../../../schemas/Address.yml"
-        description: The address of the recipient.
+        description: The address of the recipient (40 characters, Base32-encoded, checksum-validated).
       amount:
         $ref: "../../../schemas/Amount.yml"
         description: |

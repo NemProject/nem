@@ -14,6 +14,10 @@ description: |
   For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
 
   The request returns historical data points between the given block heights (inclusive).
+  Each returned data point is a snapshot of the account state at that specific block height.
+  This can be used to track changes in an account's balance or importance score over time.
+  Use `increment=1` for detailed block-by-block analysis, or a larger value (e.g. `increment=1440` for roughly daily samples)
+  to observe long-term trends over a wider block range.
 
   **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`. 
   The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**. 

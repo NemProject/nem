@@ -1,7 +1,7 @@
 type: string
 description: |
   Represents a unique account address. The first character indicates the network (T for testnet, N for mainnet).
-  Addresses are always 40 characters long and Base32-encoded.
+  Addresses are 40 characters long, Base32-encoded, and include an embedded checksum that the node validates.
 minLength: 40
 maxLength: 40
 pattern: '^[A-Z2-7]{40}$'

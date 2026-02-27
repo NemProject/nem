@@ -13,7 +13,7 @@ properties:
     type: string
     description: |
       Hex-encoded transaction signature. Fixed length: 64 bytes (128 hexadecimal characters). The signature is produced by signing the serialized transaction payload (the same bytes as `data` before hex encoding) with the signer's private key.
-      To obtain this value, use your SDK's signing method (e.g. Symbol SDK - sign the transaction payload and encode the resulting 64-byte signature to hex). The signer must match the transaction's `signer` (public key) field.
+      To obtain this value, use your SDK's signing method (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), [Python](https://pypi.org/project/symbol-sdk-python/) - sign the transaction payload and encode the resulting 64-byte signature to hex). The signer must match the transaction's `signer` (public key) field.
     pattern: "^[0-9a-fA-F]{128}$"
     minLength: 128
     maxLength: 128

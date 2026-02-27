@@ -17,4 +17,4 @@ allOf:
       otherAccount:
         $ref: "../../../schemas/Address.yml"
         description: |
-          Unique account address (40 characters, Base32-encoded). The address of the corresponding multisig account.
+          Address of the multisig account for which the transaction is being cosigned (40 characters, Base32-encoded, checksum-validated).

@@ -4,7 +4,7 @@ summary: Announce a signed transaction
 description: |
   Broadcasts a signed transaction to the network.
   The private key is not needed. The request must contain the serialized transaction data and its corresponding signature.
-  Transactions can be signed client-side using Symbol SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+  Transactions can be signed client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
   [Python](https://pypi.org/project/symbol-sdk-python/)) and then announced via this endpoint.
 operationId: announceTransaction
 requestBody:

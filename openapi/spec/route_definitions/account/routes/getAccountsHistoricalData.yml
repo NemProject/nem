@@ -13,7 +13,11 @@ description: |
   **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
   For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
 
-  The request returns historical data points for each requested account between the given block heights (inclusive). 
+  The request returns historical data points for each requested account between the given block heights (inclusive).
+  Each returned data point is a snapshot of the account state at that specific block height.
+  This can be used to track changes in an account's balance or importance score over time.
+  Use `incrementBy=1` for detailed block-by-block analysis, or a larger value (e.g. `incrementBy=1440` for roughly daily samples)
+  to observe long-term trends over a wider block range.
   If any of the provided addresses is invalid, the entire request fails with 400 Bad Request; no partial results are returned.
 
   **Number of data points:** You control this via `startHeight`, `endHeight`, `incrementBy`, and the number of accounts. 
@@ -50,7 +54,10 @@ requestBody:
             type: integer
             format: int64
             minimum: 1
-            description: Step between consecutive block heights. Must be greater than 0.
+            description: |
+              Step between consecutive block heights. Must be greater than 0.
+              Each returned data point is a snapshot of the account state at that specific block height;
+              blocks between sampled heights are simply skipped.
             examples:
               - 1
       examples:
