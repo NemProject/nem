@@ -1,0 +1,72 @@
+type: object
+description: |
+  The NEM client uses timers to schedule periodic tasks. Those tasks are monitored
+  and their result is memorized. The NemAsyncTimerVisitor structure holds the information.
+required:
+  - last-delay-time
+  - executions
+  - failures
+  - successes
+  - last-operation-start-time
+  - is-executing
+  - name
+  - average-operation-time
+  - last-operation-time
+properties:
+  last-delay-time:
+    type: integer
+    format: int32
+    description: The number of milliseconds since the last execution of the timer.
+    examples:
+      - 3000
+  executions:
+    type: integer
+    format: int32
+    description: The number of times the task was executed.
+    examples:
+      - 1024
+  failures:
+    type: integer
+    format: int32
+    description: The number of times the task failed.
+    examples:
+      - 0
+  successes:
+    type: integer
+    format: int32
+    description: The number of times the task completed successfully.
+    examples:
+      - 1024
+  last-operation-start-time:
+    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    description: |
+      Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at which the task last started.
+  is-executing:
+    type: integer
+    format: int32
+    description: |
+      Indicates whether the task is currently executing.
+      1 = true, 0 = false.
+    enum:
+      - 0
+      - 1
+    examples:
+      - 0
+  name:
+    type: string
+    description: The name of the task (timer).
+    examples:
+      - FORAGING
+  average-operation-time:
+    type: integer
+    format: int32
+    description: The number of seconds the task needed on average.
+    examples:
+      - 0
+  last-operation-time:
+    type: integer
+    format: int32
+    description: The number of seconds the task needed the last time.
+    examples:
+      - 0

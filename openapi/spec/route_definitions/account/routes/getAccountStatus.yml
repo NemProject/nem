@@ -1,0 +1,30 @@
+tags:
+  - Account
+summary: Request account status
+description: |
+  Retrieves only the account metadata for a given address: harvesting status, delegated harvesting status, and multisig relationships (cosignatories).
+  It does **not** return account info such as balance, importance, or public key.
+operationId: getAccountStatus
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+responses:
+  '200':
+    description: Account metadata successfully fetched.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AccountMetaData.yml"
+        examples:
+          default:
+            summary: Account harvesting and multisig metadata
+            value:
+              cosignatories: []
+              cosignatoryOf: []
+              status: "LOCKED"
+              remoteStatus: "ACTIVE"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

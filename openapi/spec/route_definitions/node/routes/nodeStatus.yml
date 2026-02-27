@@ -1,0 +1,21 @@
+tags:
+  - Node
+summary: Return node status
+operationId: getNodeStatus
+responses:
+  '200':
+    description: Returns the node status.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/NodeStatusResult.yml"
+        examples:
+          ok:
+            value:
+              type: 4
+              code: 3
+              message: "status"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"

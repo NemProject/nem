@@ -1,0 +1,9 @@
+name: publicKey
+in: query
+required: true
+description: Account public key (hex-encoded).
+schema:
+  $ref: "../../schemas/PublicKey.yml"
+examples:
+  default:
+    value: "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a"

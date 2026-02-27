@@ -1,0 +1,9 @@
+type: object
+description: Object containing time synchronization results.
+required:
+  - data
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./TimeSynchronizationResult.yml"

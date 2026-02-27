@@ -1,0 +1,37 @@
+tags:
+  - Node
+summary: Return basic node information
+description: |
+  Retrieves basic information about a NEM node, including its identity, endpoint configuration, and metadata.
+  Using IP `127.0.0.1` retrieves information about the local node.
+operationId: getNodeInfo
+responses:
+  '200':
+    description: Node information successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/Node.yml"
+        examples:
+          default:
+            summary: Node with identity, endpoint and metadata
+            value:
+              metaData:
+                features: 1
+                application: "NIS"
+                networkId: -104
+                version: "0.4.33-BETA"
+                platform: "Oracle Corporation (1.8.0_25) on Windows 8"
+              endpoint:
+                protocol: "http"
+                port: 7890
+                host: "81.224.224.156"
+              identity:
+                name: "Alice"
+                public-key: "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

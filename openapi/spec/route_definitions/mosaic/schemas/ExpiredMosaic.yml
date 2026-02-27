@@ -1,0 +1,22 @@
+type: object
+description: |
+  Single expired or restored mosaic at a given block height, including balances per account at time of expiry.
+properties:
+  mosaicId:
+    $ref: "../../../schemas/MosaicId.yml"
+  expiredMosaicType:
+    type: integer
+    description: |
+      Event type at this height:
+      - `1`: Expired — mosaic (owning namespace) expired and balances were zeroed.
+      - `2`: Restored — mosaic was restored (namespace renewal) and balances reapplied.
+    enum: [1, 2]
+  balances:
+    type: array
+    items:
+      $ref: "./AddressBalancePair.yml"
+    description: Account addresses and mosaic quantities held at the time of expiry.
+required:
+  - mosaicId
+  - expiredMosaicType
+  - balances

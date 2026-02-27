@@ -1,0 +1,91 @@
+tags:
+  - Account
+summary: Retrieve historical account data for multiple accounts
+description: |
+  Retrieves historical balance and importance information for a collection of accounts.
+
+  ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
+
+  **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`). 
+  The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`; 
+  the node supports this endpoint if that bit is set.
+
+  **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
+  For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
+
+  The request returns historical data points for each requested account between the given block heights (inclusive).
+  Each returned data point is a snapshot of the account state at that specific block height.
+  This can be used to track changes in an account's balance or importance score over time.
+  Use `incrementBy=1` for detailed block-by-block analysis, or a larger value (e.g. `incrementBy=1440` for roughly daily samples)
+  to observe long-term trends over a wider block range.
+  If any of the provided addresses is invalid, the entire request fails with 400 Bad Request; no partial results are returned.
+
+  **Number of data points:** You control this via `startHeight`, `endHeight`, `incrementBy`, and the number of accounts. 
+  Points per account = **`(endHeight − startHeight) ÷ incrementBy + 1`**. 
+  Total points = **points per account × number of accounts**. 
+  This total must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request). 
+  To stay under the limit, reduce the height range, increase `incrementBy`, and/or request fewer accounts.
+operationId: getAccountHistoricalDataBatch
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - accounts
+          - startHeight
+          - endHeight
+          - incrementBy
+        properties:
+          accounts:
+            type: array
+            minItems: 1
+            description: List of account addresses. All must be valid; if any is invalid, the request fails with 400 Bad Request.
+            items:
+              $ref: "../../../schemas/AccountId.yml"
+          startHeight:
+            $ref: "../../../schemas/BlockHeight.yml"
+            description: Block height from which the data should be supplied.
+          endHeight:
+            $ref: "../../../schemas/BlockHeight.yml"
+            description: Block height up to which the data should be supplied (inclusive).
+          incrementBy:
+            type: integer
+            format: int64
+            minimum: 1
+            description: |
+              Step between consecutive block heights. Must be greater than 0.
+              Each returned data point is a snapshot of the account state at that specific block height;
+              blocks between sampled heights are simply skipped.
+            examples:
+              - 1
+      examples:
+        default:
+          value:
+            accounts:
+              - account: "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ"
+              - account: "NDZQI4MPLUCFVWQY5P6LD5LFLH2NVDYOQ347DATW"
+            startHeight: 17590
+            endHeight: 17592
+            incrementBy: 1
+responses:
+  '200':
+    description: Successfully retrieved historical account data for all requested accounts.
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/AccountHistoricalDataList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

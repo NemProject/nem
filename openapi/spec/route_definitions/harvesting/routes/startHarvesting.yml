@@ -1,0 +1,31 @@
+tags:
+  - Harvesting
+summary: Start harvesting (unlock account)
+description: |
+  Starts harvesting for the specified account.
+  Accounts with a vested balance of at least 10,000 XEM are eligible to harvest blocks.
+  After NEM client startup, all accounts are locked by default; harvesters need to unlock their accounts again
+  (start harvesting) after each NEM client restart.
+
+  Node operators can further restrict which accounts may harvest on this node via configuration:
+  - `nis.allowedHarvesterAddresses`: only these account addresses are allowed to use this node for harvesting
+    (other private keys are rejected by server-side validation).
+  - `nis.additionalHarvesterPrivateKeys`: additional harvester private keys that are automatically unlocked
+    for harvesting on boot (subject to `nis.unlockedLimit` and standard eligibility checks).
+
+  ⚠️ **Security warning:** For non-local network calls, the private key used in the request must always be the private key of the delegated account.
+  For trusted and local network calls, it is possible, but not recommended, to use the private key of the main account.
+operationId: startHarvesting
+requestBody:
+  $ref: "../../../request_bodies/privateKey.yml"
+responses:
+  '200':
+    description: Indicates success. No response body is returned.
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,7 @@
+type: object
+description: Wrapper for an account address.
+required:
+  - account
+properties:
+  account:
+    $ref: "./Address.yml"

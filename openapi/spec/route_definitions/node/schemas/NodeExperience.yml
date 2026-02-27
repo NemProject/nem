@@ -1,0 +1,21 @@
+type: object
+description: |
+  Aggregated communication results between the local node and a remote node.
+  Only successful and failed calls are tracked; the counters are only incremented and never reset in place.
+
+  They are held in memory only and reset when the node process restarts (e.g. after a reboot).
+  In addition, experience entries can be removed by periodic pruning: entries whose last update is older than 24 hours
+  are dropped. After an entry is pruned, the next interaction with that peer creates a new entry starting at 0, 0.
+  So for a given peer, the counts are effectively "since last restart" or "since the entry was (re)created after pruning".
+properties:
+  s:
+    type: integer
+    format: int64
+    description: Number of successful communications.
+  f:
+    type: integer
+    format: int64
+    description: Number of failed communications.
+required:
+  - s
+  - f

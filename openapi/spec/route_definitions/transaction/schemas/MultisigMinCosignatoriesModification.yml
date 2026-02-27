@@ -1,0 +1,16 @@
+type: object
+description: |
+  Multisig minimum cosignatories modification.
+  This object specifies a relative change to the minimum number of cosignatories
+  required to approve a multisig transaction.
+required:
+  - relativeChange
+properties:
+  relativeChange:
+    type: integer
+    description: |
+      Relative change of the minimum number of cosignatories.
+      A positive value increases the required number of cosignatories,
+      while a negative value decreases it.
+    examples:
+      - 1

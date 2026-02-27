@@ -1,0 +1,55 @@
+tags:
+  - Transaction
+summary: Announce a signed transaction
+description: |
+  Broadcasts a signed transaction to the network.
+  The private key is not needed. The request must contain the serialized transaction data and its corresponding signature.
+  Transactions can be signed client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+  [Python](https://pypi.org/project/symbol-sdk-python/)) and then announced via this endpoint.
+operationId: announceTransaction
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/AnnounceRequest.yml"
+responses:
+  '200':
+    description: |
+      Transaction accepted and announced.
+      The response body is always an `AnnounceResult`; check `code` and `message` to see whether validation passed
+      (code 1, message SUCCESS, or code 0, message NEUTRAL) or failed (e.g., FAILURE_INSUFFICIENT_BALANCE). 
+      A non-success result means the transaction was not added to the unconfirmed cache and will not be further processed.
+      
+      The most common errors are:
+        - `FAILURE_INSUFFICIENT_BALANCE`: The sender account has not enough funds.
+        - `FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE`: The timestamp is invalid because it lies too far in the future.
+        - `FAILURE_PAST_DEADLINE`: The deadline is invalid because it has already been passed.
+        - `FAILURE_MESSAGE_TOO_LARGE`: The attached message is too large.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AnnounceResult.yml"
+        examples:
+          success:
+            summary: Transaction accepted and announced
+            value:
+              type: 1
+              code: 1
+              message: "SUCCESS"
+              transactionHash:
+                data: "c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+              innerTransactionHash:
+                data: "cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+          validationFailureInsufficientBalance:
+            summary: Validation failed - insufficient balance
+            value:
+              type: 1
+              code: 5
+              message: "FAILURE_INSUFFICIENT_BALANCE"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

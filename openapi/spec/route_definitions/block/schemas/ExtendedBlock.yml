@@ -1,0 +1,32 @@
+type: object
+description: >
+  Extended block data used by NEM client services such as the block explorer.
+required:
+  - block
+  - hash
+  - difficulty
+  - txes
+  - beneficiary
+  - totalFee
+properties:
+  block:
+    $ref: "./Block.yml"
+  hash:
+    $ref: "../../../schemas/Hash.yml"
+    description: |
+      Block hash (the 256-bit SHA3 hash encoded as a hexadecimal string - 64 characters).
+  difficulty:
+    $ref: "../../../schemas/BlockDifficulty.yml"
+  txes:
+    type: array
+    description: List of transactions contained in the block along with their corresponding transaction hashes.
+    items:
+      $ref: "../../transaction/schemas/TransactionWithHash.yml"
+  beneficiary:
+    $ref: "../../../schemas/Address.yml"
+    description: |
+      Address (40 characters, Base32-encoded; first character indicates network: T testnet, N mainnet) 
+      of the account that receives the block fees (the harvester, or the delegator when harvesting is delegated).
+  totalFee:
+    $ref: "../../../schemas/Amount.yml"
+    description: Total fee (in micro XEM) collected from all transactions in the block.

@@ -1,0 +1,10 @@
+type: object
+description: Boot node meta data.
+properties:
+  application:
+    type: string
+    description: |
+      Optional application name for the local node. If provided, it is stored in the node's metadata and is then
+      exposed in `GET /node/info` (and in extended node info) and sent to peers when the node identifies itself.
+      It is a human-readable label for the running software (e.g. `NIS`, `NEM Deploy`). Platform and version are
+      filled in automatically by the NEM client, so this is the only metadata field that can be set at boot time.

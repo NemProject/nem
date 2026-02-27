@@ -1,0 +1,20 @@
+tags:
+  - Node
+summary: Return the list of reachable (active) nodes in the neighborhood of the queried node
+description: |
+  Returns a list of all nodes currently known by the queried node that have status **ACTIVE**.
+  Only nodes that are reachable and respond in a timely manner are returned.
+operationId: getReachableNodePeerList
+responses:
+  '200':
+    description: Successfully retrieved reachable nodes.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/NodeList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

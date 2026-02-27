@@ -1,0 +1,8 @@
+name: height
+in: query
+description: Block height at which the data is queried.
+schema:
+  $ref: "../../schemas/BlockHeight.yml"
+examples:
+  default:
+    value: 17592

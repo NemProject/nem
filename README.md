@@ -6,12 +6,13 @@ This project contains [NEM Infrastructure Server](nis) and all its dependencies.
 
 The main folders are:
 
-| Folder   | Content                          |
-|----------|----------------------------------|
-| `core`   | The [core](core) dependency.     |
-| `deploy` | The [deploy](deploy) dependency. |
-| `peer`   | The [peer](peer) dependency.     |
-| `nis`    | The [nis](nis) dependency.       |
+| Folder    | Content                                                                           |
+|-----------|-----------------------------------------------------------------------------------|
+| `core`    | The [core](core) dependency.                                                      |
+| `deploy`  | The [deploy](deploy) dependency.                                                  |
+| `peer`    | The [peer](peer) dependency.                                                      |
+| `nis`     | The [nis](nis) dependency.                                                        |
+| `openapi` | OpenAPI specification of the NIS REST API implemented by the [`nis`](nis) module. |
 
 ## Building the package
 

@@ -1,0 +1,9 @@
+type: object
+required:
+  - meta
+  - namespace
+properties:
+  meta:
+    $ref: "./NamespaceMetaData.yml"
+  namespace:
+    $ref: "./Namespace.yml"

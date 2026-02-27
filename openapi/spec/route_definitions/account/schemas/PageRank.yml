@@ -1,0 +1,8 @@
+type: number
+format: double
+description: |
+  PageRank of the account in the NEM Proof of Importance (POI) model: a value between 0 and 1 that reflects the account's 
+  relative importance in the transfer graph (accounts and XEM transfers between them).
+  It is one of the inputs to the final importance score.
+examples:
+  - 0.0007605047835049349

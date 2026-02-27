@@ -1,0 +1,34 @@
+tags:
+  - Mosaic
+summary: Return last known mosaic definition
+description: |
+  Returns the last known mosaic definition (latest version) for the given mosaic identifier.
+
+  Mosaic definitions can be updated over time. If multiple definitions exist for the same `mosaicId`, this endpoint always returns the
+  most recent version known to the node (highest internal database id), regardless of whether the mosaic or its owning namespace has expired.
+
+  This endpoint does not perform any height-based or expiry checks:
+  it simply returns the latest stored definition. For the native XEM mosaic, a predefined static definition is returned.
+
+  To check whether a mosaic is still active at a specific block height, use one of the following:
+  - GET /local/mosaic/definition/supply with mosaicId and height to get the definition together with expirationHeight of the owning namespace;
+    if height is greater than or equal to expirationHeight, the mosaic is expired at that height.
+  - GET /local/mosaics/expired to list mosaics that expire at a given height (requires the `TRACK_EXPIRED_MOSAICS` feature).
+operationId: getLastMosaicDefinition
+parameters:
+  - $ref: "../../../parameters/query/mosaicId.yml"
+responses:
+  '200':
+    description: Last mosaic definition successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../../transaction/schemas/MosaicDefinition.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '404':
+    $ref: "../../../responses/ResourceNotFound.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

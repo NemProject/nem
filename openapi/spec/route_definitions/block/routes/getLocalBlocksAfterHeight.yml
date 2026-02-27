@@ -1,0 +1,29 @@
+tags:
+  - Block
+summary: Return blocks after block height
+description: |
+  Returns up to 10 blocks from the blockchain that come after the given block height.
+  The returned list does not include the block at the specified (starting) height.
+  If the database contains fewer than 10 blocks after the specified height, all available blocks are returned.
+
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+operationId: getLocalBlocksAfterHeight
+requestBody:
+  $ref: "../../../request_bodies/blockHeight.yml"
+responses:
+  '200':
+    description: List of extended blocks data successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExtendedBlockList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

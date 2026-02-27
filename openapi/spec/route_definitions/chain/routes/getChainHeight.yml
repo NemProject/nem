@@ -1,0 +1,23 @@
+tags:
+  - Chain
+summary: Return blockchain height
+description: |
+  Returns the current height of the blockchain.
+  The response contains the height of the last block in the chain.
+operationId: getChainHeight
+responses:
+  '200':
+    description: Blockchain height successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/BlockReference.yml"
+        examples:
+          default:
+            summary: Current chain height
+            value:
+              height: 42799
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"

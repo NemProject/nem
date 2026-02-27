@@ -1,0 +1,30 @@
+type: object
+description: |
+  Represents a node in the NEM network.
+
+  A node consists of an identity, an endpoint used for communication, and additional metadata describing the node.
+required:
+  - identity
+  - endpoint
+  - metaData
+properties:
+  identity:
+    $ref: "./NodeIdentity.yml"
+  endpoint:
+    $ref: "./NodeEndpoint.yml"
+  metaData:
+    $ref: "./NodeMetaData.yml"
+examples:
+  - metaData:
+      features: 1
+      application: NIS
+      networkId: -104
+      version: 0.4.33-BETA
+      platform: Oracle Corporation (1.8.0_25) on Windows 8
+    endpoint:
+      protocol: http
+      port: 7890
+      host: 81.224.224.156
+    identity:
+      name: Alice
+      public-key: a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a

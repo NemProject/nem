@@ -1,0 +1,36 @@
+type: object
+description: |
+  Metadata about the NEM client application (the server software running on this node).
+required:
+  - application
+  - version
+  - startTime
+  - currentTime
+properties:
+  application:
+    type: string
+    description: Application name.
+    examples:
+      - NEM Deploy
+  version:
+    type: string
+    description: Application version string.
+    examples:
+      - 0.6.102
+  signer:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: Signer of the certificate used by the application.
+    examples:
+      - CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD
+  startTime:
+    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    description: |
+      Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at which the application was started.
+  currentTime:
+    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    description: |
+      Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Current network time.

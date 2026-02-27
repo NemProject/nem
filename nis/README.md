@@ -28,6 +28,20 @@ The main folders are:
 | `org.nem.nis.visitors`   | Block by block visitors that allow block by block processing.                  |
 | `org.nem.nis.websocket`  | NEM websocket implementation.                                                  |
 
+## REST API and OpenAPI specification
+
+The NIS REST API implemented in `org.nem.nis.controller` is described by an OpenAPI specification
+maintained in the [`openapi`](../openapi) module of this repository.
+
+To build and validate the specification, from the repository root run:
+
+```bash
+cd openapi
+npm install
+npm run build
+npm run test
+```
+
 ## Building the package
 
 > **NOTE:**

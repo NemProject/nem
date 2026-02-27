@@ -1,0 +1,27 @@
+description: |
+  Multisig aggregate modification transactions are part of the NEM multisig account system and are used to change the configuration
+  of a multisig account: they can add or remove cosignatories and (optionally) adjust the minimum number of required cosignatories.
+
+  A multisig aggregate modification transaction holds:
+  - an array of multisig cosignatory modifications (`modifications`), and
+  - an optional multisig minimum cosignatories modification (`minCosignatories`).
+
+  This transaction is embedded inside a multisig transaction, which is then signed by the cosignatories of the multisig account.
+
+  The current entity version for multisig aggregate modification transactions is `2`. This corresponds to the following
+  serialized `version` field values (network byte + entity version):
+  - `0x68000002` (decimal `1744830466`) on mainnet
+  - `0x98000002` (decimal `-1744830462`) on testnet
+allOf:
+  - $ref: "./Transaction.yml"
+  - type: object
+    required:
+      - modifications
+    properties:
+      modifications:
+        type: array
+        description: Array of multisig modifications.
+        items:
+          $ref: "./MultisigCosignatoryModification.yml"
+      minCosignatories:
+        $ref: "./MultisigMinCosignatoriesModification.yml"

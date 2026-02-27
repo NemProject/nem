@@ -1,0 +1,21 @@
+allOf:
+  - $ref: "../../../schemas/DefaultResult.yml"
+  - type: object
+    description: Node status result.
+    properties:
+      type:
+        description: Result type. Always set to `4` (node status).
+        const: 4
+      code:
+        description: |
+          Result code.
+          - `2`: Node is starting.
+          - `3`: Node is running.
+          - `4`: Node is booting (implies RUNNING).
+          - `5`: Node is booted (implies RUNNING).
+          - `6`: Node is synchronized (implies RUNNING and BOOTED).
+          - `7`: Node does not see any remote node (implies RUNNING and BOOTED).
+          - `8`: Node is currently loading the blockchain.
+      message:
+        description: Message. Always set to `status`.
+        const: "status"

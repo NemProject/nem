@@ -1,0 +1,41 @@
+tags:
+  - Account
+summary: Generate new account data
+description: |
+  Generates a new random account key pair and returns the private key, public key, and address.
+  Key pairs can also be generated client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+  [Python](https://pypi.org/project/symbol-sdk-python/)), without calling this endpoint.
+
+  **How the account is generated:** The key pair is generated using the Ed25519 curve. The private key is 32 random bytes 
+  produced by the JVM's `java.security.SecureRandom` (a cryptographically secure pseudorandom number generator). 
+  The public key is derived from the private key. No custom or weak RNG is used.
+
+  **Security:** For typical use (wallets, client applications), this is considered secure: `SecureRandom` is backed by
+  the operating system's entropy source (e.g. `/dev/urandom` on Linux) and is appropriate for key generation. 
+  If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could theoretically be weaker;
+  the NEM client relies entirely on the JVM and OS for randomness quality and does not perform additional entropy checks or seeding.
+  
+  ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+operationId: generateAccount
+responses:
+  '200':
+    description: Account successfully generated.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/GeneratedAccount.yml"
+        examples:
+          default:
+            summary: New key pair and address
+            value:
+              privateKey: "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f"
+              address: "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+              publicKey: "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+  '401':
+    $ref: "../../../responses/Unauthorized.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

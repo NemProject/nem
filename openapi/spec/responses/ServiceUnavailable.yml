@@ -1,0 +1,34 @@
+description: The service is temporarily unavailable.
+content:
+  application/json:
+    schema:
+      description: Service unavailable response body.
+      allOf:
+        - $ref: "../schemas/ModelError.yml"
+        - type: object
+          properties:
+            error:
+              description: The value is always `Service Unavailable`.
+              const: "Service Unavailable"
+              examples:
+                - "Service Unavailable"
+            status:
+              description: The HTTP status code of the response. Always `503`.
+              const: 503
+              examples:
+                - 503
+            message:
+              description: |
+                Detailed error message describing the failure. Examples:
+                - `NIS_ILLEGAL_STATE_LOADING_CHAIN`: NEM client is loading the blockchain.
+                - `NIS_ILLEGAL_STATE_NOT_BOOTED`: NEM client is not booted.
+                - `NIS_ILLEGAL_STATE_ALREADY_BOOTED`: NEM client has already been booted.
+    examples:
+      serviceUnavailable:
+        summary: Service is temporarily unavailable
+        description: The node is currently loading the blockchain and cannot process requests.
+        value:
+          timeStamp: 342377277
+          error: "Service Unavailable"
+          message: "NIS_ILLEGAL_STATE_LOADING_CHAIN"
+          status: 503

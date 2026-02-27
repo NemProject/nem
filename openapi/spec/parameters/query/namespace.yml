@@ -1,0 +1,9 @@
+name: namespace
+in: query
+required: true
+description: Fully-qualified namespace identifier (e.g. `makoto.metal.coins`).
+schema:
+  $ref: "../../schemas/NamespaceId.yml"
+examples:
+  default:
+    value: "makoto.metal.coins"

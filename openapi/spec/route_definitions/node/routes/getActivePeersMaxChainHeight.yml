@@ -1,0 +1,20 @@
+tags:
+  - Node
+summary: Return maximum chain height from active peers
+description: |
+  Makes the queried node request the blockchain height from every node in its active peer list, and returns the maximum height observed
+  (the highest known chain height in the active neighborhood).
+operationId: getActivePeersMaxChainHeight
+responses:
+  '200':
+    description: Maximum chain height retrieved successfully.
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/BlockReference.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

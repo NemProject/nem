@@ -1,0 +1,7 @@
+type: integer
+description: Number of entries to return.
+minimum: 5
+maximum: 100
+default: 25
+examples:
+  - 50

@@ -1,0 +1,17 @@
+type: object
+description: |
+  Represents network timestamps for sending and receiving a time synchronization request or response.
+required:
+  - sendTimeStamp
+  - receiveTimeStamp
+properties:
+  sendTimeStamp:
+    $ref: "../../../schemas/NetworkTimeStampMilliseconds.yml"
+    description: |
+      Network timestamp in milliseconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at the moment the reply was sent.
+  receiveTimeStamp:
+    $ref: "../../../schemas/NetworkTimeStampMilliseconds.yml"
+    description: |
+      Network timestamp in milliseconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
+      Time at the moment the request was received.

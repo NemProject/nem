@@ -1,0 +1,10 @@
+type: object
+required:
+  - mosaicId
+  - supply
+properties:
+  mosaicId:
+    $ref: "../../../schemas/MosaicId.yml"
+  supply:
+    $ref: "../../../schemas/Amount.yml"
+    description: Total supply of the mosaic; token amount in smallest unit (no decimals), non-negative.

@@ -1,0 +1,12 @@
+type: object
+description: |
+  Provides extended information about a node.
+  It contains both the node description and application-level metadata.
+required:
+  - node
+  - nisInfo
+properties:
+  node:
+    $ref: "./Node.yml"
+  nisInfo:
+    $ref: "./NodeApplicationMetaData.yml"

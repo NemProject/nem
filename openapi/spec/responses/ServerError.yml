@@ -1,0 +1,34 @@
+description: An internal server error occurred.
+content:
+  application/json:
+    schema:
+      description: Internal server error response body.
+      allOf:
+        - $ref: "../schemas/ModelError.yml"
+        - type: object
+          properties:
+            error:
+              description: The value is always `Internal Server Error`.
+              const: "Internal Server Error"
+              examples:
+                - "Internal Server Error"
+            status:
+              description: The HTTP status code of the response. Always `500`.
+              const: 500
+              examples:
+                - 500
+            message:
+              description: |
+                Detailed error message describing the failure. Examples:
+                - `Request method 'GET' not supported`: The endpoint expects POST, not GET.
+                - `this node does not support historical account data retrieval`: The node does not provide historical account data.
+                - `this node does not support transaction hash lookup`: The node does not support transaction lookup by hash.
+    examples:
+      internalServerError:
+        summary: Internal server error
+        description: The node does not support retrieval of historical account data.
+        value:
+          timeStamp: 342379020
+          error: "Internal Server Error"
+          message: "this node does not support historical account data retrieval"
+          status: 500

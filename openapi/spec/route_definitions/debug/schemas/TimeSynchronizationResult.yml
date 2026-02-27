@@ -1,0 +1,26 @@
+type: object
+description: >
+  A time synchronization result is the outcome of the network time
+  synchronization of a node with other remote nodes.
+required:
+  - dateTime
+  - currentTimeOffset
+  - change
+properties:
+  dateTime:
+    type: string
+    description: The date and time when the synchronization was performed.
+    examples:
+      - "2014-11-16 20:47:06"
+  currentTimeOffset:
+    type: integer
+    format: int64
+    description: The current offset to the local computer clock in milliseconds.
+    examples:
+      - 2786
+  change:
+    type: integer
+    format: int64
+    description: The change in milliseconds compared to the last synchronization.
+    examples:
+      - 36

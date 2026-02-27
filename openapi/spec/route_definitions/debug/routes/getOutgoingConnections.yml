@@ -1,0 +1,20 @@
+tags:
+  - Debug
+summary: Return outgoing connections
+description: |
+  Returns an audit collection of outgoing connections.
+  Use this information to monitor outstanding and recent outgoing requests.
+operationId: getDebugOutgoingConnections
+responses:
+  '200':
+    description: Audit collection of outgoing connections returned successfully.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ConnectionAuditResult.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,14 @@
+type: object
+required:
+  - mosaicDefinition
+  - supply
+  - expirationHeight
+properties:
+  mosaicDefinition:
+    $ref: "../../transaction/schemas/MosaicDefinition.yml"
+  supply:
+    $ref: "../../../schemas/Amount.yml"
+    description: Current supply of the mosaic. Token amount in smallest unit (no decimals).
+  expirationHeight:
+    $ref: "../../../schemas/BlockHeight.yml"
+    description: Expiration height of the owning namespace.

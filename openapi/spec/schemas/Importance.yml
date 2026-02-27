@@ -1,0 +1,7 @@
+type: number
+format: double
+description: Account importance for harvesting, between 0 and 1 (inclusive).
+minimum: 0
+maximum: 1
+examples:
+  - 0.00008857563463531297

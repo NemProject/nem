@@ -1,0 +1,44 @@
+tags:
+  - Harvesting
+summary: Retrieve the list of blocks harvested by an account
+description: |
+  Gets an array of harvested block information objects for the specified account.
+
+  The result contains information about blocks harvested by the account,
+  starting from a given block identifier and supports pagination.
+operationId: getHarvestedBlocks
+parameters:
+  - $ref: "../../../parameters/query/addressFilter.yml"
+  - $ref: "../../../parameters/query/id.yml"
+  - $ref: "../../../parameters/query/pageSize.yml"
+responses:
+  '200':
+    description: Successfully returned harvested info for the account.
+    content:
+      application/json:
+        schema:
+          type: object
+          description: Array of harvest info.
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/HarvestInfo.yml"
+        examples:
+          default:
+            summary: Harvested blocks for account
+            value:
+              data:
+                - timeStamp: 8879051
+                  difficulty: 26453656336676
+                  totalFee: 102585065
+                  id: 1262068
+                  height: 37015
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,26 @@
+tags:
+  - Node
+summary: Return node heartbeat
+description: |
+  Determines whether the node is up and responsive.
+  If this request does not return a response, the node is either not running or is unable to serve requests.
+operationId: nodeHeartbeat
+responses:
+  '200':
+    description: Indicates that the node is responsive.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/NodeHeartbeatResult.yml"
+        examples:
+          ok:
+            value:
+              type: 2
+              code: 1
+              message: "ok"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

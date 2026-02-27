@@ -1,0 +1,8 @@
+type: object
+description: Uniquely identifies a mosaic definition.
+properties:
+  namespaceId:
+    $ref: "./NamespaceId.yml"
+  name:
+    type: string
+    description: The mosaic name.

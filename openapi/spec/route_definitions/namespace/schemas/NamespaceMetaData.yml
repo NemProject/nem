@@ -1,0 +1,7 @@
+type: object
+required:
+  - id
+properties:
+  id:
+    $ref: "../../../schemas/DatabaseId.yml"
+    description: Namespace database identifier used for paging.

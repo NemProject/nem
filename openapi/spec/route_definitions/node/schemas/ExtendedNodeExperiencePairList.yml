@@ -1,0 +1,7 @@
+type: object
+description: List of extended node experience pairs.
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./ExtendedNodeExperiencePair.yml"

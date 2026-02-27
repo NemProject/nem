@@ -1,0 +1,9 @@
+type: object
+description: List of unconfirmed transaction metadata pairs.
+required:
+  - data
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./UnconfirmedTransactionMetaDataPair.yml"

@@ -1,0 +1,21 @@
+type: object
+description: |
+  Multisig cosignatory modification.
+  This object represents the addition or removal of a cosignatory
+  from a multisig account.
+required:
+  - modificationType
+  - cosignatoryAccount
+properties:
+  modificationType:
+    type: integer
+    enum:
+      - 1
+      - 2
+    description: |
+      Type of cosignatory modification:
+      - 1: Add a new cosignatory
+      - 2: Remove an existing cosignatory
+  cosignatoryAccount:
+    $ref: "../../../schemas/PublicKey.yml"
+    description: Public key of the cosignatory account.

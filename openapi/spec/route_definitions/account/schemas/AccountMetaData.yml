@@ -1,0 +1,22 @@
+type: object
+description: Additional metadata describing the account state.
+required:
+  - status
+  - remoteStatus
+  - cosignatoryOf
+  - cosignatories
+properties:
+  status:
+    $ref: "./AccountStatus.yml"
+  remoteStatus:
+    $ref: "./AccountRemoteStatus.yml"
+  cosignatoryOf:
+    type: array
+    description: Accounts for which this account is a cosignatory.
+    items:
+      $ref: "./AccountInfo.yml"
+  cosignatories:
+    type: array
+    description: Accounts that are cosignatories of this account.
+    items:
+      $ref: "./AccountInfo.yml"

@@ -1,0 +1,45 @@
+tags:
+  - Account
+summary: Retrieve historical account data
+description: |
+  Retrieves historical balance and importance information for an account.
+
+  ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
+
+  **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`). 
+  The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`; 
+  the node supports this endpoint if that bit is set.
+
+  **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
+  For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
+
+  The request returns historical data points between the given block heights (inclusive).
+  Each returned data point is a snapshot of the account state at that specific block height.
+  This can be used to track changes in an account's balance or importance score over time.
+  Use `increment=1` for detailed block-by-block analysis, or a larger value (e.g. `increment=1440` for roughly daily samples)
+  to observe long-term trends over a wider block range.
+
+  **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`. 
+  The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**. 
+  For example, `startHeight=100`, `endHeight=199`, `increment=1` gives 100 points; the same range with `increment=10` gives 10 points. 
+  This value must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request). 
+  To stay under the limit, use a larger `increment` and/or a smaller height range.
+operationId: getAccountHistoricalData
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+  - $ref: "../../../parameters/query/startHeight.yml"
+  - $ref: "../../../parameters/query/endHeight.yml"
+  - $ref: "../../../parameters/query/increment.yml"
+responses:
+  '200':
+    description: Successfully retrieved historical account data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/AccountHistoricalDataList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

@@ -1,0 +1,4 @@
+type: string
+description: The 256-bit SHA3 hash encoded as a hexadecimal string (64 characters).
+examples:
+  - "81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8"

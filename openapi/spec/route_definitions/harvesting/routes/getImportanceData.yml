@@ -1,0 +1,30 @@
+tags:
+  - Harvesting
+summary: Retrieve importance data for all accounts
+description: |
+  Gets an array of account importance objects.
+
+  Each entry contains an account address and its importance information.
+  Importance data may be unset for accounts that are not eligible for harvesting.
+operationId: getImportanceData
+responses:
+  '200':
+    description: Successfully returned importance data for accounts.
+    content:
+      application/json:
+        schema:
+          type: object
+          description: Array of accounts importance data.
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "../schemas/AccountImportanceData.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

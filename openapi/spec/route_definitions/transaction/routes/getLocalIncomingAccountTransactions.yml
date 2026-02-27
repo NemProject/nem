@@ -1,0 +1,32 @@
+tags:
+  - Transaction
+summary: Return incoming transactions for an account with decoded messages
+description: |
+  Gets an array of transaction metadata pairs for which the specified account is the recipient of the transaction.
+  If a transaction contains an encrypted message, the message is decrypted before being returned.
+  
+  Transactions are sorted in descending order by insertion time.
+  
+  ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
+  By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+operationId: getLocalIncomingAccountTransactions
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/AccountPrivateKeyTransactionsPage.yml"
+responses:
+  '200':
+    description: Successfully returned transaction data.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/TransactionMetaDataPairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

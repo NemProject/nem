@@ -1,0 +1,29 @@
+tags:
+  - Chain
+summary: Return blockchain score
+description: |
+  Returns the current score of the blockchain. The higher the score, the better the chain.
+
+  Normally there is only one chain shared by all nodes. When the network splits (e.g. connectivity issues),
+  different chains can temporarily exist. Nodes then use the chain score to choose among the chains they are
+  aware of until the network rejoins. Applications are typically not concerned with this value; it is mainly
+  used by the node for synchronization and chain selection.
+operationId: getChainScore
+responses:
+  '200':
+    description: Blockchain score successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/BlockchainScore.yml"
+        examples:
+          default:
+            summary: Chain score (integer value in hexadecimal)
+            value:
+              score: "18722d5a7d590deb"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

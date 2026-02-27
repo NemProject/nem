@@ -1,0 +1,22 @@
+tags:
+  - Node
+summary: Return node experiences
+description: |
+  Returns an array of node experiences collected by the local node (success/failure counts per peer).
+  This data is used internally by the P2P layer for trust scoring and node selection. For API clients,
+  the endpoint is mainly useful as a diagnostics and monitoring tool e.g. to see how the node is
+  doing with its peers or to troubleshoot connectivity.
+operationId: getNodeExperiences
+responses:
+  '200':
+    description: Successfully retrieved node experiences.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExtendedNodeExperiencePairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

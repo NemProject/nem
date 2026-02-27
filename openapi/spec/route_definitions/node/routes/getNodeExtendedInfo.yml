@@ -1,0 +1,23 @@
+tags:
+  - Node
+summary: Return extended node information
+description: |
+  Retrieves extended information about a NEM node.
+  
+  The response contains:
+    - basic node information (`node`)
+    - application-level metadata (`nisInfo`)
+operationId: getNodeExtendedInfo
+responses:
+  '200':
+    description: Extended node information successfully retrieved.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/ExtendedNode.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

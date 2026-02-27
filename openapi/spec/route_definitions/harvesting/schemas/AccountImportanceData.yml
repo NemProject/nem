@@ -1,0 +1,10 @@
+type: object
+description: Object containing account address and importance information.
+properties:
+  address:
+    $ref: "../../../schemas/Address.yml"
+  importance:
+    $ref: "./AccountImportance.yml"
+required:
+  - address
+  - importance

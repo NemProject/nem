@@ -1,0 +1,26 @@
+type: object
+description: Error response returned when a request is invalid or an internal error occurs.
+required:
+  - timeStamp
+  - error
+  - message
+  - status
+properties:
+  timeStamp:
+    $ref: "./NetworkTimeStamp.yml"
+  error:
+    type: string
+    description: Short error type identifier.
+  message:
+    type: string
+    description: Detailed error message describing the failure.
+  status:
+    type: integer
+    format: int32
+    description: The HTTP status code of the response.
+    examples:
+      - 400
+      - 404
+      - 500
+      - 503
+      - 401

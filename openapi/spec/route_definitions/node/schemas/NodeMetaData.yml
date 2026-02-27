@@ -1,0 +1,62 @@
+type: object
+description: Additional metadata describing the node.
+required:
+  - version
+  - networkId
+  - features
+properties:
+  features:
+    type: integer
+    format: int32
+    description: |
+      Bitmask of optional features this node supports. Built by bitwise OR of the feature flags below.
+      Clients can test support with a bitwise AND (e.g. `(features & 0x2) !== 0` for historical account data).
+      Known flags:
+      - `0x1`: Transaction hash lookup. Node can look up transactions by hash (e.g. `/transaction/get`).
+      - `0x2`: Historical account data. Node exposes historical account state.
+      - `0x4`: Track expired mosaics. Node tracks and can list expired mosaics.
+      Example: value `3` means `0x1 | 0x2`, i.e. transaction hash lookup and historical account data.
+    examples:
+      - 3
+  networkId:
+    type: integer
+    format: int32
+    description: |
+      Network identifier. Identifies which blockchain the node is running on. Nodes with different `networkId`
+      values are on different networks and are not compatible. Peers only connect to nodes with
+      the same `networkId`.
+      Known values:
+      - `104`: Main network (public NEM mainnet)
+      - `-104`: Test network (public testnet)
+    examples:
+      - -104
+  application:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: |
+      Optional name of the application running the node, as reported when the node is booted.
+      For NIS this is typically a short product name such as `NIS` or `NEM Infrastructure Server`,
+      but the exact value is free-form and comes from the local node / client configuration.
+      If this field is `null`, it simply means no application name was provided; the node still works
+      normally.
+    examples:
+      - NIS
+  version:
+    type: string
+    description: Version of the node software.
+    examples:
+      - 0.6.100
+  platform:
+    oneOf:
+      - type: string
+      - type: "null"
+    description: |
+      Underlying platform (OS and Java version).
+      NIS populates this from the Java runtime system properties (for example
+      `java.vendor` + `java.version` + `os.name`), so typical values look like
+      `Oracle Corporation (1.8.0_151) on Linux`.
+      The format is free-form and intended for diagnostics / debugging only; clients
+      should not rely on a strict schema here.
+    examples:
+      - "Oracle Corporation (1.8.0_151) on Linux"

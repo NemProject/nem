@@ -1,0 +1,23 @@
+tags:
+  - Time synchronization
+summary: Return current network time (communication timestamps)
+description: |
+  Returns the local node's current network time as a pair of communication timestamps: `sendTimeStamp` and `receiveTimeStamp`.
+
+  Both fields are network timestamps in **milliseconds since the NEM network epoch** (see `NetworkTimeStampMilliseconds`).
+  Both `sendTimeStamp` and `receiveTimeStamp` are set to the same value (the moment when the node handled the request).
+  They are structured this way to match the format used by the P2P time synchronization protocol.
+operationId: getNetworkTime
+responses:
+  '200':
+    description: Network communication timestamps successfully returned.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/CommunicationTimestamps.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

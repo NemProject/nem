@@ -1,0 +1,14 @@
+name: increment
+in: query
+required: true
+description: |
+  Step between consecutive block heights. Must be greater than 0.
+  Each returned data point is a snapshot of the account state at that specific block height;
+  blocks between sampled heights are simply skipped.
+schema:
+  type: integer
+  format: int32
+  minimum: 1
+examples:
+  default:
+    value: 1

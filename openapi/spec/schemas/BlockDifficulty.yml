@@ -1,0 +1,7 @@
+type: integer
+format: int64
+description: |
+  The block difficulty. The initial difficulty was set to 100'000'000'000'000.
+  The block difficulty is always between one tenth and ten times the initial difficulty.
+examples:
+  - 26453656336676

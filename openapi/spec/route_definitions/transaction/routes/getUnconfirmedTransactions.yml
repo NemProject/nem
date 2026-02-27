@@ -1,0 +1,23 @@
+tags:
+  - Transaction
+summary: Return unconfirmed transactions for an account
+description: |
+  Returns a list of unconfirmed transactions where the given account is either the sender or the recipient.
+  Only the most recent 25 unconfirmed transactions are returned.
+  Transactions remain in this list until they are either accepted (included in a block) or expire.
+operationId: getUnconfirmedTransactions
+parameters:
+  - $ref: "../../../parameters/query/address.yml"
+responses:
+  '200':
+    description: Returns a list of unconfirmed transactions.
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/UnconfirmedTransactionMetaDataPairList.yml"
+  '400':
+    $ref: "../../../responses/BadRequest.yml"
+  '500':
+    $ref: "../../../responses/ServerError.yml"
+  '503':
+    $ref: "../../../responses/ServiceUnavailable.yml"

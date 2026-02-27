@@ -1,0 +1,16 @@
+type: object
+description: A transfer model extended by transaction hash.
+required:
+  - tx
+  - hash
+properties:
+  tx:
+    $ref: "../../transaction/schemas/Transaction.yml"
+  hash:
+    $ref: "../../../schemas/Hash.yml"
+    description: Transaction hash.
+  innerHash:
+    $ref: "../../../schemas/Hash.yml"
+    description: |
+      Hash of the inner transaction embedded inside a multisig transaction (the `otherTransaction` of a multisig).
+      Present only when `tx` is a multisig transaction; the property is absent when the transaction is not multisig.
