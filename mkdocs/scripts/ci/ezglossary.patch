@@ -1,0 +1,12 @@
+--- a/src/mkdocs_ezglossary_plugin/plugin.py
++++ b/src/mkdocs_ezglossary_plugin/plugin.py
+@@ -239,6 +239,9 @@
+				 sec = f"{td.section}:" if td.section != "_" else ""
+				 return f'<a href="{sec}{term}">{text}</a>'
+ 
++            entry.definition = re.sub(r'<([^:<]*):>', r'\1', entry.definition)
++            entry.definition = re.sub(r'<[^:<]*:\|([^>]*)>', r'\1', entry.definition)
++
+			# Preserve visible text from nested glossary links/anchors before html2text
+			entry.definition = _preserve_visible_text_for_tooltip(entry.definition)
+			entry.definition = _html2text(entry.definition)
