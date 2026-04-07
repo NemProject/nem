@@ -1,0 +1,88 @@
+{% set ns = namespace(step_count=1) %}
+{% set lang_name = {"py":"Python", "js":"JavaScript"} %}
+{% set lang_icon = {"py":":simple-python:", "js":":simple-javascript:"} %}
+{% set lang_ext = {"py":"py", "js":"mjs"} %}
+
+{% macro list_begin() -%}
+{% set ns.step_count = 1 %}
+<table markdown class="tutorial">
+{%- endmacro %}
+
+{% macro list_end() -%}
+</table>
+{%- endmacro %}
+
+{% macro step_begin(fname) -%}
+<tr markdown><td markdown>![]({{ fname }}){ .data-description=".step-{{ ns.step_count }}" }<div markdown class="step-{{ ns.step_count }}"><span class="big-number">{{ ns.step_count }}. </span>
+{%- endmacro -%}
+
+{% macro step_end() -%}
+</div></td></tr>
+{% set ns.step_count = ns.step_count + 1 %}
+{%- endmacro %}
+
+{% macro code_full(filename, langs, show=true) -%}
+{%- set ns.filename = filename -%}
+
+{# Convert list to dictionary with empty values #}
+{%- if langs is sequence -%}
+    {%- set parsed = {} -%}
+    {%- for l in langs -%}
+        {%- set _ = parsed.update({ l: {} }) -%}
+    {%- endfor -%}
+    {%- set langs = parsed %}
+{%- endif -%}
+
+{# Now iterate over the normalized dictionary #}
+{%- if show -%}
+{%- for l, props in langs.items() -%}
+{%- set caption = props.caption if props.caption is defined else None -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{l}} linenums="1"
+    --8<-- "{{filename}}.{{lang_ext[l]}}"
+    ```
+
+    [Download source]({{ config.repo_url }}/raw/refs/heads/{{config.extra.nem.branch}}/mkdocs/overrides/{{filename}}.{{lang_ext[l]}}){ .source-link }
+
+    {% if caption %}{{ caption | indent }}{% endif %}
+
+{% endfor %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro code_snippet(langs) -%}
+{# Normalize: if langs is a list of "lang:start:end(:descriptor)" strings, convert to dict #}
+{%- if langs is sequence and langs[0] is string -%}
+    {%- set parsed = {} %}
+    {%- for entry in langs -%}
+        {%- set parts = entry.split(":") %}
+        {%- set l = parts[0] %}
+        {%- set range = [parts[1]|int, parts[2]|int] %}
+        {%- set descriptor = parts[3] if parts|length > 3 else none %}
+        {%- set _ = parsed.update({l: {"range": range, "descriptor": descriptor} }) %}
+    {%- endfor %}
+    {%- set langs = parsed %}
+{%- endif %}
+
+{# Now iterate over the normalized dictionary #}
+{%- for l, props in langs.items() -%}
+{%- set start = props.range[0] -%}
+{%- set end = props.range[1] -%}
+{%- set caption = props.caption if props.caption is defined else None -%}
+{%- set descriptor = props.descriptor if props.descriptor is defined else None -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{l}} linenums="{{start}}"
+    --8<-- "{{ns.filename}}.{{lang_ext[l]}}:{{start}}:{{end}}"
+    ```
+
+    {% if descriptor -%}
+    > Use a <js:{{descriptor}}> to create this transaction in a type-safe way.  
+    > See the [Typed Descriptors](site:/devbook/transactions/typed-descriptors) tutorial for details.
+    {% endif %}
+
+    {% if caption %}{{ caption | indent }}{% endif %}
+
+{% endfor %}
+{%- endmacro %}
