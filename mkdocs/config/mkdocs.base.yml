@@ -23,7 +23,7 @@ plugins:
       JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
         src-dirs: ../core/src/main/java ../nis/src/main/java ../peer/src/main/java  # path to source code (support multiple paths separated by space) => INPUT
         template-dir: templates/mkdoxy
-        full-doc: true  # if you want to generate full documentation
+        full-doc: !ENV [NEM_DOCS_FULL, true]  # if you want to generate full documentation
         api-path: devbook/reference/java
         doxy-cfg:  # standard doxygen configuration (key: value)
           FILE_PATTERNS: "*.java"  # specify file patterns to filter out
