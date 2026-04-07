@@ -1,0 +1,81 @@
+INHERIT: ./mkdocs.base.yml
+
+site_name: NEM Docs WIP 🚧
+site_url: https://nemproject.github.io/nem-docs/en
+docs_dir: ../pages/en
+site_dir: ../../docs/en
+edit_uri: blob/new-docs/mkdocs/pages/en
+plugins:
+  search:
+    lang: en
+  mkdoxy:  # Generate API reference docs for Java
+    projects:
+      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
+        doxy-cfg:  # standard doxygen configuration (key: value)
+          OUTPUT_LANGUAGE: English
+markdown_extensions:
+  toc:
+    permalink_title: Anchor link to this section for reference
+    title: On this page
+theme:
+  language: en
+  font:
+    text: Nunito Sans
+  palette:
+    # Palette toggle for automatic mode
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+extra:
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+  social:
+    - icon: fontawesome/solid/house
+      link: https://nemproject.github.io/nem-docs
+      name: Go to the home page
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/SymbolSyndicate
+      name: Follow us on X
+    - icon: fontawesome/brands/github
+      link: https://github.com/NemProject
+      name: Explore our repos
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/J38KwW5ZuG
+      name: Join our Discord server
+    - icon: fontawesome/solid/handshake-simple
+      link: https://nemproject.github.io/nem-docs
+      name: Visit the legacy documentation site
+nav:
+  - index.md
+  - User Manual:
+      - userbook/intro.md
+  - Developer Manual:
+      - devbook/intro.md
+      - Reference Guides:
+          - Java SDK: devbook/reference/java/
+          - NEM REST API: devbook/reference/rest/nem.md
+          - Serialization: devbook/reference/serialization/index.md
+          - WebSockets: devbook/reference/websockets/index.md
+  - Textbook:
+      - textbook/intro.md
+      - textbook/glossary.md

@@ -1,0 +1,131 @@
+repo_url: https://github.com/NemProject/nem
+repo_name: nem
+plugins:
+  search: {}
+  meta-manager: {}  # Add recursive metadata to md files
+  ezglossary:  # Automatic glossary tooltips
+    templates: ../templates/ezglossary
+    use_default: true
+    inline_refs: none
+    markdown_links: true
+    tooltip: full
+    ignore_case: true
+    strict: true
+    plurals: en
+    sections:
+      - java
+      - ws
+      - ser
+      - _
+  mkdoxy:  # Generate API reference docs for Java
+    save-api: .doxy
+    projects:
+      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
+        src-dirs: ../core/src/main/java ../nis/src/main/java ../peer/src/main/java  # path to source code (support multiple paths separated by space) => INPUT
+        template-dir: templates/mkdoxy
+        full-doc: true  # if you want to generate full documentation
+        api-path: devbook/reference/java
+        doxy-cfg:  # standard doxygen configuration (key: value)
+          FILE_PATTERNS: "*.java"  # specify file patterns to filter out
+          OPTIMIZE_OUTPUT_JAVA: true
+          JAVADOC_AUTOBRIEF: true
+          STRIP_FROM_PATH: !relative $config_dir/../..
+          SOURCE_BROWSER: true
+          SOURCE_TOOLTIPS: true
+          INLINE_SOURCES: true
+  gen-files:  # Generate stub files for API reference docs and link.md files for literate-nav
+    scripts:
+      - ../scripts/gen_ref_pages_java.py
+  literate-nav:  # Allow navigation to be specified in the md files created by gen-files
+    nav_file: links.md
+  git-revision-date-localized:  # git dates in page footers
+    enable_creation_date: true
+    exclude:
+      - devbook/reference/*
+  git-authors:  # git authors in page footers
+    sort_authors_by: contribution
+    exclude:
+      - devbook/reference/*
+  swagger-ui-tag: {}  # Allow embedding OpenAPI specs
+  glightbox:
+    auto_caption: false
+    caption_position: left
+    background: none
+    shadow: false
+  macros:
+    include_dir: templates/macros
+  site-urls: {}
+hooks:
+  - ../scripts/hooks.py
+  - ../scripts/register_cats_lexer.py
+markdown_extensions:
+  attr_list: {}
+  admonition: {}
+  pymdownx.caret: {}
+  pymdownx.mark: {}
+  pymdownx.tilde: {}
+  pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+  pymdownx.inlinehilite: {}
+  pymdownx.snippets:
+    base_path: !relative $config_dir/../overrides
+    check_paths: true
+  pymdownx.superfences: {}
+  pymdownx.tabbed:
+    alternate_style: true
+  pymdownx.details: {}
+  def_list: {}
+  md_in_html: {}
+  toc:
+    permalink: ⚓︎
+    toc_depth: 3
+  mkdocs_graphviz: {}
+  pymdownx.arithmatex:
+    generic: true
+extra_javascript:
+  - assets/javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+theme:
+  name: material
+  custom_dir: ../overrides
+  favicon: assets/images/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/images/nem-logo.svg
+  features:
+    - content.tooltips  # Material tooltips instead of browser
+    # - navigation.instant  # Single-page application
+    # - navigation.prune  # Navigation only holds visible items
+    - navigation.tracking  # URL follows the current section in the page
+    - navigation.tabs  # Top navbar
+    - toc.follow  # Current section in TOC is always visible
+    - content.tabs.link  # Linked content tabs
+    - content.code.copy  # Copy code button in code blocks
+    - content.action.edit  # Edit on GitHub button
+    - content.action.view  # View on GitHub button
+    - search.suggest  # Suggest search terms
+    - search.highlight  # Highlight searched term
+    - search.share  # Add share button for deep-linking to search results
+extra:
+  homepage: https://nemproject.github.io/nem-docs
+  alternate:
+    - name: English
+      link: /en/
+      lang: en
+    - name: 日本語
+      link: /ja/
+      lang: ja
+  nem:
+    branch: new-docs
+    java-sdk:
+      include-prefixes: [classorg, interfaceorg]
+copyright: >
+  Copyright &copy; 2026 The Symbol Syndicate
+extra_css:
+  - assets/stylesheets/extra.css
+  - https://unpkg.com/katex@0/dist/katex.min.css

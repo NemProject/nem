@@ -1,0 +1,23 @@
+<!-- User-preference: link content tabs -->
+{% if "content.tabs.link" in features %}
+	<script>
+		var tabs = __md_get("__tabs") || ["Python"]
+		main: for (var set of document.querySelectorAll(".tabbed-set")) {
+			var labels = set.querySelector(".tabbed-labels")
+			for (var tab of tabs)
+				for (var label of labels.getElementsByTagName("label"))
+					if (label.innerText.trim() === tab) {
+						var input = document.getElementById(label.htmlFor)
+						input.checked = true
+						continue main
+					}
+		}
+	</script>
+{% endif %}
+
+<!-- Switch to content tab target -->
+<script>
+	var target = document.getElementById(location.hash.slice(1))
+	if (target && target.name)
+		target.checked = target.name.startsWith("__tabbed_")
+</script>

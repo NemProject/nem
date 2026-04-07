@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+{% if page and page.meta and page.meta.section_name %}
+<style>
+[data-md-color-primary=indigo] {
+	--md-primary-fg-color: var(--{{ page.meta.section_name }}-color);
+	--md-primary-fg-color--dark: var(--{{ page.meta.section_name }}-color--dark);
+	--md-primary-fg-color--light: var(--{{ page.meta.section_name }}-color--light);
+	--md-accent-fg-color--transparent: var(--{{ page.meta.section_name }}-color--transparent);
+}
+</style>
+{% else %}
+<style>
+[data-md-color-primary=indigo] {
+	--md-primary-fg-color: var(--textbook-color);
+	--md-primary-fg-color--dark: var(--textbook-color--dark);
+	--md-primary-fg-color--light: var(--textbook-color--light);
+	--md-accent-fg-color--transparent: var(--textbook-color--transparent);
+}
+</style>
+{% endif %}
+{% endblock %}
