@@ -91,15 +91,15 @@
 }
 
 .userbook:hover div {
-	background: url("../images/userbook.svg") no-repeat center / contain;
+	background: url("../images/userbook-selected.svg") no-repeat center / contain;
 }
 
 .devbook:hover div {
-	background: url("../images/devbook.svg") no-repeat center / contain;
+	background: url("../images/devbook-selected.svg") no-repeat center / contain;
 }
 
 .textbook:hover div {
-	background: url("../images/textbook.svg") no-repeat center / contain;
+	background: url("../images/textbook-selected.svg") no-repeat center / contain;
 }
 
 .md-typeset .grid .card {
@@ -161,21 +161,21 @@
 	background: url("../images/userbook.svg") no-repeat;
 	background-size: 1.4rem;
 	background-position: left center;
-	filter: opacity(25%);
+	filter: opacity(50%);
 }
 
 .md-tabs .md-tabs__item:nth-child(3) {
 	background: url("../images/devbook.svg") no-repeat;
 	background-size: 1.4rem;
 	background-position: left center;
-	filter: opacity(25%);
+	filter: opacity(50%);
 }
 
 .md-tabs .md-tabs__item:nth-child(4) {
 	background: url("../images/textbook.svg") no-repeat;
 	background-size: 1.4rem;
 	background-position: left center;
-	filter: opacity(25%);
+	filter: opacity(50%);
 }
 
 .md-tabs .md-tabs__item:nth-child(2):hover,
@@ -185,21 +185,21 @@
 }
 
 .md-tabs .md-tabs__item--active:nth-child(2) {
-	background: url("../images/userbook.svg") no-repeat;
+	background: url("../images/userbook-selected.svg") no-repeat;
 	background-size: 2.4rem;
 	background-position: left center;
 	filter: none;
 }
 
 .md-tabs .md-tabs__item--active:nth-child(3) {
-	background: url("../images/devbook.svg") no-repeat;
+	background: url("../images/devbook-selected.svg") no-repeat;
 	background-size: 2.4rem;
 	background-position: left center;
 	filter: none;
 }
 
 .md-tabs .md-tabs__item--active:nth-child(4) {
-	background: url("../images/textbook.svg") no-repeat;
+	background: url("../images/textbook-selected.svg") no-repeat;
 	background-size: 2.4rem;
 	background-position: left center;
 	filter: none;
