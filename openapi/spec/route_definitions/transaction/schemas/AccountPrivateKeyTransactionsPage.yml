@@ -20,13 +20,14 @@ properties:
       256-bit SHA3 hash encoded as a hexadecimal string (64 characters).
       Optional pagination cursor: when supplied, the list returns transactions that appeared **before** this transaction.
       Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention
-      window (`nis.transactionHashRetentionTime`); after that time the hash is removed from the node's cache and the request will fail.
-      Obtain this from `meta.hash` of a transaction in a previous response.
+      window (`nis.transactionHashRetentionTime`); after that time the hash is removed from the node's cache and
+      the request will fail. Obtain this from `meta.hash` of a transaction in a previous response.
   id:
     type: string
     description: |
       Optional pagination cursor: node database identifier of the transaction. When supplied, the list returns transactions
-      that appeared **before** this transaction. Works on all nodes. Obtain this from `meta.id` of a transaction in a previous response.
+      that appeared **before** this transaction. Works on all nodes. Obtain this from `meta.id` of a transaction
+      in a previous response.
     examples:
       - "100"
   pageSize:

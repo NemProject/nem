@@ -54,14 +54,16 @@ allOf:
           - `62` (`FAILURE_DESTINATION_ACCOUNT_IN_USE`): Validation failed because the delegated (harvesting)
             account is not eligible. The account must have balance zero (no XEM). It must also have no mosaics,
             own no namespaces, and must not be a multisig or cosignatory.
-          - `63` (`FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS`): Validation failed because previous importance transfer change is in progress
+          - `63` (`FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS`): Validation failed because previous importance transfer
+            change is in progress
           - `64` (`FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED`): Validation failed because
             importance transfer activation was attempted while already activated.
           - `65` (`FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE`): Validation failed because importance
             transfer deactivation was attempted while already deactivated.
           - `66` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE`): Validation failed because transaction
             is using delegated account in an improper way.
-          - `71` (`FAILURE_MULTISIG_NOT_A_COSIGNER`): Validation failed because signer is not a cosigner of given multisig account.
+          - `71` (`FAILURE_MULTISIG_NOT_A_COSIGNER`): Validation failed because signer is not a cosigner
+            of given multisig account.
           - `72` (`FAILURE_MULTISIG_INVALID_COSIGNERS`): Validation failed because the cosignatories
             attached to a multisig transaction were invalid.
           - `73` (`FAILURE_MULTISIG_NO_MATCHING_MULTISIG`): Validation failed because a multisig signature
@@ -69,7 +71,8 @@ allOf:
           - `74` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG`): Validation failed because multisig
             account tried to make transaction that is not allowed. Multisig accounts are not allowed
             to initiate any transaction (only cosignatories are allowed to do so).
-          - `75` (`FAILURE_MULTISIG_ALREADY_A_COSIGNER`): Validation failed because signer is already a cosigner of given multisig account.
+          - `75` (`FAILURE_MULTISIG_ALREADY_A_COSIGNER`): Validation failed because signer is already a cosigner
+            of given multisig account.
           - `76` (`FAILURE_MULTISIG_MISMATCHED_SIGNATURE`): Validation failed because a multisig signature
             is attached to an incorrect multisig transaction.
           - `77` (`FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES`): Validation failed because a multisig
@@ -96,7 +99,8 @@ allOf:
           - `121` (`FAILURE_NAMESPACE_UNKNOWN`): Validation failed because the namespace is unknown.
           - `122` (`FAILURE_NAMESPACE_ALREADY_EXISTS`): Validation failed because the namespace already exists.
           - `123` (`FAILURE_NAMESPACE_EXPIRED`): Validation failed because the namespace has expired.
-          - `124` (`FAILURE_NAMESPACE_OWNER_CONFLICT`): Validation failed because the transaction signer is not the owner of the namespace.
+          - `124` (`FAILURE_NAMESPACE_OWNER_CONFLICT`): Validation failed because the transaction signer is not the owner
+            of the namespace.
           - `125` (`FAILURE_NAMESPACE_INVALID_NAME`): Validation failed because the name for the namespace is invalid.
           - `126` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`): Validation failed because the specified
             namespace rental fee sink is invalid.
@@ -107,12 +111,15 @@ allOf:
           - `141` (`FAILURE_MOSAIC_UNKNOWN`): Validation failed because the mosaic is unknown.
           - `142` (`FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED`): Validation failed because the modification
             of the existing mosaic is not allowed.
-          - `143` (`FAILURE_MOSAIC_CREATOR_CONFLICT`): Validation failed because the transaction signer is not the creator of the mosaic.
+          - `143` (`FAILURE_MOSAIC_CREATOR_CONFLICT`): Validation failed because the transaction signer is not the creator
+            of the mosaic.
           - `144` (`FAILURE_MOSAIC_SUPPLY_IMMUTABLE`): Validation failed because the mosaic supply is immutable.
-          - `145` (`FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED`): Validation failed because the maximum overall mosaic supply is exceeded.
+          - `145` (`FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED`): Validation failed because the maximum overall mosaic
+            supply is exceeded.
           - `146` (`FAILURE_MOSAIC_SUPPLY_NEGATIVE`): Validation failed because the resulting mosaic supply would be negative.
           - `147` (`FAILURE_MOSAIC_NOT_TRANSFERABLE`): Validation failed because the mosaic is not transferable.
-          - `148` (`FAILURE_MOSAIC_DIVISIBILITY_VIOLATED`): Validation failed because the divisibility of the mosaic is violated.
+          - `148` (`FAILURE_MOSAIC_DIVISIBILITY_VIOLATED`): Validation failed because the divisibility of
+            the mosaic is violated.
           - `149` (`FAILURE_CONFLICTING_MOSAIC_CREATION`): Validation failed because conflicting mosaic creation is present.
           - `150` (`FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK`): Validation failed because the mosaic creation fee sink is invalid.
           - `151` (`FAILURE_MOSAIC_INVALID_CREATION_FEE`): Validation failed because the specified creation fee is invalid.

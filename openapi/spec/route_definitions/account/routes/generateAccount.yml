@@ -12,12 +12,14 @@ description: |
 
   **Security:** For typical use (wallets, client applications), this is considered secure: `SecureRandom` is backed by
   the operating system's entropy source (e.g. `/dev/urandom` on Linux) and is appropriate for key generation.
-  If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could theoretically be weaker;
-  the NEM client relies entirely on the JVM and OS for randomness quality and does not perform additional entropy checks or seeding.
+  If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could
+  theoretically be weaker; the NEM client relies entirely on the JVM and OS for randomness quality and does not perform
+  additional entropy checks or seeding.
 
-  ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted IP addresses.
-  By default, it is available only from the machine where the REST server is running (localhost).
-  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted
+  IP addresses. By default, it is available only from the machine where the REST server is running (localhost).
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+  in the NEM client configuration file.
 operationId: generateAccount
 responses:
   '200':

@@ -23,12 +23,15 @@ content:
                 - `address must be valid`: One or more addresses provided in the request are invalid.
                   All addresses are validated prior to processing.
                 - `JSON Object was expected`: A required parameter is missing or the request body is not valid JSON.
-                - `height must be positive`: The supplied block height is zero or negative. Block height values must be greater than zero.
+                - `height must be positive`: The supplied block height is zero or negative. Block height values must be
+                  greater than zero.
                 - `'11źż' is not a valid namespace id part`: The provided namespace identifier contains invalid characters
                   or does not conform to the required format.
                 - `FAILURE_UNKNOWN_ACCOUNT`: Harvesting could not be started for account because it is unknown.
-                - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible for harvesting.
-                - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked from harvesting.
+                - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible
+                  for harvesting.
+                - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked
+                  from harvesting.
                 - `FAILURE_SERVER_LIMIT`: Harvesting could not be started for account because the server limit has been hit.
     examples:
       invalidAddress:

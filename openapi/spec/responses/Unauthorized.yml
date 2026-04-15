@@ -44,7 +44,8 @@ content:
         value:
           timeStamp: 342379945
           error: Unauthorized
-          message: remote 10.0.0.5 attempted to call local /account/unlock with non-remote address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
+          message: remote 10.0.0.5 attempted to call local /account/unlock with
+            non-remote address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
           status: 401
       keyNotInConfiguredList:
         summary: Private key not in allowed list
