@@ -1,20 +1,21 @@
 description: |
-  The request is unauthorized (HTTP 401). This can occur when a local-only endpoint is called from a remote address,
-  when a harvesting-related request from remote uses a non-delegated private key, or when the private key is not in the node's allowed harvester list.
+  The request is unauthorized (HTTP 401). This can occur when a local-only endpoint is called
+  from a remote address, when a harvesting-related request from remote uses a non-delegated
+  private key, or when the private key is not in the node's allowed harvester list.
   See the examples below for typical response bodies.
 content:
   application/json:
     schema:
       description: Unauthorized response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Unauthorized`.
-              const: "Unauthorized"
+              const: Unauthorized
               examples:
-                - "Unauthorized"
+                - Unauthorized
             status:
               description: The HTTP status code of the response. Always `401`.
               const: 401
@@ -24,29 +25,32 @@ content:
               description: |
                 Detailed error message describing the failure. Examples:
                 - `remote ... attempted to call local /node/boot`: Local API was called from a remote address.
-                - `remote ... attempted to call local /account/unlock with non-remote address ...`: Start harvesting was called with a non-delegated key from a remote address.
+                - `remote ... attempted to call local /account/unlock with non-remote address ...`:
+                  Start harvesting was called with a non-delegated key from a remote address.
     examples:
       localOnlyFromRemote:
         summary: Local-only endpoint called from remote
         description: The endpoint is restricted to the local machine; the request came from a non-trusted IP.
         value:
           timeStamp: 342379944
-          error: "Unauthorized"
-          message: "remote 192.168.1.10 attempted to call local /account/generate"
+          error: Unauthorized
+          message: remote 192.168.1.10 attempted to call local /account/generate
           status: 401
       nonDelegatedKeyFromRemote:
         summary: Non-delegated private key from remote
-        description: Harvesting-related request from a remote address used the main account key instead of the delegated (remote harvester) key.
+        description: >-
+          Harvesting-related request from a remote address used the main
+          account key instead of the delegated (remote harvester) key.
         value:
           timeStamp: 342379945
-          error: "Unauthorized"
-          message: "remote 10.0.0.5 attempted to call local /account/unlock with non-remote address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK"
+          error: Unauthorized
+          message: remote 10.0.0.5 attempted to call local /account/unlock with non-remote address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
           status: 401
       keyNotInConfiguredList:
         summary: Private key not in allowed list
         description: The node is configured with allowed harvester addresses; the supplied private key does not match any of them.
         value:
           timeStamp: 342379946
-          error: "Unauthorized"
-          message: "blocking private key request with non-configured address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK"
+          error: Unauthorized
+          message: blocking private key request with non-configured address NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
           status: 401

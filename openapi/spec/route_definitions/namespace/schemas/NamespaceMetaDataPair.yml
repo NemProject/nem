@@ -4,6 +4,6 @@ required:
   - namespace
 properties:
   meta:
-    $ref: "./NamespaceMetaData.yml"
+    $ref: ./NamespaceMetaData.yml
   namespace:
-    $ref: "./Namespace.yml"
+    $ref: ./Namespace.yml

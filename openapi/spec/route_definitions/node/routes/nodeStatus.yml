@@ -8,14 +8,14 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/NodeStatusResult.yml"
+          $ref: ../schemas/NodeStatusResult.yml
         examples:
           ok:
             value:
               type: 4
               code: 3
-              message: "status"
+              message: status
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml

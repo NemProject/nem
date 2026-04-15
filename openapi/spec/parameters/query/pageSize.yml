@@ -2,7 +2,7 @@ name: pageSize
 in: query
 description: Number of entries to return.
 schema:
-  $ref: "../../schemas/PageSize.yml"
+  $ref: ../../schemas/PageSize.yml
 examples:
   default:
     value: 25

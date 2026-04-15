@@ -6,10 +6,10 @@ description: |
   If the optional parent parameter is supplied, only sub-namespaces of the given parent namespace are returned.
 operationId: getNamespaces
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
-  - $ref: "../../../parameters/query/id.yml"
-  - $ref: "../../../parameters/query/pageSize.yml"
-  - $ref: "../../../parameters/query/parentNamespace.yml"
+  - $ref: ../../../parameters/query/address.yml
+  - $ref: ../../../parameters/query/id.yml
+  - $ref: ../../../parameters/query/pageSize.yml
+  - $ref: ../../../parameters/query/parentNamespace.yml
 responses:
   '200':
     description: Namespaces owned by the account retrieved successfully.
@@ -23,10 +23,10 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/Namespace.yml"
+                $ref: ../schemas/Namespace.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

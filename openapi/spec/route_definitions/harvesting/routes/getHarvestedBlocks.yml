@@ -8,9 +8,9 @@ description: |
   starting from a given block identifier and supports pagination.
 operationId: getHarvestedBlocks
 parameters:
-  - $ref: "../../../parameters/query/addressFilter.yml"
-  - $ref: "../../../parameters/query/id.yml"
-  - $ref: "../../../parameters/query/pageSize.yml"
+  - $ref: ../../../parameters/query/addressFilter.yml
+  - $ref: ../../../parameters/query/id.yml
+  - $ref: ../../../parameters/query/pageSize.yml
 responses:
   '200':
     description: Successfully returned harvested info for the account.
@@ -25,7 +25,7 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/HarvestInfo.yml"
+                $ref: ../schemas/HarvestInfo.yml
         examples:
           default:
             summary: Harvested blocks for account
@@ -37,8 +37,8 @@ responses:
                   id: 1262068
                   height: 37015
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

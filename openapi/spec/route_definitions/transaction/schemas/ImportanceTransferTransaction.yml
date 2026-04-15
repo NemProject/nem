@@ -5,7 +5,7 @@ description: |
   Once an importance transfer transaction has been included in a block,
   it needs 6 hours to become active.
 allOf:
-  - $ref: "./Transaction.yml"
+  - $ref: ./Transaction.yml
   - type: object
     description: Importance transfer transaction object.
     required:
@@ -22,6 +22,6 @@ allOf:
           - 1: Activate delegated harvesting
           - 2: Deactivate delegated harvesting
       remoteAccount:
-        $ref: "../../../schemas/PublicKey.yml"
+        $ref: ../../../schemas/PublicKey.yml
         description: |
-          The public key (256-bit encoded as a hexadecimal string - 64 characters) of the delegated (remote) account. 
+          The public key (256-bit encoded as a hexadecimal string - 64 characters) of the delegated (remote) account.

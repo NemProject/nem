@@ -4,14 +4,14 @@ content:
     schema:
       description: Bad request response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Bad Request`.
-              const: "Bad Request"
+              const: Bad Request
               examples:
-                - "Bad Request"
+                - Bad Request
             status:
               description: The HTTP status code of the response. Always `400`.
               const: 400
@@ -36,14 +36,14 @@ content:
         description: The provided address is not valid.
         value:
           timeStamp: 342378866
-          error: "Bad Request"
-          message: "address must be valid"
+          error: Bad Request
+          message: address must be valid
           status: 400
       invalidPublicKey:
         summary: Invalid public key format
         description: The provided public key is not in compressed form.
         value:
           timeStamp: 342378753
-          error: "Bad Request"
-          message: "publicKey must be in compressed form"
+          error: Bad Request
+          message: publicKey must be in compressed form
           status: 400

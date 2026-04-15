@@ -2,4 +2,4 @@ type: string
 description: Fully qualified namespace identifier (e.g., `makoto.metal.coins`).
 minLength: 1
 examples:
-  - "makoto.metal.coins"
+  - makoto.metal.coins

@@ -12,26 +12,26 @@ description: |
   The namespace must exist and be active; otherwise the request fails with HTTP `404 Not Found` (`ResourceNotFound`).
 operationId: getNamespace
 parameters:
-  - $ref: "../../../parameters/query/namespace.yml"
+  - $ref: ../../../parameters/query/namespace.yml
 responses:
   '200':
     description: Namespace information retrieved successfully.
     content:
       application/json:
         schema:
-          $ref: "../schemas/Namespace.yml"
+          $ref: ../schemas/Namespace.yml
         examples:
           default:
             summary: Namespace with fully-qualified name and owner
             value:
-              fqn: "makoto.metal.coins"
-              owner: "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH"
+              fqn: makoto.metal.coins
+              owner: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
               height: 13465
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

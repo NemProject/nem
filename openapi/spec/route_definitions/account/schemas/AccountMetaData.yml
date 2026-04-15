@@ -7,16 +7,16 @@ required:
   - cosignatories
 properties:
   status:
-    $ref: "./AccountStatus.yml"
+    $ref: ./AccountStatus.yml
   remoteStatus:
-    $ref: "./AccountRemoteStatus.yml"
+    $ref: ./AccountRemoteStatus.yml
   cosignatoryOf:
     type: array
     description: Accounts for which this account is a cosignatory.
     items:
-      $ref: "./AccountInfo.yml"
+      $ref: ./AccountInfo.yml
   cosignatories:
     type: array
     description: Accounts that are cosignatories of this account.
     items:
-      $ref: "./AccountInfo.yml"
+      $ref: ./AccountInfo.yml

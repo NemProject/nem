@@ -9,23 +9,25 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../../block/schemas/Block.yml"
+          $ref: ../../block/schemas/Block.yml
         examples:
           mainnetLastBlock:
             summary: Example last block (main network)
             value:
               timeStamp: 9232968
-              signature: "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05"
+              signature: "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c\
+                3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67d\
+                aefcf1952f71bc36f747c8a738036b05"
               prevBlockHash:
-                data: "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
+                data: 58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6
                 type: 1
-              transactions: [ ]
+              transactions: []
               version: 1744830465
-              signer: "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7"
+              signer: 2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7
               height: 42804
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

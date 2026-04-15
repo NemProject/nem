@@ -4,5 +4,5 @@ properties:
   data:
     type: array
     items:
-      $ref: "./ExpiredMosaic.yml"
+      $ref: ./ExpiredMosaic.yml
     description: List of expired/restored mosaic entries (one per mosaic id at that height).

@@ -6,7 +6,7 @@ description: |
   The account is identified by its address, which is provided as a query parameter.
 operationId: getMosaicOwnedDefinition
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
+  - $ref: ../../../parameters/query/address.yml
 responses:
   '200':
     description: Mosaic definitions successfully retrieved.
@@ -21,12 +21,12 @@ responses:
             data:
               type: array
               items:
-                $ref: "../../transaction/schemas/MosaicDefinition.yml"
+                $ref: ../../transaction/schemas/MosaicDefinition.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

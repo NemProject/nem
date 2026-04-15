@@ -7,12 +7,12 @@ required:
   - hash
 properties:
   height:
-    $ref: "../../../schemas/BlockHeight.yml"
+    $ref: ../../../schemas/BlockHeight.yml
   id:
     type: integer
     description: Internal (database) transaction identifier.
   hash:
-    $ref: "../../../schemas/HashReference.yml"
+    $ref: ../../../schemas/HashReference.yml
     description: The hash of the transaction.
   innerHash:
     type: object
@@ -22,4 +22,4 @@ properties:
       When the transaction is not multisig, the object is empty `{}`.
     properties:
       data:
-        $ref: "../../../schemas/Hash.yml"
+        $ref: ../../../schemas/Hash.yml

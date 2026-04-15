@@ -4,7 +4,7 @@ required: true
 description: |
   The 256-bit SHA3 hash of the transaction (64 hexadecimal characters).
 schema:
-  $ref: "../../schemas/Hash.yml"
+  $ref: ../../schemas/Hash.yml
 examples:
   default:
-    value: "81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8"
+    value: 81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8

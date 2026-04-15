@@ -5,7 +5,7 @@ description: |
   Returns a list of mosaics (mosaic ID and quantity) owned by the specified account address.
 operationId: getMosaicOwned
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
+  - $ref: ../../../parameters/query/address.yml
 responses:
   '200':
     description: Mosaics successfully retrieved.
@@ -20,10 +20,10 @@ responses:
             data:
               type: array
               items:
-                $ref: "../../../schemas/Mosaic.yml"
+                $ref: ../../../schemas/Mosaic.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

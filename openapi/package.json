@@ -4,13 +4,20 @@
   "description": "OpenAPI Specification of NEM Client API",
   "main": "index.js",
   "scripts": {
-    "test": "redocly lint _build/openapi3.yml",
-    "build": "redocly bundle ./spec/openapi.yml -o _build/openapi3.yml",
-    "version": "echo $npm_package_version"
+    "lint:openapi": "redocly lint spec/openapi.yml",
+    "lint": "npm run lint:openapi",
+    "test": "npm run verify-links",
+    "verify-links": "markdown-link-check _build/openapi3.yml -c .markdown-link-check.json -q",
+    "build": "redocly bundle spec/openapi.yml -o _build/openapi3.yml && redocly bundle spec/openapi.yml -o _build/openapi3.json",
+    "postman": "openapi2postmanv2 -s _build/openapi3.yml -o _build/postman.json -p",
+    "version": "echo $npm_package_version",
+    "version:prepare": "mkdir -p _build/v$npm_package_version",
+    "version:pack": "cp _build/openapi3.yml _build/openapi3.json _build/postman.json _build/v$npm_package_version"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NemProject/nem.git"
+    "url": "git+https://github.com/NemProject/nem.git",
+    "directory": "openapi"
   },
   "license": "Apache 2.0",
   "bugs": {
@@ -19,6 +26,8 @@
   "homepage": "https://github.com/NemProject/nem/tree/dev/openapi",
   "dependencies": {},
   "devDependencies": {
-    "@redocly/cli": "2.15.0"
+    "@redocly/cli": "^1.25.0",
+    "markdown-link-check": "^3.14.2",
+    "openapi-to-postmanv2": "^6.0.0"
   }
 }

@@ -13,5 +13,5 @@ properties:
     examples:
       - Alice
   public-key:
-    $ref: "../../../schemas/PublicKey.yml"
+    $ref: ../../../schemas/PublicKey.yml
     description: Public key used to identify the node.

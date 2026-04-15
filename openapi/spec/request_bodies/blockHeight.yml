@@ -1,7 +1,7 @@
 content:
   application/json:
     schema:
-      $ref: "../schemas/BlockReference.yml"
+      $ref: ../schemas/BlockReference.yml
     examples:
       default:
         summary: Block height for request

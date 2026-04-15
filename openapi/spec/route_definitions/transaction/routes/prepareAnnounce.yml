@@ -3,11 +3,11 @@ tags:
 summary: Prepare and announce a transaction
 description: |
   Creates, signs, and broadcasts a transaction to the NEM network.
-  
+
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
   You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
-  
+
   This endpoint requires the sender’s private key, which the NEM client uses to sign the transaction before announcing it to the network.
 operationId: prepareAnnounceTransaction
 requestBody:
@@ -15,30 +15,30 @@ requestBody:
   content:
     application/json:
       schema:
-        $ref: "../schemas/PrepareAnnounceRequest.yml"
+        $ref: ../schemas/PrepareAnnounceRequest.yml
 responses:
   '200':
     description: Transaction successfully announced.
     content:
       application/json:
         schema:
-          $ref: "../schemas/AnnounceResult.yml"
+          $ref: ../schemas/AnnounceResult.yml
         examples:
           success:
             summary: Transaction signed and announced
             value:
               type: 1
               code: 1
-              message: "SUCCESS"
+              message: SUCCESS
               transactionHash:
-                data: "c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+                data: c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586
               innerTransactionHash:
-                data: "cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+                data: cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '401':
-    $ref: "../../../responses/Unauthorized.yml"
+    $ref: ../../../responses/Unauthorized.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

@@ -2,6 +2,6 @@ type: string
 description: 256-bit private key encoded as a hexadecimal string (64 hex characters).
 minLength: 64
 maxLength: 64
-pattern: '^[0-9a-fA-F]{64}$'
+pattern: ^[0-9a-fA-F]{64}$
 examples:
-  - "a04cd0fce20b0806bef448d273d47d4a15945f46716d198b506cbf1c44650f42"
+  - a04cd0fce20b0806bef448d273d47d4a15945f46716d198b506cbf1c44650f42

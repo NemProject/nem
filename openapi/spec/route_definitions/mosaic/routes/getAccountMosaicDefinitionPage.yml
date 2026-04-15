@@ -6,10 +6,10 @@ description: |
   Results can be optionally filtered by a parent namespace and retrieved in pages using a cursor-based pagination mechanism.
 operationId: getAccountMosaicDefinitionPage
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
-  - $ref: "../../../parameters/query/parentNamespace.yml"
-  - $ref: "../../../parameters/query/id.yml"
-  - $ref: "../../../parameters/query/pageSize.yml"
+  - $ref: ../../../parameters/query/address.yml
+  - $ref: ../../../parameters/query/parentNamespace.yml
+  - $ref: ../../../parameters/query/id.yml
+  - $ref: ../../../parameters/query/pageSize.yml
 responses:
   '200':
     description: Mosaic definitions successfully retrieved.
@@ -23,12 +23,12 @@ responses:
             data:
               type: array
               items:
-                $ref: "../../transaction/schemas/MosaicDefinition.yml"
+                $ref: ../../transaction/schemas/MosaicDefinition.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

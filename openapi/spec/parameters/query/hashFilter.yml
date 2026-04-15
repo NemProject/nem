@@ -5,11 +5,14 @@ description: |
   When supplied, the request returns transactions that appeared directly before this transaction,
   in the order defined by the request criteria.
 
-  Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention window (`nis.transactionHashRetentionTime`). 
-  Even when the feature is enabled, hashes older than this window are removed from the node's cache and will cause the request to fail. 
-  Obtain this from `meta.hash` of a transaction in a previous list response. For reliable pagination on any node, prefer using the `id` parameter instead.
+  Requires the transaction hash lookup (hash retention) feature and a hash that is still within
+  the retention window (`nis.transactionHashRetentionTime`).
+  Even when the feature is enabled, hashes older than this window are removed from the node's
+  cache and will cause the request to fail.
+  Obtain this from `meta.hash` of a transaction in a previous list response.
+  For reliable pagination on any node, prefer using the `id` parameter instead.
 schema:
-  $ref: "../../schemas/Hash.yml"
+  $ref: ../../schemas/Hash.yml
 examples:
   default:
-    value: "81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8"
+    value: 81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8

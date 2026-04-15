@@ -3,5 +3,5 @@ required:
   - id
 properties:
   id:
-    $ref: "../../../schemas/DatabaseId.yml"
+    $ref: ../../../schemas/DatabaseId.yml
     description: Mosaic database identifier used for paging.

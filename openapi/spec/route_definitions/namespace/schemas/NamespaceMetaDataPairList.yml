@@ -5,4 +5,4 @@ properties:
   data:
     type: array
     items:
-      $ref: "./NamespaceMetaDataPair.yml"
+      $ref: ./NamespaceMetaDataPair.yml

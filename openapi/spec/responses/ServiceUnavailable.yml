@@ -4,14 +4,14 @@ content:
     schema:
       description: Service unavailable response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Service Unavailable`.
-              const: "Service Unavailable"
+              const: Service Unavailable
               examples:
-                - "Service Unavailable"
+                - Service Unavailable
             status:
               description: The HTTP status code of the response. Always `503`.
               const: 503
@@ -29,6 +29,6 @@ content:
         description: The node is currently loading the blockchain and cannot process requests.
         value:
           timeStamp: 342377277
-          error: "Service Unavailable"
-          message: "NIS_ILLEGAL_STATE_LOADING_CHAIN"
+          error: Service Unavailable
+          message: NIS_ILLEGAL_STATE_LOADING_CHAIN
           status: 503

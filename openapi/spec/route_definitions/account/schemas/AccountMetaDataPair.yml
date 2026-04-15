@@ -6,6 +6,6 @@ required:
   - meta
 properties:
   account:
-    $ref: "./AccountInfo.yml"
+    $ref: ./AccountInfo.yml
   meta:
-    $ref: "./AccountMetaData.yml"
+    $ref: ./AccountMetaData.yml

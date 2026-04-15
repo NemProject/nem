@@ -9,7 +9,7 @@ properties:
     type: integer
     description: |
       Levy type:
-      - `1`: Absolute fee: The fee is specified as absolute quantity and thus does not depend on the quantity 
+      - `1`: Absolute fee: The fee is specified as absolute quantity and thus does not depend on the quantity
         that is transferred.
       - `2`: Percentage fee: The fee is specified as a percentage of the quantity transferred.
         The fee increases linearly with the transferred mosaic quantity.
@@ -18,15 +18,15 @@ properties:
       - 1
       - 2
   recipient:
-    $ref: "../../../schemas/Address.yml"
+    $ref: ../../../schemas/Address.yml
     description: Recipient (40 characters, Base32-encoded, checksum-validated) of the levy. This can be any account.
   mosaicId:
-    $ref: "../../../schemas/MosaicId.yml"
+    $ref: ../../../schemas/MosaicId.yml
     description: |
       ID of the mosaic in which the fee must be paid. Any existing mosaic can be specified.
       For fees in XEM, use the mosaic ID `nem:xem`.
   fee:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: |
       Fee value. Interpretation depends on `type`:
       - Type `1` (Absolute): fee is the exact quantity to charge (same units as the levy mosaic).

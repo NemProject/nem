@@ -59,4 +59,4 @@ properties:
       The format is free-form and intended for diagnostics / debugging only; clients
       should not rely on a strict schema here.
     examples:
-      - "Oracle Corporation (1.8.0_151) on Linux"
+      - Oracle Corporation (1.8.0_151) on Linux

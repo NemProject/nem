@@ -7,7 +7,7 @@ description: |
   The request body contains a list of account identifiers.
 operationId: getAccountsBatch
 requestBody:
-  $ref: "../../../request_bodies/accounts.yml"
+  $ref: ../../../request_bodies/accounts.yml
 responses:
   '200':
     description: Successfully fetched list of account data.
@@ -22,10 +22,10 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/AccountMetaDataPair.yml"
+                $ref: ../schemas/AccountMetaDataPair.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

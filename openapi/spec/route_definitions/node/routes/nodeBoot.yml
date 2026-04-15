@@ -11,7 +11,8 @@ description: |
   Boot state is **not persisted**: after restarting the NEM client process, the node must be booted again, either via
   configuration (auto-boot) or by calling this endpoint.
 
-  If you call this endpoint when the node is already booted, the request fails with HTTP `503 Service Unavailable` and message `NIS_ILLEGAL_STATE_ALREADY_BOOTED`.
+  If you call this endpoint when the node is already booted, the request fails with
+  HTTP `503 Service Unavailable` and message `NIS_ILLEGAL_STATE_ALREADY_BOOTED`.
 
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
@@ -22,26 +23,26 @@ requestBody:
   content:
     application/json:
       schema:
-        $ref: "../schemas/BootNodeRequest.yml"
+        $ref: ../schemas/BootNodeRequest.yml
       examples:
         default:
           summary: Boot local NEM client node
           value:
             metaData:
-              application: "NIS"
+              application: NIS
             endpoint:
-              protocol: "http"
-              host: "localhost"
+              protocol: http
+              host: localhost
               port: 7890
             identity:
-              private-key: "a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f"
-              name: "Alice"
+              private-key: a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f
+              name: Alice
 responses:
   '200':
     description: Indicates that the node was successfully booted. No content is returned.
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

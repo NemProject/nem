@@ -10,7 +10,7 @@ required:
   - private-key
 properties:
   private-key:
-    $ref: "../../../schemas/PrivateKey.yml"
+    $ref: ../../../schemas/PrivateKey.yml
     description: |
       Node boot key (private key) used to create the local node identity. Transmit only to localhost or a trusted host.
       Format: 256-bit private key encoded as a hexadecimal string (64 hex characters).

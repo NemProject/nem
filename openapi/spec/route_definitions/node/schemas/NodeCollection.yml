@@ -6,29 +6,29 @@ properties:
   active:
     type: array
     description: |
-      Nodes that have this status can be successfully communicated with. 
+      Nodes that have this status can be successfully communicated with.
       Whenever a node is selecting another node for communication, it will pick one from this list.
     items:
-      $ref: "./Node.yml"
+      $ref: ./Node.yml
   busy:
     type: array
     description: |
-      A node is set to status 'busy' if a connection can be established but the node did not answer 
+      A node is set to status 'busy' if a connection can be established but the node did not answer
       a request within a certain time limit.
     items:
-      $ref: "./Node.yml"
+      $ref: ./Node.yml
   inactive:
     type: array
     description: Inactive nodes are nodes with which it is not possible to establish a connection.
     items:
-      $ref: "./Node.yml"
+      $ref: ./Node.yml
   failure:
     type: array
     description: |
       The failure status is assigned to a remote node when a severe error occurs during communication,
       for example a different protocol version or an unexpected node identity.
     items:
-      $ref: "./Node.yml"
+      $ref: ./Node.yml
 required:
   - active
   - busy

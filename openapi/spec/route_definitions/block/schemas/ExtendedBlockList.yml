@@ -7,4 +7,4 @@ properties:
   data:
     type: array
     items:
-      $ref: "./ExtendedBlock.yml"
+      $ref: ./ExtendedBlock.yml

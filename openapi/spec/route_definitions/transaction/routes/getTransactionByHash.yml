@@ -7,7 +7,8 @@ description: |
   **Retention window**
 
   Transactions can be looked up by hash only while the hash is in the node's in-memory cache.
-  Once the retention period expires, the hash is removed and this endpoint can no longer return that transaction, even if it is already in a block.
+  Once the retention period expires, the hash is removed and this endpoint can no longer
+  return that transaction, even if it is already in a block.
 
   The cache duration is set by `nis.transactionHashRetentionTime` (in hours). Default is 36 hours.
   Minimum is 36 hours unless the value is -1 (infinite retention). There is no fixed maximum; it depends on node configuration.
@@ -18,24 +19,29 @@ description: |
   This endpoint is only available when the node has the transaction-hash-lookup feature (`TRANSACTION_HASH_LOOKUP`) enabled.
   When it is disabled, lookup by hash is not available at all - you cannot search for a transaction by its hash on that node.
   To check: call `GET /node/info` and inspect `metaData.features`. If `(metaData.features & 0x1) !== 0`, the node supports lookup by hash.
-  There is no single API that returns a list of nodes supporting this feature; you must query each node's info and test the `features` bitmask.
+  There is no single API that returns a list of nodes supporting this feature;
+  you must query each node's info and test the `features` bitmask.
 
   Errors:
-  - Unsupported feature: HTTP 500 with message like `this node does not support transaction lookup using a hash`. The node does not support this endpoint.
-  - Hash not found: HTTP 400 with message `Hash was not found in cache`. The hash is not in the cache—either it never existed on this node or it has expired from the retention window. The response does not distinguish between these two cases.
+  - Unsupported feature: HTTP 500 with message like
+    `this node does not support transaction lookup using a hash`.
+    The node does not support this endpoint.
+  - Hash not found: HTTP 400 with message `Hash was not found in cache`.
+    The hash is not in the cache—either it never existed on this node or it has expired
+    from the retention window. The response does not distinguish between these two cases.
 operationId: getTransactionByHash
 parameters:
-  - $ref: "../../../parameters/query/hash.yml"
+  - $ref: ../../../parameters/query/hash.yml
 responses:
   '200':
     description: Successfully returned transaction data.
     content:
       application/json:
         schema:
-          $ref: "../schemas/TransactionMetaDataPair.yml"
+          $ref: ../schemas/TransactionMetaDataPair.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

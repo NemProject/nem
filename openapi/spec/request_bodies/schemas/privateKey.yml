@@ -1,4 +1,4 @@
 type: object
 properties:
   value:
-    $ref: "../../schemas/PrivateKey.yml"
+    $ref: ../../schemas/PrivateKey.yml

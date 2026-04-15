@@ -4,8 +4,16 @@ summary: Return incoming connections
 description: |
   Returns a request audit of HTTP requests that other clients or nodes have sent to this node's REST API.
 
-  For each request the node records the caller's host (IP), the API path (e.g. `/chain/score`, `/node/info`), start time, and elapsed time. The response has two lists: **outstanding** (requests currently in progress) and **most-recent** (a sliding window of the latest requests). So you can see who is calling the node, which endpoints are hit, and how long requests take—useful for debugging connectivity, load, or slow endpoints.
-  The node records each incoming request and exposes this trace via the API. It is a request log/trace for inspection, not a security or compliance audit. What is special is that you get a live view of in-flight requests and a short history of recent ones without parsing server logs.
+  For each request the node records the caller's host (IP), the API path
+  (e.g. `/chain/score`, `/node/info`), start time, and elapsed time.
+  The response has two lists: **outstanding** (requests currently in progress) and
+  **most-recent** (a sliding window of the latest requests). So you can see who is calling
+  the node, which endpoints are hit, and how long requests take—useful for debugging
+  connectivity, load, or slow endpoints.
+  The node records each incoming request and exposes this trace via the API. It is a request
+  log/trace for inspection, not a security or compliance audit. What is special is that you
+  get a live view of in-flight requests and a short history of recent ones without parsing
+  server logs.
 operationId: getDebugIncomingConnections
 responses:
   '200':
@@ -13,10 +21,10 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/ConnectionAuditResult.yml"
+          $ref: ../schemas/ConnectionAuditResult.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

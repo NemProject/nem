@@ -3,7 +3,7 @@ tags:
 summary: Return all known nodes in the neighborhood of the queried node
 description: |
   Gets a collection of all nodes currently known by the queried node, grouped by their connection status.
-  
+
   The response contains arrays of nodes categorized by status:
     - `active`: node is reachable and responsive
     - `busy`: node is reachable but does not respond within timeout
@@ -16,10 +16,10 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/NodeCollection.yml"
+          $ref: ../schemas/NodeCollection.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

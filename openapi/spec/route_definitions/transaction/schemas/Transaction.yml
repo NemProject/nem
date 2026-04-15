@@ -8,7 +8,7 @@ required:
   - signer
 properties:
   timeStamp:
-    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    $ref: ../../../schemas/NetworkTimeStamp.yml
     description: |
       Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
       Creation time of the transaction. Future timestamps are not allowed; validation returns an error.
@@ -18,14 +18,14 @@ properties:
       - type: string
       - type: "null"
     description: |
-      The transaction signature. 
-      The transaction signature is validated using the supplied public key in the field signer. 
+      The transaction signature.
+      The transaction signature is validated using the supplied public key in the field signer.
       If the signature is not valid, an error is returned from validation.
   fee:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: |
-      The fee (in micro XEM) for the transaction. The higher the fee, the higher is the priority of the transaction. 
-      Transactions with high priority get included in a block before transactions with lower priority. 
+      The fee (in micro XEM) for the transaction. The higher the fee, the higher is the priority of the transaction.
+      Transactions with high priority get included in a block before transactions with lower priority.
       If the sender does not have enough funds the validation will result in an error.
   type:
     type: integer
@@ -40,15 +40,17 @@ properties:
       - `16385`: Mosaic Definition Creation Transaction
       - `16386`: Mosaic Supply Change Transaction
   deadline:
-    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    $ref: ../../../schemas/NetworkTimeStamp.yml
     description: |
       Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
       Deadline for the transaction; if not included in a block before this time, the transaction is discarded.
   version:
     type: integer
     description: |
-      The transaction version. In the API this field is a decimal integer (e.g. `1744830466`). 
-      Internally it is a 32-bit value whose bits are often referred to in hex (e.g. `0x68000002`): the high 8 bits are the network identifier (`0x68` mainnet, `0x98` testnet), 
+      The transaction version. In the API this field is a decimal integer (e.g. `1744830466`).
+      Internally it is a 32-bit value whose bits are often referred to in hex
+      (e.g. `0x68000002`): the high 8 bits are the network identifier
+      (`0x68` mainnet, `0x98` testnet),
       and the low 24 bits are the entity version (`1` or `2`, depending on transaction type and fork height).
 
       Examples (hex and decimal):
@@ -60,17 +62,17 @@ properties:
       The network byte is fixed for a given network; the entity version is validated per transaction type and fork height
       (see `VersionTransactionValidator` in the NEM node implementation).
   signer:
-    $ref: "../../../schemas/PublicKey.yml"
+    $ref: ../../../schemas/PublicKey.yml
     description: |
       The public key (256-bit encoded as a hexadecimal string - 64 hex characters) of the account that created the transaction.
 discriminator:
   propertyName: type
   mapping:
-    "257": "./TransferTransaction.yml"
-    "2049": "./ImportanceTransferTransaction.yml"
-    "4097": "./MultisigAggregateModificationTransaction.yml"
-    "4098": "./MultisigSignatureTransaction.yml"
-    "4100": "./MultisigTransaction.yml"
-    "8193": "./ProvisionNamespaceTransaction.yml"
-    "16385": "./MosaicDefinitionCreationTransaction.yml"
-    "16386": "./MosaicSupplyChangeTransaction.yml"
+    "257": ./TransferTransaction.yml
+    "2049": ./ImportanceTransferTransaction.yml
+    "4097": ./MultisigAggregateModificationTransaction.yml
+    "4098": ./MultisigSignatureTransaction.yml
+    "4100": ./MultisigTransaction.yml
+    "8193": ./ProvisionNamespaceTransaction.yml
+    "16385": ./MosaicDefinitionCreationTransaction.yml
+    "16386": ./MosaicSupplyChangeTransaction.yml

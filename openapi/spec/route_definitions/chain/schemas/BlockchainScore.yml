@@ -13,4 +13,4 @@ properties:
     description: |
       Blockchain score as a hexadecimal string representing a non-negative integer (BigInteger).
       The numeric value is used for comparison; the API uses hex to avoid precision loss for large numbers.
-    pattern: '^[0-9a-fA-F]+$'
+    pattern: ^[0-9a-fA-F]+$

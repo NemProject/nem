@@ -11,16 +11,16 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/NodeHeartbeatResult.yml"
+          $ref: ../schemas/NodeHeartbeatResult.yml
         examples:
           ok:
             value:
               type: 2
               code: 1
-              message: "ok"
+              message: ok
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

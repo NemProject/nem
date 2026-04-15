@@ -5,7 +5,7 @@ description: |
 properties:
   data:
     oneOf:
-      - $ref: "../../../schemas/Hash.yml"
+      - $ref: ../../../schemas/Hash.yml
       - type: "null"
     description: |
       The hash of the inner transaction (multisig only), or null if the transaction is not a multisig transaction.

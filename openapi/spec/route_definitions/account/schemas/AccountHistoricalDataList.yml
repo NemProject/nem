@@ -6,4 +6,4 @@ properties:
   data:
     type: array
     items:
-      $ref: "./AccountHistoricalData.yml"
+      $ref: ./AccountHistoricalData.yml

@@ -4,14 +4,14 @@ content:
     schema:
       description: Resource not found response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Not Found`.
-              const: "Not Found"
+              const: Not Found
               examples:
-                - "Not Found"
+                - Not Found
             status:
               description: The HTTP status code of the response. Always `404`.
               const: 404
@@ -28,6 +28,6 @@ content:
         description: The requested resource does not exist or could not be found in the database.
         value:
           timeStamp: 342380122
-          error: "Not Found"
-          message: "block not found in the db '50111111' (org.nem.core.model.Block)"
+          error: Not Found
+          message: block not found in the db '50111111' (org.nem.core.model.Block)
           status: 404

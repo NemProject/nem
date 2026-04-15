@@ -4,4 +4,4 @@ required:
   - account
 properties:
   account:
-    $ref: "./Address.yml"
+    $ref: ./Address.yml

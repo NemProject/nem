@@ -3,4 +3,4 @@ required:
   - height
 properties:
   height:
-    $ref: "./BlockHeight.yml"
+    $ref: ./BlockHeight.yml

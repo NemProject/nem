@@ -12,7 +12,7 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/HarvestingStats.yml"
+          $ref: ../schemas/HarvestingStats.yml
         examples:
           default:
             summary: Unlock capacity and current count
@@ -20,8 +20,8 @@ responses:
               num-unlocked: 2
               max-unlocked: 3
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

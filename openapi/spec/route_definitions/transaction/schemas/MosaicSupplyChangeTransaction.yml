@@ -3,7 +3,7 @@ description: |
   This transaction can only be executed by the creator of the mosaic definition,
   and only if the mosaic property `supplyMutable` is set to `true`.
 allOf:
-  - $ref: "./Transaction.yml"
+  - $ref: ./Transaction.yml
   - type: object
     description: Mosaic Supply Change Transaction object.
     required:
@@ -12,7 +12,7 @@ allOf:
       - delta
     properties:
       mosaicId:
-        $ref: "../../../schemas/MosaicId.yml"
+        $ref: ../../../schemas/MosaicId.yml
         description: The mosaic identifier whose supply is being modified.
       supplyType:
         type: integer

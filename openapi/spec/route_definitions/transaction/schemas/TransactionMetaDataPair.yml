@@ -6,8 +6,8 @@ required:
   - meta
 properties:
   transaction:
-    $ref: "./Transaction.yml"
+    $ref: ./Transaction.yml
     description: The transaction object.
   meta:
-    $ref: "./TransactionMetaData.yml"
+    $ref: ./TransactionMetaData.yml
     description: Additional metadata about the transaction.
