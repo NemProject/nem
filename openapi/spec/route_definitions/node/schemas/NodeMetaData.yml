@@ -33,7 +33,7 @@ properties:
   application:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: |
       Optional name of the application running the node, as reported when the node is booted.
       For NIS this is typically a short product name such as `NIS` or `NEM Infrastructure Server`,
@@ -50,7 +50,7 @@ properties:
   platform:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: |
       Underlying platform (OS and Java version).
       NIS populates this from the Java runtime system properties (for example

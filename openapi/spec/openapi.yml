@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  "$ref": ./info.yml
+  $ref: ./info.yml
 tags:
-  "$ref": ./tags.yml
+  $ref: ./tags.yml
 paths:
-  "$ref": ./routes.yml
+  $ref: ./routes.yml
 # No authentication required for NEM client API; empty requirement satisfies security-defined rule.
 security:
   - {}

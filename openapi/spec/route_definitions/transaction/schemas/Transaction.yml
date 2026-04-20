@@ -16,7 +16,7 @@ properties:
   signature:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: |
       The transaction signature.
       The transaction signature is validated using the supplied public key in the field signer.
@@ -68,11 +68,11 @@ properties:
 discriminator:
   propertyName: type
   mapping:
-    "257": ./TransferTransaction.yml
-    "2049": ./ImportanceTransferTransaction.yml
-    "4097": ./MultisigAggregateModificationTransaction.yml
-    "4098": ./MultisigSignatureTransaction.yml
-    "4100": ./MultisigTransaction.yml
-    "8193": ./ProvisionNamespaceTransaction.yml
-    "16385": ./MosaicDefinitionCreationTransaction.yml
-    "16386": ./MosaicSupplyChangeTransaction.yml
+    '257': ./TransferTransaction.yml
+    '2049': ./ImportanceTransferTransaction.yml
+    '4097': ./MultisigAggregateModificationTransaction.yml
+    '4098': ./MultisigSignatureTransaction.yml
+    '4100': ./MultisigTransaction.yml
+    '8193': ./ProvisionNamespaceTransaction.yml
+    '16385': ./MosaicDefinitionCreationTransaction.yml
+    '16386': ./MosaicSupplyChangeTransaction.yml

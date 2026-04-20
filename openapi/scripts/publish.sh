@@ -5,13 +5,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-VERSION="$(node -p "require('./package.json').version")"
-TAG="${OPENAPI_RELEASE_TAG:-openapi-v${VERSION}}"
+VERSION="$(npm run version --silent)"
+TAG="${OPENAPI_RELEASE_TAG:-openapi/v${VERSION}}"
 OUTPUT_DIR="_build/v${VERSION}"
 
 echo "Preparing OpenAPI release artifacts for ${TAG}"
 npm run build
-npm run postman
 npm run version:prepare
 npm run version:pack
 

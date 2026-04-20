@@ -20,7 +20,7 @@ properties:
   signer:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: Signer of the certificate used by the application.
     examples:
       - CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD

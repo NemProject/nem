@@ -26,12 +26,12 @@ properties:
   publicKey:
     oneOf:
       - $ref: ../../../schemas/PublicKey.yml
-      - type: "null"
+      - type: 'null'
     description: Public key of the account, or null if the account has not yet published a transaction.
   label:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: Reserved; currently unused and always null.
     examples:
       - null

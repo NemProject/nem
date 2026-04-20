@@ -15,9 +15,8 @@ responses:
             summary: Example last block (main network)
             value:
               timeStamp: 9232968
-              signature: "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c\
-                3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67d\
-                aefcf1952f71bc36f747c8a738036b05"
+              signature: '0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de\
+                7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05'
               prevBlockHash:
                 data: 58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6
                 type: 1

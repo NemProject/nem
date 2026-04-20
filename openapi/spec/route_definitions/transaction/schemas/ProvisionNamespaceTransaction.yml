@@ -31,5 +31,5 @@ allOf:
       parent:
         oneOf:
           - type: string
-          - type: "null"
+          - type: 'null'
         description: The parent namespace. This can be null if the transaction rents a root namespace.

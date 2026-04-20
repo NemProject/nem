@@ -1,202 +1,202 @@
 # Account
-"/account/generate":
+'/account/generate':
   get:
     $ref: ./route_definitions/account/routes/generateAccount.yml
-"/account/get":
+'/account/get':
   get:
     $ref: ./route_definitions/account/routes/getAccount.yml
-"/account/get/forwarded":
+'/account/get/forwarded':
   get:
     $ref: ./route_definitions/account/routes/getAccountByForwarded.yml
-"/account/get/from-public-key":
+'/account/get/from-public-key':
   get:
     $ref: ./route_definitions/account/routes/getAccountByPublicKey.yml
-"/account/get/forwarded/from-public-key":
+'/account/get/forwarded/from-public-key':
   get:
     $ref: ./route_definitions/account/routes/getAccountByForwardedPublicKey.yml
-"/account/status":
+'/account/status':
   get:
     $ref: ./route_definitions/account/routes/getAccountStatus.yml
-"/account/get/batch":
+'/account/get/batch':
   post:
     $ref: ./route_definitions/account/routes/getAccounts.yml
-"/account/historical/get":
+'/account/historical/get':
   get:
     $ref: ./route_definitions/account/routes/getAccountHistoricalData.yml
-"/account/historical/get/batch":
+'/account/historical/get/batch':
   post:
     $ref: ./route_definitions/account/routes/getAccountsHistoricalData.yml
 
 # Block
-"/block/at/public":
+'/block/at/public':
   post:
     $ref: ./route_definitions/block/routes/getBlockAtHeight.yml
-"/local/block/at":
+'/local/block/at':
   post:
     $ref: ./route_definitions/block/routes/getLocalBlockAtHeight.yml
-"/local/chain/blocks-after":
+'/local/chain/blocks-after':
   post:
     $ref: ./route_definitions/block/routes/getLocalBlocksAfterHeight.yml
-"/chain/last-block":
+'/chain/last-block':
   get:
     $ref: ./route_definitions/block/routes/getLastBlock.yml
 
 # Chain
-"/chain/score":
+'/chain/score':
   get:
     $ref: ./route_definitions/chain/routes/getChainScore.yml
-"/chain/height":
+'/chain/height':
   get:
     $ref: ./route_definitions/chain/routes/getChainHeight.yml
 
 # Debug
-"/debug/timers":
+'/debug/timers':
   get:
     $ref: ./route_definitions/debug/routes/getTimers.yml
-"/debug/connections/incoming":
+'/debug/connections/incoming':
   get:
     $ref: ./route_definitions/debug/routes/getIncomingConnections.yml
-"/debug/connections/outgoing":
+'/debug/connections/outgoing':
   get:
     $ref: ./route_definitions/debug/routes/getOutgoingConnections.yml
-"/debug/time-synchronization":
+'/debug/time-synchronization':
   get:
     $ref: ./route_definitions/debug/routes/getTimeSynchronization.yml
 
 # Harvesting
-"/account/unlock":
+'/account/unlock':
   post:
     $ref: ./route_definitions/harvesting/routes/startHarvesting.yml
-"/account/lock":
+'/account/lock':
   post:
     $ref: ./route_definitions/harvesting/routes/stopHarvesting.yml
-"/account/unlocked/info":
+'/account/unlocked/info':
   post:
     $ref: ./route_definitions/harvesting/routes/fetchHarvestingStats.yml
-"/account/harvests":
+'/account/harvests':
   get:
     $ref: ./route_definitions/harvesting/routes/getHarvestedBlocks.yml
-"/account/importances":
+'/account/importances':
   get:
     $ref: ./route_definitions/harvesting/routes/getImportanceData.yml
-"/local/account/isunlocked":
+'/local/account/isunlocked':
   post:
     $ref: ./route_definitions/harvesting/routes/fetchHarvestingStatus.yml
 
 # Mosaic
-"/mosaic/supply":
+'/mosaic/supply':
   get:
     $ref: ./route_definitions/mosaic/routes/getMosaicSupply.yml
-"/account/mosaic/owned/definition":
+'/account/mosaic/owned/definition':
   get:
     $ref: ./route_definitions/mosaic/routes/getMosaicOwnedDefinition.yml
-"/account/mosaic/owned/definition/batch":
+'/account/mosaic/owned/definition/batch':
   post:
     $ref: ./route_definitions/mosaic/routes/getMosaicOwnedDefinitionBatch.yml
-"/account/mosaic/owned":
+'/account/mosaic/owned':
   get:
     $ref: ./route_definitions/mosaic/routes/getMosaicOwned.yml
-"/mosaic/definition":
+'/mosaic/definition':
   get:
     $ref: ./route_definitions/mosaic/routes/getMosaicDefinition.yml
-"/mosaic/definition/last":
+'/mosaic/definition/last':
   get:
     $ref: ./route_definitions/mosaic/routes/getLastMosaicDefinition.yml
-"/mosaic/definition/page":
+'/mosaic/definition/page':
   get:
     $ref: ./route_definitions/mosaic/routes/getMosaicDefinitionPage.yml
-"/namespace/mosaic/definition/page":
+'/namespace/mosaic/definition/page':
   get:
     $ref: ./route_definitions/mosaic/routes/getNamespaceMosaicDefinitionPage.yml
-"/account/mosaic/definition/page":
+'/account/mosaic/definition/page':
   get:
     $ref: ./route_definitions/mosaic/routes/getAccountMosaicDefinitionPage.yml
-"/local/mosaic/definition/supply":
+'/local/mosaic/definition/supply':
   get:
     $ref: ./route_definitions/mosaic/routes/getLocalMosaicDefinitionWithSupply.yml
-"/local/mosaics/expired":
+'/local/mosaics/expired':
   get:
     $ref: ./route_definitions/mosaic/routes/getLocalMosaicExpired.yml
 
 # Namespace
-"/namespace/root/page":
+'/namespace/root/page':
   get:
     $ref: ./route_definitions/namespace/routes/getRootNamespaces.yml
-"/namespace":
+'/namespace':
   get:
     $ref: ./route_definitions/namespace/routes/getNamespace.yml
-"/account/namespace/page":
+'/account/namespace/page':
   get:
     $ref: ./route_definitions/namespace/routes/getNamespaces.yml
 
 # Node
-"/node/info":
+'/node/info':
   get:
     $ref: ./route_definitions/node/routes/getNodeInfo.yml
-"/node/extended-info":
+'/node/extended-info':
   get:
     $ref: ./route_definitions/node/routes/getNodeExtendedInfo.yml
-"/node/peer-list/all":
+'/node/peer-list/all':
   get:
     $ref: ./route_definitions/node/routes/getAllNodePeerList.yml
-"/node/peer-list/reachable":
+'/node/peer-list/reachable':
   get:
     $ref: ./route_definitions/node/routes/getReachableNodePeerList.yml
-"/node/peer-list/active":
+'/node/peer-list/active':
   get:
     $ref: ./route_definitions/node/routes/getActiveNodePeerList.yml
-"/node/active-peers/max-chain-height":
+'/node/active-peers/max-chain-height':
   get:
     $ref: ./route_definitions/node/routes/getActivePeersMaxChainHeight.yml
-"/node/boot":
+'/node/boot':
   post:
     $ref: ./route_definitions/node/routes/nodeBoot.yml
-"/node/experiences":
+'/node/experiences':
   get:
     $ref: ./route_definitions/node/routes/getNodeExperiences.yml
-"/shutdown":
+'/shutdown':
   get:
     $ref: ./route_definitions/node/routes/nodeShutdown.yml
-"/heartbeat":
+'/heartbeat':
   get:
     $ref: ./route_definitions/node/routes/nodeHeartbeat.yml
-"/status":
+'/status':
   get:
     $ref: ./route_definitions/node/routes/nodeStatus.yml
 
 # Time Synchronization
-"/time-sync/network-time":
+'/time-sync/network-time':
   get:
     $ref: ./route_definitions/time-sync/routes/getNetworkTime.yml
 
 # Transaction
-"/account/unconfirmedTransactions":
+'/account/unconfirmedTransactions':
   get:
     $ref: ./route_definitions/transaction/routes/getUnconfirmedTransactions.yml
-"/account/transfers/all":
+'/account/transfers/all':
   get:
     $ref: ./route_definitions/transaction/routes/getAllAccountTransactions.yml
-"/account/transfers/incoming":
+'/account/transfers/incoming':
   get:
     $ref: ./route_definitions/transaction/routes/getIncomingAccountTransactions.yml
-"/account/transfers/outgoing":
+'/account/transfers/outgoing':
   get:
     $ref: ./route_definitions/transaction/routes/getOutgoingAccountTransactions.yml
-"/transaction/get":
+'/transaction/get':
   get:
     $ref: ./route_definitions/transaction/routes/getTransactionByHash.yml
-"/local/account/transfers/all":
+'/local/account/transfers/all':
   post:
     $ref: ./route_definitions/transaction/routes/getLocalAllAccountTransactions.yml
-"/local/account/transfers/incoming":
+'/local/account/transfers/incoming':
   post:
     $ref: ./route_definitions/transaction/routes/getLocalIncomingAccountTransactions.yml
-"/local/account/transfers/outgoing":
+'/local/account/transfers/outgoing':
   post:
     $ref: ./route_definitions/transaction/routes/getLocalOutgoingAccountTransactions.yml
-"/transaction/announce":
+'/transaction/announce':
   post:
     $ref: ./route_definitions/transaction/routes/announce.yml
-"/transaction/prepare-announce":
+'/transaction/prepare-announce':
   post:
     $ref: ./route_definitions/transaction/routes/prepareAnnounce.yml
