@@ -101,3 +101,22 @@ updates:
         update-types:
           - minor
           - patch
+
+  - package-ecosystem: npm
+    schedule:
+      interval: weekly
+      day: sunday
+    labels: [dependencies]
+    commit-message:
+      prefix: '[dependency]'
+    target-branch: dev
+    versioning-strategy: increase-if-necessary
+    groups:
+      npm-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+    directories:
+      - /openapi
