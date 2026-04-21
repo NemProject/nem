@@ -22,6 +22,9 @@ builds:
       - deploy
       - peer
 
+  - name: NEM OpenAPI
+    path: openapi
+
 customBuilds:
   - name: Nightly Job
     jobName: nightlyJob
