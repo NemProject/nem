@@ -13,7 +13,7 @@ description: |
   - `0x68000002` (decimal `1744830466`) on mainnet
   - `0x98000002` (decimal `-1744830462`) on testnet
 allOf:
-  - $ref: "./Transaction.yml"
+  - $ref: ./Transaction.yml
   - type: object
     required:
       - modifications
@@ -22,6 +22,6 @@ allOf:
         type: array
         description: Array of multisig modifications.
         items:
-          $ref: "./MultisigCosignatoryModification.yml"
+          $ref: ./MultisigCosignatoryModification.yml
       minCosignatories:
-        $ref: "./MultisigMinCosignatoriesModification.yml"
+        $ref: ./MultisigMinCosignatoriesModification.yml

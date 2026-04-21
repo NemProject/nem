@@ -3,32 +3,33 @@ tags:
 summary: Return all transactions with decoded messages
 description: |
   Returns incoming and outgoing transactions for an account, including decoded transaction messages.
-  
-  This endpoint behaves like `/account/transfers/all`, but if a transaction contains an encrypted message, 
+
+  This endpoint behaves like `/account/transfers/all`, but if a transaction contains an encrypted message,
   the message is decrypted before being returned.
-  
+
   Transactions are sorted in descending order by insertion time.
-  
+
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
-  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+  in the NEM client configuration file.
 operationId: getLocalAllAccountTransactions
 requestBody:
   required: true
   content:
     application/json:
       schema:
-        $ref: "../schemas/AccountPrivateKeyTransactionsPage.yml"
+        $ref: ../schemas/AccountPrivateKeyTransactionsPage.yml
 responses:
   '200':
     description: Successfully returned transaction data.
     content:
       application/json:
         schema:
-          $ref: "../schemas/TransactionMetaDataPairList.yml"
+          $ref: ../schemas/TransactionMetaDataPairList.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

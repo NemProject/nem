@@ -8,22 +8,23 @@ description: |
 
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
-  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+  in the NEM client configuration file.
 operationId: getLocalBlocksAfterHeight
 requestBody:
-  $ref: "../../../request_bodies/blockHeight.yml"
+  $ref: ../../../request_bodies/blockHeight.yml
 responses:
   '200':
     description: List of extended blocks data successfully returned.
     content:
       application/json:
         schema:
-          $ref: "../schemas/ExtendedBlockList.yml"
+          $ref: ../schemas/ExtendedBlockList.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '401':
-    $ref: "../../../responses/Unauthorized.yml"
+    $ref: ../../../responses/Unauthorized.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

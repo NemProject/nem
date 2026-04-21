@@ -10,22 +10,22 @@ required:
   - pageRank
 properties:
   height:
-    $ref: "../../../schemas/BlockHeight.yml"
+    $ref: ../../../schemas/BlockHeight.yml
     description: Block height at which the data was recorded.
   address:
-    $ref: "../../../schemas/Address.yml"
+    $ref: ../../../schemas/Address.yml
   balance:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: Account balance in micro XEM.
   vestedBalance:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: Vested balance in micro XEM.
   unvestedBalance:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: Unvested balance in micro XEM.
   importance:
-    $ref: "../../../schemas/Importance.yml"
+    $ref: ../../../schemas/Importance.yml
     description: Account importance at this block height.
   pageRank:
-    $ref: "./PageRank.yml"
+    $ref: ./PageRank.yml
     description: PageRank value associated with the account.

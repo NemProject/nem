@@ -21,10 +21,10 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/AccountImportanceData.yml"
+                $ref: ../schemas/AccountImportanceData.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

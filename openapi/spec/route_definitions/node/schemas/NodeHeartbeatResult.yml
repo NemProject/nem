@@ -1,5 +1,5 @@
 allOf:
-  - $ref: "../../../schemas/DefaultResult.yml"
+  - $ref: ../../../schemas/DefaultResult.yml
   - type: object
     description: Response object for the heartbeat endpoint.
     properties:
@@ -11,4 +11,4 @@ allOf:
         const: 1
       message:
         description: Message. Always set to `ok`.
-        const: "ok"
+        const: ok

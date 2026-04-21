@@ -1,12 +1,12 @@
 content:
   application/json:
     schema:
-      $ref: "./schemas/accounts.yml"
+      $ref: ./schemas/accounts.yml
     examples:
       default:
         summary: Mainnet accounts (batch)
         value:
           data:
-            - account: "NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK"
-            - account: "NDEE6PQL2OTX7BSE7PKQ55IQXXFJHPAH7QVBOJMP"
+            - account: NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
+            - account: NDEE6PQL2OTX7BSE7PKQ55IQXXFJHPAH7QVBOJMP
 required: true

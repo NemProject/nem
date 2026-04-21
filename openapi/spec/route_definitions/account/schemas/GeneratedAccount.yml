@@ -8,8 +8,8 @@ required:
   - address
 properties:
   privateKey:
-    $ref: "../../../schemas/PrivateKey.yml"
+    $ref: ../../../schemas/PrivateKey.yml
   publicKey:
-    $ref: "../../../schemas/PublicKey.yml"
+    $ref: ../../../schemas/PublicKey.yml
   address:
-    $ref: "../../../schemas/Address.yml"
+    $ref: ../../../schemas/Address.yml

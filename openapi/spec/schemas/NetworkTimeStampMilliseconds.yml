@@ -3,6 +3,8 @@ format: int64
 description: |
   Network timestamp in **milliseconds** since the NEM network epoch (29 March 2015, 00:06:25 UTC).
   Same epoch as the nemesis block; used for time synchronization request/response timestamps.
-  To convert to a real date: add this value to the Unix timestamp of the NEM epoch (e.g. 1427587585000 ms for 29 March 2015 00:06:25 UTC), then use standard date functions.
+  To convert to a real date: add this value to the Unix timestamp of the NEM epoch
+  (e.g. 1427587585000 ms for 29 March 2015 00:06:25 UTC), then use standard
+  date functions.
 examples:
   - 344290910584

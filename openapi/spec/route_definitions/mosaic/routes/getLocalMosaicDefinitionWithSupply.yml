@@ -5,14 +5,15 @@ description: |
   Returns the mosaic definition along with its current supply and
   the expiration height of the owning namespace at the specified block height.
   If the mosaic does not exist at that height, an empty list is returned.
-  
+
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
-  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+  in the NEM client configuration file.
 operationId: getMosaicDefinitionWithSupply
 parameters:
-  - $ref: "../../../parameters/query/mosaicId.yml"
-  - $ref: "../../../parameters/query/height.yml"
+  - $ref: ../../../parameters/query/mosaicId.yml
+  - $ref: ../../../parameters/query/height.yml
 responses:
   '200':
     description: Mosaic definition and supply list (empty list if not found).
@@ -23,12 +24,12 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/MosaicDefinitionSupplyTuple.yml"
+                $ref: ../schemas/MosaicDefinitionSupplyTuple.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

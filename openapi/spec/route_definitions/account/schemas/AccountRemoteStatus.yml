@@ -1,13 +1,13 @@
 type: string
 description: |
   The status of delegated harvesting of a queried account.
-  
+
   The delegated (remote) harvesting status can be one of the following values:
   - **REMOTE**: The account is a delegated account and therefore delegated harvesting status is not applicable for it.
   - **ACTIVATING**: The account has activated delegated harvesting, but it is not yet active.
   - **ACTIVE**: The account has activated delegated harvesting and delegated harvesting is active.
   - **DEACTIVATING**: The account has deactivated delegated harvesting, but delegated harvesting is still active.
-  - **INACTIVE**: The account has inactive delegated harvesting, or it has deactivated delegated harvesting and 
+  - **INACTIVE**: The account has inactive delegated harvesting, or it has deactivated delegated harvesting and
     deactivation is operational.
 enum:
   - REMOTE

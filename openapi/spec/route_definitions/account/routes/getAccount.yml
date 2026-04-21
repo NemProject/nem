@@ -6,35 +6,35 @@ description: |
   The response contains both account information and additional metadata such as harvesting and multisig state.
 operationId: getAccount
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
+  - $ref: ../../../parameters/query/address.yml
 responses:
   '200':
     description: Account information successfully fetched.
     content:
       application/json:
         schema:
-          $ref: "../schemas/AccountMetaDataPair.yml"
+          $ref: ../schemas/AccountMetaDataPair.yml
         examples:
           testnet:
             summary: Testnet account with metadata
             value:
               account:
-                address: "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+                address: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
                 balance: 124446551689680
                 vestedBalance: 104443451691625
                 importance: 0.010263666447108395
-                publicKey: "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a"
+                publicKey: a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a
                 label: null
                 harvestedBlocks: 645
                 multisigInfo: {}
               meta:
                 cosignatoryOf: []
                 cosignatories: []
-                status: "LOCKED"
-                remoteStatus: "ACTIVE"
+                status: LOCKED
+                remoteStatus: ACTIVE
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

@@ -1,8 +1,12 @@
 type: integer
 format: int64
 description: |
-  Network timestamp in **seconds** since the NEM network epoch (29 March 2015, 00:06:25 UTC), i.e. since the creation of the nemesis (genesis) block.
-  The epoch is hardcoded and **the same for all networks** (mainnet, testnet). Used in transactions, blocks, and deadlines.
-  To convert to a real date: add this value (in seconds) to the Unix timestamp of the NEM epoch (1427587585 s for 29 March 2015 00:06:25 UTC), then use standard date functions.
+  Network timestamp in **seconds** since the NEM network epoch
+  (29 March 2015, 00:06:25 UTC), i.e. since the creation of the nemesis (genesis) block.
+  The epoch is hardcoded and **the same for all networks** (mainnet, testnet).
+  Used in transactions, blocks, and deadlines.
+  To convert to a real date: add this value (in seconds) to the Unix timestamp of the
+  NEM epoch (1427587585 s for 29 March 2015 00:06:25 UTC), then use standard
+  date functions.
 examples:
   - 9108808

@@ -11,7 +11,7 @@ properties:
     type: string
     description: The date and time when the synchronization was performed.
     examples:
-      - "2014-11-16 20:47:06"
+      - '2014-11-16 20:47:06'
   currentTimeOffset:
     type: integer
     format: int64

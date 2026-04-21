@@ -7,17 +7,17 @@ description: |
   Transactions remain in this list until they are either accepted (included in a block) or expire.
 operationId: getUnconfirmedTransactions
 parameters:
-  - $ref: "../../../parameters/query/address.yml"
+  - $ref: ../../../parameters/query/address.yml
 responses:
   '200':
     description: Returns a list of unconfirmed transactions.
     content:
       application/json:
         schema:
-          $ref: "../schemas/UnconfirmedTransactionMetaDataPairList.yml"
+          $ref: ../schemas/UnconfirmedTransactionMetaDataPairList.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

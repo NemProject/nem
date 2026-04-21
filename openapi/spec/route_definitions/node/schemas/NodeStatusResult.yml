@@ -1,5 +1,5 @@
 allOf:
-  - $ref: "../../../schemas/DefaultResult.yml"
+  - $ref: ../../../schemas/DefaultResult.yml
   - type: object
     description: Node status result.
     properties:
@@ -18,4 +18,4 @@ allOf:
           - `8`: Node is currently loading the blockchain.
       message:
         description: Message. Always set to `status`.
-        const: "status"
+        const: status

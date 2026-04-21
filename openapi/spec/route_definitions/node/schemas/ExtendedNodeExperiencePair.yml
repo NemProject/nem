@@ -3,13 +3,13 @@ description: |
   Represents a remote node together with the accumulated communication experience and synchronization statistics.
 properties:
   node:
-    $ref: "./Node.yml"
+    $ref: ./Node.yml
   syncs:
     type: integer
     format: int32
     description: Number of synchronization attempts with the remote node.
   experience:
-    $ref: "./NodeExperience.yml"
+    $ref: ./NodeExperience.yml
 required:
   - node
   - syncs

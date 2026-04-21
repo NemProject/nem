@@ -8,10 +8,10 @@ properties:
     type: string
     description: Fully-qualified namespace name.
     examples:
-      - "makoto.metal.coins"
+      - makoto.metal.coins
   owner:
-    $ref: "../../../schemas/Address.yml"
+    $ref: ../../../schemas/Address.yml
     description: Address of the namespace owner.
   height:
-    $ref: "../../../schemas/BlockHeight.yml"
+    $ref: ../../../schemas/BlockHeight.yml
     description: Block height at which ownership begins.

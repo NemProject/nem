@@ -13,19 +13,20 @@ description: |
   - `nis.additionalHarvesterPrivateKeys`: additional harvester private keys that are automatically unlocked
     for harvesting on boot (subject to `nis.unlockedLimit` and standard eligibility checks).
 
-  ⚠️ **Security warning:** For non-local network calls, the private key used in the request must always be the private key of the delegated account.
+  ⚠️ **Security warning:** For non-local network calls, the private key used in the request
+  must always be the private key of the delegated account.
   For trusted and local network calls, it is possible, but not recommended, to use the private key of the main account.
 operationId: startHarvesting
 requestBody:
-  $ref: "../../../request_bodies/privateKey.yml"
+  $ref: ../../../request_bodies/privateKey.yml
 responses:
   '200':
     description: Indicates success. No response body is returned.
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '401':
-    $ref: "../../../responses/Unauthorized.yml"
+    $ref: ../../../responses/Unauthorized.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

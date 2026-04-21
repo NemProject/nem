@@ -1,0 +1,7 @@
+{
+  "ignorePatterns": [
+    { "pattern": "^http://libertalia\\.nemtest\\.net" },
+    { "pattern": "^http://portobelo\\.nemmain\\.net" },
+    { "pattern": "^https://www\\.npmjs\\.com" }
+  ]
+}

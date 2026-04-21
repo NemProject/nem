@@ -8,18 +8,18 @@ required:
   - isSet
 properties:
   isSet:
-   type: integer
-   format: int32
-   enum:
-    - 0
-    - 1
-   description: When set to 1, indicates that the fields `score`, `ev` and `height` are present.
-   examples:
-    - 1
+    type: integer
+    format: int32
+    enum:
+      - 0
+      - 1
+    description: When set to 1, indicates that the fields `score`, `ev` and `height` are present.
+    examples:
+      - 1
   score:
-    $ref: "../../../schemas/Importance.yml"
+    $ref: ../../../schemas/Importance.yml
   ev:
-    $ref: "../../account/schemas/PageRank.yml"
+    $ref: ../../account/schemas/PageRank.yml
   height:
-    $ref: "../../../schemas/BlockHeight.yml"
+    $ref: ../../../schemas/BlockHeight.yml
     description: The height at which the importance calculation was performed.

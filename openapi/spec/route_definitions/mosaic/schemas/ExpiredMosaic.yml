@@ -3,7 +3,7 @@ description: |
   Single expired or restored mosaic at a given block height, including balances per account at time of expiry.
 properties:
   mosaicId:
-    $ref: "../../../schemas/MosaicId.yml"
+    $ref: ../../../schemas/MosaicId.yml
   expiredMosaicType:
     type: integer
     description: |
@@ -14,7 +14,7 @@ properties:
   balances:
     type: array
     items:
-      $ref: "./AddressBalancePair.yml"
+      $ref: ./AddressBalancePair.yml
     description: Account addresses and mosaic quantities held at the time of expiry.
 required:
   - mosaicId

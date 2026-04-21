@@ -7,8 +7,8 @@ description: |
   the account holds (plus XEM and first‑level levy mosaics) and collects their definitions. Mosaic definitions
   are aggregated across all accounts and deduplicated in the response.
 
-  This is useful when you manage or query many accounts at once (for example, a service that tracks several customers' accounts) 
-  and want to fetch each mosaic definition only once: even if the same mosaic is owned by multiple accounts in the request, 
+  This is useful when you manage or query many accounts at once (for example, a service that tracks several customers' accounts)
+  and want to fetch each mosaic definition only once: even if the same mosaic is owned by multiple accounts in the request,
   its definition appears only a single time in the response.
 operationId: getMosaicOwnedDefinitionBatch
 requestBody:
@@ -24,16 +24,16 @@ requestBody:
           data:
             type: array
             items:
-              $ref: "../../../schemas/AccountId.yml"
+              $ref: ../../../schemas/AccountId.yml
       examples:
         testnet:
           value:
             data:
-              - account: "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+              - account: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
         mainnet:
           value:
             data:
-              - account: "NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK"
+              - account: NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK
 responses:
   '200':
     description: Mosaic definitions successfully retrieved.
@@ -42,12 +42,12 @@ responses:
         schema:
           type: array
           items:
-            $ref: "../../transaction/schemas/MosaicDefinition.yml"
+            $ref: ../../transaction/schemas/MosaicDefinition.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

@@ -6,8 +6,8 @@ properties:
   data:
     type: array
     items:
-      $ref: "../../schemas/AccountId.yml"
+      $ref: ../../schemas/AccountId.yml
 examples:
   - data:
-    - account: NDZQI4MPLUCFVWQY5P6LD5LFLH2NVDYOQ347DATW
-    - account: NAXF4PC4RUB7HRKCCVDWFLILUUAO2HRETM34OCQZ
+      - account: NDZQI4MPLUCFVWQY5P6LD5LFLH2NVDYOQ347DATW
+      - account: NAXF4PC4RUB7HRKCCVDWFLILUUAO2HRETM34OCQZ

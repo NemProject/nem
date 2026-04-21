@@ -6,4 +6,4 @@ schema:
   type: string
 examples:
   default:
-    value: "nem:xem"
+    value: nem:xem

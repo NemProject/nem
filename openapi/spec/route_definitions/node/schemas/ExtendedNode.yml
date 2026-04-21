@@ -7,6 +7,6 @@ required:
   - nisInfo
 properties:
   node:
-    $ref: "./Node.yml"
+    $ref: ./Node.yml
   nisInfo:
-    $ref: "./NodeApplicationMetaData.yml"
+    $ref: ./NodeApplicationMetaData.yml

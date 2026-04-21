@@ -9,11 +9,11 @@ required:
   - metaData
 properties:
   identity:
-    $ref: "./NodeIdentity.yml"
+    $ref: ./NodeIdentity.yml
   endpoint:
-    $ref: "./NodeEndpoint.yml"
+    $ref: ./NodeEndpoint.yml
   metaData:
-    $ref: "./NodeMetaData.yml"
+    $ref: ./NodeMetaData.yml
 examples:
   - metaData:
       features: 1

@@ -1,7 +1,8 @@
 type: object
 description: |
   Information about a single **audited request**: a request that was recorded by the node for inspection.
-  "Audit" means the request is tracked (who, which path, when, how long) for debug/trace purposes - not a security or compliance audit.
+  "Audit" means the request is tracked (who, which path, when, how long) for debug/trace purposes - not a security
+  or compliance audit.
 required:
   - id
   - host

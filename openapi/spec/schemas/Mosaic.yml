@@ -3,7 +3,7 @@ description: |
   A mosaic describes an instance of a mosaic definition. Mosaics can be transferred by means of a transfer transaction.
 properties:
   mosaicId:
-    $ref: "./MosaicId.yml"
+    $ref: ./MosaicId.yml
   quantity:
     type: integer
     description: |

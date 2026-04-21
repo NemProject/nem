@@ -1,5 +1,5 @@
 content:
   application/json:
     schema:
-      $ref: "./schemas/privateKey.yml"
+      $ref: ./schemas/privateKey.yml
 required: true

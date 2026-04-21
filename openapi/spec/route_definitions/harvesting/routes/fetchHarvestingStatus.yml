@@ -6,10 +6,11 @@ description: |
 
   ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
   By default, it is available only from the machine where the REST server is running (localhost).
-  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+  You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+  in the NEM client configuration file.
 operationId: fetchAccountHarvestingStatus
 requestBody:
-  $ref: "../../../request_bodies/privateKey.yml"
+  $ref: ../../../request_bodies/privateKey.yml
 responses:
   '200':
     description: Returns whether the account is harvesting (`ok`) or not (`nope`).
@@ -22,14 +23,14 @@ responses:
             - nope
         examples:
           unlocked:
-            value: "ok"
+            value: ok
           locked:
-            value: "nope"
+            value: nope
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '401':
-    $ref: "../../../responses/Unauthorized.yml"
+    $ref: ../../../responses/Unauthorized.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

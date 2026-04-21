@@ -10,9 +10,9 @@ description: |
   The request supports cursor-based paging. Each returned item contains a mosaic definition and associated metadata.
 operationId: getNamespaceMosaicDefinitionPage
 parameters:
-  - $ref: "../../../parameters/query/namespace.yml"
-  - $ref: "../../../parameters/query/id.yml"
-  - $ref: "../../../parameters/query/pageSize.yml"
+  - $ref: ../../../parameters/query/namespace.yml
+  - $ref: ../../../parameters/query/id.yml
+  - $ref: ../../../parameters/query/pageSize.yml
 responses:
   '200':
     description: Mosaic definitions successfully retrieved.
@@ -26,12 +26,12 @@ responses:
             data:
               type: array
               items:
-                $ref: "../schemas/MosaicDefinitionMetaDataPair.yml"
+                $ref: ../schemas/MosaicDefinitionMetaDataPair.yml
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '404':
-    $ref: "../../../responses/ResourceNotFound.yml"
+    $ref: ../../../responses/ResourceNotFound.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

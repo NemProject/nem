@@ -3,7 +3,7 @@ in: query
 required: true
 description: Block height from which to return data.
 schema:
-  $ref: "../../schemas/BlockHeight.yml"
+  $ref: ../../schemas/BlockHeight.yml
 examples:
   default:
     value: 17590

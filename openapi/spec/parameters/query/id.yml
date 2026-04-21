@@ -7,7 +7,7 @@ description: |
 
   For account transaction list endpoints, this is the value from `meta.id` of a transaction in a previous response.
 schema:
-  $ref: "../../schemas/DatabaseId.yml"
+  $ref: ../../schemas/DatabaseId.yml
 examples:
   default:
     value: 5646403

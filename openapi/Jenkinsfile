@@ -1,0 +1,6 @@
+defaultCiPipeline {
+	operatingSystem = ['ubuntu']
+	instanceSize = 'medium'
+	environment = 'javascript'
+	packageId = 'nem-openapi'
+}

@@ -2,21 +2,21 @@ type: object
 description: Information about a block that an account harvested.
 properties:
   id:
-    $ref: "../../../schemas/DatabaseId.yml"
+    $ref: ../../../schemas/DatabaseId.yml
     description: The database id for the harvested block.
   height:
-    $ref: "../../../schemas/BlockHeight.yml"
+    $ref: ../../../schemas/BlockHeight.yml
     description: The height of the harvested block.
   timeStamp:
-    $ref: "../../../schemas/NetworkTimeStamp.yml"
+    $ref: ../../../schemas/NetworkTimeStamp.yml
     description: |
       Network timestamp in seconds since the NEM network epoch (29 March 2015, 00:06:25 UTC).
       Timestamp of the harvested block.
   totalFee:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: The total fee (in micro XEM) collected by harvesting the block.
   difficulty:
-    $ref: "../../../schemas/BlockDifficulty.yml"
+    $ref: ../../../schemas/BlockDifficulty.yml
 required:
   - id
   - height

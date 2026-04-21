@@ -8,29 +8,30 @@ required:
   - harvestedBlocks
 properties:
   address:
-    $ref: "../../../schemas/Address.yml"
+    $ref: ../../../schemas/Address.yml
   balance:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: |
       The account's balance as a non-negative integer in micro XEM. For example, 123456789 means 123.456789 XEM.
       This is the spendable amount. When sending a transaction, the node checks that the amount does not exceed this balance.
   vestedBalance:
-    $ref: "../../../schemas/Amount.yml"
+    $ref: ../../../schemas/Amount.yml
     description: |
       Vested balance of the account in micro XEM. It indicates how much of the balance is already vested.
-      Each day, 10% of the unvested balance is added to the vested balance. Used for importance calculation only; it is not used when sending a transaction.
+      Each day, 10% of the unvested balance is added to the vested balance.
+      Used for importance calculation only; it is not used when sending a transaction.
       Only accounts with at least 10,000 XEM vested balance are eligible for importance score calculation and can activate harvesting.
   importance:
-    $ref: "../../../schemas/Importance.yml"
+    $ref: ../../../schemas/Importance.yml
   publicKey:
     oneOf:
-      - $ref: "../../../schemas/PublicKey.yml"
-      - type: "null"
+      - $ref: ../../../schemas/PublicKey.yml
+      - type: 'null'
     description: Public key of the account, or null if the account has not yet published a transaction.
   label:
     oneOf:
       - type: string
-      - type: "null"
+      - type: 'null'
     description: Reserved; currently unused and always null.
     examples:
       - null
@@ -42,4 +43,4 @@ properties:
     examples:
       - 645
   multisigInfo:
-    $ref: "./AccountMultisigInfo.yml"
+    $ref: ./AccountMultisigInfo.yml

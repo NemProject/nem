@@ -12,9 +12,9 @@ properties:
     type: array
     description: Audited requests currently in progress.
     items:
-      $ref: "./ConnectionAuditEntry.yml"
+      $ref: ./ConnectionAuditEntry.yml
   most-recent:
     type: array
     description: Most recently recorded audited requests (sliding window).
     items:
-      $ref: "./ConnectionAuditEntry.yml"
+      $ref: ./ConnectionAuditEntry.yml

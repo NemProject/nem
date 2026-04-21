@@ -1,0 +1,6 @@
+extends:
+  - minimal
+
+apis:
+  main:
+    root: spec/openapi.yml

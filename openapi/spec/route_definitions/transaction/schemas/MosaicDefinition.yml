@@ -7,9 +7,9 @@ required:
   - properties
 properties:
   creator:
-    $ref: "../../../schemas/PublicKey.yml"
+    $ref: ../../../schemas/PublicKey.yml
   id:
-    $ref: "../../../schemas/MosaicId.yml"
+    $ref: ../../../schemas/MosaicId.yml
   description:
     type: string
     minLength: 1
@@ -20,6 +20,6 @@ properties:
     description: Mosaic properties.
     type: array
     items:
-      $ref: "./MosaicProperty.yml"
+      $ref: ./MosaicProperty.yml
   levy:
-    $ref: "./MosaicLevy.yml"
+    $ref: ./MosaicLevy.yml

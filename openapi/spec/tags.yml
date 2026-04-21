@@ -7,7 +7,7 @@
     - **Account status**: `UNLOCKED` or `LOCKED` for harvesting on the queried node.
     - **Delegated account**: when requesting by delegated account key, the node resolves the main account
       that delegated to the given key (used for delegated harvesting flows).
-    
+
     Local-only endpoints (e.g. generation, historical batch) are restricted by configuration (`nis.additionalLocalIps`).
 - name: Block
   description: |

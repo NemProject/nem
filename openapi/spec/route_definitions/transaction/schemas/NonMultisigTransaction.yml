@@ -1,16 +1,16 @@
 oneOf:
-  - $ref: "./TransferTransaction.yml"
-  - $ref: "./ImportanceTransferTransaction.yml"
-  - $ref: "./MultisigAggregateModificationTransaction.yml"
-  - $ref: "./ProvisionNamespaceTransaction.yml"
-  - $ref: "./MosaicDefinitionCreationTransaction.yml"
-  - $ref: "./MosaicSupplyChangeTransaction.yml"
+  - $ref: ./TransferTransaction.yml
+  - $ref: ./ImportanceTransferTransaction.yml
+  - $ref: ./MultisigAggregateModificationTransaction.yml
+  - $ref: ./ProvisionNamespaceTransaction.yml
+  - $ref: ./MosaicDefinitionCreationTransaction.yml
+  - $ref: ./MosaicSupplyChangeTransaction.yml
 discriminator:
   propertyName: type
   mapping:
-    "257": "./TransferTransaction.yml"
-    "2049": "./ImportanceTransferTransaction.yml"
-    "4097": "./MultisigAggregateModificationTransaction.yml"
-    "8193": "./ProvisionNamespaceTransaction.yml"
-    "16385": "./MosaicDefinitionCreationTransaction.yml"
-    "16386": "./MosaicSupplyChangeTransaction.yml"
+    '257': ./TransferTransaction.yml
+    '2049': ./ImportanceTransferTransaction.yml
+    '4097': ./MultisigAggregateModificationTransaction.yml
+    '8193': ./ProvisionNamespaceTransaction.yml
+    '16385': ./MosaicDefinitionCreationTransaction.yml
+    '16386': ./MosaicSupplyChangeTransaction.yml

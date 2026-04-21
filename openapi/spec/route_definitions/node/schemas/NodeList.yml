@@ -7,4 +7,4 @@ properties:
     type: array
     description: List of nodes.
     items:
-      $ref: "./Node.yml"
+      $ref: ./Node.yml

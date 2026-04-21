@@ -15,15 +15,15 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../schemas/BlockchainScore.yml"
+          $ref: ../schemas/BlockchainScore.yml
         examples:
           default:
             summary: Chain score (integer value in hexadecimal)
             value:
-              score: "18722d5a7d590deb"
+              score: 18722d5a7d590deb
   '400':
-    $ref: "../../../responses/BadRequest.yml"
+    $ref: ../../../responses/BadRequest.yml
   '500':
-    $ref: "../../../responses/ServerError.yml"
+    $ref: ../../../responses/ServerError.yml
   '503':
-    $ref: "../../../responses/ServiceUnavailable.yml"
+    $ref: ../../../responses/ServiceUnavailable.yml

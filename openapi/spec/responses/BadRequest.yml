@@ -4,14 +4,14 @@ content:
     schema:
       description: Bad request response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Bad Request`.
-              const: "Bad Request"
+              const: Bad Request
               examples:
-                - "Bad Request"
+                - Bad Request
             status:
               description: The HTTP status code of the response. Always `400`.
               const: 400
@@ -23,12 +23,15 @@ content:
                 - `address must be valid`: One or more addresses provided in the request are invalid.
                   All addresses are validated prior to processing.
                 - `JSON Object was expected`: A required parameter is missing or the request body is not valid JSON.
-                - `height must be positive`: The supplied block height is zero or negative. Block height values must be greater than zero.
+                - `height must be positive`: The supplied block height is zero or negative. Block height values must be
+                  greater than zero.
                 - `'11źż' is not a valid namespace id part`: The provided namespace identifier contains invalid characters
                   or does not conform to the required format.
                 - `FAILURE_UNKNOWN_ACCOUNT`: Harvesting could not be started for account because it is unknown.
-                - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible for harvesting.
-                - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked from harvesting.
+                - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible
+                  for harvesting.
+                - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked
+                  from harvesting.
                 - `FAILURE_SERVER_LIMIT`: Harvesting could not be started for account because the server limit has been hit.
     examples:
       invalidAddress:
@@ -36,14 +39,14 @@ content:
         description: The provided address is not valid.
         value:
           timeStamp: 342378866
-          error: "Bad Request"
-          message: "address must be valid"
+          error: Bad Request
+          message: address must be valid
           status: 400
       invalidPublicKey:
         summary: Invalid public key format
         description: The provided public key is not in compressed form.
         value:
           timeStamp: 342378753
-          error: "Bad Request"
-          message: "publicKey must be in compressed form"
+          error: Bad Request
+          message: publicKey must be in compressed form
           status: 400

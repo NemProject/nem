@@ -3,4 +3,4 @@ required:
   - data
 properties:
   data:
-    $ref: "./Hash.yml"
+    $ref: ./Hash.yml

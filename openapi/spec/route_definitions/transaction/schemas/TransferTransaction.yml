@@ -1,10 +1,10 @@
 description: |
   Transfer transactions contain data about transfers of XEM or mosaics to another account.
-  There are two versions of transfer transactions, version 1 and version 2. 
-  Version 1 transfer transactions are only capable of transferring XEM and a message 
+  There are two versions of transfer transactions, version 1 and version 2.
+  Version 1 transfer transactions are only capable of transferring XEM and a message
   while version 2 transfer transactions additionally can transfer a set of mosaics.
 allOf:
-  - $ref: "./Transaction.yml"
+  - $ref: ./Transaction.yml
   - type: object
     description: Transfer transaction object.
     required:
@@ -12,10 +12,10 @@ allOf:
       - amount
     properties:
       recipient:
-        $ref: "../../../schemas/Address.yml"
+        $ref: ../../../schemas/Address.yml
         description: The address of the recipient (40 characters, Base32-encoded, checksum-validated).
       amount:
-        $ref: "../../../schemas/Amount.yml"
+        $ref: ../../../schemas/Amount.yml
         description: |
           The amount of micro XEM that is transferred from sender to recipient for version 1 type.
           For version 2 transaction types amount field acts as multiplier for mosaic array.
@@ -44,4 +44,4 @@ allOf:
         type: array
         description: The array of transferred mosaics.
         items:
-          $ref: "../../../schemas/Mosaic.yml"
+          $ref: ../../../schemas/Mosaic.yml

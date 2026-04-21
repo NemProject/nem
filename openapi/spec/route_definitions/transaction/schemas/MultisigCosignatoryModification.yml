@@ -17,5 +17,5 @@ properties:
       - 1: Add a new cosignatory
       - 2: Remove an existing cosignatory
   cosignatoryAccount:
-    $ref: "../../../schemas/PublicKey.yml"
+    $ref: ../../../schemas/PublicKey.yml
     description: Public key of the cosignatory account.

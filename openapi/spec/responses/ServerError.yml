@@ -4,14 +4,14 @@ content:
     schema:
       description: Internal server error response body.
       allOf:
-        - $ref: "../schemas/ModelError.yml"
+        - $ref: ../schemas/ModelError.yml
         - type: object
           properties:
             error:
               description: The value is always `Internal Server Error`.
-              const: "Internal Server Error"
+              const: Internal Server Error
               examples:
-                - "Internal Server Error"
+                - Internal Server Error
             status:
               description: The HTTP status code of the response. Always `500`.
               const: 500
@@ -29,6 +29,6 @@ content:
         description: The node does not support retrieval of historical account data.
         value:
           timeStamp: 342379020
-          error: "Internal Server Error"
-          message: "this node does not support historical account data retrieval"
+          error: Internal Server Error
+          message: this node does not support historical account data retrieval
           status: 500

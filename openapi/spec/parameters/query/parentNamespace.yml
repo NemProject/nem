@@ -2,7 +2,7 @@ name: parent
 in: query
 description: Parent namespace identifier.
 schema:
-  $ref: "../../schemas/NamespaceId.yml"
+  $ref: ../../schemas/NamespaceId.yml
 examples:
   default:
-    value: "makoto.metal"
+    value: makoto.metal
