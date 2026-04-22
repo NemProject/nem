@@ -4,12 +4,15 @@
   "description": "OpenAPI Specification of NEM Client API",
   "main": "index.js",
   "scripts": {
-    "lint:openapi": "redocly lint spec/openapi.yml",
-    "lint": "npm run lint:openapi",
-    "test": "npm run verify-links",
+    "lint:openapi:source": "redocly lint spec/openapi.yml",
+    "lint:openapi:build": "redocly lint _build/openapi3.yml _build/openapi3.json",
+    "lint": "npm run lint:openapi:source",
+    "test": "npm run lint:openapi:build && npm run verify-links",
     "verify-links": "markdown-link-check _build/openapi3.yml -c .markdown-link-check.json -q",
-    "build": "redocly bundle spec/openapi.yml -o _build/openapi3.yml && redocly bundle spec/openapi.yml -o _build/openapi3.json && npm run postman",
-    "postman": "openapi2postmanv2 -s _build/openapi3.yml -o _build/postman.json -p",
+    "build:openapi-yaml": "redocly bundle spec/openapi.yml -o _build/openapi3.yml",
+    "build:openapi-json": "redocly bundle spec/openapi.yml -o _build/openapi3.json",
+    "build:postman": "openapi2postmanv2 -s _build/openapi3.yml -o _build/postman.json -p",
+    "build": "npm run build:openapi-yaml && npm run build:openapi-json && npm run build:postman",
     "version": "echo $npm_package_version",
     "version:prepare": "mkdir -p _build/v$npm_package_version",
     "version:pack": "cp _build/openapi3.yml _build/openapi3.json _build/postman.json _build/v$npm_package_version"
@@ -26,7 +29,7 @@
   "homepage": "https://github.com/NemProject/nem/tree/dev/openapi",
   "dependencies": {},
   "devDependencies": {
-    "@redocly/cli": "^1.25.0",
+    "@redocly/cli": "^2.29.0",
     "markdown-link-check": "^3.14.2",
     "openapi-to-postmanv2": "^6.0.0"
   }
