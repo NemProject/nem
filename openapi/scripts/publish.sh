@@ -10,6 +10,7 @@ TAG="${OPENAPI_RELEASE_TAG:-openapi/v${VERSION}}"
 OUTPUT_DIR="_build/v${VERSION}"
 
 echo "Preparing OpenAPI release artifacts for ${TAG}"
+npm install
 npm run build
 npm run version:prepare
 npm run version:pack
