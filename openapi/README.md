@@ -5,7 +5,7 @@ The API is implemented in the [`nis`](../nis) module in this repository.
 
 ## Requirements
 
-* Node.js 18 LTS or higher
+* Node.js 20 LTS or higher
 
 YAML style and syntax for files under `spec/` are checked by the monorepo **Linters** job (`linters/scripts/lint_yaml.sh` -> `yamllint` with `linters/yaml/.yamllint`). Run that from the repository root if you need the same check locally:
 
@@ -43,7 +43,7 @@ npm run build
 Checks links in the built specification (`_build/openapi3.yml`).
 
 ```
-npm test
+npm run test
 ```
 
 In CI the flow is split into dedicated stages:
@@ -83,7 +83,7 @@ This prepares:
 Optional: create a GitHub release with assets (requires authenticated `gh` CLI):
 
 ```sh
-OPENAPI_RELEASE_CREATE_GH=1 OPENAPI_RELEASE_TAG=openapi-v<version> scripts/ci/publish.sh
+OPENAPI_RELEASE_CREATE_GH=1 OPENAPI_RELEASE_TAG=openapi/v<version> scripts/ci/publish.sh
 ```
 
 ## Contributing
