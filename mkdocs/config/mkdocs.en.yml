@@ -78,4 +78,5 @@ nav:
           - WebSockets: devbook/reference/websockets/index.md
   - Textbook:
       - textbook/intro.md
+      - textbook/transfer_transactions.md
       - textbook/glossary.md
