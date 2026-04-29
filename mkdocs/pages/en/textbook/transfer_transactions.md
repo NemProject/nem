@@ -6,8 +6,6 @@ Transfer Transaction
 Transfer transactions are the most common type of transaction on NEM, enabling both asset transfers and simple
 communication.
 
-Adapts [Transfer Transactions](https://docs.symboltest.net/en/textbook/transfer_transactions/) concepts to NEM technology.
-
 ## Key Features
 
 * **Mosaic Transfer**
@@ -41,7 +39,7 @@ a transfer transaction contains the following attributes:
 
 ### Recipient's Address
 
-The recipient is specified as a 40-character base32-encoded <address:>.
+The recipient is specified as an <address:>.
 
 !!! warning "Assets sent to an unowned address are lost"
 
@@ -50,26 +48,27 @@ The recipient is specified as a 40-character base32-encoded <address:>.
 
 ### XEM Amount
 
-The **XEM amount** is expressed in micro-XEM, where `1 XEM = 1 000 000 micro-XEM`.
+The **XEM amount** is expressed in micro-XEM, where `1 XEM = 1'000'000 micro-XEM`.
 It serves two purposes depending on the [mosaic list](#list-of-transferred-mosaics):
 
 * **Transfer amount.**
     When the mosaic list is empty, the XEM amount is the XEM sent to the recipient.
 * **Mosaic multiplier.**
     When the mosaic list is non-empty, the XEM amount transfers no XEM on its own.
-    Instead, it acts as a whole-number **multiplier** applied to every attached mosaic's quantity.
+    Instead, the value is divided by `1'000'000` to obtain a **multiplier** that scales every attached mosaic's
+    quantity.
     The same multiplier applies to all mosaics in the list.
 
-    For example, `2 000 000` doubles every mosaic quantity in the list, so a list entry of `500` units is delivered as
-    `1 000` units to the recipient.
+    For example, `2'000'000` yields a multiplier of `2`, doubling every mosaic quantity in the list.
+    A list entry of `500` units is delivered as `1000` units to the recipient.
 
 !!! note "Multiplier rules"
 
     When the XEM amount acts as a multiplier:
 
-    * The multiplier must be a whole number of XEM, so the stored micro-XEM value must be divisible by `1 000 000`.
+    * The value must be divisible by `1'000'000` so the resulting multiplier is an integer.
         Fractional amounts are rejected.
-    * Wallets set it to `1 000 000` by convention, transferring each mosaic quantity as specified.
+    * Wallets set it to `1'000'000` by convention, transferring each mosaic quantity as specified.
     * A multiplier of `0` produces a valid transaction that transfers no mosaics.
 
 ### List of Transferred Mosaics
@@ -78,13 +77,13 @@ A transfer transaction can include up to **10 mosaics**.
 The list can also be empty, which lets the sender attach a message without moving any assets.
 
 Each entry specifies a mosaic ID and a quantity.
-Quantities are raw integers counted in the mosaic's **atomic units**.
+Quantities are integers counted in the mosaic's **atomic units**.
 
 A mosaic's `divisibility` property, set when the mosaic is created and ranging from `0` to `6`,
 defines how many atomic units make one whole unit.
-XEM, for example, has divisibility `6`, so 1 000 000 atomic units (micro-XEM) equal one whole XEM.
+XEM, for example, has divisibility `6`, so `1'000'000` atomic units equal one whole XEM.
 
-Full details appear in the [Mosaics](./mosaics.md) chapter.
+Full details appear in the [Mosaics](./mosaics.md) page.
 
 The network rejects the transaction if the sender does not hold enough of any listed mosaic.
 
@@ -116,20 +115,12 @@ NEM wallets and applications typically assume UTF-8.
 #### Secure message conventions
 
 Secure payloads are encrypted so that only the recipient can decrypt them.
+The protocol does not standardize an encryption scheme.
 
-The protocol does not standardize an encryption scheme, but two are widely used in existing wallets and SDKs:
-
-* **AES-CBC.**
-    AES in [CBC mode](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#CBC), using a shared key derived
-    via Elliptic Curve Diffie-Hellman (ECDH).
-    The payload is a 32-byte salt, a 16-byte initialization vector (IV), and the ciphertext, leaving up to
-    **960 bytes** of usable plaintext.
-
-* **AES-GCM.**
-    AES in [GCM mode](https://en.wikipedia.org/wiki/Galois/Counter_Mode) with its own ECDH-based key derivation, under
-    the same `0x0002` type flag.
-    The payload is a 16-byte authentication tag, a 12-byte IV, and the ciphertext, leaving up to **996 bytes** of
-    usable plaintext.
+Two schemes are widely used in existing wallets and SDKs:
+**AES-CBC** and **AES-GCM**, both with a shared key derived via Elliptic Curve Diffie-Hellman (ECDH).
+Each scheme reserves part of the 1024-byte payload for cryptographic metadata, leaving up to **960 bytes** of usable
+plaintext under AES-CBC and **996 bytes** under AES-GCM.
 
 !!! warning "CBC and GCM are not interoperable"
 
