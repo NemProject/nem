@@ -45,7 +45,7 @@ to be valid.
 Cosignature
 :   When a transaction requires signatures from multiple accounts, the additional signatures are called _cosignatures_.
 
-On NEM, cosignatures are delivered as separate multisig signature transactions that reference the
+On NEM, cosignatures are delivered as separate multisig cosignature transactions that reference the
 <inner transaction:> by hash.
 Cosignatories can submit their signatures independently and over multiple blocks until the required threshold is
 reached.
@@ -99,7 +99,7 @@ Inner transactions behave like basic transactions, with the following difference
 
 * They are not individually signed.
     The multisig transaction is signed by the initiating cosignatory, and additional cosignatories provide
-    their approvals through separate multisig signature transactions.
+    their approvals through separate multisig cosignature transactions.
 
 * They cannot themselves be multisig transactions.
     Multisig hierarchies are only one layer deep.
@@ -155,14 +155,14 @@ This step also involves signing the transaction.
 Signatures prove that the signing account has authorized the transaction, since only the holder of an account's
 <private key:> can produce a valid signature.
 
-For multisig transactions, the initiating cosignatory signs the multisig envelope.
-Other cosignatories provide their cosignatures separately, via multisig signature transactions.
+For multisig transactions, the initiating cosignatory signs the multisig transaction that wraps the inner transaction.
+Other cosignatories provide their cosignatures separately, via multisig cosignature transactions.
 
 ### 2. Announcement
 
 The client application submits the transaction to a connected <API node:> on the network.
 
-For multisig transactions, cosignatures are announced as separate multisig signature transactions, each submitted
+For multisig transactions, cosignatures are announced as separate multisig cosignature transactions, each submitted
 independently by its signer.
 
 ### 3. Validation
@@ -193,9 +193,9 @@ is distributed across the network.
 !!! warning "Do not rely on unconfirmed transactions"
 
     A transaction in the unconfirmed pool is not yet guaranteed to be included in a block.
-    Applications should never act on an unconfirmed transaction as if it had already been confirmed.
+    Wait until it is [confirmed](#6-confirmation), and ideally past the rewrite limit, before treating it as final.
 
-For multisig transactions, the multisig transaction and its accompanying multisig signature transactions propagate
+For multisig transactions, the multisig transaction and its accompanying multisig cosignature transactions propagate
 independently.
 
 ### 5. Harvesting
@@ -261,20 +261,20 @@ and validation steps, but differ in purpose and required fields.
 
 <div class="subsections" markdown>
 
-| **Transaction Type**                                                | **Type ID** | **Description**                                                                                               |
-| ------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
-| **[Transfer Transactions](default:transfer transaction)**           |             |                                                                                                               |
-| `Transfer`                                                          | `0x0101`    | Send XEM or <mosaics:> and an optional message between two <accounts:>.                                       |
-| **[Importance Transfers](default:harvesting)**                      |             |                                                                                                               |
-| `Importance Transfer`                                               | `0x0801`    | Activate or deactivate delegated harvesting by linking a remote account.                                      |
-| **[Multisig](default:multisignature account)**                      |             |                                                                                                               |
-| `Multisig Aggregate Modification`                                   | `0x1001`    | Create a multisig account, add or remove cosignatories, and change the minimum number of required signatures. |
-| `Multisig Signature`                                                | `0x1002`    | Provide a cosignature for a pending multisig transaction.                                                     |
-| `Multisig`                                                          | `0x1004`    | Wrap an inner transaction issued on behalf of a multisig account.                                             |
-| **[Namespaces](default:namespace)**                                 |             |                                                                                                               |
-| `Provision Namespace`                                               | `0x2001`    | Register or renew a namespace.                                                                                |
-| **[Mosaics](default:mosaic)**                                       |             |                                                                                                               |
-| `Mosaic Definition Creation`                                        | `0x4001`    | Create a new mosaic.                                                                                          |
-| `Mosaic Supply Change`                                              | `0x4002`    | Change the total supply of a mosaic.                                                                          |
+| **Transaction Type**                                                | **Description**                                                                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **[Transfer Transactions](default:transfer transaction)**           |                                                                                                               |
+| `Transfer`                                                          | Send XEM or <mosaics:> and an optional message between two <accounts:>.                                       |
+| **[Harvesting](default:harvesting)**                                |                                                                                                               |
+| `Account Key Link`                                                  | Activate or deactivate delegated harvesting by linking a remote account.                                      |
+| **[Multisig](default:multisignature account)**                      |                                                                                                               |
+| `Multisig Account Modification`                                     | Create a multisig account, add or remove cosignatories, and change the minimum number of required signatures. |
+| `Multisig Cosignature`                                              | Provide a cosignature for a pending multisig transaction.                                                     |
+| `Multisig`                                                          | Wrap an inner transaction issued on behalf of a multisig account.                                             |
+| **[Namespaces](default:namespace)**                                 |                                                                                                               |
+| `Namespace Registration`                                            | Register or renew a namespace.                                                                                |
+| **[Mosaics](default:mosaic)**                                       |                                                                                                               |
+| `Mosaic Definition`                                                 | Create a new mosaic.                                                                                          |
+| `Mosaic Supply Change`                                              | Change the total supply of a mosaic.                                                                          |
 
 </div>
