@@ -109,6 +109,7 @@ The following root names are reserved by the protocol and cannot be claimed by u
 `nem`, `user`, `account`, `org`, `com`, `biz`, `net`, `edu`, `mil`, `gov`, `info`.
 
 The `nem` namespace, in particular, hosts the native currency `nem:xem` and is permanently active.
+The colon separates the namespace from the [mosaic name](./mosaics.md#fully-qualified-name).
 
 ## Ownership
 
