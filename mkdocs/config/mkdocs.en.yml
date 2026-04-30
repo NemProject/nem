@@ -80,4 +80,5 @@ nav:
       - textbook/intro.md
       - textbook/cryptography.md
       - textbook/accounts.md
+      - textbook/transactions.md
       - textbook/glossary.md
