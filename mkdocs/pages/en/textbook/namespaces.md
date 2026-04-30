@@ -5,7 +5,7 @@ Namespace
 
 Namespaces let an account group related mosaics under a meaningful prefix like `mycompany.tokens`.
 
-The account that registers a root namespace is called its _owner_.
+The account that registers a namespace is called its _owner_.
 The owner controls which mosaics can be defined under it, so namespaces provide both naming structure and
 ownership scoping.
 
@@ -85,7 +85,7 @@ The following operations are permitted depending on the state of the namespace r
 | Register the namespace              | :white_check_mark:  | :material-close:       | :material-close:   |
 | Register a subnamespace             | :material-close:    | :white_check_mark:     | :material-close:   |
 | Define a mosaic under the namespace | :material-close:    | :white_check_mark:     | :material-close:   |
-| Renew the namespace                 | :material-close:    | :white_check_mark:  | :white_check_mark: |
+| Renew the namespace                 | :material-close:    | :white_check_mark:     | :white_check_mark: |
 
 ## Lease Fee
 
@@ -108,7 +108,7 @@ The following root names are reserved by the protocol and cannot be claimed by u
 
 `nem`, `user`, `account`, `org`, `com`, `biz`, `net`, `edu`, `mil`, `gov`, `info`.
 
-The `nem` namespace, in particular, is used by the system to host the native currency `nem:xem`.
+The `nem` namespace, in particular, hosts the native currency `nem:xem` and is permanently active.
 
 ## Ownership
 
