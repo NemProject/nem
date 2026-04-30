@@ -720,6 +720,10 @@ code.doc-symbol-interface::after {
 	transition: fill 0.25s;
 }
 
+.graphviz .node:hover a:any-link text {
+	fill: var(--md-primary-fg-color--dark);
+}
+
 .graphviz .cluster polygon {
 	stroke: var(--md-primary-fg-color--light);
 }
