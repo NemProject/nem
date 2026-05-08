@@ -82,4 +82,5 @@ nav:
       - textbook/accounts.md
       - textbook/transactions.md
       - textbook/transfer_transactions.md
+      - textbook/namespaces.md
       - textbook/glossary.md
