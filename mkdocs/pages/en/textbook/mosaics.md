@@ -16,10 +16,10 @@ and inherits its duration from its parent namespace's lease (see [Lifetime](#lif
 
 ## Name
 
-The mosaic name is the local identifier for a mosaic within its namespace, and must be unique within it.
-The name follows specific formatting rules:
+The name identifies a mosaic within its namespace and must be unique within it.
+It follows specific formatting rules:
 
-- It can contain lowercase letters, numbers, hyphens `-`, underscores `_`, and apostrophes `'`.
+- It can only contain lowercase letters, numbers, hyphens `-`, underscores `_`, and apostrophes `'`.
 - It must start with a letter or a number.
 - It can be at most **32 characters** long.
 
@@ -44,7 +44,7 @@ Examples:
 
 ## Description
 
-Each mosaic has a **description**: a free-text field of up to **512 characters** documenting the asset, for example
+Each mosaic can have a **description**: a free-text field of up to **512 characters** documenting the asset, for example
 its purpose, origin, or terms of use.
 
 ## Properties
@@ -61,7 +61,7 @@ Divisibility
 For example, a divisibility of `2` means each _whole unit_ can be divided into 100 _fractional units_ (10^2^),
 allowing the mosaic to be handled in increments of `0.01`.
 
-Fractional units are also called _atomic units_, so in this example, 1 unit consists of 100 atomic units.
+Fractional units are also called _atomic units_, so in this example, 1 whole unit consists of 100 atomic units.
 
 In many other protocols, this value is hardcoded.
 For example, Bitcoin uses 8 decimal places, and Ethereum uses 18.
@@ -118,18 +118,25 @@ mosaic.
 
 A levy specifies four fields:
 
-| Field         | Description                                                                                              |
-| ------------- | -------------------------------------------------------------------------------------------------------- |
-| **Type**      | `Absolute` (fixed quantity) or `Percentile` (proportional to the amount transferred).                    |
-| **Recipient** | Account that receives the levy on every transfer.                                                        |
-| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.                   |
-| **Fee**       | Quantity of the levy mosaic. For `Percentile`, the levy equals `Fee / 10000` of the transferred amount.  |
+| Field         | Description                                                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type**      | `Absolute` (fixed quantity) or `Percentile` (proportional to the amount transferred).                                                                                                                                              |
+| **Recipient** | Account that receives the levy on every transfer.                                                                                                                                                                                  |
+| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.                                                                                                                                             |
+| **Fee**       | Quantity of the levy mosaic. For `Absolute`, it is the exact quantity charged on every transfer in atomic units. For `Percentile`, it is interpreted in **basis points**: the levy equals `Fee / 10000` of the transferred amount. |
 
-When a transfer transaction includes a mosaic with a levy, the network charges the levy to the sender and credits it to
-the levy recipient, in addition to the regular transaction fee.
+When a transfer transaction includes a mosaic with a levy, the network charges the levy to the sender and credits it
+to the levy recipient, in addition to the regular transaction fee.
 
-For example, a `Percentile` levy with `Fee = 100` charges 1% of the transferred amount.
-A transfer of `1 000` atomic units triggers a levy of `10` atomic units credited to the levy recipient.
+The levy is paid on top of the transferred amount: the recipient receives the full quantity sent, and the sender is
+debited for both the transfer and the levy.
+
+For example, a `Percentile` levy with `Fee = 100` (100 basis points) charges 1% of the transferred amount.
+Sending `1 000` atomic units debits the sender `1 010` in total: `1 000` credited to the recipient and `10` credited
+to the levy recipient.
+
+The sender must hold enough balance to cover the transferred amount and the levy in the levy mosaic, which may differ
+from the one being transferred.
 
 ## Lifetime
 
@@ -140,7 +147,8 @@ Its lifetime is tied to the lifetime of its parent namespace:
 [properties](#properties)).
 - When the namespace expires, the mosaic becomes inactive: transfers and supply changes are rejected, but existing
     balances are preserved.
-- If the original owner renews the namespace during the grace period, the mosaic and its balances become usable again.
+- If the original owner renews the namespace during the [grace period](./namespaces.md#duration), the mosaic and its
+    balances become usable again.
 
 !!! warning "Mosaic loss past the grace period is permanent"
     After the grace period, the mosaic is permanently lost.
@@ -152,7 +160,7 @@ See [Namespace duration](./namespaces.md#duration) for the namespace lease lifec
 
 ## Creation Fee
 
-Creating a mosaic requires paying a one-time creation fee of **10 XEM**.
+Registering a new mosaic requires paying a one-time _creation fee_ of **10 XEM**.
 
 The fee must be paid at the time of creation and is non-refundable.
 
@@ -167,8 +175,8 @@ After creation, the original creator can modify a mosaic's **definition**.
 Each field has its own rule:
 
 - **Description**: can be changed at any time.
-- **Divisibility**, **initial supply**, **supply mutability**, and **levy**: can be changed only while the
-    creator holds the entire mosaic supply.
+- **Divisibility**, **initial supply**, **supply mutability**, and **levy**: can be changed only while the creator holds
+    the entire mosaic supply.
 - **Transferability**: cannot be changed once set.
 - **Name**: cannot be changed.
 
