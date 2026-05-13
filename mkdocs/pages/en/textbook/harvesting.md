@@ -27,7 +27,7 @@ The account's <importance:> score determines how often it can harvest.
 
 ## Harvesting Process
 
-NEM does not use an explicit selection process to determine which node will harvest the next block.
+NEM has no central coordinator to determine which node will harvest the next block.
 Instead, every <node:> independently competes by running the same deterministic eligibility check with each of its
 <harvester accounts:>.
 
