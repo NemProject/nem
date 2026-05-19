@@ -4,7 +4,7 @@ title: Welcome
 
 # Welcome to the User Manual
 
-This manual explains how to perform various actions on the NEM blockchain using the applications maintained by the Symbol Syndicate.
+This manual explains how to perform various actions on the NEM blockchain using the applications maintained by The Symbol Syndicate.
 No coding required!
 
 The topics range from basic tasks, such as creating an account and funding it, to more advanced ones, such as restricting an account to only send transactions to a selected list of addresses.
