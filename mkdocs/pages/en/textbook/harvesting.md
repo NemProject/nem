@@ -20,7 +20,7 @@ Unlike mining in <PoW:>, harvesting does not require specialized hardware.
 
 Participation in harvesting is open to any <account:> that:
 
-* Holds at least 10'000 <XEM:> in <vesting:|vested balance>.
+* Holds at least 10'000 <XEM:> in <vesting:|vested> balance.
 * Is connected to a <node:>, either directly or through delegation.
 
 The account's <importance:> score determines how often it can harvest.
@@ -35,7 +35,7 @@ To do this, a _target_ value is calculated based primarily on each account's <im
 The higher the importance, the higher its target will be.
 
 For each of its harvester accounts, the node computes a number called the _hit_ from the candidate block's
-[generation hash](blocks.md#derived-fields).
+[generation hash](./blocks.md#derived-fields).
 
 If any of its harvester accounts produces a hit below the target, the node assembles a candidate block
 from the <unconfirmed pool:> and announces it to the rest of the network.
@@ -158,8 +158,8 @@ For hosting other lessors, incentives come from external programs rather than fr
 ## Importance
 
 Importance
-:   A measure of an <account:>'s contribution to the network, based on its vested balance and its outgoing transfers to
-    other accounts.
+:   A measure of an <account:>'s contribution to the network, based on its <vesting:|vested> balance and its outgoing
+    transfers to other accounts.
     This score determines the account's chances of harvesting a <block:>.
 
 Importance serves a role similar to hashrate in <PoW:> systems or stake in <PoS:> systems:
@@ -195,16 +195,17 @@ and becomes harvesting-eligible at that point.
     The importance score for an eligible account combines:
 
     * Its **vested balance**.
-    * A **PageRank-like score** computed over the graph of outgoing transfer transactions.
+    * A **[PageRank](https://en.wikipedia.org/wiki/PageRank)-like score** computed over the graph of outgoing transfer
+        transactions.
 
-    Only transfers that meet both of the following are considered:
+        Only transfers that meet both of the following are considered:
 
-    * The transfer occurred within the last 43200 blocks (about 30 days).
-    * The recipient is itself eligible (has at least 10'000 vested XEM).
+        * The transfer occurred within the last 43200 blocks (about 30 days).
+        * The recipient is itself eligible (has at least 10'000 vested XEM).
 
-    Each qualifying transfer contributes its amount, with older transfers counting for less (10% less per day).
-    If two accounts sent XEM to each other, only the difference counts.
-    That difference must be at least 1'000 XEM to contribute to the score.
+        Each qualifying transfer contributes its amount, with older transfers counting for less (10% less per day).
+        If two accounts sent XEM to each other, only the difference counts.
+        That difference must be at least 1'000 XEM to contribute to the score.
 
     The full algorithm is the _Proof-of-Importance_ (PoI) scheme described in the
     [NEM Technical Reference](site:/assets/pdfs/NEM_techRef.pdf), section 7.

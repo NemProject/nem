@@ -56,8 +56,10 @@ return to the <unconfirmed pool:> and must be re-verified before they can be inc
 
 Rollbacks on NEM are usually shallow and rare, affecting only the most recent blocks.
 
+To prevent very deep chain reorganizations, NEM enforces a _rewrite limit_.
+
 Rewrite limit
 :   The maximum depth a rollback can reach on NEM, set to **360 blocks** (approximately six hours).
 
-Each new block adds another layer of confirmation, and once a transaction sits past the rewrite limit, it is
-considered irreversible.
+Blocks deeper than the rewrite limit cannot be replaced by an alternative chain.
+As a result, transactions gradually become effectively irreversible as new blocks are added on top of them.
