@@ -192,15 +192,15 @@ Sybil Attack
     Common countermeasures include <PoW:> or <PoS:>, which tie influence to scarce resources.
 
 testnet
-:   NEM's Test Network, intended for development. Test <XYM:> can be freely obtained from a
-    [faucet](../devbook/accounts/testnet-faucet.md), so transactions on this network do not have real value,
-    as opposed to transactions on the <mainnet:>.
+:   NEM's Test Network, intended for development.
+    Test <XEM:> can be freely obtained from a [faucet](../devbook/accounts/testnet-faucet.md), so transactions on this
+    network do not have real value, as opposed to transactions on the <mainnet:>.
 
 TLC
 :   Tender Loving Care.
 
 TLS
-:   Security protocol used to encrypting communication between peers on a network.
+:   Security protocol used to encrypt communication between peers on a network.
 
 Token
 :   A representation of a digital asset.

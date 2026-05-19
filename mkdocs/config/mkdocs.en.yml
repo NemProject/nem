@@ -80,9 +80,11 @@ nav:
       - textbook/intro.md
       - textbook/cryptography.md
       - textbook/accounts.md
+      - textbook/consensus.md
       - textbook/transactions.md
       - textbook/transfer_transactions.md
       - textbook/mosaics.md
       - textbook/namespaces.md
       - textbook/blocks.md
+      - textbook/harvesting.md
       - textbook/glossary.md
