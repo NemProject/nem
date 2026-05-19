@@ -193,7 +193,7 @@ is distributed across the network.
 !!! warning "Do not rely on unconfirmed transactions"
 
     A transaction in the unconfirmed pool is not yet guaranteed to be included in a block.
-    Wait until it is [confirmed](#6-confirmation), and ideally past the rewrite limit, before treating it as final.
+    Wait until it is [confirmed](#6-confirmation), and ideally past the <rewrite limit:>, before treating it as final.
 
 For multisig transactions, the multisig transaction and its accompanying multisig cosignature transactions propagate
 independently.
@@ -217,10 +217,7 @@ Occasionally, a block already accepted by a node is later rejected by the majori
 <rollback:|rolled back>.
 In this case, the block's transactions are reverted and returned to the unconfirmed pool.
 
-NEM bounds how far back this can happen with a **rewrite limit of 360 blocks** (approximately 6 hours at a
-one-minute target block time), so no rollback can reach further into the past.
-Each new block adds another layer of confirmation, and once a transaction has more than 360 confirmations, it is
-considered irreversible.
+NEM bounds how far back a rollback can reach with the <rewrite limit:>.
 
 If a transaction's deadline expires while it is still in the unconfirmed pool, it is dropped from the pool.
 This may happen, for example, if the transaction fee offered is too low to be included by any harvester.
