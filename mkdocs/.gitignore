@@ -1,0 +1,8 @@
+# Doxygen temporary folder
+.doxy
+
+# Re-include this folder, excluded by the previous .gitignore
+!ts
+
+.venv
+__pycache__
