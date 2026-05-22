@@ -147,7 +147,9 @@ a remote on their own node (using the same security pattern as any other lessor)
 For hosting other lessors, incentives come from external programs rather than from block rewards.
 
 !!! note "Supernode Program"
-    Because NEM has no block subsidy or inflation, transaction fees alone are typically modest.
+    NEM has no block subsidy or inflation.
+    Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
+
     To sustain high-quality public node infrastructure, the <Supernode Program:> supplements operator income by paying
     periodic rewards to qualifying nodes.
 

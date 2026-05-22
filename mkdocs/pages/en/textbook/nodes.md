@@ -1,7 +1,7 @@
 # Nodes
 
 Node
-:   A computer running the NEM software which shares information with other nodes, validates incoming <transactions:>,
+:   A computer running the NEM software which shares information with peer nodes, validates incoming <transactions:>,
     and participates in <consensus:> and block creation.
 
 Nodes form the backbone of the blockchain, ensuring the network remains functional as long as enough nodes are active.
@@ -15,10 +15,15 @@ or to qualify for the <Supernode Program:>.
 Every NEM node runs the same application, called _NIS_.
 
 NIS
-:   NEM Infrastructure Server. A single Java process that implements everything a NEM node does.
+:   NEM Infrastructure Server.
+    A single Java process that implements all node functionality.
 
-NIS has four parts: an [engine](#engine) that does the blockchain work, a [REST API](#rest-api) and a
-[WebSocket](#websocket) service that expose it, and an embedded [database](#database) that stores its data.
+NIS has four parts: an [engine](#engine), exposed by a [REST API](#rest-api) and a [WebSocket](#websocket) service, with an embedded [database](#database) for storage.
+
+Over the network, NIS exchanges data with other nodes and with clients:
+
+* _Other nodes_ are NIS peers on the network.
+* _Clients_ are external programs such as wallets, explorers, and applications.
 
 ```dot
 digraph NemNode {
@@ -44,7 +49,7 @@ digraph NemNode {
         // Core components
         REST   [label="REST + WebSocket" style=filled fixedsize=true width=6.0 height=0.8 URL="#rest-api"];
         Engine [label="Engine" style=filled width=2.6 height=0.9 URL="#engine"];
-        H2     [label="State + Blocks\n(H2)" style=filled width=2.6 height=0.9 shape=cylinder URL="#database"];
+        H2     [label="Blocks\n(H2)" style=filled width=2.6 height=0.9 shape=cylinder URL="#database"];
 
         { rank=same; Engine; H2; }
 
@@ -62,36 +67,40 @@ digraph NemNode {
 
 ### Engine
 
-The engine runs <consensus:>, <harvesting:>, [peer-to-peer networking](#peer-to-peer-communication), and the
+The engine performs the blockchain work: it validates incoming data, runs <consensus:> and <harvesting:>, handles
+[peer-to-peer networking](#peer-to-peer-communication), and maintains the
 <unconfirmed pool:|unconfirmed transactions pool>.
-It does the blockchain work: validating incoming data, producing blocks, and keeping the node in sync with its peers.
 
-The engine is not reachable from outside.
-Every inbound request, from another node or from a client, arrives through the HTTP layer described below and is then
-handed to the engine.
+The engine is an internal component and is not exposed directly.
+Every inbound request, from a peer or from a client, arrives through the REST API described below and is then handed
+to the engine.
 
 ### REST API
 
-NIS exposes a single HTTP API.
-It serves two kinds of callers: other nodes, which use it for the peer-to-peer protocol, and clients such as wallets,
-explorers, and applications.
+Both peers and clients reach NIS through a single HTTP API:
 
-Peer requests cover block synchronization, transaction relay, and node discovery.
-Client requests read blockchain data and submit new <transactions:>, which NIS validates, adds to the local pool,
-and propagates to its peers.
+* _Peer requests_ handle block synchronization, transaction relay, and node discovery.
+* _Client requests_ handle reading blockchain data and submitting <transactions:>.
 
 ### WebSocket
 
-NIS publishes block and transaction events through a built-in WebSocket service.
-Subscribed applications receive notifications in real time without polling.
+NIS publishes block and transaction events through a built-in
+[WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) service.
+Subscribed clients receive notifications in real time without polling.
 
 ### Database
 
-NIS persists both blocks and the current blockchain state in an embedded [H2](https://www.h2database.com) relational
-database, managed through Hibernate.
-Schema migrations are handled by Flyway.
+NIS stores the blockchain in an [H2](https://www.h2database.com) relational database that is _embedded_, meaning it runs
+inside the NIS process rather than as a separate database server.
 
-The database files live under the node's data directory.
+The database holds only the chain itself: every block and the transactions inside it.
+It does not store the current blockchain state, such as account balances and <importance:> scores.
+NIS keeps that state in memory and rebuilds it at every start by replaying the chain from the <nemesis block:> onward,
+which is why a node stays unavailable for a while after it starts.
+
+NIS reads and writes data through [Hibernate](https://hibernate.org), a library that maps Java objects to database rows.
+When NIS is upgraded to a newer release, [Flyway](https://flywaydb.org) automatically applies any required schema
+changes.
 
 ## Peer To Peer Communication
 
@@ -175,22 +184,34 @@ A supernode is a node enrolled in the _Supernode Program_.
 Supernode Program
 :   An off-chain, community-funded program that rewards reliable public nodes.
 
-NEM has no block subsidy or inflation, so transaction fees alone are typically modest.
+NEM has no block subsidy or inflation.
+Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
 The Supernode Program offsets this by paying daily rewards to nodes that prove themselves reliable.
 
-To qualify, a node must:
+The program runs entirely off-chain, and NIS itself plays no part: a separate, centrally operated service called the
+_controller_ tests participating nodes and pays out the rewards.
 
-* Hold at least 10'000 <XEM:>.
-* Stay in sync with the chain and run an up-to-date client.
-* Run on hardware and a network connection fast enough to serve the rest of the network.
+A node qualifies for a day's reward by holding at least 10'000 <XEM:> and passing a battery of automated tests that
+confirm it is in sync, up to date, and running on hardware and a network connection capable of serving peers reliably.
 
-Eligibility is re-tested every day across four rounds of checks spaced six hours apart,
-and a node must pass every check to earn that day's reward.
+Testing happens in four rounds spaced six hours apart, and a node must pass every test in every round to be eligible.
+Each round runs the eight tests below, several of them measured against a trusted _reference node_ that the controller
+knows to be healthy:
+
+| Test                | A node passes when                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------------------|
+| **Chain height**    | Its chain is no more than 4 blocks behind the reference node.                                          |
+| **Chain part**      | A random sequence of 60 to 100 recent blocks matches the reference node exactly, including signatures. |
+| **Balance**         | Its main account holds at least 10'000 XEM.                                                            |
+| **Computing power** | It completes 10'000 successive key derivations, round trip included, in 5 seconds or less.             |
+| **Version**         | It runs a client version at least as recent as the reference node's.                                   |
+| **Ping**            | Across pings to 5 random peers, at most one ping fails and the average round trip stays under 200 ms.  |
+| **Bandwidth**       | A bulk hashing exchange with a peer runs at an effective transfer speed of at least 5 Mbit/s.          |
+| **Responsiveness**  | It answers 10 chain-height requests in 1 second or less, with at least 9 succeeding.                   |
 
 Rewards come from a fixed daily pool of 25'500 XEM, and each qualifying node earns at most 500 XEM per day.
 While 51 or fewer nodes qualify, each receives the full 500 XEM.
 Beyond that, the pool is divided equally, so per-node rewards fall as the network grows.
 
 Enrollment is optional.
-The program runs off-chain, with a separate, centrally operated service testing nodes and paying rewards.
-NIS itself plays no part.
+Step-by-step instructions are available on the [NEM Supernode page](https://nem.io/supernode/).
