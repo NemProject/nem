@@ -147,13 +147,11 @@ a remote on their own node (using the same security pattern as any other lessor)
 For hosting other lessors, incentives come from external programs rather than from block rewards.
 
 !!! note "Supernode Program"
-    Because NEM has no block subsidy or inflation, transaction fees alone are typically modest.
-    To sustain high-quality public node infrastructure, The Symbol Syndicate runs the **Supernode Program**, which pays
-    nodes that pass daily availability, performance, and connectivity checks.
+    NEM has no block subsidy or inflation.
+    Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
 
-    Rewards come from a fund set aside in the nemesis block for this purpose.
-
-    The program runs as a separate service, not as part of the consensus protocol.
+    To sustain high-quality public node infrastructure, the <Supernode Program:> supplements operator income by paying
+    periodic rewards to qualifying nodes.
 
 ## Importance
 
