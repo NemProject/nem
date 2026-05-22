@@ -86,6 +86,7 @@ nav:
       - textbook/mosaics.md
       - textbook/namespaces.md
       - textbook/blocks.md
+      - textbook/nodes.md
       - textbook/harvesting.md
       - textbook/cats.md
       - textbook/glossary.md
