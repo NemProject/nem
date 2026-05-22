@@ -1,5 +1,5 @@
-mkdocs build -f config/mkdocs.en.yml
-mkdocs build -f config/mkdocs.ja.yml
+NEM_DOCS_FULL=true mkdocs build -f config/mkdocs.en.yml
+NEM_DOCS_FULL=true mkdocs build -f config/mkdocs.ja.yml
 cd ../docs
 mv en en2
 mv ja ja2
