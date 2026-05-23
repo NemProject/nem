@@ -1,0 +1,42 @@
+Using node http://libertalia.nemtest.net:7890
+Fetching current network time from /time-sync/network-time
+  Network time: 353346165 s since the nemesis block
+Fetching mosaic definition from /namespace/mosaic/definition/page?namespace=company
+Fetching mosaic supply from /mosaic/supply?mosaicId=company:token
+  company:token: divisibility 0, supply 1000000
+  Transaction fee: 0.35 XEM
+Built transaction:
+{
+  type: 257,
+  version: 2,
+  network: 152,
+  timestamp: 353346165,
+  signerPublicKey: '462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE',
+  signature: 'C5BAAB71037317719398BA8643A7A3561AF0D69CEAC67757080E2625C4EAB3E0D7B960C850209CAD8E9C4EEA492FB75084AD9090DAE422624120D9C129642104',
+  fee: '350000',
+  deadline: 353353365,
+  recipientAddress: '5442554C4541554732435A51495355523434324857413655414B47574958484441424A5649505334',
+  amount: '1000000',
+  mosaics: [
+    {
+      mosaic: {
+        mosaicId: { namespaceId: { name: '636F6D70616E79' }, name: '746F6B656E' },
+        amount: '100'
+      }
+    }
+  ]
+}
+Announcing transaction to /transaction/announce
+  Result: SUCCESS
+Waiting for confirmation from /transaction/get?hash=FAA9346884DF9AB9CEBD21D18242FEB24559F781F94148FD069165AECB751F65
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+Transaction confirmed in block 649700

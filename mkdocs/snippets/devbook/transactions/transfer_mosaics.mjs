@@ -1,0 +1,149 @@
+import { PrivateKey } from 'symbol-sdk';
+import { NemFacade } from 'symbol-sdk/nem';
+
+const NODE_URL = process.env.NODE_URL ||
+	'http://libertalia.nemtest.net:7890';
+const textEncoder = new TextEncoder();
+console.log('Using node', NODE_URL);
+// [>step-1]
+const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
+	'0000000000000000000000000000000000000000000000000000000000000000';
+const signerKeyPair = new NemFacade.KeyPair(
+	new PrivateKey(SIGNER_PRIVATE_KEY));
+
+const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
+	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
+// [<step-1]
+// [>step-2]
+const MOSAIC_ID = process.env.MOSAIC_ID || 'company:token';
+const [MOSAIC_NAMESPACE, MOSAIC_NAME] = MOSAIC_ID.split(':');
+const QUANTITY = parseInt(process.env.QUANTITY || '100', 10);
+// [<step-2]
+const facade = new NemFacade('testnet');
+
+try {
+	// Fetch current network time [>step-3]
+	const timePath = '/time-sync/network-time';
+	console.log('Fetching current network time from', timePath);
+	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
+	const timeJSON = await timeResponse.json();
+	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
+	console.log('  Network time:', networkTime,
+		's since the nemesis block');
+
+	// Derived fields from network time
+	const timestamp = networkTime;
+	const deadline = networkTime + (2 * 60 * 60);
+	// [<step-3]
+	// Fetch the mosaic's divisibility and supply [>step-4]
+	const definitionPath =
+		`/namespace/mosaic/definition/page?namespace=${MOSAIC_NAMESPACE}`;
+	console.log('Fetching mosaic definition from', definitionPath);
+	const definitionResponse = await fetch(`${NODE_URL}${definitionPath}`);
+	const definitions = (await definitionResponse.json()).data;
+	const definition = definitions.find(
+		entry => MOSAIC_NAME === entry.mosaic.id.name).mosaic;
+	const divisibility = Number(definition.properties.find(
+		prop => 'divisibility' === prop.name).value);
+
+	const supplyPath = `/mosaic/supply?mosaicId=${MOSAIC_ID}`;
+	console.log('Fetching mosaic supply from', supplyPath);
+	const supplyResponse = await fetch(`${NODE_URL}${supplyPath}`);
+	const { supply } = await supplyResponse.json();
+	console.log(`  ${MOSAIC_ID}: divisibility ${divisibility},`,
+		`supply ${supply}`);
+	// [<step-4]
+	// Calculate the transaction fee [>step-5]
+	const quantity = QUANTITY * (10 ** divisibility);
+	const multiplier = 1;
+	const amount = multiplier * 1_000_000;
+	let fee;
+	if (10_000 >= supply && 0 === divisibility) {
+		// Tiny, indivisible mosaics pay a flat 0.05 XEM
+		fee = 50_000n;
+	} else {
+		const totalQuantity = supply * (10 ** divisibility);
+		// 1. XEM-equivalent value
+		const xemEquivalent = Math.floor(
+			(8_999_999_999 * quantity * multiplier) / totalQuantity);
+		// 2. Base fee from the XEM-only schedule
+		const steps = Math.min(25,
+			Math.max(1, Math.floor(xemEquivalent / 10_000)));
+		// 3. Supply discount (larger for scarcer mosaics)
+		const supplyAdjustment = Math.floor(
+			0.8 * Math.log(9_000_000_000_000_000 / totalQuantity));
+		// Final fee: base minus discount, min 0.05 XEM
+		fee = BigInt(50_000 * Math.max(1, steps - supplyAdjustment));
+	}
+	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
+	// [<step-5]
+	// Build the transaction [>step-6]
+	const transaction = facade.transactionFactory.create({
+		type: 'transfer_transaction_v2',
+		signerPublicKey: signerKeyPair.publicKey.toString(),
+		fee,
+		timestamp,
+		deadline,
+		recipientAddress: RECIPIENT_ADDRESS,
+		amount: BigInt(amount),
+		mosaics: [{
+			mosaic: {
+				mosaicId: {
+					namespaceId: {
+						name: textEncoder.encode(MOSAIC_NAMESPACE)
+					},
+					name: textEncoder.encode(MOSAIC_NAME)
+				},
+				amount: BigInt(quantity)
+			}
+		}]
+	});
+	// [<step-6]
+	// Sign transaction and generate final payload [>step-7]
+	const signature = facade.signTransaction(signerKeyPair, transaction);
+	const jsonPayload = facade.transactionFactory.static.attachSignature(
+		transaction, signature);
+	console.log('Built transaction:');
+	console.dir(transaction.toJson(), { colors: true, depth: null });
+	// [<step-7]
+	// Announce the transaction [>step-8]
+	const announcePath = '/transaction/announce';
+	console.log('Announcing transaction to', announcePath);
+	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: jsonPayload
+	});
+	const announceResult = await announceResponse.json();
+	console.log('  Result:', announceResult.message);
+	// [<step-8]
+	// Wait for confirmation [>step-9]
+	if ('SUCCESS' === announceResult.message) {
+		const transactionHash = facade.hashTransaction(transaction)
+			.toString();
+		const statusPath = `/transaction/get?hash=${transactionHash}`;
+		console.log('Waiting for confirmation from', statusPath);
+
+		let isConfirmed = false;
+		for (let attempt = 1; 120 >= attempt; ++attempt) {
+			const response = await fetch(`${NODE_URL}${statusPath}`);
+
+			if (response.ok) {
+				const confirmed = await response.json();
+				console.log('Transaction confirmed in block',
+					confirmed.meta.height);
+				isConfirmed = true;
+				break;
+			}
+			console.log('  Transaction status: pending');
+			await new Promise(resolve => { setTimeout(resolve, 1000); });
+		}
+		if (!isConfirmed)
+			console.warn('Confirmation took too long.');
+	} else {
+		console.log('Transaction rejected:', announceResult.message);
+	}
+	// [<step-9]
+} catch (e) {
+	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
+}
