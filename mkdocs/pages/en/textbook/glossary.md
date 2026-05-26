@@ -192,7 +192,7 @@ Sybil Attack
     Common countermeasures include <PoW:> or <PoS:>, which tie influence to scarce resources.
 
 Symbol
-:   A separate blockchain platform created by the NEM project, launched in March 2021.
+:   A blockchain platform created by the NEM project, launched in March 2021 as an evolution of <NIS1:>.
 
 testnet
 :   NEM's Test Network, intended for development.

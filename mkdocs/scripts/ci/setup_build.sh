@@ -6,7 +6,7 @@ set -ex
 npm install
 
 # Build Typescript SDK
-pushd ../sdk/javascript
+pushd ../_symbol/sdk/javascript
 npm install
 npx tsc -p ./tsconfig/build-bindings.json
 popd

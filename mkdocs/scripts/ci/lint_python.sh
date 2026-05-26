@@ -12,7 +12,7 @@ find snippets \( -name node_modules -o -name .venv \) -prune -o -type f -name "*
 	--config=.pycodestyle
 
 # Build a custom .pylintrc file based on the global one
-TMP_RC_FILE=/tmp/symbol-docs.pylintrc
+TMP_RC_FILE=/tmp/nem-docs.pylintrc
 cp "$(git rev-parse --show-toplevel)/linters/python/.pylintrc" "$TMP_RC_FILE"
 {
 	# Allow lowercase "constants" (actually, top-level regular variables)

@@ -41,7 +41,7 @@ launch date.
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-Interaction with the NEM blockchain happens through an <node:>, which exposes a REST interface for querying network
+Interaction with the NEM blockchain happens through a <node:>, which exposes a REST interface for querying network
 state and submitting transactions.
 
 This example connects to a testnet node and retrieves the current blockchain height from the <get:/chain/height>

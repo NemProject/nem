@@ -396,12 +396,7 @@ aside.md-source-file {
 }
 
 /* Dynamic links */
-.md-typeset .dylink input {
-	height: 0;
-	width: 0;
-	margin: 0;
-}
-
+.md-typeset .dylink input,
 .md-typeset .dylink label {
 	display: none;
 }
@@ -535,6 +530,11 @@ a code.doc-symbol-interface {
 
 code.doc-symbol-interface::after {
 	content: "interface";
+}
+
+.md-code__nav,
+:hover>.md-code__nav {
+	background-color: transparent;
 }
 
 /* Reset admonition text size to normal */
