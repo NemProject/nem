@@ -1,0 +1,70 @@
+<table style="width: 100%;"><tr><td>
+    <div class="side-info"><table>
+    <tr><td class="side-info-icon">&varr;</td><td>Size: 60+ bytes = 0x3c+ <i>(variable)</i></td></tr>
+    <tr><td class="side-info-icon"><i class="fab fa-github"></i></td><td><a href="https://github.com/symbol/symbol/blob/main/catbuffer/schemas/nem/mosaic/mosaic_definition.cats#L55">schema</a></td></tr>
+    </table></div>
+    <dl markdown><dt><code>ser:MosaicDefinition</code></dt><dd>binary layout for a mosaic definition </dd></dl>
+</td></tr></table>
+
+<div class="big-table6">
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">owner_public_key_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">32</code><br/><p>owner public key size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">owner_public_key</code></div>
+   <div><a href="#publickey" title="">PublicKey</a></div>
+   <div class="description"><p>owner public key </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">id_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>mosaic id size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">id</code></div>
+   <div><a href="#mosaicid" title="binary layout for a mosaic id">MosaicId</a></div>
+   <div class="description"><p>mosaic id referenced by this definition </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">description_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>description size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">description</code></div>
+   <div>byte[description_size]</div>
+   <div class="description"><p>description </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">properties_count</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>number of properties </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">properties</code></div>
+   <div><a href="#sizeprefixedmosaicproperty" title="binary layout for a size prefixed mosaic property">SizePrefixedMosaicProperty</a>&ZeroWidthSpace;[properties_count]</div>
+   <div class="description"><p>properties </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">levy_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>size of the serialized levy </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">levy</code></div>
+   <div><a href="#mosaiclevy" title="binary layout for a mosaic levy">MosaicLevy</a></div>
+   <div class="description"><p>optional levy that is applied to transfers of this mosaic </p><b>This field is only present if:</b><br/><code class="docutils literal">levy_size not equals 0</code></div>
+</div>
