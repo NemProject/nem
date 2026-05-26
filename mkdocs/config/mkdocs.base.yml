@@ -13,11 +13,14 @@ plugins:
     strict: true
     plurals: en
     sections:
+      - py
+      - js
       - java
       - ws
       - ser
       - _
   mkdoxy:  # Generate API reference docs for Java
+    enabled: !ENV [NEM_DOCS_JAVA, false]
     save-api: .doxy
     projects:
       JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
@@ -36,6 +39,21 @@ plugins:
   gen-files:  # Generate stub files for API reference docs and link.md files for literate-nav
     scripts:
       - ../scripts/gen_ref_pages_java.py
+      - ../scripts/gen_ref_pages_py.py
+      - ../scripts/gen_ref_pages_ts.py
+  mkdocstrings:  # Generate API reference docs for Python
+    default_handler: python
+    custom_templates: ../templates/mkdocstrings
+    handlers:
+      python:
+        paths: [../../_symbol/sdk/python]
+        options:
+          show_source: false
+          merge_init_into_class: false
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          show_root_toc_entry: false
+          show_object_full_path: false
   literate-nav:  # Allow navigation to be specified in the md files created by gen-files
     nav_file: links.md
   git-revision-date-localized:  # git dates in page footers
@@ -46,7 +64,6 @@ plugins:
     sort_authors_by: contribution
     exclude:
       - devbook/reference/*
-  swagger-ui-tag: {}  # Allow embedding OpenAPI specs
   glightbox:
     auto_caption: false
     caption_position: left
@@ -57,6 +74,7 @@ plugins:
   site-urls: {}
 hooks:
   - ../scripts/hooks.py
+  - ../scripts/typedoc-plugin.py
   - ../scripts/register_cats_lexer.py
 markdown_extensions:
   attr_list: {}
@@ -124,6 +142,28 @@ extra:
     branch: new-docs
     java-sdk:
       include-prefixes: [classorg, interfaceorg]
+    py-sdk:  # Symbol SDK is shared with NEM; exclude the Symbol-only parts
+      ignore-files:
+        - __main__
+        - symbolchain
+        - nem
+        - sc
+        - nc
+        - SymbolFacade
+        - facade
+        - external
+        - Ordered
+        - SharedKey
+      ignore-folders:
+        - symbol
+        - impl
+    ts-sdk:
+      output_dir: devbook/reference/ts
+      tsconfig: ../_symbol/sdk/javascript/tsconfig/check-bindings.json
+      options: config/typedoc.json
+      disabled: !ENV [NEM_DOCS_DISABLE_TS, false]
+    class-remaps: {}
+    global-namespaces: []
 copyright: >
   Copyright &copy; 2026 The Symbol Syndicate
 extra_css:

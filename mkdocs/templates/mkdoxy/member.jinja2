@@ -3,9 +3,9 @@ brief: True
 details: True
 implements: True
 ---
-{% filter indent(config.get('indent_level', 0), True) -%}
+{% filter indent(config.get('indent_level', 0), True) %}
 
-# <code class="doc-symbol doc-symbol-heading doc-symbol-{{node.kind.value}}"></code> {{node.name_long|replace("::","<wbr>::")}}
+# <code class="doc-symbol doc-symbol-heading doc-symbol-{{node.kind.value}}"></code> {{node.name_long}}
 {% if node.has_templateparams %}
 **template &lt;{{node.templateparams}}&gt;**
 {% endif %}
@@ -15,7 +15,7 @@ implements: True
 [Go to the source code of this file]({{node.url_source}})
 {%- endif %}
 
-<dl class="automatic-reference-term" markdown><dt>java:{{ node.name_long|replace("::",".") }}</dt><dd markdown>
+<dl class="automatic-reference-term" markdown><dt>Java:{{ node.name_long|replace("::",".") }}</dt><dd>
 {{node.brief}}
 </dd></dl>
 
@@ -32,7 +32,7 @@ implements: True
 {% if node.has_base_classes %}
 Inherits the following classes:
 {%- for base in node.base_classes -%}
-{%- if base is string %} {{base}}{%- else %} <java:{{base.name_long|replace("::",".")}}|{{base.name_long}}>{%- endif -%}
+{%- if base is string %} {{base}}{%- else %} <Java:{{base.name_long|replace("::",".")}}|{{base.name_long}}>{%- endif -%}
 {{ ', ' if not loop.last else '' }}
 {%- endfor -%}
 {%- endif %}
@@ -40,7 +40,7 @@ Inherits the following classes:
 {% if node.has_derived_classes %}
 Inherited by the following classes:
 {%- for derived in node.derived_classes -%}
-{%- if derived is string %} {{derived}}{%- else %} <java:{{derived.name_long|replace("::",".")}}|{{derived.name_long}}>{%- endif -%}
+{%- if derived is string %} {{derived}}{%- else %} <Java:{{derived.name_long|replace("::",".")}}|{{derived.name_long}}>{%- endif -%}
 {{ ', ' if not loop.last else '' }}
 {%- endfor -%}
 {%- endif %}

@@ -1,0 +1,5 @@
+Network name: testnet
+Network launch date: 2015-03-29 00:06:25+00:00
+Using node http://tortuga.nemtest.net:7890
+Fetching chain height from /chain/height
+  Blockchain height: 625,079 blocks
