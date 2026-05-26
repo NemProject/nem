@@ -160,7 +160,7 @@ Other cosignatories provide their cosignatures separately, via multisig cosignat
 
 ### 2. Announcement
 
-The client application submits the transaction to a connected <API node:> on the network.
+The client application submits the transaction to a connected <node:> on the network.
 
 For multisig transactions, cosignatures are announced as separate multisig cosignature transactions, each submitted
 independently by its signer.
