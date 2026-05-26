@@ -179,7 +179,7 @@ If all checks pass, the process continues.
 
 ### 4. Propagation
 
-Once the node considers the transaction to be valid, it is broadcast to the <peer nodes:> in the network,
+Once the node considers the transaction to be valid, it is broadcast to other peer <nodes:> in the network,
 and added to every node's _unconfirmed pool_.
 
 Unconfirmed pool
