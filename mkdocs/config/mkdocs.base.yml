@@ -72,7 +72,7 @@ markdown_extensions:
     line_spans: __span
   pymdownx.inlinehilite: {}
   pymdownx.snippets:
-    base_path: !relative $config_dir/../overrides
+    base_path: !relative $config_dir/../snippets
     check_paths: true
   pymdownx.superfences: {}
   pymdownx.tabbed:
