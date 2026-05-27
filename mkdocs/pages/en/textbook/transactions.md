@@ -160,7 +160,7 @@ Other cosignatories provide their cosignatures separately, via multisig cosignat
 
 ### 2. Announcement
 
-The client application submits the transaction to a connected <API node:> on the network.
+The client application submits the transaction to a connected <node:> on the network.
 
 For multisig transactions, cosignatures are announced as separate multisig cosignature transactions, each submitted
 independently by its signer.
@@ -179,7 +179,7 @@ If all checks pass, the process continues.
 
 ### 4. Propagation
 
-Once the node considers the transaction to be valid, it is broadcast to the <peer nodes:> in the network,
+Once the node considers the transaction to be valid, it is broadcast to other peer <nodes:> in the network,
 and added to every node's _unconfirmed pool_.
 
 Unconfirmed pool

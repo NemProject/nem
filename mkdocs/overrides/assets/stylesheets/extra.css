@@ -396,12 +396,7 @@ aside.md-source-file {
 }
 
 /* Dynamic links */
-.md-typeset .dylink input {
-	height: 0;
-	width: 0;
-	margin: 0;
-}
-
+.md-typeset .dylink input,
 .md-typeset .dylink label {
 	display: none;
 }
@@ -537,6 +532,11 @@ code.doc-symbol-interface::after {
 	content: "interface";
 }
 
+.md-code__nav,
+:hover>.md-code__nav {
+	background-color: transparent;
+}
+
 /* Reset admonition text size to normal */
 .md-typeset .admonition,
 .md-typeset details {
@@ -630,6 +630,41 @@ code.doc-symbol-interface::after {
 	padding: 1em;
 	border-top: 1px solid var(--md-default-bg-color--light);
 	border-bottom: 1px solid var(--md-default-bg-color--light);
+}
+
+/* Tutorial level badge */
+.md-typeset .tutorial_level {
+	border-radius: 0.5rem;
+	font-size: initial;
+	font-weight: normal;
+	padding: 0 10px;
+}
+
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-beginner {
+	background-color: #1F7A3E;
+	color: #B6F2C8;
+}
+.md-typeset .tutorial_level-beginner {
+	background-color: #DFF5E6;
+	color: #1F7A3E;
+}
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-intermediate {
+	background-color: #8A6D1A;
+	color: #FFF1B8;
+}
+.md-typeset .tutorial_level-intermediate {
+	background-color: #FFF4CC;
+	color: #8A6D1A;
+}
+
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-advanced {
+	background-color: #8C2F39;
+	color: #FFD1D6;
+}
+
+.md-typeset .tutorial_level-advanced {
+	background-color: #FDE2E4;
+	color: #8C2F39;
 }
 
 /* Links around code blocks */

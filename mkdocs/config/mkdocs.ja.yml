@@ -69,7 +69,8 @@ nav:
   - 開発者マニュアル:
       - devbook/intro.md
       - リファレンスガイド:
-          - Java SDK: devbook/reference/java/
+          - Python SDK: devbook/reference/py/
+          - TypeScript SDK: devbook/reference/ts/
           - NEM REST API: devbook/reference/rest/nem.md
   - 教科書:
       - textbook/intro.md

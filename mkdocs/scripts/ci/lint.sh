@@ -1,3 +1,6 @@
 #!/bin/bash
 
-echo "no linter for docs (for now)"
+set -ex
+
+npm run lint
+bash scripts/ci/lint_python.sh

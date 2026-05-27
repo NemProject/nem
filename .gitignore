@@ -3,6 +3,8 @@
 
 # Log file
 *.log
+# ...except tutorial sample output
+!mkdocs/**/*.log
 
 # BlueJ files
 *.ctxt
@@ -26,3 +28,18 @@ hs_err_pid*
 .vscode/
 .idea/
 *.iml
+
+# MacOS
+.DS_Store
+
+# js
+node_modules/
+npm-*.log*
+ts/
+
+# python
+.python-version
+__pycache__/
+*.egg-info/
+build/
+dist/

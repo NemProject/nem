@@ -1,4 +1,5 @@
 {% set ns = namespace(step_count=1) %}
+{% set ns.group_count = 99 %}
 {% set lang_name = {"py":"Python", "js":"JavaScript"} %}
 {% set lang_icon = {"py":":simple-python:", "js":":simple-javascript:"} %}
 {% set lang_ext = {"py":"py", "js":"mjs"} %}
@@ -21,7 +22,7 @@
 {% set ns.step_count = ns.step_count + 1 %}
 {%- endmacro %}
 
-{% macro code_full(filename, langs, show=true) -%}
+{% macro code_full_tagged(filename, langs, show=true) -%}
 {%- set ns.filename = filename -%}
 
 {# Convert list to dictionary with empty values #}
@@ -32,57 +33,51 @@
     {%- endfor -%}
     {%- set langs = parsed %}
 {%- endif -%}
+{%- set ns.langs = langs -%}
 
 {# Now iterate over the normalized dictionary #}
 {%- if show -%}
 {%- for l, props in langs.items() -%}
-{%- set caption = props.caption if props.caption is defined else None -%}
 === "{{lang_icon[l]}} {{lang_name[l]}}"
 
-    ```{{l}} linenums="1"
-    --8<-- "{{filename}}.{{lang_ext[l]}}"
+    ```{{ l }} linenums="1"
+    {% for line in config['extra']['nem']['tutorial_code'][filename ~ '.' ~ lang_ext[l]]['full'].split('\n') %}
+    {{- line }}
+    {% endfor %}
     ```
 
     [Download source]({{ config.repo_url }}/raw/refs/heads/{{config.extra.nem.branch}}/mkdocs/overrides/{{filename}}.{{lang_ext[l]}}){ .source-link }
-
-    {% if caption %}{{ caption | indent }}{% endif %}
 
 {% endfor %}
 {%- endif -%}
 {%- endmacro %}
 
-{% macro code_snippet(langs) -%}
-{# Normalize: if langs is a list of "lang:start:end(:descriptor)" strings, convert to dict #}
-{%- if langs is sequence and langs[0] is string -%}
-    {%- set parsed = {} %}
-    {%- for entry in langs -%}
-        {%- set parts = entry.split(":") %}
-        {%- set l = parts[0] %}
-        {%- set range = [parts[1]|int, parts[2]|int] %}
-        {%- set descriptor = parts[3] if parts|length > 3 else none %}
-        {%- set _ = parsed.update({l: {"range": range, "descriptor": descriptor} }) %}
-    {%- endfor %}
-    {%- set langs = parsed %}
-{%- endif %}
-
-{# Now iterate over the normalized dictionary #}
-{%- for l, props in langs.items() -%}
-{%- set start = props.range[0] -%}
-{%- set end = props.range[1] -%}
-{%- set caption = props.caption if props.caption is defined else None -%}
-{%- set descriptor = props.descriptor if props.descriptor is defined else None -%}
+{% macro code_snippet_tagged(section) -%}
+{# Iterate over the langs of the full code #}
+{%- for l, props in ns.langs.items() -%}
+{%- set snippet = config['extra']['nem']['tutorial_code'][ns.filename ~ '.' ~ lang_ext[l]]['snippets'][section] -%}
 === "{{lang_icon[l]}} {{lang_name[l]}}"
 
-    ```{{l}} linenums="{{start}}"
-    --8<-- "{{ns.filename}}.{{lang_ext[l]}}:{{start}}:{{end}}"
+    ```{{ l }} linenums="{{snippet['start_line']}}"
+    {% for line in snippet['code'].split('\n') %}
+    {{- line }}
+    {% endfor %}
     ```
 
-    {% if descriptor -%}
-    > Use a <js:{{descriptor}}> to create this transaction in a type-safe way.  
-    > See the [Typed Descriptors](site:/devbook/transactions/typed-descriptors) tutorial for details.
-    {% endif %}
-
-    {% if caption %}{{ caption | indent }}{% endif %}
-
 {% endfor %}
+{%- endmacro %}
+
+{% macro to_camel_case(name) -%}
+{%- set parts = name.split('_') -%}
+{{ parts[0] }}{{ parts[1:] | map('title') | join('') }}
+{%- endmacro %}
+
+{% macro var(name) -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display_name = name if 'py' == l else to_camel_case(name) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display_name }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
 {%- endmacro %}
