@@ -42,6 +42,12 @@ theme:
         icon: material/brightness-4
         name: Switch to system preference
 extra:
+  nem:
+    tutorial_level: Tutorial level
+    tutorial_level_labels:
+      beginner: BEGINNER
+      intermediate: INTERMEDIATE
+      advanced: ADVANCED
   consent:
     title: Cookie consent
     description: >-
@@ -71,8 +77,12 @@ nav:
       - userbook/intro.md
   - Developer Manual:
       - devbook/intro.md
+      - Getting Started:
+          - devbook/start/setup.md
+          - devbook/start/hello-world.md
       - Reference Guides:
-          - Java SDK: devbook/reference/java/
+          - Python SDK: devbook/reference/py/
+          - TypeScript SDK: devbook/reference/ts/
           - NEM REST API: devbook/reference/rest/nem.md
           - Serialization: devbook/reference/serialization/index.md
           - WebSockets: devbook/reference/websockets/index.md

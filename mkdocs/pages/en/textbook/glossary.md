@@ -191,6 +191,9 @@ Sybil Attack
     over a network or consensus process.
     Common countermeasures include <PoW:> or <PoS:>, which tie influence to scarce resources.
 
+Symbol
+:   A blockchain platform created by the NEM project, launched in March 2021 as an evolution of <NIS1:>.
+
 testnet
 :   NEM's Test Network, intended for development.
     Test <XEM:> can be freely obtained from a [faucet](../devbook/accounts/testnet-faucet.md), so transactions on this
@@ -228,4 +231,4 @@ XEM
 :   The native currency of the NEM blockchain.
 
 XYM
-:   The native currency of the Symbol blockchain.
+:   The native currency of the <Symbol:> blockchain.
