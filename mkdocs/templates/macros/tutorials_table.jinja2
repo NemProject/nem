@@ -1,0 +1,19 @@
+{% macro render() -%}
+{% set sym = config.extra.nem %}
+{% set levels = ['beginner', 'intermediate', 'advanced'] %}
+
+| |
+{%- for level in levels -%}
+<span class="tutorial_level tutorial_level-{{level}}">{{sym.tutorial_level_labels[level]}}</span> |
+{%- endfor %}
+| - | - | - | - |
+{%- for section_name, section in sym.tutorials.items() %}
+| {{section_name | title}} |
+  {%- for level in levels -%}
+    {%- for t in section[level] -%}
+      [{{ t.title }}]({{t.url}})<br/>
+    {%- endfor %} |
+  {%- endfor -%}
+{% endfor %}
+
+{%- endmacro %}

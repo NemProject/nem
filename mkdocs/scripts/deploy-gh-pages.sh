@@ -1,5 +1,9 @@
-NEM_DOCS_FULL=true mkdocs build -f config/mkdocs.en.yml
-NEM_DOCS_FULL=true mkdocs build -f config/mkdocs.ja.yml
+#!/bin/bash
+
+set -ex
+
+NEM_DOCS_DISABLE_TS=false mkdocs build -f config/mkdocs.en.yml
+NEM_DOCS_DISABLE_TS=false mkdocs build -f config/mkdocs.ja.yml
 cd ../docs
 mv en en2
 mv ja ja2
