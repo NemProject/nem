@@ -12,7 +12,7 @@ url_source: True
 
 {% if configMemDef.get('brief') -%}
 {% if node.has_brief -%}
-<dl class="automatic-reference-term" markdown><dt>java:{{ node.name_long|replace("::",".") }}</dt><dd markdown>
+<dl class="automatic-reference-term" markdown><dt>Java:{{ node.name_long|replace("::",".") }}</dt><dd>
 {{node.brief + "\n"}}
 </dd></dl>
 {%- endif -%}
@@ -29,7 +29,7 @@ url_source: True
 
 {% if configMemDef.get('implements') -%}
 {% if node.reimplements %}
-Implements <java:{{node.reimplements.name_long|replace("::",".")}}|{{node.reimplements.name_long}}>
+Implements <Java:{{node.reimplements.name_long|replace("::",".")}}|{{node.reimplements.name_long}}>
 {% endif %}
 {%- endif -%}
 
