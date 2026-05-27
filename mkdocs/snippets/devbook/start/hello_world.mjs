@@ -9,7 +9,7 @@ console.log(`Network name: ${facade.network.name}`);
 const launchDate = facade.network.toDatetime(new NetworkTimestamp(0));
 console.log(`Network launch date: ${launchDate.toISOString()}`); // [<step-1]
 // [>step-2]
-const NODE_URL = 'http://tortuga.nemtest.net:7890';
+const NODE_URL = 'http://libertalia.nemtest.net:7890';
 console.log(`Using node ${NODE_URL}`);
 try {
 	// Fetch current chain height
