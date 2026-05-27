@@ -1,0 +1,45 @@
+{
+    "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+
+    // The Symbol SDK is shared with NEM. Document only the NEM and shared
+    // entry points and exclude the Symbol-only modules.
+    "entryPoints": [
+        "../../_symbol/sdk/javascript/ts/src/index.d.ts",
+        "../../_symbol/sdk/javascript/ts/src/Bip32.d.ts",
+        "../../_symbol/sdk/javascript/ts/src/Network.d.ts",
+        "../../_symbol/sdk/javascript/ts/src/NetworkTimestamp.d.ts",
+        "../../_symbol/sdk/javascript/ts/src/nem/index.d.ts",
+        "../../_symbol/sdk/javascript/ts/src/nem/MessageEncoder.d.ts"
+    ],
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+
+    "router": "kind-structure",
+    "includeVersion": true,
+    "excludePrivate": true,
+    "excludeExternals": true,
+    "sortEntryPoints": false,
+    "cleanOutputDir": true,
+    "readme": "none",
+    "disableSources": true,
+    "gitRemote": "upstream",
+    "exclude": ["**/symbol/*"],
+    "disableGit": true,
+
+    // Markdown plugin options
+    "hidePageHeader": true,
+    "hidePageTitle": false,
+    "hideBreadcrumbs": true,
+    "hideGroupHeadings": true,
+    "useCodeBlocks": true,
+    "excludeScopesInPaths": true,
+    "parametersFormat": "table",
+    "propertiesFormat": "table",
+    "enumMembersFormat": "table",
+    "classPropertiesFormat": "table",
+    "propertyMembersFormat": "table",
+    "typeDeclarationFormat": "table",
+    "interfacePropertiesFormat": "table",
+    "useHTMLEncodedBrackets": true
+}

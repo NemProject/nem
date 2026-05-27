@@ -1,0 +1,15 @@
+{% extends "_base/attribute.html.jinja" %}
+
+{% block heading scoped %}
+	{# Additional short anchor for convenience #}
+	<a id={{ attribute.parent.name }}.{{ attribute.name }}></a>
+	{{ super() }}
+{% endblock heading %}
+
+{% block docstring scoped %}
+	<dl class="automatic-reference-term"><dt>py:{{ attribute.parent.name }}.{{ attribute.name }}</dt><dd>
+	{%- with docstring_sections = attribute.docstring.parsed -%}
+		{%- include "docstring"|get_template with context -%}
+	{%- endwith -%}
+	</dd></dl>
+{% endblock docstring %}
