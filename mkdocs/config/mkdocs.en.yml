@@ -80,6 +80,10 @@ nav:
       - Getting Started:
           - devbook/start/setup.md
           - devbook/start/hello-world.md
+      - Tutorials:
+          - Accounts:
+              - devbook/accounts/create-from-private-key.md
+              - devbook/accounts/create-from-mnemonic.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
