@@ -1,0 +1,27 @@
+# descriptors
+
+## Classes
+
+- [AccountKeyLinkTransactionV1Descriptor](classes/AccountKeyLinkTransactionV1Descriptor.md)
+- [CosignatureV1BodyDescriptor](classes/CosignatureV1BodyDescriptor.md)
+- [CosignatureV1Descriptor](classes/CosignatureV1Descriptor.md)
+- [MessageDescriptor](classes/MessageDescriptor.md)
+- [MosaicDefinitionDescriptor](classes/MosaicDefinitionDescriptor.md)
+- [MosaicDefinitionTransactionV1Descriptor](classes/MosaicDefinitionTransactionV1Descriptor.md)
+- [MosaicDescriptor](classes/MosaicDescriptor.md)
+- [MosaicIdDescriptor](classes/MosaicIdDescriptor.md)
+- [MosaicLevyDescriptor](classes/MosaicLevyDescriptor.md)
+- [MosaicPropertyDescriptor](classes/MosaicPropertyDescriptor.md)
+- [MosaicSupplyChangeTransactionV1Descriptor](classes/MosaicSupplyChangeTransactionV1Descriptor.md)
+- [MultisigAccountModificationDescriptor](classes/MultisigAccountModificationDescriptor.md)
+- [MultisigAccountModificationTransactionV1Descriptor](classes/MultisigAccountModificationTransactionV1Descriptor.md)
+- [MultisigAccountModificationTransactionV2Descriptor](classes/MultisigAccountModificationTransactionV2Descriptor.md)
+- [MultisigTransactionV1Descriptor](classes/MultisigTransactionV1Descriptor.md)
+- [NamespaceIdDescriptor](classes/NamespaceIdDescriptor.md)
+- [NamespaceRegistrationTransactionV1Descriptor](classes/NamespaceRegistrationTransactionV1Descriptor.md)
+- [SizePrefixedCosignatureV1Descriptor](classes/SizePrefixedCosignatureV1Descriptor.md)
+- [SizePrefixedMosaicDescriptor](classes/SizePrefixedMosaicDescriptor.md)
+- [SizePrefixedMosaicPropertyDescriptor](classes/SizePrefixedMosaicPropertyDescriptor.md)
+- [SizePrefixedMultisigAccountModificationDescriptor](classes/SizePrefixedMultisigAccountModificationDescriptor.md)
+- [TransferTransactionV1Descriptor](classes/TransferTransactionV1Descriptor.md)
+- [TransferTransactionV2Descriptor](classes/TransferTransactionV2Descriptor.md)

@@ -1,0 +1,7147 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://nemproject.github.io/nem-docs/en/textbook/nodes/">
+      
+      
+        <link rel="prev" href="../blocks/">
+      
+      
+        <link rel="next" href="../harvesting/">
+      
+      
+        
+          <link rel="alternate" href="/en/" hreflang="en">
+        
+          <link rel="alternate" href="/ja/" hreflang="ja">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Nodes - NEM Docs WIP 🚧</title>
+      
+    
+    
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+
+<style>
+[data-md-color-primary=indigo] {
+	--md-primary-fg-color: var(--textbook-color);
+	--md-primary-fg-color--dark: var(--textbook-color--dark);
+	--md-primary-fg-color--light: var(--textbook-color--light);
+	--md-accent-fg-color--transparent: var(--textbook-color--transparent);
+}
+</style>
+
+
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Nunito Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: none; }
+    .glightbox-clean .gslide-media {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#nodes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+	<nav class="md-header__inner md-grid" aria-label="Header">
+		<a href="https://nemproject.github.io/nem-docs" title="NEM Docs WIP 🚧" class="md-header__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
+			
+  <img src="../../assets/images/nem-logo.svg" alt="logo">
+
+		</a>
+		<label class="md-header__button md-icon" for="__drawer">
+			
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+		</label>
+		<div class="md-header__title" data-md-component="header-title">
+			<div class="md-header__ellipsis">
+				<div class="md-header__topic">
+					<span class="md-ellipsis">
+						NEM Docs WIP 🚧
+					</span>
+				</div>
+				<div class="md-header__topic" data-md-component="header-topic">
+					<span class="md-ellipsis">
+						
+						
+							Nodes
+						
+					</span>
+				</div>
+			</div>
+		</div>
+		
+			
+				<form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+			
+		
+		
+			<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+		
+		
+			<div class="md-header__option">
+	<div class="md-select">
+		
+		<button class="md-header__button md-icon" aria-label="Select language">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+		</button>
+		<div class="md-select__inner">
+			<ul class="md-select__list">
+				
+					<li class="md-select__item">
+						
+						
+						<a href="/en/textbook/nodes/" hreflang="en" class="md-select__link">
+							English
+						</a>
+					</li>
+				
+					<li class="md-select__item">
+						
+						
+						<a href="/ja/textbook/nodes/" hreflang="ja" class="md-select__link">
+							日本語
+						</a>
+					</li>
+				
+			</ul>
+		</div>
+	</div>
+</div>
+		
+		
+			
+			
+				<label class="md-header__button md-icon" for="__search">
+					
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+				</label>
+				<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+			
+		
+		
+			<div class="md-header__source">
+				
+			</div>
+		
+	</nav>
+	
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Welcome to the NEM documentation pages
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../userbook/intro/" class="md-tabs__link">
+          
+  
+  
+  User Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../devbook/intro/" class="md-tabs__link">
+          
+  
+  
+  Developer Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../intro/" class="md-tabs__link">
+          
+  
+  
+  Textbook
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://nemproject.github.io/nem-docs" title="NEM Docs WIP 🚧" class="md-nav__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
+      
+  <img src="../../assets/images/nem-logo.svg" alt="logo">
+
+    </a>
+    NEM Docs WIP 🚧
+  </label>
+  
+    <div class="md-nav__source">
+      
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome to the NEM documentation pages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Manual
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../userbook/intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Manual
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Manual
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/start/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/start/hello-world/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hello World
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_1" id="__nav_3_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Accounts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/accounts/create-from-private-key/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create from Private Keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/accounts/create-from-mnemonic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create from Mnemonic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1" id="__nav_3_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python SDK
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Python SDK
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1_1" id="__nav_3_4_1_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    symbolchain
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    symbolchain
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/AccountDescriptorRepository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AccountDescriptorRepository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/ArrayHelpers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ArrayHelpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/BaseValue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BaseValue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/Bip32/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bip32
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/BlockchainSettings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BlockchainSettings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/BufferReader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BufferReader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/BufferWriter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BufferWriter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/ByteArray/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ByteArray
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/Cipher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cipher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/CodeWordsEncoder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CodeWordsEncoder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/CryptoTypes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CryptoTypes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/DiceMnemonicGenerator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DiceMnemonicGenerator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/Network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/NetworkTimestamp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkTimestamp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/NodeDescriptorRepository/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NodeDescriptorRepository
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/PrivateKeyStorage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PrivateKeyStorage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/QrSignatureStorage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QrSignatureStorage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/QrStorage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QrStorage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/RuleBasedTransactionFactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RuleBasedTransactionFactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/TransactionDescriptorProcessor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransactionDescriptorProcessor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/Transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1_1_22" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1_1_22" id="__nav_3_4_1_1_22_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    external
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_1_1_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1_1_22">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    external
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/external/ed25519/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ed25519
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1_1_23" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1_1_23" id="__nav_3_4_1_1_23_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    facade
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_1_1_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1_1_23">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    facade
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/facade/BatchOperations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BatchOperations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/facade/NemFacade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NemFacade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1_1_24" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1_1_24" id="__nav_3_4_1_1_24_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nem
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_1_1_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1_1_24">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    nem
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/nem/KeyPair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KeyPair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/nem/MessageEncoder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MessageEncoder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/nem/Network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/nem/TransactionFactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransactionFactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/py/ripemd160/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ripemd160
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2" id="__nav_3_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TypeScript SDK
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    TypeScript SDK
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_1" id="__nav_3_4_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bip32
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Bip32
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Bip32/classes/Bip32/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bip32
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Bip32/classes/Bip32Node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bip32Node
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_2" id="__nav_3_4_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Network/classes/Network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Network/classes/NetworkLocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkLocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_2_3" id="__nav_3_4_2_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    type-aliases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_2_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    type-aliases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Network/type-aliases/AddressConstructable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConstructable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Network/type-aliases/Constructable/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constructable
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/Network/type-aliases/EncodedSizeAccessor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EncodedSizeAccessor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_3" id="__nav_3_4_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkTimestamp
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    NetworkTimestamp
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/NetworkTimestamp/classes/NetworkTimestamp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkTimestamp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/NetworkTimestamp/classes/NetworkTimestampDatetimeConverter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkTimestampDatetimeConverter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_4" id="__nav_3_4_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    index
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    index
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/BaseValue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BaseValue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/ByteArray/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ByteArray
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/Hash256/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hash256
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/PrivateKey/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PrivateKey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/PublicKey/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PublicKey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/SharedKey256/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SharedKey256
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/classes/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_4_8" id="__nav_3_4_2_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    utils
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_2_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    utils
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/bytesToBigInt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bytesToBigInt
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/bytesToInt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bytesToInt
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/deepCompare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deepCompare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/hexToUint8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hexToUint8
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/intToBytes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    intToBytes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/isHexString/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    isHexString
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/tryParseUint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tryParseUint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/index/namespaces/utils/functions/uint8ToHex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    uint8ToHex
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_5" id="__nav_3_4_2_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    nem
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_4_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    nem
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_5_1" id="__nav_3_4_2_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MessageEncoder
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_2_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MessageEncoder
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/MessageEncoder/classes/default/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    default
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_5_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_5_1_2" id="__nav_3_4_2_5_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    type-aliases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="6" aria-labelledby="__nav_3_4_2_5_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_5_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    type-aliases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/MessageEncoder/type-aliases/TryDecodeResult/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TryDecodeResult
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/Address/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/KeyPair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KeyPair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/NemAccount/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NemAccount
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/NemFacade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NemFacade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/NemPublicAccount/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NemPublicAccount
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/Network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/NetworkTimestamp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkTimestamp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/TransactionFactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransactionFactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/classes/Verifier/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verifier
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_5_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_5_11" id="__nav_3_4_2_5_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    descriptors
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_2_5_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_5_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    descriptors
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/AccountKeyLinkTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AccountKeyLinkTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/CosignatureV1BodyDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CosignatureV1BodyDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/CosignatureV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CosignatureV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MessageDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MessageDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDefinitionDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicDefinitionDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDefinitionTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicDefinitionTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicIdDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicIdDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicLevyDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicLevyDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicPropertyDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicPropertyDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicSupplyChangeTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicSupplyChangeTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationTransactionV2Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationTransactionV2Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/NamespaceIdDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NamespaceIdDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/NamespaceRegistrationTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NamespaceRegistrationTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedCosignatureV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedCosignatureV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMosaicDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMosaicDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMosaicPropertyDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMosaicPropertyDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMultisigAccountModificationDescriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMultisigAccountModificationDescriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/TransferTransactionV1Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransferTransactionV1Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/descriptors/classes/TransferTransactionV2Descriptor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransferTransactionV2Descriptor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_2_5_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_2_5_12" id="__nav_3_4_2_5_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_4_2_5_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_2_5_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/AccountKeyLinkTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AccountKeyLinkTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Address/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Amount/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Amount
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/CosignatureV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CosignatureV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/CosignatureV1Body/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CosignatureV1Body
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Hash256/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hash256
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Height/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Height
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/LinkAction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LinkAction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Message/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MessageType/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MessageType
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicDefinition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicDefinition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicDefinitionTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicDefinitionTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicId/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicId
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicLevy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicLevy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicProperty/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicProperty
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicSupplyChangeAction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicSupplyChangeAction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicSupplyChangeTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicSupplyChangeTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MosaicTransferFeeType/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MosaicTransferFeeType
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationTransactionV2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationTransactionV2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationType/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigAccountModificationType
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/MultisigTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultisigTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NamespaceId/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NamespaceId
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NamespaceRegistrationTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NamespaceRegistrationTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NetworkType/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NetworkType
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableAccountKeyLinkTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableAccountKeyLinkTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableCosignatureV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableCosignatureV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMosaicDefinitionTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableMosaicDefinitionTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMosaicSupplyChangeTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableMosaicSupplyChangeTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigAccountModificationTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableMultisigAccountModificationTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigAccountModificationTransactionV2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableMultisigAccountModificationTransactionV2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableMultisigTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableNamespaceRegistrationTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableNamespaceRegistrationTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransaction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableTransaction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransactionFactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableTransactionFactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransferTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableTransferTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransferTransactionV2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NonVerifiableTransferTransactionV2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/PublicKey/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PublicKey
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedCosignatureV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedCosignatureV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMosaicProperty/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMosaicProperty
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMultisigAccountModification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SizePrefixedMultisigAccountModification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Timestamp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timestamp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/Transaction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/TransactionFactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransactionFactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/TransactionType/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransactionType
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/TransferTransactionV1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransferTransactionV1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/ts/nem/namespaces/models/classes/TransferTransactionV2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TransferTransactionV2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/rest/nem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NEM REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/serialization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serialization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/websockets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSockets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Textbook
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Textbook
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cryptography/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Cryptography
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../accounts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../consensus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Consensus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transfer_transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transfer Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mosaics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mosaics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../namespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Namespaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nodes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nodes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#node-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebSocket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peer-to-peer-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peer To Peer Communication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Peer To Peer Communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-reputation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Reputation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supernodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supernodes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../harvesting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Harvesting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CATS DSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#node-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WebSocket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peer-to-peer-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peer To Peer Communication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Peer To Peer Communication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#node-reputation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Reputation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supernodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supernodes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+	
+		<a href="https://github.com/NemProject/nem/blob/new-docs/mkdocs/pages/en/textbook/nodes.md" title="Edit this page" class="md-content__button md-icon">
+			
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+		</a>
+	
+	
+		
+			
+		
+		<a href="https://github.com/NemProject/nem/raw/new-docs/mkdocs/pages/en/textbook/nodes.md" title="View source of this page" class="md-content__button md-icon">
+			
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+		</a>
+	
+	
+
+
+<h1 id="nodes">Nodes<a class="headerlink" href="#nodes" title="Anchor link to this section for reference">⚓︎</a></h1>
+<dl>
+<dt>
+	<a id="bc6d0fc1a92ae07d7739daed957574ab">Node</a> 
+</dt>
+<dd>A computer running the NEM software which shares information with peer nodes, validates incoming <a class="mkdocs-ezglossary-link"
+	id="0b1f116b4a7cb55915b4e936693e5e8d"
+	title="A transaction represents an action to perform on the NEM blockchain,
+like moving funds from one account to another, or registering a new mosaic."
+	name="_:Transaction"
+	href="../../textbook/transactions/#dbaff459c19d2574b92538a13b4b8910">transactions</a>,
+and participates in <a class="mkdocs-ezglossary-link"
+	id="d7f017e9ee49a4015682e18eabb192cb"
+	title="The process by which all nodes in the network agree on the current state of the blockchain."
+	name="_:Consensus"
+	href="../../textbook/consensus/#92c744def3f7fe5c0703c81afb16f4f8">consensus</a> and block creation.</dd>
+
+</dl>
+<p>Nodes form the backbone of the blockchain, ensuring the network remains functional as long as enough nodes are active.</p>
+<p>Anyone can run a NEM node.
+Operators do so to <a class="mkdocs-ezglossary-link"
+	id="964088dd06a05c6c78196e92bba772c2"
+	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
+It plays a similar role to mining in PoW or staking in PoS."
+	name="_:Harvesting"
+	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvest</a> blocks with their own account, to host <a class="mkdocs-ezglossary-link"
+	id="ff3c41008b6128b6b8247f4fe40c6677"
+	title="A form of harvesting where an account delegates block-signing to a separate remote account on a node,
+while keeping its importance and receiving all the rewards."
+	name="_:Delegated Harvesting"
+	href="../../textbook/harvesting/#252148c4daf33af1a7e32bc8f8a36292">delegated harvesting</a> for others,
+or to qualify for the <a class="mkdocs-ezglossary-link"
+	id="2ddc411638a87552c92bdb11e8b1b892"
+	title="An off-chain, community-funded program that rewards reliable public nodes."
+	name="_:Supernode Program"
+	href="../../textbook/nodes/#74e6d1e76b06867da93582d7ca521342">Supernode Program</a>.</p>
+<h2 id="node-structure">Node Structure<a class="headerlink" href="#node-structure" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>Every NEM node runs the same application, called <em>NIS</em>.</p>
+<dl>
+<dt>
+	<a id="7db9da2b4c1b58bd6ba92f043f0dfb4e">NIS</a> 
+</dt>
+<dd>NEM Infrastructure Server.
+A single Java process that implements all node functionality.</dd>
+
+</dl>
+<p>NIS has four parts: an <a href="#engine">engine</a>, exposed by a <a href="#rest-api">REST API</a> and a <a href="#websocket">WebSocket</a> service, with an embedded <a href="#database">database</a> for storage.</p>
+<p>Over the network, NIS exchanges data with other nodes and with clients:</p>
+<ul>
+<li><em>Other nodes</em> are NIS peers on the network.</li>
+<li><em>Clients</em> are external programs such as wallets, explorers, and applications.</li>
+</ul>
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="506pt" height="325pt" viewBox="0.00 0.00 506.00 325.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 320.65)"><title>NemNode</title><polygon fill="none" stroke="none" points="-4,4 -4,-320.65 502,-320.65 502,4 -4,4"/><g id="clust1" class="cluster"><title>cluster_nis</title><polygon fill="none" stroke="#789abc" stroke-width="1.5" stroke-dasharray="5,2" points="8,-8 8,-255.65 490,-255.65 490,-8 8,-8"/><text xml:space="preserve" text-anchor="middle" x="249" y="-15.95" font-family="Times,serif" font-size="14.00" fill="#789abc">NIS</text></g><!-- OtherNodes --><g id="node1" class="node"><title>OtherNodes</title><text xml:space="preserve" text-anchor="middle" x="181" y="-293.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Other nodes</text></g><!-- REST --><g id="node3" class="node"><title>REST</title><g id="a_node3"><a xlink:href="#rest-api" xlink:title="REST + WebSocket"><polygon fill="#789abc" stroke="#789abc" points="465,-230.65 33,-230.65 33,-173.05 465,-173.05 465,-230.65"/><text xml:space="preserve" text-anchor="middle" x="249" y="-197.18" font-family="Times,serif" font-size="14.00" fill="#789abc">REST + WebSocket</text></a></g></g><!-- OtherNodes&#45;&gt;REST --><g id="edge4" class="edge"><title>OtherNodes&#45;&gt;REST</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M181,-268.63C181,-268.63 181,-243.16 181,-243.16"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="177.5,-268.63 181,-278.63 184.5,-268.63 177.5,-268.63"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="184.5,-243.16 181,-233.16 177.5,-243.16 184.5,-243.16"/></g><!-- Clients --><g id="node2" class="node"><title>Clients</title><text xml:space="preserve" text-anchor="middle" x="316" y="-293.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Clients</text></g><!-- Clients&#45;&gt;REST --><g id="edge5" class="edge"><title>Clients&#45;&gt;REST</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M316,-268.63C316,-268.63 316,-243.16 316,-243.16"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="312.5,-268.63 316,-278.63 319.5,-268.63 312.5,-268.63"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="319.5,-243.16 316,-233.16 312.5,-243.16 319.5,-243.16"/></g><!-- Engine --><g id="node4" class="node"><title>Engine</title><g id="a_node4"><a xlink:href="#engine" xlink:title="Engine"><polygon fill="#789abc" stroke="#789abc" points="223.6,-123.05 36.4,-123.05 36.4,-58.25 223.6,-58.25 223.6,-123.05"/><text xml:space="preserve" text-anchor="middle" x="130" y="-85.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Engine</text></a></g></g><!-- REST&#45;&gt;Engine --><g id="edge1" class="edge"><title>REST&#45;&gt;Engine</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M130,-160.36C130,-160.36 130,-135.47 130,-135.47"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="126.5,-160.36 130,-170.36 133.5,-160.36 126.5,-160.36"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="133.5,-135.47 130,-125.47 126.5,-135.47 133.5,-135.47"/></g><!-- H2 --><g id="node5" class="node"><title>H2</title><g id="a_node5"><a xlink:href="#database" xlink:title="Blocks\n(H2)"><path fill="#789abc" stroke="#789abc" d="M460.6,-117.16C460.6,-120.41 418.65,-123.05 367,-123.05 315.35,-123.05 273.4,-120.41 273.4,-117.16 273.4,-117.16 273.4,-64.14 273.4,-64.14 273.4,-60.89 315.35,-58.25 367,-58.25 418.65,-58.25 460.6,-60.89 460.6,-64.14 460.6,-64.14 460.6,-117.16 460.6,-117.16"/><path fill="none" stroke="#789abc" d="M460.6,-117.16C460.6,-113.91 418.65,-111.27 367,-111.27 315.35,-111.27 273.4,-113.91 273.4,-117.16"/><text xml:space="preserve" text-anchor="middle" x="367" y="-94.6" font-family="Times,serif" font-size="14.00" fill="#789abc">Blocks</text><text xml:space="preserve" text-anchor="middle" x="367" y="-77.35" font-family="Times,serif" font-size="14.00" fill="#789abc">(H2)</text></a></g></g><!-- REST&#45;&gt;H2 --><!-- Engine&#45;&gt;H2 --><g id="edge3" class="edge"><title>Engine&#45;&gt;H2</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M236.28,-91C236.28,-91 260.83,-91 260.83,-91"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="236.28,-87.5 226.28,-91 236.28,-94.5 236.28,-87.5"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="260.83,-94.5 270.83,-91 260.83,-87.5 260.83,-94.5"/></g></g></svg></p>
+<h3 id="engine">Engine<a class="headerlink" href="#engine" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>The engine performs the blockchain work: it validates incoming data, runs <a class="mkdocs-ezglossary-link"
+	id="06d7eea3c4c4af4455ed2b99eb1a44af"
+	title="The process by which all nodes in the network agree on the current state of the blockchain."
+	name="_:Consensus"
+	href="../../textbook/consensus/#92c744def3f7fe5c0703c81afb16f4f8">consensus</a> and <a class="mkdocs-ezglossary-link"
+	id="b71091773a18abb28999cfe997e7de7d"
+	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
+It plays a similar role to mining in PoW or staking in PoS."
+	name="_:Harvesting"
+	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>, handles
+<a href="#peer-to-peer-communication">peer-to-peer networking</a>, and maintains the
+<a class="mkdocs-ezglossary-link"
+	id="0cce01a0f2521877aedce2dfc45dadab"
+	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
+	name="_:Unconfirmed pool"
+	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed transactions pool</a>.</p>
+<p>The engine is an internal component and is not exposed directly.
+Every inbound request, from a peer or from a client, arrives through the REST API described below and is then handed
+to the engine.</p>
+<h3 id="rest-api">REST API<a class="headerlink" href="#rest-api" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>Both peers and clients reach NIS through a single HTTP API:</p>
+<ul>
+<li><em>Peer requests</em> handle block synchronization, transaction relay, and node discovery.</li>
+<li><em>Client requests</em> handle reading blockchain data and submitting <a class="mkdocs-ezglossary-link"
+	id="b7d6af138add74359e0bef946833076f"
+	title="A transaction represents an action to perform on the NEM blockchain,
+like moving funds from one account to another, or registering a new mosaic."
+	name="_:Transaction"
+	href="../../textbook/transactions/#dbaff459c19d2574b92538a13b4b8910">transactions</a>.</li>
+</ul>
+<h3 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>NIS publishes block and transaction events through a built-in
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSocket</a> service.
+Subscribed clients receive notifications in real time without polling.</p>
+<h3 id="database">Database<a class="headerlink" href="#database" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>NIS stores the blockchain in an <a href="https://www.h2database.com">H2</a> relational database that is <em>embedded</em>, meaning it runs
+inside the NIS process rather than as a separate database server.</p>
+<p>The database holds only the chain itself: every block and the transactions inside it.
+It does not store the current blockchain state, such as account balances and <a class="mkdocs-ezglossary-link"
+	id="820eccfb8d39d82c5f2fa0cfdf906593"
+	title="A measure of an account's contribution to the network, based on its vested balance and its outgoing
+transfers to other accounts.
+This score determines the account's chances of harvesting a block."
+	name="_:Importance"
+	href="../../textbook/harvesting/#76ca9920588d90f42b544215c87ec7d4">importance</a> scores.
+NIS keeps that state in memory and rebuilds it at every start by replaying the chain from the <a class="mkdocs-ezglossary-link"
+	id="27d1a6fa02b57a27a29c89246dcc019f"
+	title="The first block in the NEM blockchain.
+Unlike all other blocks, which are created through network consensus, the nemesis block is manually generated by the
+network creators."
+	name="_:Nemesis block"
+	href="../../textbook/blocks/#bd1e6e872753711cb56151debae22b42">nemesis block</a> onward,
+which is why a node stays unavailable for a while after it starts.</p>
+<p>NIS reads and writes data through <a href="https://hibernate.org">Hibernate</a>, a library that maps Java objects to database rows.
+When NIS is upgraded to a newer release, <a href="https://flywaydb.org">Flyway</a> automatically applies any required schema
+changes.</p>
+<h2 id="peer-to-peer-communication">Peer To Peer Communication<a class="headerlink" href="#peer-to-peer-communication" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>NEM nodes communicate directly with one another in a decentralized, peer-to-peer fashion.
+There is no central coordinator: instead, each node establishes connections with a subset of other nodes,
+forming a distributed network.</p>
+<p>Nodes share their lists of known peers, allowing a newly connected node to quickly discover others and integrate
+into the network.
+This process ensures robust connectivity and helps the network remain resilient, even if individual nodes go offline.</p>
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="433pt" height="375pt" viewBox="0.00 0.00 433.00 375.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 371.04)"><title>P2PNetwork</title><polygon fill="none" stroke="none" points="-4,4 -4,-371.04 429.04,-371.04 429.04,4 -4,4"/><!-- N1 --><g id="node1" class="node"><title>N1</title><ellipse fill="#789abc" stroke="#789abc" cx="212.52" cy="-18" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="212.52" y="-13.32" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 1</text></g><!-- N2 --><g id="node2" class="node"><title>N2</title><ellipse fill="#789abc" stroke="#789abc" cx="95.48" cy="-300.56" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="95.48" y="-295.88" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 2</text></g><!-- N1&#45;&#45;N2 --><g id="edge1" class="edge"><title>N1&#45;&#45;N2</title><path fill="none" stroke="#789abc" d="M200.62,-46.73C178.14,-100.99 129.69,-217.97 107.28,-272.06"/><polygon fill="#789abc" stroke="#789abc" points="203.85,-48.08 204.44,-37.5 197.38,-45.4 203.85,-48.08"/><polygon fill="#789abc" stroke="#789abc" points="104.09,-270.63 103.49,-281.21 110.56,-273.31 104.09,-270.63"/></g><!-- N5 --><g id="node5" class="node"><title>N5</title><ellipse fill="#789abc" stroke="#789abc" cx="329.56" cy="-66.48" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="329.56" y="-61.8" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 5</text></g><!-- N1&#45;&#45;N5 --><g id="edge8" class="edge"><title>N1&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M255.16,-35.66C265.5,-39.95 276.56,-44.53 286.91,-48.81"/><polygon fill="#789abc" stroke="#789abc" points="256.79,-32.55 246.21,-31.95 254.11,-39.02 256.79,-32.55"/><polygon fill="#789abc" stroke="#789abc" points="285.4,-51.97 295.97,-52.57 288.07,-45.51 285.4,-51.97"/></g><!-- N3 --><g id="node3" class="node"><title>N3</title><ellipse fill="#789abc" stroke="#789abc" cx="47" cy="-183.52" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="47" y="-178.84" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 3</text></g><!-- N2&#45;&#45;N3 --><g id="edge2" class="edge"><title>N2&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M83.72,-272.18C76.21,-254.03 66.49,-230.57 58.94,-212.34"/><polygon fill="#789abc" stroke="#789abc" points="80.37,-273.23 87.43,-281.13 86.84,-270.55 80.37,-273.23"/><polygon fill="#789abc" stroke="#789abc" points="62.2,-211.06 55.14,-203.16 55.73,-213.74 62.2,-211.06"/></g><!-- N6 --><g id="node6" class="node"><title>N6</title><ellipse fill="#789abc" stroke="#789abc" cx="212.52" cy="-349.04" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="212.52" y="-344.36" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 6</text></g><!-- N2&#45;&#45;N6 --><g id="edge9" class="edge"><title>N2&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M138.12,-318.22C148.46,-322.51 159.52,-327.09 169.87,-331.37"/><polygon fill="#789abc" stroke="#789abc" points="139.75,-315.11 129.17,-314.51 137.07,-321.57 139.75,-315.11"/><polygon fill="#789abc" stroke="#789abc" points="168.36,-334.53 178.93,-335.13 171.03,-328.07 168.36,-334.53"/></g><!-- N4 --><g id="node4" class="node"><title>N4</title><ellipse fill="#789abc" stroke="#789abc" cx="95.48" cy="-66.48" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="95.48" y="-61.8" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 4</text></g><!-- N3&#45;&#45;N4 --><g id="edge3" class="edge"><title>N3&#45;&#45;N4</title><path fill="none" stroke="#789abc" d="M58.76,-155.14C66.27,-136.99 75.99,-113.53 83.54,-95.3"/><polygon fill="#789abc" stroke="#789abc" points="55.64,-153.51 55.05,-164.09 62.11,-156.19 55.64,-153.51"/><polygon fill="#789abc" stroke="#789abc" points="86.75,-96.7 87.34,-86.12 80.28,-94.02 86.75,-96.7"/></g><!-- N4&#45;&#45;N1 --><g id="edge10" class="edge"><title>N4&#45;&#45;N1</title><path fill="none" stroke="#789abc" d="M138.12,-48.82C148.46,-44.53 159.52,-39.95 169.87,-35.67"/><polygon fill="#789abc" stroke="#789abc" points="137.07,-45.46 129.17,-52.52 139.75,-51.93 137.07,-45.46"/><polygon fill="#789abc" stroke="#789abc" points="171.03,-38.97 178.93,-31.91 168.36,-32.5 171.03,-38.97"/></g><!-- N4&#45;&#45;N5 --><g id="edge4" class="edge"><title>N4&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M154.19,-66.48C189.91,-66.48 235.36,-66.48 271.04,-66.48"/><polygon fill="#789abc" stroke="#789abc" points="154.36,-62.98 144.36,-66.48 154.36,-69.98 154.36,-62.98"/><polygon fill="#789abc" stroke="#789abc" points="270.75,-69.98 280.75,-66.48 270.75,-62.98 270.75,-69.98"/></g><!-- N5&#45;&#45;N6 --><g id="edge5" class="edge"><title>N5&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M317.66,-95.2C295.18,-149.47 246.73,-266.45 224.32,-320.54"/><polygon fill="#789abc" stroke="#789abc" points="320.89,-96.56 321.48,-85.98 314.42,-93.88 320.89,-96.56"/><polygon fill="#789abc" stroke="#789abc" points="221.13,-319.11 220.53,-329.69 227.59,-321.79 221.13,-319.11"/></g><!-- N7 --><g id="node7" class="node"><title>N7</title><ellipse fill="#789abc" stroke="#789abc" cx="329.56" cy="-300.56" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="329.56" y="-295.88" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 7</text></g><!-- N6&#45;&#45;N7 --><g id="edge6" class="edge"><title>N6&#45;&#45;N7</title><path fill="none" stroke="#789abc" d="M255.16,-331.38C265.5,-327.09 276.56,-322.51 286.91,-318.22"/><polygon fill="#789abc" stroke="#789abc" points="254.11,-328.02 246.21,-335.08 256.79,-334.49 254.11,-328.02"/><polygon fill="#789abc" stroke="#789abc" points="288.07,-321.53 295.97,-314.47 285.4,-315.06 288.07,-321.53"/></g><!-- N8 --><g id="node8" class="node"><title>N8</title><ellipse fill="#789abc" stroke="#789abc" cx="378.04" cy="-183.52" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="378.04" y="-178.84" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 8</text></g><!-- N7&#45;&#45;N8 --><g id="edge7" class="edge"><title>N7&#45;&#45;N8</title><path fill="none" stroke="#789abc" d="M341.31,-272.18C348.83,-254.03 358.55,-230.57 366.1,-212.34"/><polygon fill="#789abc" stroke="#789abc" points="338.2,-270.55 337.61,-281.13 344.67,-273.23 338.2,-270.55"/><polygon fill="#789abc" stroke="#789abc" points="369.31,-213.74 369.9,-203.16 362.84,-211.06 369.31,-213.74"/></g><!-- N8&#45;&#45;N3 --><g id="edge11" class="edge"><title>N8&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M319.47,-183.52C259.2,-183.52 165.84,-183.52 105.56,-183.52"/><polygon fill="#789abc" stroke="#789abc" points="319.09,-187.02 329.09,-183.52 319.09,-180.02 319.09,-187.02"/><polygon fill="#789abc" stroke="#789abc" points="105.85,-180.02 95.85,-183.52 105.85,-187.02 105.85,-180.02"/></g></g></svg></p>
+<p>To facilitate bootstrapping, an initial list of peers is bundled with <a class="mkdocs-ezglossary-link"
+	id="c32575453852dc8e1e9ddd9a45040d38"
+	title="NEM Infrastructure Server.
+A single Java process that implements all node functionality."
+	name="_:NIS"
+	href="../../textbook/nodes/#7db9da2b4c1b58bd6ba92f043f0dfb4e">NIS</a>.
+This allows a new node to make its first connections and begin discovering others.
+However, nodes on this list receive no special treatment:
+once connected, all peers are treated equally by the protocol.</p>
+<h3 id="node-reputation">Node Reputation<a class="headerlink" href="#node-reputation" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>In a decentralized network like NEM, nodes must decide which peers to trust and maintain connections with.
+Rather than relying on static whitelists or manually curated connections, NEM nodes use a <em>reputation</em> system
+to dynamically score and rank their peers based on observed behavior over time.</p>
+<p>Each node calculates reputation independently, using metrics such as communication success, response time,
+and the validity of received data.
+Nodes that behave correctly and respond consistently are given higher scores.
+Those that send invalid data, fail to respond, or otherwise misbehave may be penalized or temporarily blacklisted.</p>
+<p>When a node needs to establish a new connection, it selects from the available peers, prioritizing those with higher
+reputation based on past interactions.</p>
+<p>Note that reputation scores are local: each node maintains its own view of the network,
+based solely on its direct experience.</p>
+<p>The implementation is based on the <a href="https://en.wikipedia.org/wiki/EigenTrust">EigenTrust++</a> algorithm.</p>
+<div class="admonition note">
+<p class="admonition-title">Node rotation</p>
+<p>To prevent the formation of isolated or stagnant node groups,
+NEM nodes periodically refresh their peer set, pulling peer lists from a sample of current peers
+and merging newly discovered nodes into the candidate pool, regardless of how well existing peers are scoring.</p>
+<p>This forced churn ensures that nodes continually discover and evaluate new peers,
+maintaining a well-connected and adaptive network topology.</p>
+<p>By balancing reputation-based stability with deliberate connection turnover,
+the protocol avoids network fragmentation and promotes long-term decentralization.</p>
+</div>
+<p>Finally, note that this reputation score is an internal metric used by nodes to decide which other nodes to connect to.
+When using <a class="mkdocs-ezglossary-link"
+	id="43ec9eda3c44d8e5323141ac8a8e8c05"
+	title="A form of harvesting where an account delegates block-signing to a separate remote account on a node,
+while keeping its importance and receiving all the rewards."
+	name="_:Delegated Harvesting"
+	href="../../textbook/harvesting/#252148c4daf33af1a7e32bc8f8a36292">delegated harvesting</a>, accounts may delegate to any node they choose, based on reputation factors
+that may or may not be related to the score described in this page.</p>
+<h2 id="supernodes">Supernodes<a class="headerlink" href="#supernodes" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>A supernode is a node enrolled in the <em>Supernode Program</em>.</p>
+<dl>
+<dt>
+	<a id="74e6d1e76b06867da93582d7ca521342">Supernode Program</a> 
+</dt>
+<dd>An off-chain, community-funded program that rewards reliable public nodes.</dd>
+
+</dl>
+<p>NEM has no block subsidy or inflation.
+Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
+The Supernode Program offsets this by paying daily rewards to nodes that prove themselves reliable.</p>
+<p>The program runs entirely off-chain, and NIS itself plays no part: a separate, centrally operated service called the
+<em>controller</em> tests participating nodes and pays out the rewards.</p>
+<p>A node qualifies for a day's reward by holding at least 10'000 <a class="mkdocs-ezglossary-link"
+	id="a9ebc0e4a01979b431f3faf47de68fc1"
+	title="The native currency of the NEM blockchain."
+	name="_:XEM"
+	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> and passing a battery of automated tests that
+confirm it is in sync, up to date, and running on hardware and a network connection capable of serving peers reliably.</p>
+<p>Testing happens in four rounds spaced six hours apart, and a node must pass every test in every round to be eligible.
+Each round runs the eight tests below, several of them measured against a trusted <em>reference node</em> that the controller
+knows to be healthy:</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>A node passes when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chain height</strong></td>
+<td>Its chain is no more than 4 blocks behind the reference node.</td>
+</tr>
+<tr>
+<td><strong>Chain part</strong></td>
+<td>A random sequence of 60 to 100 recent blocks matches the reference node exactly, including signatures.</td>
+</tr>
+<tr>
+<td><strong>Balance</strong></td>
+<td>Its main account holds at least 10'000 XEM.</td>
+</tr>
+<tr>
+<td><strong>Computing power</strong></td>
+<td>It completes 10'000 successive key derivations, round trip included, in 5 seconds or less.</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>It runs a client version at least as recent as the reference node's.</td>
+</tr>
+<tr>
+<td><strong>Ping</strong></td>
+<td>Across pings to 5 random peers, at most one ping fails and the average round trip stays under 200 ms.</td>
+</tr>
+<tr>
+<td><strong>Bandwidth</strong></td>
+<td>A bulk hashing exchange with a peer runs at an effective transfer speed of at least 5 Mbit/s.</td>
+</tr>
+<tr>
+<td><strong>Responsiveness</strong></td>
+<td>It answers 10 chain-height requests in 1 second or less, with at least 9 succeeding.</td>
+</tr>
+</tbody>
+</table>
+<p>Rewards come from a fixed daily pool of 25'500 XEM, and each qualifying node earns at most 500 XEM per day.
+While 51 or fewer nodes qualify, each receives the full 500 XEM.
+Beyond that, the pool is divided equally, so per-node rewards fall as the network grows.</p>
+<p>Enrollment is optional.
+Step-by-step instructions are available on the <a href="https://nem.io/supernode/">NEM Supernode page</a>.</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 22, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 22, 2026</span>
+  </span>
+
+    
+    
+      
+  
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Contributors">
+      
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+      
+    </span>
+    <nav>
+      
+        <a href="mailto:zero4862@pm.me">zero</a>
+    </nav>
+  </span>
+
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          <!-- User-preference: link content tabs -->
+
+	<script>
+		var tabs = __md_get("__tabs") || ["Python"]
+		main: for (var set of document.querySelectorAll(".tabbed-set")) {
+			var labels = set.querySelector(".tabbed-labels")
+			for (var tab of tabs)
+				for (var label of labels.getElementsByTagName("label"))
+					if (label.innerText.trim() === tab) {
+						var input = document.getElementById(label.htmlFor)
+						input.checked = true
+						continue main
+					}
+		}
+		// Initialize dynamic links
+		main2: for (var set of document.querySelectorAll(".dylink")) {
+			var labels = set.querySelectorAll(".dylink-option")
+			for (var tab of tabs)
+				for (var label of labels)
+					if (label.htmlFor === tab) {
+						var input = set.querySelector(`#${label.htmlFor}`)
+						input.checked = true
+						continue main2
+					}
+		}
+		// Link dynamic links to their tabs
+		var tab_groups = document.getElementsByClassName("tabbed-labels");
+		for (var tab_group of tab_groups) {
+				labels = tab_group.getElementsByTagName("label");
+				for (var label of labels) {
+						label.addEventListener("click", function(e){
+								tab_name = e.target.innerText.trim();
+								dylink_options = document.getElementsByClassName("dylink-option");
+								for (var dylink_option of dylink_options) {
+										if (dylink_option.htmlFor === tab_name) {
+												document.querySelectorAll(`#${dylink_option.htmlFor}`).forEach(
+													radio => radio.checked = true);
+										}
+								}
+						})
+				}
+		}
+	</script>
+
+
+<!-- Switch to content tab target -->
+<script>
+	var target = document.getElementById(location.hash.slice(1))
+	if (target && target.name)
+		target.checked = target.name.startsWith("__tabbed_")
+</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <!--
+	Copyright (c) 2016-2022 Martin Donath <martin.donath@squidfunk.com>
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to
+	deal in the Software without restriction, including without limitation the
+	rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+	sell copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+	IN THE SOFTWARE.
+-->
+
+<div class="md-copyright">
+	
+		<div>
+			Copyright &copy; 2026 The Symbol Syndicate
+
+		</div>
+	
+	<div class="md-copyright__highlight">
+		<a href="#__consent">Cookie settings</a>
+	</div>
+
+	
+		<div>
+			Made with 
+			<a
+			href="https://squidfunk.github.io/mkdocs-material/"
+			target="_blank" rel="noopener"
+			>
+			Material for MkDocs
+		</a>
+	</div>
+	
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://nemproject.github.io/nem-docs" target="_blank" rel="noopener" title="Go to the home page" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://x.com/SymbolSyndicate" target="_blank" rel="noopener" title="Follow us on X" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/NemProject" target="_blank" rel="noopener" title="Explore our repos" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/J38KwW5ZuG" target="_blank" rel="noopener" title="Join our Discord server" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://nemproject.github.io/nem-docs" target="_blank" rel="noopener" title="Visit the legacy documentation site" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M268.9 85.2 152.3 214.8c-4.6 5.1-4.4 13 .5 17.9 30.5 30.5 80 30.5 110.5 0l31.8-31.8c4.2-4.2 9.5-6.5 14.9-6.9 6.8-.6 13.8 1.7 19 6.9L505.6 376l70.4-56V32L464 96l-23.8-15.9A96.2 96.2 0 0 0 386.9 64h-70.4c-1.1 0-2.3 0-3.4.1-16.9.9-32.8 8.5-44.2 21.1m-152.3 97.5L223.4 64h-39.6c-25.5 0-49.9 10.1-67.9 28.1L112 96 0 32v288l156.4 130.3c23 19.2 52 29.7 81.9 29.7H254l-7-7c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l41 41h9c19.1 0 37.8-4.3 54.8-12.3L359 441c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l32 32 17.5-17.5c8.9-8.9 11.5-21.8 7.6-33.1L312.1 251.7l-14.9 14.9c-49.3 49.3-129.1 49.3-178.4 0-23-23-23.9-59.9-2.2-84z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            
+
+
+  
+
+
+<h4>Cookie consent</h4>
+<p>We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.</p>
+<input class="md-toggle" type="checkbox" id="__settings" >
+<div class="md-consent__settings">
+  <ul class="task-list">
+    
+    
+      
+    
+    
+      
+        
+  
+  
+    
+    
+  
+  <li class="task-list-item">
+    <label class="task-list-control">
+      <input type="checkbox" name="github" checked>
+      <span class="task-list-indicator"></span>
+      GitHub
+    </label>
+  </li>
+
+      
+    
+    
+  </ul>
+</div>
+<div class="md-consent__controls">
+  
+    
+      <button class="md-button md-button--primary">Accept</button>
+    
+    
+    
+  
+    
+    
+    
+      <label class="md-button" for="__settings">Manage settings</label>
+    
+  
+</div>
+          </form>
+        </aside>
+      </div>
+      <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.tooltips", "navigation.tracking", "navigation.tabs", "toc.follow", "content.tabs.link", "content.code.copy", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../assets/javascripts/katex.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+    
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
+</html>
