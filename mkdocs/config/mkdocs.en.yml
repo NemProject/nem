@@ -84,6 +84,7 @@ nav:
           - Accounts:
               - devbook/accounts/create-from-private-key.md
               - devbook/accounts/create-from-mnemonic.md
+              - devbook/accounts/testnet-faucet.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
