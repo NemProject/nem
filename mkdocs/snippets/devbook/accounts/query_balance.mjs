@@ -56,32 +56,37 @@ const ADDRESS = process.env.ADDRESS ||
 	'TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP';
 console.log('Fetching balances for', ADDRESS);
 
-// Fetch mosaic balances and definitions for the account
-const accountMosaics = await getMosaicBalances(ADDRESS);
-const mosaicDefinitions = await getMosaicDefinitions(ADDRESS);
+try {
+	// Fetch mosaic balances and definitions for the account
+	const accountMosaics = await getMosaicBalances(ADDRESS);
+	const mosaicDefinitions = await getMosaicDefinitions(ADDRESS);
 
-if (0 === accountMosaics.length) {
-	console.log('Account holds no mosaics');
-} else {
-	console.log(`Account holds ${accountMosaics.length} mosaic(s):`);
+	if (0 === accountMosaics.length) {
+		console.log('Account holds no mosaics');
+	} else {
+		console.log(`Account holds ${accountMosaics.length} mosaic(s):`);
 
-	for (const mosaicEntry of accountMosaics) {
-		const { mosaicId } = mosaicEntry;
-		const key = `${mosaicId.namespaceId}:${mosaicId.name}`;
-		const balance = BigInt(mosaicEntry.quantity);
+		for (const mosaicEntry of accountMosaics) {
+			const { mosaicId } = mosaicEntry;
+			const key = `${mosaicId.namespaceId}:${mosaicId.name}`;
+			const balance = BigInt(mosaicEntry.quantity);
 
-		// Get mosaic divisibility from the definition
-		const definition = mosaicDefinitions.get(key);
-		const properties = Object.fromEntries(
-			definition.properties.map(p => [p.name, p.value])
-		);
-		const divisibility = parseInt(properties.divisibility || '0', 10);
+			// Get mosaic divisibility from the definition
+			const definition = mosaicDefinitions.get(key);
+			const properties = Object.fromEntries(
+				definition.properties.map(p => [p.name, p.value])
+			);
+			const divisibility = parseInt(
+				properties.divisibility || '0', 10);
 
-		// Format and display the balance
-		const formattedBalance = formatAmount(balance, divisibility);
-		console.log(`- Mosaic ${key}`);
-		console.log(`  Balance: ${formattedBalance}`);
-		console.log(`  Balance (atomic): ${balance.toString()}`);
-		console.log(`  Divisibility: ${divisibility}`);
+			// Format and display the balance
+			const formattedBalance = formatAmount(balance, divisibility);
+			console.log(`- Mosaic ${key}`);
+			console.log(`  Balance: ${formattedBalance}`);
+			console.log(`  Balance (atomic): ${balance.toString()}`);
+			console.log(`  Divisibility: ${divisibility}`);
+		}
 	}
+} catch (e) {
+	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 } // [<step-5]

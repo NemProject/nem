@@ -68,28 +68,36 @@ def format_amount(amount, divisibility):  # [>step-4]
 ADDRESS = os.getenv('ADDRESS', 'TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP')
 print(f'Fetching balances for {ADDRESS}')
 
-# Fetch mosaic balances and definitions for the account
-account_mosaics = get_mosaic_balances(ADDRESS)
-acc_mosaic_defs = get_mosaic_definitions(ADDRESS)
+try:
+	# Fetch mosaic balances and definitions for the account
+	account_mosaics = get_mosaic_balances(ADDRESS)
+	mosaic_definitions = get_mosaic_definitions(ADDRESS)
 
-if not account_mosaics:
-	print('Account holds no mosaics')
-else:
-	print(f'Account holds {len(account_mosaics)} mosaic(s):')
+	if not account_mosaics:
+		print('Account holds no mosaics')
+	else:
+		print(f'Account holds {len(account_mosaics)} mosaic(s):')
 
-for mosaic_entry in account_mosaics:
-	mosaic_id = mosaic_entry['mosaicId']
-	key = f'{mosaic_id["namespaceId"]}:{mosaic_id["name"]}'
-	balance = int(mosaic_entry['quantity'])
+		for mosaic_entry in account_mosaics:
+			mosaic_id = mosaic_entry['mosaicId']
+			key = f'{mosaic_id["namespaceId"]}:{mosaic_id["name"]}'
+			balance = int(mosaic_entry['quantity'])
 
-	# Get mosaic divisibility from the definition
-	definition = acc_mosaic_defs[key]
-	properties = {p['name']: p['value'] for p in definition['properties']}
-	mosaic_divisibility = int(properties.get('divisibility', '0'))
+			# Get mosaic divisibility from the definition
+			definition = mosaic_definitions[key]
+			properties = {
+				p['name']: p['value']
+				for p in definition['properties']
+			}
+			mosaic_divisibility = int(
+				properties.get('divisibility', '0'))
 
-	# Format and display the balance
-	formatted_balance = format_amount(balance, mosaic_divisibility)
-	print(f'- Mosaic {key}')
-	print(f'  Balance: {formatted_balance}')
-	print(f'  Balance (atomic): {balance}')
-	print(f'  Divisibility: {mosaic_divisibility}')  # [<step-5]
+			# Format and display the balance
+			formatted_balance = format_amount(
+				balance, mosaic_divisibility)
+			print(f'- Mosaic {key}')
+			print(f'  Balance: {formatted_balance}')
+			print(f'  Balance (atomic): {balance}')
+			print(f'  Divisibility: {mosaic_divisibility}')
+except urllib.error.URLError as e:
+	print(e.reason)  # [<step-5]
