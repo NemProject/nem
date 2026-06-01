@@ -7,12 +7,12 @@ tutorial_level: beginner
 
 <Accounts:|Accounts> on NEM can hold <mosaics:> (fungible tokens), including the native currency <XEM:>.
 
-This tutorial shows how to query an account's mosaic balances and display them with the appropriate number of decimal
-places.
+This tutorial shows how to query an account's mosaic balances and display NEM's whole-number
+[atomic amounts](../../textbook/mosaics.md#divisibility) in decimal form.
 
 ## Prerequisites
 
-This tutorial uses the [NEM REST API](../reference/rest/nem.md) without requiring an SDK.
+This tutorial uses the [NEM REST API](../reference/rest/nem.md) without requiring an <SDK:>.
 You only need a way to make HTTP requests.
 
 ## Full Code
@@ -37,7 +37,8 @@ The tutorial defines the following functions:
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The <get:/account/mosaic/owned> endpoint returns every mosaic the account holds, together with its quantity.
+The <get:/account/mosaic/owned> endpoint returns every mosaic the account holds, together with its quantity in
+_atomic units_.
 
 ### Fetching Mosaic Definitions
 
