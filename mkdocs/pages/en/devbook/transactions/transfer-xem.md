@@ -132,7 +132,7 @@ the transfer transaction:
     No mosaics are attached here, so the transaction sends XEM only.
 
 * `signer_public_key`: The signer is the account that will pay the fee.
-    In a transfer transaction, it is also the source of the transferred XEM and mosaics.
+    In a transfer transaction, it is also the source of the transferred XEM.
 
 * `fee`: The value calculated in the previous step. For 1 XEM, this is `50_000` atomic units (0.05 XEM).
 
