@@ -73,6 +73,7 @@ try {
 		const statusPath = `/transaction/get?hash=${transactionHash}`;
 		console.log('Waiting for confirmation from', statusPath);
 
+		let isConfirmed = false;
 		for (let attempt = 1; 120 >= attempt; ++attempt) {
 			const response = await fetch(`${NODE_URL}${statusPath}`);
 
@@ -80,13 +81,14 @@ try {
 				const confirmed = await response.json();
 				console.log('Transaction confirmed in block',
 					confirmed.meta.height);
+				isConfirmed = true;
 				break;
 			}
 			console.log('  Transaction status: pending');
 			await new Promise(resolve => { setTimeout(resolve, 1000); });
-			if (120 === attempt)
-				console.warn('Confirmation took too long.');
 		}
+		if (!isConfirmed)
+			console.warn('Confirmation took too long.');
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}

@@ -80,6 +80,7 @@ try:
 			f'/transaction/get?hash={
 				facade.hash_transaction(transaction)}')
 		print(f'Waiting for confirmation from {status_path}')
+		is_confirmed = False
 		for attempt in range(120):
 			try:
 				with urllib.request.urlopen(
@@ -88,11 +89,12 @@ try:
 					confirmed = json.loads(response.read().decode())
 					height = confirmed['meta']['height']
 					print(f'Transaction confirmed in block {height}')
+					is_confirmed = True
 					break
 			except urllib.error.HTTPError:
 				print('  Transaction status: pending')
 			time.sleep(1)
-		else:
+		if not is_confirmed:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result['message']}')
