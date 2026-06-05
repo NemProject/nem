@@ -14,15 +14,16 @@ SIGNER_PRIVATE_KEY = os.getenv(
 	'SIGNER_PRIVATE_KEY',
 	'0000000000000000000000000000000000000000000000000000000000000000')
 signer_key_pair = NemFacade.KeyPair(PrivateKey(SIGNER_PRIVATE_KEY))
+
 RECIPIENT_ADDRESS = os.getenv(
 	'RECIPIENT_ADDRESS',
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4')
 # [<step-1]
 facade = NemFacade('testnet')
+
 # Define the amount of XEM to transfer [>step-2]
-xem = int(os.getenv('XEM_AMOUNT', '1'))
-# Convert XEM to atomic units (XEM has a divisibility of 6)
-amount = xem * 1_000_000
+xem = float(os.getenv('XEM_AMOUNT', '1'))
+amount = round(xem * 1_000_000)
 # [<step-2]
 
 try:

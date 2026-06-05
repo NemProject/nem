@@ -1,21 +1,23 @@
 import { PrivateKey } from 'symbol-sdk';
 import { NemFacade } from 'symbol-sdk/nem';
 
-const NODE_URL = 'http://libertalia.nemtest.net:7890';
+const NODE_URL = process.env.NODE_URL ||
+	'http://libertalia.nemtest.net:7890';
 console.log('Using node', NODE_URL);
 // [>step-1]
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
 	'0000000000000000000000000000000000000000000000000000000000000000';
 const signerKeyPair = new NemFacade.KeyPair(
 	new PrivateKey(SIGNER_PRIVATE_KEY));
+
 const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
 // [<step-1]
 const facade = new NemFacade('testnet');
+
 // Define the amount of XEM to transfer [>step-2]
-const xem = parseInt(process.env.XEM_AMOUNT || '1', 10);
-// Convert XEM to atomic units (XEM has a divisibility of 6)
-const amount = BigInt(xem * 1_000_000);
+const xem = parseFloat(process.env.XEM_AMOUNT || '1');
+const amount = BigInt(Math.round(xem * 1_000_000));
 // [<step-2]
 
 try {

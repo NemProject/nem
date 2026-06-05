@@ -57,19 +57,19 @@ Its private key is loaded from the `SIGNER_PRIVATE_KEY` environment variable.
 If not provided, a test key is used as default.
 
 The **recipient** is the account that receives the XEM.
-Its testnet <address:>, which is all that is needed to send funds, is loaded from the `RECIPIENT_ADDRESS`
-environment variable.
+Its <address:> is loaded from the `RECIPIENT_ADDRESS` environment variable.
 If not provided, a test address is used as default.
 
 ### Defining the Transfer Amount
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The snippet defines the transfer amount in the `xem` variable, loaded from the `XEM_AMOUNT` environment variable.
+The snippet defines the transfer amount in the `xem` variable, loaded as a number from the `XEM_AMOUNT`
+environment variable.
 If not provided, a default of 1 XEM is used.
 
 The transaction's `amount` field requires atomic units, not whole XEM.
-<XEM:> has a <divisibility:> of 6, so one XEM equals one million atomic units.
+XEM has a <divisibility:> of 6, so one XEM equals one million atomic units.
 The snippet derives `amount` by multiplying `xem` by 1'000'000.
 
 ### Fetching Network Time
@@ -99,26 +99,19 @@ This provides a good balance between accuracy and performance.
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-Every transaction pays a fee that rewards the nodes that process it and include it in a block.
+Every transaction pays a fee to the <harvester:> that includes it in a block.
 
-NEM fees are not market-driven.
-Instead of floating with network demand, NEM uses a fixed, published schedule, so the fee can be calculated in
-advance without contacting a node.
+NEM uses a fixed fee schedule, so the snippet calculates the fee locally without contacting a node.
+For a XEM-only transfer, the fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of
+1.25 XEM.
+See [Fees](../../textbook/transfer_transactions.md#fees) for the full rules, including the mosaic and message costs.
 
-For an XEM transfer, the fee depends only on the amount being sent:
-
-* A transfer of up to 10,000 XEM costs 0.05 XEM.
-* Above that, the fee rises by 0.05 XEM for every further 10,000 XEM sent.
-* The fee is capped at 1.25 XEM, however large the transfer.
-
-The snippet derives the fee from `xem`, defined in the previous step:
+The snippet implements this schedule:
 
 * `fee_steps` is the number of full 10'000-XEM increments in `xem`, clamped between 1 and 25.
 * `fee` is `fee_steps` multiplied by 50'000 atomic units, the value of one increment (0.05 XEM).
 
 With the default 1 XEM, the fee falls in the first increment (0.05 XEM).
-
-Attaching a message or sending other <mosaics:> costs more than this XEM-only fee.
 
 ### Building the Transaction
 
@@ -127,8 +120,8 @@ Attaching a message or sending other <mosaics:> costs more than this XEM-only fe
 The snippet calls <dy:TransactionFactory.create> with a descriptor that supplies every required property of
 the transfer transaction:
 
-* `type`: This tutorial uses `transfer_transaction_v2`, the current transfer version, which can
-    carry both XEM and other <mosaics:>.
+* `type`: This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry both XEM and
+    other <mosaics:>.
     No mosaics are attached here, so the transaction sends XEM only.
 
 * `signer_public_key`: The signer is the account that will pay the fee.
@@ -144,8 +137,8 @@ the transfer transaction:
 
 !!! info "Sending a mosaic or a message"
 
-    A <ser:TransferTransactionV2> can also carry other <mosaics:> instead of XEM, or include a
-    <message:>, with the fee calculated differently in each case.
+    A <ser:TransferTransactionV2> can also carry other <mosaics:> instead of XEM, or include a <message:>, with the fee
+    calculated differently in each case.
     See the [Transfer Mosaics](./transfer-mosaics.md) and [Transfer with a Message](./messages.md) tutorials.
 
 ### Signing and Serializing
