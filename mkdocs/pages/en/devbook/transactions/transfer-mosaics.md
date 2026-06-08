@@ -5,7 +5,7 @@ tutorial_level: intermediate
 
 # Sending Mosaics with a Transfer Transaction
 
-A <transfer transaction:|transfer transaction> can carry other <mosaics:> instead of, or alongside, <XEM:>.
+A <transfer transaction:> can carry other <mosaics:> instead of, or alongside, <XEM:>.
 
 This tutorial shows how to send a mosaic, focusing on the parts that differ from a plain
 [XEM Transfer](./transfer-xem.md).
