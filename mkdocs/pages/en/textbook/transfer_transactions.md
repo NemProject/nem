@@ -142,7 +142,7 @@ For a XEM-only transfer, the fee scales with the amount sent:
 
 | Amount sent                  | Cost      |
 | ---------------------------- | --------- |
-| Up to 10'000 XEM             | 0.05 XEM  |
+| Up to 19'999 XEM             | 0.05 XEM  |
 | Each additional 10'000 XEM   | +0.05 XEM |
 | 250'000 XEM or more          | 1.25 XEM  |
 
@@ -165,15 +165,16 @@ The minimum per-mosaic fee is **0.05 XEM**.
     **1. XEM-equivalent value**
 
     \[
-    \text{xem\_equivalent} \approx \frac{8.999 \times 10^9 \cdot \text{atomic\_quantity} \cdot \text{multiplier}}{\text{total\_atomic\_supply}}
+    \text{xem\_equivalent} = \frac{\text{8'999'999'999} \cdot \text{atomic\_quantity} \cdot \text{multiplier}}{\text{total\_atomic\_supply}}
     \]
 
     where:
 
-    * `8.999 × 10^9` is the initial XEM supply, in whole units.
-    * `atomic_quantity` is the amount of the mosaic being transferred, in atomic units.
-    * `multiplier` is the [XEM-amount multiplier](#xem-amount) (typically 1).
-    * `total_atomic_supply` is the mosaic's total supply, in atomic units: `supply × 10^divisibility`.
+    * $\text{8'999'999'999}$ is the initial XEM supply, in whole units.
+    * $\text{atomic\_quantity}$ is the amount of the mosaic being transferred, in atomic units.
+    * $\text{multiplier}$ is the [XEM-amount multiplier](#xem-amount) (typically 1).
+    * $\text{total\_atomic\_supply}$ is the mosaic's total supply, in atomic units:
+        $\text{supply} \cdot 10^{\text{divisibility}}$.
 
     **2. Base fee**
 
@@ -185,14 +186,27 @@ The minimum per-mosaic fee is **0.05 XEM**.
     A **supply discount** is then subtracted from that base fee:
 
     \[
-    \text{discount} = \left\lfloor 0.8 \cdot \ln \!\left( \frac{9 \times 10^{15}}{\text{total\_atomic\_supply}} \right) \right\rfloor \cdot 0.05 \text{ XEM}
+    \text{discount} = \left\lfloor 0.8 \cdot \ln \!\left( \frac{9 \cdot 10^{15}}{\text{total\_atomic\_supply}} \right) \right\rfloor \cdot 0.05 \text{ XEM}
     \]
 
-    where `9 × 10^15` is the largest mosaic quantity NEM allows.
+    where $9 \cdot 10^{15}$ is the largest mosaic quantity NEM allows.
 
-    Scarcer mosaics receive a larger discount, because the logarithm grows as the supply shrinks.
-
+    $\text{xem\_equivalent}$ grows as the mosaic's supply shrinks, so without the discount low-supply mosaics would hit
+    the $1.25$ XEM cap on tiny transfers.
+    The discount counteracts this with a logarithm of that same supply, so scarcer mosaics get a larger correction.
     The final fee is **never less than 0.05 XEM**, even when the discount exceeds the base fee.
+
+    **Example**
+
+    A mosaic with supply $\text{1'000'000}$ and divisibility $0$, sending $100$ units with multiplier $1$:
+
+    1. **XEM-equivalent**: $\frac{\text{8'999'999'999} \cdot 100 \cdot 1}{\text{1'000'000}} = \text{899'999.9999}$.
+    2. **Base fee**: The XEM-only schedule above adds $0.05$ XEM per $\text{10'000}$ XEM of value,
+        with a $1.25$ XEM cap at $\text{250'000}$ XEM or more.
+        Since $\text{899'999.9999}$ exceeds $\text{250'000}$, the base fee is the maximum: $1.25$ XEM.
+    3. **Supply discount**: $\left\lfloor 0.8 \cdot \ln \!\left( \frac{9 \cdot 10^{15}}{\text{1'000'000}} \right) \right\rfloor \cdot 0.05 = 0.90$ XEM.
+
+    **Final fee**: $1.25 - 0.90 = 0.35$ XEM.
 
 ### Message Fee
 

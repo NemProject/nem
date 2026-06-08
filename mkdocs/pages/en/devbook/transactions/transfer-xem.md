@@ -99,7 +99,7 @@ This provides a good balance between accuracy and performance.
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-Every transaction pays a fee to the <harvester:> that includes it in a block.
+Every transaction pays a fee to the <harvester account:> that includes it in a block.
 
 NEM uses a fixed fee schedule, so the snippet calculates the fee locally without contacting a node.
 For a XEM-only transfer, the fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of
@@ -137,7 +137,7 @@ the transfer transaction:
 
 !!! info "Sending a mosaic or a message"
 
-    A <ser:TransferTransactionV2> can also carry other <mosaics:> instead of XEM, or include a <message:>, with the fee
+    A <ser:TransferTransactionV2> can also carry other <mosaics:> instead of XEM, or include a message, with the fee
     calculated differently in each case.
     See the [Transfer Mosaics](./transfer-mosaics.md) and [Transfer with a Message](./messages.md) tutorials.
 
