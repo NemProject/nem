@@ -86,6 +86,8 @@ nav:
               - devbook/accounts/create-from-mnemonic.md
               - devbook/accounts/testnet-faucet.md
               - devbook/accounts/query-balance.md
+      - Transactions:
+          - devbook/transactions/transfer-xem.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/

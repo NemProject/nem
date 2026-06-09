@@ -275,3 +275,40 @@ and validation steps, but differ in purpose and required fields.
 | `Mosaic Supply Change`                                              | Change the total supply of a mosaic.                                                                          |
 
 </div>
+
+## Transaction Fees
+
+Every transaction pays a fee that compensates the <harvester account:> that includes it in a block.
+
+NEM fees are not market-driven.
+The network publishes a fixed schedule, so the cost of any transaction can be calculated up front without contacting a
+node.
+
+### Fee Schedule
+
+The current schedule is:
+
+| Transaction                       | Cost                  | Notes                                                                                                         |
+| --------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------|
+| `Transfer`                        | From 0.05 XEM         | Depends on the XEM amount, attached mosaics, and message length. See [Fees](./transfer_transactions.md#fees). |
+| `Account Key Link`                | 0.15 XEM              |                                                                                                               |
+| `Multisig Account Modification`   | 0.5 XEM               | Paid by the multisig account (or, when converting a regular account into a multisig, by that account).        |
+| `Multisig Cosignature`            | 0.15 XEM              | Paid by the multisig account, not the cosignatory.                                                            |
+| `Multisig` (wrapper)              | 0.15 XEM              | Paid by the multisig account, on top of the inner transaction's fee.                                          |
+| `Namespace Registration`          | 0.15 XEM              | Plus a [lease fee](./namespaces.md#lease-fee) paid to a network sink address.                                 |
+| `Mosaic Definition`               | 0.15 XEM              | Plus a [creation fee](./mosaics.md#creation-fee) paid to a network sink address.                              |
+| `Mosaic Supply Change`            | 0.15 XEM              |                                                                                                               |
+
+### Floor and Bidding
+
+The amounts in the schedule are minimums.
+A transaction whose fee is below the minimum is rejected by validators.
+
+A higher fee than the minimum is accepted and increases the chance of inclusion:
+
+* When a harvester builds a block, it picks transactions sorted by fee, highest first.
+* During network congestion, a node's spam filter ranks pending transactions by a combination of the signer's
+    <importance:> and a small fee bonus, so higher-fee transactions are more likely to enter the <unconfirmed pool:>.
+
+`Multisig Cosignature` fees are additionally capped at 1000 XEM, which protects the multisig account from being drained
+by a single cosignatory bidding an extreme fee.
