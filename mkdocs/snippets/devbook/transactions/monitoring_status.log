@@ -1,0 +1,13 @@
+Using node http://libertalia.nemtest.net:7890
+Monitoring transaction: AE0B2142DFB75C9C126442EF612944E926BCE63FA34B353CDE409E2E87703C0B
+
+Waiting for transaction confirmation
+Polling /transaction/get?hash=AE0B2142DFB75C9C126442EF612944E926BCE63FA34B353CDE409E2E87703C0B
+  Attempt 1: pending
+  Attempt 2: pending
+  Attempt 3: pending
+  Attempt 4: pending
+  Attempt 5: pending
+  Attempt 6: confirmed in block 652601
+
+Transaction confirmed!
