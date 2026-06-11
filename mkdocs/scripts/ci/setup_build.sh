@@ -14,7 +14,7 @@ popd
 # Build OpenAPI spec
 pushd ../openapi
 npm install
-npm run build:openapi-yaml
+npm run build
 popd
 
 # Patch the ezglossary plugin, ignoring errors if it was already patched
