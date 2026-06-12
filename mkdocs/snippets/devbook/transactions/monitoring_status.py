@@ -25,41 +25,26 @@ transaction_signature = os.getenv(
 print(f"Monitoring transaction: {transaction_hash}")
 
 
-def wait_for_transaction_confirmation(  # [>step-2]
-	tx_hash, max_attempts=120, wait_seconds=1
-):
+def get_confirmation_height(tx_hash):  # [>step-2]
 	"""
-	Poll /transaction/get until the transaction is confirmed.
+	Query /transaction/get once to check for confirmation.
 
 	Args:
-		tx_hash: hash of the transaction to monitor
-		max_attempts: maximum polling attempts
-		wait_seconds: seconds to wait between attempts
+		tx_hash: hash of the transaction to check
 
 	Returns:
-		True if the transaction was confirmed, False otherwise
+		The height of the block containing the transaction, or None
+		if the transaction is not confirmed yet
 	"""
-	status_path = f"/transaction/get?hash={tx_hash}"
-	print("\nWaiting for transaction confirmation")
-	print(f"Polling {status_path}")
-
-	for attempt in range(1, max_attempts + 1):
-		try:
-			url = f"{NODE_URL}{status_path}"
-			with urllib.request.urlopen(url) as response:
-				confirmed = json.loads(response.read().decode())
-				height = confirmed["meta"]["height"]
-				print(f"  Attempt {attempt}: confirmed in block {height}")
-				return True
-		except urllib.error.HTTPError as err:
-			if err.status != 400:
-				raise
-			print(f"  Attempt {attempt}: pending")
-		# Wait before next attempt (except on last attempt)
-		if attempt < max_attempts:
-			time.sleep(wait_seconds)
-	return False
-	# [<step-2]
+	url = f"{NODE_URL}/transaction/get?hash={tx_hash}"
+	try:
+		with urllib.request.urlopen(url) as response:
+			confirmed = json.loads(response.read().decode())
+			return confirmed["meta"]["height"]
+	except urllib.error.HTTPError as err:
+		if err.status != 400:
+			raise
+		return None  # [<step-2]
 
 
 def is_in_unconfirmed_pool(signature, address):  # [>step-3]
@@ -75,15 +60,44 @@ def is_in_unconfirmed_pool(signature, address):  # [>step-3]
 	return any(
 		entry["transaction"]["signature"].lower() == target
 		for entry in pool
-	)
-	# [<step-3]
+	)  # [<step-3]
 
 
-# [>step-4]
-if wait_for_transaction_confirmation(transaction_hash):
-	print("\nTransaction confirmed!")
-elif is_in_unconfirmed_pool(transaction_signature, signer_address):
-	print("\nTransaction still in the unconfirmed pool.")
-else:
-	print("\nTransaction not in the unconfirmed pool.")
-# [<step-4]
+def wait_for_confirmation(  # [>step-4]
+	tx_hash, max_attempts=120, wait_seconds=1
+):
+	"""
+	Check for confirmation repeatedly until the transaction is confirmed or
+	the attempts run out.
+
+	Args:
+		tx_hash: hash of the transaction to monitor
+		max_attempts: maximum polling attempts
+		wait_seconds: seconds to wait between attempts
+
+	Returns:
+		True if the transaction was confirmed, False otherwise
+	"""
+	print("\nWaiting for transaction confirmation")
+	for attempt in range(1, max_attempts + 1):
+		time.sleep(wait_seconds)
+		height = get_confirmation_height(tx_hash)
+		status = f"confirmed in block {height}" if height else "pending"
+		print(f"  Attempt {attempt}: {status}")
+		if height:
+			return True
+	return False  # [<step-4]
+
+
+try:  # [>step-5]
+	block_height = get_confirmation_height(transaction_hash)
+	if block_height:
+		print(f"\nTransaction already confirmed in block {block_height}")
+	elif not is_in_unconfirmed_pool(transaction_signature, signer_address):
+		print("\nTransaction not in the unconfirmed pool")
+	elif wait_for_confirmation(transaction_hash):
+		print("\nTransaction confirmed!")
+	else:
+		print("\nTransaction not confirmed within the polling window")
+except urllib.error.URLError as err:
+	print(f"\nCould not reach the node: {err.reason}")  # [<step-5]

@@ -5,23 +5,24 @@ tutorial_level: beginner
 
 # Monitoring Transaction Status
 
-When a <transaction:> is announced to the NEM network and accepted, it enters the <unconfirmed pool:>, where it remains
-until it is included in a <block:>.
-An invalid transaction never gets that far: the receiving <node:> rejects it immediately when announced, as shown in the
-[Transfer XEM tutorial](./transfer-xem.md#announcing-the-transaction).
+After announcing a <transaction:> to the NEM network, it remains unconfirmed until it is included in a <block:>.
 
-Acceptance is not confirmation, though.
-The network exposes the transaction's progress but does not push it to the sender, so applications that need to react to
-confirmation or failure must check for status changes themselves.
+Monitoring status changes is essential for building responsive applications that can react to transaction confirmation
+or failure.
 
-This tutorial shows how to monitor a transaction's status until it is confirmed, how to check whether a transaction that
-has not yet confirmed is still in the unconfirmed pool, and how to decide when a transaction will never confirm.
-Along the way, you will gain a practical understanding of the
-[transaction lifecycle](../../textbook/transactions.md#transaction-lifecycle).
+This tutorial shows how to monitor a transaction's status until it is confirmed, how to check whether it is still
+waiting in the <unconfirmed pool:>, and how to decide when it will never confirm.
 
-!!! note "Confirmed transactions can still be reversed"
-    A confirmed transaction has been included in a block but is not yet irreversible.
-    Until enough subsequent blocks are added to surpass the <rewrite limit:>, <rollbacks:> are still possible.
+This kind of monitoring typically happens right after announcing a transaction, as shown in the
+[Transfer XEM tutorial](./transfer-xem.md), to make sure it gets confirmed.
+
+!!! note "Polling is not recommended for production"
+
+    This tutorial uses polling to check the transaction status.
+    Polling is used here for illustration purposes, but it is not the recommended approach for production applications.
+
+    [WebSockets](../reference/websockets/index.md) provide a more responsive solution without the overhead of repeated
+    API calls.
 
 ## Prerequisites
 
@@ -30,15 +31,21 @@ You only need a way to make HTTP requests.
 
 ## Full Code
 
-This tutorial uses polling to check the transaction status.
-Polling is used here for illustration purposes, but it is not the recommended approach for production applications.
-
 {% import 'tutorial.jinja2' as tutorial with context %}
 
 {{ tutorial.code_full_tagged('devbook/transactions/monitoring_status', ['py', 'js']) }}
 
 The snippet uses the `NODE_URL` environment variable to set the NEM API node.
 If no value is provided, a default one is used.
+
+The tutorial first defines the following reusable functions:
+
+* {{ tutorial.var('get_confirmation_height()') }}: Checks whether the transaction has been confirmed.
+* {{ tutorial.var('is_in_unconfirmed_pool()') }}: Reports whether the transaction is waiting in the <unconfirmed pool:>.
+* {{ tutorial.var('wait_for_confirmation()') }}: Repeats the confirmation check until the transaction is confirmed or
+    the attempts run out.
+
+It then calls them together to monitor the transaction, as shown in [Putting It All Together](#putting-it-all-together).
 
 ## Code Explanation
 
@@ -50,39 +57,38 @@ To monitor a transaction, you need its hash, which is generated after signing.
 The hash uniquely identifies the transaction on the NEM network.
 
 The snippet also reads a **signer's address** and the **transaction signature**.
-Neither is needed to detect confirmation, but both are used to diagnose a transaction that does not confirm within
-the polling window.
+Neither is needed to detect confirmation, but both are used to check whether a transaction is still waiting in the
+<unconfirmed pool:>.
 
 The snippet uses sample values.
 Set `TRANSACTION_HASH`, `SIGNER_ADDRESS`, and `TRANSACTION_SIGNATURE` environment variables to override them.
 All three values are produced when signing a transaction, as shown in the [Transfer XEM tutorial](./transfer-xem.md).
 
-### Polling for Confirmation
+### Checking for Confirmation
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The {{ tutorial.var('wait_for_transaction_confirmation') }} function polls a transaction until it is confirmed.
-It queries <get:/transaction/get> with the transaction hash up to 120 times by default, sleeping 1 second between
-attempts (about two minutes in total), so monitoring eventually stops even if the transaction never confirms.
+The {{ tutorial.var('get_confirmation_height') }} function checks whether the transaction is confirmed by querying
+<get:/transaction/get> with the transaction hash.
 
 When the transaction has been included in a block, the endpoint returns it together with the block height under
-`meta.height`, and the function returns successfully.
+`meta.height`, and the function returns that height.
 
-Otherwise, the endpoint responds with HTTP `400` ("Hash was not found in cache") and the function logs the attempt as
-`pending` and continues polling.
+Otherwise, the endpoint responds with HTTP `400` ("Hash was not found in cache") and the function returns no height,
+meaning the transaction is not confirmed yet.
+A transaction that is not confirmed may still be waiting in the <unconfirmed pool:>, which the next function inspects.
 
 !!! warning "Hash lookup is short-lived"
 
     <get:/transaction/get> reads from an in-memory cache with a default retention of 36 hours.
     The lookup is enabled by default, but node operators can disable it or change the retention.
-    After the retention period, a confirmed transaction returns the same HTTP `400` error.
 
-    For long-term lookups, store `meta.height` on confirmation and fetch the block by height via
-    <post:/block/at/public>.
+    A transaction older than the retention period returns the same HTTP `400` error even if it is confirmed.
+    If a transaction needs to be looked up much later, store its confirmation block height along with its hash, and
+    fetch the containing block via <post:/block/at/public>.
+    The transaction can also be found by paging through the signer's history with <get:/account/transfers/all>.
 
-If the loop ends without a confirmation, the function returns `False`.
-This means the transaction was not confirmed within the polling window, not that it failed, and the next function
-answers whether it is still in the <unconfirmed pool:>.
+    Otherwise, recovering the transaction requires searching the blockchain block by block.
 
 ### Inspecting the Unconfirmed Pool
 
@@ -91,6 +97,11 @@ answers whether it is still in the <unconfirmed pool:>.
 {{ tutorial.var('is_in_unconfirmed_pool') }} queries <get:/account/unconfirmedTransactions> for the signer's address and
 reports whether the monitored transaction is among them.
 
+!!! note "Invalid transactions never enter the pool"
+
+    A transaction that fails validation does not reach the unconfirmed pool: the receiving <node:> rejects it
+    immediately when announced, as shown in the [Transfer XEM tutorial](./transfer-xem.md#announcing-the-transaction).
+
 The endpoint response omits each entry's hash, so the function matches by **signature** instead.
 A transaction's signature is unique and appears under `transaction.signature` in every pool entry.
 For multisig transactions, this is the signature of the announced wrapper, not of the inner transaction.
@@ -98,57 +109,83 @@ For multisig transactions, this is the signature of the announced wrapper, not o
 The function returns:
 
 * `True`: the transaction is still in the unconfirmed pool, waiting for a block.
-* `False`: the transaction is not in the response, because it has not arrived at this node yet, because it was dropped
-    from the pool, or because it was pushed out by the entry cap.
+* `False`: the transaction is not in the response, because it has not arrived at this node yet, because it has already
+    been confirmed, because it was dropped from the pool, or because it was left out of the response.
 
-    !!! warning "The pool view is capped at 25 entries"
+    !!! warning "The response is limited to 25 transactions"
 
-        The endpoint returns at most the 25 most recent entries involving the address.
-        Incoming transactions count toward this cap too, so on a busy account the monitored transaction can drop out of
-        the response while it is still in the pool.
+        The endpoint returns at most the 25 most recent transactions involving the address.
+        Incoming transactions count toward this limit too, so on a busy account the monitored transaction can be missing
+        from the response while it is still in the unconfirmed pool.
 
-??? info "Alternative: hash-based matching"
-
-    Each pool entry can be rebuilt using <dy:TransactionFactory.create> and hashed with <dy:NemFacade.hashTransaction>
-    to compare against the monitored hash.
-    However, rebuilding requires mapping the REST fields to a typed descriptor for every transaction type, which is
-    why the snippet matches by signature instead.
-
-### Putting Both Functions Together
+### Waiting for Confirmation
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-The snippet combines both functions: when {{ tutorial.var('wait_for_transaction_confirmation') }} ends without a
-confirmation, {{ tutorial.var('is_in_unconfirmed_pool') }} diagnoses whether the transaction is still in the unconfirmed
-pool.
+The {{ tutorial.var('wait_for_confirmation') }} function calls {{ tutorial.var('get_confirmation_height') }} up to 120
+times by default, sleeping 1 second between attempts (about two minutes in total), so monitoring eventually stops even
+if the transaction never confirms.
 
-!!! note "Detecting rejected transactions"
+The function returns `True` as soon as a check reports a confirmation.
+When the attempts run out, it returns `False` instead.
+This means the transaction was not confirmed within the polling window, not that it failed.
 
-    A node keeps no record of dropped transactions, and other nodes may still hold the transaction as unconfirmed,
-    so a missing transaction is not necessarily a failed one.
+### Putting It All Together
 
-    The transaction's **deadline** gives the definitive verdict.
-    Blocks cannot include a transaction whose deadline has passed, so once the current <network time:> moves past
-    the deadline, the transaction will never confirm.
+{{ tutorial.code_snippet_tagged('step-5') }}
 
-    To decide whether to keep waiting or to announce a new transaction, compare the deadline chosen when
-    [building the transaction](./transfer-xem.md#fetching-network-time) against the network time from
-    <get:/time-sync/network-time>.
+The snippet starts with a single call to {{ tutorial.var('get_confirmation_height') }}: when the transaction is already
+confirmed, there is nothing left to monitor.
+
+!!! warning "Confirmed transactions can still be reversed"
+
+    A confirmed transaction has been included in a block but is not yet irreversible.
+    Until enough subsequent blocks are added to surpass the <rewrite limit:>, <rollbacks:> are still possible.
+
+When it is not, {{ tutorial.var('is_in_unconfirmed_pool') }} decides whether waiting makes sense.
+A transaction that is neither confirmed nor in the pool is not going to confirm from this node's perspective, so the
+snippet reports it and exits.
+
+Only when the transaction is waiting in the pool does the snippet call {{ tutorial.var('wait_for_confirmation') }} to
+poll until the transaction is confirmed or the polling window ends.
+
+!!! note "Only rejection or a passed deadline means failure"
+
+    There are two ways to be sure a transaction will never confirm: it was rejected at announcement, or its **deadline**
+    has passed.
+
+    A transaction dropped from one node's unconfirmed pool may still confirm, because each node keeps its own pool and
+    a peer may still hold it (for example, the node restarted with an empty pool, or evicted the transaction during
+    revalidation).
+
+    Since rejections come back in the announcement response, the **deadline** gives the definitive verdict.
+    Once <network time:> passes it, the transaction can no longer enter a block and it is safe to announce a
+    replacement.
+
+    Compare the deadline chosen when [building the transaction](./transfer-xem.md#fetching-network-time) against the
+    network time from <get:/time-sync/network-time>.
 
 ## Output
 
 The following output shows a typical run monitoring a freshly-announced transaction:
 
-```text
+```text linenums="1" hl_lines="2 4 10 12"
 --8<-- 'devbook/transactions/monitoring_status.log'
 ```
 
-The output shows:
+Some highlights from the output:
 
-1. The transaction hash being monitored.
-2. Several polling attempts reporting `pending` while the transaction is being processed.
-3. The successful inclusion in a block on a later attempt.
-4. A success message when the transaction is confirmed.
+* **Transaction hash** (line 2): The hash of the transaction to monitor, which uniquely identifies it on the network.
+
+* **Polling start** (line 4): Polling only starts when the transaction was not confirmed on the first check but was
+    found waiting in the unconfirmed pool.
+
+* **Polling attempts** (lines 5-9): Each attempt reports `pending` while the transaction waits to be included in a
+    block.
+
+* **Confirmation** (line 10): A polling attempt finally reports the inclusion in block `652601`.
+
+* **Final outcome** (line 12): The transaction is confirmed and monitoring ends.
 
 The number of attempts and timing vary depending on network conditions and block production rate.
 
@@ -159,20 +196,21 @@ search for the transaction hash.
 
 This tutorial showed how to:
 
-| Step                                                                             | Related documentation                  |
-| -------------------------------------------------------------------------------- | -------------------------------------- |
-| [Poll for confirmation](#polling-for-confirmation)                               | <get:/transaction/get>                 |
-| [Inspect the unconfirmed pool](#inspecting-the-unconfirmed-pool)                 | <get:/account/unconfirmedTransactions> |
-| [Detect when a transaction will never confirm](#putting-both-functions-together) | <get:/time-sync/network-time>          |
+| Step                                                                      | Related documentation                   |
+| ------------------------------------------------------------------------- | --------------------------------------- |
+| [Check for confirmation](#checking-for-confirmation)                      | <get:/transaction/get>                  |
+| [Inspect the unconfirmed pool](#inspecting-the-unconfirmed-pool)          | <get:/account/unconfirmedTransactions>  |
+| [Wait for confirmation](#waiting-for-confirmation)                        | <get:/transaction/get>                  |
+| [Detect when a transaction will never confirm](#putting-it-all-together)  | <get:/time-sync/network-time>           |
 
 ## Next steps
 
 For production applications, consider these improvements:
 
-* **Re-check confirmation after a negative pool result.** The transaction may confirm in the gap between the
-    polling timeout and the pool check, so query <get:/transaction/get> once more before reacting.
 * **Wait past the rewrite limit.** A confirmed transaction can still be rolled back until enough subsequent
     blocks have been added.
     See the <rewrite limit:> for the practical threshold.
 * **Query multiple nodes.** Check status across several <nodes:> for greater reliability and protection against
     single-node issues.
+* **Use WebSockets:** Replace polling with WebSocket subscriptions for real-time updates without repeated API calls.
+    See the [Listening to Transaction Flow](../websockets/listen-transaction-flow.md) WebSocket tutorial.

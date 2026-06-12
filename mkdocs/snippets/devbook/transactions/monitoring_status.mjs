@@ -18,43 +18,21 @@ console.log(`Monitoring transaction: ${transactionHash}`);
 
 // [>step-2]
 /**
- * Poll /transaction/get until the transaction is confirmed.
- * @param {string} txHash - hash of the transaction to monitor
- * @param {number} maxAttempts - maximum polling attempts
- * @param {number} waitSeconds - seconds to wait between attempts
- * @returns {boolean} true if the transaction was confirmed
+ * Query /transaction/get once to check for confirmation.
+ * @param {string} txHash - hash of the transaction to check
+ * @returns {number|null} height of the block containing the
+ *   transaction, or null if it is not confirmed yet
  */
-async function waitForTransactionConfirmation(
-	txHash,
-	maxAttempts = 120,
-	waitSeconds = 1
-) {
-	const statusPath = `/transaction/get?hash=${txHash}`;
-	console.log('\nWaiting for transaction confirmation');
-	console.log(`Polling ${statusPath}`);
-
-	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-		const response = await fetch(`${NODE_URL}${statusPath}`);
-		if (response.ok) {
-			const confirmed = await response.json();
-			console.log(
-				`  Attempt ${attempt}: ` +
-				`confirmed in block ${confirmed.meta.height}`
-			);
-			return true;
-		}
-		if (400 !== response.status)
-			throw new Error(`Unexpected status: ${response.status}`);
-
-		console.log(`  Attempt ${attempt}: pending`);
-		// Wait before next attempt (except on last attempt)
-		if (attempt < maxAttempts) {
-			await new Promise(resolve => {
-				setTimeout(resolve, waitSeconds * 1000);
-			});
-		}
+async function getConfirmationHeight(txHash) {
+	const url = `${NODE_URL}/transaction/get?hash=${txHash}`;
+	const response = await fetch(url);
+	if (response.ok) {
+		const confirmed = await response.json();
+		return confirmed.meta.height;
 	}
-	return false;
+	if (400 !== response.status)
+		throw new Error(`Unexpected status: ${response.status}`);
+	return null;
 } // [<step-2]
 
 // [>step-3]
@@ -77,11 +55,45 @@ async function isInUnconfirmedPool(signature, address) {
 } // [<step-3]
 
 // [>step-4]
-if (await waitForTransactionConfirmation(transactionHash))
-	console.log('\nTransaction confirmed!');
-else if (await isInUnconfirmedPool(transactionSignature, signerAddress))
-	console.log('\nTransaction still in the unconfirmed pool.');
-else
-	console.log('\nTransaction not in the unconfirmed pool.');
+/**
+ * Check for confirmation repeatedly until the transaction is
+ * confirmed or the attempts run out.
+ * @param {string} txHash - hash of the transaction to monitor
+ * @param {number} maxAttempts - maximum polling attempts
+ * @param {number} waitSeconds - seconds to wait between attempts
+ * @returns {boolean} true if the transaction was confirmed
+ */
+async function waitForConfirmation(
+	txHash,
+	maxAttempts = 120,
+	waitSeconds = 1
+) {
+	console.log('\nWaiting for transaction confirmation');
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		await new Promise(resolve => {
+			setTimeout(resolve, waitSeconds * 1000);
+		});
+		const height = await getConfirmationHeight(txHash);
+		const status = height ? `confirmed in block ${height}` : 'pending';
+		console.log(`  Attempt ${attempt}: ${status}`);
+		if (height)
+			return true;
+	}
+	return false;
+} // [<step-4]
 
-// [<step-4]
+// [>step-5]
+try {
+	const blockHeight = await getConfirmationHeight(transactionHash);
+	if (blockHeight)
+		console.log(`\nTransaction already confirmed in block ${blockHeight}`);
+	else if (!(await isInUnconfirmedPool(transactionSignature, signerAddress)))
+		console.log('\nTransaction not in the unconfirmed pool');
+	else if (await waitForConfirmation(transactionHash))
+		console.log('\nTransaction confirmed!');
+	else
+		console.log('\nTransaction not confirmed within the polling window');
+} catch (error) {
+	console.log(`\nCould not reach the node: ${error.message}`);
+}
+// [<step-5]
