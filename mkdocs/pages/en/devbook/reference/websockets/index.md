@@ -7,7 +7,7 @@ Client applications can open a WebSocket connection and get a unique identifier.
 With this identifier, applications can subscribe to any of the available channels instead of needing to constantly
 poll the [REST API](../rest/nem.md) for updates.
 
-When an event occurs in a channel, the [REST Gateway](../../../textbook/nodes.md#rest-gateway) sends a notification to
+When an event occurs in a channel, the [REST Gateway](../../../textbook/nodes.md#rest-api) sends a notification to
 every subscribed client in real-time.
 
 WebSocket URIs share the same host and port as the HTTP requests URIs, but use the ``ws://`` protocol.
