@@ -87,4 +87,4 @@ This way, you practice sending transactions while helping keep the faucet stocke
 
 ## Next Steps
 
-Why not try [sending a transfer transaction](../transactions/transfer.md)?
+Why not try [sending a transfer transaction](../transactions/transfer-xem.md)?
