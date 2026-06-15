@@ -2,658 +2,678 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/404/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/intro/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/accounts/create-from-mnemonic/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/accounts/create-from-private-key/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
+    </url>
+    <url>
+         <loc>https://nemproject.github.io/nem-docs/en/devbook/accounts/query-balance/</loc>
+         <lastmod>2026-06-15</lastmod>
+    </url>
+    <url>
+         <loc>https://nemproject.github.io/nem-docs/en/devbook/accounts/testnet-faucet/</loc>
+         <lastmod>2026-06-15</lastmod>
+    </url>
+    <url>
+         <loc>https://nemproject.github.io/nem-docs/en/devbook/mosaics/get-mosaic-info/</loc>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/AccountDescriptorRepository/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/ArrayHelpers/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/BaseValue/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/Bip32/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/BlockchainSettings/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/BufferReader/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/BufferWriter/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/ByteArray/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/Cipher/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/CodeWordsEncoder/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/CryptoTypes/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/DiceMnemonicGenerator/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/Network/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/NetworkTimestamp/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/NodeDescriptorRepository/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/PrivateKeyStorage/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/QrSignatureStorage/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/QrStorage/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/RuleBasedTransactionFactory/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/TransactionDescriptorProcessor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/Transforms/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/links/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/ripemd160/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/external/ed25519/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/facade/BatchOperations/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/facade/NemFacade/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/nem/KeyPair/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/nem/MessageEncoder/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/nem/Network/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/py/nem/TransactionFactory/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/rest/nem/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/serialization/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/links/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Bip32/classes/Bip32/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Bip32/classes/Bip32Node/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Network/classes/Network/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Network/classes/NetworkLocator/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Network/type-aliases/AddressConstructable/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Network/type-aliases/Constructable/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/Network/type-aliases/EncodedSizeAccessor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/NetworkTimestamp/classes/NetworkTimestamp/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/NetworkTimestamp/classes/NetworkTimestampDatetimeConverter/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/BaseValue/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/ByteArray/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/Hash256/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/PrivateKey/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/PublicKey/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/SharedKey256/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/classes/Signature/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/bytesToBigInt/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/bytesToInt/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/deepCompare/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/hexToUint8/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/intToBytes/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/isHexString/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/tryParseUint/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/index/namespaces/utils/functions/uint8ToHex/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/MessageEncoder/classes/default/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/MessageEncoder/type-aliases/TryDecodeResult/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/Address/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/KeyPair/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/NemAccount/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/NemFacade/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/NemPublicAccount/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/Network/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/NetworkTimestamp/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/TransactionFactory/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/classes/Verifier/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/AccountKeyLinkTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/CosignatureV1BodyDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/CosignatureV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MessageDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDefinitionDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDefinitionTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicIdDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicLevyDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicPropertyDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MosaicSupplyChangeTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigAccountModificationTransactionV2Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/MultisigTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/NamespaceIdDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/NamespaceRegistrationTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedCosignatureV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMosaicDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMosaicPropertyDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/SizePrefixedMultisigAccountModificationDescriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/TransferTransactionV1Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/descriptors/classes/TransferTransactionV2Descriptor/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/AccountKeyLinkTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Address/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Amount/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/CosignatureV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/CosignatureV1Body/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Hash256/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Height/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/LinkAction/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Message/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MessageType/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Mosaic/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicDefinition/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicDefinitionTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicId/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicLevy/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicProperty/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicSupplyChangeAction/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicSupplyChangeTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MosaicTransferFeeType/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModification/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationTransactionV2/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MultisigAccountModificationType/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/MultisigTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NamespaceId/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NamespaceRegistrationTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NetworkType/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableAccountKeyLinkTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableCosignatureV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMosaicDefinitionTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMosaicSupplyChangeTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigAccountModificationTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigAccountModificationTransactionV2/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableMultisigTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableNamespaceRegistrationTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransaction/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransactionFactory/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransferTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/NonVerifiableTransferTransactionV2/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/PublicKey/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Signature/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedCosignatureV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMosaic/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMosaicProperty/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/SizePrefixedMultisigAccountModification/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Timestamp/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/Transaction/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/TransactionFactory/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/TransactionType/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/TransferTransactionV1/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/ts/nem/namespaces/models/classes/TransferTransactionV2/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/reference/websockets/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/start/hello-world/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/devbook/start/setup/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
+    </url>
+    <url>
+         <loc>https://nemproject.github.io/nem-docs/en/devbook/transactions/monitoring-status/</loc>
+         <lastmod>2026-06-15</lastmod>
+    </url>
+    <url>
+         <loc>https://nemproject.github.io/nem-docs/en/devbook/transactions/transfer-xem/</loc>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/accounts/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/blocks/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/cats/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/consensus/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/cryptography/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/glossary/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/harvesting/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/intro/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/mosaics/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/namespaces/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/nodes/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/transactions/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/textbook/transfer_transactions/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
     <url>
          <loc>https://nemproject.github.io/nem-docs/en/userbook/intro/</loc>
-         <lastmod>2026-05-28</lastmod>
+         <lastmod>2026-06-15</lastmod>
     </url>
 </urlset>
