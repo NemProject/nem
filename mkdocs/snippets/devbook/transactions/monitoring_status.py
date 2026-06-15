@@ -67,8 +67,8 @@ def wait_for_confirmation(  # [>step-4]
 	tx_hash, max_attempts=120, wait_seconds=1
 ):
 	"""
-	Check for confirmation repeatedly until the transaction is confirmed or
-	the attempts run out.
+	Check for confirmation repeatedly until the transaction is confirmed
+	or the attempts run out.
 
 	Args:
 		tx_hash: hash of the transaction to monitor
@@ -92,9 +92,10 @@ def wait_for_confirmation(  # [>step-4]
 try:  # [>step-5]
 	block_height = get_confirmation_height(transaction_hash)
 	if block_height:
-		print(f"\nTransaction already confirmed in block {block_height}")
-	elif not is_in_unconfirmed_pool(transaction_signature, signer_address):
-		print("\nTransaction not in the unconfirmed pool")
+		print(f"\nTransaction confirmed in block {block_height}")
+	elif not is_in_unconfirmed_pool(transaction_signature,
+			signer_address):
+		print("\nTransaction not found")
 	elif wait_for_confirmation(transaction_hash):
 		print("\nTransaction confirmed!")
 	else:

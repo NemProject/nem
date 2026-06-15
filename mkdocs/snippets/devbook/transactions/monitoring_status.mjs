@@ -74,7 +74,8 @@ async function waitForConfirmation(
 			setTimeout(resolve, waitSeconds * 1000);
 		});
 		const height = await getConfirmationHeight(txHash);
-		const status = height ? `confirmed in block ${height}` : 'pending';
+		const status =
+			height ? `confirmed in block ${height}` : 'pending';
 		console.log(`  Attempt ${attempt}: ${status}`);
 		if (height)
 			return true;
@@ -86,13 +87,14 @@ async function waitForConfirmation(
 try {
 	const blockHeight = await getConfirmationHeight(transactionHash);
 	if (blockHeight)
-		console.log(`\nTransaction already confirmed in block ${blockHeight}`);
-	else if (!(await isInUnconfirmedPool(transactionSignature, signerAddress)))
-		console.log('\nTransaction not in the unconfirmed pool');
+		console.log(`\nTransaction confirmed in block ${blockHeight}`);
+	else if (!(await isInUnconfirmedPool(transactionSignature,
+		signerAddress)))
+		console.log('\nTransaction not found');
 	else if (await waitForConfirmation(transactionHash))
 		console.log('\nTransaction confirmed!');
 	else
-		console.log('\nTransaction not confirmed within the polling window');
+		console.log('\nConfirmation timed out');
 } catch (error) {
 	console.log(`\nCould not reach the node: ${error.message}`);
 }
