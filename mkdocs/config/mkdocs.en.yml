@@ -88,6 +88,7 @@ nav:
               - devbook/accounts/query-balance.md
           - Transactions:
               - devbook/transactions/transfer-xem.md
+              - devbook/transactions/monitoring-status.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
