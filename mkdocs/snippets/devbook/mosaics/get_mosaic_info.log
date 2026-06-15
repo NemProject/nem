@@ -1,0 +1,17 @@
+Using node http://libertalia.nemtest.net:7890
+Mosaic ID: nem:xem
+Fetching mosaic information from /mosaic/definition?mosaicId=nem:xem
+Mosaic information:
+  Mosaic ID: nem:xem
+  Description: reserved xem mosaic
+  Creator: 3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262
+  Divisibility: 6
+  Initial supply: 8999999999
+  Supply mutable: false
+  Transferable: true
+  Levy: none
+
+Fetching current supply from /mosaic/supply?mosaicId=nem:xem
+  Current supply: 8999999999
+
+Supply in atomic units: 8999999999000000
