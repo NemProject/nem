@@ -36,8 +36,9 @@ If not set, it defaults to the <XEM:> mosaic (`nem:xem`).
 
 The <get:/mosaic/definition> endpoint retrieves the definition of a mosaic, including:
 
+* **Description:** A human-readable [description](../../textbook/mosaics.md#description) of the mosaic,
+    provided when the mosaic was registered.
 * **Creator:** The <public key:> of the account that created the mosaic.
-* **Description:** A human-readable [description](../../textbook/mosaics.md#description) of the mosaic.
 * **Properties:** The mosaic's [behavioral properties](../../textbook/mosaics.md#properties):
     * **[Divisibility](../../textbook/mosaics.md#divisibility):** The number of decimal places the mosaic supports.
         For example, XEM has a divisibility of `6`, meaning 1 XEM equals 1'000'000 atomic units.
@@ -66,7 +67,7 @@ The endpoint reports supply in whole units, but transaction quantities are expre
 [atomic units](../../textbook/mosaics.md#divisibility).
 To convert from whole to atomic units, the code multiplies the supply by 10 raised to the mosaic's divisibility.
 
-For XEM (divisibility `6`), a supply of `8999999999` whole units equals `8999999999000000` atomic units.
+For XEM (divisibility `6`), a supply of `8'999'999'999` whole units equals `8'999'999'999'000'000'` atomic units.
 
 ## Output
 
@@ -82,7 +83,7 @@ Some highlights from the output:
 
 * **Description** (line 6): A human-readable label set when the mosaic was created.
 
-* **Creator** (line 7): The public key of the account that defined the mosaic.
+* **Creator** (line 7): The public key of the account that created the mosaic.
 
 * **Divisibility** (line 8): The value `6` means 1 XEM = 1,000,000 (10^6^) atomic units.
 
