@@ -27,8 +27,7 @@ try {
 		nonCirculating += balance;
 		console.log(`  ${label}: ${fmt(balance)} XEM`);
 	}
-	console.log(`Non-circulating supply: ${fmt(nonCirculating)} XEM`);
-	// [<step-2]
+	console.log(`Non-circulating supply: ${fmt(nonCirculating)} XEM`); // [<step-2]
 	// [>step-3]
 	const circulating = total - nonCirculating;
 	console.log(`Circulating supply: ${fmt(circulating)} XEM`); // [<step-3]

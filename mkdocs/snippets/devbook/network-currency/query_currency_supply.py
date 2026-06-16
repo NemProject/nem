@@ -29,7 +29,6 @@ try:
 		non_circulating += balance
 		print(f'  {label}: {balance:,.6f} XEM')
 	print(f'Non-circulating supply: {non_circulating:,.6f} XEM')  # [<step-2]
-
 	# [>step-3]
 	circulating = total - non_circulating
 	print(f'Circulating supply: {circulating:,.6f} XEM')  # [<step-3]
