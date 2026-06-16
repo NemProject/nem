@@ -7,14 +7,11 @@ tutorial_level: beginner
 
 The <get:/chain/height> endpoint returns the current chain height.
 
-A <block:> becomes effectively irreversible once enough newer blocks sit on top of it that the network can no longer
-roll it back.
-The height of the most recent irreversible block is the **irreversible height**.
+The **irreversible height** is the highest block that can no longer be rolled back.
+On NEM, it is calculated by subtracting the <rewrite limit:> from the current chain height.
 
-Comparing the chain height with the irreversible height shows which blocks can still be rolled back and which are
-already settled, which is useful for applications that need to know when a transaction can no longer be reversed.
-
-This tutorial shows how to poll the chain height in a loop and track how long ago it last changed.
+This tutorial shows how to poll the chain height in a loop, calculate the irreversible height, and track how long ago
+the chain height last changed.
 
 ## Prerequisites
 
@@ -52,24 +49,21 @@ The <rewrite limit:> is the maximum number of blocks a rollback can undo on NEM,
 six hours).
 
 Subtracting the rewrite limit from the current chain height gives the **irreversible height**.
-Any block at or below `height - 360` has enough blocks on top of it that it can no longer be replaced by an alternative
-chain.
 
-Because the rewrite limit is constant, the irreversible height advances by one block each time a new block is produced,
-keeping a fixed gap below the chain tip.
+Any block at or below the irreversible height can no longer be rolled back.
 
-See the [Consensus](../../textbook/consensus.md#conflict-resolution) textbook section for details on how rollbacks and
-the rewrite limit work.
+See the [Consensus](../../textbook/consensus.md#conflict-resolution) textbook section for details on rollbacks and the
+rewrite limit.
 
 ### Tracking Height Changes
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-To show how long ago the height last changed, the code stores the previous value and its timestamp.
-When the height differs from the previous value, the timestamp is updated to the current time.
+To show how long ago the chain height last changed, the code stores the previous height and the time at which it was
+last updated.
 
-Until a change is observed, the timestamp remains unset and the output displays `-` instead of a number.
-Once a change occurs, the counter starts from `0s ago` and increments each second until the next change.
+Whenever a new block arrives and the height changes, the timestamp is refreshed.
+The elapsed time is then displayed alongside the current chain height.
 
 ### Polling Loop
 
@@ -78,9 +72,9 @@ Once a change occurs, the counter starts from `0s ago` and increments each secon
 Each iteration prints a single status line showing:
 
 * The current chain height and how many seconds have elapsed since it last changed.
-* The irreversible height, the highest block that can no longer be rolled back.
+* The irreversible height.
 
-The loop then sleeps for one second between iterations.
+The loop then sleeps for one second before querying the node again.
 
 ## Output
 
@@ -92,15 +86,15 @@ The following output shows a typical run monitoring the chain height and the irr
 
 Some highlights from the output:
 
-* **Before a new block** (lines 2 to 4): The change counter shows `-` because no change has been observed yet.
-* **A new block arrives** (line 5): The chain height advances from `659,471` to `659,472` and the change counter starts
-    from `0s`.
-    The irreversible height advances to `659,112`.
+* **Before a new block** (lines 2 to 4): The chain height remains unchanged while the program continues polling.
+* **A new block arrives** (line 5): The chain height advances from `659,471` to `659,472`.
+    The irreversible height advances as well.
 
-The gap between the chain height and the irreversible height is normal.
-A transaction included in a block at the chain tip is confirmed but not yet irreversible.
-Once it falls below the rewrite limit, the block can no longer be rolled back and the transaction is guaranteed to
-remain in the chain.
+!!! note "Chain height vs. irreversible height"
+
+    The irreversible height always trails the chain height by the <rewrite limit:>.
+    Transactions near the chain tip may still be rolled back.
+    Once their block falls below the rewrite limit, they become irreversible.
 
 ## Conclusion
 
