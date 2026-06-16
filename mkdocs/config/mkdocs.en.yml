@@ -93,6 +93,8 @@ nav:
               - devbook/mosaics/get-mosaic-info.md
           - Namespaces:
               - devbook/namespaces/get-namespace-info.md
+          - Chain:
+              - devbook/chain/chain-heights.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
