@@ -91,6 +91,8 @@ nav:
               - devbook/transactions/monitoring-status.md
           - Mosaics:
               - devbook/mosaics/get-mosaic-info.md
+          - Namespaces:
+              - devbook/namespaces/get-namespace-info.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
