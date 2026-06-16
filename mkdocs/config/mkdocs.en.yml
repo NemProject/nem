@@ -88,8 +88,15 @@ nav:
               - devbook/accounts/query-balance.md
           - Transactions:
               - devbook/transactions/transfer-xem.md
+              - devbook/transactions/monitoring-status.md
+          - Mosaics:
+              - devbook/mosaics/get-mosaic-info.md
+          - Namespaces:
+              - devbook/namespaces/get-namespace-info.md
           - Network Currency:
               - devbook/network-currency/query-currency-supply.md
+          - Chain:
+              - devbook/chain/chain-heights.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
