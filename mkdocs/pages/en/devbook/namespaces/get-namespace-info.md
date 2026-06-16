@@ -39,6 +39,8 @@ The <get:/namespace> endpoint retrieves the current properties of a namespace, i
     from the root down to the queried level.
     For example, `foo` is a <root namespace:> and `foo.bar` is a <subnamespace:> of `foo`.
 
+    `fqn` in the returned data structure stands for _Fully-Qualified Name_.
+
 * **Owner:** The <address:> of the account that [registered the namespace](../../textbook/namespaces.md#ownership).
 
 * **Height:** The <block:> height at which the current ownership began.
@@ -61,12 +63,14 @@ the namespace expires.
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-There is no endpoint that returns the children of a namespace directly, but
-[subnamespaces always share the owner](../../textbook/namespaces.md#ownership) of their root namespace.
+There is no endpoint that returns the children of a namespace directly.
+However, because [subnamespaces always share the owner](../../textbook/namespaces.md#ownership) of their root
+namespace, they can be found by querying the namespaces owned by that account.
 
 The <get:/account/namespace/page> endpoint returns the namespaces owned by an account, and its optional `parent`
-parameter restricts the results to subnamespaces of the given namespace.
-Combining the owner obtained in the first step with the queried namespace as parent lists its subnamespaces.
+parameter restricts the results to subnamespaces of a given namespace.
+Using the namespace owner obtained in the previous step and the queried namespace as the `parent` value returns its
+subnamespaces.
 
 ### Listing the Namespace's Mosaics
 
@@ -89,20 +93,20 @@ The output shown below corresponds to a typical run of the program, querying the
 
 Some highlights from the output:
 
-* **Namespace name** (line 5): The queried namespace, `company`, which is a root namespace because it contains no dots.
+* **Namespace name** (line 5): The queried namespace, `company`.
+    Because it contains no dots, it is a root namespace.
 
-* **Owner** (line 6): The address of the account that registered the namespace.
+* **Owner** (line 6): The account that currently owns the namespace.
 
-* **Height** (line 7): The block height at which the current ownership began.
+* **Height** (line 7): The block height at which the current ownership period began.
 
 * **Lease expiration** (lines 9-11): The expiration height is the ownership height plus the lease duration of
     525600 blocks.
-    Subtracting the current chain height shows how many blocks remain before the namespace expires.
+    Subtracting the current chain height shows how many blocks remain before expiration.
 
-* **Subnamespaces** (lines 14-15): The namespace has a single subnamespace, `company.division`, listed by its full
-    dot-separated name.
+* **Subnamespaces** (lines 14-15): One subnamespace exists under `company`: `company.division`.
 
-* **Mosaics** (lines 18-19): The namespace has a single mosaic defined directly under it.
+* **Mosaics** (lines 18-19): One mosaic is defined directly under the namespace: `company:token`.
 
 ## Conclusion
 
