@@ -88,6 +88,8 @@ nav:
               - devbook/accounts/query-balance.md
           - Transactions:
               - devbook/transactions/transfer-xem.md
+          - Network Currency:
+              - devbook/network-currency/query-currency-supply.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
