@@ -64,8 +64,8 @@ If not provided, a test address is used as default.
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The snippet defines the transfer amount in the `xem` variable, loaded as a number from the `XEM_AMOUNT`
-environment variable.
+The snippet defines the transfer amount in the `xem` variable, loaded as a number from the `XEM_AMOUNT` environment
+variable.
 If not provided, a default of 1 XEM is used.
 
 The transaction's `amount` field requires atomic units, not whole XEM.
@@ -81,7 +81,8 @@ the number of seconds since the NEM nemesis block:
 
 * `timestamp`: The moment the transaction is created, set here to the current network time.
 * `deadline`: How long the network keeps trying to confirm the transaction before discarding it.
-    It must be after the timestamp and no more than 24 hours later.
+    It must be after the timestamp and no more than
+    [24 hours](../../textbook/transactions.md#common-transaction-structure) later.
     Otherwise, the node rejects the transaction.
     This example sets it two hours after the timestamp, well within the limit.
 
@@ -95,30 +96,12 @@ However, applications do not need to query the network time before every transac
 It can be fetched once and then adjusted using the local system clock when needed.
 This provides a good balance between accuracy and performance.
 
-### Calculating the Transaction Fee
+### Building the Transaction
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-Every transaction pays a fee to the <harvester account:> that includes it in a block.
-
-NEM uses a fixed fee schedule, so the snippet calculates the fee locally without contacting a node.
-For a XEM-only transfer, the fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of
-1.25 XEM.
-See [Fees](../../textbook/transfer_transactions.md#fees) for the full rules, including the mosaic and message costs.
-
-The snippet implements this schedule:
-
-* `fee_steps` is the number of full 10'000-XEM increments in `xem`, clamped between 1 and 25.
-* `fee` is `fee_steps` multiplied by 50'000 atomic units, the value of one increment (0.05 XEM).
-
-With the default 1 XEM, the fee falls in the first increment (0.05 XEM).
-
-### Building the Transaction
-
-{{ tutorial.code_snippet_tagged('step-5') }}
-
-The snippet calls <dy:TransactionFactory.create> with a descriptor that supplies every required property of
-the transfer transaction:
+The snippet calls <dy:TransactionFactory.create> with a descriptor that supplies the transfer transaction's
+properties:
 
 * `type`: This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry both XEM and
     other <mosaics:>.
@@ -126,8 +109,6 @@ the transfer transaction:
 
 * `signer_public_key`: The signer is the account that will pay the fee.
     In a transfer transaction, it is also the source of the transferred XEM.
-
-* `fee`: The value calculated in the previous step. For 1 XEM, this is `50_000` atomic units (0.05 XEM).
 
 * `timestamp` and `deadline`: The values computed in the network time step.
 
@@ -140,6 +121,23 @@ the transfer transaction:
     A <ser:TransferTransactionV2> can also carry other <mosaics:> instead of XEM, or include a message, with the fee
     calculated differently in each case.
     See the [Transfer Mosaics](./transfer-mosaics.md) and [Transfer with a Message](./messages.md) tutorials.
+
+### Calculating the Transaction Fee
+
+{{ tutorial.code_snippet_tagged('step-5') }}
+
+Every transaction pays a fee to the <harvester account:> that includes it in a block.
+
+Rather than implement NEM's fixed fee schedule by hand, the snippet calls the SDK's
+<dy:FeeCalculator.calculateTransactionFee> helper, which reads the XEM amount directly from the transaction built in the
+previous step.
+
+The returned fee is assigned to `transaction.fee` before signing.
+The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of 1.25 XEM.
+With the default 1 XEM, it comes to 0.05 XEM.
+
+See the [Fees](../../textbook/transfer_transactions.md#fees) section for the full rules, including the mosaic and
+message costs.
 
 ### Signing and Serializing
 
@@ -203,20 +201,21 @@ The output shown below corresponds to a typical run of the program.
 
 The number of `pending` checks depends on how soon the next block is harvested, so it varies between runs.
 
-To see the transaction from the network's perspective, you can search for the transaction hash on a [NEM testnet
-explorer](https://testnet.nem.fyi/).
+To see the transaction from the network's perspective, you can search for the transaction hash on the
+[NEM testnet explorer](https://testnet.nem.fyi/).
 The hash is printed in the line that says `Waiting for confirmation from /transaction/get?hash=...`.
 
 ## Conclusion
 
 This tutorial showed how to:
 
-| Step                                                        | Related documentation                                                                                               |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------|
-| [Obtain the network time](#fetching-network-time)           | <get:/time-sync/network-time>                                                                                       |
-| [Build the transaction](#building-the-transaction)          | <dy:TransactionFactory.create>                                                                                      |
-| [Sign the transaction](#signing-and-serializing)            | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature>                                          |
-| [Announce the transaction](#announcing-the-transaction)     | <post:/transaction/announce>                                                                                        |
-| [Wait for confirmation](#waiting-for-confirmation)          | <get:/transaction/get>                                                                                              |
+| Step                                                              | Related documentation                                                      |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [Obtain the network time](#fetching-network-time)                 | <get:/time-sync/network-time>                                              |
+| [Build the transaction](#building-the-transaction)                | <dy:TransactionFactory.create>                                             |
+| [Calculate the transaction fee](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee>                                 |
+| [Sign the transaction](#signing-and-serializing)                  | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature> |
+| [Announce the transaction](#announcing-the-transaction)           | <post:/transaction/announce>                                               |
+| [Wait for confirmation](#waiting-for-confirmation)                | <get:/transaction/get>                                                     |
 
 Most other NEM transaction types are created, signed, and announced in the same way.

@@ -5,6 +5,8 @@ import urllib.request
 
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
+from symbolchain.nc import Amount
+from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 
@@ -39,21 +41,20 @@ try:
 	timestamp = network_time
 	deadline = network_time + 2 * 60 * 60
 	# [<step-3]
-	# Calculate the transaction fee [>step-4]
-	fee_steps = max(1, min(25, xem // 10_000))
-	fee = fee_steps * 50_000
-	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-4]
-	# Build the transaction [>step-5]
+	# Build the transaction [>step-4]
 	transaction = facade.transaction_factory.create({
 		'type': 'transfer_transaction_v2',
 		'signer_public_key': signer_key_pair.public_key,
-		'fee': fee,
 		'timestamp': timestamp,
 		'deadline': deadline,
 		'recipient_address': RECIPIENT_ADDRESS,
 		'amount': amount
 	})
+	# [<step-4]
+	# Calculate and attach the transaction fee [>step-5]
+	fee = calculate_transaction_fee(transaction)
+	transaction.fee = Amount(fee)
+	print(f'  Transaction fee: {fee / 1_000_000} XEM')
 	# [<step-5]
 	# Sign transaction and generate final payload [>step-6]
 	signature = facade.sign_transaction(signer_key_pair, transaction)

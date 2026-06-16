@@ -1,5 +1,9 @@
 import { PrivateKey } from 'symbol-sdk';
-import { NemFacade } from 'symbol-sdk/nem';
+import {
+	NemFacade,
+	calculateTransactionFee,
+	models
+} from 'symbol-sdk/nem';
 
 const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
@@ -34,21 +38,20 @@ try {
 	const timestamp = networkTime;
 	const deadline = networkTime + (2 * 60 * 60);
 	// [<step-3]
-	// Calculate the transaction fee [>step-4]
-	const feeSteps = Math.max(1, Math.min(25, Math.floor(xem / 10_000)));
-	const fee = BigInt(feeSteps * 50_000);
-	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-4]
-	// Build the transaction [>step-5]
+	// Build the transaction [>step-4]
 	const transaction = facade.transactionFactory.create({
 		type: 'transfer_transaction_v2',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		fee,
 		timestamp,
 		deadline,
 		recipientAddress: RECIPIENT_ADDRESS,
 		amount
 	});
+	// [<step-4]
+	// Calculate and attach the transaction fee [>step-5]
+	const fee = calculateTransactionFee(transaction);
+	transaction.fee = new models.Amount(fee);
+	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
 	// [<step-5]
 	// Sign transaction and generate final payload [>step-6]
 	const signature = facade.signTransaction(signerKeyPair, transaction);

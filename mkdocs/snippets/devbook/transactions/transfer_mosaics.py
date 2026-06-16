@@ -1,11 +1,12 @@
 import json
-import math
 import os
 import time
 import urllib.request
 
 from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
+from symbolchain.nc import Amount
+from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 
@@ -60,46 +61,34 @@ try:
 		supply = json.loads(response.read().decode())['supply']
 	print(f'  {MOSAIC_ID}: divisibility {divisibility}, supply {supply}')
 	# [<step-4]
-	# Calculate the transaction fee [>step-5]
-	quantity = QUANTITY * (10 ** divisibility)
+	# Build the transaction [>step-5]
+	atomic_quantity = QUANTITY * (10 ** divisibility)
 	multiplier = 1
-	amount = multiplier * 1_000_000
-	if supply <= 10_000 and 0 == divisibility:
-		# Tiny, indivisible mosaics pay a flat 0.05 XEM
-		fee = 50_000
-	else:
-		total_quantity = supply * 10 ** divisibility
-		# 1. XEM-equivalent value
-		xem_equivalent = (8_999_999_999 * quantity * multiplier
-			// total_quantity)
-		# 2. Base fee from the XEM-only schedule
-		steps = min(25, max(1, xem_equivalent // 10_000))
-		# 3. Supply discount (larger for scarcer mosaics)
-		supply_adjustment = math.floor(
-			0.8 * math.log(9_000_000_000_000_000 / total_quantity))
-		# Final fee: base minus discount, min 0.05 XEM
-		fee = 50_000 * max(1, steps - supply_adjustment)
-	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-5]
-	# Build the transaction [>step-6]
+	scaled_multiplier = multiplier * 1_000_000
 	transaction = facade.transaction_factory.create({
 		'type': 'transfer_transaction_v2',
 		'signer_public_key': signer_key_pair.public_key,
-		'fee': fee,
 		'timestamp': timestamp,
 		'deadline': deadline,
 		'recipient_address': RECIPIENT_ADDRESS,
-		'amount': amount,
+		'amount': scaled_multiplier,
 		'mosaics': [{
 			'mosaic': {
 				'mosaic_id': {
 					'namespace_id': {'name': MOSAIC_NAMESPACE.encode()},
 					'name': MOSAIC_NAME.encode()
 				},
-				'amount': quantity
+				'amount': atomic_quantity
 			}
 		}]
 	})
+	# [<step-5]
+	# Calculate and attach the transaction fee [>step-6]
+	fee = calculate_transaction_fee(
+		transaction,
+		{MOSAIC_ID: {'supply': supply, 'divisibility': divisibility}})
+	transaction.fee = Amount(fee)
+	print(f'  Transaction fee: {fee / 1_000_000} XEM')
 	# [<step-6]
 	# Sign transaction and generate final payload [>step-7]
 	signature = facade.sign_transaction(signer_key_pair, transaction)
