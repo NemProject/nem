@@ -6,7 +6,7 @@ NODE_URL = os.getenv('NODE_URL', 'http://portobelo.nemmain.net:7890')
 print(f'Using node {NODE_URL}')
 
 try:
-	supply_path = '/mosaic/supply?mosaicId=nem:xem' # [>step-1]
+	supply_path = '/mosaic/supply?mosaicId=nem:xem'  # [>step-1]
 	with urllib.request.urlopen(f'{NODE_URL}{supply_path}') as response:
 		supply_info = json.loads(response.read().decode())
 	total = supply_info['supply']
