@@ -95,7 +95,7 @@ nav:
               - devbook/namespaces/get-namespace-info.md
           - Network Currency:
               - devbook/network-currency/query-currency-supply.md
-          - Chain:
+          - Chain State:
               - devbook/chain/chain-heights.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
