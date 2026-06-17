@@ -96,6 +96,7 @@ nav:
               - devbook/namespaces/get-namespace-info.md
           - Network Currency:
               - devbook/network-currency/query-currency-supply.md
+              - devbook/network-currency/query-block-rewards.md
           - Chain State:
               - devbook/chain/chain-heights.md
       - Reference Guides:
