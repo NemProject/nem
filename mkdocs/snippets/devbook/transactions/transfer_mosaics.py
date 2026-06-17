@@ -9,7 +9,6 @@ from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
-
 print(f'Using node {NODE_URL}')
 # [>step-1]
 SIGNER_PRIVATE_KEY = os.getenv(
@@ -25,6 +24,8 @@ RECIPIENT_ADDRESS = os.getenv(
 MOSAIC_ID = os.getenv('MOSAIC_ID', 'company:token')
 MOSAIC_NAMESPACE, MOSAIC_NAME = MOSAIC_ID.split(':')
 QUANTITY = int(os.getenv('QUANTITY', '100'))
+print(f'Sending mosaic {MOSAIC_ID}')
+print(f'  Amount: {QUANTITY} units')
 # [<step-2]
 facade = NemFacade('testnet')
 
@@ -75,8 +76,8 @@ try:
 		'mosaics': [{
 			'mosaic': {
 				'mosaic_id': {
-					'namespace_id': {'name': MOSAIC_NAMESPACE.encode()},
-					'name': MOSAIC_NAME.encode()
+					'namespace_id': {'name': MOSAIC_NAMESPACE},
+					'name': MOSAIC_NAME
 				},
 				'amount': atomic_quantity
 			}

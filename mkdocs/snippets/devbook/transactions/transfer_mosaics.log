@@ -1,4 +1,6 @@
 Using node http://libertalia.nemtest.net:7890
+Sending mosaic company:token
+  Amount: 100 units
 Fetching current network time from /time-sync/network-time
   Network time: 353346165 s since the nemesis block
 Fetching mosaic definition from /namespace/mosaic/definition/page?namespace=company

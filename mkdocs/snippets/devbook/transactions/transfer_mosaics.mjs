@@ -7,7 +7,6 @@ import {
 
 const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
-const textEncoder = new TextEncoder();
 console.log('Using node', NODE_URL);
 // [>step-1]
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
@@ -22,6 +21,8 @@ const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
 const MOSAIC_ID = process.env.MOSAIC_ID || 'company:token';
 const [MOSAIC_NAMESPACE, MOSAIC_NAME] = MOSAIC_ID.split(':');
 const QUANTITY = parseInt(process.env.QUANTITY || '100', 10);
+console.log('Sending mosaic', MOSAIC_ID);
+console.log(`  Amount: ${QUANTITY} units`);
 // [<step-2]
 const facade = new NemFacade('testnet');
 
@@ -73,9 +74,9 @@ try {
 			mosaic: {
 				mosaicId: {
 					namespaceId: {
-						name: textEncoder.encode(MOSAIC_NAMESPACE)
+						name: MOSAIC_NAMESPACE
 					},
-					name: textEncoder.encode(MOSAIC_NAME)
+					name: MOSAIC_NAME
 				},
 				amount: BigInt(atomicQuantity)
 			}

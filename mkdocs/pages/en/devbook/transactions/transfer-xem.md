@@ -67,7 +67,7 @@ The snippet defines the transfer amount in the `xem` variable, loaded as a numbe
 variable.
 If not provided, a default of 1 XEM is used.
 
-The transaction's `amount` field requires atomic units, not whole XEM.
+The transaction's `amount` field requires [atomic units](../../textbook/mosaics.md#divisibility), not whole XEM.
 XEM has a <divisibility:> of 6, so one XEM equals one million atomic units.
 The snippet derives `amount` by multiplying `xem` by 1'000'000.
 
@@ -133,7 +133,6 @@ the transaction built in the previous step.
 
 The returned fee is assigned to `transaction.fee` before signing.
 The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of 1.25 XEM.
-With the default 1 XEM, it comes to 0.05 XEM.
 
 ### Signing and Serializing
 
@@ -191,9 +190,31 @@ NEM produces a block roughly once per minute, so confirmation usually takes from
 
 The output shown below corresponds to a typical run of the program.
 
-```text
+```text linenums="1" hl_lines="11 13 15 16 17 20 21 34"
 --8<-- 'devbook/transactions/transfer_xem.log'
 ```
+
+Some highlights from the output:
+
+* **Signer public key** (line 11): The account that signs the transaction and sends the XEM.
+
+* **Transaction fee** (line 13): `50000` atomic units (`0.05` XEM), the fee for sending the default amount of 1 XEM.
+
+* **Recipient address** (line 15): The account that receives the XEM.
+    This is the same `RECIPIENT_ADDRESS`, but it looks different because NEM's transaction format encodes each character
+    of its Base32 text as an ASCII code in hexadecimal, so `5442...` decodes back to `TBUL...`
+    (`54` is `T`, `42` is `B`, and so on).
+
+* **Transfer amount** (line 16): `1000000` atomic units, equal to 1 XEM.
+
+* **No mosaics** (line 17): An empty mosaics array means the transaction sends XEM only.
+
+* **Announcement result** (line 20): A result of `SUCCESS` means the node accepted the transaction into the unconfirmed
+    pool.
+
+* **Transaction hash** (line 21): The hash that uniquely identifies the transaction on the network.
+
+* **Confirmation** (line 34): The transaction is included in block `626588`.
 
 The number of `pending` checks depends on how soon the next block is harvested, so it varies between runs.
 

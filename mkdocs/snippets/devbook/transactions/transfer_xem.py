@@ -9,7 +9,6 @@ from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
-
 print(f'Using node {NODE_URL}')
 # [>step-1]
 SIGNER_PRIVATE_KEY = os.getenv(

@@ -162,7 +162,6 @@ The helper reads the transferred quantities directly from the transaction built 
 each mosaic's `supply` and `divisibility` as a second argument, since those values are not stored in the transaction.
 
 The returned fee is assigned to `transaction.fee` before signing.
-With the default `company:token` mosaic (supply 1'000'000, divisibility 0) and `QUANTITY=100`, it comes to 0.35 XEM.
 
 See the [Fees](../../textbook/transfer_transactions.md#fees) section for the full rules behind the calculation.
 
@@ -181,9 +180,24 @@ These steps work the same as in [Transfer XEM](./transfer-xem.md) and are not de
 
 The output shown below corresponds to a typical run of the program.
 
-```text
+```text linenums="1" hl_lines="8 18 21 22-29"
 --8<-- 'devbook/transactions/transfer_mosaics.log'
 ```
+
+Some highlights from the output, focusing on the parts that differ from a plain XEM transfer:
+
+* **Definition and supply** (line 8): The mosaic `company:token`, with its divisibility (`0`) and current supply
+    (`1000000`), fetched to convert the quantity to atomic units and to calculate the fee.
+
+* **Transaction fee** (line 18): `350000` atomic units (`0.35` XEM), derived from the mosaic's supply, divisibility, and
+    the quantity sent.
+
+* **Amount as multiplier** (line 21): With mosaics attached, `amount` is `1000000` (a factor of one) rather than an
+    amount of XEM.
+
+* **Mosaics array** (lines 22-29): The mosaics included in the transfer, here a single entry with a quantity of `100`.
+    The namespace and name are hex-encoded like the address, so `636F6D70616E79` and `746F6B656E` decode back to
+    `company` and `token`.
 
 To see the transaction from the network's perspective, you can search for the transaction hash on the
 [NEM testnet explorer](https://testnet.nem.fyi/).
