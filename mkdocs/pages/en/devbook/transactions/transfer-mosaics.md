@@ -30,8 +30,7 @@ The same flow works for any other mosaic, as long as the signing account owns en
 
 Before you start, make sure to:
 
-* Set up your development environment.
-    See [Setting Up a Development Environment](../start/setup.md).
+* [Set Up your Development Environment](../start/setup.md).
 * Create an <account:> to send the transfer transaction, either
     [from code](../accounts/create-from-private-key.md) or
     [by using a wallet](../../userbook/wallet/create-account.md).

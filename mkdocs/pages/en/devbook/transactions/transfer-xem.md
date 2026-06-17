@@ -27,8 +27,7 @@ and then poll the transaction's status until it is confirmed.
 
 Before you start, make sure to:
 
-* Set up your development environment.
-    See [Setting Up a Development Environment](../start/setup.md).
+* [Set Up your Development Environment](../start/setup.md).
 * Create an <account:> to send the transfer transaction, either
     [from code](../accounts/create-from-private-key.md) or
     [by using a wallet](../../userbook/wallet/create-account.md).
@@ -128,16 +127,13 @@ properties:
 
 Every transaction pays a fee to the <harvester account:> that includes it in a block.
 
-Rather than implement NEM's fixed fee schedule by hand, the snippet calls the SDK's
-<dy:FeeCalculator.calculateTransactionFee> helper, which reads the XEM amount directly from the transaction built in the
-previous step.
+Rather than implement NEM's [fixed fee schedule](../../textbook/transfer_transactions.md#fees) by hand,
+the snippet calls the SDK's <dy:FeeCalculator.calculateTransactionFee> helper, which reads the XEM amount directly from
+the transaction built in the previous step.
 
 The returned fee is assigned to `transaction.fee` before signing.
 The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to a cap of 1.25 XEM.
 With the default 1 XEM, it comes to 0.05 XEM.
-
-See the [Fees](../../textbook/transfer_transactions.md#fees) section for the full rules, including the mosaic and
-message costs.
 
 ### Signing and Serializing
 
