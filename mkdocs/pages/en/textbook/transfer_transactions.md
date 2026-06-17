@@ -105,14 +105,14 @@ The protocol does not define a plaintext encoding, and it does not standardize a
 payloads.
 Both are conventions agreed between sender and recipient.
 
-#### Plaintext conventions
+#### Plaintext Conventions
 
 Plaintext payloads are stored as-is.
 Sender and recipient agree on a format such as UTF-8, JSON, or hex.
 
 NEM wallets and applications typically assume UTF-8.
 
-#### Secure message conventions
+#### Secure Message Conventions
 
 Secure payloads are encrypted so that only the recipient can decrypt them.
 The protocol does not standardize an encryption scheme.
@@ -215,7 +215,7 @@ payload, up to the 1024-byte maximum:
 
 | Message length         | Added cost |
 | ---------------------- | ---------- |
-| No message             | —          |
+| No message             | None       |
 | 1 to 31 bytes          | 0.05 XEM   |
 | 32 to 63 bytes         | 0.10 XEM   |
 | 64 to 95 bytes         | 0.15 XEM   |

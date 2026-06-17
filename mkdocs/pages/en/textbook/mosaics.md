@@ -19,13 +19,13 @@ and inherits its duration from its parent namespace's lease (see [Lifetime](#lif
 The name identifies a mosaic within its namespace and must be unique within it.
 It follows specific formatting rules:
 
-- It can only contain lowercase letters, numbers, hyphens `-`, underscores `_`, and apostrophes `'`.
-- It must start with a letter or a number.
-- It can be at most **32 characters** long.
+* It can only contain lowercase letters, numbers, hyphens `-`, underscores `_`, and apostrophes `'`.
+* It must start with a letter or a number.
+* It can be at most **32 characters** long.
 
 Once registered, a mosaic name cannot be changed.
 
-## Fully qualified name
+## Fully Qualified Name
 
 A mosaic's **fully qualified name** (also called its **mosaic ID**) is the unique identifier on the network.
 It joins the namespace and the local mosaic name with a colon, in the form `<namespace>:<mosaic name>`:
@@ -39,8 +39,8 @@ Namespace segments follow the [namespace name rules](./namespaces.md#name).
 
 Examples:
 
-- `nem:xem`: The native network currency.
-- `mycompany.tokens:goldcoin`: A hypothetical company token.
+* `nem:xem`: The native network currency.
+* `mycompany.tokens:goldcoin`: A hypothetical company token.
 
 ## Description
 
@@ -85,8 +85,8 @@ It allows for dynamic issuance or removal of mosaic units, depending on the desi
 Only the account that created the mosaic can modify its total supply.
 These changes affect only the creator's balance:
 
-- When _minting_ (increasing the supply), new units are created and added to the creator's account.
-- When _burning_ (decreasing the supply), existing units are removed from the creator's account.
+* When _minting_ (increasing the supply), new units are created and added to the creator's account.
+* When _burning_ (decreasing the supply), existing units are removed from the creator's account.
     If the account does not have enough balance, the operation fails.
 
 ### Transferability
@@ -143,11 +143,11 @@ from the one being transferred.
 A mosaic has no duration of its own.
 Its lifetime is tied to the lifetime of its parent namespace:
 
-- While the namespace is active, the mosaic can be transferred and its supply can be changed (subject to its
+* While the namespace is active, the mosaic can be transferred and its supply can be changed (subject to its
 [properties](#properties)).
-- When the namespace expires, the mosaic becomes inactive: transfers and supply changes are rejected, but existing
+* When the namespace expires, the mosaic becomes inactive: transfers and supply changes are rejected, but existing
     balances are preserved.
-- If the original owner renews the namespace during the [grace period](./namespaces.md#duration), the mosaic and its
+* If the original owner renews the namespace during the [grace period](./namespaces.md#duration), the mosaic and its
     balances become usable again.
 
 !!! warning "Mosaic loss past the grace period is permanent"
@@ -174,10 +174,10 @@ After creation, the original creator can modify a mosaic's **definition**.
 
 Each field has its own rule:
 
-- **Description**: can be changed at any time.
-- **Divisibility**, **initial supply**, **supply mutability**, and **levy**: can be changed only while the creator holds
+* **Description**: can be changed at any time.
+* **Divisibility**, **initial supply**, **supply mutability**, and **levy**: can be changed only while the creator holds
     the entire mosaic supply.
-- **Transferability**: cannot be changed once set.
-- **Name**: cannot be changed.
+* **Transferability**: cannot be changed once set.
+* **Name**: cannot be changed.
 
 The total supply can be changed (mint or burn) if [supply mutability](#supply-mutability) is enabled.

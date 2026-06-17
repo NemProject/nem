@@ -210,7 +210,7 @@ This tutorial showed how to:
 | [Wait for confirmation](#waiting-for-confirmation)                        | <get:/transaction/get>                  |
 | [Detect when a transaction will never confirm](#putting-it-all-together)  | <get:/time-sync/network-time>           |
 
-## Next steps
+## Next Steps
 
 For production applications, consider these improvements:
 

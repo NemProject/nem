@@ -115,7 +115,7 @@ digraph "M-of-N Multisignature" {
 In the previous diagram, Cosignatories 1 and 2 sign, which meets the minimum of `M=2`, so the transaction is valid
 without Cosignatory 3.
 
-### Use cases
+### Use Cases
 
 * **Shared control over funds or functionality**.
 

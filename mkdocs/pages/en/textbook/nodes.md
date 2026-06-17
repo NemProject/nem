@@ -102,7 +102,7 @@ NIS reads and writes data through [Hibernate](https://hibernate.org), a library 
 When NIS is upgraded to a newer release, [Flyway](https://flywaydb.org) automatically applies any required schema
 changes.
 
-## Peer To Peer Communication
+## Peer-to-Peer Communication
 
 NEM nodes communicate directly with one another in a decentralized, peer-to-peer fashion.
 There is no central coordinator: instead, each node establishes connections with a subset of other nodes,
