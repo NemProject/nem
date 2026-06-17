@@ -54,7 +54,8 @@ A portion of the total supply is held by accounts that are not part of the open 
 
 * **Treasury:** A reserve account that holds undistributed XEM.
 * **Nemesis:** The account that signed the nemesis block.
-    It cannot send transactions after the nemesis block, so any XEM held by this account is effectively burnt.
+    It cannot send transactions after the nemesis block, so any XEM held by this account is effectively out of
+    circulation.
 * **Namespace rental sink:** Collects the fees paid to register <namespaces:>.
 * **Mosaic rental sink:** Collects the fees paid to create <mosaics:>.
 
