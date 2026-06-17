@@ -17,12 +17,14 @@ const signerKeyPair = new NemFacade.KeyPair(
 const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
 // [<step-1]
-const facade = new NemFacade('testnet');
-
-// Define the amount of XEM to transfer [>step-2]
-const xem = parseFloat(process.env.XEM_AMOUNT || '1');
-const amount = BigInt(Math.round(xem * 1_000_000));
+// [>step-2]
+const MOSAIC_ID = process.env.MOSAIC_ID || 'company:token';
+const [MOSAIC_NAMESPACE, MOSAIC_NAME] = MOSAIC_ID.split(':');
+const QUANTITY = parseInt(process.env.QUANTITY || '100', 10);
+console.log('Sending mosaic', MOSAIC_ID);
+console.log(`  Amount: ${QUANTITY} units`);
 // [<step-2]
+const facade = new NemFacade('testnet');
 
 try {
 	// Fetch current network time [>step-3]
@@ -38,29 +40,64 @@ try {
 	const timestamp = networkTime;
 	const deadline = networkTime + (2 * 60 * 60);
 	// [<step-3]
-	// Build the transaction [>step-4]
+	// Fetch the mosaic's divisibility and supply [>step-4]
+	const definitionPath =
+		`/namespace/mosaic/definition/page?namespace=${MOSAIC_NAMESPACE}`;
+	console.log('Fetching mosaic definition from', definitionPath);
+	const definitionResponse =
+		await fetch(`${NODE_URL}${definitionPath}`);
+	const definitions = (await definitionResponse.json()).data;
+	const definition = definitions.find(
+		entry => MOSAIC_NAME === entry.mosaic.id.name).mosaic;
+	const divisibility = Number(definition.properties.find(
+		prop => 'divisibility' === prop.name).value);
+
+	const supplyPath = `/mosaic/supply?mosaicId=${MOSAIC_ID}`;
+	console.log('Fetching mosaic supply from', supplyPath);
+	const supplyResponse = await fetch(`${NODE_URL}${supplyPath}`);
+	const { supply } = await supplyResponse.json();
+	console.log(`  ${MOSAIC_ID}: divisibility ${divisibility},`,
+		`supply ${supply}`);
+	// [<step-4]
+	// Build the transaction [>step-5]
+	const atomicQuantity = QUANTITY * (10 ** divisibility);
+	const multiplier = 1;
+	const scaledMultiplier = multiplier * 1_000_000;
 	const transaction = facade.transactionFactory.create({
 		type: 'transfer_transaction_v2',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
 		timestamp,
 		deadline,
 		recipientAddress: RECIPIENT_ADDRESS,
-		amount
+		amount: BigInt(scaledMultiplier),
+		mosaics: [{
+			mosaic: {
+				mosaicId: {
+					namespaceId: {
+						name: MOSAIC_NAMESPACE
+					},
+					name: MOSAIC_NAME
+				},
+				amount: BigInt(atomicQuantity)
+			}
+		}]
 	});
-	// [<step-4]
-	// Calculate and attach the transaction fee [>step-5]
-	const fee = calculateTransactionFee(transaction);
+	// [<step-5]
+	// Calculate and attach the transaction fee [>step-6]
+	const fee = calculateTransactionFee(transaction, {
+		[MOSAIC_ID]: { supply: BigInt(supply), divisibility }
+	});
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-5]
-	// Sign transaction and generate final payload [>step-6]
+	// [<step-6]
+	// Sign transaction and generate final payload [>step-7]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
 	console.log('Built transaction:');
-	console.dir(transaction.toJson(), { colors: true });
-	// [<step-6]
-	// Announce the transaction [>step-7]
+	console.dir(transaction.toJson(), { colors: true, depth: null });
+	// [<step-7]
+	// Announce the transaction [>step-8]
 	const announcePath = '/transaction/announce';
 	console.log('Announcing transaction to', announcePath);
 	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
@@ -70,8 +107,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-7]
-	// Wait for confirmation [>step-8]
+	// [<step-8]
+	// Wait for confirmation [>step-9]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -97,7 +134,7 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-8]
+	// [<step-9]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }
