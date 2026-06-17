@@ -226,13 +226,14 @@ This may happen, for example, if the transaction fee offered is too low to be in
 
 All transaction types in NEM share a set of common attributes:
 
-| Attribute             | Description                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------- |
-| **Signer public key** | Public key of the account that created and signed the transaction.                    |
-| **Signature**         | Cryptographic proof that the signer authorized the transaction and its content.       |
-| **Deadline**          | Timestamp indicating when the transaction expires if not confirmed.                   |
-| **Fee**               | Fee the signer pays to have the transaction included in a block.                      |
-| **Type**              | Transaction type, which determines which additional attributes, if any, are present.  |
+| Attribute             | Description                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Signer public key** | Public key of the account that created and signed the transaction.                                              |
+| **Signature**         | Cryptographic proof that the signer authorized the transaction and its content.                                 |
+| **Timestamp**         | Timestamp indicating when the transaction was created, relative to the <network time:>.                         |
+| **Deadline**          | Timestamp indicating when the transaction expires if not confirmed, no later than 24 hours after the timestamp. |
+| **Fee**               | Fee the signer pays to have the transaction included in a block.                                                |
+| **Type**              | Transaction type, which determines which additional attributes, if any, are present.                            |
 
 ## Validation Details
 

@@ -113,8 +113,9 @@ digraph "Transferability" {
 
 ## Levy
 
-A mosaic definition may include an optional **levy**, a fee paid to a designated account on every transfer of that
-mosaic.
+Levy
+:   An optional fee attached to a mosaic, paid to a designated account on every transfer of that mosaic, on top of the
+    transaction fee.
 
 A levy specifies four fields:
 
