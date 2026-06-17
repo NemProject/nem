@@ -163,7 +163,8 @@ extra:
       options: config/typedoc.json
       disabled: !ENV [NEM_DOCS_DISABLE_TS, false]
     class-remaps: {}
-    global-namespaces: []
+    global-namespaces:
+      - FeeCalculator
 copyright: >
   Copyright &copy; 2026 The Symbol Syndicate
 extra_css:

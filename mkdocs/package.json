@@ -5,7 +5,7 @@
     "lint": "eslint snippets --ext .mjs"
   },
   "dependencies": {
-    "symbol-sdk": "^3.3.1",
+    "symbol-sdk": "^3.3.2",
     "typedoc": "0.28.0",
     "typedoc-plugin-markdown": "4.5.0"
   },
