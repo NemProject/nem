@@ -93,7 +93,9 @@ nav:
               - devbook/mosaics/get-mosaic-info.md
           - Namespaces:
               - devbook/namespaces/get-namespace-info.md
-          - Chain:
+          - Network Currency:
+              - devbook/network-currency/query-currency-supply.md
+          - Chain State:
               - devbook/chain/chain-heights.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
