@@ -105,7 +105,7 @@ with the **Keccak-512** hash function.
 
 Address
 :   A convenient, shorter form of a <public key:>, that simplifies sharing it by requiring only
-    letters and numbers. It's typically a synonym for <account:>.
+    letters and numbers. It is typically a synonym for <account:>.
 
 Keys, both public and private, are binary data which is hard to print and share, whereas addresses are made up of
 only latin letters and numbers.
@@ -142,7 +142,7 @@ On NEM, addresses are obtained from public keys by:
 
     In fact, NEM only tracks addresses and associated public keys when they first appear in a transaction.
 
-## Vanity addresses
+## Vanity Addresses
 
 While keys, and therefore <addresses:> too, are normally generated randomly, it is possible to create
 **vanity addresses** that include specific patterns or prefixes.

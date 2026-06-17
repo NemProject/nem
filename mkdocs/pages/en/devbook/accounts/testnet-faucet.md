@@ -50,7 +50,7 @@ Once authorized, you will be redirected again to the faucet.
 {{ tutorial.step_begin("faucet-address.jpg") }}
 Enter the address where you want to receive the funds in the **Your Testnet Address** field.
 
-Make sure the address starts with `T`, meaning it's a testnet account.
+Make sure the address starts with `T`, meaning it is a testnet account.
 {{ tutorial.step_end() }}
 
 {{ tutorial.step_begin("faucet-xem.jpg") }}
