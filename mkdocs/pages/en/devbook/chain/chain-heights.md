@@ -104,7 +104,7 @@ This tutorial showed how to:
 | -------------------------------------------- | --------------------- |
 | [Fetch chain height](#fetching-chain-height) | <get:/chain/height>   |
 
-## Next steps
+## Next Steps
 
 For an event-driven approach to monitoring new blocks, see the
 [Listening to New Blocks](../websockets/listen-new-blocks.md) WebSocket tutorial.
