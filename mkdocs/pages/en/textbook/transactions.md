@@ -146,7 +146,7 @@ valid?", shape=diamond, style="", URL="#3-validation"];
 }
 ```
 
-### 1. Creation and signature
+### 1. Creation and Signature
 
 A software client, typically an app, creates the transaction and fills in all its parameters.
 For example, a transfer transaction requires the source <account:>, destination account, and amount.

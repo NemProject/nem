@@ -32,10 +32,10 @@ Subnamespace
 
 Each namespace has a unique name that identifies it on the network, and must follow specific formatting rules:
 
-- Names can only contain lowercase letters, numbers, hyphens `-`, and underscores `_`.
-- They must start with a letter or number.
-- Root names can be at most 16 characters long.
-- Subnamespace names can be at most 64 characters long.
+* Names can only contain lowercase letters, numbers, hyphens `-`, and underscores `_`.
+* They must start with a letter or number.
+* Root names can be at most 16 characters long.
+* Subnamespace names can be at most 64 characters long.
 
 Once registered, a name cannot be changed.
 
@@ -44,9 +44,9 @@ Once registered, a name cannot be changed.
 When a root namespace is registered, it is leased for approximately one year (525600 blocks on <mainnet:>).
 During this time, the owner can perform operations such as:
 
-- Define <mosaics:> under the namespace.
-- Create subnamespaces.
-- Renew the root namespace.
+* Define <mosaics:> under the namespace.
+* Create subnamespaces.
+* Renew the root namespace.
     Subnamespaces do not need to be renewed, as they have the same duration as their root namespace.
 
 Renewal while the namespace is registered is restricted to the **last 43200 blocks before expiration**
@@ -91,8 +91,8 @@ The following operations are permitted depending on the state of the namespace r
 
 Registering a namespace requires paying a lease fee in the network currency (<XEM:>):
 
-- **Root namespace:** 100 XEM per registration or renewal.
-- **Subnamespace:** 10 XEM, paid once at registration.
+* **Root namespace:** 100 XEM per registration or renewal.
+* **Subnamespace:** 10 XEM, paid once at registration.
 
 This reflects the fact that namespaces are a limited global resource and helps prevent name squatting.
 
@@ -117,9 +117,9 @@ A namespace is controlled by the account that registered the root namespace.
 
 Only the owner can:
 
-- Define mosaics under the namespace.
-- Create subnamespaces.
-- Renew the root namespace.
+* Define mosaics under the namespace.
+* Create subnamespaces.
+* Renew the root namespace.
 
 Namespace ownership cannot be transferred directly.
 Instead, control must be transferred by handing over the owner account, for example, using a <multisignature account:>.
