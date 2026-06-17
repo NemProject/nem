@@ -1,4 +1,4 @@
-# symbol-sdk v3.3.1
+# symbol-sdk v3.3.2
 
 ## Modules
 

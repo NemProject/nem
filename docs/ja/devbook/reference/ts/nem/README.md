@@ -17,6 +17,12 @@
 - [TransactionFactory](classes/TransactionFactory.md)
 - [Verifier](classes/Verifier.md)
 
+## Functions
+
+- [calculateMosaicRentalFee](functions/calculateMosaicRentalFee.md)
+- [calculateNamespaceRentalFee](functions/calculateNamespaceRentalFee.md)
+- [calculateTransactionFee](functions/calculateTransactionFee.md)
+
 ## MessageEncoder
 
 Renames and re-exports [default](MessageEncoder/classes/default.md)
