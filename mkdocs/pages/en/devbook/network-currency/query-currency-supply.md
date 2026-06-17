@@ -24,8 +24,9 @@ You only need a way to make HTTP requests.
 The snippet uses the `NODE_URL` environment variable to set a NEM <mainnet:> node.
 
 !!! note "Why mainnet?"
-    This tutorial queries fixed mainnet account addresses to calculate the circulating supply, so `NODE_URL` must point
-    to a mainnet node.
+    Other tutorials typically run against <testnet:> to avoid spending real funds.
+    This one is different because it queries fixed mainnet account addresses to calculate the circulating supply, so
+    `NODE_URL` must point to a mainnet node.
 
 ## Code Explanation
 
@@ -58,8 +59,8 @@ A portion of the total supply is held by accounts that are not part of the open 
 * **Mosaic rental sink:** Collects the fees paid to create <mosaics:>.
 
 The code queries each account with the <get:/account/get> endpoint and sums their balances.
-Balances are returned in [atomic units](../../textbook/mosaics.md#divisibility), so each one is divided by 1'000'000
-to match the supply in whole units.
+Balances are returned in [atomic units](../../textbook/mosaics.md#divisibility).
+Because `nem:xem` has a <divisibility:> of 6, each balance is divided by 1'000'000 to match the supply in whole units.
 
 ### Deriving the Circulating Supply
 
@@ -90,8 +91,7 @@ This tutorial showed how to:
 | -------------------------------------------------------------------- | --------------------- |
 | [Fetch total supply](#fetching-the-total-supply)                     | <get:/mosaic/supply>  |
 | [Fetch non-circulating supply](#fetching-the-non-circulating-supply) | <get:/account/get>    |
-| [Derive circulating supply](#deriving-the-circulating-supply)        | -                     |
 
-## Next steps
+## Next Steps
 
 To check a specific account's XEM balance, see the [Query Account Balance](../accounts/query-balance.md) tutorial.

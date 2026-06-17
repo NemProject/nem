@@ -9,8 +9,8 @@ try {
 	const supplyPath = '/mosaic/supply?mosaicId=nem:xem';
 	const response = await fetch(`${NODE_URL}${supplyPath}`);
 	const supplyInfo = await response.json();
-	const total = supplyInfo.supply;
-	console.log(`Total supply: ${fmt(total)} XEM`); // [<step-1]
+	const totalSupply = supplyInfo.supply;
+	console.log(`Total supply: ${fmt(totalSupply)} XEM`); // [<step-1]
 	// [>step-2]
 	const NON_CIRCULATING_ADDRESSES = [
 		['Treasury', 'NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK'],
@@ -18,19 +18,21 @@ try {
 		['Namespace rental', 'NAMESPACEWH4MKFMBCVFERDPOOP4FK7MTBXDPZZA'],
 		['Mosaic rental', 'NBMOSAICOD4F54EE5CDMR23CCBGOAM2XSIUX6TRS']
 	];
-	let nonCirculating = 0;
+	let nonCirculatingSupply = 0;
 	for (const [label, address] of NON_CIRCULATING_ADDRESSES) {
 		const accountPath = `/account/get?address=${address}`;
 		const accountResponse = await fetch(`${NODE_URL}${accountPath}`);
 		const accountInfo = await accountResponse.json();
 		const balance = accountInfo.account.balance / 1_000_000;
-		nonCirculating += balance;
+		nonCirculatingSupply += balance;
 		console.log(`  ${label}: ${fmt(balance)} XEM`);
 	}
-	console.log(`Non-circulating supply: ${fmt(nonCirculating)} XEM`); // [<step-2]
+	console.log(
+		`Non-circulating supply: ${fmt(nonCirculatingSupply)} XEM`
+	); // [<step-2]
 	// [>step-3]
-	const circulating = total - nonCirculating;
-	console.log(`Circulating supply: ${fmt(circulating)} XEM`); // [<step-3]
+	const circulatingSupply = totalSupply - nonCirculatingSupply;
+	console.log(`Circulating supply: ${fmt(circulatingSupply)} XEM`); // [<step-3]
 } catch (error) {
 	console.log(error);
 }
