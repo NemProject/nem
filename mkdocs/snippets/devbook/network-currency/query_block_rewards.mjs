@@ -33,16 +33,16 @@ try {
 	console.log(`Harvester: ${harvester}`);
 	// [<step-2]
 	// Sum the transaction fees [>step-3]
-	let reward = 0n;
+	let totalReward = 0n;
 	console.log('\nTransaction fees:');
 	for (const transaction of transactions) {
 		const fee = BigInt(transaction.fee);
-		reward += fee;
+		totalReward += fee;
 		console.log(`  Fee: ${fmt(fee)} XEM`);
 	}
 	// [<step-3]
 	// Total reward [>step-4]
-	console.log(`\nTotal block reward: ${fmt(reward)} XEM`);
+	console.log(`\nTotal block reward: ${fmt(totalReward)} XEM`);
 	// [<step-4]
 } catch (error) {
 	console.log(error);

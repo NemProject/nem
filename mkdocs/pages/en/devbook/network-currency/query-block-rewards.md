@@ -38,25 +38,21 @@ It then sums the fees of every transaction in the block to obtain the total rewa
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
-The <post:/block/at/public> endpoint returns the block at the requested height.
-The request body is a JSON object containing the target height.
-
-The response includes the block's `signer`, which is the harvester's <public key:>, and its `transactions` array.
+The <post:/block/at/public> endpoint returns information about the block at the requested height,
+including the list of transactions present in the block.
 
 ### Identifying the Harvester
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The `signer` field holds the public key of the account that harvested the block.
+The `signer` field holds the <public key:> of the account that harvested the block.
 The <dy:network.publicKeyToAddress> method converts this public key into the corresponding testnet <address:>.
 
 !!! info "The signer is not always the account that earns the reward"
 
-    With local harvesting, the `signer` is the <harvester account:> itself, so the derived address is the account that
-    earns the reward.
+    With <local harvesting:>, the `signer` is the <harvester account:> and receives the reward.
 
-    With <delegated harvesting:>, the `signer` is a <remote account:>, so the derived address is that account, not the
-    <lessor:> that actually earns the reward.
+    With <delegated harvesting:>, the `signer` is a <remote account:>, while the reward is paid to the <lessor:>.
 
 ### Summing the Transaction Fees
 
@@ -74,15 +70,18 @@ Adding the fees of every transaction gives the total reward for the block.
 The total block reward equals the sum of all transaction fees, paid in full to the harvester.
 An empty block has no fees, and therefore no reward.
 
-!!! note "Listing every reward an account has earned"
+!!! note "Alternative: Query rewards by account"
 
-    The <get:/account/harvests> endpoint lists the rewards an account has earned.
-    It returns one entry per block the account harvested, each with a `totalFee` field holding the reward collected for
-    that block.
+    This tutorial calculates the reward for a specific block by summing the transaction fees it contains.
 
-    The endpoint takes the address of the account that earns the rewards: the <harvester account:> for local harvesting,
-    or the <lessor:> for <delegated harvesting:>.
-    A <remote account:> address also returns the blocks that remote signed on the lessor's behalf.
+    If you are interested in the rewards earned by a particular account instead, use the
+    <get:/account/harvests> endpoint.
+    It returns one entry per harvested block, including a `totalFee` field with the reward earned for that block.
+
+    The endpoint accepts the address of the account that receives the rewards: the <harvester account:> for local
+    harvesting, or the <lessor:> for <delegated harvesting:>.
+
+    A <remote account:> address also returns the blocks signed on behalf of the lessor.
 
 ## Output
 

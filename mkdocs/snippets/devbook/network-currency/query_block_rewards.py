@@ -31,15 +31,15 @@ try:
 	print(f'Harvester: {harvester}')
 	# [<step-2]
 	# Sum the transaction fees [>step-3]
-	reward = 0
+	total_reward = 0
 	print('\nTransaction fees:')
 	for transaction in transactions:
 		fee = int(transaction['fee'])
-		reward += fee
+		total_reward += fee
 		print(f'  Fee: {fee / 1e6:,.6f} XEM')
 	# [<step-3]
 	# Total reward [>step-4]
-	print(f'\nTotal block reward: {reward / 1e6:,.6f} XEM')
+	print(f'\nTotal block reward: {total_reward / 1e6:,.6f} XEM')
 	# [<step-4]
 except Exception as error:
 	print(error)
