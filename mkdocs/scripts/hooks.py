@@ -453,12 +453,25 @@ def page_markdown_ws(content, page, config, files):
 	return content
 
 
+def page_markdown_tutorial_complexity_tags(content, page, config, files):
+	if 'tutorial_level' in page.meta:
+		level = page.meta['tutorial_level']
+		tag = (
+			f'<span class="tutorial_level tutorial_level-{level}" title="{config.extra['nem']['tutorial_level']}">'
+			f'{config.extra['nem']['tutorial_level_labels'][level]}'
+			f'</span>'
+		)
+		content = re.sub(r'(^# [^\n]*)', rf'\g<1><br/>{tag}', content)
+	return content
+
+
 @mkdocs.plugins.event_priority(0)
 def on_page_markdown(content, page, config, files):
 	content = page_markdown_js_typedoc(content, page, config, files)
 	content = page_markdown_dylinks(content, page, config, files)
 	content = page_markdown_rest(content, page, config, files)
 	content = page_markdown_ws(content, page, config, files)
+	content = page_markdown_tutorial_complexity_tags(content, page, config, files)
 	return content
 
 
