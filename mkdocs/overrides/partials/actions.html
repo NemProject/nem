@@ -16,9 +16,4 @@
 			{% include ".icons/" ~ icon ~ ".svg" %}
 		</a>
 	{% endif %}
-	{% if page.meta and page.meta.tutorial_level %}
-	<span class="md-content__button tutorial_level tutorial_level-{{page.meta.tutorial_level}}" title="{{config.extra.nem.tutorial_level}}">
-		{{config.extra.nem.tutorial_level_labels[page.meta.tutorial_level]}}
-	</span>
-	{% endif %}
 {% endif %}
