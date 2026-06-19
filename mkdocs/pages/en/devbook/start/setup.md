@@ -1,13 +1,12 @@
 ---
 title: Setup
-tutorial_level: beginner
 ---
 
 # Setting Up a Development Environment
 
 This page lists the dependencies required to run the tutorials in this documentation and explains how to run them.
 
-All tutorials use the Symbol SDK, which supports both the NEM and <Symbol:> networks.
+Most tutorials use the Symbol SDK, which supports both the <NEM:> and <Symbol:> networks.
 It is the recommended library for building NEM applications, so the steps below apply to every tutorial.
 
 Select the language you prefer:
