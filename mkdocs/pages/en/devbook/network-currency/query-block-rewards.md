@@ -94,7 +94,6 @@ The following output shows a typical run querying the rewards for block 661,258:
 Some highlights from the output:
 
 * **Harvester** (line 4): The address derived from the block's `signer` public key.
-    This block was harvested locally, so the signer is the harvester credited with the reward.
 * **Transaction fees** (lines 7 to 8): The fee paid by each transaction included in the block.
 * **Total block reward** (line 10): The sum of all transaction fees paid in full to the harvester.
 
