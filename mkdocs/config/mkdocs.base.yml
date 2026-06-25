@@ -75,7 +75,7 @@ plugins:
 hooks:
   - ../scripts/hooks.py
   - ../scripts/typedoc-plugin.py
-  - ../scripts/register_cats_lexer.py
+  - ../scripts/register_lexers.py
 markdown_extensions:
   attr_list: {}
   admonition: {}
