@@ -108,7 +108,7 @@ enum TransportMode : uint32
 ### Enum Attributes
 
 Enumerations support attributes that modify their behavior.
-Each attributes starts with `@` and must appear on the line above the enum declaration.
+Each attribute starts with `@` and must appear on the line above the enum declaration.
 Currently, the only supported attribute is:
 
 * `#!cats @is_bitwise`: indicates that the enumeration represents a bit field (i.e. a set of flags)
@@ -216,8 +216,8 @@ CATS supports the following conditional operators:
 
 * `#!cats equals`: include the field if the selector field exactly matches the constant value.
 * `#!cats not equals`: include the field if the selector field does not match the constant value.
-* `#!cats has`: include the field if all bits in the constant value are set in the selector field (for bit flags).
-* `#!cats not has`: include the field if any bits in the constant value are **not** set in the selector field.
+* `#!cats in`: include the field if the constant is present in the selector field (for bit flags).
+* `#!cats not in`: include the field if the constant is not present in the selector field.
 
 For example, the field `#!cats buoyancy` is only included when `#!cats transport_mode` is equal to `#!cats SEA`:
 
@@ -264,7 +264,8 @@ Where `#!cats <NumberOfElements>` can be:
     referencing a field that holds the total size in bytes.
 
     ```cats
-    @size(garage_byte_size) struct Garage
+    @size(garage_byte_size)
+    struct Garage
         garage_byte_size = uint32
         vehicles = array(Vehicle, __FILL__)
     ```
@@ -369,7 +370,7 @@ Attributes appear above the `#!cats struct` declaration, starting with `@`.
 CATS supports the following struct-level attributes:
 
 * `#!cats @is_aligned`: forces all fields to be aligned to their natural boundaries.
-* `#!cats @is_size_implicit`: allows the struct to be referenced in a `#!cats sizeof(x)` expression.
+* `#!cats @is_size_implicit`: allows the struct to be referenced by a `#!cats sizeof(type, field)` expression.
 * `#!cats @size(x)`: declares that the field `x` contains the full size of the struct in bytes.
 * `#!cats @initializes(x, Y)`: initializes field `x` with the constant `Y` defined elsewhere.
 * `#!cats @discriminator(x [, y...])`: used with `#!cats abstract` structs to select the appropriate derived type when decoding,
