@@ -37,7 +37,7 @@ The client uses these frames:
 
 To subscribe to a channel, send a `SUBSCRIBE` frame with a client-chosen `id` and the channel `destination`:
 
-```text title="SUBSCRIBE frame"
+```stomp title="SUBSCRIBE frame"
 SUBSCRIBE
 id:sub-0
 destination:/blocks
@@ -51,7 +51,7 @@ destination:/blocks
 
 Each update is delivered as a STOMP `MESSAGE` frame:
 
-```text title="MESSAGE frame"
+```stomp title="MESSAGE frame"
 MESSAGE
 destination:/blocks
 subscription:sub-0
@@ -78,7 +78,7 @@ ws:blocks
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/blocks
@@ -96,7 +96,7 @@ ws:blocks-new
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/blocks/new
@@ -120,7 +120,7 @@ ws:unconfirmed
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/unconfirmed
@@ -137,7 +137,7 @@ ws:unconfirmed
     In order to receive notifications for account channels, each account has to be registered by sending a `SEND` frame
     to `/w/api/account/subscribe`:
 
-    ```text
+    ```stomp
     SEND
     destination:/w/api/account/subscribe
 
@@ -151,7 +151,7 @@ ws:account&#47;{address}
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/account/{address}
@@ -169,7 +169,7 @@ ws:unconfirmed&#47;{address}
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/unconfirmed/{address}
@@ -186,7 +186,7 @@ ws:transactions&#47;{address}
 
 === "Request body"
 
-    ```text
+    ```stomp
     SUBSCRIBE
     id:sub-0
     destination:/transactions/{address}
