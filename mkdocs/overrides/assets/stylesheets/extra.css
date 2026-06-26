@@ -882,3 +882,9 @@ code.doc-symbol-interface::after {
 	--scalar-background-1: var(--md-default-bg-color);
 	--scalar-color-accent: var(--devbook-color);
 }
+
+/* CATS documentation placeholders, such as <TypeName>. */
+.md-typeset .language-cats .nt {
+	font-style: italic;
+	color: var(--md-code-hl-generic-color);
+}
