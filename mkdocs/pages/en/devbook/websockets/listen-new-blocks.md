@@ -18,12 +18,15 @@ This tutorial shows how to subscribe to the channel and display each update as i
 
 ## Prerequisites
 
+NEM serves WebSockets using the [STOMP](https://stomp.github.io/) messaging protocol over
+[SockJS](https://github.com/sockjs/sockjs-client), so a STOMP client and a WebSocket transport are required.
+
 === ":simple-python: Python"
 
-    Install the `websockets` and `stomper` libraries:
+    Install the `stomper` and `websockets` libraries:
 
     ```bash
-    pip install websockets stomper
+    pip install stomper websockets
     ```
 
 === ":simple-javascript: JavaScript"
@@ -33,6 +36,8 @@ This tutorial shows how to subscribe to the channel and display each update as i
     ```bash
     npm install @stomp/stompjs sockjs-client
     ```
+
+See the [WebSocket reference](../reference/websockets/index.md) for details on the connection protocol.
 
 ## Full Code
 
@@ -54,8 +59,6 @@ The program runs until interrupted with `Ctrl+C`, which triggers the unsubscribe
 
 The first step is to open a connection to the node's `/w/messages` endpoint and start a STOMP session over it.
 
-See the [WebSocket reference](../reference/websockets/index.md) for details on the connection protocol.
-
 ### Subscribing to the Channel
 
 {{ tutorial.code_snippet_tagged('step-2') }}
@@ -63,7 +66,7 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
 The code subscribes to the <ws:blocks> channel, which fires every time a new block is added to the chain
 (approximately every minute).
 
-The subscription is given an `id` (`sub-blocks`) when subscribing, which is reused to unsubscribe on exit.
+The subscription is given an `id` (`id-0`) which is used to unsubscribe on exit.
 
 Each incoming message is then passed to the formatting logic below.
 
@@ -107,7 +110,7 @@ The following output shows a typical run listening to new blocks:
 
 The output shows:
 
-* **Connection** (line 2): The STOMP session is established over the SockJS endpoint.
+* **Connection** (line 2): The STOMP session is established over the node's WebSocket endpoint at port `7778`.
 * **Subscription** (line 3): The `/blocks` channel is subscribed.
 * **New blocks** (lines 4-8): New block notifications arrive approximately every minute.
 * **Unsubscribe** (line 9): On `Ctrl+C`, the code unsubscribes and disconnects.

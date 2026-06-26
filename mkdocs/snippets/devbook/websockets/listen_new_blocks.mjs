@@ -1,7 +1,8 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const NODE_URL = process.env.NODE_URL || 'http://ntn1.dusanjp.com:7778';
+const NODE_URL = process.env.NODE_URL
+	|| 'http://libertalia.nemtest.net:7778';
 console.log(`Using node ${NODE_URL}`);
 
 // Open connection [>step-1]
@@ -25,7 +26,7 @@ function formatBlock(message) {
 // [<step-3]
 // Subscribe to the new block channel [>step-2]
 const subscription = client.subscribe('/blocks', formatBlock, {
-	id: 'sub-blocks'
+	id: 'id-0'
 });
 console.log('Subscribed to /blocks channel');
 // [<step-2]

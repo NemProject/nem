@@ -7,23 +7,41 @@ import uuid
 import stomper
 from websockets import connect
 
-NODE_URL = os.getenv('NODE_URL', 'http://ntn1.dusanjp.com:7778')
+NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7778')
 print(f'Using node {NODE_URL}')
 
 
 # SockJS has no Python client library.
 # These helpers wrap the raw WebSocket transport.
-def sockjs_url(node_url):
+def sockjs_url(endpoint_url):
 	# SockJS raw WebSocket transport adds a random server and session id
 	server = random.randint(100, 999)
 	session = uuid.uuid4().hex
-	ws_base = node_url.replace('http', 'ws', 1)
-	return f'{ws_base}/w/messages/{server}/{session}/websocket'
+	ws_base = endpoint_url.replace('http', 'ws', 1)
+	return f'{ws_base}/{server}/{session}/websocket'
 
 
-def sockjs_send(frame):
+async def send_frame(websocket, frame):
 	# SockJS wraps each client payload as a JSON array of frame strings
-	return json.dumps([frame])
+	await websocket.send(json.dumps([frame]))
+
+
+async def stomp_connect(websocket):
+	await websocket.recv()  # consume the SockJS open frame
+	await send_frame(
+		websocket, stomper.connect('', '', NODE_URL, heartbeats=(0, 0)))
+
+
+async def stomp_subscribe(websocket, destination, sub_id):
+	await send_frame(websocket, stomper.subscribe(destination, sub_id))
+
+
+async def stomp_unsubscribe(websocket, sub_id):
+	await send_frame(websocket, stomper.unsubscribe(sub_id))
+
+
+async def stomp_disconnect(websocket):
+	await send_frame(websocket, stomper.disconnect())
 
 
 def stomp_messages(raw):
@@ -38,15 +56,12 @@ def stomp_messages(raw):
 
 async def main():
 	# Open connection [>step-1]
-	async with connect(sockjs_url(NODE_URL)) as websocket:
-		await websocket.recv()
-		await websocket.send(sockjs_send(
-			stomper.connect('', '', NODE_URL, heartbeats=(0, 0))))
+	async with connect(sockjs_url(f'{NODE_URL}/w/messages')) as websocket:
+		await stomp_connect(websocket)
 		print(f'Connected to {NODE_URL}')
 		# [<step-1]
 		# Subscribe to the new block channel [>step-2]
-		await websocket.send(sockjs_send(
-			stomper.subscribe('/blocks', 'sub-blocks')))
+		await stomp_subscribe(websocket, '/blocks', 'id-0')
 		print('Subscribed to /blocks channel')
 		# [<step-2]
 		# Read and format each new block [>step-3]
@@ -60,9 +75,8 @@ async def main():
 		# [<step-3]
 		# Unsubscribe on exit [>step-4]
 		finally:
-			await websocket.send(
-				sockjs_send(stomper.unsubscribe('sub-blocks')))
-			await websocket.send(sockjs_send(stomper.disconnect()))
+			await stomp_unsubscribe(websocket, 'id-0')
+			await stomp_disconnect(websocket)
 			print('Unsubscribed and disconnected')
 		# [<step-4]
 
