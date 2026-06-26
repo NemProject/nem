@@ -13,11 +13,12 @@ NEM serves WebSockets using the [STOMP](https://stomp.github.io/) messaging prot
 port.
 The SockJS endpoint is `/w/messages`, for example: `http://localhost:7778/w/messages`.
 
-!!! warning
+!!! warning "Connections can drop silently"
 
-    The WebSocket connection is dropped silently if idle for too long.
+    The WebSocket connection can drop without notice, for example after being idle for too long.
+    Most STOMP clients report this through a connection-closed callback, which is a good place to reconnect.
 
-    Channels are not automatically resubscribed on reconnection.
+    Reconnection starts a fresh session, so every channel must be subscribed again.
 
 ## Request Format
 
@@ -66,7 +67,7 @@ message-id:befkedjj-6247
 
 ## Channels
 
-The available channels are grouped by the type of event they report.
+The available channels are grouped here by the type of event they report.
 
 ### Block channels
 
@@ -133,8 +134,8 @@ ws:unconfirmed
 
 !!! note "Account channels require registration"
 
-    Account channels only push after the account has been registered by sending a `SEND` frame to
-    `/w/api/account/subscribe`:
+    In order to receive notifications for account channels, each account has to be registered by sending a `SEND` frame
+    to `/w/api/account/subscribe`:
 
     ```text
     SEND
