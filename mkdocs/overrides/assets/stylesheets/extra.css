@@ -714,6 +714,10 @@ code.doc-symbol-interface::after {
 	background-color: #b50505;
 }
 
+.md-typeset code.rest-method-req {
+	background-color: #8e6fc9;
+}
+
 /* Graphviz diagrams */
 .graphviz {
 	display: block;

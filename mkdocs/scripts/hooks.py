@@ -453,6 +453,11 @@ def page_markdown_ws(content, page, config, files):
 	return content
 
 
+def page_markdown_req(content, page, config, files):
+	content = re.sub(r'(<req:[^>]*>)', r'\1&nbsp;<code class="rest-method rest-method-req">REQ</code>', content)
+	return content
+
+
 def page_markdown_tutorial_complexity_tags(content, page, config, files):
 	if 'tutorial_level' in page.meta:
 		level = page.meta['tutorial_level']
@@ -471,6 +476,7 @@ def on_page_markdown(content, page, config, files):
 	content = page_markdown_dylinks(content, page, config, files)
 	content = page_markdown_rest(content, page, config, files)
 	content = page_markdown_ws(content, page, config, files)
+	content = page_markdown_req(content, page, config, files)
 	content = page_markdown_tutorial_complexity_tags(content, page, config, files)
 	return content
 

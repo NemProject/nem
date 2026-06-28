@@ -101,6 +101,7 @@ nav:
               - devbook/chain/chain-heights.md
           - WebSockets:
               - devbook/websockets/listen-new-blocks.md
+              - devbook/websockets/listen-transaction-flow.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
