@@ -1,19 +1,19 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const NODE_URL = process.env.NODE_URL
-	|| 'http://libertalia.nemtest.net:7778';
-console.log(`Using node ${NODE_URL}`);
+const NODE_HOST = process.env.NODE_HOST || 'libertalia.nemtest.net';
+const WS_URL = `http://${NODE_HOST}:7778`;
+console.log(`Using node ${NODE_HOST}`);
 
 // Open connection [>step-1]
 const client = new Client({
-	webSocketFactory: () => new SockJS(`${NODE_URL}/w/messages`)
+	webSocketFactory: () => new SockJS(`${WS_URL}/w/messages`)
 });
 await new Promise(resolve => {
 	client.onConnect = resolve;
 	client.activate();
 });
-console.log(`Connected to ${NODE_URL}`);
+console.log(`Connected to ${WS_URL}`);
 // [<step-1]
 // Read and format each new block [>step-3]
 function formatBlock(message) {

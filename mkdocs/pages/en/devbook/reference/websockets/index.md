@@ -106,6 +106,8 @@ The client and node exchange these frames:
 | `UNSUBSCRIBE` | Cancels a subscription by its `id`.                                      |
 | `DISCONNECT`  | Ends the session.                                                        |
 
+For each frame's syntax, see the [Connect](#connect) section.
+
 ## Channels
 
 Channel

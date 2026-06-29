@@ -7,8 +7,9 @@ import uuid
 import stomper
 from websockets import connect
 
-NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7778')
-print(f'Using node {NODE_URL}')
+NODE_HOST = os.getenv('NODE_HOST', 'libertalia.nemtest.net')
+WS_URL = f'http://{NODE_HOST}:7778'
+print(f'Using node {NODE_HOST}')
 
 
 # SockJS has no Python client library.
@@ -29,7 +30,7 @@ async def send_frame(websocket, frame):
 async def stomp_connect(websocket):
 	await websocket.recv()  # consume the SockJS open frame
 	await send_frame(
-		websocket, stomper.connect('', '', NODE_URL, heartbeats=(0, 0)))
+		websocket, stomper.connect('', '', WS_URL, heartbeats=(0, 0)))
 
 
 async def stomp_subscribe(websocket, destination, sub_id):
@@ -56,9 +57,9 @@ def stomp_messages(raw):
 
 async def main():
 	# Open connection [>step-1]
-	async with connect(sockjs_url(f'{NODE_URL}/w/messages')) as websocket:
+	async with connect(sockjs_url(f'{WS_URL}/w/messages')) as websocket:
 		await stomp_connect(websocket)
-		print(f'Connected to {NODE_URL}')
+		print(f'Connected to {WS_URL}')
 		# [<step-1]
 		# Subscribe to the new block channel [>step-2]
 		await stomp_subscribe(websocket, '/blocks', 'id-0')

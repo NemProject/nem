@@ -15,7 +15,7 @@ from websockets import connect
 NODE_HOST = os.getenv('NODE_HOST', 'libertalia.nemtest.net')
 NODE_URL = f'http://{NODE_HOST}:7890'
 WS_URL = f'http://{NODE_HOST}:7778'
-print(f'Using node {NODE_URL}')
+print(f'Using node {NODE_HOST}')
 
 
 # SockJS has no Python client library.

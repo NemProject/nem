@@ -50,8 +50,8 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
     There is no SockJS client library for Python, so a few small helper methods are defined at the top of the file
     for convenience.
 
-The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
-WebSockets are served on a dedicated port (`7778` by default), separate from the REST API port (`7890`).
+The snippet uses the `NODE_HOST` environment variable to set the NEM <node:>.
+The WebSocket URL is built from it, using port `7778`, separate from the REST API port (`7890`).
 If no value is provided, a default one is used.
 
 The program runs until interrupted with `Ctrl+C`, which triggers the unsubscribe step before closing the connection.

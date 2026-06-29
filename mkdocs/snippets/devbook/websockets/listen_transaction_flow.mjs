@@ -8,7 +8,7 @@ import {
 const NODE_HOST = process.env.NODE_HOST || 'libertalia.nemtest.net';
 const NODE_URL = `http://${NODE_HOST}:7890`;
 const WS_URL = `http://${NODE_HOST}:7778`;
-console.log(`Using node ${NODE_URL}`);
+console.log(`Using node ${NODE_HOST}`);
 // Set up the monitored address and signer [>step-1]
 const MONITOR_ADDRESS = process.env.MONITOR_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
