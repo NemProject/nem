@@ -99,6 +99,8 @@ nav:
               - devbook/network-currency/query-block-rewards.md
           - Chain State:
               - devbook/chain/chain-heights.md
+          - WebSockets:
+              - devbook/websockets/listen-new-blocks.md
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
