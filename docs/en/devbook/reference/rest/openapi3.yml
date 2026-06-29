@@ -7,9 +7,9 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: http://libertalia.nemtest.net:7890
+  - url: https://libertalia.nemtest.net:7890
     description: Testnet node
-  - url: http://portobelo.nemmain.net:7890
+  - url: https://portobelo.nemmain.net:7890
     description: Mainnet node
 security:
   - {}

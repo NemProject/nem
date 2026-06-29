@@ -111,7 +111,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#monitoring-transaction-status" class="md-skip">
+        <a href="#monitoring-transaction-statusbeginner" class="md-skip">
           Skip to content
         </a>
       
@@ -1507,6 +1507,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-currency/query-block-rewards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Block Rewards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1580,6 +1608,92 @@
     
   
     Chain and Irreversible Height
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_7" id="__nav_3_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSockets
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebSockets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../websockets/listen-new-blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Blocks
   
 
     
@@ -7327,21 +7441,16 @@
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
 		</a>
 	
-	
-	<span class="md-content__button tutorial_level tutorial_level-beginner" title="Tutorial level">
-		BEGINNER
-	</span>
-	
 
 
-<h1 id="monitoring-transaction-status">Monitoring Transaction Status<a class="headerlink" href="#monitoring-transaction-status" title="Anchor link to this section for reference">⚓︎</a></h1>
+<h1 id="monitoring-transaction-statusbeginner">Monitoring Transaction Status<br/><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span><a class="headerlink" href="#monitoring-transaction-statusbeginner" title="Anchor link to this section for reference">⚓︎</a></h1>
 <p>After announcing a <a class="mkdocs-ezglossary-link"
-	id="4e3112a264187f80026bf59933185136"
+	id="eaf21db69d84cd9938e1a1f789e839fe"
 	title="A transaction represents an action to perform on the NEM blockchain,
 like moving funds from one account to another, or registering a new mosaic."
 	name="_:Transaction"
 	href="../../../textbook/transactions/#dbaff459c19d2574b92538a13b4b8910">transaction</a> to the NEM network, it remains unconfirmed until it is included in a <a class="mkdocs-ezglossary-link"
-	id="9437209c3a574643ed3dc1b6d5da3402"
+	id="ca44f2ed20e31e5de49c83db340b6d29"
 	title="A block records a set of transactions confirmed at a specific point in time."
 	name="_:Block"
 	href="../../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">block</a>.</p>
@@ -7349,7 +7458,7 @@ like moving funds from one account to another, or registering a new mosaic."
 or failure.</p>
 <p>This tutorial shows how to poll a transaction's status until it is confirmed, how to check whether it is still
 waiting in the <a class="mkdocs-ezglossary-link"
-	id="e5da1c62b540828e62e316038ed976a4"
+	id="0cce01a0f2521877aedce2dfc45dadab"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>, and how to decide when it will never confirm.</p>
@@ -7797,7 +7906,7 @@ It plays a similar role to mining in PoW or staking in PoS."
     and is already part of the blockchain.</li>
 <li><span markdown class="dylink"><input type="radio" name="rGroup100" id="Python" /><label class="dylink-option" for="Python" markdown><code>is_in_unconfirmed_pool()</code></label><input type="radio" name="rGroup100" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>isInUnconfirmedPool()</code></label></span>: Reports whether the transaction is waiting to be confirmed in the
     <a class="mkdocs-ezglossary-link"
-	id="e23e29d325adb0aa3786dbf3ddb23bda"
+	id="6624a08d9d70e13589eff5d3d957f62c"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.</li>
@@ -7867,7 +7976,7 @@ The hash uniquely identifies the transaction on the NEM network.</p>
 <p>The snippet also reads a <strong>signer's address</strong> and the <strong>transaction signature</strong>.
 Neither is needed to detect confirmation, but both are used to check whether a transaction is still waiting in the
 <a class="mkdocs-ezglossary-link"
-	id="0cce01a0f2521877aedce2dfc45dadab"
+	id="a7217771a35fcd3391627fef502094c7"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.</p>
@@ -7964,7 +8073,7 @@ in <code>meta.height</code>, which the function returns.</p>
 <p>Otherwise, the endpoint responds with HTTP <code>400</code> ("Hash was not found in cache") and the function returns no height,
 meaning the transaction is not confirmed.
 A transaction that is not confirmed may still be waiting in the <a class="mkdocs-ezglossary-link"
-	id="6624a08d9d70e13589eff5d3d957f62c"
+	id="d7cf21d215d6f78cb0d587159a3d7341"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>, which the next function inspects.</p>
@@ -8057,7 +8166,7 @@ reports whether the monitored transaction is among the pending list.</p>
 <p class="admonition-title">Invalid transactions never enter the pool</p>
 <p>A transaction that fails <a href="../../../textbook/transactions/#3-validation">validation</a> does not reach the unconfirmed
 pool: the receiving <a class="mkdocs-ezglossary-link"
-	id="66b8472a440ea9895291351523d7d931"
+	id="b0c292014679f553d5ffa78fbd29fa8f"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"

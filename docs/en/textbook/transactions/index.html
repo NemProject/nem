@@ -1322,6 +1322,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/network-currency/query-block-rewards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query Block Rewards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1395,6 +1423,92 @@
     
   
     Chain and Irreversible Height
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_7" id="__nav_3_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSockets
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WebSockets
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-new-blocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New Blocks
   
 
     
@@ -7479,7 +7593,6 @@
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
 		</a>
 	
-	
 
 
 <h1 id="transactions">Transactions<a class="headerlink" href="#transactions" title="Anchor link to this section for reference">⚓︎</a></h1>
@@ -7489,7 +7602,7 @@
 </dt>
 <dd>A transaction represents an action to perform on the NEM blockchain,
 like moving funds from one <a class="mkdocs-ezglossary-link"
-	id="53034ae777f8ee5f93d000c36273cdb3"
+	id="26552828d03b3124affcca33a75ab932"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7513,7 +7626,7 @@ the blockchain.</p>
 	<a id="bcea03960e60020401e81c2a1de149b0">Basic Transaction</a> 
 </dt>
 <dd>A basic <a class="mkdocs-ezglossary-link"
-	id="60a0fa9a8b2d61dde0608714727d16e8"
+	id="5d4de31105d60fab03bdb4961b931f78"
 	title="A transaction represents an action to perform on the NEM blockchain,
 like moving funds from one account to another, or registering a new mosaic."
 	name="_:Transaction"
@@ -7621,7 +7734,7 @@ before it can be included in a block."
 <h3 id="1-creation-and-signature">1. Creation and Signature<a class="headerlink" href="#1-creation-and-signature" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>A software client, typically an app, creates the transaction and fills in all its parameters.
 For example, a transfer transaction requires the source <a class="mkdocs-ezglossary-link"
-	id="26552828d03b3124affcca33a75ab932"
+	id="4415118be2d5ecf32b87e88b81795389"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7640,7 +7753,7 @@ it is extremely unlikely that the same number is generated twice by chance."
 Other cosignatories provide their cosignatures separately, via multisig cosignature transactions.</p>
 <h3 id="2-announcement">2. Announcement<a class="headerlink" href="#2-announcement" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The client application submits the transaction to a connected <a class="mkdocs-ezglossary-link"
-	id="e4f168c5ed945975367f8960b1f8fae3"
+	id="fdade8ceff8dacc19c589454eeeb335f"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -7678,7 +7791,7 @@ is distributed across the network.</p>
 <p class="admonition-title">Do not rely on unconfirmed transactions</p>
 <p>A transaction in the unconfirmed pool is not yet guaranteed to be included in a block.
 Wait until it is <a href="#6-confirmation">confirmed</a>, and ideally past the <a class="mkdocs-ezglossary-link"
-	id="a8c8d22d144182c3df3173b717645bfb"
+	id="ca3888c79d430494f0500aa612008886"
 	title="The maximum depth a rollback can reach on NEM, set to 360 blocks (approximately six hours)."
 	name="_:Rewrite limit"
 	href="../../textbook/consensus/#fb8366894cdceddf7af8032a5b90fb2e">rewrite limit</a>, before treating it as final.</p>
@@ -7713,7 +7826,7 @@ typically after a fork is resolved."
 	href="../../textbook/consensus/#fa68d384bf5dbf284e2a6a02fb2ef92d">rolled back</a>.
 In this case, the block's transactions are reverted and returned to the unconfirmed pool.</p>
 <p>NEM bounds how far back a rollback can reach with the <a class="mkdocs-ezglossary-link"
-	id="ca3888c79d430494f0500aa612008886"
+	id="a1cce4dfa221311754eb97396bae2e7f"
 	title="The maximum depth a rollback can reach on NEM, set to 360 blocks (approximately six hours)."
 	name="_:Rewrite limit"
 	href="../../textbook/consensus/#fb8366894cdceddf7af8032a5b90fb2e">rewrite limit</a>.</p>
@@ -7905,7 +8018,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 </div>
 <h2 id="transaction-fees">Transaction Fees<a class="headerlink" href="#transaction-fees" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Every transaction pays a fee that compensates the <a class="mkdocs-ezglossary-link"
-	id="543233367a6aa8b6e53a8836fbea70b4"
+	id="9d29c4724e8b41b57eb842141998b554"
 	title="An account participating in harvesting.
 Its importance determines its chance of producing blocks, and it receives the rewards from each block it harvests."
 	name="_:Harvester account"
@@ -7980,7 +8093,7 @@ transfers to other accounts.
 This score determines the account's chances of harvesting a block."
 	name="_:Importance"
 	href="../../textbook/harvesting/#76ca9920588d90f42b544215c87ec7d4">importance</a> and a small fee bonus, so higher-fee transactions are more likely to enter the <a class="mkdocs-ezglossary-link"
-	id="bdcf7abe2e9c1adbb414bbab693bbd1b"
+	id="2bc53df7df61e246851c5cf82fe55e6e"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.</li>
