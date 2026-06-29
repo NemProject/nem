@@ -45,6 +45,11 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
 
 {{ tutorial.code_full_tagged('devbook/websockets/listen_new_blocks', ['py', 'js']) }}
 
+!!! note
+
+    There is no SockJS client library for Python, so a few small helper methods are defined at the top of the file
+    for convenience.
+
 The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 WebSockets are served on a dedicated port (`7778` by default), separate from the REST API port (`7890`).
 If no value is provided, a default one is used.
