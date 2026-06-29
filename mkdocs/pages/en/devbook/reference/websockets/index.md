@@ -12,76 +12,26 @@ NEM serves WebSockets using the [STOMP](https://stomp.github.io/) messaging prot
 [SockJS](https://github.com/sockjs/sockjs-client), on a dedicated port (`7778` by default) separate from the HTTP API
 port.
 
-## Connect
+## Session
 
 The SockJS endpoint is `/w/messages`, for example `http://localhost:7778/w/messages`.
 A client that does not use SockJS can open a plain WebSocket to `/w/messages/websocket` directly.
 
-After the socket opens, the client sends a STOMP `CONNECT` <frame:> to start the session:
+Once the socket is open, the client drives the session with STOMP <frames:>:
 
-```stomp title="CONNECT frame"
-CONNECT
-accept-version:1.2
-heart-beat:0,0
-```
+1. Send a `CONNECT` frame to start the STOMP session.
+2. Send a `SUBSCRIBE` frame for each <channel:> to monitor, each with a client-chosen `id`.
 
-To subscribe to a <channel:>, a client sends a `SUBSCRIBE` frame with a client-chosen `id` and the channel
-`destination`:
+    !!! note "Some channels require registration"
 
-```stomp title="SUBSCRIBE frame"
-SUBSCRIBE
-id:sub-0
-destination:/blocks
-```
+        Some channels, like [account channels](#account-channels), deliver nothing until they receive a registration
+        request.
+        A client must send this request before subscribing to the channels it enables.
 
-* `id` is unique only within a single connection (other clients can reuse the same value).
-    It is echoed back as the `subscription` header on every message and used to `UNSUBSCRIBE` later.
-* `destination` identifies the channel, so the same connection can monitor multiple channels.
+        See [registration requests](#registration-requests) for the full list.
 
-Each update is delivered as a STOMP `MESSAGE` frame:
-
-```stomp title="MESSAGE frame"
-MESSAGE
-destination:/blocks
-subscription:sub-0
-message-id:befkedjj-6247
-
-{ ... }
-```
-
-* `destination` matches the channel from the `SUBSCRIBE` frame.
-* `subscription` matches the `id` from the `SUBSCRIBE` frame.
-* The `message-id` is a unique identifier the server assigns to each message.
-* The frame body is a channel-specific JSON object, shown under **Message body** for each [channel](#channels) below.
-
-!!! note "Some channels require registration"
-
-    Some channels, like [account channels](#account-channels), deliver nothing until they receive a registration
-    request.
-
-    ```stomp title="SEND frame"
-    SEND
-    destination:/w/api/account/subscribe
-
-    { "account": "{address}" }
-    ```
-
-    A client must send this request before subscribing to the channels it enables.
-
-    See [registration requests](#registration-requests) for the full list.
-
-When a channel is no longer needed, the client sends an `UNSUBSCRIBE` frame with the subscription's `id`:
-
-```stomp title="UNSUBSCRIBE frame"
-UNSUBSCRIBE
-id:sub-0
-```
-
-To end the session, the client sends a `DISCONNECT` frame:
-
-```stomp title="DISCONNECT frame"
-DISCONNECT
-```
+3. Receive a `MESSAGE` frame from the node for every event on a subscribed channel.
+4. Send an `UNSUBSCRIBE` frame to leave a channel, then a `DISCONNECT` frame to end the session.
 
 !!! warning "Connections can drop silently"
 
@@ -95,18 +45,78 @@ DISCONNECT
 Frame
 :   A plain-text message made of a command, optional `header:value` lines, and an optional body.
 
-The client and node exchange these frames:
+The client and node exchange these frames.
 
-| Frame         | Purpose                                                                  |
-| ------------- | ------------------------------------------------------------------------ |
-| `CONNECT`     | Starts the STOMP session. Sent once, right after the connection opens.   |
-| `SUBSCRIBE`   | Subscribes to a <channel:>, with a client-chosen `id` and `destination`. |
-| `SEND`        | Sends a one-time <request:> to a `/w/api` destination.                   |
-| `MESSAGE`     | Delivers channel data from the node, the only frame the node sends.      |
-| `UNSUBSCRIBE` | Cancels a subscription by its `id`.                                      |
-| `DISCONNECT`  | Ends the session.                                                        |
+### `CONNECT`
 
-For each frame's syntax, see the [Connect](#connect) section.
+Starts the STOMP session. Sent once, right after the connection opens.
+
+```stomp
+CONNECT
+accept-version:1.2
+heart-beat:0,0
+```
+
+### `SUBSCRIBE`
+
+Subscribes to a <channel:>, with a client-chosen `id` and `destination`.
+
+```stomp
+SUBSCRIBE
+id:sub-0
+destination:/blocks
+```
+
+* `id` is unique only within a single connection (other clients can reuse the same value).
+    It is echoed back as the `subscription` header on every message and used to `UNSUBSCRIBE` later.
+* `destination` identifies the channel, so the same connection can monitor multiple channels.
+
+### `MESSAGE`
+
+Delivers channel data from the node, and is the only frame the node sends.
+
+```stomp
+MESSAGE
+destination:/blocks
+subscription:sub-0
+message-id:befkedjj-6247
+
+{ ... }
+```
+
+* `destination` matches the channel from the `SUBSCRIBE` frame.
+* `subscription` matches the `id` from the `SUBSCRIBE` frame.
+* `message-id` is a unique identifier the server assigns to each message.
+* `{ ... }` is the body, a JSON object whose shape depends on the [channel](#channels).
+    See the **Message body** tabs below.
+
+### `SEND`
+
+Sends a <request:> to a `/w/api` destination.
+
+```stomp
+SEND
+destination:/w/api/account/subscribe
+
+{ "account": "{address}" }
+```
+
+### `UNSUBSCRIBE`
+
+Cancels a subscription by its `id`.
+
+```stomp
+UNSUBSCRIBE
+id:sub-0
+```
+
+### `DISCONNECT`
+
+Ends the session.
+
+```stomp
+DISCONNECT
+```
 
 ## Channels
 
