@@ -59,11 +59,13 @@ Key Pair
 NEM uses key pairs in two places:
 
 Main Key
-:   <Key pair:|Key pair> associated with every <account:>, identifying its owner.
+:   <Key pair:|Key pair> associated with every <account:>.
+    Its private key identifies the account owner and grants full control over the account, including the ability to
+    transfer funds and announce transactions.
 
 Remote Key
-:   Key pair associated with an account that has delegated harvesting to a remote node (see <harvesting:>).
-    The remote key signs blocks on behalf of the main account without exposing the main private key.
+:   <Key pair:|Key pair> associated with every <remote harvesting:> account.
+    It allows a node to harvest on behalf of another account without exposing the account's <main key:>.
 
 ??? warning "Key Security"
 
@@ -98,8 +100,9 @@ However, transferring assets from a <multisignature account:|multiple-owner acco
 cosignatories to meet the multisig threshold, and must therefore gather multiple signatures before it is considered
 valid.
 
-Signatures on NEM are 512-bit (64-byte) long and are generated using the [Ed25519](https://ed25519.cr.yp.to) algorithm
-with the **Keccak-512** hash function.
+Signatures on NEM are 512-bit (64-byte) long and use the [Ed25519](https://ed25519.cr.yp.to) algorithm.
+Unlike standard Ed25519, which relies on SHA-512, NEM uses the **Keccak-512** hash function
+(see [NEM uses Keccak, not SHA-3](#hashes)).
 
 ## Addresses
 
@@ -136,11 +139,9 @@ On NEM, addresses are obtained from public keys by:
 
     Example: `NBHK6W-HL5TGB-MCLVW4-RSFMRO-4ZYXCJ-FRAVO2-B4FU`
 
-!!! note "Address generation is an offline process"
+!!! note "Addresses are tracked only once used"
 
-    Note that address generation does not require interaction with the blockchain.
-
-    In fact, NEM only tracks addresses and associated public keys when they first appear in a transaction.
+    NEM only starts tracking an address and its associated public key when they first appear in a transaction.
 
 ## Vanity Addresses
 

@@ -115,8 +115,8 @@ For multisig transactions, this is the signature of the announced wrapper, not o
 
 The function returns:
 
-* `True`: the transaction is still in the unconfirmed pool, waiting to be included in a block.
-* `False`: the transaction is not in the response.
+* {{ tutorial.lit('True') }}: the transaction is still in the unconfirmed pool, waiting to be included in a block.
+* {{ tutorial.lit('False') }}: the transaction is not in the response.
     Possible causes include: it has not arrived at this node yet, it has already been confirmed,
     it was dropped from the pool, or it was left out of the response.
 
@@ -133,8 +133,8 @@ The function returns:
 The {{ tutorial.var('wait_for_confirmation') }} function calls {{ tutorial.var('get_confirmation_height') }} every
 second until the transaction is confirmed, or two minutes ellapse (configurable timeout).
 
-The function returns `True` as soon as a check reports a confirmation.
-When the attempts run out, it returns `False` instead.
+The function returns {{ tutorial.lit('True') }} as soon as a check reports a confirmation.
+When the attempts run out, it returns {{ tutorial.lit('False') }} instead.
 This means the transaction was not confirmed within the polling window, not that it failed, but this is a rare case.
 
 ### Putting It All Together

@@ -4,6 +4,7 @@ Namespace
 :   A registered name leased to an <account:>, used to prefix and group <mosaics:> defined under it.
 
 Namespaces let an account group related mosaics under a meaningful prefix like `mycompany.tokens`.
+The network's own currency follows the same pattern: `nem:xem`, commonly known as <XEM:>, lives in the `nem` namespace.
 
 The account that registers a namespace is called its _owner_.
 The owner controls which mosaics can be defined under it, so namespaces provide both naming structure and
@@ -26,6 +27,7 @@ Root namespace
 
 Subnamespace
 :   A namespace that belongs to a parent namespace, either the root or another subnamespace.
+    It is also called a _child namespace_.
     Subnamespaces expire when the root namespace expires (see [Duration](#duration)).
 
 ## Name
@@ -33,8 +35,10 @@ Subnamespace
 Each namespace has a unique name that identifies it on the network, and must follow specific formatting rules:
 
 * Names can only contain lowercase letters, numbers, hyphens `-`, and underscores `_`.
-* They must start with a letter or number.
+* Names must start with a letter or number.
 * Root names can be at most 16 characters long.
+* Root names `nem`, `user`, `account`, `org`, `com`, `biz`, `net`, `edu`, `mil`, `gov`, and `info` are reserved by
+    the protocol and cannot be registered.
 * Subnamespace names can be at most 64 characters long.
 
 Once registered, a name cannot be changed.
@@ -60,6 +64,10 @@ During this time, the namespace is effectively disabled: mosaics defined under i
 
 Only the original owner can renew the namespace during the grace period.
 Once the grace period ends, the namespace is fully released and becomes available for others to register.
+
+!!! note "The `nem` namespace never expires"
+
+    The `nem` namespace, which holds <XEM:>, is permanently active and is exempt from the lease and renewal cycle.
 
 ```dot
 digraph "Namespace registration" {
@@ -101,15 +109,6 @@ The fee must be paid at the time of registration or renewal, and is non-refundab
 !!! note "Transaction fee vs. lease fee"
     Registering or renewing any kind of namespace requires announcing a transaction, which also has an associated fee.
     However, this transaction fee is typically negligible compared to the lease fee.
-
-## Reserved Names
-
-The following root names are reserved by the protocol and cannot be claimed by users:
-
-`nem`, `user`, `account`, `org`, `com`, `biz`, `net`, `edu`, `mil`, `gov`, `info`.
-
-The `nem` namespace, in particular, hosts the native currency `nem:xem` and is permanently active.
-The colon separates the namespace from the [mosaic name](./mosaics.md#fully-qualified-name).
 
 ## Ownership
 
