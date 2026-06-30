@@ -457,11 +457,13 @@ def page_markdown_tutorial_complexity_tags(content, page, config, files):
 	if 'tutorial_level' in page.meta:
 		level = page.meta['tutorial_level']
 		tag = (
+			f'<div class="tutorial_level-container">'
 			f'<span class="tutorial_level tutorial_level-{level}" title="{config.extra['nem']['tutorial_level']}">'
 			f'{config.extra['nem']['tutorial_level_labels'][level]}'
 			f'</span>'
+			f'</div>'
 		)
-		content = re.sub(r'(^# [^\n]*)', rf'\g<1><br/>{tag}', content)
+		content = re.sub(r'(^# [^\n]*)', rf'\g<1>\n\n{tag}', content)
 	return content
 
 

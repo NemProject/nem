@@ -640,6 +640,13 @@ code.doc-symbol-interface::after {
 	padding: 0 10px;
 }
 
+.md-typeset h1:has(+ .tutorial_level-container) {
+	margin-bottom: 0.5rem;
+}
+.md-typeset .tutorial_level-container {
+	margin: 0 0 1.2em;
+}
+
 [data-md-color-scheme=slate] .md-typeset .tutorial_level-beginner {
 	background-color: #1F7A3E;
 	color: #B6F2C8;
