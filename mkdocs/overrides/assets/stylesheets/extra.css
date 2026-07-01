@@ -782,6 +782,12 @@ code.doc-symbol-interface::after {
 	margin: 0 auto;
 }
 
+.md-typeset .frame-table table:not([class]) {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
+
 /* Tables with subsections */
 .md-typeset .subsections table td:not(:has(strong)):first-child {
 	padding-left: 2rem;
