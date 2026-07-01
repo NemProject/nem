@@ -41,16 +41,15 @@ try {
 	const deadline = networkTime + (2 * 60 * 60);
 	// [<step-3]
 	// Fetch the mosaic's divisibility and supply [>step-4]
-	const definitionPath =
-		`/namespace/mosaic/definition/page?namespace=${MOSAIC_NAMESPACE}`;
+	const definitionPath = `/mosaic/definition?mosaicId=${MOSAIC_ID}`;
 	console.log('Fetching mosaic definition from', definitionPath);
 	const definitionResponse =
 		await fetch(`${NODE_URL}${definitionPath}`);
-	const definitions = (await definitionResponse.json()).data;
-	const definition = definitions.find(
-		entry => MOSAIC_NAME === entry.mosaic.id.name).mosaic;
-	const divisibility = Number(definition.properties.find(
-		prop => 'divisibility' === prop.name).value);
+	const definition = await definitionResponse.json();
+	const properties = Object.fromEntries(
+		definition.properties.map(
+			property => [property.name, property.value]));
+	const divisibility = parseInt(properties.divisibility, 10);
 
 	const supplyPath = `/mosaic/supply?mosaicId=${MOSAIC_ID}`;
 	console.log('Fetching mosaic supply from', supplyPath);

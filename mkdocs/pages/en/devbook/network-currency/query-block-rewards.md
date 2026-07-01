@@ -52,7 +52,8 @@ The <dy:network.publicKeyToAddress> method converts this public key into the cor
 
     With <local harvesting:>, the `signer` is the <harvester account:> and receives the reward.
 
-    With <delegated harvesting:>, the `signer` is a <remote account:>, while the reward is paid to the <lessor:>.
+    With <remote harvesting:> or <delegated harvesting:>, the `signer` is a <remote key:|remote account>, while the
+    reward is paid to the <main key:|main account>.
 
 ### Summing the Transaction Fees
 
@@ -78,10 +79,10 @@ An empty block has no fees, and therefore no reward.
     <get:/account/harvests> endpoint.
     It returns one entry per harvested block, including a `totalFee` field with the reward earned for that block.
 
-    The endpoint accepts the address of the account that receives the rewards: the <harvester account:> for local
-    harvesting, or the <lessor:> for <delegated harvesting:>.
+    The endpoint accepts the address of the <harvester account:>, the account that earns the reward.
+    With <remote harvesting:> or <delegated harvesting:>, that is the main account, not the remote account that signed.
 
-    A <remote account:> address also returns the blocks signed on behalf of the lessor.
+    A remote account address also returns the blocks it signed on behalf of the main account.
 
 ## Output
 

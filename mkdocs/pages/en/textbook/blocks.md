@@ -61,27 +61,27 @@ For other networks, it can be retrieved from the network properties.
 
 Each block in the NEM blockchain contains a combination of metadata and transaction data, including:
 
-| **Field**               | **Description**                                                                                                                                                                          |
-| ----------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Height**              | The block's position in the chain, starting from `1` for the <nemesis block:>. Each new block has a height one greater than its predecessor.                                             |
-| **Timestamp**           | Seconds elapsed since the nemesis block, strictly increasing for each block. Average time between blocks is kept close to 60s.                                                           |
-| **Type**                | `-1` for the nemesis block, `1` for regular blocks.                                                                                                                                      |
-| **Version**             | Encodes the block format version and the network (`1744830465` on mainnet, `-1744830463` on testnet).                                                                                    |
-| **Previous block hash** | <Hash:> of the previous block. If its contents were tampered with, this hash would change, breaking the chain and invalidating every successor.                                          |
-| **Signature**           | Cryptographic signature produced by the harvester over the block's contents. Used by every node to verify block integrity.                                                               |
-| **Signer**              | The account that signs the block, also referred to as the _harvester_. Transaction fees are credited to it, or to the lessor when the block is produced through <delegated harvesting:>. |
-| **Transactions**        | A list of valid transactions included in the block. Each transaction is independently verified before being accepted into the block.                                                     |
+| **Field**               | **Description**                                                                                                                                                                                                                          |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Height**              | The block's position in the chain, starting from `1` for the <nemesis block:>. Each new block has a height one greater than its predecessor.                                                                                             |
+| **Timestamp**           | Seconds elapsed since the nemesis block, strictly increasing for each block. Average time between blocks is kept close to 60s.                                                                                                           |
+| **Type**                | `-1` for the nemesis block, `1` for regular blocks.                                                                                                                                                                                      |
+| **Version**             | Encodes the block format version and the network (`1744830465` on mainnet, `-1744830463` on testnet).                                                                                                                                    |
+| **Previous block hash** | <Hash:> of the previous block. If its contents were tampered with, this hash would change, breaking the chain and invalidating every successor.                                                                                          |
+| **Signature**           | Cryptographic signature produced by the harvester over the block's contents. Used by every node to verify block integrity.                                                                                                               |
+| **Signer**              | The account that signs the block, also referred to as the _harvester_. Transaction fees are credited to it, or to the main account when the block is signed by a remote account through <remote harvesting:> or <delegated harvesting:>. |
+| **Transactions**        | A list of valid transactions included in the block. Each transaction is independently verified before being accepted into the block.                                                                                                     |
 
 ## Derived Fields
 
 In addition to the fields above, each node keeps the following values for every block.
 They are not part of the block payload: every node computes them from earlier blocks.
 
-| **Field**           | **Description**                                                                                                                                                                                         |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Generation hash** | A hash carried forward from block to block, used to determine which accounts are eligible to harvest the next block. Computed from the previous block's generation hash and the harvester's public key. |
-| **Difficulty**      | A network-wide measure of how hard it is to harvest the next block. Adjusted dynamically from the recent block history to keep the average block time close to 60s.                                     |
-| **Lessor**          | When the block is harvested through <delegated harvesting:>, the account that delegated the harvesting rights. Resolved from the harvester's delegation state recorded earlier in the chain.            |
+| **Field**           | **Description**                                                                                                                                                                                                                                                        |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Generation hash** | A hash carried forward from block to block, used to determine which accounts are eligible to harvest the next block. Computed from the previous block's generation hash and the harvester's public key.                                                                |
+| **Difficulty**      | A network-wide measure of how hard it is to harvest the next block. Adjusted dynamically from the recent block history to keep the average block time close to 60s.                                                                                                    |
+| **Lessor**          | When the block is signed by a remote account through <remote harvesting:> or <delegated harvesting:>, the main account whose <importance:> backed it and which receives the reward. Resolved from the remote account's delegation state recorded earlier in the chain. |
 
 ## Block Score
 

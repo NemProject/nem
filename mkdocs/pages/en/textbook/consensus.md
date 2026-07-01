@@ -63,3 +63,9 @@ Rewrite limit
 
 Blocks deeper than the rewrite limit cannot be replaced by an alternative chain.
 As a result, transactions gradually become effectively irreversible as new blocks are added on top of them.
+
+The rewrite limit has a second consequence.
+A node that keeps adding its own blocks while disconnected builds a separate chain.
+If that chain grows past the rewrite limit, switching back would require too deep a rollback, so the node cannot rejoin
+on its own.
+The two chains form an **unresolvable fork** that an operator must clear by restoring the node to the main chain.

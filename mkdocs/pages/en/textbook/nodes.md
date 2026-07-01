@@ -18,50 +18,79 @@ NIS
 :   NEM Infrastructure Server.
     A single Java process that implements all node functionality.
 
-NIS has four parts: an [engine](#engine), exposed by a [REST API](#rest-api) and a [WebSocket](#websocket) service, with an embedded [database](#database) for storage.
+NIS has four parts: an [engine](#engine), a [REST API](#rest-api), a [WebSocket](#websocket) service, and an embedded
+[database](#database).
+The engine is the core, exposed through the REST API and WebSocket service, while the database stores the blockchain.
 
-Over the network, NIS exchanges data with other nodes and with clients:
+NIS exchanges data with other nodes and with clients:
 
 * _Other nodes_ are NIS peers on the network.
 * _Clients_ are external programs such as wallets, explorers, and applications.
 
 ```dot
 digraph NemNode {
-    compound=true;
+    layout=neato;
     splines=ortho;
-    nodesep=0.7;
-    ranksep=0.7;
     node [shape=box];
     edge [penwidth=1.5 dir=both];
 
+    // Layer labels
+    LblExt  [label="External"   shape=plain pos="-1.7,6!"];
+    LblInt  [label="Interface"  shape=plain pos="-1.7,4!"];
+    LblProc [label="Processing" shape=plain pos="-1.7,2!"];
+    LblStor [label="Storage"    shape=plain pos="-1.7,0!"];
+
     // External actors
-    OtherNodes [label="Other nodes" shape=plaintext];
-    Clients    [label="Clients" shape=plaintext];
+    OtherNodes [label="Other nodes" style=dashed fixedsize=true width=2 height=0.8 pos="1,6!"];
+    Clients    [label="Clients" style=dashed fixedsize=true width=2 height=0.8 pos="5,6!"];
 
     subgraph cluster_nis {
-        label="NIS";
-        labelloc=b;
-        labeljust=c;
-        style=dashed;
-        penwidth=1.5;
-        margin=25;
+        label="";
+        style="rounded,dashed";
 
         // Core components
-        REST   [label="REST + WebSocket" style=filled fixedsize=true width=6.0 height=0.8 URL="#rest-api"];
-        Engine [label="Engine" style=filled width=2.6 height=0.9 URL="#engine"];
-        H2     [label="Blocks\n(H2)" style=filled width=2.6 height=0.9 shape=cylinder URL="#database"];
+        REST      [label="REST API" style=filled fixedsize=true width=2 height=0.8 pos="1,4!" URL="#rest-api"];
+        WebSocket [label="WebSocket" style=filled fixedsize=true width=2 height=0.8 pos="5,4!" URL="#websocket"];
+        Engine    [label="Engine" style=filled fixedsize=true width=6 height=0.9 pos="3,2!" URL="#engine"];
+        H2        [label="Blocks (H2)" style=filled shape=cylinder fixedsize=true width=2.6 height=0.95 pos="3,0!" URL="#database"];
+        NISLabel  [label="NIS" shape=plain pos="3,-1.1!"];
 
-        { rank=same; Engine; H2; }
-
-        // Internal connections
-        REST -> Engine;
-        REST -> H2 [style=invis];
-        Engine -> H2;
+        // Invisible spacers so the NIS box fully encloses REST and WebSocket
+        spcL [shape=point style=invis pos="-0.3,4.85!"];
+        spcR [shape=point style=invis pos="6.3,4.85!"];
     }
+
+    // Midpoint waypoints pin the three Engine arrows to straight verticals,
+    // so the labels beside them cannot deflect the arrows off-centre
+    pR [shape=point width=0.01 style=invis pos="1,3.0!"];
+    pW [shape=point width=0.01 style=invis pos="5,3.0!"];
+    pB [shape=point width=0.01 style=invis pos="3,1.0!"];
+
+    // Waypoints for the squared Clients <-> REST route
+    cw1 [shape=point width=0 style=invis pos="3,4!"];
+    cw2 [shape=point width=0 style=invis pos="3,6!"];
+
+    // Labels sit right beside their arrows
+    reqLbl [label="requests" shape=plain pos="1.6,3.0!"];
+    evtLbl [label="events"   shape=plain pos="4.5,3.0!"];
+    rwLbl  [label="read / write" shape=plain pos="3.75,1.0!"];
 
     // External connections
     OtherNodes -> REST;
-    Clients -> REST;
+    Clients -> WebSocket;
+
+    // Internal connections, pinned straight through the waypoints
+    REST -> pR [dir=back headclip=false];
+    pR -> Engine [dir=forward tailclip=false];
+    WebSocket -> pW [dir=back headclip=false];
+    pW -> Engine [dir=none tailclip=false];
+    Engine -> pB [dir=back headclip=false];
+    pB -> H2 [dir=forward tailclip=false];
+
+    // Clients reach the REST API too: out of REST's right side, into the left of Clients
+    REST:e -> cw1 [dir=back];
+    cw1 -> cw2 [dir=none];
+    cw2 -> Clients:w [dir=forward];
 }
 ```
 
@@ -82,6 +111,9 @@ Both peers and clients reach NIS through a single HTTP API:
 * _Peer requests_ handle block synchronization, transaction relay, and node discovery.
 * _Client requests_ handle reading blockchain data and submitting <transactions:>.
 
+The API supports two encodings, selected by the request's content type: JSON and binary.
+Peers exchange data in binary, while clients typically use JSON.
+
 ### WebSocket
 
 NIS publishes block and transaction events through a built-in
@@ -95,21 +127,17 @@ inside the NIS process rather than as a separate database server.
 
 The database holds only the chain itself: every block and the transactions inside it.
 It does not store the current blockchain state, such as account balances and <importance:> scores.
-NIS keeps that state in memory and rebuilds it at every start by replaying the chain from the <nemesis block:> onward,
+NIS keeps that state in memory and rebuilds it at startup by replaying the chain from the <nemesis block:> onward,
 which is why a node stays unavailable for a while after it starts.
-
-NIS reads and writes data through [Hibernate](https://hibernate.org), a library that maps Java objects to database rows.
-When NIS is upgraded to a newer release, [Flyway](https://flywaydb.org) automatically applies any required schema
-changes.
 
 ## Peer-to-Peer Communication
 
 NEM nodes communicate directly with one another in a decentralized, peer-to-peer fashion.
-There is no central coordinator: instead, each node establishes connections with a subset of other nodes,
-forming a distributed network.
+There is no central coordinator: instead, each node establishes connections with a subset of other nodes, forming a
+distributed network.
 
-Nodes share their lists of known peers, allowing a newly connected node to quickly discover others and integrate
-into the network.
+Nodes share their lists of known peers, allowing a newly connected node to quickly discover others and integrate into
+the network.
 This process ensures robust connectivity and helps the network remain resilient, even if individual nodes go offline.
 
 ```dot
@@ -137,10 +165,8 @@ graph P2PNetwork {
 }
 ```
 
-To facilitate bootstrapping, an initial list of peers is bundled with <NIS:>.
+To facilitate bootstrapping, an initial list of _pre-trusted_ peers is bundled with <NIS:>.
 This allows a new node to make its first connections and begin discovering others.
-However, nodes on this list receive no special treatment:
-once connected, all peers are treated equally by the protocol.
 
 ### Node Reputation
 
@@ -156,26 +182,25 @@ Those that send invalid data, fail to respond, or otherwise misbehave may be pen
 When a node needs to establish a new connection, it selects from the available peers, prioritizing those with higher
 reputation based on past interactions.
 
-Note that reputation scores are local: each node maintains its own view of the network,
-based solely on its direct experience.
+The bundled pre-trusted peers are weighted more heavily in this selection,
+so they are chosen more often than other peers and act as reliable anchors for the network.
+Their behavior is still scored like any other peer, so a misbehaving pre-trusted peer loses reputation accordingly.
+
+Reputation scores are local.
+Each node builds its own view of the network from its direct experience alone, and it holds that view only in memory.
+After a restart, a node keeps no earned reputation and rebuilds it from new interactions.
 
 The implementation is based on the [EigenTrust++](https://en.wikipedia.org/wiki/EigenTrust) algorithm.
 
-!!! note "Node rotation"
+### Node Rotation
 
-    To prevent the formation of isolated or stagnant node groups,
-    NEM nodes periodically refresh their peer set, pulling peer lists from a sample of current peers
-    and merging newly discovered nodes into the candidate pool, regardless of how well existing peers are scoring.
+To prevent the formation of isolated or stagnant node groups, a node does not always communicate with the same
+peers.
+Every time it selects peers to communicate with, it draws them at random, weighted by reputation.
+Higher-scoring peers are more likely to be chosen, but the choice stays probabilistic.
 
-    This forced churn ensures that nodes continually discover and evaluate new peers,
-    maintaining a well-connected and adaptive network topology.
-
-    By balancing reputation-based stability with deliberate connection turnover,
-    the protocol avoids network fragmentation and promotes long-term decentralization.
-
-Finally, note that this reputation score is an internal metric used by nodes to decide which other nodes to connect to.
-When using <delegated harvesting:>, accounts may delegate to any node they choose, based on reputation factors
-that may or may not be related to the score described in this page.
+This randomness keeps nodes cycling through different peers, avoiding network fragmentation and promoting
+long-term decentralization.
 
 ## Supernodes
 
@@ -187,6 +212,9 @@ Supernode Program
 NEM has no block subsidy or inflation.
 Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
 The Supernode Program offsets this by paying daily rewards to nodes that prove themselves reliable.
+
+!!! warning "Supernode rewards are not guaranteed"
+    Reward amounts may be reduced or discontinued at any time.
 
 The program runs entirely off-chain, and NIS itself plays no part: a separate, centrally operated service called the
 _controller_ tests participating nodes and pays out the rewards.
@@ -209,8 +237,11 @@ knows to be healthy:
 | **Bandwidth**       | A bulk hashing exchange with a peer runs at an effective transfer speed of at least 5 Mbit/s.          |
 | **Responsiveness**  | It answers 10 chain-height requests in 1 second or less, with at least 9 succeeding.                   |
 
+The ping and bandwidth tests reach out to other peers on the network, so a node's score reflects how it performs with
+the wider network rather than just its exchange with the reference node.
+
 Rewards come from a fixed daily pool of 25'500 XEM, and each qualifying node earns at most 500 XEM per day.
-While 51 or fewer nodes qualify, each receives the full 500 XEM.
+When 51 or fewer nodes qualify, each receives the full 500 XEM.
 Beyond that, the pool is divided equally, so per-node rewards fall as the network grows.
 
 Enrollment is optional.
