@@ -82,6 +82,7 @@ grouping related mosaics together.
 The <get:/namespace/mosaic/definition/page> endpoint returns one definition for each mosaic whose namespace matches
 the queried name exactly.
 Mosaics defined under deeper subnamespaces (such as `foo.bar:baz` when querying `foo`) are not included.
+To list those as well, repeat this query for each subnamespace found in the previous step.
 
 ## Output
 

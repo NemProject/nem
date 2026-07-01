@@ -43,18 +43,16 @@ try:
 	deadline = network_time + 2 * 60 * 60
 	# [<step-3]
 	# Fetch the mosaic's divisibility and supply [>step-4]
-	definition_path = (
-		f'/namespace/mosaic/definition/page?namespace={MOSAIC_NAMESPACE}')
+	definition_path = f'/mosaic/definition?mosaicId={MOSAIC_ID}'
 	print(f'Fetching mosaic definition from {definition_path}')
 	with urllib.request.urlopen(
 		f'{NODE_URL}{definition_path}') as response:
-		definitions = json.loads(response.read().decode())['data']
-	definition = next(
-		entry['mosaic'] for entry in definitions
-		if entry['mosaic']['id']['name'] == MOSAIC_NAME)
-	divisibility = int(next(
-		prop['value'] for prop in definition['properties']
-		if prop['name'] == 'divisibility'))
+		definition = json.loads(response.read().decode())
+	properties = {
+		prop['name']: prop['value']
+		for prop in definition['properties']
+	}
+	divisibility = int(properties['divisibility'])
 
 	supply_path = f'/mosaic/supply?mosaicId={MOSAIC_ID}'
 	print(f'Fetching mosaic supply from {supply_path}')

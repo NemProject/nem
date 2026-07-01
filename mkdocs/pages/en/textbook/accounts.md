@@ -161,3 +161,62 @@ Bear in mind the following when designing multisignature solutions:
     In NEM, a multisig account cannot itself be a cosignatory of another multisig, and a cosignatory account cannot
     be converted into a multisig.
     Multisig hierarchies are therefore **one layer deep**.
+
+## Importance
+
+Importance
+:   A measure of an <account:>'s contribution to the network, based on its <vesting:|vested> balance and its outgoing
+    transfers to other accounts.
+    This score determines the account's chances of harvesting a <block:>.
+
+Importance serves a role similar to hashrate in <PoW:> systems or stake in <PoS:> systems:
+the higher the value, the greater the chance to harvest a block and earn rewards.
+
+### Vesting
+
+Vesting
+:   The process by which an account's <XEM:> balance gradually matures from _unvested_ to _vested_.
+    Only the vested portion counts toward the account's importance, so newly funded accounts do not
+    start harvesting immediately.
+
+When an account first receives XEM, the full amount is unvested.
+Every 1440 blocks (about one day at the 60-second target), 10% of the unvested balance migrates to the vested portion.
+The same step repeats each day, gradually moving more of the balance to vested.
+
+For example:
+
+* After day 1, 10% of the original balance is vested.
+* After day 2, 19% is vested.
+* After day 7, just over half is vested.
+* The balance asymptotically approaches fully vested.
+
+Larger holdings cross the 10'000 XEM vested threshold sooner.
+An account holding 100'000 XEM, for instance, vests 10'000 XEM at its first vesting cycle (after about one day)
+and becomes harvesting-eligible at that point.
+
+??? info "Importance Calculation"
+
+    All accounts that have at least 10'000 XEM in vested balance are eligible to harvest and participate in the
+    importance calculation.
+
+    The importance score for an eligible account combines:
+
+    * Its **vested balance**.
+    * A **[PageRank](https://en.wikipedia.org/wiki/PageRank)-like score** computed over the graph of outgoing transfer
+        transactions.
+
+        Only transfers that meet both of the following are considered:
+
+        * The transfer occurred within the last 43200 blocks (about 30 days).
+        * The recipient is itself eligible (has at least 10'000 vested XEM).
+
+        Each qualifying transfer contributes its amount, with older transfers counting for less (10% less per day).
+        If two accounts sent XEM to each other, only the difference counts.
+        That difference must be at least 1'000 XEM to contribute to the score.
+
+    The full algorithm is the _Proof-of-Importance_ (PoI) scheme described in the
+    [NEM Technical Reference](site:/assets/pdfs/NEM_techRef.pdf), section 7.
+
+!!! note
+    Importance scores are recalculated every 359 blocks (roughly 6 hours), and the recalculated value applies to all
+    subsequent blocks until the next recalculation.

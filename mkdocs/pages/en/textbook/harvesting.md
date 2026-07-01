@@ -80,14 +80,16 @@ The cycle repeats at the next block height.
 
 ## Harvesting Methods
 
-NEM supports two <harvesting:> modes, [local](#local-harvesting) and [delegated](#delegated-harvesting), which differ in
-how the signing key is held.
+Node owners can participate in harvesting by enabling [local](#local-harvesting) or [remote](#remote-harvesting)
+harvesting, depending on their preferred balance between simplicity and security.
+Accounts that do not operate a node but meet the balance requirements can still harvest by linking to a node through
+[delegated harvesting](#delegated-harvesting).
 
 ### Local Harvesting
 
 Local Harvesting
-:   A type of harvesting where the <node:> signs produced <blocks:> using the harvester's <private key:>,
-    which must be stored on the machine.
+:   A type of <harvesting:> where the rewards are sent directly to the harvester account.
+    The <node:> signs produced <blocks:> using the operator's <main key:>, which must be stored on the machine.
 
 !!! warning
     The harvester account must hold a significant balance to maintain a high <importance:> score.
@@ -95,119 +97,76 @@ Local Harvesting
     in case of unauthorized access.
 
 While local harvesting offers a straightforward setup, these security risks make it unsuitable for public nodes.
-Most operators instead prefer <delegated harvesting:>.
+Most operators instead prefer remote harvesting.
+
+### Remote Harvesting
+
+Remote Harvesting
+:   A type of <harvesting:> that delegates block signing to a separate <remote key:|remote account>, while the node's
+    <importance:> score and rewards remain tied to the operator's <main key:>.
+
+The remote account holds no funds and exists only to sign blocks on behalf of the harvester's main account.
+Because its <private key:> is stored in the node's configuration files, hosted on a permanently-online machine, it is
+designed to be expendable.
+
+The remote account is designated by signing an _Account Key Link_ transaction, which transfers the main account's
+<importance:> to it.
+The remote account begins signing blocks after a settling period of 360 blocks (approximately six hours), and a second
+_Account Key Link_ transaction removes it, subject to the same delay.
+
+The main account still determines the node's importance and receives all block rewards.
+However, its key remains offline, safe from compromise.
+For simplicity, the main account is still called the harvester account, even though blocks are signed by the remote
+account.
+
+This separation of duties offers strong protection for the harvester's funds and makes remote harvesting the preferred
+option for most operators.
 
 ### Delegated Harvesting
 
 Delegated Harvesting
-:   A form of harvesting where an account delegates block-signing to a separate <remote account:> on a node,
-    while keeping its importance and receiving all the rewards.
+:   A form of <harvesting:> that lets an eligible account that does not operate a node delegate harvesting duties to a
+    third-party node.
+    The delegating account's <importance:> score is used, and it receives the harvested rewards in full.
 
-Delegated harvesting involves two accounts, the _lessor_ and the _remote account_:
+Such an account is called a _delegator_, or _delegated harvester_.
 
-Lessor
-:   An account that delegates its harvesting rights to a remote account, retaining its importance and
-    receiving all fees from blocks harvested on its behalf. Also called the _delegated harvester_.
+Delegator
+:   An account that <delegated harvesting:|delegates> harvesting to a third-party node while retaining its <importance:>
+    and receiving the harvested rewards.
+    Also called a _delegated harvester_.
 
-Remote account
-:   An account dedicated to signing blocks on a lessor's behalf, with its private key kept on the node.
+Although the node performs the work, the delegator is still considered the harvester, and NEM pays it the block rewards
+in full.
+The arrangement lets an account earn rewards without running a node of its own.
 
-Delegated harvesting is activated by signing an _importance transfer transaction_ that designates a remote
-account to sign on the lessor's behalf.
-After a settling period of 360 blocks (approximately six hours), the remote account begins signing blocks on the
-lessor's behalf.
+Delegated harvesting uses the same remote account setup as remote harvesting.
+The delegator provides the remote account's <private key:> to the third-party node, which adds the account to the set it
+harvests for and signs blocks on the delegator's behalf.
 
-The protocol enforces that a remote account holds no funds: it must have zero balance at activation, and afterwards
-cannot send or receive transfers.
-Stealing the remote key therefore grants no access to the lessor's funds, which remain controlled by the lessor's
-private key (which can stay offline).
+Whether the node accepts the remote account depends on the operator's policy, and the delegator can revoke the
+arrangement at any time by changing its linked key.
 
-A stolen remote key could still be used to harvest blocks on the lessor's behalf from another node, but block rewards
-continue to flow to the lessor's account regardless of who controls the remote key.
-The lessor can deactivate the remote by announcing another importance transfer transaction.
-The deactivation takes effect after the same 360-block settling period, at which point the remote stops harvesting.
+As with remote harvesting, block signing is performed by an account other than the delegator, so its <private key:>
+never needs to leave secure storage.
 
-This separation of duties makes delegated harvesting the preferred option for most operators and for any account that
-does not run its own node.
+!!! info "Remote vs. Delegated Harvesting"
+
+    Both methods use the same remote account setup.
+    They differ only in who runs the node: in remote harvesting the operator harvests through their own node, while in
+    delegated harvesting the account harvests through a third party's node.
 
 ## Reward Distribution
 
 When a <block:> is harvested, the harvester receives the sum of fees from every <transaction:> in the block.
 
-In <delegated harvesting:>, the rewards go to the <lessor:>, not to the <remote account:> that signed the block or to
-the node operator's own account.
-In <local harvesting:> the harvester is the signer and receives the rewards directly.
+With <local harvesting:>, the harvester signs its own blocks and receives the rewards directly.
+With <remote harvesting:> and <delegated harvesting:>, the remote account signs the blocks, but the rewards still
+flow to the main account, never to the remote account or to the node operator hosting it.
 
 NEM does not split block rewards between the harvester and the node operator.
-A node hosting a lessor's remote account receives nothing from those blocks.
-The protocol pays the lessor in full.
+A node that hosts a remote account for someone else receives nothing from those blocks.
+The protocol pays the harvester in full.
 
-A node operator can still earn block rewards by harvesting with their own account, either locally or by delegating it to
-a remote on their own node (using the same security pattern as any other lessor).
-For hosting other lessors, incentives come from external programs rather than from block rewards.
-
-!!! note "Supernode Program"
-    NEM has no block subsidy or inflation.
-    Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
-
-    To sustain high-quality public node infrastructure, the <Supernode Program:> supplements operator income by paying
-    periodic rewards to qualifying nodes.
-
-## Importance
-
-Importance
-:   A measure of an <account:>'s contribution to the network, based on its <vesting:|vested> balance and its outgoing
-    transfers to other accounts.
-    This score determines the account's chances of harvesting a <block:>.
-
-Importance serves a role similar to hashrate in <PoW:> systems or stake in <PoS:> systems:
-the higher the value, the greater the chance to harvest a block and earn rewards.
-
-### Vesting
-
-Vesting
-:   The process by which an account's <XEM:> balance gradually matures from _unvested_ to _vested_.
-    Only the vested portion counts toward the account's importance, so newly funded accounts do not
-    start harvesting immediately.
-
-When an account first receives XEM, the full amount is unvested.
-Every 1440 blocks (about one day at the 60-second target), 10% of the unvested balance migrates to the vested portion.
-The same step repeats each day, gradually moving more of the balance to vested.
-
-For example:
-
-* After day 1, 10% of the original balance is vested.
-* After day 2, 19% is vested.
-* After day 7, just over half is vested.
-* The balance asymptotically approaches fully vested.
-
-Larger holdings cross the 10'000 XEM vested threshold sooner.
-An account holding 100'000 XEM, for instance, vests 10'000 XEM at its first vesting cycle (after about one day)
-and becomes harvesting-eligible at that point.
-
-??? info "Importance Calculation"
-
-    All accounts that have at least 10'000 XEM in vested balance are eligible to harvest and participate in the
-    importance calculation.
-
-    The importance score for an eligible account combines:
-
-    * Its **vested balance**.
-    * A **[PageRank](https://en.wikipedia.org/wiki/PageRank)-like score** computed over the graph of outgoing transfer
-        transactions.
-
-        Only transfers that meet both of the following are considered:
-
-        * The transfer occurred within the last 43200 blocks (about 30 days).
-        * The recipient is itself eligible (has at least 10'000 vested XEM).
-
-        Each qualifying transfer contributes its amount, with older transfers counting for less (10% less per day).
-        If two accounts sent XEM to each other, only the difference counts.
-        That difference must be at least 1'000 XEM to contribute to the score.
-
-    The full algorithm is the _Proof-of-Importance_ (PoI) scheme described in the
-    [NEM Technical Reference](site:/assets/pdfs/NEM_techRef.pdf), section 7.
-
-!!! note
-    Importance scores are recalculated every 359 blocks (roughly 6 hours), and the recalculated value applies to all
-    subsequent blocks until the next recalculation.
+How node operators are compensated for hosting delegated harvesters, if at all, falls outside the protocol and is left
+to arrangements between the parties involved.
