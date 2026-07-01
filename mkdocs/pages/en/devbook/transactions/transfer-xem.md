@@ -102,18 +102,18 @@ This provides a good balance between accuracy and performance.
 The snippet calls <dy:TransactionFactory.create> with a descriptor that supplies the transfer transaction's
 properties:
 
-* `type`: This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry both XEM and
+* {{ tutorial.var('type') }}: This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry both XEM and
     other <mosaics:>.
     No mosaics are attached here, so the transaction sends XEM only.
 
-* `signer_public_key`: The signer is the account that will pay the fee.
+* {{ tutorial.var('signer_public_key') }}: The signer is the account that will pay the fee.
     In a transfer transaction, it is also the source of the transferred XEM.
 
-* `timestamp` and `deadline`: The values computed in the network time step.
+* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
 
-* `recipient_address`: The address that will receive the XEM.
+* {{ tutorial.var('recipient_address') }}: The address that will receive the XEM.
 
-* `amount`: The atomic-unit value computed earlier. For 1 XEM, this is `1_000_000`.
+* {{ tutorial.var('amount') }}: The atomic-unit value computed earlier. For 1 XEM, this is `1_000_000`.
 
 !!! info "Sending a mosaic or a message"
 
@@ -141,8 +141,7 @@ The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to 
 Once the transaction is created, it must be signed with the signing account's private key.
 Signing ensures the transaction is authentic and authorized by the sender.
 
-<dy:NemFacade.signTransaction> returns a <signature:> encoded as a hexadecimal string.
-
+<dy:NemFacade.signTransaction> returns a <signature:>.
 <dy:TransactionFactory.attachSignature> adds the signature to the transaction and serializes it into a JSON payload
 ready to be submitted directly to a node for announcement.
 
