@@ -51,7 +51,7 @@
 
 [data-md-color-scheme=default][data-md-color-primary=indigo] {
 	--md-typeset-a-color: var(--md-primary-fg-color);
-	--md-accent-fg-color: var(--md-primary-fg-color--light);
+	--md-accent-fg-color: var(--md-primary-fg-color--dark);
 	--md-accent-fg-color--light: var(--md-primary-fg-color--light);
 	--md-accent-fg-color--dark: var(--md-primary-fg-color--dark);
 	--md-default-bg-color--light: #DDD;
@@ -64,11 +64,11 @@
 	--md-typeset-table-color: var(--md-primary-fg-color);
 	--md-typeset-table-color--light: var(--md-accent-fg-color--transparent);
 	--userbook-a-color: var(--userbook-color);
-	--userbook-a-hl-color: var(--userbook-color--light);
+	--userbook-a-hl-color: var(--userbook-color--dark);
 	--devbook-a-color: var(--devbook-color);
-	--devbook-a-hl-color: var(--devbook-color--light);
+	--devbook-a-hl-color: var(--devbook-color--dark);
 	--textbook-a-color: var(--textbook-color);
-	--textbook-a-hl-color: var(--textbook-color--light);
+	--textbook-a-hl-color: var(--textbook-color--dark);
 }
 
 /* Home page cards */
@@ -114,15 +114,15 @@
 
 .md-typeset .grid a.userbook:hover h2,
 .md-typeset .grid a.userbook:hover p {
-	color: var(--userbook-color--light);
+	color: var(--userbook-a-hl-color);
 }
 .md-typeset .grid a.devbook:hover h2,
 .md-typeset .grid a.devbook:hover p {
-	color: var(--devbook-color--light);
+	color: var(--devbook-a-hl-color);
 }
 .md-typeset .grid a.textbook:hover h2,
 .md-typeset .grid a.textbook:hover p {
-	color: var(--textbook-color--light);
+	color: var(--textbook-a-hl-color);
 }
 
 .md-typeset .grid .card a {
@@ -230,15 +230,9 @@
 }
 
 /* Page background */
-[data-md-color-scheme=default] .md-main {
-	background: url("../images/watercolor-light.webp") repeat,
-		var(--md-accent-fg-color--transparent);
-	background-blend-mode: multiply;
-}
-
+[data-md-color-scheme=default] .md-main,
 [data-md-color-scheme=slate] .md-main {
-	background: var(--md-accent-fg-color--transparent);
-	background-blend-mode: multiply;
+	background: transparent;
 }
 
 /* Header  & Footer*/
