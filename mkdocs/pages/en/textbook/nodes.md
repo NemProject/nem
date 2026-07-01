@@ -83,7 +83,7 @@ digraph NemNode {
     REST -> pR [dir=back headclip=false];
     pR -> Engine [dir=forward tailclip=false];
     WebSocket -> pW [dir=back headclip=false];
-    pW -> Engine [dir=forward tailclip=false];
+    pW -> Engine [dir=none tailclip=false];
     Engine -> pB [dir=back headclip=false];
     pB -> H2 [dir=forward tailclip=false];
 

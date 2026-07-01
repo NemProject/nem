@@ -65,10 +65,6 @@ During this time, the namespace is effectively disabled: mosaics defined under i
 Only the original owner can renew the namespace during the grace period.
 Once the grace period ends, the namespace is fully released and becomes available for others to register.
 
-!!! note "The `nem` namespace never expires"
-
-    The `nem` namespace, which holds <XEM:>, is permanently active and is exempt from the lease and renewal cycle.
-
 ```dot
 digraph "Namespace registration" {
     rankdir="LR";
@@ -94,6 +90,10 @@ The following operations are permitted depending on the state of the namespace r
 | Register a subnamespace             | :material-close:    | :white_check_mark:     | :material-close:   |
 | Define a mosaic under the namespace | :material-close:    | :white_check_mark:     | :material-close:   |
 | Renew the namespace                 | :material-close:    | :white_check_mark:     | :white_check_mark: |
+
+!!! note "The `nem` namespace never expires"
+
+    The `nem` namespace, which holds <XEM:>, is permanently active and is exempt from the lease and renewal cycle.
 
 ## Lease Fee
 

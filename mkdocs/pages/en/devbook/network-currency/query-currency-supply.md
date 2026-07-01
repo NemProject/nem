@@ -50,11 +50,11 @@ The response is a JSON object with the mosaic identifier and its current `supply
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The supply fetched above is already in whole units, but the account balances read in the next steps are reported in
-[atomic units](../../textbook/mosaics.md#divisibility).
+The supply fetched in the previous step is already in whole units, but the account balances read in the next steps are
+reported in [atomic units](../../textbook/mosaics.md#divisibility).
 
-To add them to the same total, this step fetches the mosaic's <divisibility:> up front, which is used to convert an
-atomic-unit balance into whole units.
+To convert values to the same units, this step first fetches the mosaic's <divisibility:>.
+This value is then used to convert the balances from atomic units to whole units.
 
 The <get:/mosaic/definition> endpoint returns the mosaic's definition, which includes the divisibility.
 For `nem:xem`, the divisibility is 6.
@@ -73,7 +73,9 @@ A portion of the total supply is held by accounts that are not part of the open 
 * **Mosaic rental sink:** Collects the fees paid to create <mosaics:>.
 
 The code queries each account with the <get:/account/get> endpoint and sums their balances.
-Each balance is divided by 10^divisibility^ (1'000'000 for `nem:xem`) to convert it from atomic units to whole units.
+Each balance is divided by 10^divisibility^, using the divisibility value fetched in the previous step, to convert it
+from atomic units to whole units.
+For `nem:xem`, this divisor is 1'000'000.
 
 ### Deriving the Circulating Supply
 

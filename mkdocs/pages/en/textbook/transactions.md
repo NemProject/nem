@@ -46,14 +46,15 @@ Cosignature
 :   When a transaction requires signatures from multiple accounts, the additional signatures are called _cosignatures_.
 
 On NEM, each cosignature is delivered as its own _Multisig Cosignature_ transaction that references the
-<inner transaction:> by hash, so cosignatories can sign independently and at different times.
-These cosignatures accumulate on the pending multisig transaction in the <unconfirmed pool:>, and it can be included in
-a block only once it has enough of them to meet its threshold.
-
+<inner transaction:> by hash, allowing cosignatories to sign independently and at different times.
 Multiple coordinated actions must therefore be issued as separate multisig transactions, one per inner transaction.
 
-When a multisig transaction is included in a block, the multisig account pays every fee in the composition:
-the inner transaction's fee, the multisig transaction's fee, and every cosignature's fee.
+These cosignatures accumulate on the pending multisig transaction in the <unconfirmed pool:>, and the transaction
+can be included in a block only after it has collected enough cosignatures to meet its required threshold.
+The multisig transaction and its cosignatures are then confirmed together atomically as a single unit.
+
+When a multisig transaction is included in a block, the multisig account pays all fees associated with the
+transaction: the inner transaction's fee, the multisig transaction's fee, and every cosignature's fee.
 Cosignatories never spend from their own balance when cosigning.
 
 !!! tip "Multisig Transaction Example"

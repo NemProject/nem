@@ -145,10 +145,16 @@ The delegator provides the remote account's <private key:> to the third-party no
 harvests for and signs blocks on the delegator's behalf.
 
 Whether the node accepts the remote account depends on the operator's policy, and the delegator can revoke the
-arrangement at any time.
+arrangement at any time by changing its linked key.
 
 As with remote harvesting, block signing is performed by an account other than the delegator, so its <private key:>
 never needs to leave secure storage.
+
+!!! info "Remote vs. Delegated Harvesting"
+
+    Both methods use the same remote account setup.
+    They differ only in who runs the node: in remote harvesting the operator harvests through their own node, while in
+    delegated harvesting the account harvests through a third party's node.
 
 ## Reward Distribution
 
@@ -161,3 +167,6 @@ flow to the main account, never to the remote account or to the node operator ho
 NEM does not split block rewards between the harvester and the node operator.
 A node that hosts a remote account for someone else receives nothing from those blocks.
 The protocol pays the harvester in full.
+
+How node operators are compensated for hosting delegated harvesters, if at all, falls outside the protocol and is left
+to arrangements between the parties involved.
