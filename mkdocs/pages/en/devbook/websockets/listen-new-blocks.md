@@ -5,7 +5,8 @@ tutorial_level: beginner
 
 # Listening to New Blocks
 
-The <ws:blocks> WebSocket channel sends a real-time notification every time a new <block:> is added to the chain.
+The <ws:blocks> <WebSocket channel:> sends a real-time notification every time a new <block:> is
+added to the chain.
 Compared to polling the <get:/chain/height> endpoint, WebSockets push updates as they happen without the overhead of
 repeated API calls.
 
@@ -51,8 +52,10 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
     for convenience.
 
 The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
-WebSockets are served on a dedicated port (`7778` by default), separate from the REST API port (`7890`).
 If no value is provided, a default one is used.
+
+`WS_URL` defines the WebSocket endpoint for the same node.
+It is derived from `NODE_URL` by replacing port `7890` with `7778`.
 
 The program runs until interrupted with `Ctrl+C`, which triggers the unsubscribe step before closing the connection.
 
@@ -62,14 +65,15 @@ The program runs until interrupted with `Ctrl+C`, which triggers the unsubscribe
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
-The first step is to open a connection to the node's `/w/messages` endpoint and start a STOMP session over it.
+The first step is to open a connection to the node's `/w/messages` endpoint and start a <STOMP session:>
+over it.
 
 ### Subscribing to the Channel
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The code subscribes to the <ws:blocks> channel, which fires every time a new block is added to the chain
-(approximately every minute).
+The code subscribes to the <ws:blocks> channel.
+The node then notifies subscribers every time a new block is added to the chain (approximately every minute).
 
 The subscription is given an `id` (`id-0`) which is used to unsubscribe on exit.
 
@@ -79,7 +83,7 @@ Each incoming message is then passed to the formatting logic below.
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-The body of each incoming STOMP message is the new block, following the [Block](../reference/rest/nem.md#model/Block)
+The body of each incoming message is the new block, following the [Block](../reference/rest/nem.md#model/Block)
 schema.
 
 For each message, the snippet prints two of its fields:

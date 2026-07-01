@@ -721,6 +721,10 @@ code.doc-symbol-interface::after {
 	background-color: #b50505;
 }
 
+.md-typeset code.rest-method-req {
+	background-color: #8e6fc9;
+}
+
 /* Graphviz diagrams */
 .graphviz {
 	display: block;
@@ -780,9 +784,19 @@ code.doc-symbol-interface::after {
 	background: var(--md-accent-fg-color--transparent);
 }
 
+[data-md-color-scheme=default] .md-typeset table:not([class]) th {
+	color: var(--md-typeset-color);
+}
+
 .centered .md-typeset__table {
 	display: table;
 	margin: 0 auto;
+}
+
+.md-typeset .frame-table table:not([class]) {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
 }
 
 /* Tables with subsections */
