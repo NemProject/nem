@@ -105,9 +105,10 @@ The mosaic's <divisibility:> is used to convert the transfer quantity to
 current supply it determines the fee.
 Both are fetched from the node before building the transaction.
 
-* The <get:/namespace/mosaic/definition/page> endpoint returns the mosaic definitions registered under a namespace.
-    Each entry contains the mosaic's properties, including `divisibility`.
-* The <get:/mosaic/supply> endpoint returns the current total supply.
+* The <get:/mosaic/definition> endpoint returns the mosaic's definition, including its properties such as
+    `divisibility`.
+* The <get:/mosaic/supply> endpoint returns the current total supply, in
+    [whole units](../../textbook/mosaics.md#divisibility).
 
 As with the network time, these values do not need to be fetched before every transfer.
 A mosaic's divisibility is fixed at creation, and its supply changes only if the mosaic was created with a mutable
@@ -135,8 +136,8 @@ The snippet then calls <dy:TransactionFactory.create> with a <ser:TransferTransa
 `mosaics` field, which accepts up to 10 entries.
 Each entry identifies a mosaic and how much of it to send:
 
-* The <namespace:> that owns the mosaic, as a byte string.
-* The mosaic's name, also as a byte string.
+* The <namespace:> that owns the mosaic.
+* The mosaic's name.
 * The quantity, given in the mosaic's **atomic units** (calculated above).
 
 When mosaics are attached, the top-level `amount` is no longer the
@@ -159,7 +160,8 @@ Rather than implement NEM's fixed fee schedule by hand, the snippet calls the SD
 <dy:FeeCalculator.calculateTransactionFee> helper.
 
 The helper reads the transferred quantities directly from the transaction built in the previous step, and takes
-each mosaic's `supply` and `divisibility` as a second argument, since those values are not stored in the transaction.
+each mosaic's `supply` (in [whole units](../../textbook/mosaics.md#divisibility)) and `divisibility` as a second
+argument, since those values are not stored in the transaction.
 
 The returned fee is assigned to `transaction.fee` before signing.
 
@@ -209,7 +211,7 @@ This tutorial showed how to:
 
 | Step                                                                        | Related documentation                                              |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| [Fetch a mosaic's divisibility](#fetching-the-mosaic-definition-and-supply) | <get:/namespace/mosaic/definition/page>                            |
+| [Fetch a mosaic's divisibility](#fetching-the-mosaic-definition-and-supply) | <get:/mosaic/definition>                                           |
 | [Fetch a mosaic's supply](#fetching-the-mosaic-definition-and-supply)       | <get:/mosaic/supply>                                               |
 | [Build a mosaic transfer](#building-the-transaction)                        | <dy:TransactionFactory.create>                                     |
 | [Calculate the transaction fee](#calculating-the-transaction-fee)           | <dy:FeeCalculator.calculateTransactionFee>                         |
