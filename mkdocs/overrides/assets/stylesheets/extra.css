@@ -836,3 +836,19 @@ code.doc-symbol-interface::after {
 .md-typeset .icon-list>ul>li>p:first-child>.twemoji>svg {
 	width: 2em;
 }
+
+/* Scalar REST API reference */
+.light-mode,
+.dark-mode {
+	--scalar-font: "Nunito Sans", -apple-system, "system-ui", Helvetica, Arial, sans-serif;
+	--scalar-paragraph: 0.7rem;
+}
+
+.light-mode {
+	--scalar-color-accent: var(--devbook-color--dark);
+}
+
+.dark-mode {
+	--scalar-background-1: var(--md-default-bg-color);
+	--scalar-color-accent: var(--devbook-color);
+}
