@@ -7,9 +7,9 @@ import uuid
 import stomper
 from websockets import connect
 
-NODE_HOST = os.getenv('NODE_HOST', 'libertalia.nemtest.net')
-WS_URL = f'http://{NODE_HOST}:7778'
-print(f'Using node {NODE_HOST}')
+NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
+WS_URL = NODE_URL.replace(':7890', ':7778')
+print(f'Using node {NODE_URL}')
 
 
 # SockJS has no Python client library.
@@ -45,11 +45,11 @@ async def stomp_disconnect(websocket):
 	await send_frame(websocket, stomper.disconnect())
 
 
-def stomp_messages(raw):
+def stomp_messages(raw_frame):
 	# Yield the JSON body of each STOMP MESSAGE in a SockJS data frame
-	if 'a' != raw[0]:  # skip 'o' open, 'h' heartbeat, 'c' close
+	if 'a' != raw_frame[0]:  # skip 'o' open, 'h' heartbeat, 'c' close
 		return
-	for payload in json.loads(raw[1:]):
+	for payload in json.loads(raw_frame[1:]):
 		frame = stomper.unpack_frame(payload)
 		if 'MESSAGE' == frame['cmd']:
 			yield json.loads(frame['body'])
@@ -62,16 +62,17 @@ async def main():
 		print(f'Connected to {WS_URL}')
 		# [<step-1]
 		# Subscribe to the new block channel [>step-2]
-		await stomp_subscribe(websocket, '/blocks', 'id-0')
-		print('Subscribed to /blocks channel')
+		destination = '/blocks'
+		await stomp_subscribe(websocket, destination, 'id-0')
+		print(f'Subscribed to {destination} channel')
 		# [<step-2]
 		# Read and format each new block [>step-3]
 		try:
-			async for raw in websocket:
-				for block in stomp_messages(raw):
+			async for raw_frame in websocket:
+				for block in stomp_messages(raw_frame):
 					print(
 						f'New block: height={block["height"]:,}'
-						f' harvester={block["signer"][:16]}...'
+						f' harvester={block["signer"][:16].upper()}...'
 					)
 		# [<step-3]
 		# Unsubscribe on exit [>step-4]

@@ -5,8 +5,8 @@ tutorial_level: beginner
 
 # Listening to Transaction Flow
 
-NEM provides WebSocket channels that send real-time notifications as a <transaction:> moves through the confirmation
-process for a specific <account:>.
+NEM provides <WebSocket channels:> that send real-time notifications as a <transaction:> moves
+through the confirmation process for a specific <account:>.
 Compared to polling the <get:/transaction/get> endpoint, WebSockets push updates as they happen without the overhead
 of repeated API calls.
 
@@ -61,9 +61,11 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
     There is no SockJS client library for Python, so a few small helper methods are defined at the top of the file
     for convenience.
 
-The snippet uses the `NODE_HOST` environment variable to set the NEM <node:>.
-The REST API and WebSocket URLs are built from it, using separate ports: `7890` for REST and `7778` for WebSockets.
+The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 If no value is provided, a default one is used.
+
+`WS_URL` defines the WebSocket endpoint for the same node.
+It is derived from `NODE_URL` by replacing port `7890` with `7778`.
 
 ## Code Explanation
 
@@ -85,7 +87,8 @@ If any of these environment variables is not provided, the tutorial provides def
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The code opens a SockJS connection to the `/w/messages` endpoint on `WS_URL` and starts a STOMP session over it.
+The code opens a SockJS connection to the `/w/messages` endpoint on `WS_URL` and starts a <STOMP session:>
+over it.
 
 ### Registering the Account
 
@@ -94,16 +97,19 @@ The code opens a SockJS connection to the `/w/messages` endpoint on `WS_URL` and
 To receive notifications on an account's transaction channels, the address must first be **registered** with the node.
 
 The code registers the address by sending a <req:w&#47;api&#47;account&#47;get> request, which both registers it and
-replies with the account's current state on the <ws:account&#47;{address}> channel.
+triggers a reply containing the account's current state on the <ws:account&#47;{address}> channel.
 
-To catch that reply, the code subscribes to the channel using `id-0`, then waits.
-Once the reply arrives, the registration is active and the temporary subscription is dropped.
+The code first temporarily subscribes to the <ws:account&#47;{address}> channel, sends the registration request, and
+waits for that reply.
+
+Once the reply arrives, the registration is active and the temporary subscription to the account messages channel is
+dropped, using the same `id-0` used during registration.
 
 ### Subscribing to the Channels
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-With the account registered, the code subscribes to two address-scoped channels:
+With the account's address registered, the code subscribes to two address-scoped channels:
 
 * <ws:unconfirmed&#47;{address}>: Notifies when a transaction involving the address enters the <unconfirmed pool:>,
     waiting to be included in a block.
@@ -115,12 +121,13 @@ The subscriptions use IDs `id-1` and `id-2`, which identify them when the code u
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
-This tutorial builds a minimal [Transfer Transaction](../transactions/transfer-xem.md) to the monitored address, with a
-zero amount, no mosaics, and no message.
+This tutorial builds a minimal <Transfer Transaction:> to the monitored address, with a zero amount, no mosaics, and no message.
 A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
 
-The transaction is built as usual: fetching the network time, creating the transaction, and signing it.
-The hash is computed locally so it can be matched against incoming WebSocket messages later.
+The transaction follows the same process described in the
+[Transfer Transaction tutorial](../transactions/transfer-xem.md): fetching the network time, creating the transaction,
+and signing it.
+The hash is computed locally so it can be matched against incoming messages later.
 
 ### Announcing and Waiting for Confirmation
 
@@ -133,8 +140,8 @@ Otherwise, the code waits for confirmation, printing each message from the two s
 Each message follows the [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) schema, whose
 `meta.hash.data` field holds the transaction hash.
 
-When a message from the `/transactions/{address}` channel arrives whose hash matches the announced transaction, the
-program prints a confirmation message and exits.
+When a message from the <ws:transactions&#47;{address}> channel arrives whose hash matches the announced transaction,
+the program prints a confirmation message and exits.
 
 !!! warning "Announce after subscribing to channels"
 

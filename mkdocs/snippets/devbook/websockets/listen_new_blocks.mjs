@@ -1,9 +1,10 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
-const NODE_HOST = process.env.NODE_HOST || 'libertalia.nemtest.net';
-const WS_URL = `http://${NODE_HOST}:7778`;
-console.log(`Using node ${NODE_HOST}`);
+const NODE_URL = process.env.NODE_URL ||
+	'http://libertalia.nemtest.net:7890';
+const WS_URL = NODE_URL.replace(':7890', ':7778');
+console.log(`Using node ${NODE_URL}`);
 
 // Open connection [>step-1]
 const client = new Client({
@@ -20,15 +21,16 @@ function formatBlock(message) {
 	const block = JSON.parse(message.body);
 	console.log(
 		`New block: height=${block.height.toLocaleString()}` +
-		` harvester=${block.signer.substring(0, 16)}...`
+		` harvester=${block.signer.substring(0, 16).toUpperCase()}...`
 	);
 }
 // [<step-3]
 // Subscribe to the new block channel [>step-2]
-const subscription = client.subscribe('/blocks', formatBlock, {
+const destination = '/blocks';
+const subscription = client.subscribe(destination, formatBlock, {
 	id: 'id-0'
 });
-console.log('Subscribed to /blocks channel');
+console.log(`Subscribed to ${destination} channel`);
 // [<step-2]
 // Unsubscribe on exit [>step-4]
 process.on('SIGINT', () => {

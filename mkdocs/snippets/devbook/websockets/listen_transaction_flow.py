@@ -12,10 +12,9 @@ from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 from websockets import connect
 
-NODE_HOST = os.getenv('NODE_HOST', 'libertalia.nemtest.net')
-NODE_URL = f'http://{NODE_HOST}:7890'
-WS_URL = f'http://{NODE_HOST}:7778'
-print(f'Using node {NODE_HOST}')
+NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
+WS_URL = NODE_URL.replace(':7890', ':7778')
+print(f'Using node {NODE_URL}')
 
 
 # SockJS has no Python client library.
@@ -55,11 +54,11 @@ async def stomp_disconnect(websocket):
 	await send_frame(websocket, stomper.disconnect())
 
 
-def stomp_messages(raw):
+def stomp_messages(raw_frame):
 	# Yield each STOMP MESSAGE frame in a SockJS data frame
-	if 'a' != raw[0]:  # skip 'o' open, 'h' heartbeat, 'c' close
+	if 'a' != raw_frame[0]:  # skip 'o' open, 'h' heartbeat, 'c' close
 		return
-	for payload in json.loads(raw[1:]):
+	for payload in json.loads(raw_frame[1:]):
 		frame = stomper.unpack_frame(payload)
 		if 'MESSAGE' == frame['cmd']:
 			yield frame
@@ -88,13 +87,13 @@ async def main():
 		print(f'Connected to {WS_URL}')
 		# [<step-2]
 		# Register the account and confirm it is active [>step-3]
-		account = f'/account/{MONITOR_ADDRESS}'
-		await stomp_subscribe(websocket, account, 'id-0')
+		destination = f'/account/{MONITOR_ADDRESS}'
+		await stomp_subscribe(websocket, destination, 'id-0')
 		await stomp_send(websocket, '/w/api/account/get',
 			json.dumps({'account': MONITOR_ADDRESS}))
-		async for raw in websocket:
-			if any(f['headers']['destination'] == account
-					for f in stomp_messages(raw)):
+		async for raw_frame in websocket:
+			if any(f['headers']['destination'] == destination
+					for f in stomp_messages(raw_frame)):
 				break
 		await stomp_unsubscribe(websocket, 'id-0')
 		print('Account registered')
@@ -104,9 +103,9 @@ async def main():
 			f'/unconfirmed/{MONITOR_ADDRESS}': 'id-1',
 			f'/transactions/{MONITOR_ADDRESS}': 'id-2',
 		}
-		for destination, sub_id in channels.items():
-			await stomp_subscribe(websocket, destination, sub_id)
-			print(f'Subscribed to {destination} channel')
+		for channel, sub_id in channels.items():
+			await stomp_subscribe(websocket, channel, sub_id)
+			print(f'Subscribed to {channel} channel')
 		# [<step-4]
 		# Build and sign a transfer to the monitored address [>step-5]
 		with urllib.request.urlopen(
@@ -126,7 +125,8 @@ async def main():
 		signature = facade.sign_transaction(signer_key_pair, transaction)
 		json_payload = facade.transaction_factory.attach_signature(
 			transaction, signature)
-		transaction_hash = str(facade.hash_transaction(transaction))
+		transaction_hash = str(
+			facade.hash_transaction(transaction)).upper()
 		# [<step-5]
 		# Announce the transaction and wait for it to confirm [>step-6]
 		print(f'Announcing transaction {transaction_hash[:16]}...')
@@ -140,20 +140,20 @@ async def main():
 			result = json.loads(resp.read().decode())
 
 		if 'SUCCESS' == result['message']:
-			expected_hash = transaction_hash.upper()
 			confirmed = False
-			async for raw in websocket:
-				for frame in stomp_messages(raw):
+			async for raw_frame in websocket:
+				for frame in stomp_messages(raw_frame):
 					destination = frame['headers']['destination']
 					pair = json.loads(frame['body'])
 					message_hash = pair['meta']['hash']['data']
-					name = ('confirmed' if '/transactions/' in destination
-							else 'unconfirmed')
-					print(f'{name}: hash={message_hash[:16]}...')
-					is_match = message_hash.upper() == expected_hash
-					if name == 'confirmed' and is_match:
-						short = transaction_hash[:16]
-						print(f'Transaction {short}... confirmed')
+					status = (
+						'confirmed' if '/transactions/' in destination
+						else 'unconfirmed')
+					print(f'{status}: hash={message_hash[:16]}...')
+					is_match = message_hash.upper() == transaction_hash
+					if status == 'confirmed' and is_match:
+						short_hash = transaction_hash[:16]
+						print(f'Transaction {short_hash}... confirmed')
 						confirmed = True
 				if confirmed:
 					break

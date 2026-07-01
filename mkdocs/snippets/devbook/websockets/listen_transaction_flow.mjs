@@ -5,10 +5,10 @@ import {
 	NemFacade, calculateTransactionFee, models
 } from 'symbol-sdk/nem';
 
-const NODE_HOST = process.env.NODE_HOST || 'libertalia.nemtest.net';
-const NODE_URL = `http://${NODE_HOST}:7890`;
-const WS_URL = `http://${NODE_HOST}:7778`;
-console.log(`Using node ${NODE_HOST}`);
+const NODE_URL = process.env.NODE_URL ||
+	'http://libertalia.nemtest.net:7890';
+const WS_URL = NODE_URL.replace(':7890', ':7778');
+console.log(`Using node ${NODE_URL}`);
 // Set up the monitored address and signer [>step-1]
 const MONITOR_ADDRESS = process.env.MONITOR_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
@@ -32,9 +32,9 @@ try {
 	console.log(`Connected to ${WS_URL}`);
 	// [<step-2]
 	// Register the account and confirm it is active [>step-3]
-	const account = `/account/${MONITOR_ADDRESS}`;
+	const destination = `/account/${MONITOR_ADDRESS}`;
 	await new Promise(resolve => {
-		client.subscribe(account, () => {
+		client.subscribe(destination, () => {
 			client.unsubscribe('id-0');
 			resolve();
 		}, { id: 'id-0' });
@@ -53,9 +53,9 @@ try {
 	// The message handler is set later, when waiting for confirmation
 	let handleMessage;
 	const onMessage = message => handleMessage?.(message);
-	for (const [destination, id] of Object.entries(channels)) {
-		client.subscribe(destination, onMessage, { id });
-		console.log(`Subscribed to ${destination} channel`);
+	for (const [channel, id] of Object.entries(channels)) {
+		client.subscribe(channel, onMessage, { id });
+		console.log(`Subscribed to ${channel} channel`);
 	}
 	// [<step-4]
 	// Build and sign a transfer to the monitored address [>step-5]
@@ -77,21 +77,20 @@ try {
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
 	const transactionHash =
-		facade.hashTransaction(transaction).toString();
+		facade.hashTransaction(transaction).toString().toUpperCase();
 	// [<step-5]
 	// Announce the transaction and wait for it to confirm [>step-6]
 	const shortHash = transactionHash.substring(0, 16);
-	const expectedHash = transactionHash.toUpperCase();
 	const confirmed = new Promise(resolve => {
 		handleMessage = message => {
 			const pair = JSON.parse(message.body);
 			const messageHash = pair.meta.hash.data;
 			const messageShort = messageHash.substring(0, 16);
-			const name = message.headers.destination
+			const status = message.headers.destination
 				.includes('/transactions/') ? 'confirmed' : 'unconfirmed';
-			console.log(`${name}: hash=${messageShort}...`);
-			if ('confirmed' === name &&
-				messageHash.toUpperCase() === expectedHash) {
+			console.log(`${status}: hash=${messageShort}...`);
+			if ('confirmed' === status &&
+				messageHash.toUpperCase() === transactionHash) {
 				console.log(`Transaction ${shortHash}... confirmed`);
 				resolve();
 			}
