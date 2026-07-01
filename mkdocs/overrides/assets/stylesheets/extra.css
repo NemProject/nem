@@ -391,6 +391,7 @@ aside.md-source-file {
 }
 
 .md-content dt a:target {
+	color: var(--md-default-bg-color);
 	font-weight: bold;
 }
 

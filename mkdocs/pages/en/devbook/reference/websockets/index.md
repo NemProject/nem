@@ -63,7 +63,7 @@ STOMP Frame
 :   A plain-text message adhering to the [STOMP](https://stomp.github.io/) protocol,
     made of a command, optional `header:value` lines, and an optional body.
 
-The client and node exchange the following frames.
+The client and node exchange the following frame types.
 
 ### `CONNECT`
 
@@ -80,6 +80,7 @@ heart-beat:0,0
 ### `SUBSCRIBE`
 
 Subscribes to a <WebSocket Channel:|channel>, with a client-chosen `id` and `destination`.
+See the [STOMP specification](https://stomp.github.io/stomp-specification-1.2.html#SUBSCRIBE) for full details.
 
 ```stomp title="Example"
 SUBSCRIBE
@@ -93,7 +94,9 @@ destination:/blocks
 
 ### `MESSAGE`
 
-Delivers channel data from the node, and is the only frame the node sends.
+Delivers channel data from the node.
+It is the only frame type the node sends.
+See the [STOMP specification](https://stomp.github.io/stomp-specification-1.2.html#MESSAGE) for full details.
 
 ```stomp title="Example"
 MESSAGE
@@ -113,6 +116,7 @@ message-id:befkedjj-6247
 ### `SEND`
 
 Sends a <WebSocket Request:|request> to a `/w/api` destination.
+See the [STOMP specification](https://stomp.github.io/stomp-specification-1.2.html#SEND) for full details.
 
 ```stomp title="Example"
 SEND
@@ -124,6 +128,7 @@ destination:/w/api/account/subscribe
 ### `UNSUBSCRIBE`
 
 Cancels a subscription by its `id`.
+See the [STOMP specification](https://stomp.github.io/stomp-specification-1.2.html#UNSUBSCRIBE) for full details.
 
 ```stomp title="Example"
 UNSUBSCRIBE
@@ -133,6 +138,7 @@ id:sub-0
 ### `DISCONNECT`
 
 Ends the session.
+See the [STOMP specification](https://stomp.github.io/stomp-specification-1.2.html#DISCONNECT) for full details.
 
 ```stomp title="Example"
 DISCONNECT
@@ -500,8 +506,8 @@ message-id:...
 
 WebSocket Request
 :   A message sent by the client to make the node deliver:
-    either notifications on channels that require **registration**, or an immediate response containing a **snapshot**
-    of the state of the blockchain.
+    either notifications on channels that require **registration**, or an immediate notification containing a
+    **snapshot** of the state of the blockchain.
 
 Requests are **read-only** and do not modify the chain state.
 

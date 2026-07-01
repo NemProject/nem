@@ -96,14 +96,16 @@ over it.
 
 To receive notifications on an account's transaction channels, the address must first be **registered** with the node.
 
-The code registers the address by sending a <req:w&#47;api&#47;account&#47;get> request, which both registers it and
-triggers a reply containing the account's current state on the <ws:account&#47;{address}> channel.
+Before sending the registration request, the code temporarily subscribes to the <ws:account&#47;{address}> channel
+using `id-0`, so it can capture the notification that confirms registration.
 
-The code first temporarily subscribes to the <ws:account&#47;{address}> channel, sends the registration request, and
-waits for that reply.
+The code then sends a <req:w&#47;api&#47;account&#47;get> request to register the address.
 
-Once the reply arrives, the registration is active and the temporary subscription to the account messages channel is
-dropped, using the same `id-0` used during registration.
+Once the address is registered, the node sends the account’s current state on the same <ws:account&#47;{address}>
+channel, which serves as the registration confirmation.
+
+When the notification arrives, the temporary subscription to the account messages channel is dropped using the same
+`id-0` identifier.
 
 ### Subscribing to the Channels
 
