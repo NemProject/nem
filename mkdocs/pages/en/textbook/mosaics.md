@@ -30,12 +30,15 @@ Once registered, a mosaic name cannot be changed.
 A mosaic's **fully qualified name** (also called its **mosaic ID**) is the unique identifier on the network.
 It joins the namespace and the local mosaic name with a colon, in the form `<namespace>:<mosaic name>`:
 
-| Part            | Definition                                          | Length limit                                                |
-| --------------- | --------------------------------------------------- | ----------------------------------------------------------- |
-| **Namespace**   | One to three dot-separated segments before the `:`. | 16 characters (root) and 64 characters (each subnamespace). |
-| **Mosaic name** | The local name after the `:`.                       | 32 characters.                                              |
+| Part            | Definition                                                                         | Length limit                                                |
+| --------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **Namespace**   | One root namespace and up to two subnamespaces, separated by dots, before the `:`. | 16 characters (root) and 64 characters (each subnamespace). |
+| **Mosaic name** | The local name after the `:`.                                                      | 32 characters.                                              |
 
-Namespace segments follow the [namespace name rules](./namespaces.md#name).
+!!! note "The colon is just a separator"
+
+    The colon separates the namespace from the mosaic name and is not a character in either.
+    Some applications display it as `.` or `!` instead.
 
 Examples:
 
@@ -138,6 +141,16 @@ to the levy recipient.
 
 The sender must hold enough balance to cover the transferred amount and the levy in the levy mosaic, which may differ
 from the one being transferred.
+
+Levies are not recursive.
+If the mosaic used to pay the levy carries its own levy, that second levy is not applied.
+
+!!! warning "A levy is not a guaranteed charge"
+
+    Because levies are not recursive, they can be sidestepped.
+    For example, if mosaic `A`'s levy is paid in mosaic `B`, and another mosaic `C`'s levy is paid in `A`, transferring
+    `C` moves `A` as `C`'s levy without triggering `A`'s levy.
+    A levy is therefore a best-effort fee, not an enforceable guarantee on every transfer.
 
 ## Lifetime
 

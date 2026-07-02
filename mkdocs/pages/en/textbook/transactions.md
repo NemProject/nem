@@ -45,15 +45,16 @@ to be valid.
 Cosignature
 :   When a transaction requires signatures from multiple accounts, the additional signatures are called _cosignatures_.
 
-On NEM, cosignatures are delivered as separate multisig cosignature transactions that reference the
-<inner transaction:> by hash.
-Cosignatories can submit their signatures independently and over multiple blocks until the required threshold is
-reached.
-
+On NEM, each cosignature is delivered as its own _Multisig Cosignature_ transaction that references the
+<inner transaction:> by hash, allowing cosignatories to sign independently and at different times.
 Multiple coordinated actions must therefore be issued as separate multisig transactions, one per inner transaction.
 
-When a multisig transaction is included in a block, the multisig account pays every fee in the composition:
-the inner transaction's fee, the multisig transaction's fee, and every cosignature's fee.
+These cosignatures accumulate on the pending multisig transaction in the <unconfirmed pool:>, and the transaction
+can be included in a block only after it has collected enough cosignatures to meet its required threshold.
+The multisig transaction and its cosignatures are then confirmed together atomically as a single unit.
+
+When a multisig transaction is included in a block, the multisig account pays all fees associated with the
+transaction: the inner transaction's fee, the multisig transaction's fee, and every cosignature's fee.
 Cosignatories never spend from their own balance when cosigning.
 
 !!! tip "Multisig Transaction Example"
@@ -200,8 +201,9 @@ independently.
 
 ### 5. Harvesting
 
-Once in the unconfirmed pool, the transaction will eventually be picked up by the <harvesting:> process and
-_included_ in a block.
+Once in the unconfirmed pool, the transaction can be included in a block by the <harvesting:> process, though inclusion
+is not guaranteed.
+The transaction is dropped if its deadline passes or a conflicting transaction is confirmed first.
 
 For multisig transactions, harvesters do not include the transaction in a block until enough cosignatures have
 been collected to meet the multisig account's signature threshold.
@@ -226,14 +228,14 @@ This may happen, for example, if the transaction fee offered is too low to be in
 
 All transaction types in NEM share a set of common attributes:
 
-| Attribute             | Description                                                                                                     |
-| --------------------- | --------------------------------------------------------------------------------------------------------------- |
-| **Signer public key** | Public key of the account that created and signed the transaction.                                              |
-| **Signature**         | Cryptographic proof that the signer authorized the transaction and its content.                                 |
-| **Timestamp**         | Timestamp indicating when the transaction was created, relative to the <network time:>.                         |
-| **Deadline**          | Timestamp indicating when the transaction expires if not confirmed, no later than 24 hours after the timestamp. |
-| **Fee**               | Fee the signer pays to have the transaction included in a block.                                                |
-| **Type**              | Transaction type, which determines which additional attributes, if any, are present.                            |
+| Attribute             | Description                                                                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Signer public key** | Public key of the account that created and signed the transaction.                                                                                        |
+| **Signature**         | Cryptographic proof that the signer authorized the transaction and its content.                                                                           |
+| **Timestamp**         | When the transaction was created, expressed in <network time:>. It mainly serves to anchor the deadline rather than as a precise record of creation time. |
+| **Deadline**          | Timestamp indicating when the transaction expires if not confirmed, no later than 24 hours after the timestamp.                                           |
+| **Fee**               | Fee the signer pays to have the transaction included in a block.                                                                                          |
+| **Type**              | Transaction type, which determines which additional attributes, if any, are present.                                                                      |
 
 ## Validation Details
 
@@ -242,7 +244,7 @@ Before a transaction is included in a block, each node independently validates i
 | **Check**            | **Description**                                                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Signature check**  | Verifies the signature is valid and matches the signer's public key and the transaction's contents.                                                |
-| **Fee check**        | Confirms the fee meets the node's minimum threshold and that the signer has enough XEM to pay the fee.                                             |
+| **Fee check**        | Confirms the fee meets the network minimum and that the signer has enough XEM to pay it.                                                           |
 | **Deadline check**   | Discards the transaction if its deadline has already passed.                                                                                       |
 | **Timestamp check**  | Rejects transactions whose timestamp lies too far in the future, protecting against clock manipulation.                                            |
 | **Network check**    | Rejects transactions that target a different network, for example a testnet transaction sent to mainnet.                                           |

@@ -81,3 +81,15 @@
 </span>
 {%- set ns.group_count = ns.group_count + 1 -%}
 {%- endmacro %}
+
+{# Renders a language-specific literal (e.g. Python True -> JavaScript true) as a language-switching dylink. #}
+{% macro lit(value) -%}
+{%- set js_literals = {"True": "true", "False": "false", "None": "null"} -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display = value if 'py' == l else js_literals.get(value, value) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
+{%- endmacro %}
