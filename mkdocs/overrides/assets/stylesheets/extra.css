@@ -24,6 +24,17 @@
 	--textbook-color--transparent: #4FBAAF20;
 	--example-admonition-color: #4CAF50;
 	--example-admonition-color--transparent: #4CAF5020;
+
+	/* Scalar REST API reference */
+	--scalar-font-size: 0.8rem;
+	--scalar-small-font-size: 0.7rem;
+	--scalar-font: var(--scalar-font-size);
+	--scalar-font-size-3: var(--scalar-small-font-size);
+	--scalar-font-size-4: var(--scalar-small-font-size);
+	--scalar-small: var(--scalar-small-font-size);
+	--scalar-micro: var(--scalar-small-font-size);
+	--scalar-mini: var(--scalar-small-font-size);
+
 }
 
 [data-md-color-scheme=slate][data-md-color-primary=indigo] {
@@ -843,4 +854,18 @@ code.doc-symbol-interface::after {
 
 .md-typeset .icon-list>ul>li>p:first-child>.twemoji>svg {
 	width: 2em;
+}
+
+/* Scalar REST API reference */
+.scalar-app {
+	font-size: 0.8rem;
+}
+
+.light-mode:has(.scalar-app) {
+	--scalar-color-accent: var(--devbook-color--dark);
+}
+
+.dark-mode:has(.scalar-app) {
+	--scalar-background-1: var(--md-default-bg-color);
+	--scalar-color-accent: var(--devbook-color);
 }
