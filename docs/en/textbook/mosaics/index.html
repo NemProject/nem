@@ -1064,6 +1064,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1509,6 +1537,34 @@
     
   
     New Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
   
 
     
@@ -7508,7 +7564,7 @@ It joins the namespace and the local mosaic name with a colon, in the form <code
 <tbody>
 <tr>
 <td><strong>Namespace</strong></td>
-<td>One to three dot-separated segments before the <code>:</code>.</td>
+<td>One root namespace and up to two subnamespaces, separated by dots, before the <code>:</code>.</td>
 <td>16 characters (root) and 64 characters (each subnamespace).</td>
 </tr>
 <tr>
@@ -7518,7 +7574,11 @@ It joins the namespace and the local mosaic name with a colon, in the form <code
 </tr>
 </tbody>
 </table>
-<p>Namespace segments follow the <a href="../namespaces/#name">namespace name rules</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">The colon is just a separator</p>
+<p>The colon separates the namespace from the mosaic name and is not a character in either.
+Some applications display it as <code>.</code> or <code>!</code> instead.</p>
+</div>
 <p>Examples:</p>
 <ul>
 <li><code>nem:xem</code>: The native network currency.</li>
@@ -7563,7 +7623,7 @@ These changes affect only the creator's balance:</p>
 <h3 id="transferability">Transferability<a class="headerlink" href="#transferability" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Specifies whether the mosaic can be freely transferred between accounts.
 If disabled, every transfer must involve the creator's account as either sender or recipient.</p>
-<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="347pt" height="152pt" viewBox="0.00 0.00 347.00 152.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 148)"><title>Transferability</title><polygon fill="none" stroke="none" points="-4,4 -4,-148 343.08,-148 343.08,4 -4,4"/><!-- Mosaic Creator --><g id="node1" class="node"><title>Mosaic Creator</title><ellipse fill="none" stroke="#789abc" cx="70.28" cy="-72" rx="70.28" ry="18"/><text xml:space="preserve" text-anchor="middle" x="70.28" y="-67.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Mosaic Creator</text></g><!-- Account A --><g id="node2" class="node"><title>Account A</title><ellipse fill="none" stroke="#789abc" cx="226.33" cy="-126" rx="49.77" ry="18"/><text xml:space="preserve" text-anchor="middle" x="226.33" y="-121.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Account A</text></g><!-- Mosaic Creator&#45;&gt;Account A --><g id="edge1" class="edge"><title>Mosaic Creator&#45;&gt;Account A</title><path fill="none" stroke="#789abc" d="M123.69,-90.37C141.67,-96.68 161.66,-103.68 179.12,-109.8"/><polygon fill="#789abc" stroke="#789abc" points="124.99,-87.12 114.4,-87.11 122.68,-93.72 124.99,-87.12"/><polygon fill="#789abc" stroke="#789abc" points="177.6,-112.98 188.19,-112.98 179.92,-106.37 177.6,-112.98"/></g><!-- Account B --><g id="node3" class="node"><title>Account B</title><ellipse fill="none" stroke="#789abc" cx="226.33" cy="-18" rx="49.77" ry="18"/><text xml:space="preserve" text-anchor="middle" x="226.33" y="-13.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Account B</text></g><!-- Mosaic Creator&#45;&gt;Account B --><g id="edge2" class="edge"><title>Mosaic Creator&#45;&gt;Account B</title><path fill="none" stroke="#789abc" d="M123.69,-53.63C141.67,-47.32 161.66,-40.32 179.12,-34.2"/><polygon fill="#789abc" stroke="#789abc" points="122.68,-50.28 114.4,-56.89 124.99,-56.88 122.68,-50.28"/><polygon fill="#789abc" stroke="#789abc" points="179.92,-37.63 188.19,-31.02 177.6,-31.02 179.92,-37.63"/></g><!-- Account A&#45;&gt;Account B --><g id="edge3" class="edge"><title>Account A&#45;&gt;Account B</title><path fill="none" stroke="#789abc" stroke-dasharray="5,2" d="M226.33,-96.47C226.33,-80.18 226.33,-63.9 226.33,-47.61"/><polygon fill="#789abc" stroke="#789abc" points="222.83,-96.23 226.33,-106.23 229.83,-96.23 222.83,-96.23"/><polygon fill="#789abc" stroke="#789abc" points="229.83,-47.65 226.33,-37.65 222.83,-47.65 229.83,-47.65"/><text xml:space="preserve" text-anchor="middle" x="286.95" y="-75.09" font-family="Times,serif" font-size="14.00" fill="#789abc">Only if mosaic</text><text xml:space="preserve" text-anchor="middle" x="286.95" y="-57.84" font-family="Times,serif" font-size="14.00" fill="#789abc">is transferable</text></g></g></svg></p>
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="342pt" height="152pt" viewBox="0.00 0.00 342.41 152.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 148)"><title>Transferability</title><polygon fill="transparent" stroke="transparent" points="-4,4 -4,-148 338.41,-148 338.41,4 -4,4"/><!-- Mosaic Creator --><g id="node1" class="node"><title>Mosaic Creator</title><ellipse fill="none" stroke="#789abc" cx="68.33" cy="-72" rx="68.16" ry="18"/><text text-anchor="middle" x="68.33" y="-68.9" font-family="Times,serif" font-size="12.00" fill="#789abc">Mosaic Creator</text></g><!-- Account A --><g id="node2" class="node"><title>Account A</title><ellipse fill="none" stroke="#789abc" cx="221.29" cy="-126" rx="48.76" ry="18"/><text text-anchor="middle" x="221.29" y="-122.9" font-family="Times,serif" font-size="12.00" fill="#789abc">Account A</text></g><!-- Mosaic Creator&#45;&gt;Account A --><g id="edge1" class="edge"><title>Mosaic Creator&#45;&gt;Account A</title><path fill="none" stroke="#789abc" d="M119.2,-89.84C137.56,-96.41 158.21,-103.79 176.04,-110.17"/><polygon fill="#789abc" stroke="#789abc" points="120.38,-86.54 109.79,-86.47 118.02,-93.13 120.38,-86.54"/><polygon fill="#789abc" stroke="#789abc" points="175.03,-113.53 185.62,-113.6 177.38,-106.93 175.03,-113.53"/></g><!-- Account B --><g id="node3" class="node"><title>Account B</title><ellipse fill="none" stroke="#789abc" cx="221.29" cy="-18" rx="48.76" ry="18"/><text text-anchor="middle" x="221.29" y="-14.9" font-family="Times,serif" font-size="12.00" fill="#789abc">Account B</text></g><!-- Mosaic Creator&#45;&gt;Account B --><g id="edge2" class="edge"><title>Mosaic Creator&#45;&gt;Account B</title><path fill="none" stroke="#789abc" d="M119.2,-54.16C137.56,-47.59 158.21,-40.21 176.04,-33.83"/><polygon fill="#789abc" stroke="#789abc" points="118.02,-50.87 109.79,-57.53 120.38,-57.46 118.02,-50.87"/><polygon fill="#789abc" stroke="#789abc" points="177.38,-37.07 185.62,-30.4 175.03,-30.47 177.38,-37.07"/></g><!-- Account A&#45;&gt;Account B --><g id="edge3" class="edge"><title>Account A&#45;&gt;Account B</title><path fill="none" stroke="#789abc" stroke-dasharray="5,2" d="M221.29,-97.65C221.29,-80.5 221.29,-63.36 221.29,-46.21"/><polygon fill="#789abc" stroke="#789abc" points="217.79,-97.75 221.29,-107.75 224.79,-97.75 217.79,-97.75"/><polygon fill="#789abc" stroke="#789abc" points="224.79,-46.14 221.29,-36.14 217.79,-46.14 224.79,-46.14"/><text text-anchor="middle" x="281.91" y="-74.94" font-family="Times,serif" font-size="14.00" fill="#789abc">Only if mosaic</text><text text-anchor="middle" x="281.91" y="-59.94" font-family="Times,serif" font-size="14.00" fill="#789abc">is transferable</text></g></g></svg></p>
 <h2 id="levy">Levy<a class="headerlink" href="#levy" title="Anchor link to this section for reference">⚓︎</a></h2>
 <dl>
 <dt>
@@ -7609,6 +7669,15 @@ Sending <code>1 000</code> atomic units debits the sender <code>1 010</code> in 
 to the levy recipient.</p>
 <p>The sender must hold enough balance to cover the transferred amount and the levy in the levy mosaic, which may differ
 from the one being transferred.</p>
+<p>Levies are not recursive.
+If the mosaic used to pay the levy carries its own levy, that second levy is not applied.</p>
+<div class="admonition warning">
+<p class="admonition-title">A levy is not a guaranteed charge</p>
+<p>Because levies are not recursive, they can be sidestepped.
+For example, if mosaic <code>A</code>'s levy is paid in mosaic <code>B</code>, and another mosaic <code>C</code>'s levy is paid in <code>A</code>, transferring
+<code>C</code> moves <code>A</code> as <code>C</code>'s levy without triggering <code>A</code>'s levy.
+A levy is therefore a best-effort fee, not an enforceable guarantee on every transfer.</p>
+</div>
 <h2 id="lifetime">Lifetime<a class="headerlink" href="#lifetime" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>A mosaic has no duration of its own.
 Its lifetime is tied to the lifetime of its parent namespace:</p>
@@ -7668,7 +7737,7 @@ However, this transaction fee is typically negligible compared to the creation f
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     

@@ -14,7 +14,7 @@
         <link rel="prev" href="../../chain/chain-heights/">
       
       
-        <link rel="next" href="../../reference/py/AccountDescriptorRepository/">
+        <link rel="next" href="../listen-transaction-flow/">
       
       
         
@@ -111,7 +111,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#listening-to-new-blocksbeginner" class="md-skip">
+        <a href="#listening-to-new-blocks" class="md-skip">
           Skip to content
         </a>
       
@@ -1071,6 +1071,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transactions/typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1680,6 +1708,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -7399,16 +7455,24 @@
 	
 
 
-<h1 id="listening-to-new-blocksbeginner">Listening to New Blocks<br/><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span><a class="headerlink" href="#listening-to-new-blocksbeginner" title="Anchor link to this section for reference">⚓︎</a></h1>
+<h1 id="listening-to-new-blocks">Listening to New Blocks<a class="headerlink" href="#listening-to-new-blocks" title="Anchor link to this section for reference">⚓︎</a></h1>
+<div class="tutorial_level-container"><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span></div>
+
 <p>The <code><a class="mkdocs-ezglossary-link"
-	id="06bf8d0a123089b2abb64897fdc93b08"
+	id="d8fbfd15f21f706f71ea7360eed2806f"
 	title="Notifies subscribed clients every time a new block is added to the chain."
 	name="ws:blocks"
-	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> WebSocket channel sends a real-time notification every time a new <a class="mkdocs-ezglossary-link"
+	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> <a class="mkdocs-ezglossary-link"
+	id="e1fe4860ed8491ab8c45b1fc42d65aa3"
+	title="Node notifications are grouped into channels.
+Clients subscribe to each channel whose notifications they want to receive."
+	name="_:WebSocket Channel"
+	href="../../../devbook/reference/websockets/#917bf8c3f504e6f666dd06aa41ce373e">WebSocket Channel</a> sends a real-time notification every time a new <a class="mkdocs-ezglossary-link"
 	id="26c3d005e70ecefb750f205084b6ade6"
 	title="A block records a set of transactions confirmed at a specific point in time."
 	name="_:Block"
-	href="../../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">block</a> is added to the chain.
+	href="../../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">block</a> is
+added to the chain.
 Compared to polling the <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Chain/getChainHeight" title="Return blockchain height"><code>/chain/height</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint, WebSockets push updates as they happen without the overhead of
 repeated API calls.</p>
 <p>This tutorial shows how to subscribe to the channel and display each update as it arrives.</p>
@@ -7526,7 +7590,9 @@ repeated API calls.</p>
 <span class="normal"><a href="#__codelineno-2-85">85</a></span>
 <span class="normal"><a href="#__codelineno-2-86">86</a></span>
 <span class="normal"><a href="#__codelineno-2-87">87</a></span>
-<span class="normal"><a href="#__codelineno-2-88">88</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="normal"><a href="#__codelineno-2-88">88</a></span>
+<span class="normal"><a href="#__codelineno-2-89">89</a></span>
+<span class="normal"><a href="#__codelineno-2-90">90</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
@@ -7535,85 +7601,87 @@ repeated API calls.</p>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">stomper</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">websockets</span><span class="w"> </span><span class="kn">import</span> <span class="n">connect</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="n">NODE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;NODE_URL&#39;</span><span class="p">,</span> <span class="s1">&#39;http://libertalia.nemtest.net:7778&#39;</span><span class="p">)</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using node </span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="n">NODE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;NODE_URL&#39;</span><span class="p">,</span> <span class="s1">&#39;http://libertalia.nemtest.net:7890&#39;</span><span class="p">)</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="n">WS_URL</span> <span class="o">=</span> <span class="n">NODE_URL</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:7890&#39;</span><span class="p">,</span> <span class="s1">&#39;:7778&#39;</span><span class="p">)</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using node </span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13"></a>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="c1"># SockJS has no Python client library.</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="c1"># These helpers wrap the raw WebSocket transport.</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="k">def</span><span class="w"> </span><span class="nf">sockjs_url</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">):</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17"></a>    <span class="c1"># SockJS raw WebSocket transport adds a random server and session id</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18"></a>    <span class="n">server</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19"></a>    <span class="n">session</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20"></a>    <span class="n">ws_base</span> <span class="o">=</span> <span class="n">endpoint_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;ws&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ws_base</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">server</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">/websocket&#39;</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22"></a>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="c1"># SockJS has no Python client library.</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="c1"># These helpers wrap the raw WebSocket transport.</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="k">def</span><span class="w"> </span><span class="nf">sockjs_url</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">):</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18"></a>    <span class="c1"># SockJS raw WebSocket transport adds a random server and session id</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19"></a>    <span class="n">server</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20"></a>    <span class="n">session</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21"></a>    <span class="n">ws_base</span> <span class="o">=</span> <span class="n">endpoint_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;ws&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ws_base</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">server</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">session</span><span class="si">}</span><span class="s1">/websocket&#39;</span>
 </span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23"></a>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25"></a>    <span class="c1"># SockJS wraps each client payload as a JSON array of frame strings</span>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26"></a>    <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">frame</span><span class="p">]))</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27"></a>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26"></a>    <span class="c1"># SockJS wraps each client payload as a JSON array of frame strings</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27"></a>    <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">frame</span><span class="p">]))</span>
 </span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28"></a>
-</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">):</span>
-</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30"></a>    <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>  <span class="c1"># consume the SockJS open frame</span>
-</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span>
-</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32"></a>        <span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">NODE_URL</span><span class="p">,</span> <span class="n">heartbeats</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
-</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33"></a>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29"></a>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">):</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31"></a>    <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>  <span class="c1"># consume the SockJS open frame</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33"></a>        <span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">WS_URL</span><span class="p">,</span> <span class="n">heartbeats</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
 </span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34"></a>
-</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">):</span>
-</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">))</span>
-</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37"></a>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35"></a>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">):</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">))</span>
 </span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38"></a>
-</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">):</span>
-</span><span id="__span-2-40"><a id="__codelineno-2-40" name="__codelineno-2-40"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">(</span><span class="n">sub_id</span><span class="p">))</span>
-</span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41"></a>
+</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39"></a>
+</span><span id="__span-2-40"><a id="__codelineno-2-40" name="__codelineno-2-40"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">sub_id</span><span class="p">):</span>
+</span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">(</span><span class="n">sub_id</span><span class="p">))</span>
 </span><span id="__span-2-42"><a id="__codelineno-2-42" name="__codelineno-2-42"></a>
-</span><span id="__span-2-43"><a id="__codelineno-2-43" name="__codelineno-2-43"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">):</span>
-</span><span id="__span-2-44"><a id="__codelineno-2-44" name="__codelineno-2-44"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">disconnect</span><span class="p">())</span>
-</span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45"></a>
+</span><span id="__span-2-43"><a id="__codelineno-2-43" name="__codelineno-2-43"></a>
+</span><span id="__span-2-44"><a id="__codelineno-2-44" name="__codelineno-2-44"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">):</span>
+</span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45"></a>    <span class="k">await</span> <span class="n">send_frame</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">stomper</span><span class="o">.</span><span class="n">disconnect</span><span class="p">())</span>
 </span><span id="__span-2-46"><a id="__codelineno-2-46" name="__codelineno-2-46"></a>
-</span><span id="__span-2-47"><a id="__codelineno-2-47" name="__codelineno-2-47"></a><span class="k">def</span><span class="w"> </span><span class="nf">stomp_messages</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
-</span><span id="__span-2-48"><a id="__codelineno-2-48" name="__codelineno-2-48"></a>    <span class="c1"># Yield the JSON body of each STOMP MESSAGE in a SockJS data frame</span>
-</span><span id="__span-2-49"><a id="__codelineno-2-49" name="__codelineno-2-49"></a>    <span class="k">if</span> <span class="s1">&#39;a&#39;</span> <span class="o">!=</span> <span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># skip &#39;o&#39; open, &#39;h&#39; heartbeat, &#39;c&#39; close</span>
-</span><span id="__span-2-50"><a id="__codelineno-2-50" name="__codelineno-2-50"></a>        <span class="k">return</span>
-</span><span id="__span-2-51"><a id="__codelineno-2-51" name="__codelineno-2-51"></a>    <span class="k">for</span> <span class="n">payload</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
-</span><span id="__span-2-52"><a id="__codelineno-2-52" name="__codelineno-2-52"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">stomper</span><span class="o">.</span><span class="n">unpack_frame</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-</span><span id="__span-2-53"><a id="__codelineno-2-53" name="__codelineno-2-53"></a>        <span class="k">if</span> <span class="s1">&#39;MESSAGE&#39;</span> <span class="o">==</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]:</span>
-</span><span id="__span-2-54"><a id="__codelineno-2-54" name="__codelineno-2-54"></a>            <span class="k">yield</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
-</span><span id="__span-2-55"><a id="__codelineno-2-55" name="__codelineno-2-55"></a>
+</span><span id="__span-2-47"><a id="__codelineno-2-47" name="__codelineno-2-47"></a>
+</span><span id="__span-2-48"><a id="__codelineno-2-48" name="__codelineno-2-48"></a><span class="k">def</span><span class="w"> </span><span class="nf">stomp_messages</span><span class="p">(</span><span class="n">raw_frame</span><span class="p">):</span>
+</span><span id="__span-2-49"><a id="__codelineno-2-49" name="__codelineno-2-49"></a>    <span class="c1"># Yield the JSON body of each STOMP MESSAGE in a SockJS data frame</span>
+</span><span id="__span-2-50"><a id="__codelineno-2-50" name="__codelineno-2-50"></a>    <span class="k">if</span> <span class="s1">&#39;a&#39;</span> <span class="o">!=</span> <span class="n">raw_frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>  <span class="c1"># skip &#39;o&#39; open, &#39;h&#39; heartbeat, &#39;c&#39; close</span>
+</span><span id="__span-2-51"><a id="__codelineno-2-51" name="__codelineno-2-51"></a>        <span class="k">return</span>
+</span><span id="__span-2-52"><a id="__codelineno-2-52" name="__codelineno-2-52"></a>    <span class="k">for</span> <span class="n">payload</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw_frame</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+</span><span id="__span-2-53"><a id="__codelineno-2-53" name="__codelineno-2-53"></a>        <span class="n">frame</span> <span class="o">=</span> <span class="n">stomper</span><span class="o">.</span><span class="n">unpack_frame</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</span><span id="__span-2-54"><a id="__codelineno-2-54" name="__codelineno-2-54"></a>        <span class="k">if</span> <span class="s1">&#39;MESSAGE&#39;</span> <span class="o">==</span> <span class="n">frame</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]:</span>
+</span><span id="__span-2-55"><a id="__codelineno-2-55" name="__codelineno-2-55"></a>            <span class="k">yield</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
 </span><span id="__span-2-56"><a id="__codelineno-2-56" name="__codelineno-2-56"></a>
-</span><span id="__span-2-57"><a id="__codelineno-2-57" name="__codelineno-2-57"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-</span><span id="__span-2-58"><a id="__codelineno-2-58" name="__codelineno-2-58"></a>    <span class="c1"># Open connection</span>
-</span><span id="__span-2-59"><a id="__codelineno-2-59" name="__codelineno-2-59"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockjs_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">/w/messages&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">websocket</span><span class="p">:</span>
-</span><span id="__span-2-60"><a id="__codelineno-2-60" name="__codelineno-2-60"></a>        <span class="k">await</span> <span class="n">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
-</span><span id="__span-2-61"><a id="__codelineno-2-61" name="__codelineno-2-61"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connected to </span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="__span-2-62"><a id="__codelineno-2-62" name="__codelineno-2-62"></a>
-</span><span id="__span-2-63"><a id="__codelineno-2-63" name="__codelineno-2-63"></a>        <span class="c1"># Subscribe to the new block channel</span>
-</span><span id="__span-2-64"><a id="__codelineno-2-64" name="__codelineno-2-64"></a>        <span class="k">await</span> <span class="n">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;/blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
-</span><span id="__span-2-65"><a id="__codelineno-2-65" name="__codelineno-2-65"></a>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Subscribed to /blocks channel&#39;</span><span class="p">)</span>
-</span><span id="__span-2-66"><a id="__codelineno-2-66" name="__codelineno-2-66"></a>
-</span><span id="__span-2-67"><a id="__codelineno-2-67" name="__codelineno-2-67"></a>        <span class="c1"># Read and format each new block</span>
-</span><span id="__span-2-68"><a id="__codelineno-2-68" name="__codelineno-2-68"></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="__span-2-69"><a id="__codelineno-2-69" name="__codelineno-2-69"></a>            <span class="k">async</span> <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">websocket</span><span class="p">:</span>
-</span><span id="__span-2-70"><a id="__codelineno-2-70" name="__codelineno-2-70"></a>                <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">stomp_messages</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
-</span><span id="__span-2-71"><a id="__codelineno-2-71" name="__codelineno-2-71"></a>                    <span class="nb">print</span><span class="p">(</span>
-</span><span id="__span-2-72"><a id="__codelineno-2-72" name="__codelineno-2-72"></a>                        <span class="sa">f</span><span class="s1">&#39;New block: height=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="__span-2-73"><a id="__codelineno-2-73" name="__codelineno-2-73"></a>                        <span class="sa">f</span><span class="s1">&#39; harvester=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;signer&quot;</span><span class="p">][:</span><span class="mi">16</span><span class="p">]</span><span class="si">}</span><span class="s1">...&#39;</span>
-</span><span id="__span-2-74"><a id="__codelineno-2-74" name="__codelineno-2-74"></a>                    <span class="p">)</span>
-</span><span id="__span-2-75"><a id="__codelineno-2-75" name="__codelineno-2-75"></a>
-</span><span id="__span-2-76"><a id="__codelineno-2-76" name="__codelineno-2-76"></a>        <span class="c1"># Unsubscribe on exit</span>
-</span><span id="__span-2-77"><a id="__codelineno-2-77" name="__codelineno-2-77"></a>        <span class="k">finally</span><span class="p">:</span>
-</span><span id="__span-2-78"><a id="__codelineno-2-78" name="__codelineno-2-78"></a>            <span class="k">await</span> <span class="n">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
-</span><span id="__span-2-79"><a id="__codelineno-2-79" name="__codelineno-2-79"></a>            <span class="k">await</span> <span class="n">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
-</span><span id="__span-2-80"><a id="__codelineno-2-80" name="__codelineno-2-80"></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">)</span>
-</span><span id="__span-2-81"><a id="__codelineno-2-81" name="__codelineno-2-81"></a>
-</span><span id="__span-2-82"><a id="__codelineno-2-82" name="__codelineno-2-82"></a>
-</span><span id="__span-2-83"><a id="__codelineno-2-83" name="__codelineno-2-83"></a><span class="k">try</span><span class="p">:</span>
-</span><span id="__span-2-84"><a id="__codelineno-2-84" name="__codelineno-2-84"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-</span><span id="__span-2-85"><a id="__codelineno-2-85" name="__codelineno-2-85"></a><span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-</span><span id="__span-2-86"><a id="__codelineno-2-86" name="__codelineno-2-86"></a>    <span class="k">pass</span>
-</span><span id="__span-2-87"><a id="__codelineno-2-87" name="__codelineno-2-87"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-</span><span id="__span-2-88"><a id="__codelineno-2-88" name="__codelineno-2-88"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+</span><span id="__span-2-57"><a id="__codelineno-2-57" name="__codelineno-2-57"></a>
+</span><span id="__span-2-58"><a id="__codelineno-2-58" name="__codelineno-2-58"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-2-59"><a id="__codelineno-2-59" name="__codelineno-2-59"></a>    <span class="c1"># Open connection</span>
+</span><span id="__span-2-60"><a id="__codelineno-2-60" name="__codelineno-2-60"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockjs_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">WS_URL</span><span class="si">}</span><span class="s1">/w/messages&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">websocket</span><span class="p">:</span>
+</span><span id="__span-2-61"><a id="__codelineno-2-61" name="__codelineno-2-61"></a>        <span class="k">await</span> <span class="n">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
+</span><span id="__span-2-62"><a id="__codelineno-2-62" name="__codelineno-2-62"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connected to </span><span class="si">{</span><span class="n">WS_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span><span id="__span-2-63"><a id="__codelineno-2-63" name="__codelineno-2-63"></a>
+</span><span id="__span-2-64"><a id="__codelineno-2-64" name="__codelineno-2-64"></a>        <span class="c1"># Subscribe to the new block channel</span>
+</span><span id="__span-2-65"><a id="__codelineno-2-65" name="__codelineno-2-65"></a>        <span class="n">destination</span> <span class="o">=</span> <span class="s1">&#39;/blocks&#39;</span>
+</span><span id="__span-2-66"><a id="__codelineno-2-66" name="__codelineno-2-66"></a>        <span class="k">await</span> <span class="n">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
+</span><span id="__span-2-67"><a id="__codelineno-2-67" name="__codelineno-2-67"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Subscribed to </span><span class="si">{</span><span class="n">destination</span><span class="si">}</span><span class="s1"> channel&#39;</span><span class="p">)</span>
+</span><span id="__span-2-68"><a id="__codelineno-2-68" name="__codelineno-2-68"></a>
+</span><span id="__span-2-69"><a id="__codelineno-2-69" name="__codelineno-2-69"></a>        <span class="c1"># Read and format each new block</span>
+</span><span id="__span-2-70"><a id="__codelineno-2-70" name="__codelineno-2-70"></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-71"><a id="__codelineno-2-71" name="__codelineno-2-71"></a>            <span class="k">async</span> <span class="k">for</span> <span class="n">raw_frame</span> <span class="ow">in</span> <span class="n">websocket</span><span class="p">:</span>
+</span><span id="__span-2-72"><a id="__codelineno-2-72" name="__codelineno-2-72"></a>                <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">stomp_messages</span><span class="p">(</span><span class="n">raw_frame</span><span class="p">):</span>
+</span><span id="__span-2-73"><a id="__codelineno-2-73" name="__codelineno-2-73"></a>                    <span class="nb">print</span><span class="p">(</span>
+</span><span id="__span-2-74"><a id="__codelineno-2-74" name="__codelineno-2-74"></a>                        <span class="sa">f</span><span class="s1">&#39;New block: height=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="__span-2-75"><a id="__codelineno-2-75" name="__codelineno-2-75"></a>                        <span class="sa">f</span><span class="s1">&#39; harvester=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;signer&quot;</span><span class="p">][:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">...&#39;</span>
+</span><span id="__span-2-76"><a id="__codelineno-2-76" name="__codelineno-2-76"></a>                    <span class="p">)</span>
+</span><span id="__span-2-77"><a id="__codelineno-2-77" name="__codelineno-2-77"></a>
+</span><span id="__span-2-78"><a id="__codelineno-2-78" name="__codelineno-2-78"></a>        <span class="c1"># Unsubscribe on exit</span>
+</span><span id="__span-2-79"><a id="__codelineno-2-79" name="__codelineno-2-79"></a>        <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-2-80"><a id="__codelineno-2-80" name="__codelineno-2-80"></a>            <span class="k">await</span> <span class="n">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
+</span><span id="__span-2-81"><a id="__codelineno-2-81" name="__codelineno-2-81"></a>            <span class="k">await</span> <span class="n">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
+</span><span id="__span-2-82"><a id="__codelineno-2-82" name="__codelineno-2-82"></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">)</span>
+</span><span id="__span-2-83"><a id="__codelineno-2-83" name="__codelineno-2-83"></a>
+</span><span id="__span-2-84"><a id="__codelineno-2-84" name="__codelineno-2-84"></a>
+</span><span id="__span-2-85"><a id="__codelineno-2-85" name="__codelineno-2-85"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-86"><a id="__codelineno-2-86" name="__codelineno-2-86"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span><span id="__span-2-87"><a id="__codelineno-2-87" name="__codelineno-2-87"></a><span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+</span><span id="__span-2-88"><a id="__codelineno-2-88" name="__codelineno-2-88"></a>    <span class="k">pass</span>
+</span><span id="__span-2-89"><a id="__codelineno-2-89" name="__codelineno-2-89"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span id="__span-2-90"><a id="__codelineno-2-90" name="__codelineno-2-90"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 <p><a class="source-link" href="https://github.com/NemProject/nem/raw/refs/heads/new-docs/mkdocs/overrides/devbook/websockets/listen_new_blocks.py">Download source</a></p>
 </div>
@@ -7656,45 +7724,49 @@ repeated API calls.</p>
 <span class="normal"><a href="#__codelineno-3-36">36</a></span>
 <span class="normal"><a href="#__codelineno-3-37">37</a></span>
 <span class="normal"><a href="#__codelineno-3-38">38</a></span>
-<span class="normal"><a href="#__codelineno-3-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Client</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@stomp/stompjs&#39;</span><span class="p">;</span>
+<span class="normal"><a href="#__codelineno-3-39">39</a></span>
+<span class="normal"><a href="#__codelineno-3-40">40</a></span>
+<span class="normal"><a href="#__codelineno-3-41">41</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Client</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@stomp/stompjs&#39;</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="nx">SockJS</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;sockjs-client&#39;</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_URL</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="w">    </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;http://libertalia.nemtest.net:7778&#39;</span><span class="p">;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Using node </span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="c1">// Open connection</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Client</span><span class="p">({</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="w">    </span><span class="nx">webSocketFactory</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SockJS</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">/w/messages`</span><span class="p">)</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="p">});</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">(</span><span class="nx">resolve</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">onConnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">resolve</span><span class="p">;</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">activate</span><span class="p">();</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="p">});</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Connected to </span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><span class="c1">// Read and format each new block</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><span class="kd">function</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><span class="w">        </span><span class="sb">`New block: height=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">height</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">+</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23"></a><span class="w">        </span><span class="sb">` harvester=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">signer</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">)</span><span class="si">}</span><span class="sb">...`</span>
-</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24"></a><span class="w">    </span><span class="p">);</span>
-</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25"></a><span class="p">}</span>
-</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26"></a>
-</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27"></a><span class="c1">// Subscribe to the new block channel</span>
-</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28"></a><span class="kd">const</span><span class="w"> </span><span class="nx">subscription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;/blocks&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29"></a><span class="w">    </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;id-0&#39;</span>
-</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30"></a><span class="p">});</span>
-</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Subscribed to /blocks channel&#39;</span><span class="p">);</span>
-</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32"></a>
-</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33"></a><span class="c1">// Unsubscribe on exit</span>
-</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34"></a><span class="nx">process</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGINT&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35"></a><span class="w">    </span><span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">();</span>
-</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">deactivate</span><span class="p">();</span>
-</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">);</span>
-</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38"></a><span class="w">    </span><span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
-</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39"></a><span class="p">});</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_URL</span><span class="w"> </span><span class="o">||</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="w">    </span><span class="s1">&#39;http://libertalia.nemtest.net:7890&#39;</span><span class="p">;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">WS_URL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">NODE_URL</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;:7890&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;:7778&#39;</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Using node </span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="c1">// Open connection</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Client</span><span class="p">({</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="w">    </span><span class="nx">webSocketFactory</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SockJS</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">WS_URL</span><span class="si">}</span><span class="sb">/w/messages`</span><span class="p">)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><span class="p">});</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">(</span><span class="nx">resolve</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">onConnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">resolve</span><span class="p">;</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">activate</span><span class="p">();</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="p">});</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Connected to </span><span class="si">${</span><span class="nx">WS_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><span class="c1">// Read and format each new block</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><span class="kd">function</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23"></a><span class="w">        </span><span class="sb">`New block: height=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">height</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">+</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24"></a><span class="w">        </span><span class="sb">` harvester=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">signer</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span><span class="si">}</span><span class="sb">...`</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26"></a><span class="p">}</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27"></a>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28"></a><span class="c1">// Subscribe to the new block channel</span>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29"></a><span class="kd">const</span><span class="w"> </span><span class="nx">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/blocks&#39;</span><span class="p">;</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30"></a><span class="kd">const</span><span class="w"> </span><span class="nx">subscription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">destination</span><span class="p">,</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31"></a><span class="w">    </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;id-0&#39;</span>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32"></a><span class="p">});</span>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Subscribed to </span><span class="si">${</span><span class="nx">destination</span><span class="si">}</span><span class="sb"> channel`</span><span class="p">);</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34"></a>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35"></a><span class="c1">// Unsubscribe on exit</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36"></a><span class="nx">process</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGINT&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37"></a><span class="w">    </span><span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">();</span>
+</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">deactivate</span><span class="p">();</span>
+</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">);</span>
+</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40"></a><span class="w">    </span><span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
+</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41"></a><span class="p">});</span>
 </span></code></pre></div></td></tr></table></div>
 <p><a class="source-link" href="https://github.com/NemProject/nem/raw/refs/heads/new-docs/mkdocs/overrides/devbook/websockets/listen_new_blocks.mjs">Download source</a></p>
 </div>
@@ -7711,121 +7783,132 @@ for convenience.</p>
 and participates in consensus and block creation."
 	name="_:Node"
 	href="../../../textbook/nodes/#bc6d0fc1a92ae07d7739daed957574ab">node</a>.
-WebSockets are served on a dedicated port (<code>7778</code> by default), separate from the REST API port (<code>7890</code>).
 If no value is provided, a default one is used.</p>
+<p><code>WS_URL</code> defines the WebSocket endpoint for the same node.
+It is derived from <code>NODE_URL</code> by replacing port <code>7890</code> with <code>7778</code>.</p>
 <p>The program runs until interrupted with <code>Ctrl+C</code>, which triggers the unsubscribe step before closing the connection.</p>
 <h2 id="code-explanation">Code Explanation<a class="headerlink" href="#code-explanation" title="Anchor link to this section for reference">⚓︎</a></h2>
 <h3 id="connecting-to-the-websocket">Connecting to the WebSocket<a class="headerlink" href="#connecting-to-the-websocket" title="Anchor link to this section for reference">⚓︎</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.25.18.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span> Python</label><label for="__tabbed_3_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179z"/></svg></span> JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-58">58</a></span>
-<span class="normal"><a href="#__codelineno-4-59">59</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-59">59</a></span>
 <span class="normal"><a href="#__codelineno-4-60">60</a></span>
-<span class="normal"><a href="#__codelineno-4-61">61</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-58"><a id="__codelineno-4-58" name="__codelineno-4-58"></a>    <span class="c1"># Open connection</span>
-</span><span id="__span-4-59"><a id="__codelineno-4-59" name="__codelineno-4-59"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockjs_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">/w/messages&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">websocket</span><span class="p">:</span>
-</span><span id="__span-4-60"><a id="__codelineno-4-60" name="__codelineno-4-60"></a>        <span class="k">await</span> <span class="n">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
-</span><span id="__span-4-61"><a id="__codelineno-4-61" name="__codelineno-4-61"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connected to </span><span class="si">{</span><span class="n">NODE_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-4-61">61</a></span>
+<span class="normal"><a href="#__codelineno-4-62">62</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-59"><a id="__codelineno-4-59" name="__codelineno-4-59"></a>    <span class="c1"># Open connection</span>
+</span><span id="__span-4-60"><a id="__codelineno-4-60" name="__codelineno-4-60"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">connect</span><span class="p">(</span><span class="n">sockjs_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">WS_URL</span><span class="si">}</span><span class="s1">/w/messages&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">websocket</span><span class="p">:</span>
+</span><span id="__span-4-61"><a id="__codelineno-4-61" name="__codelineno-4-61"></a>        <span class="k">await</span> <span class="n">stomp_connect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
+</span><span id="__span-4-62"><a id="__codelineno-4-62" name="__codelineno-4-62"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Connected to </span><span class="si">{</span><span class="n">WS_URL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
 <span class="normal"><a href="#__codelineno-5-10">10</a></span>
 <span class="normal"><a href="#__codelineno-5-11">11</a></span>
 <span class="normal"><a href="#__codelineno-5-12">12</a></span>
 <span class="normal"><a href="#__codelineno-5-13">13</a></span>
 <span class="normal"><a href="#__codelineno-5-14">14</a></span>
 <span class="normal"><a href="#__codelineno-5-15">15</a></span>
-<span class="normal"><a href="#__codelineno-5-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="c1">// Open connection</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Client</span><span class="p">({</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="w">    </span><span class="nx">webSocketFactory</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SockJS</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">/w/messages`</span><span class="p">)</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="p">});</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">(</span><span class="nx">resolve</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">onConnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">resolve</span><span class="p">;</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">activate</span><span class="p">();</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="p">});</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Connected to </span><span class="si">${</span><span class="nx">NODE_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span>
+<span class="normal"><a href="#__codelineno-5-17">17</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="c1">// Open connection</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Client</span><span class="p">({</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="w">    </span><span class="nx">webSocketFactory</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">SockJS</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">WS_URL</span><span class="si">}</span><span class="sb">/w/messages`</span><span class="p">)</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="p">});</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">(</span><span class="nx">resolve</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">onConnect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">resolve</span><span class="p">;</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">activate</span><span class="p">();</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="p">});</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Connected to </span><span class="si">${</span><span class="nx">WS_URL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 </div>
 </div>
-<p>The first step is to open a connection to the node's <code>/w/messages</code> endpoint and start a STOMP session over it.</p>
+<p>The first step is to open a connection to the node's <code>/w/messages</code> endpoint and start a <a class="mkdocs-ezglossary-link"
+	id="82ec715cfc5a3902feed9dc88fbad5c6"
+	title="A client-node conversation over a WebSocket connection, following the STOMP messaging
+protocol."
+	name="_:STOMP Session"
+	href="../../../devbook/reference/websockets/#c7c6e44f35e2656b71c263f76bef7ffd">STOMP session</a>
+over it.</p>
 <h3 id="subscribing-to-the-channel">Subscribing to the Channel<a class="headerlink" href="#subscribing-to-the-channel" title="Anchor link to this section for reference">⚓︎</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.25.18.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span> Python</label><label for="__tabbed_4_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179z"/></svg></span> JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-63">63</a></span>
-<span class="normal"><a href="#__codelineno-6-64">64</a></span>
-<span class="normal"><a href="#__codelineno-6-65">65</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-6-63"><a id="__codelineno-6-63" name="__codelineno-6-63"></a>        <span class="c1"># Subscribe to the new block channel</span>
-</span><span id="__span-6-64"><a id="__codelineno-6-64" name="__codelineno-6-64"></a>        <span class="k">await</span> <span class="n">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;/blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
-</span><span id="__span-6-65"><a id="__codelineno-6-65" name="__codelineno-6-65"></a>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Subscribed to /blocks channel&#39;</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-64">64</a></span>
+<span class="normal"><a href="#__codelineno-6-65">65</a></span>
+<span class="normal"><a href="#__codelineno-6-66">66</a></span>
+<span class="normal"><a href="#__codelineno-6-67">67</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-6-64"><a id="__codelineno-6-64" name="__codelineno-6-64"></a>        <span class="c1"># Subscribe to the new block channel</span>
+</span><span id="__span-6-65"><a id="__codelineno-6-65" name="__codelineno-6-65"></a>        <span class="n">destination</span> <span class="o">=</span> <span class="s1">&#39;/blocks&#39;</span>
+</span><span id="__span-6-66"><a id="__codelineno-6-66" name="__codelineno-6-66"></a>        <span class="k">await</span> <span class="n">stomp_subscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
+</span><span id="__span-6-67"><a id="__codelineno-6-67" name="__codelineno-6-67"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Subscribed to </span><span class="si">{</span><span class="n">destination</span><span class="si">}</span><span class="s1"> channel&#39;</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-27">27</a></span>
-<span class="normal"><a href="#__codelineno-7-28">28</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-28">28</a></span>
 <span class="normal"><a href="#__codelineno-7-29">29</a></span>
 <span class="normal"><a href="#__codelineno-7-30">30</a></span>
-<span class="normal"><a href="#__codelineno-7-31">31</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27"></a><span class="c1">// Subscribe to the new block channel</span>
-</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28"></a><span class="kd">const</span><span class="w"> </span><span class="nx">subscription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;/blocks&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29"></a><span class="w">    </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;id-0&#39;</span>
-</span><span id="__span-7-30"><a id="__codelineno-7-30" name="__codelineno-7-30"></a><span class="p">});</span>
-</span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Subscribed to /blocks channel&#39;</span><span class="p">);</span>
+<span class="normal"><a href="#__codelineno-7-31">31</a></span>
+<span class="normal"><a href="#__codelineno-7-32">32</a></span>
+<span class="normal"><a href="#__codelineno-7-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28"></a><span class="c1">// Subscribe to the new block channel</span>
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29"></a><span class="kd">const</span><span class="w"> </span><span class="nx">destination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/blocks&#39;</span><span class="p">;</span>
+</span><span id="__span-7-30"><a id="__codelineno-7-30" name="__codelineno-7-30"></a><span class="kd">const</span><span class="w"> </span><span class="nx">subscription</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">destination</span><span class="p">,</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31"></a><span class="w">    </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;id-0&#39;</span>
+</span><span id="__span-7-32"><a id="__codelineno-7-32" name="__codelineno-7-32"></a><span class="p">});</span>
+</span><span id="__span-7-33"><a id="__codelineno-7-33" name="__codelineno-7-33"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Subscribed to </span><span class="si">${</span><span class="nx">destination</span><span class="si">}</span><span class="sb"> channel`</span><span class="p">);</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 </div>
 </div>
 <p>The code subscribes to the <code><a class="mkdocs-ezglossary-link"
-	id="d8fbfd15f21f706f71ea7360eed2806f"
+	id="ef8d40ef2ed9d7c2b1641c7c6b7bf22c"
 	title="Notifies subscribed clients every time a new block is added to the chain."
 	name="ws:blocks"
-	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> channel, which fires every time a new block is added to the chain
-(approximately every minute).</p>
+	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> channel.
+The node then notifies subscribers every time a new block is added to the chain (approximately every minute).</p>
 <p>The subscription is given an <code>id</code> (<code>id-0</code>) which is used to unsubscribe on exit.</p>
 <p>Each incoming message is then passed to the formatting logic below.</p>
 <h3 id="formatting-the-message">Formatting the Message<a class="headerlink" href="#formatting-the-message" title="Anchor link to this section for reference">⚓︎</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.25.18.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span> Python</label><label for="__tabbed_5_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179z"/></svg></span> JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-67">67</a></span>
-<span class="normal"><a href="#__codelineno-8-68">68</a></span>
-<span class="normal"><a href="#__codelineno-8-69">69</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-69">69</a></span>
 <span class="normal"><a href="#__codelineno-8-70">70</a></span>
 <span class="normal"><a href="#__codelineno-8-71">71</a></span>
 <span class="normal"><a href="#__codelineno-8-72">72</a></span>
 <span class="normal"><a href="#__codelineno-8-73">73</a></span>
-<span class="normal"><a href="#__codelineno-8-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-8-67"><a id="__codelineno-8-67" name="__codelineno-8-67"></a>        <span class="c1"># Read and format each new block</span>
-</span><span id="__span-8-68"><a id="__codelineno-8-68" name="__codelineno-8-68"></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="__span-8-69"><a id="__codelineno-8-69" name="__codelineno-8-69"></a>            <span class="k">async</span> <span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">websocket</span><span class="p">:</span>
-</span><span id="__span-8-70"><a id="__codelineno-8-70" name="__codelineno-8-70"></a>                <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">stomp_messages</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
-</span><span id="__span-8-71"><a id="__codelineno-8-71" name="__codelineno-8-71"></a>                    <span class="nb">print</span><span class="p">(</span>
-</span><span id="__span-8-72"><a id="__codelineno-8-72" name="__codelineno-8-72"></a>                        <span class="sa">f</span><span class="s1">&#39;New block: height=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="__span-8-73"><a id="__codelineno-8-73" name="__codelineno-8-73"></a>                        <span class="sa">f</span><span class="s1">&#39; harvester=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;signer&quot;</span><span class="p">][:</span><span class="mi">16</span><span class="p">]</span><span class="si">}</span><span class="s1">...&#39;</span>
-</span><span id="__span-8-74"><a id="__codelineno-8-74" name="__codelineno-8-74"></a>                    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-8-74">74</a></span>
+<span class="normal"><a href="#__codelineno-8-75">75</a></span>
+<span class="normal"><a href="#__codelineno-8-76">76</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-8-69"><a id="__codelineno-8-69" name="__codelineno-8-69"></a>        <span class="c1"># Read and format each new block</span>
+</span><span id="__span-8-70"><a id="__codelineno-8-70" name="__codelineno-8-70"></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-8-71"><a id="__codelineno-8-71" name="__codelineno-8-71"></a>            <span class="k">async</span> <span class="k">for</span> <span class="n">raw_frame</span> <span class="ow">in</span> <span class="n">websocket</span><span class="p">:</span>
+</span><span id="__span-8-72"><a id="__codelineno-8-72" name="__codelineno-8-72"></a>                <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">stomp_messages</span><span class="p">(</span><span class="n">raw_frame</span><span class="p">):</span>
+</span><span id="__span-8-73"><a id="__codelineno-8-73" name="__codelineno-8-73"></a>                    <span class="nb">print</span><span class="p">(</span>
+</span><span id="__span-8-74"><a id="__codelineno-8-74" name="__codelineno-8-74"></a>                        <span class="sa">f</span><span class="s1">&#39;New block: height=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="__span-8-75"><a id="__codelineno-8-75" name="__codelineno-8-75"></a>                        <span class="sa">f</span><span class="s1">&#39; harvester=</span><span class="si">{</span><span class="n">block</span><span class="p">[</span><span class="s2">&quot;signer&quot;</span><span class="p">][:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">...&#39;</span>
+</span><span id="__span-8-76"><a id="__codelineno-8-76" name="__codelineno-8-76"></a>                    <span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-18">18</a></span>
-<span class="normal"><a href="#__codelineno-9-19">19</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-19">19</a></span>
 <span class="normal"><a href="#__codelineno-9-20">20</a></span>
 <span class="normal"><a href="#__codelineno-9-21">21</a></span>
 <span class="normal"><a href="#__codelineno-9-22">22</a></span>
 <span class="normal"><a href="#__codelineno-9-23">23</a></span>
 <span class="normal"><a href="#__codelineno-9-24">24</a></span>
-<span class="normal"><a href="#__codelineno-9-25">25</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="c1">// Read and format each new block</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="kd">function</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="w">        </span><span class="sb">`New block: height=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">height</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">+</span>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="w">        </span><span class="sb">` harvester=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">signer</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">)</span><span class="si">}</span><span class="sb">...`</span>
-</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="w">    </span><span class="p">);</span>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="p">}</span>
+<span class="normal"><a href="#__codelineno-9-25">25</a></span>
+<span class="normal"><a href="#__codelineno-9-26">26</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="c1">// Read and format each new block</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="kd">function</span><span class="w"> </span><span class="nx">formatBlock</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="w">        </span><span class="sb">`New block: height=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">height</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="w"> </span><span class="o">+</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="w">        </span><span class="sb">` harvester=</span><span class="si">${</span><span class="nx">block</span><span class="p">.</span><span class="nx">signer</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">16</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span><span class="si">}</span><span class="sb">...`</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26"></a><span class="p">}</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 </div>
 </div>
-<p>The body of each incoming STOMP message is the new block, following the <a href="../../reference/rest/nem/#model/Block">Block</a>
+<p>The body of each incoming message is the new block, following the <a href="../../reference/rest/nem/#model/Block">Block</a>
 schema.</p>
 <p>For each message, the snippet prints two of its fields:</p>
 <ul>
@@ -7859,31 +7942,31 @@ irreversible height.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.25.18.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span> Python</label><label for="__tabbed_6_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179z"/></svg></span> JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-76">76</a></span>
-<span class="normal"><a href="#__codelineno-10-77">77</a></span>
-<span class="normal"><a href="#__codelineno-10-78">78</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-78">78</a></span>
 <span class="normal"><a href="#__codelineno-10-79">79</a></span>
-<span class="normal"><a href="#__codelineno-10-80">80</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-76"><a id="__codelineno-10-76" name="__codelineno-10-76"></a>        <span class="c1"># Unsubscribe on exit</span>
-</span><span id="__span-10-77"><a id="__codelineno-10-77" name="__codelineno-10-77"></a>        <span class="k">finally</span><span class="p">:</span>
-</span><span id="__span-10-78"><a id="__codelineno-10-78" name="__codelineno-10-78"></a>            <span class="k">await</span> <span class="n">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
-</span><span id="__span-10-79"><a id="__codelineno-10-79" name="__codelineno-10-79"></a>            <span class="k">await</span> <span class="n">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
-</span><span id="__span-10-80"><a id="__codelineno-10-80" name="__codelineno-10-80"></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-10-80">80</a></span>
+<span class="normal"><a href="#__codelineno-10-81">81</a></span>
+<span class="normal"><a href="#__codelineno-10-82">82</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-78"><a id="__codelineno-10-78" name="__codelineno-10-78"></a>        <span class="c1"># Unsubscribe on exit</span>
+</span><span id="__span-10-79"><a id="__codelineno-10-79" name="__codelineno-10-79"></a>        <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-10-80"><a id="__codelineno-10-80" name="__codelineno-10-80"></a>            <span class="k">await</span> <span class="n">stomp_unsubscribe</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="s1">&#39;id-0&#39;</span><span class="p">)</span>
+</span><span id="__span-10-81"><a id="__codelineno-10-81" name="__codelineno-10-81"></a>            <span class="k">await</span> <span class="n">stomp_disconnect</span><span class="p">(</span><span class="n">websocket</span><span class="p">)</span>
+</span><span id="__span-10-82"><a id="__codelineno-10-82" name="__codelineno-10-82"></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-33">33</a></span>
-<span class="normal"><a href="#__codelineno-11-34">34</a></span>
-<span class="normal"><a href="#__codelineno-11-35">35</a></span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-35">35</a></span>
 <span class="normal"><a href="#__codelineno-11-36">36</a></span>
 <span class="normal"><a href="#__codelineno-11-37">37</a></span>
 <span class="normal"><a href="#__codelineno-11-38">38</a></span>
-<span class="normal"><a href="#__codelineno-11-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-33"><a id="__codelineno-11-33" name="__codelineno-11-33"></a><span class="c1">// Unsubscribe on exit</span>
-</span><span id="__span-11-34"><a id="__codelineno-11-34" name="__codelineno-11-34"></a><span class="nx">process</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGINT&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-35"><a id="__codelineno-11-35" name="__codelineno-11-35"></a><span class="w">    </span><span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">();</span>
-</span><span id="__span-11-36"><a id="__codelineno-11-36" name="__codelineno-11-36"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">deactivate</span><span class="p">();</span>
-</span><span id="__span-11-37"><a id="__codelineno-11-37" name="__codelineno-11-37"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">);</span>
-</span><span id="__span-11-38"><a id="__codelineno-11-38" name="__codelineno-11-38"></a><span class="w">    </span><span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
-</span><span id="__span-11-39"><a id="__codelineno-11-39" name="__codelineno-11-39"></a><span class="p">});</span>
+<span class="normal"><a href="#__codelineno-11-39">39</a></span>
+<span class="normal"><a href="#__codelineno-11-40">40</a></span>
+<span class="normal"><a href="#__codelineno-11-41">41</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-35"><a id="__codelineno-11-35" name="__codelineno-11-35"></a><span class="c1">// Unsubscribe on exit</span>
+</span><span id="__span-11-36"><a id="__codelineno-11-36" name="__codelineno-11-36"></a><span class="nx">process</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;SIGINT&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-37"><a id="__codelineno-11-37" name="__codelineno-11-37"></a><span class="w">    </span><span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">();</span>
+</span><span id="__span-11-38"><a id="__codelineno-11-38" name="__codelineno-11-38"></a><span class="w">    </span><span class="nx">client</span><span class="p">.</span><span class="nx">deactivate</span><span class="p">();</span>
+</span><span id="__span-11-39"><a id="__codelineno-11-39" name="__codelineno-11-39"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Unsubscribed and disconnected&#39;</span><span class="p">);</span>
+</span><span id="__span-11-40"><a id="__codelineno-11-40" name="__codelineno-11-40"></a><span class="w">    </span><span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mf">0</span><span class="p">);</span>
+</span><span id="__span-11-41"><a id="__codelineno-11-41" name="__codelineno-11-41"></a><span class="p">});</span>
 </span></code></pre></div></td></tr></table></div>
 </div>
 </div>
@@ -7901,14 +7984,14 @@ This ensures a clean disconnection from the node.</p>
 <span class="normal"><a href="#__codelineno-12-6">6</a></span>
 <span class="normal"><a href="#__codelineno-12-7">7</a></span>
 <span class="normal"><a href="#__codelineno-12-8">8</a></span>
-<span class="normal"><a href="#__codelineno-12-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a>Using node http://libertalia.nemtest.net:7778
+<span class="normal"><a href="#__codelineno-12-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a>Using node http://libertalia.nemtest.net:7890
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><span class="hll">Connected to http://libertalia.nemtest.net:7778
 </span></span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><span class="hll">Subscribed to /blocks channel
-</span></span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><span class="hll">New block: height=663,575 harvester=7c814b3b44b1a98b...
-</span></span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a>New block: height=663,576 harvester=7c814b3b44b1a98b...
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a>New block: height=663,577 harvester=95ba0e864cd5edb3...
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a>New block: height=663,578 harvester=7c814b3b44b1a98b...
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8"></a>New block: height=663,579 harvester=5451f450416d214b...
+</span></span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><span class="hll">New block: height=682,352 harvester=95BA0E864CD5EDB3...
+</span></span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a>New block: height=682,353 harvester=95BA0E864CD5EDB3...
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a>New block: height=682,354 harvester=7C814B3B44B1A98B...
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a>New block: height=682,355 harvester=95BA0E864CD5EDB3...
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8"></a>New block: height=682,356 harvester=95BA0E864CD5EDB3...
 </span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9"></a><span class="hll">Unsubscribed and disconnected
 </span></span></code></pre></div></td></tr></table></div>
 <p>The output shows:</p>
@@ -7931,7 +8014,7 @@ This ensures a clean disconnection from the node.</p>
 <tr>
 <td><a href="#subscribing-to-the-channel">Subscribe to the block channel</a></td>
 <td><code><a class="mkdocs-ezglossary-link"
-	id="ef8d40ef2ed9d7c2b1641c7c6b7bf22c"
+	id="5869554b48628375e110e314101bae61"
 	title="Notifies subscribed clients every time a new block is added to the chain."
 	name="ws:blocks"
 	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code></td>
@@ -7964,7 +8047,7 @@ This ensures a clean disconnection from the node.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 29, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     

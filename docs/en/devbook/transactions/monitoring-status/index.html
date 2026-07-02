@@ -14,7 +14,7 @@
         <link rel="prev" href="../transfer-mosaics/">
       
       
-        <link rel="next" href="../../mosaics/get-mosaic-info/">
+        <link rel="next" href="../typed-descriptors/">
       
       
         
@@ -111,7 +111,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#monitoring-transaction-statusbeginner" class="md-skip">
+        <a href="#monitoring-transaction-status" class="md-skip">
           Skip to content
         </a>
       
@@ -1249,6 +1249,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1694,6 +1722,34 @@
     
   
     New Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../websockets/listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
   
 
     
@@ -7443,7 +7499,9 @@
 	
 
 
-<h1 id="monitoring-transaction-statusbeginner">Monitoring Transaction Status<br/><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span><a class="headerlink" href="#monitoring-transaction-statusbeginner" title="Anchor link to this section for reference">⚓︎</a></h1>
+<h1 id="monitoring-transaction-status">Monitoring Transaction Status<a class="headerlink" href="#monitoring-transaction-status" title="Anchor link to this section for reference">⚓︎</a></h1>
+<div class="tutorial_level-container"><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span></div>
+
 <p>After announcing a <a class="mkdocs-ezglossary-link"
 	id="eaf21db69d84cd9938e1a1f789e839fe"
 	title="A transaction represents an action to perform on the NEM blockchain,
@@ -8178,9 +8236,9 @@ A transaction's signature is unique and appears under <code>transaction.signatur
 For multisig transactions, this is the signature of the announced wrapper, not of the inner transaction.</p>
 <p>The function returns:</p>
 <ul>
-<li><code>True</code>: the transaction is still in the unconfirmed pool, waiting to be included in a block.</li>
+<li><span markdown class="dylink"><input type="radio" name="rGroup104" id="Python" /><label class="dylink-option" for="Python" markdown><code>True</code></label><input type="radio" name="rGroup104" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>true</code></label></span>: the transaction is still in the unconfirmed pool, waiting to be included in a block.</li>
 <li>
-<p><code>False</code>: the transaction is not in the response.
+<p><span markdown class="dylink"><input type="radio" name="rGroup105" id="Python" /><label class="dylink-option" for="Python" markdown><code>False</code></label><input type="radio" name="rGroup105" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>false</code></label></span>: the transaction is not in the response.
     Possible causes include: it has not arrived at this node yet, it has already been confirmed,
     it was dropped from the pool, or it was left out of the response.</p>
 <div class="admonition warning">
@@ -8302,10 +8360,10 @@ from the response while it is still in the unconfirmed pool.</p>
 </div>
 </div>
 </div>
-<p>The <span markdown class="dylink"><input type="radio" name="rGroup104" id="Python" /><label class="dylink-option" for="Python" markdown><code>wait_for_confirmation</code></label><input type="radio" name="rGroup104" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>waitForConfirmation</code></label></span> function calls <span markdown class="dylink"><input type="radio" name="rGroup105" id="Python" /><label class="dylink-option" for="Python" markdown><code>get_confirmation_height</code></label><input type="radio" name="rGroup105" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>getConfirmationHeight</code></label></span> every
+<p>The <span markdown class="dylink"><input type="radio" name="rGroup106" id="Python" /><label class="dylink-option" for="Python" markdown><code>wait_for_confirmation</code></label><input type="radio" name="rGroup106" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>waitForConfirmation</code></label></span> function calls <span markdown class="dylink"><input type="radio" name="rGroup107" id="Python" /><label class="dylink-option" for="Python" markdown><code>get_confirmation_height</code></label><input type="radio" name="rGroup107" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>getConfirmationHeight</code></label></span> every
 second until the transaction is confirmed, or two minutes ellapse (configurable timeout).</p>
-<p>The function returns <code>True</code> as soon as a check reports a confirmation.
-When the attempts run out, it returns <code>False</code> instead.
+<p>The function returns <span markdown class="dylink"><input type="radio" name="rGroup108" id="Python" /><label class="dylink-option" for="Python" markdown><code>True</code></label><input type="radio" name="rGroup108" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>true</code></label></span> as soon as a check reports a confirmation.
+When the attempts run out, it returns <span markdown class="dylink"><input type="radio" name="rGroup109" id="Python" /><label class="dylink-option" for="Python" markdown><code>False</code></label><input type="radio" name="rGroup109" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>false</code></label></span> instead.
 This means the transaction was not confirmed within the polling window, not that it failed, but this is a rare case.</p>
 <h3 id="putting-it-all-together">Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Anchor link to this section for reference">⚓︎</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.25.18.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span> Python</label><label for="__tabbed_6_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179z"/></svg></span> JavaScript</label></div>
@@ -8370,7 +8428,7 @@ This means the transaction was not confirmed within the polling window, not that
 </div>
 </div>
 </div>
-<p>The snippet starts with a call to <span markdown class="dylink"><input type="radio" name="rGroup106" id="Python" /><label class="dylink-option" for="Python" markdown><code>get_confirmation_height</code></label><input type="radio" name="rGroup106" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>getConfirmationHeight</code></label></span> to check if the transaction is already
+<p>The snippet starts with a call to <span markdown class="dylink"><input type="radio" name="rGroup110" id="Python" /><label class="dylink-option" for="Python" markdown><code>get_confirmation_height</code></label><input type="radio" name="rGroup110" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>getConfirmationHeight</code></label></span> to check if the transaction is already
 confirmed.</p>
 <div class="admonition warning">
 <p class="admonition-title">Confirmed transactions can still be reversed</p>
@@ -8386,11 +8444,11 @@ typically after a fork is resolved."
 	name="_:Rollback"
 	href="../../../textbook/consensus/#fa68d384bf5dbf284e2a6a02fb2ef92d">rollbacks</a> are still possible.</p>
 </div>
-<p>If the transaction is not already part of a block, <span markdown class="dylink"><input type="radio" name="rGroup107" id="Python" /><label class="dylink-option" for="Python" markdown><code>is_in_unconfirmed_pool</code></label><input type="radio" name="rGroup107" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>isInUnconfirmedPool</code></label></span> looks for it in the
+<p>If the transaction is not already part of a block, <span markdown class="dylink"><input type="radio" name="rGroup111" id="Python" /><label class="dylink-option" for="Python" markdown><code>is_in_unconfirmed_pool</code></label><input type="radio" name="rGroup111" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>isInUnconfirmedPool</code></label></span> looks for it in the
 unconfirmed pool.
 A transaction that is neither confirmed nor in this pool is reported as not found.</p>
 <p>Only when the transaction is waiting in the unconfirmed pool does the snippet call
-<span markdown class="dylink"><input type="radio" name="rGroup108" id="Python" /><label class="dylink-option" for="Python" markdown><code>wait_for_confirmation</code></label><input type="radio" name="rGroup108" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>waitForConfirmation</code></label></span> to poll until the transaction is confirmed or the polling window ends.</p>
+<span markdown class="dylink"><input type="radio" name="rGroup112" id="Python" /><label class="dylink-option" for="Python" markdown><code>wait_for_confirmation</code></label><input type="radio" name="rGroup112" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>waitForConfirmation</code></label></span> to poll until the transaction is confirmed or the polling window ends.</p>
 <div class="admonition note">
 <p class="admonition-title">Only rejection or a passed deadline means failure</p>
 <p>There are only two ways to know a transaction will never confirm: it was rejected when announced, or its
@@ -8505,7 +8563,7 @@ and participates in consensus and block creation."
 	href="../../../textbook/nodes/#bc6d0fc1a92ae07d7739daed957574ab">nodes</a> for greater reliability and protection against
     single-node issues.</li>
 <li><strong>Use WebSockets:</strong> Replace polling with WebSocket subscriptions for real-time updates without repeated API calls.
-    See the <a href="../websockets/listen-transaction-flow.md">Listening to Transaction Flow</a> WebSocket tutorial.</li>
+    See the <a href="../../websockets/listen-transaction-flow/">Listening to Transaction Flow</a> WebSocket tutorial.</li>
 </ul>
 
 
@@ -8529,7 +8587,7 @@ and participates in consensus and block creation."
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     

@@ -24,6 +24,17 @@
 	--textbook-color--transparent: #4FBAAF20;
 	--example-admonition-color: #4CAF50;
 	--example-admonition-color--transparent: #4CAF5020;
+
+	/* Scalar REST API reference */
+	--scalar-font-size: 0.8rem;
+	--scalar-small-font-size: 0.7rem;
+	--scalar-font: var(--scalar-font-size);
+	--scalar-font-size-3: var(--scalar-small-font-size);
+	--scalar-font-size-4: var(--scalar-small-font-size);
+	--scalar-small: var(--scalar-small-font-size);
+	--scalar-micro: var(--scalar-small-font-size);
+	--scalar-mini: var(--scalar-small-font-size);
+
 }
 
 [data-md-color-scheme=slate][data-md-color-primary=indigo] {
@@ -51,7 +62,7 @@
 
 [data-md-color-scheme=default][data-md-color-primary=indigo] {
 	--md-typeset-a-color: var(--md-primary-fg-color);
-	--md-accent-fg-color: var(--md-primary-fg-color--light);
+	--md-accent-fg-color: var(--md-primary-fg-color--dark);
 	--md-accent-fg-color--light: var(--md-primary-fg-color--light);
 	--md-accent-fg-color--dark: var(--md-primary-fg-color--dark);
 	--md-default-bg-color--light: #DDD;
@@ -64,11 +75,11 @@
 	--md-typeset-table-color: var(--md-primary-fg-color);
 	--md-typeset-table-color--light: var(--md-accent-fg-color--transparent);
 	--userbook-a-color: var(--userbook-color);
-	--userbook-a-hl-color: var(--userbook-color--light);
+	--userbook-a-hl-color: var(--userbook-color--dark);
 	--devbook-a-color: var(--devbook-color);
-	--devbook-a-hl-color: var(--devbook-color--light);
+	--devbook-a-hl-color: var(--devbook-color--dark);
 	--textbook-a-color: var(--textbook-color);
-	--textbook-a-hl-color: var(--textbook-color--light);
+	--textbook-a-hl-color: var(--textbook-color--dark);
 }
 
 /* Home page cards */
@@ -114,15 +125,15 @@
 
 .md-typeset .grid a.userbook:hover h2,
 .md-typeset .grid a.userbook:hover p {
-	color: var(--userbook-color--light);
+	color: var(--userbook-a-hl-color);
 }
 .md-typeset .grid a.devbook:hover h2,
 .md-typeset .grid a.devbook:hover p {
-	color: var(--devbook-color--light);
+	color: var(--devbook-a-hl-color);
 }
 .md-typeset .grid a.textbook:hover h2,
 .md-typeset .grid a.textbook:hover p {
-	color: var(--textbook-color--light);
+	color: var(--textbook-a-hl-color);
 }
 
 .md-typeset .grid .card a {
@@ -230,15 +241,9 @@
 }
 
 /* Page background */
-[data-md-color-scheme=default] .md-main {
-	background: url("../images/watercolor-light.webp") repeat,
-		var(--md-accent-fg-color--transparent);
-	background-blend-mode: multiply;
-}
-
+[data-md-color-scheme=default] .md-main,
 [data-md-color-scheme=slate] .md-main {
-	background: var(--md-accent-fg-color--transparent);
-	background-blend-mode: multiply;
+	background: transparent;
 }
 
 /* Header  & Footer*/
@@ -640,6 +645,13 @@ code.doc-symbol-interface::after {
 	padding: 0 10px;
 }
 
+.md-typeset h1:has(+ .tutorial_level-container) {
+	margin-bottom: 0.5rem;
+}
+.md-typeset .tutorial_level-container {
+	margin: 0 0 1.2em;
+}
+
 [data-md-color-scheme=slate] .md-typeset .tutorial_level-beginner {
 	background-color: #1F7A3E;
 	color: #B6F2C8;
@@ -714,6 +726,10 @@ code.doc-symbol-interface::after {
 	background-color: #b50505;
 }
 
+.md-typeset code.rest-method-req {
+	background-color: #8e6fc9;
+}
+
 /* Graphviz diagrams */
 .graphviz {
 	display: block;
@@ -773,9 +789,19 @@ code.doc-symbol-interface::after {
 	background: var(--md-accent-fg-color--transparent);
 }
 
+[data-md-color-scheme=default] .md-typeset table:not([class]) th {
+	color: var(--md-typeset-color);
+}
+
 .centered .md-typeset__table {
 	display: table;
 	margin: 0 auto;
+}
+
+.md-typeset .frame-table table:not([class]) {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
 }
 
 /* Tables with subsections */
@@ -828,4 +854,18 @@ code.doc-symbol-interface::after {
 
 .md-typeset .icon-list>ul>li>p:first-child>.twemoji>svg {
 	width: 2em;
+}
+
+/* Scalar REST API reference */
+.scalar-app {
+	font-size: 0.8rem;
+}
+
+.light-mode:has(.scalar-app) {
+	--scalar-color-accent: var(--devbook-color--dark);
+}
+
+.dark-mode:has(.scalar-app) {
+	--scalar-background-1: var(--md-default-bg-color);
+	--scalar-color-accent: var(--devbook-color);
 }

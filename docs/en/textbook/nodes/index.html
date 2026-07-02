@@ -1064,6 +1064,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1509,6 +1537,34 @@
     
   
     New Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
   
 
     
@@ -7108,6 +7164,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#node-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7336,6 +7403,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#node-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7406,18 +7484,19 @@ and participates in <a class="mkdocs-ezglossary-link"
 <p>Nodes form the backbone of the blockchain, ensuring the network remains functional as long as enough nodes are active.</p>
 <p>Anyone can run a NEM node.
 Operators do so to <a class="mkdocs-ezglossary-link"
-	id="b71091773a18abb28999cfe997e7de7d"
+	id="a35dcdc87705014090f45bfaa85a43b2"
 	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
 It plays a similar role to mining in PoW or staking in PoS."
 	name="_:Harvesting"
 	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvest</a> blocks with their own account, to host <a class="mkdocs-ezglossary-link"
 	id="925a520cffd1fe3f3aa33c1679a4c5cb"
-	title="A form of harvesting where an account delegates block-signing to a separate remote account on a node,
-while keeping its importance and receiving all the rewards."
+	title="A form of harvesting that lets an eligible account that does not operate a node delegate harvesting duties to a
+third-party node.
+The delegating account's importance score is used, and it receives the harvested rewards in full."
 	name="_:Delegated Harvesting"
 	href="../../textbook/harvesting/#252148c4daf33af1a7e32bc8f8a36292">delegated harvesting</a> for others,
 or to qualify for the <a class="mkdocs-ezglossary-link"
-	id="2ddc411638a87552c92bdb11e8b1b892"
+	id="00818d7585a0c3cc1fe8f1cde2bf127e"
 	title="An off-chain, community-funded program that rewards reliable public nodes."
 	name="_:Supernode Program"
 	href="../../textbook/nodes/#74e6d1e76b06867da93582d7ca521342">Supernode Program</a>.</p>
@@ -7431,27 +7510,29 @@ or to qualify for the <a class="mkdocs-ezglossary-link"
 A single Java process that implements all node functionality.</dd>
 
 </dl>
-<p>NIS has four parts: an <a href="#engine">engine</a>, exposed by a <a href="#rest-api">REST API</a> and a <a href="#websocket">WebSocket</a> service, with an embedded <a href="#database">database</a> for storage.</p>
-<p>Over the network, NIS exchanges data with other nodes and with clients:</p>
+<p>NIS has four parts: an <a href="#engine">engine</a>, a <a href="#rest-api">REST API</a>, a <a href="#websocket">WebSocket</a> service, and an embedded
+<a href="#database">database</a>.
+The engine is the core, exposed through the REST API and WebSocket service, while the database stores the blockchain.</p>
+<p>NIS exchanges data with other nodes and with clients:</p>
 <ul>
 <li><em>Other nodes</em> are NIS peers on the network.</li>
 <li><em>Clients</em> are external programs such as wallets, explorers, and applications.</li>
 </ul>
-<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="506pt" height="325pt" viewBox="0.00 0.00 506.00 325.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 320.65)"><title>NemNode</title><polygon fill="none" stroke="none" points="-4,4 -4,-320.65 502,-320.65 502,4 -4,4"/><g id="clust1" class="cluster"><title>cluster_nis</title><polygon fill="none" stroke="#789abc" stroke-width="1.5" stroke-dasharray="5,2" points="8,-8 8,-255.65 490,-255.65 490,-8 8,-8"/><text xml:space="preserve" text-anchor="middle" x="249" y="-15.95" font-family="Times,serif" font-size="14.00" fill="#789abc">NIS</text></g><!-- OtherNodes --><g id="node1" class="node"><title>OtherNodes</title><text xml:space="preserve" text-anchor="middle" x="181" y="-293.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Other nodes</text></g><!-- REST --><g id="node3" class="node"><title>REST</title><g id="a_node3"><a xlink:href="#rest-api" xlink:title="REST + WebSocket"><polygon fill="#789abc" stroke="#789abc" points="465,-230.65 33,-230.65 33,-173.05 465,-173.05 465,-230.65"/><text xml:space="preserve" text-anchor="middle" x="249" y="-197.18" font-family="Times,serif" font-size="14.00" fill="#789abc">REST + WebSocket</text></a></g></g><!-- OtherNodes&#45;&gt;REST --><g id="edge4" class="edge"><title>OtherNodes&#45;&gt;REST</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M181,-268.63C181,-268.63 181,-243.16 181,-243.16"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="177.5,-268.63 181,-278.63 184.5,-268.63 177.5,-268.63"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="184.5,-243.16 181,-233.16 177.5,-243.16 184.5,-243.16"/></g><!-- Clients --><g id="node2" class="node"><title>Clients</title><text xml:space="preserve" text-anchor="middle" x="316" y="-293.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Clients</text></g><!-- Clients&#45;&gt;REST --><g id="edge5" class="edge"><title>Clients&#45;&gt;REST</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M316,-268.63C316,-268.63 316,-243.16 316,-243.16"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="312.5,-268.63 316,-278.63 319.5,-268.63 312.5,-268.63"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="319.5,-243.16 316,-233.16 312.5,-243.16 319.5,-243.16"/></g><!-- Engine --><g id="node4" class="node"><title>Engine</title><g id="a_node4"><a xlink:href="#engine" xlink:title="Engine"><polygon fill="#789abc" stroke="#789abc" points="223.6,-123.05 36.4,-123.05 36.4,-58.25 223.6,-58.25 223.6,-123.05"/><text xml:space="preserve" text-anchor="middle" x="130" y="-85.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Engine</text></a></g></g><!-- REST&#45;&gt;Engine --><g id="edge1" class="edge"><title>REST&#45;&gt;Engine</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M130,-160.36C130,-160.36 130,-135.47 130,-135.47"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="126.5,-160.36 130,-170.36 133.5,-160.36 126.5,-160.36"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="133.5,-135.47 130,-125.47 126.5,-135.47 133.5,-135.47"/></g><!-- H2 --><g id="node5" class="node"><title>H2</title><g id="a_node5"><a xlink:href="#database" xlink:title="Blocks\n(H2)"><path fill="#789abc" stroke="#789abc" d="M460.6,-117.16C460.6,-120.41 418.65,-123.05 367,-123.05 315.35,-123.05 273.4,-120.41 273.4,-117.16 273.4,-117.16 273.4,-64.14 273.4,-64.14 273.4,-60.89 315.35,-58.25 367,-58.25 418.65,-58.25 460.6,-60.89 460.6,-64.14 460.6,-64.14 460.6,-117.16 460.6,-117.16"/><path fill="none" stroke="#789abc" d="M460.6,-117.16C460.6,-113.91 418.65,-111.27 367,-111.27 315.35,-111.27 273.4,-113.91 273.4,-117.16"/><text xml:space="preserve" text-anchor="middle" x="367" y="-94.6" font-family="Times,serif" font-size="14.00" fill="#789abc">Blocks</text><text xml:space="preserve" text-anchor="middle" x="367" y="-77.35" font-family="Times,serif" font-size="14.00" fill="#789abc">(H2)</text></a></g></g><!-- REST&#45;&gt;H2 --><!-- Engine&#45;&gt;H2 --><g id="edge3" class="edge"><title>Engine&#45;&gt;H2</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M236.28,-91C236.28,-91 260.83,-91 260.83,-91"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="236.28,-87.5 226.28,-91 236.28,-94.5 236.28,-87.5"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="260.83,-94.5 270.83,-91 260.83,-87.5 260.83,-94.5"/></g></g></svg></p>
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="625pt" height="556pt" viewBox="0.00 0.00 625.30 555.70" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 551.7)"><title>NemNode</title><polygon fill="transparent" stroke="transparent" points="-4,4 -4,-551.7 621.3,-551.7 621.3,4 -4,4"/><g id="clust1" class="cluster"><title>cluster_nis</title><path fill="transparent" stroke="#789abc" stroke-dasharray="5,2" d="M150.5,0C150.5,0 605.3,0 605.3,0 611.3,0 617.3,-6 617.3,-12 617.3,-12 617.3,-425.7 617.3,-425.7 617.3,-431.7 611.3,-437.7 605.3,-437.7 605.3,-437.7 150.5,-437.7 150.5,-437.7 144.5,-437.7 138.5,-431.7 138.5,-425.7 138.5,-425.7 138.5,-12 138.5,-12 138.5,-6 144.5,0 150.5,0"/></g><!-- LblExt --><g id="node1" class="node"><title>LblExt</title><text text-anchor="middle" x="39.5" y="-515" font-family="Times,serif" font-size="14.00" fill="#789abc">External</text></g><!-- LblInt --><g id="node2" class="node"><title>LblInt</title><text text-anchor="middle" x="39.5" y="-371" font-family="Times,serif" font-size="14.00" fill="#789abc">Interface</text></g><!-- LblProc --><g id="node3" class="node"><title>LblProc</title><text text-anchor="middle" x="39.5" y="-227" font-family="Times,serif" font-size="14.00" fill="#789abc">Processing</text></g><!-- LblStor --><g id="node4" class="node"><title>LblStor</title><text text-anchor="middle" x="39.5" y="-83" font-family="Times,serif" font-size="14.00" fill="#789abc">Storage</text></g><!-- OtherNodes --><g id="node5" class="node"><title>OtherNodes</title><polygon fill="none" stroke="#789abc" stroke-dasharray="5,2" points="305.9,-547.7 161.9,-547.7 161.9,-489.7 305.9,-489.7 305.9,-547.7"/><text text-anchor="middle" x="233.9" y="-515" font-family="Times,serif" font-size="14.00" fill="#789abc">Other nodes</text></g><!-- REST --><g id="node7" class="node"><title>REST</title><g id="a_node7"><a xlink:href="#rest-api" xlink:title="REST API"><polygon fill="#789abc" stroke="#789abc" points="305.9,-403.7 161.9,-403.7 161.9,-345.7 305.9,-345.7 305.9,-403.7"/><text text-anchor="middle" x="233.9" y="-371" font-family="Times,serif" font-size="14.00" fill="#789abc">REST API</text></a></g></g><!-- OtherNodes&#45;&gt;REST --><g id="edge1" class="edge"><title>OtherNodes&#45;&gt;REST</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M233.9,-479.56C233.9,-479.56 233.9,-413.8 233.9,-413.8"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="237.4,-413.8 233.9,-403.8 230.4,-413.8 237.4,-413.8"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="230.4,-479.56 233.9,-489.56 237.4,-479.56 230.4,-479.56"/></g><!-- Clients --><g id="node6" class="node"><title>Clients</title><polygon fill="none" stroke="#789abc" stroke-dasharray="5,2" points="593.9,-547.7 449.9,-547.7 449.9,-489.7 593.9,-489.7 593.9,-547.7"/><text text-anchor="middle" x="521.9" y="-515" font-family="Times,serif" font-size="14.00" fill="#789abc">Clients</text></g><!-- WebSocket --><g id="node8" class="node"><title>WebSocket</title><g id="a_node8"><a xlink:href="#websocket" xlink:title="WebSocket"><polygon fill="#789abc" stroke="#789abc" points="593.9,-403.7 449.9,-403.7 449.9,-345.7 593.9,-345.7 593.9,-403.7"/><text text-anchor="middle" x="521.9" y="-371" font-family="Times,serif" font-size="14.00" fill="#789abc">WebSocket</text></a></g></g><!-- Clients&#45;&gt;WebSocket --><g id="edge2" class="edge"><title>Clients&#45;&gt;WebSocket</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M521.9,-479.56C521.9,-479.56 521.9,-413.8 521.9,-413.8"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="525.4,-413.8 521.9,-403.8 518.4,-413.8 525.4,-413.8"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="518.4,-479.56 521.9,-489.56 525.4,-479.56 518.4,-479.56"/></g><!-- pR --><!-- REST&#45;&gt;pR --><g id="edge3" class="edge"><title>REST&#45;&gt;pR</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M233.9,-335.41C233.9,-335.41 233.9,-302.7 233.9,-302.7"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="230.4,-335.41 233.9,-345.41 237.4,-335.41 230.4,-335.41"/></g><!-- cw1 --><!-- REST&#45;&gt;cw1 --><g id="edge9" class="edge"><title>REST:e&#45;&gt;cw1</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M315.9,-374C315.9,-374 377.85,-374 377.85,-374"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="315.9,-370.5 305.9,-374 315.9,-377.5 315.9,-370.5"/></g><!-- pW --><!-- WebSocket&#45;&gt;pW --><g id="edge5" class="edge"><title>WebSocket&#45;&gt;pW</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M521.9,-335.41C521.9,-335.41 521.9,-302.7 521.9,-302.7"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="518.4,-335.41 521.9,-345.41 525.4,-335.41 518.4,-335.41"/></g><!-- Engine --><g id="node9" class="node"><title>Engine</title><g id="a_node9"><a xlink:href="#engine" xlink:title="Engine"><polygon fill="#789abc" stroke="#789abc" points="593.9,-263.2 161.9,-263.2 161.9,-198.2 593.9,-198.2 593.9,-263.2"/><text text-anchor="middle" x="377.9" y="-227" font-family="Times,serif" font-size="14.00" fill="#789abc">Engine</text></a></g></g><!-- pB --><!-- Engine&#45;&gt;pB --><g id="edge7" class="edge"><title>Engine&#45;&gt;pB</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M377.9,-188.07C377.9,-188.07 377.9,-158.7 377.9,-158.7"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="374.4,-188.07 377.9,-198.07 381.4,-188.07 374.4,-188.07"/></g><!-- H2 --><g id="node10" class="node"><title>H2</title><g id="a_node10"><a xlink:href="#database" xlink:title="Blocks (H2)"><path fill="#789abc" stroke="#789abc" d="M471.4,-114.52C471.4,-117.93 429.49,-120.7 377.9,-120.7 326.31,-120.7 284.4,-117.93 284.4,-114.52 284.4,-114.52 284.4,-58.88 284.4,-58.88 284.4,-55.47 326.31,-52.7 377.9,-52.7 429.49,-52.7 471.4,-55.47 471.4,-58.88 471.4,-58.88 471.4,-114.52 471.4,-114.52"/><path fill="none" stroke="#789abc" d="M471.4,-114.52C471.4,-111.11 429.49,-108.34 377.9,-108.34 326.31,-108.34 284.4,-111.11 284.4,-114.52"/><text text-anchor="middle" x="377.9" y="-83" font-family="Times,serif" font-size="14.00" fill="#789abc">Blocks (H2)</text></a></g></g><!-- NISLabel --><g id="node11" class="node"><title>NISLabel</title><text text-anchor="middle" x="377.9" y="-3.8" font-family="Times,serif" font-size="14.00" fill="#789abc">NIS</text></g><!-- spcL --><!-- spcR --><!-- pR&#45;&gt;Engine --><g id="edge4" class="edge"><title>pR&#45;&gt;Engine</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M233.9,-302.7C233.9,-302.7 233.9,-273.33 233.9,-273.33"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="237.4,-273.33 233.9,-263.33 230.4,-273.33 237.4,-273.33"/></g><!-- pW&#45;&gt;Engine --><g id="edge6" class="edge"><title>pW&#45;&gt;Engine</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M521.9,-302.7C521.9,-302.7 521.9,-282.38 521.9,-263.33"/></g><!-- pB&#45;&gt;H2 --><g id="edge8" class="edge"><title>pB&#45;&gt;H2</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M377.9,-158.7C377.9,-158.7 377.9,-131.01 377.9,-131.01"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="381.4,-131.01 377.9,-121.01 374.4,-131.01 381.4,-131.01"/></g><!-- cw2 --><!-- cw1&#45;&gt;cw2 --><g id="edge10" class="edge"><title>cw1&#45;&gt;cw2</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M377.9,-374.8C377.9,-379.1 377.9,-514.37 377.9,-518.6"/></g><!-- cw2&#45;&gt;Clients --><g id="edge11" class="edge"><title>cw2&#45;&gt;Clients:w</title><path fill="none" stroke="#789abc" stroke-width="1.5" d="M377.95,-518C377.95,-518 439.9,-518 439.9,-518"/><polygon fill="#789abc" stroke="#789abc" stroke-width="1.5" points="439.9,-521.5 449.9,-518 439.9,-514.5 439.9,-521.5"/></g><!-- reqLbl --><g id="node19" class="node"><title>reqLbl</title><text text-anchor="middle" x="277.1" y="-299" font-family="Times,serif" font-size="14.00" fill="#789abc">requests</text></g><!-- evtLbl --><g id="node20" class="node"><title>evtLbl</title><text text-anchor="middle" x="485.9" y="-299" font-family="Times,serif" font-size="14.00" fill="#789abc">events</text></g><!-- rwLbl --><g id="node21" class="node"><title>rwLbl</title><text text-anchor="middle" x="431.9" y="-155" font-family="Times,serif" font-size="14.00" fill="#789abc">read / write</text></g></g></svg></p>
 <h3 id="engine">Engine<a class="headerlink" href="#engine" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The engine performs the blockchain work: it validates incoming data, runs <a class="mkdocs-ezglossary-link"
 	id="06d7eea3c4c4af4455ed2b99eb1a44af"
 	title="The process by which all nodes in the network agree on the current state of the blockchain."
 	name="_:Consensus"
 	href="../../textbook/consensus/#92c744def3f7fe5c0703c81afb16f4f8">consensus</a> and <a class="mkdocs-ezglossary-link"
-	id="a35dcdc87705014090f45bfaa85a43b2"
+	id="5be3711b8d09d1db471cd3f715bad873"
 	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
 It plays a similar role to mining in PoW or staking in PoS."
 	name="_:Harvesting"
 	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>, handles
 <a href="#peer-to-peer-communication">peer-to-peer networking</a>, and maintains the
 <a class="mkdocs-ezglossary-link"
-	id="2285d22eb4b3f6ff2311503bafce479f"
+	id="b62fd8a677d2a68d59e86e93b5964ffb"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed transactions pool</a>.</p>
@@ -7469,6 +7550,8 @@ like moving funds from one account to another, or registering a new mosaic."
 	name="_:Transaction"
 	href="../../textbook/transactions/#dbaff459c19d2574b92538a13b4b8910">transactions</a>.</li>
 </ul>
+<p>The API supports two encodings, selected by the request's content type: JSON and binary.
+Peers exchange data in binary, while clients typically use JSON.</p>
 <h3 id="websocket">WebSocket<a class="headerlink" href="#websocket" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>NIS publishes block and transaction events through a built-in
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">WebSocket</a> service.
@@ -7478,13 +7561,13 @@ Subscribed clients receive notifications in real time without polling.</p>
 inside the NIS process rather than as a separate database server.</p>
 <p>The database holds only the chain itself: every block and the transactions inside it.
 It does not store the current blockchain state, such as account balances and <a class="mkdocs-ezglossary-link"
-	id="820eccfb8d39d82c5f2fa0cfdf906593"
+	id="ebc2a1888af5d20b8b632baa662ef9ec"
 	title="A measure of an account's contribution to the network, based on its vested balance and its outgoing
 transfers to other accounts.
 This score determines the account's chances of harvesting a block."
 	name="_:Importance"
-	href="../../textbook/harvesting/#76ca9920588d90f42b544215c87ec7d4">importance</a> scores.
-NIS keeps that state in memory and rebuilds it at every start by replaying the chain from the <a class="mkdocs-ezglossary-link"
+	href="../../textbook/accounts/#76ca9920588d90f42b544215c87ec7d4">importance</a> scores.
+NIS keeps that state in memory and rebuilds it at startup by replaying the chain from the <a class="mkdocs-ezglossary-link"
 	id="2915f79a516b0daccb32a75957a34487"
 	title="The first block in the NEM blockchain.
 Unlike all other blocks, which are created through network consensus, the nemesis block is manually generated by the
@@ -7492,26 +7575,21 @@ network creators."
 	name="_:Nemesis block"
 	href="../../textbook/blocks/#bd1e6e872753711cb56151debae22b42">nemesis block</a> onward,
 which is why a node stays unavailable for a while after it starts.</p>
-<p>NIS reads and writes data through <a href="https://hibernate.org">Hibernate</a>, a library that maps Java objects to database rows.
-When NIS is upgraded to a newer release, <a href="https://flywaydb.org">Flyway</a> automatically applies any required schema
-changes.</p>
 <h2 id="peer-to-peer-communication">Peer-to-Peer Communication<a class="headerlink" href="#peer-to-peer-communication" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>NEM nodes communicate directly with one another in a decentralized, peer-to-peer fashion.
-There is no central coordinator: instead, each node establishes connections with a subset of other nodes,
-forming a distributed network.</p>
-<p>Nodes share their lists of known peers, allowing a newly connected node to quickly discover others and integrate
-into the network.
+There is no central coordinator: instead, each node establishes connections with a subset of other nodes, forming a
+distributed network.</p>
+<p>Nodes share their lists of known peers, allowing a newly connected node to quickly discover others and integrate into
+the network.
 This process ensures robust connectivity and helps the network remain resilient, even if individual nodes go offline.</p>
-<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="433pt" height="375pt" viewBox="0.00 0.00 433.00 375.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 371.04)"><title>P2PNetwork</title><polygon fill="none" stroke="none" points="-4,4 -4,-371.04 429.04,-371.04 429.04,4 -4,4"/><!-- N1 --><g id="node1" class="node"><title>N1</title><ellipse fill="#789abc" stroke="#789abc" cx="212.52" cy="-18" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="212.52" y="-13.32" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 1</text></g><!-- N2 --><g id="node2" class="node"><title>N2</title><ellipse fill="#789abc" stroke="#789abc" cx="95.48" cy="-300.56" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="95.48" y="-295.88" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 2</text></g><!-- N1&#45;&#45;N2 --><g id="edge1" class="edge"><title>N1&#45;&#45;N2</title><path fill="none" stroke="#789abc" d="M200.62,-46.73C178.14,-100.99 129.69,-217.97 107.28,-272.06"/><polygon fill="#789abc" stroke="#789abc" points="203.85,-48.08 204.44,-37.5 197.38,-45.4 203.85,-48.08"/><polygon fill="#789abc" stroke="#789abc" points="104.09,-270.63 103.49,-281.21 110.56,-273.31 104.09,-270.63"/></g><!-- N5 --><g id="node5" class="node"><title>N5</title><ellipse fill="#789abc" stroke="#789abc" cx="329.56" cy="-66.48" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="329.56" y="-61.8" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 5</text></g><!-- N1&#45;&#45;N5 --><g id="edge8" class="edge"><title>N1&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M255.16,-35.66C265.5,-39.95 276.56,-44.53 286.91,-48.81"/><polygon fill="#789abc" stroke="#789abc" points="256.79,-32.55 246.21,-31.95 254.11,-39.02 256.79,-32.55"/><polygon fill="#789abc" stroke="#789abc" points="285.4,-51.97 295.97,-52.57 288.07,-45.51 285.4,-51.97"/></g><!-- N3 --><g id="node3" class="node"><title>N3</title><ellipse fill="#789abc" stroke="#789abc" cx="47" cy="-183.52" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="47" y="-178.84" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 3</text></g><!-- N2&#45;&#45;N3 --><g id="edge2" class="edge"><title>N2&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M83.72,-272.18C76.21,-254.03 66.49,-230.57 58.94,-212.34"/><polygon fill="#789abc" stroke="#789abc" points="80.37,-273.23 87.43,-281.13 86.84,-270.55 80.37,-273.23"/><polygon fill="#789abc" stroke="#789abc" points="62.2,-211.06 55.14,-203.16 55.73,-213.74 62.2,-211.06"/></g><!-- N6 --><g id="node6" class="node"><title>N6</title><ellipse fill="#789abc" stroke="#789abc" cx="212.52" cy="-349.04" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="212.52" y="-344.36" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 6</text></g><!-- N2&#45;&#45;N6 --><g id="edge9" class="edge"><title>N2&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M138.12,-318.22C148.46,-322.51 159.52,-327.09 169.87,-331.37"/><polygon fill="#789abc" stroke="#789abc" points="139.75,-315.11 129.17,-314.51 137.07,-321.57 139.75,-315.11"/><polygon fill="#789abc" stroke="#789abc" points="168.36,-334.53 178.93,-335.13 171.03,-328.07 168.36,-334.53"/></g><!-- N4 --><g id="node4" class="node"><title>N4</title><ellipse fill="#789abc" stroke="#789abc" cx="95.48" cy="-66.48" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="95.48" y="-61.8" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 4</text></g><!-- N3&#45;&#45;N4 --><g id="edge3" class="edge"><title>N3&#45;&#45;N4</title><path fill="none" stroke="#789abc" d="M58.76,-155.14C66.27,-136.99 75.99,-113.53 83.54,-95.3"/><polygon fill="#789abc" stroke="#789abc" points="55.64,-153.51 55.05,-164.09 62.11,-156.19 55.64,-153.51"/><polygon fill="#789abc" stroke="#789abc" points="86.75,-96.7 87.34,-86.12 80.28,-94.02 86.75,-96.7"/></g><!-- N4&#45;&#45;N1 --><g id="edge10" class="edge"><title>N4&#45;&#45;N1</title><path fill="none" stroke="#789abc" d="M138.12,-48.82C148.46,-44.53 159.52,-39.95 169.87,-35.67"/><polygon fill="#789abc" stroke="#789abc" points="137.07,-45.46 129.17,-52.52 139.75,-51.93 137.07,-45.46"/><polygon fill="#789abc" stroke="#789abc" points="171.03,-38.97 178.93,-31.91 168.36,-32.5 171.03,-38.97"/></g><!-- N4&#45;&#45;N5 --><g id="edge4" class="edge"><title>N4&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M154.19,-66.48C189.91,-66.48 235.36,-66.48 271.04,-66.48"/><polygon fill="#789abc" stroke="#789abc" points="154.36,-62.98 144.36,-66.48 154.36,-69.98 154.36,-62.98"/><polygon fill="#789abc" stroke="#789abc" points="270.75,-69.98 280.75,-66.48 270.75,-62.98 270.75,-69.98"/></g><!-- N5&#45;&#45;N6 --><g id="edge5" class="edge"><title>N5&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M317.66,-95.2C295.18,-149.47 246.73,-266.45 224.32,-320.54"/><polygon fill="#789abc" stroke="#789abc" points="320.89,-96.56 321.48,-85.98 314.42,-93.88 320.89,-96.56"/><polygon fill="#789abc" stroke="#789abc" points="221.13,-319.11 220.53,-329.69 227.59,-321.79 221.13,-319.11"/></g><!-- N7 --><g id="node7" class="node"><title>N7</title><ellipse fill="#789abc" stroke="#789abc" cx="329.56" cy="-300.56" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="329.56" y="-295.88" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 7</text></g><!-- N6&#45;&#45;N7 --><g id="edge6" class="edge"><title>N6&#45;&#45;N7</title><path fill="none" stroke="#789abc" d="M255.16,-331.38C265.5,-327.09 276.56,-322.51 286.91,-318.22"/><polygon fill="#789abc" stroke="#789abc" points="254.11,-328.02 246.21,-335.08 256.79,-334.49 254.11,-328.02"/><polygon fill="#789abc" stroke="#789abc" points="288.07,-321.53 295.97,-314.47 285.4,-315.06 288.07,-321.53"/></g><!-- N8 --><g id="node8" class="node"><title>N8</title><ellipse fill="#789abc" stroke="#789abc" cx="378.04" cy="-183.52" rx="47" ry="18"/><text xml:space="preserve" text-anchor="middle" x="378.04" y="-178.84" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 8</text></g><!-- N7&#45;&#45;N8 --><g id="edge7" class="edge"><title>N7&#45;&#45;N8</title><path fill="none" stroke="#789abc" d="M341.31,-272.18C348.83,-254.03 358.55,-230.57 366.1,-212.34"/><polygon fill="#789abc" stroke="#789abc" points="338.2,-270.55 337.61,-281.13 344.67,-273.23 338.2,-270.55"/><polygon fill="#789abc" stroke="#789abc" points="369.31,-213.74 369.9,-203.16 362.84,-211.06 369.31,-213.74"/></g><!-- N8&#45;&#45;N3 --><g id="edge11" class="edge"><title>N8&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M319.47,-183.52C259.2,-183.52 165.84,-183.52 105.56,-183.52"/><polygon fill="#789abc" stroke="#789abc" points="319.09,-187.02 329.09,-183.52 319.09,-180.02 319.09,-187.02"/><polygon fill="#789abc" stroke="#789abc" points="105.85,-180.02 95.85,-183.52 105.85,-187.02 105.85,-180.02"/></g></g></svg></p>
-<p>To facilitate bootstrapping, an initial list of peers is bundled with <a class="mkdocs-ezglossary-link"
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="413pt" height="361pt" viewBox="0.00 0.00 413.15 360.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 356.76)"><title>P2PNetwork</title><polygon fill="transparent" stroke="transparent" points="-4,4 -4,-356.76 409.15,-356.76 409.15,4 -4,4"/><!-- N1 --><g id="node1" class="node"><title>N1</title><ellipse fill="#789abc" stroke="#789abc" cx="202.58" cy="-18" rx="44.39" ry="18"/><text text-anchor="middle" x="202.58" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 1</text></g><!-- N2 --><g id="node2" class="node"><title>N2</title><ellipse fill="#789abc" stroke="#789abc" cx="90.58" cy="-288.37" rx="44.39" ry="18"/><text text-anchor="middle" x="90.58" y="-284.67" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 2</text></g><!-- N1&#45;&#45;N2 --><g id="edge1" class="edge"><title>N1&#45;&#45;N2</title><path fill="none" stroke="#789abc" d="M191.11,-45.67C169.62,-97.56 123.5,-208.9 102.03,-260.75"/><polygon fill="#789abc" stroke="#789abc" points="194.46,-46.74 195.06,-36.16 187.99,-44.06 194.46,-46.74"/><polygon fill="#789abc" stroke="#789abc" points="98.67,-259.71 98.07,-270.29 105.13,-262.39 98.67,-259.71"/></g><!-- N5 --><g id="node5" class="node"><title>N5</title><ellipse fill="#789abc" stroke="#789abc" cx="314.57" cy="-64.39" rx="44.39" ry="18"/><text text-anchor="middle" x="314.57" y="-60.69" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 5</text></g><!-- N1&#45;&#45;N5 --><g id="edge8" class="edge"><title>N1&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M243.19,-34.82C253.28,-39 264.08,-43.48 274.15,-47.65"/><polygon fill="#789abc" stroke="#789abc" points="244.35,-31.52 233.77,-30.92 241.67,-37.98 244.35,-31.52"/><polygon fill="#789abc" stroke="#789abc" points="272.96,-50.94 283.54,-51.54 275.64,-44.48 272.96,-50.94"/></g><!-- N3 --><g id="node3" class="node"><title>N3</title><ellipse fill="#789abc" stroke="#789abc" cx="44.2" cy="-176.38" rx="44.39" ry="18"/><text text-anchor="middle" x="44.2" y="-172.68" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 3</text></g><!-- N2&#45;&#45;N3 --><g id="edge2" class="edge"><title>N2&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M79.3,-261.13C72.11,-243.77 62.82,-221.35 55.61,-203.93"/><polygon fill="#789abc" stroke="#789abc" points="76.07,-262.48 83.13,-270.38 82.54,-259.8 76.07,-262.48"/><polygon fill="#789abc" stroke="#789abc" points="58.69,-202.23 51.63,-194.33 52.22,-204.91 58.69,-202.23"/></g><!-- N6 --><g id="node6" class="node"><title>N6</title><ellipse fill="#789abc" stroke="#789abc" cx="202.58" cy="-334.76" rx="44.39" ry="18"/><text text-anchor="middle" x="202.58" y="-331.06" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 6</text></g><!-- N2&#45;&#45;N6 --><g id="edge9" class="edge"><title>N2&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M131.2,-305.2C141.28,-309.37 152.09,-313.85 162.16,-318.02"/><polygon fill="#789abc" stroke="#789abc" points="132.36,-301.89 121.78,-301.3 129.68,-308.36 132.36,-301.89"/><polygon fill="#789abc" stroke="#789abc" points="160.97,-321.32 171.55,-321.91 163.65,-314.85 160.97,-321.32"/></g><!-- N4 --><g id="node4" class="node"><title>N4</title><ellipse fill="#789abc" stroke="#789abc" cx="90.58" cy="-64.39" rx="44.39" ry="18"/><text text-anchor="middle" x="90.58" y="-60.69" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 4</text></g><!-- N3&#45;&#45;N4 --><g id="edge3" class="edge"><title>N3&#45;&#45;N4</title><path fill="none" stroke="#789abc" d="M55.48,-149.13C62.67,-131.77 71.96,-109.36 79.17,-91.94"/><polygon fill="#789abc" stroke="#789abc" points="52.24,-147.81 51.65,-158.39 58.71,-150.49 52.24,-147.81"/><polygon fill="#789abc" stroke="#789abc" points="82.56,-92.92 83.15,-82.34 76.09,-90.24 82.56,-92.92"/></g><!-- N4&#45;&#45;N1 --><g id="edge10" class="edge"><title>N4&#45;&#45;N1</title><path fill="none" stroke="#789abc" d="M131.2,-47.57C141.28,-43.39 152.09,-38.91 162.16,-34.74"/><polygon fill="#789abc" stroke="#789abc" points="129.68,-44.41 121.78,-51.47 132.36,-50.87 129.68,-44.41"/><polygon fill="#789abc" stroke="#789abc" points="163.65,-37.91 171.55,-30.85 160.97,-31.45 163.65,-37.91"/></g><!-- N4&#45;&#45;N5 --><g id="edge4" class="edge"><title>N4&#45;&#45;N5</title><path fill="none" stroke="#789abc" d="M145.3,-64.39C180.17,-64.39 225.18,-64.39 260.03,-64.39"/><polygon fill="#789abc" stroke="#789abc" points="144.84,-60.89 134.84,-64.39 144.84,-67.89 144.84,-60.89"/><polygon fill="#789abc" stroke="#789abc" points="260.03,-67.89 270.03,-64.39 260.03,-60.89 260.03,-67.89"/></g><!-- N5&#45;&#45;N6 --><g id="edge5" class="edge"><title>N5&#45;&#45;N6</title><path fill="none" stroke="#789abc" d="M303.11,-92.06C281.61,-143.95 235.5,-255.29 214.02,-307.14"/><polygon fill="#789abc" stroke="#789abc" points="306.45,-93.13 307.05,-82.55 299.99,-90.45 306.45,-93.13"/><polygon fill="#789abc" stroke="#789abc" points="210.66,-306.1 210.07,-316.68 217.13,-308.78 210.66,-306.1"/></g><!-- N7 --><g id="node7" class="node"><title>N7</title><ellipse fill="#789abc" stroke="#789abc" cx="314.57" cy="-288.37" rx="44.39" ry="18"/><text text-anchor="middle" x="314.57" y="-284.67" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 7</text></g><!-- N6&#45;&#45;N7 --><g id="edge6" class="edge"><title>N6&#45;&#45;N7</title><path fill="none" stroke="#789abc" d="M243.19,-317.94C253.28,-313.76 264.08,-309.29 274.15,-305.11"/><polygon fill="#789abc" stroke="#789abc" points="241.67,-314.78 233.77,-321.84 244.35,-321.25 241.67,-314.78"/><polygon fill="#789abc" stroke="#789abc" points="275.64,-308.29 283.54,-301.23 272.96,-301.82 275.64,-308.29"/></g><!-- N8 --><g id="node8" class="node"><title>N8</title><ellipse fill="#789abc" stroke="#789abc" cx="360.96" cy="-176.38" rx="44.39" ry="18"/><text text-anchor="middle" x="360.96" y="-172.68" font-family="Times,serif" font-size="14.00" fill="#789abc">Node 8</text></g><!-- N7&#45;&#45;N8 --><g id="edge7" class="edge"><title>N7&#45;&#45;N8</title><path fill="none" stroke="#789abc" d="M325.86,-261.13C333.05,-243.77 342.33,-221.35 349.55,-203.93"/><polygon fill="#789abc" stroke="#789abc" points="322.62,-259.8 322.02,-270.38 329.08,-262.48 322.62,-259.8"/><polygon fill="#789abc" stroke="#789abc" points="352.93,-204.91 353.52,-194.33 346.46,-202.23 352.93,-204.91"/></g><!-- N8&#45;&#45;N3 --><g id="edge11" class="edge"><title>N8&#45;&#45;N3</title><path fill="none" stroke="#789abc" d="M306.27,-176.38C248.11,-176.38 156.67,-176.38 98.61,-176.38"/><polygon fill="#789abc" stroke="#789abc" points="306.58,-179.88 316.58,-176.38 306.58,-172.88 306.58,-179.88"/><polygon fill="#789abc" stroke="#789abc" points="98.53,-172.88 88.53,-176.38 98.53,-179.88 98.53,-172.88"/></g></g></svg></p>
+<p>To facilitate bootstrapping, an initial list of <em>pre-trusted</em> peers is bundled with <a class="mkdocs-ezglossary-link"
 	id="c32575453852dc8e1e9ddd9a45040d38"
 	title="NEM Infrastructure Server.
 A single Java process that implements all node functionality."
 	name="_:NIS"
 	href="../../textbook/nodes/#7db9da2b4c1b58bd6ba92f043f0dfb4e">NIS</a>.
-This allows a new node to make its first connections and begin discovering others.
-However, nodes on this list receive no special treatment:
-once connected, all peers are treated equally by the protocol.</p>
+This allows a new node to make its first connections and begin discovering others.</p>
 <h3 id="node-reputation">Node Reputation<a class="headerlink" href="#node-reputation" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>In a decentralized network like NEM, nodes must decide which peers to trust and maintain connections with.
 Rather than relying on static whitelists or manually curated connections, NEM nodes use a <em>reputation</em> system
@@ -7522,27 +7600,20 @@ Nodes that behave correctly and respond consistently are given higher scores.
 Those that send invalid data, fail to respond, or otherwise misbehave may be penalized or temporarily blacklisted.</p>
 <p>When a node needs to establish a new connection, it selects from the available peers, prioritizing those with higher
 reputation based on past interactions.</p>
-<p>Note that reputation scores are local: each node maintains its own view of the network,
-based solely on its direct experience.</p>
+<p>The bundled pre-trusted peers are weighted more heavily in this selection,
+so they are chosen more often than other peers and act as reliable anchors for the network.
+Their behavior is still scored like any other peer, so a misbehaving pre-trusted peer loses reputation accordingly.</p>
+<p>Reputation scores are local.
+Each node builds its own view of the network from its direct experience alone, and it holds that view only in memory.
+After a restart, a node keeps no earned reputation and rebuilds it from new interactions.</p>
 <p>The implementation is based on the <a href="https://en.wikipedia.org/wiki/EigenTrust">EigenTrust++</a> algorithm.</p>
-<div class="admonition note">
-<p class="admonition-title">Node rotation</p>
-<p>To prevent the formation of isolated or stagnant node groups,
-NEM nodes periodically refresh their peer set, pulling peer lists from a sample of current peers
-and merging newly discovered nodes into the candidate pool, regardless of how well existing peers are scoring.</p>
-<p>This forced churn ensures that nodes continually discover and evaluate new peers,
-maintaining a well-connected and adaptive network topology.</p>
-<p>By balancing reputation-based stability with deliberate connection turnover,
-the protocol avoids network fragmentation and promotes long-term decentralization.</p>
-</div>
-<p>Finally, note that this reputation score is an internal metric used by nodes to decide which other nodes to connect to.
-When using <a class="mkdocs-ezglossary-link"
-	id="70e9ac5f9b16e890c23a4fb0d09d374d"
-	title="A form of harvesting where an account delegates block-signing to a separate remote account on a node,
-while keeping its importance and receiving all the rewards."
-	name="_:Delegated Harvesting"
-	href="../../textbook/harvesting/#252148c4daf33af1a7e32bc8f8a36292">delegated harvesting</a>, accounts may delegate to any node they choose, based on reputation factors
-that may or may not be related to the score described in this page.</p>
+<h3 id="node-rotation">Node Rotation<a class="headerlink" href="#node-rotation" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>To prevent the formation of isolated or stagnant node groups, a node does not always communicate with the same
+peers.
+Every time it selects peers to communicate with, it draws them at random, weighted by reputation.
+Higher-scoring peers are more likely to be chosen, but the choice stays probabilistic.</p>
+<p>This randomness keeps nodes cycling through different peers, avoiding network fragmentation and promoting
+long-term decentralization.</p>
 <h2 id="supernodes">Supernodes<a class="headerlink" href="#supernodes" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>A supernode is a node enrolled in the <em>Supernode Program</em>.</p>
 <dl>
@@ -7555,10 +7626,14 @@ that may or may not be related to the score described in this page.</p>
 <p>NEM has no block subsidy or inflation.
 Nodes are paid exclusively from transaction fees, which can be small in periods of low activity.
 The Supernode Program offsets this by paying daily rewards to nodes that prove themselves reliable.</p>
+<div class="admonition warning">
+<p class="admonition-title">Supernode rewards are not guaranteed</p>
+<p>Reward amounts may be reduced or discontinued at any time.</p>
+</div>
 <p>The program runs entirely off-chain, and NIS itself plays no part: a separate, centrally operated service called the
 <em>controller</em> tests participating nodes and pays out the rewards.</p>
 <p>A node qualifies for a day's reward by holding at least 10'000 <a class="mkdocs-ezglossary-link"
-	id="c4244d7ba9aa910047f21a6a1badca7c"
+	id="d8271a980dbeb9f851cfdd0f55db8e08"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> and passing a battery of automated tests that
@@ -7608,8 +7683,10 @@ knows to be healthy:</p>
 </tr>
 </tbody>
 </table>
+<p>The ping and bandwidth tests reach out to other peers on the network, so a node's score reflects how it performs with
+the wider network rather than just its exchange with the reference node.</p>
 <p>Rewards come from a fixed daily pool of 25'500 XEM, and each qualifying node earns at most 500 XEM per day.
-While 51 or fewer nodes qualify, each receives the full 500 XEM.
+When 51 or fewer nodes qualify, each receives the full 500 XEM.
 Beyond that, the pool is divided equally, so per-node rewards fall as the network grows.</p>
 <p>Enrollment is optional.
 Step-by-step instructions are available on the <a href="https://nem.io/supernode/">NEM Supernode page</a>.</p>
@@ -7635,7 +7712,7 @@ Step-by-step instructions are available on the <a href="https://nem.io/supernode
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     

@@ -1064,6 +1064,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1509,6 +1537,34 @@
     
   
     New Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
   
 
     
@@ -7397,22 +7453,36 @@ The private key is kept secret by the owner, while the public key is distributed
 Together, they enable secure cryptographic operations such as digital signatures and encryption."
 	name="_:Key Pair"
 	href="../../textbook/cryptography/#d2ea30f34aa8993ee9cbd363be7ecb50">Key pair</a> associated with every <a class="mkdocs-ezglossary-link"
-	id="2a291e5452d1d8578c19a114d2c022f7"
+	id="cdc9790796255812e1a50c10575f1545"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
-	href="../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a>, identifying its owner.</dd>
+	href="../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a>.
+Its private key identifies the account owner and grants full control over the account, including the ability to
+transfer funds and announce transactions.</dd>
 
 <dt>
 	<a id="fdb843cdeea7bb265f839f24adc30f4f">Remote Key</a> 
 </dt>
-<dd>Key pair associated with an account that has delegated harvesting to a remote node (see <a class="mkdocs-ezglossary-link"
-	id="34c6b7cad2c878aa425f7e6196ac893c"
-	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
-It plays a similar role to mining in PoW or staking in PoS."
-	name="_:Harvesting"
-	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>).
-The remote key signs blocks on behalf of the main account without exposing the main private key.</dd>
+<dd><a class="mkdocs-ezglossary-link"
+	id="fc38fd151163c753a557fe5fce58c990"
+	title="A matched set consisting of a private key and its corresponding public key.
+The private key is kept secret by the owner, while the public key is distributed openly.
+Together, they enable secure cryptographic operations such as digital signatures and encryption."
+	name="_:Key Pair"
+	href="../../textbook/cryptography/#d2ea30f34aa8993ee9cbd363be7ecb50">Key pair</a> associated with every <a class="mkdocs-ezglossary-link"
+	id="994d8239db4c458d5ff90d4f444b4ff8"
+	title="A type of harvesting that delegates block signing to a separate remote account, while the node's
+importance score and rewards remain tied to the operator's main key."
+	name="_:Remote Harvesting"
+	href="../../textbook/harvesting/#751db2f93ebac437a7c2ffb37e7a3d54">remote harvesting</a> account.
+It allows a node to harvest on behalf of another account without exposing the account's <a class="mkdocs-ezglossary-link"
+	id="8a6ac95b2b11dc52aa574b37da0baa5f"
+	title="Key pair associated with every account.
+Its private key identifies the account owner and grants full control over the account, including the ability to
+transfer funds and announce transactions."
+	name="_:Main Key"
+	href="../../textbook/cryptography/#a291244137ae0c728b9d1cea6494128c">main key</a>.</dd>
 
 </dl>
 <details class="warning">
@@ -7451,7 +7521,7 @@ using <a href="https://ed25519.cr.yp.to">Ed25519</a>, which is defined over a
 	<a id="64c803c8046a084f159cb3fa471c7450">Signature</a> 
 </dt>
 <dd>A digital attachment to a document that certifies that the document is approved by a given <a class="mkdocs-ezglossary-link"
-	id="045a324f83c53de3eff056eae2bf3201"
+	id="96373ff71ea1666b67eff65614c7f7f7"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7479,8 +7549,9 @@ approve transactions."
 	href="../../textbook/accounts/#acdd6609b712640449e6fc8c54e718ec">multiple-owner account</a> requires the approval of enough
 cosignatories to meet the multisig threshold, and must therefore gather multiple signatures before it is considered
 valid.</p>
-<p>Signatures on NEM are 512-bit (64-byte) long and are generated using the <a href="https://ed25519.cr.yp.to">Ed25519</a> algorithm
-with the <strong>Keccak-512</strong> hash function.</p>
+<p>Signatures on NEM are 512-bit (64-byte) long and use the <a href="https://ed25519.cr.yp.to">Ed25519</a> algorithm.
+Unlike standard Ed25519, which relies on SHA-512, NEM uses the <strong>Keccak-512</strong> hash function
+(see <a href="#hashes">NEM uses Keccak, not SHA-3</a>).</p>
 <h2 id="addresses">Addresses<a class="headerlink" href="#addresses" title="Anchor link to this section for reference">⚓︎</a></h2>
 <dl>
 <dt>
@@ -7495,7 +7566,7 @@ current technology."
 	name="_:Public Key"
 	href="../../textbook/cryptography/#17f7d52090c7c880d909358ef3c0e17f">public key</a>, that simplifies sharing it by requiring only
 letters and numbers. It is typically a synonym for <a class="mkdocs-ezglossary-link"
-	id="cdc9790796255812e1a50c10575f1545"
+	id="63b755c58cc148607c9c023c56960adc"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7547,9 +7618,8 @@ mainnet and testnet."
 </li>
 </ol>
 <div class="admonition note">
-<p class="admonition-title">Address generation is an offline process</p>
-<p>Note that address generation does not require interaction with the blockchain.</p>
-<p>In fact, NEM only tracks addresses and associated public keys when they first appear in a transaction.</p>
+<p class="admonition-title">Addresses are tracked only once used</p>
+<p>NEM only starts tracking an address and its associated public key when they first appear in a transaction.</p>
 </div>
 <h2 id="vanity-addresses">Vanity Addresses<a class="headerlink" href="#vanity-addresses" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>While keys, and therefore <a class="mkdocs-ezglossary-link"
@@ -7590,7 +7660,7 @@ The process usually requires substantial time and computation depending on the c
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     

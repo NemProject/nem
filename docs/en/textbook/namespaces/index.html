@@ -1064,6 +1064,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/typed-descriptors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1509,6 +1537,34 @@
     
   
     New Blocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transaction Flow
   
 
     
@@ -7013,17 +7069,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reserved-names" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reserved Names
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ownership" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7274,17 +7319,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reserved-names" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reserved Names
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ownership" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7345,7 +7379,7 @@
 	<a id="2f0cefc8ad477caf4f66272797ede73d">Namespace</a> 
 </dt>
 <dd>A registered name leased to an <a class="mkdocs-ezglossary-link"
-	id="53034ae777f8ee5f93d000c36273cdb3"
+	id="26552828d03b3124affcca33a75ab932"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7357,7 +7391,12 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 	href="../../textbook/mosaics/#1ce1007d637826ac3e2531934a09da3f">mosaics</a> defined under it.</dd>
 
 </dl>
-<p>Namespaces let an account group related mosaics under a meaningful prefix like <code>mycompany.tokens</code>.</p>
+<p>Namespaces let an account group related mosaics under a meaningful prefix like <code>mycompany.tokens</code>.
+The network's own currency follows the same pattern: <code>nem:xem</code>, commonly known as <a class="mkdocs-ezglossary-link"
+	id="d34243bea19f5eb7ab0a0dabab6a664d"
+	title="The native currency of the NEM blockchain."
+	name="_:XEM"
+	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, lives in the <code>nem</code> namespace.</p>
 <p>The account that registers a namespace is called its <em>owner</em>.
 The owner controls which mosaics can be defined under it, so namespaces provide both naming structure and
 ownership scoping.</p>
@@ -7379,6 +7418,7 @@ It can be used to group subnamespaces together in a hierarchical manner.</dd>
 	<a id="e62b35ddac703414b7c55745c6e9a203">Subnamespace</a> 
 </dt>
 <dd>A namespace that belongs to a parent namespace, either the root or another subnamespace.
+It is also called a <em>child namespace</em>.
 Subnamespaces expire when the root namespace expires (see <a href="#duration">Duration</a>).</dd>
 
 </dl>
@@ -7386,8 +7426,10 @@ Subnamespaces expire when the root namespace expires (see <a href="#duration">Du
 <p>Each namespace has a unique name that identifies it on the network, and must follow specific formatting rules:</p>
 <ul>
 <li>Names can only contain lowercase letters, numbers, hyphens <code>-</code>, and underscores <code>_</code>.</li>
-<li>They must start with a letter or number.</li>
+<li>Names must start with a letter or number.</li>
 <li>Root names can be at most 16 characters long.</li>
+<li>Root names <code>nem</code>, <code>user</code>, <code>account</code>, <code>org</code>, <code>com</code>, <code>biz</code>, <code>net</code>, <code>edu</code>, <code>mil</code>, <code>gov</code>, and <code>info</code> are reserved by
+    the protocol and cannot be registered.</li>
 <li>Subnamespace names can be at most 64 characters long.</li>
 </ul>
 <p>Once registered, a name cannot be changed.</p>
@@ -7422,7 +7464,7 @@ During this time, the namespace is effectively disabled: mosaics defined under i
 (see <a href="../mosaics/#lifetime">Mosaic lifetime</a>) and the namespace is not yet available for others to register.</p>
 <p>Only the original owner can renew the namespace during the grace period.
 Once the grace period ends, the namespace is fully released and becomes available for others to register.</p>
-<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="941pt" height="128pt" viewBox="0.00 0.00 941.00 128.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 123.75)"><title>Namespace registration</title><polygon fill="none" stroke="none" points="-4,4 -4,-123.75 936.99,-123.75 936.99,4 -4,4"/><!-- Available --><g id="node1" class="node"><title>Available</title><ellipse fill="none" stroke="#789abc" cx="69.65" cy="-42.25" rx="69.65" ry="42.25"/><text xml:space="preserve" text-anchor="middle" x="69.65" y="-54.82" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text xml:space="preserve" text-anchor="middle" x="69.65" y="-37.57" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text xml:space="preserve" text-anchor="middle" x="69.65" y="-20.32" font-family="Times,serif" font-size="14.00" fill="#789abc">available</text></g><!-- Registered --><g id="node2" class="node"><title>Registered</title><ellipse fill="none" stroke="#789abc" cx="333.45" cy="-42.25" rx="69.65" ry="42.25"/><text xml:space="preserve" text-anchor="middle" x="333.45" y="-54.82" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text xml:space="preserve" text-anchor="middle" x="333.45" y="-37.57" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text xml:space="preserve" text-anchor="middle" x="333.45" y="-20.32" font-family="Times,serif" font-size="14.00" fill="#789abc">registered</text></g><!-- Available&#45;&gt;Registered --><g id="edge1" class="edge"><title>Available&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M139.78,-42.25C174.23,-42.25 216.08,-42.25 251.96,-42.25"/><polygon fill="#789abc" stroke="#789abc" points="251.88,-45.75 261.88,-42.25 251.88,-38.75 251.88,-45.75"/><text xml:space="preserve" text-anchor="middle" x="201.55" y="-46.2" font-family="Times,serif" font-size="14.00" fill="#789abc">Registration</text></g><!-- Registered&#45;&gt;Registered --><g id="edge3" class="edge"><title>Registered&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M310.1,-82.51C311.12,-93.82 318.91,-102.5 333.45,-102.5 342.77,-102.5 349.31,-98.94 353.08,-93.4"/><polygon fill="#789abc" stroke="#789abc" points="356.39,-94.54 356.31,-83.95 349.76,-92.28 356.39,-94.54"/><text xml:space="preserve" text-anchor="middle" x="333.45" y="-106.45" font-family="Times,serif" font-size="14.00" fill="#789abc">Renewal</text></g><!-- Grace Period --><g id="node3" class="node"><title>Grace Period</title><ellipse fill="none" stroke="#789abc" cx="590.64" cy="-42.25" rx="76.54" ry="41.37"/><text xml:space="preserve" text-anchor="middle" x="590.64" y="-38.2" font-family="Times,serif" font-size="14.00" fill="#789abc">Grace Period</text><text xml:space="preserve" text-anchor="middle" x="590.64" y="-20.95" font-family="Times,serif" font-size="14.00" fill="#789abc"> </text></g><!-- Registered&#45;&gt;Grace Period --><g id="edge2" class="edge"><title>Registered&#45;&gt;Grace Period</title><path fill="none" stroke="#789abc" d="M403.51,-42.25C434.01,-42.25 470.21,-42.25 502.54,-42.25"/><polygon fill="#789abc" stroke="#789abc" points="502.29,-45.75 512.29,-42.25 502.29,-38.75 502.29,-45.75"/><text xml:space="preserve" text-anchor="middle" x="458.6" y="-46.2" font-family="Times,serif" font-size="14.00" fill="#789abc">Expiration</text></g><!-- Grace Period&#45;&gt;Registered --><g id="edge4" class="edge"><title>Grace Period&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M531.79,-15.3C520.2,-11.02 507.95,-7.27 496.1,-5 463.36,1.28 453.75,1.72 421.1,-5 413.66,-6.53 406.08,-8.73 398.65,-11.3"/><polygon fill="#789abc" stroke="#789abc" points="397.46,-8.01 389.31,-14.78 399.91,-14.57 397.46,-8.01"/><text xml:space="preserve" text-anchor="middle" x="458.6" y="-8.95" font-family="Times,serif" font-size="14.00" fill="#789abc">Renewal</text></g><!-- Available Again --><g id="node4" class="node"><title>Available Again</title><ellipse fill="none" stroke="#789abc" cx="845.84" cy="-42.25" rx="87.15" ry="42.25"/><text xml:space="preserve" text-anchor="middle" x="845.84" y="-54.82" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text xml:space="preserve" text-anchor="middle" x="845.84" y="-37.57" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text xml:space="preserve" text-anchor="middle" x="845.84" y="-20.32" font-family="Times,serif" font-size="14.00" fill="#789abc">available again</text></g><!-- Grace Period&#45;&gt;Available Again --><g id="edge5" class="edge"><title>Grace Period&#45;&gt;Available Again</title><path fill="none" stroke="#789abc" d="M667.61,-42.25C692.59,-42.25 720.72,-42.25 747.09,-42.25"/><polygon fill="#789abc" stroke="#789abc" points="746.76,-45.75 756.76,-42.25 746.76,-38.75 746.76,-45.75"/><text xml:space="preserve" text-anchor="middle" x="712.94" y="-46.2" font-family="Times,serif" font-size="14.00" fill="#789abc">Release</text></g></g></svg></p>
+<p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="947pt" height="118pt" viewBox="0.00 0.00 946.53 118.18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 114.18)"><title>Namespace registration</title><polygon fill="transparent" stroke="transparent" points="-4,4 -4,-114.18 942.53,-114.18 942.53,4 -4,4"/><!-- Available --><g id="node1" class="node"><title>Available</title><ellipse fill="none" stroke="#789abc" cx="70" cy="-39.71" rx="70.01" ry="37.45"/><text text-anchor="middle" x="70" y="-51.01" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text text-anchor="middle" x="70" y="-36.01" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text text-anchor="middle" x="70" y="-21.01" font-family="Times,serif" font-size="14.00" fill="#789abc">available</text></g><!-- Registered --><g id="node2" class="node"><title>Registered</title><ellipse fill="none" stroke="#789abc" cx="335.01" cy="-39.71" rx="70.01" ry="37.45"/><text text-anchor="middle" x="335.01" y="-51.01" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text text-anchor="middle" x="335.01" y="-36.01" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text text-anchor="middle" x="335.01" y="-21.01" font-family="Times,serif" font-size="14.00" fill="#789abc">registered</text></g><!-- Available&#45;&gt;Registered --><g id="edge1" class="edge"><title>Available&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M140.11,-39.71C175.3,-39.71 218.26,-39.71 254.79,-39.71"/><polygon fill="#789abc" stroke="#789abc" points="254.91,-43.21 264.91,-39.71 254.91,-36.21 254.91,-43.21"/><text text-anchor="middle" x="202.51" y="-43.51" font-family="Times,serif" font-size="14.00" fill="#789abc">Registration</text></g><!-- Registered&#45;&gt;Registered --><g id="edge3" class="edge"><title>Registered&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M311.4,-75.19C311.76,-86.36 319.63,-95.18 335.01,-95.18 345.34,-95.18 352.29,-91.2 355.84,-85.2"/><polygon fill="#789abc" stroke="#789abc" points="359.32,-85.76 358.62,-75.19 352.57,-83.89 359.32,-85.76"/><text text-anchor="middle" x="335.01" y="-98.98" font-family="Times,serif" font-size="14.00" fill="#789abc">Renewal</text></g><!-- Grace Period --><g id="node3" class="node"><title>Grace Period</title><ellipse fill="none" stroke="#789abc" cx="594.09" cy="-39.71" rx="77.15" ry="38.37"/><text text-anchor="middle" x="594.09" y="-35.51" font-family="Times,serif" font-size="14.00" fill="#789abc">Grace Period</text><text text-anchor="middle" x="594.09" y="-20.51" font-family="Times,serif" font-size="14.00" fill="#789abc"> </text></g><!-- Registered&#45;&gt;Grace Period --><g id="edge2" class="edge"><title>Registered&#45;&gt;Grace Period</title><path fill="none" stroke="#789abc" d="M405.24,-39.71C436.51,-39.71 473.77,-39.71 506.84,-39.71"/><polygon fill="#789abc" stroke="#789abc" points="506.95,-43.21 516.95,-39.71 506.95,-36.21 506.95,-43.21"/><text text-anchor="middle" x="461.01" y="-43.51" font-family="Times,serif" font-size="14.00" fill="#789abc">Expiration</text></g><!-- Grace Period&#45;&gt;Registered --><g id="edge4" class="edge"><title>Grace Period&#45;&gt;Registered</title><path fill="none" stroke="#789abc" d="M535.79,-14.72C523.85,-10.57 511.19,-6.9 499.01,-4.71 465.77,1.28 456.18,1.71 423.01,-4.71 414.54,-6.35 405.84,-8.81 397.37,-11.69"/><polygon fill="#789abc" stroke="#789abc" points="396.16,-8.4 387.94,-15.08 398.53,-14.99 396.16,-8.4"/><text text-anchor="middle" x="461.01" y="-8.51" font-family="Times,serif" font-size="14.00" fill="#789abc">Renewal</text></g><!-- Available Again --><g id="node4" class="node"><title>Available Again</title><ellipse fill="none" stroke="#789abc" cx="850.84" cy="-39.71" rx="87.86" ry="37.45"/><text text-anchor="middle" x="850.84" y="-51.01" font-family="Times,serif" font-size="14.00" fill="#789abc">Namespace</text><text text-anchor="middle" x="850.84" y="-36.01" font-family="Times,serif" font-size="14.00" fill="#789abc">is</text><text text-anchor="middle" x="850.84" y="-21.01" font-family="Times,serif" font-size="14.00" fill="#789abc">available again</text></g><!-- Grace Period&#45;&gt;Available Again --><g id="edge5" class="edge"><title>Grace Period&#45;&gt;Available Again</title><path fill="none" stroke="#789abc" d="M671.18,-39.71C696.79,-39.71 725.72,-39.71 752.73,-39.71"/><polygon fill="#789abc" stroke="#789abc" points="752.97,-43.21 762.97,-39.71 752.97,-36.21 752.97,-43.21"/><text text-anchor="middle" x="717.16" y="-43.51" font-family="Times,serif" font-size="14.00" fill="#789abc">Release</text></g></g></svg></p>
 <p>The following operations are permitted depending on the state of the namespace registration:</p>
 <table>
 <thead>
@@ -7460,9 +7502,17 @@ Once the grace period ends, the namespace is fully released and becomes availabl
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">The <code>nem</code> namespace never expires</p>
+<p>The <code>nem</code> namespace, which holds <a class="mkdocs-ezglossary-link"
+	id="c4244d7ba9aa910047f21a6a1badca7c"
+	title="The native currency of the NEM blockchain."
+	name="_:XEM"
+	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, is permanently active and is exempt from the lease and renewal cycle.</p>
+</div>
 <h2 id="lease-fee">Lease Fee<a class="headerlink" href="#lease-fee" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Registering a namespace requires paying a lease fee in the network currency (<a class="mkdocs-ezglossary-link"
-	id="d34243bea19f5eb7ab0a0dabab6a664d"
+	id="6b9c146f68a9a4685cff85f84aea5294"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>):</p>
@@ -7477,11 +7527,6 @@ Once the grace period ends, the namespace is fully released and becomes availabl
 <p>Registering or renewing any kind of namespace requires announcing a transaction, which also has an associated fee.
 However, this transaction fee is typically negligible compared to the lease fee.</p>
 </div>
-<h2 id="reserved-names">Reserved Names<a class="headerlink" href="#reserved-names" title="Anchor link to this section for reference">⚓︎</a></h2>
-<p>The following root names are reserved by the protocol and cannot be claimed by users:</p>
-<p><code>nem</code>, <code>user</code>, <code>account</code>, <code>org</code>, <code>com</code>, <code>biz</code>, <code>net</code>, <code>edu</code>, <code>mil</code>, <code>gov</code>, <code>info</code>.</p>
-<p>The <code>nem</code> namespace, in particular, hosts the native currency <code>nem:xem</code> and is permanently active.
-The colon separates the namespace from the <a href="../mosaics/#fully-qualified-name">mosaic name</a>.</p>
 <h2 id="ownership">Ownership<a class="headerlink" href="#ownership" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>A namespace is controlled by the account that registered the root namespace.</p>
 <p>Only the owner can:</p>
@@ -7563,7 +7608,7 @@ approve transactions."
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 17, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
   </span>
 
     
