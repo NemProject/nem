@@ -89,6 +89,7 @@ nav:
           - Transactions:
               - devbook/transactions/transfer-xem.md
               - devbook/transactions/transfer-mosaics.md
+              - devbook/transactions/messages.md
               - devbook/transactions/monitoring-status.md
               - devbook/transactions/typed-descriptors.md
           - Mosaics:
