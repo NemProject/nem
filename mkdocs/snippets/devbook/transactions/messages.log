@@ -1,0 +1,27 @@
+Using node http://libertalia.nemtest.net:7890
+Sender address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Recipient address: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4
+
+Fetching current network time from /time-sync/network-time
+  Network time: 355248540 s since the nemesis block
+
+==> Sending Plain Text Message
+Plain message: Hello, NEM!
+Transaction hash: 2F8F20CAF8F6FA42ADE05ED85FED0B4D1DA88051972405C4AE2D181B01FB69C3
+Plain message transaction announced
+
+<== Receiving Plain Text Message
+Polling for Plain message transaction confirmation...
+  Plain message transaction confirmed!
+Received plain message: Hello, NEM!
+
+==> Sending Encrypted Message
+Original message: This is a secret message!
+Encrypted payload: 3fefcf6e4f1e5e2165f941a5c15ea66778f82eded50cfbde5fc27eba24f4580ff72fb9d0b45061747be0324a120dc357dd11351c09
+Transaction hash: 76604471D5A345E6F5CE20C65D618BC6F9A600F1DF515A696B2152E0E2D0B427
+Encrypted message transaction announced
+
+<== Receiving Encrypted Message
+Polling for Encrypted message transaction confirmation...
+  Encrypted message transaction confirmed!
+Recipient decrypted message: This is a secret message!
