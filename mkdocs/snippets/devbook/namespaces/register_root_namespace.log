@@ -1,0 +1,33 @@
+Using node http://libertalia.nemtest.net:7890
+Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Fetching current network time from /time-sync/network-time
+  Network time: 355503793 s since the nemesis block
+Creating root namespace: ns_1783091378
+  Namespace lease fee: 100.0 XEM
+  Transaction fee: 0.15 XEM
+Built transaction:
+{
+  "type": 8193,
+  "version": 1,
+  "network": 152,
+  "timestamp": 355503793,
+  "signer_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+  "signature": "D15220D1888AC85CE205D4D2B1AF3540CA415716DD266A29646FE0DEFAFBED924F0B698C4F6EEAA706AA836FA82516552D54B5BCE91D841D6F1C865633EED50D",
+  "fee": "150000",
+  "deadline": 355510993,
+  "rental_fee_sink": "54414D4553504143455748344D4B464D42435646455244504F4F5034464B374D54444A4559503335",
+  "rental_fee": "100000000",
+  "name": "6e735f31373833303931333738"
+}
+Announcing namespace registration to /transaction/announce
+  Result: SUCCESS
+Waiting for confirmation from /transaction/get?hash=D56EDC5946F1A41304CDDC2BC322793C558DFB57831EF7D45024DE46D6AD827F
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+Transaction confirmed in block 685363
+Fetching namespace information from /namespace?namespace=ns_1783091378
+Namespace information:
+  Name: ns_1783091378
+  Owner: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+  Height: 685363
