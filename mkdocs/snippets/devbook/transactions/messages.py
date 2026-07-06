@@ -151,7 +151,8 @@ encrypted_message = sender_message_encoder.encode(
 	recipient_key_pair.public_key, secret_message
 )
 print(f'Original message: {secret_message.decode("utf-8")}')
-print(f'Encrypted payload: {hexlify(encrypted_message.message).decode("utf-8")}')
+encrypted_payload = hexlify(encrypted_message.message).decode('utf-8')
+print(f'Encrypted payload: {encrypted_payload}')
 
 # Build transfer transaction with encrypted message
 encrypted_transaction = facade.transaction_factory.create(

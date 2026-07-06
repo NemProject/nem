@@ -133,8 +133,8 @@ To decrypt the message from the confirmed transaction, a <dy:MessageEncoder> is 
 then <dy:MessageEncoder.tryDecode> is called with the sender's public key (obtained from the transaction's
 `signer` field) and the encrypted payload.
 
-The method returns a tuple `(is_decoded, message)` indicating whether decryption was successful, and, if so, contains
-the original plaintext bytes, which still need to be decoded.
+The method returns a tuple {{ tutorial.var('(is_decoded, message)') }} indicating whether decryption was successful,
+and, if so, contains the original plaintext bytes, which still need to be decoded.
 
 !!! note "Decryption works both ways"
 
@@ -148,14 +148,32 @@ If decryption fails, possible causes include:
 * The message is corrupted or tampered with.
 * The message is plain text, not encrypted.
 * An incorrect public key was used for the other party.
+* The same convention was not used when encrypting and decrypting.
 
 ## Output
 
 The output shown below corresponds to a typical run of the program.
 
-```text
+```text linenums="1" hl_lines="9 16 19 20 27"
 --8<-- 'devbook/transactions/messages.log'
 ```
+
+Some highlights from the output:
+
+* **Plain message** (line 9): The message attached to the first transaction.
+    Because it is not encrypted, anyone inspecting the blockchain can read it.
+
+* **Received plain message** (line 16): The same message, recovered from the confirmed transaction by converting the
+    hexadecimal payload back to UTF-8.
+
+* **Original message** (line 19): The secret message before encryption.
+
+* **Encrypted payload** (line 20): The result of encrypting the previous message with <dy:MessageEncoder.encode>,
+    shown as a hexadecimal string.
+    This is what gets stored on the blockchain.
+
+* **Recipient decrypted message** (line 27): The original message, retrieved from the confirmed transaction and
+    decrypted by <dy:MessageEncoder.tryDecode> using the recipient's private key and the sender's public key.
 
 You can view the transactions on the [NEM testnet explorer](https://testnet.nem.fyi/) by searching for the
 transaction hashes printed in the output.
