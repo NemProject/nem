@@ -40,13 +40,13 @@ try {
 		console.log(`  ${label}: ${fmt(balance)} ${MOSAIC_ID}`);
 	}
 	console.log(
-		`Non-circulating supply: ` +
+		'Non-circulating supply: ' +
 		`${fmt(nonCirculatingSupply)} ${MOSAIC_ID}`
 	); // [<step-3]
 	// [>step-4]
 	const circulatingSupply = totalSupply - nonCirculatingSupply;
 	console.log(
-		`Circulating supply: ` +
+		'Circulating supply: ' +
 		`${fmt(circulatingSupply)} ${MOSAIC_ID}`
 	); // [<step-4]
 } catch (error) {
