@@ -334,8 +334,8 @@ def page_markdown_js_typedoc(content, page, config, files):
 	m = re.search(r'\n## Methods\n', content)
 	if m:
 		content = content[:m.start()] + re.sub(
-			r"(\n### )([^(]*?)(\(\)\n\n```.*?```\n\n)([^#].*?)(\n\n####)",
-			rf'\1\2\3<dl class="automatic-reference-term" markdown><dt>js:{symbol_name}.\2</dt><dd>\4</dd></dl>\5',
+			r"(\n### )(~~)?([^(]*?)(\(\))(~~)?(\n\n```.*?```\n\n)([^#].*?)(\n\n####)",
+			rf'\1\2\3\4\5\6<dl class="automatic-reference-term" markdown><dt>js:{symbol_name}.\3</dt><dd>\7</dd></dl>\8',
 			content[m.start():], flags=re.DOTALL)
 
 	# Add glossary definition to global functions
