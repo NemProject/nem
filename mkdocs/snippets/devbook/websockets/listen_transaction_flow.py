@@ -64,6 +64,13 @@ def stomp_messages(raw_frame):
 			yield frame
 
 
+async def stomp_frames(websocket):
+	# Yield each STOMP MESSAGE frame as it arrives
+	async for raw_frame in websocket:
+		for frame in stomp_messages(raw_frame):
+			yield frame
+
+
 # Set up the monitored address and signer [>step-1]
 MONITOR_ADDRESS = os.getenv(
 	'MONITOR_ADDRESS',
@@ -80,26 +87,37 @@ signer_key_pair = NemFacade.KeyPair(PrivateKey(SIGNER_PRIVATE_KEY))  # [<step-1]
 
 
 async def main():
-	# Connect to the WebSocket [>step-2]
+	# Build and sign a transfer to the monitored address [>step-2]
+	with urllib.request.urlopen(
+		f'{NODE_URL}/time-sync/network-time'
+	) as resp:
+		network_time = json.loads(
+			resp.read().decode())['receiveTimeStamp'] // 1000
+	transaction = facade.transaction_factory.create({
+		'type': 'transfer_transaction_v2',
+		'signer_public_key': signer_key_pair.public_key,
+		'timestamp': network_time,
+		'deadline': network_time + 2 * 60 * 60,
+		'recipient_address': MONITOR_ADDRESS,
+		'amount': 0,
+	})
+	transaction.fee = Amount(calculate_transaction_fee(transaction))
+	signature = facade.sign_transaction(signer_key_pair, transaction)
+	json_payload = facade.transaction_factory.attach_signature(
+		transaction, signature)
+	transaction_hash = str(
+		facade.hash_transaction(transaction)).upper()
+	# [<step-2]
+	# Connect to the WebSocket [>step-3]
 	endpoint = f'{WS_URL}/w/messages'
 	async with connect(sockjs_url(endpoint)) as websocket:
 		await stomp_connect(websocket)
 		print(f'Connected to {WS_URL}')
-		# [<step-2]
-		# Register the account and confirm it is active [>step-3]
-		destination = f'/account/{MONITOR_ADDRESS}'
-		await stomp_subscribe(websocket, destination, 'id-0')
-		await stomp_send(websocket, '/w/api/account/get',
-			json.dumps({'account': MONITOR_ADDRESS}))
-		async for raw_frame in websocket:
-			if any(f['headers']['destination'] == destination
-					for f in stomp_messages(raw_frame)):
-				break
-		await stomp_unsubscribe(websocket, 'id-0')
-		print('Account registered')
 		# [<step-3]
-		# Subscribe to the transaction channels [>step-4]
+		# Subscribe to the account and transaction channels [>step-4]
+		account_channel = f'/account/{MONITOR_ADDRESS}'
 		channels = {
+			account_channel: 'id-0',
 			f'/unconfirmed/{MONITOR_ADDRESS}': 'id-1',
 			f'/transactions/{MONITOR_ADDRESS}': 'id-2',
 		}
@@ -107,26 +125,16 @@ async def main():
 			await stomp_subscribe(websocket, channel, sub_id)
 			print(f'Subscribed to {channel} channel')
 		# [<step-4]
-		# Build and sign a transfer to the monitored address [>step-5]
-		with urllib.request.urlopen(
-			f'{NODE_URL}/time-sync/network-time'
-		) as resp:
-			network_time = json.loads(
-				resp.read().decode())['receiveTimeStamp'] // 1000
-		transaction = facade.transaction_factory.create({
-			'type': 'transfer_transaction_v2',
-			'signer_public_key': signer_key_pair.public_key,
-			'timestamp': network_time,
-			'deadline': network_time + 2 * 60 * 60,
-			'recipient_address': MONITOR_ADDRESS,
-			'amount': 0,
-		})
-		transaction.fee = Amount(calculate_transaction_fee(transaction))
-		signature = facade.sign_transaction(signer_key_pair, transaction)
-		json_payload = facade.transaction_factory.attach_signature(
-			transaction, signature)
-		transaction_hash = str(
-			facade.hash_transaction(transaction)).upper()
+		# Register the account and confirm it is active [>step-5]
+		await stomp_send(websocket, '/w/api/account/get',
+			json.dumps({'account': MONITOR_ADDRESS}))
+		async for frame in stomp_frames(websocket):
+			if account_channel == frame['headers']['destination']:
+				balance = json.loads(
+					frame['body'])['account']['balance']
+				print(f'Account update: balance={balance}')
+				break
+		print('Account registered')
 		# [<step-5]
 		# Announce the transaction and wait for it to confirm [>step-6]
 		print(f'Announcing transaction {transaction_hash[:16]}...')
@@ -141,22 +149,24 @@ async def main():
 
 		if 'SUCCESS' == result['message']:
 			confirmed = False
-			async for raw_frame in websocket:
-				for frame in stomp_messages(raw_frame):
-					destination = frame['headers']['destination']
-					pair = json.loads(frame['body'])
-					message_hash = pair['meta']['hash']['data']
-					status = (
-						'confirmed' if '/transactions/' in destination
-						else 'unconfirmed')
-					print(f'{status}: hash={message_hash[:16]}...')
-					is_match = message_hash.upper() == transaction_hash
-					if status == 'confirmed' and is_match:
+			async for frame in stomp_frames(websocket):
+				destination = frame['headers']['destination']
+				body = json.loads(frame['body'])
+				if account_channel == destination:
+					balance = body['account']['balance']
+					print(f'Account update: balance={balance}')
+					if confirmed:
+						break
+				elif '/transactions/' in destination:
+					message_hash = body['meta']['hash']['data']
+					print(f'confirmed: hash={message_hash[:16]}...')
+					if message_hash.upper() == transaction_hash:
 						short_hash = transaction_hash[:16]
 						print(f'Transaction {short_hash}... confirmed')
 						confirmed = True
-				if confirmed:
-					break
+				else:
+					message_hash = body['meta']['hash']['data']
+					print(f'unconfirmed: hash={message_hash[:16]}...')
 		else:
 			print(f'Transaction rejected: {result["message"]}')
 		# [<step-6]

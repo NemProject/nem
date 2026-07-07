@@ -65,7 +65,8 @@ The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 If no value is provided, a default one is used.
 
 `WS_URL` defines the WebSocket endpoint for the same node.
-It is derived from `NODE_URL` by replacing port `7890` with `7778`.
+It is derived from `NODE_URL` by replacing port `7890`, the default HTTP API port, with `7778`, the default NIS
+WebSocket port.
 
 ## Code Explanation
 
@@ -73,77 +74,80 @@ It is derived from `NODE_URL` by replacing port `7890` with `7778`.
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
-Each transaction channel is scoped to a specific address.
-The channels send a notification whenever this address is involved in a transaction, as sender or recipient.
-The `MONITOR_ADDRESS` environment variable sets the address to watch.
-The WebSocket API expects it uppercase and without hyphens.
+This step sets up the address to monitor and the account that sends a transfer to it.
 
-To trigger notifications, this tutorial sends a transfer transaction to the monitored address.
-The sender's private key is read from `SIGNER_PRIVATE_KEY`.
+`MONITOR_ADDRESS` is the address to watch.
+The channels this tutorial subscribes to are scoped to this address and notify whenever it is involved in a transaction,
+for example as the sender or recipient of a transfer.
+The WebSocket API expects the address uppercase and without hyphens.
+
+`SIGNER_PRIVATE_KEY` is the private key of the account that sends the transfer, which triggers the notifications.
 
 If any of these environment variables is not provided, the tutorial provides default values.
 
-### Connecting to the WebSocket
+### Building and Signing a Transfer Transaction
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-The code opens a SockJS connection to the `/w/messages` endpoint on `WS_URL` and starts a <STOMP session:>
-over it.
+This tutorial builds a minimal <Transfer Transaction:> to the monitored address, with a zero amount, no mosaics, and
+no message.
+A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
 
-### Registering the Account
+The transaction follows the same process described in the
+[Transfer XEM tutorial](../transactions/transfer-xem.md): fetching the network time, creating the transaction,
+and signing it.
+The hash is computed locally, before any channel is subscribed, so the message handler defined below can match
+incoming messages against it.
+
+### Connecting to the WebSocket
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-To receive notifications on an account's transaction channels, the address must first be **registered** with the node.
-
-Before sending the registration request, the code temporarily subscribes to the <ws:account&#47;{address}> channel
-using `id-0`, so it can capture the notification that confirms registration.
-
-The code then sends a <req:w&#47;api&#47;account&#47;get> request to register the address.
-
-Once the address is registered, the node sends the account’s current state on the same <ws:account&#47;{address}>
-channel, which serves as the registration confirmation.
-
-When the notification arrives, the temporary subscription to the account messages channel is dropped using the same
-`id-0` identifier.
+The code opens a SockJS connection to the `/w/messages` endpoint on `WS_URL` and starts a <STOMP session:>
+over it.
 
 ### Subscribing to the Channels
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-With the account's address registered, the code subscribes to two address-scoped channels:
+The code subscribes to three address-scoped channels:
 
+* <ws:account&#47;{address}>: Notifies with the account's current state when a <block:> containing a transaction
+    involving the address is confirmed.
 * <ws:unconfirmed&#47;{address}>: Notifies when a transaction involving the address enters the <unconfirmed pool:>,
     waiting to be included in a block.
 * <ws:transactions&#47;{address}>: Notifies when a transaction involving the address is included in a <block:>.
 
-The subscriptions use IDs `id-1` and `id-2`, which identify them when the code unsubscribes after confirmation.
+The subscriptions use the IDs `id-0`, `id-1` and `id-2`, which identify them when the code unsubscribes at the end.
 
-### Building and Signing a Transfer Transaction
+All three channels stay silent until the address is registered, which the next step performs.
+
+### Registering the Account
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
-This tutorial builds a minimal <Transfer Transaction:> to the monitored address, with a zero amount, no mosaics, and no message.
-A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
+To receive notifications on an account's channels, the address must first be **registered** with the node.
 
-The transaction follows the same process described in the
-[Transfer Transaction tutorial](../transactions/transfer-xem.md): fetching the network time, creating the transaction,
-and signing it.
-The hash is computed locally so it can be matched against incoming messages later.
+The code sends a <req:w&#47;api&#47;account&#47;get> request, which registers the address and also forces the node to
+send the account's current state on the <ws:account&#47;{address}> channel.
+
+The code waits for this first account notification, which confirms that the registration is active.
+The notification follows the [AccountMetaDataPair](../reference/rest/nem.md#model/AccountMetaDataPair) schema.
+
+The subscription to the account channel stays open for the rest of the run, so the account notification triggered by
+the transaction confirmation also appears in the output.
 
 ### Announcing and Waiting for Confirmation
 
 {{ tutorial.code_snippet_tagged('step-6') }}
 
 The code announces the transaction to the <post:/transaction/announce> endpoint and checks the result.
-If the node rejected it, the code prints the rejection reason and stops.
+If the node rejects it, the code prints the rejection reason and stops.
 
-Otherwise, the code waits for confirmation, printing each message from the two subscribed channels.
-Each message follows the [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) schema, whose
+Otherwise, the code waits for confirmation, printing each message from the subscribed channels.
+Messages from the transaction channels follow the
+[TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) schema, whose
 `meta.hash.data` field holds the transaction hash.
-
-When a message from the <ws:transactions&#47;{address}> channel arrives whose hash matches the announced transaction,
-the program prints a confirmation message and exits.
 
 !!! warning "Announce after subscribing to channels"
 
@@ -156,15 +160,21 @@ The expected sequence for a successful transaction is described in the
 1. `unconfirmed`: The transaction enters the <unconfirmed pool:>.
 2. `confirmed`: The transaction is included in a <block:>.
 
+The block that includes the transaction also triggers a final notification on the <ws:account&#47;{address}>
+channel.
+
+Once this final notification arrives, the program moves on to the cleanup step.
+
 ### Unsubscribing from Channels
 
 {{ tutorial.code_snippet_tagged('step-7') }}
 
-After confirmation, the code unsubscribes from both channels and ends the STOMP session before the connection closes.
+After confirmation, the code unsubscribes from the three channels and ends the STOMP session before the connection
+closes.
 
 ## Output
 
-```text linenums="1" hl_lines="2 3 4 5 6 7 8 9 10 11"
+```text linenums="1" hl_lines="2-14"
 --8<-- 'devbook/websockets/listen_transaction_flow.log'
 ```
 
@@ -172,13 +182,16 @@ The output shows:
 
 * **Address** (line 2): The monitored address.
 * **Connection** (line 3): The STOMP session is established over the node's WebSocket endpoint at port `7778`.
-* **Registration** (line 4): The account registration is confirmed before subscribing.
-* **Subscriptions** (lines 5-6): Both transaction channels are subscribed.
-* **Announcement** (line 7): The transaction is announced and its hash is printed.
-* **Transaction flow** (lines 8-9): The transaction moves from `unconfirmed` to `confirmed`, showing the confirmation
-    lifecycle.
-* **Confirmation** (line 10): The hash from the `/transactions/{address}` channel matches the announced transaction.
-* **Unsubscribe** (line 11): The code unsubscribes from both channels.
+* **Subscriptions** (lines 4-6): The account channel and both transaction channels are subscribed.
+* **Registration** (lines 7-8): The account's current state arrives on the account channel, confirming the
+    registration.
+* **Announcement** (line 9): The transaction is announced and its hash is printed.
+* **Transaction flow** (lines 10-11): The transaction moves from `unconfirmed` to `confirmed`, showing the
+    confirmation lifecycle.
+* **Confirmation** (line 12): The hash from the <ws:transactions&#47;{address}> channel matches the announced transaction.
+* **Account update** (line 13): The block containing the transaction triggers a final account notification.
+    The balance is unchanged, since the transfer amount is zero.
+* **Unsubscribe** (line 14): The code unsubscribes from the three channels.
 
 ## Conclusion
 
@@ -186,7 +199,8 @@ This tutorial showed how to:
 
 | Step                                                                    | Related documentation                                                             |
 | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [Register the account](#registering-the-account)                        | <req:w&#47;api&#47;account&#47;get>, <ws:account&#47;{address}>                   |
+| [Subscribe to the account channel](#subscribing-to-the-channels)        | <ws:account&#47;{address}>                                                        |
 | [Subscribe to the unconfirmed channel](#subscribing-to-the-channels)    | <ws:unconfirmed&#47;{address}>                                                    |
 | [Subscribe to the transactions channel](#subscribing-to-the-channels)   | <ws:transactions&#47;{address}>                                                   |
+| [Register the account](#registering-the-account)                        | <req:w&#47;api&#47;account&#47;get>                                               |
 | [Handle transaction messages](#announcing-and-waiting-for-confirmation) | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) |
