@@ -5,10 +5,11 @@ tutorial_level: intermediate
 
 # Registering a Root Namespace
 
-<Namespaces:|Namespaces> provide human-readable spaces that group related <mosaics:> under a meaningful name, like the
-`nem` prefix in the native `nem:xem` mosaic.
+<Namespaces:|Namespaces> provide labels that group related <mosaics:> under a meaningful name, like the `nem` prefix
+in the native `nem:xem` mosaic.
 
-This tutorial shows how to register a <root namespace:> for one year.
+Namespaces can be nested under other namespaces, and this tutorial shows how to register a <root namespace:> for one
+year.
 
 ## Prerequisites
 
@@ -76,12 +77,11 @@ The namespace registration transaction specifies:
     The SDK's <dy:FeeCalculator.calculateNamespaceRentalFee> helper returns the required amount.
     The {{ tutorial.lit('True') }} argument requests the fee for a root namespace.
 
-    The network rejects transactions that pay less than the minimum fee.
+    The network rejects transactions that pay less than this fee.
     Larger amounts are accepted, but the entire amount is transferred to the sink account.
 
 * {{ tutorial.var('name') }}: The name of the root namespace.
-    Names can only contain lowercase letters, numbers, hyphens, and underscores, must start with a letter or number,
-    and root names can be at most 16 characters long.
+    See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
     To ensure the namespace name is unique across multiple runs of the tutorial, a timestamp is added to the name.
     In practice, programs would use a fixed name for their namespaces.
@@ -96,8 +96,8 @@ Namespace registration transactions pay a fixed transaction fee of 0.15 XEM, as 
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-The transaction is signed and announced following the same process as in
-[Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction).
+The transaction is signed and announced following the same process as in the
+[Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
@@ -110,6 +110,7 @@ transaction is included in a block.
 
 To verify the namespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint and
 displays its properties.
+The registration height is the block in which the namespace was registered, marking the start of the one-year lease.
 
 A successful response confirms that the namespace is registered and active.
 
@@ -126,10 +127,11 @@ Some highlights from the output:
 * **Namespace name** (line 5): The chosen name `ns_1783091378` includes a timestamp to ensure uniqueness.
     Search for this name in the [NEM testnet explorer](https://testnet.nem.fyi/) to view the namespace details.
 
-* **Lease fee and transaction fee** (lines 6-7): The lease fee is 100 XEM, while the transaction fee is a flat 0.15 XEM.
+* **Lease fee and transaction fee** (lines 6-7): The lease fee is 100 XEM because this is a root namespace
+    (<subnamespaces:> pay 10 XEM instead), while the transaction fee is 0.15 XEM.
 
-* **Namespace information** (lines 31-33): The registered namespace, its owner (the signer's address), and the block
-    height at which the lease began.
+* **Namespace information** (lines 31-33): The registered namespace, its owner (the signer's address), and the
+    registration height, which is the block at which the lease began.
 
 ## Conclusion
 

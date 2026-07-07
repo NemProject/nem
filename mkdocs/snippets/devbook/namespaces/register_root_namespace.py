@@ -113,7 +113,7 @@ try:
 		print('Namespace information:')
 		print(f'  Name: {namespace_info["fqn"]}')
 		print(f'  Owner: {namespace_info["owner"]}')
-		print(f'  Height: {namespace_info["height"]}')
+		print(f'  Registration height: {namespace_info["height"]}')
 	# [<step-6]
 except urllib.error.URLError as e:
 	print(e.reason)

@@ -109,7 +109,7 @@ try {
 	console.log('Namespace information:');
 	console.log('  Name:', namespaceInfo.fqn);
 	console.log('  Owner:', namespaceInfo.owner);
-	console.log('  Height:', namespaceInfo.height);
+	console.log('  Registration height:', namespaceInfo.height);
 	// [<step-6]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');

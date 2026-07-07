@@ -26,7 +26,8 @@ You can extend a namespace in two situations:
     The network rejects renewal attempts made earlier than that.
 
 * **During the grace period:** The namespace has expired but is still within the
-    [grace period](../../textbook/namespaces.md#duration).
+    [grace period](../../textbook/namespaces.md#duration), which lasts 43200 blocks (approximately 30 days) after
+    expiration.
     Extending it restores the namespace to active status immediately.
 
 !!! note "Extending Subnamespaces"
