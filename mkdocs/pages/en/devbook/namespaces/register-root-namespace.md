@@ -84,7 +84,8 @@ The namespace registration transaction specifies:
     See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
     To ensure the namespace name is unique across multiple runs of the tutorial, a timestamp is added to the name.
-    In practice, programs would use a fixed name for their namespaces.
+    In practice, programs would use a fixed name for their namespaces, which can be set with the `ROOT_NAMESPACE`
+    environment variable.
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -110,9 +111,11 @@ transaction is included in a block.
 
 To verify the namespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint and
 displays its properties.
-The registration height is the block in which the namespace was registered, marking the start of the one-year lease.
 
 A successful response confirms that the namespace is registered and active.
+
+The response also shows the registration height, which is the block in which the namespace was registered,
+marking the start of the one-year lease.
 
 ## Output
 
