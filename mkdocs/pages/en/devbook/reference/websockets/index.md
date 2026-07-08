@@ -174,12 +174,15 @@ ws:blocks
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/blocks
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/blocks
@@ -188,6 +191,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [Block](../rest/nem.md#model/Block) JSON body.
 </td></tr></table></div>
 
@@ -206,12 +210,15 @@ ws:blocks&#47;new
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/blocks/new
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/blocks/new
@@ -220,6 +227,7 @@ message-id:...
 
 { "height": 1234567 }
 ```
+
 </td></tr></table></div>
 
 ### Transaction Channels
@@ -240,12 +248,15 @@ ws:unconfirmed
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/unconfirmed
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/unconfirmed
@@ -254,6 +265,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [Transaction](../rest/nem.md#model/Transaction) JSON body.
 </td></tr></table></div>
 
@@ -261,6 +273,14 @@ Followed by a [Transaction](../rest/nem.md#model/Transaction) JSON body.
 
 These channels report activity for a specific account, such as its balance, transactions, and the mosaics and
 namespaces it owns.
+
+!!! note "Address format"
+
+    Wherever an address appears, either in a channel `destination` or a request body, it uses the
+    [encoded address](../../../textbook/cryptography.md#addresses) format:
+    uppercase letters and digits, without hyphens.
+
+    **Example:** `TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4`.
 
 Account channels send a notification whenever the account is **involved** in a transaction, even if the account
 state does not change.
@@ -277,7 +297,7 @@ The accounts considered involved depend on the transaction type:
 | Mosaic supply change              | The signer, plus the levy recipient if the mosaic definition includes a levy.           |
 | Multisig                          | The initiating cosignatory, the multisig account, and others in the inner transaction.  |
 
-??? note "Multisig transactions"
+!!! note "Multisig transactions"
 
     An account that has multiple roles, for example the initiating cosignatory and the recipient of the inner transfer,
     receives one notification for each role.
@@ -287,34 +307,29 @@ The accounts considered involved depend on the transaction type:
     Cosignatures appear only on the global <ws:unconfirmed> channel.
     They never reach account channels, not even the multisig account's or the submitting cosignatory's.
 
-!!! note "Address format"
-
-    Wherever an address appears, either in a channel `destination` or a request body, it uses the
-    [encoded address](../../../textbook/cryptography.md#addresses) format:
-    uppercase letters and digits, without hyphens.
-
-    **Example:** `TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4`.
-
 #### `/account/{address}`
 
 ws:account&#47;{address}
-:   Notifies subscribed clients with the account's current state every time a confirmed block contains a transaction
-    the account is [involved in](#account-channels), and every time the account harvests a block.
+:   Notifies subscribed clients of the account's current state every time a confirmed block involves the address,
+    either through a transaction it is [involved in](#account-channels) or by harvesting the block.
     Requires the address to be [registered](#registration-requests) first.
 
-    Involvement in a transaction does not guarantee that the account changed.
+    Involvement in a transaction does not mean that the account changed.
     For example, the recipient of a transfer of zero XEM is notified even though its balance stays the same.
 
 <div class="frame-table" markdown>
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/account/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/account/{address}
@@ -323,6 +338,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by an [AccountMetaDataPair](../rest/nem.md#model/AccountMetaDataPair) JSON body.
 </td></tr></table></div>
 
@@ -340,12 +356,15 @@ ws:unconfirmed&#47;{address}
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/unconfirmed/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/unconfirmed/{address}
@@ -354,6 +373,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [TransactionMetaDataPair](../rest/nem.md#model/TransactionMetaDataPair) JSON body.
 </td></tr></table></div>
 
@@ -368,12 +388,15 @@ ws:transactions&#47;{address}
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/transactions/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/transactions/{address}
@@ -382,35 +405,40 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [TransactionMetaDataPair](../rest/nem.md#model/TransactionMetaDataPair) JSON body.
 </td></tr></table></div>
 
 #### `/account/mosaic/owned/{address}`
 
 ws:account&#47;mosaic&#47;owned&#47;{address}
-:   Notifies subscribed clients with the mosaics the account owns, every time a confirmed block might have
-    changed them.
+:   Notifies subscribed clients of the account's mosaics, every time a confirmed block might have changed them.
+    The account's mosaics are the ones it holds a balance of, together with any it created.
 
-    A notification burst is sent when a block contains a mosaic-related transaction involving the account.
-    This includes transfers that carry mosaics (notifying the signer, the recipient, and any levy recipients),
-    mosaic definition creation, and mosaic supply changes.
+    A notification burst is sent when a block contains a mosaic-related transaction [involving](#account-channels) the
+    account.
+    A transfer that carries mosaics notifies the signer, the recipient, and any levy recipients.
+    Mosaic definition creation and mosaic supply changes instead notify the mosaic's creator, plus any levy recipient.
 
     The transaction does not need to change the account's mosaics.
     For example, a transfer of zero units of a mosaic still notifies both the sender and the recipient.
 
-    Each burst contains the account's full list of owned mosaics, with one notification per mosaic, regardless of which
-    mosaics changed.
+    Each burst contains the account's full mosaic list, with one notification per mosaic, regardless of which mosaics
+    changed.
 
 <div class="frame-table" markdown>
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/account/mosaic/owned/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/account/mosaic/owned/{address}
@@ -419,29 +447,34 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [Mosaic](../rest/nem.md#model/Mosaic) JSON body.
 </td></tr></table></div>
 
 #### `/account/mosaic/owned/definition/{address}`
 
 ws:account&#47;mosaic&#47;owned&#47;definition&#47;{address}
-:   Notifies subscribed clients with the mosaic definitions the account owns, every time a confirmed block might
-    have changed them.
+:   Notifies subscribed clients of the definitions of the account's mosaics, every time a confirmed block might have
+    changed them.
 
-    This channel is triggered by the same transactions as <ws:account/mosaic/owned/{address}>.
-    Each burst contains the account's full list of owned mosaic definitions, with one notification per definition,
-    regardless of which definitions changed.
+    This channel is triggered by the same transactions as <ws:account/mosaic/owned/{address}> and covers the same
+    mosaics.
+    Each burst contains the account's full list of mosaic definitions, with one notification per definition, regardless
+    of which mosaics changed.
 
 <div class="frame-table" markdown>
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/account/mosaic/owned/definition/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/account/mosaic/owned/definition/{address}
@@ -450,13 +483,14 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [MosaicDefinitionSupplyTuple](../rest/nem.md#model/MosaicDefinitionSupplyTuple) JSON body.
 </td></tr></table></div>
 
 #### `/account/namespace/owned/{address}`
 
 ws:account&#47;namespace&#47;owned&#47;{address}
-:   Notifies subscribed clients with the namespaces the account owns, every time a confirmed block might have
+:   Notifies subscribed clients of the namespaces the account owns, every time a confirmed block might have
     changed them.
 
     A notification burst is sent when a block contains a provision namespace transaction signed by the account.
@@ -466,12 +500,15 @@ ws:account&#47;namespace&#47;owned&#47;{address}
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/account/namespace/owned/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/account/namespace/owned/{address}
@@ -480,6 +517,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [Namespace](../rest/nem.md#model/Namespace) JSON body.
 </td></tr></table></div>
 
@@ -493,12 +531,15 @@ ws:recenttransactions&#47;{address}
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/recenttransactions/{address}
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/recenttransactions/{address}
@@ -507,6 +548,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a list of [TransactionMetaDataPair](../rest/nem.md#model/TransactionMetaDataPair) wrapped in a `data` field.
 </td></tr></table></div>
 
@@ -523,12 +565,15 @@ ws:node&#47;info
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/node/info
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/node/info
@@ -537,6 +582,7 @@ message-id:...
 
 { ... }
 ```
+
 Followed by a [Node](../rest/nem.md#model/Node) JSON body.
 </td></tr></table></div>
 
@@ -551,12 +597,15 @@ ws:errors
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Subscription frame</th><th markdown>:material-arrow-down-bold: Notification frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SUBSCRIBE
 id:sub-0
 destination:/errors
 ```
+
 </td><td markdown>
+
 ```stomp
 MESSAGE
 destination:/errors
@@ -570,6 +619,7 @@ message-id:...
     "message": "account is not valid"
 }
 ```
+
 </td></tr></table></div>
 
 ## Requests
@@ -605,12 +655,14 @@ req:w&#47;api&#47;account&#47;subscribe
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/subscribe
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/account/get`
@@ -623,12 +675,14 @@ req:w&#47;api&#47;account&#47;get
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/get
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 ### Snapshot Requests
@@ -649,12 +703,14 @@ req:w&#47;api&#47;account&#47;transfers&#47;all
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/transfers/all
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/account/transfers/unconfirmed`
@@ -667,12 +723,14 @@ req:w&#47;api&#47;account&#47;transfers&#47;unconfirmed
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/transfers/unconfirmed
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/account/mosaic/owned`
@@ -685,12 +743,14 @@ req:w&#47;api&#47;account&#47;mosaic&#47;owned
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/mosaic/owned
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/account/mosaic/owned/definition`
@@ -703,12 +763,14 @@ req:w&#47;api&#47;account&#47;mosaic&#47;owned&#47;definition
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/mosaic/owned/definition
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/account/namespace/owned`
@@ -721,12 +783,14 @@ req:w&#47;api&#47;account&#47;namespace&#47;owned
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/account/namespace/owned
 
 { "account": "{address}" }
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/block/last`
@@ -741,10 +805,12 @@ req:w&#47;api&#47;block&#47;last
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/block/last
 ```
+
 </td></tr></table></div>
 
 #### `/w/api/node/info`
@@ -756,8 +822,10 @@ req:w&#47;api&#47;node&#47;info
 <table markdown>
 <tr markdown><th markdown>:material-arrow-up-bold: Request frame</th></tr>
 <tr markdown><td markdown>
+
 ```stomp
 SEND
 destination:/w/api/node/info
 ```
+
 </td></tr></table></div>

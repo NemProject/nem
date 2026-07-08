@@ -166,7 +166,8 @@ async def main():
 						confirmed = True
 				else:
 					message_hash = body['meta']['hash']['data']
-					print(f'unconfirmed: hash={message_hash[:16]}...')
+					if message_hash.upper() == transaction_hash:
+						print(f'unconfirmed: hash={message_hash[:16]}...')
 		else:
 			print(f'Transaction rejected: {result["message"]}')
 		# [<step-6]

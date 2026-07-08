@@ -93,11 +93,18 @@ This tutorial builds a minimal <Transfer Transaction:> to the monitored address,
 no message.
 A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
 
-The transaction follows the same process described in the
-[Transfer XEM tutorial](../transactions/transfer-xem.md): fetching the network time, creating the transaction,
-and signing it.
-The hash is computed locally, before any channel is subscribed, so the message handler defined below can match
-incoming messages against it.
+The transaction is built the same way as in the
+[Transfer XEM](../transactions/transfer-xem.md) tutorial: fetching the network time, creating the transaction, and
+signing it.
+
+Signing the transaction produces its hash, which uniquely identifies it.
+The code stores this hash because transaction channel notifications include the transaction hash.
+The message handler, defined later, compares each received hash with the stored value to identify notifications for this
+transaction.
+
+The transaction is prepared, but it is not [announced](#announcing-and-waiting-for-confirmation) yet.
+The announcement happens after the channel subscriptions are established, so the notifications it triggers are not
+missed.
 
 ### Connecting to the WebSocket
 
@@ -112,11 +119,12 @@ over it.
 
 The code subscribes to three address-scoped channels:
 
-* <ws:account&#47;{address}>: Notifies with the account's current state when a <block:> containing a transaction
-    involving the address is confirmed.
-* <ws:unconfirmed&#47;{address}>: Notifies when a transaction involving the address enters the <unconfirmed pool:>,
-    waiting to be included in a block.
-* <ws:transactions&#47;{address}>: Notifies when a transaction involving the address is included in a <block:>.
+* <ws:account&#47;{address}>: Notifies of the account's current state when a <block:> involving the account's address is
+    confirmed.
+* <ws:unconfirmed&#47;{address}>: Notifies of a transaction involving the account's address when it enters the
+    <unconfirmed pool:>, waiting to be included in a block.
+* <ws:transactions&#47;{address}>: Notifies of a transaction involving the account's address when it is included in a
+    <block:>.
 
 The subscriptions use the IDs `id-0`, `id-1` and `id-2`, which identify them when the code unsubscribes at the end.
 
@@ -141,6 +149,11 @@ the transaction confirmation also appears in the output.
 
 {{ tutorial.code_snippet_tagged('step-6') }}
 
+!!! warning "Announce after subscribing to channels"
+
+    Always announce the transaction **after** subscribing to the WebSocket channels to ensure the listener is ready.
+    Otherwise, notifications could arrive before the WebSocket is listening.
+
 The code announces the transaction to the <post:/transaction/announce> endpoint and checks the result.
 If the node rejects it, the code prints the rejection reason and stops.
 
@@ -148,11 +161,8 @@ Otherwise, the code waits for confirmation, printing each message from the subsc
 Messages from the transaction channels follow the
 [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) schema, whose
 `meta.hash.data` field holds the transaction hash.
-
-!!! warning "Announce after subscribing to channels"
-
-    Always announce the transaction **after** subscribing to the WebSocket channels to ensure the listener is ready.
-    Otherwise, notifications could arrive before the WebSocket is listening.
+As each one arrives, the message handler compares that hash against the stored value to recognize this transaction
+among the channel notifications.
 
 The expected sequence for a successful transaction is described in the
 [Transaction Lifecycle](../../textbook/transactions.md#transaction-lifecycle) section:
@@ -162,6 +172,8 @@ The expected sequence for a successful transaction is described in the
 
 The block that includes the transaction also triggers a final notification on the <ws:account&#47;{address}>
 channel.
+Unlike the transaction channels, this notification contains the account's updated state rather than a transaction hash,
+so it cannot be matched to a specific transaction.
 
 Once this final notification arrives, the program moves on to the cleanup step.
 
@@ -188,7 +200,8 @@ The output shows:
 * **Announcement** (line 9): The transaction is announced and its hash is printed.
 * **Transaction flow** (lines 10-11): The transaction moves from `unconfirmed` to `confirmed`, showing the
     confirmation lifecycle.
-* **Confirmation** (line 12): The hash from the <ws:transactions&#47;{address}> channel matches the announced transaction.
+* **Confirmation** (line 12): The hash from the <ws:transactions&#47;{address}> channel matches the announced
+    transaction.
 * **Account update** (line 13): The block containing the transaction triggers a final account notification.
     The balance is unchanged, since the transfer amount is zero.
 * **Unsubscribe** (line 14): The code unsubscribes from the three channels.

@@ -88,8 +88,11 @@ try {
 			}
 		} else {
 			const messageHash = body.meta.hash.data;
-			console.log(
-				`unconfirmed: hash=${messageHash.substring(0, 16)}...`);
+			if (messageHash.toUpperCase() === transactionHash) {
+				console.log(
+					'unconfirmed: hash=' +
+					`${messageHash.substring(0, 16)}...`);
+			}
 		}
 	};
 	for (const [channel, id] of Object.entries(channels)) {
