@@ -127,7 +127,7 @@ This tutorial builds a minimal <Transfer Transaction:> to the monitored address,
 A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
 
 The transaction follows the same process described in the
-[Transfer Transaction tutorial](../transactions/transfer-xem.md): fetching the network time, creating the transaction,
+[Transfer XEM](../transactions/transfer-xem.md) tutorial: fetching the network time, creating the transaction,
 and signing it.
 The hash is computed locally so it can be matched against incoming messages later.
 
