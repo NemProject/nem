@@ -36,7 +36,7 @@ If not set, it defaults to the <XEM:> mosaic (`nem:xem`).
 
 The <get:/mosaic/definition> endpoint retrieves the definition of a mosaic, including:
 
-* **Description:** Human-readable text [describing](../../textbook/mosaics.md#description) the mosaic.
+* **Description:** Text [describing](../../textbook/mosaics.md#description) the mosaic.
 * **Creator:** The <public key:> of the account that created the mosaic.
 * **Properties:** The mosaic's [behavioral properties](../../textbook/mosaics.md#properties):
     * **[Divisibility](../../textbook/mosaics.md#divisibility):** The number of decimal places the mosaic supports.
@@ -80,7 +80,7 @@ Some highlights from the output:
 
 * **Mosaic ID** (line 5): The XEM mosaic identifier, the fully qualified name `nem:xem`.
 
-* **Description** (line 6): A human-readable label set when the mosaic was created.
+* **Description** (line 6): Text that describes the mosaic, set by its creator.
 
 * **Creator** (line 7): The public key of the account that created the mosaic.
 

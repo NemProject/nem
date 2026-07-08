@@ -14,7 +14,7 @@ This tutorial shows how to poll a transaction's status until it is confirmed, ho
 waiting in the <unconfirmed pool:>, and how to decide when it will never confirm.
 
 This kind of monitoring typically happens right after announcing a transaction, as shown in the
-[Transfer XEM tutorial](./transfer-xem.md), to make sure it gets confirmed.
+[Transfer XEM](./transfer-xem.md) tutorial, to make sure it gets confirmed.
 
 !!! note "Polling is not recommended for production"
 
@@ -65,7 +65,7 @@ Neither is needed to detect confirmation, but both are used to check whether a t
 
 The snippet uses sample values.
 Set `TRANSACTION_HASH`, `SIGNER_ADDRESS`, and `TRANSACTION_SIGNATURE` environment variables to override them.
-All three values are produced when signing a transaction, as shown in the [Transfer XEM tutorial](./transfer-xem.md).
+All three values are produced when signing a transaction, as shown in the [Transfer XEM](./transfer-xem.md) tutorial.
 
 ### Checking for Confirmation
 
@@ -107,7 +107,7 @@ reports whether the monitored transaction is among the pending list.
 
     A transaction that fails [validation](../../textbook/transactions.md#3-validation) does not reach the unconfirmed
     pool: the receiving <node:> rejects it immediately when announced, as shown in the
-    [Transfer XEM tutorial](./transfer-xem.md#announcing-the-transaction).
+    [Transfer XEM](./transfer-xem.md#announcing-the-transaction) tutorial.
 
 The above endpoint response omits each entry's hash, so the function matches by **signature** instead.
 A transaction's signature is unique and appears under `transaction.signature` in every pool entry.

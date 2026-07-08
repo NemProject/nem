@@ -95,6 +95,8 @@ nav:
           - Mosaics:
               - devbook/mosaics/get-mosaic-info.md
           - Namespaces:
+              - devbook/namespaces/register-root-namespace.md
+              - devbook/namespaces/extend-root-namespace.md
               - devbook/namespaces/get-namespace-info.md
           - Network Currency:
               - devbook/network-currency/query-currency-supply.md
