@@ -57,8 +57,15 @@ are derived from it, following the process described in the [Transfer XEM](../tr
 {{ tutorial.code_snippet_tagged('step-3') }}
 
 A namespace is identified by its name, which the transaction registers on the network for one year.
+See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
-The namespace registration transaction specifies:
+To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
+In practice, however, programs would use a fixed name for their namespaces.
+You can force the tutorial to use a fixed name through the `ROOT_NAMESPACE` environment variable.
+
+{{ tutorial.code_snippet_tagged('step-4') }}
+
+The namespace registration transaction then registers the namespace on the network, specifying:
 
 * {{ tutorial.var('type') }}: Namespace registration transactions use the type <ser:NamespaceRegistrationTransactionV1>.
 
@@ -84,11 +91,8 @@ The namespace registration transaction specifies:
     Larger amounts are accepted, but the entire amount is transferred to the sink account.
 
 * {{ tutorial.var('name') }}: The name of the root namespace.
-    See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
-    To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
-    In practice, however, programs would use a fixed name for their namespaces.
-    You can force the tutorial to use a fixed name through the `ROOT_NAMESPACE` environment variable.
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -98,19 +102,19 @@ Namespace registration transactions pay a fixed transaction fee of 0.15 XEM, as 
 
 ### Submitting the Transaction
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 The transaction is signed and announced following the same process as in the
 [Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 The code then waits for the transaction to be confirmed by polling the <get:/transaction/get> endpoint until the
 transaction is included in a block.
 
 ### Retrieving the Namespace
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 To verify the namespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint and
 displays its properties.
