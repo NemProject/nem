@@ -11,6 +11,9 @@ in the native `nem:xem` mosaic.
 Namespaces can be nested under other namespaces, and this tutorial shows how to register a <root namespace:> for one
 year.
 
+To learn how to register a <subnamespace:> instead, read the [Registering a Subnamespace](./register-subnamespace.md)
+guide.
+
 ## Prerequisites
 
 Before you start, make sure to:
@@ -83,8 +86,9 @@ The namespace registration transaction specifies:
 * {{ tutorial.var('name') }}: The name of the root namespace.
     See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
-    To ensure the namespace name is unique across multiple runs of the tutorial, a timestamp is added to the name.
-    In practice, programs would use a fixed name for their namespaces.
+    To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
+    In practice, however, programs would use a fixed name for their namespaces.
+    You can force the tutorial to use a fixed name through the `ROOT_NAMESPACE` environment variable.
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -110,9 +114,11 @@ transaction is included in a block.
 
 To verify the namespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint and
 displays its properties.
-The registration height is the block in which the namespace was registered, marking the start of the one-year lease.
 
 A successful response confirms that the namespace is registered and active.
+
+The response also shows the registration height, which is the block in which the namespace was registered,
+marking the start of the one-year lease.
 
 ## Output
 

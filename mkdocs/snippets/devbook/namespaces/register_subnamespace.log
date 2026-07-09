@@ -1,0 +1,34 @@
+Using node http://libertalia.nemtest.net:7890
+Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Fetching current network time from /time-sync/network-time
+  Network time: 355824143 s since the nemesis block
+Creating subnamespace: ns_root.sub_1783411728
+  Namespace lease fee: 10.0 XEM
+  Transaction fee: 0.15 XEM
+Built transaction:
+{
+  "type": 8193,
+  "version": 1,
+  "network": 152,
+  "timestamp": 355824143,
+  "signer_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+  "signature": "EB8065E0D51173189950A7F28863135AA2E308B1F9A32840BCF48E85F15E0DD0AC48D8B6999D2BEDDC4B934842F93C9C4B4AFF28820CFA3B7EE73FE09B3D2303",
+  "fee": "150000",
+  "deadline": 355831343,
+  "rental_fee_sink": "54414D4553504143455748344D4B464D42435646455244504F4F5034464B374D54444A4559503335",
+  "rental_fee": "10000000",
+  "name": "7375625f31373833343131373238",
+  "parent_name": "6e735f726f6f74"
+}
+Announcing namespace registration to /transaction/announce
+  Result: SUCCESS
+Waiting for confirmation from /transaction/get?hash=79C4412BC6A9AA73DB37AD01ECDC84A17926FB5E152979FFDCCFE567EC4F63ED
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+Transaction confirmed in block 690650
+Fetching namespace information from /namespace?namespace=ns_root.sub_1783411728
+Namespace information:
+  Name: ns_root.sub_1783411728
+  Owner: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+  Registration height: 690649
