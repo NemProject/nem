@@ -14,7 +14,7 @@
 {%- endmacro %}
 
 {% macro step_begin(fname) -%}
-<tr markdown><td markdown>![]({{ fname }}){ .data-description=".step-{{ ns.step_count }}" }<div markdown class="step-{{ ns.step_count }}"><span class="big-number">{{ ns.step_count }}. </span>
+<tr markdown><td markdown>![]({{ fname }}){ data-description=".step-{{ ns.step_count }}" }<div markdown class="step-{{ ns.step_count }}"><span class="big-number">{{ ns.step_count }}. </span>
 {%- endmacro -%}
 
 {% macro step_end() -%}
