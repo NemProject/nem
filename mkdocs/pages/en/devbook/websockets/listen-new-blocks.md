@@ -55,7 +55,8 @@ The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 If no value is provided, a default one is used.
 
 `WS_URL` defines the WebSocket endpoint for the same node.
-It is derived from `NODE_URL` by replacing port `7890` with `7778`.
+It is derived from `NODE_URL` by replacing port `7890`, the default HTTP API port, with `7778`, the default NIS
+WebSocket port.
 
 The program runs until interrupted with `Ctrl+C`, which triggers the unsubscribe step before closing the connection.
 
@@ -74,6 +75,10 @@ over it.
 
 The code subscribes to the <ws:blocks> channel.
 The node then notifies subscribers every time a new block is added to the chain (approximately every minute).
+
+Notifications are not always evenly spaced.
+When the node adds several blocks at once, for example while catching up with its peers, the channel delivers them in
+a quick burst, still one notification per block.
 
 The subscription is given an `id` (`id-0`) which is used to unsubscribe on exit.
 
@@ -98,6 +103,9 @@ and also prints the harvester's `signer`.
 
     New blocks are already part of the chain but not yet irreversible.
     Until enough subsequent blocks surpass the <rewrite limit:>, <rollbacks:> are still possible.
+    After a rollback, the channel can even report a block with a lower height than one already received, because the
+    incoming blocks replace blocks that were reported earlier.
+
     The [Querying Chain and Irreversible Height](../chain/chain-heights.md) tutorial shows how to calculate the
     irreversible height.
 

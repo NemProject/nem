@@ -21,44 +21,7 @@ const signerKeyPair = new NemFacade.KeyPair(
 	new PrivateKey(SIGNER_PRIVATE_KEY)); // [<step-1]
 
 try {
-	// Connect to the WebSocket [>step-2]
-	const client = new Client({
-		webSocketFactory: () => new SockJS(`${WS_URL}/w/messages`)
-	});
-	await new Promise(resolve => {
-		client.onConnect = resolve;
-		client.activate();
-	});
-	console.log(`Connected to ${WS_URL}`);
-	// [<step-2]
-	// Register the account and confirm it is active [>step-3]
-	const destination = `/account/${MONITOR_ADDRESS}`;
-	await new Promise(resolve => {
-		client.subscribe(destination, () => {
-			client.unsubscribe('id-0');
-			resolve();
-		}, { id: 'id-0' });
-		client.publish({
-			destination: '/w/api/account/get',
-			body: JSON.stringify({ account: MONITOR_ADDRESS })
-		});
-	});
-	console.log('Account registered');
-	// [<step-3]
-	// Subscribe to the transaction channels [>step-4]
-	const channels = {
-		[`/unconfirmed/${MONITOR_ADDRESS}`]: 'id-1',
-		[`/transactions/${MONITOR_ADDRESS}`]: 'id-2'
-	};
-	// The message handler is set later, when waiting for confirmation
-	let handleMessage;
-	const onMessage = message => handleMessage?.(message);
-	for (const [channel, id] of Object.entries(channels)) {
-		client.subscribe(channel, onMessage, { id });
-		console.log(`Subscribed to ${channel} channel`);
-	}
-	// [<step-4]
-	// Build and sign a transfer to the monitored address [>step-5]
+	// Build and sign a transfer to the monitored address [>step-2]
 	const timeResponse = await fetch(
 		`${NODE_URL}/time-sync/network-time`);
 	const networkTime = Math.floor(
@@ -78,24 +41,74 @@ try {
 		transaction, signature);
 	const transactionHash =
 		facade.hashTransaction(transaction).toString().toUpperCase();
+	const shortHash = transactionHash.substring(0, 16);
+	// [<step-2]
+	// Connect to the WebSocket [>step-3]
+	const client = new Client({
+		webSocketFactory: () => new SockJS(`${WS_URL}/w/messages`)
+	});
+	await new Promise(resolve => {
+		client.onConnect = resolve;
+		client.activate();
+	});
+	console.log(`Connected to ${WS_URL}`);
+	// [<step-3]
+	// Subscribe to the account and transaction channels [>step-4]
+	const accountChannel = `/account/${MONITOR_ADDRESS}`;
+	const channels = {
+		[accountChannel]: 'id-0',
+		[`/unconfirmed/${MONITOR_ADDRESS}`]: 'id-1',
+		[`/transactions/${MONITOR_ADDRESS}`]: 'id-2'
+	};
+	let confirmed = false;
+	let resolveRegistered;
+	let resolveDone;
+	const registered = new Promise(resolve => {
+		resolveRegistered = resolve;
+	});
+	const done = new Promise(resolve => {
+		resolveDone = resolve;
+	});
+	const onMessage = message => {
+		const body = JSON.parse(message.body);
+		const { destination } = message.headers;
+		if (accountChannel === destination) {
+			const { balance } = body.account;
+			console.log(`Account update: balance=${balance}`);
+			resolveRegistered();
+			if (confirmed)
+				resolveDone();
+		} else if (destination.includes('/transactions/')) {
+			const messageHash = body.meta.hash.data;
+			console.log(
+				`confirmed: hash=${messageHash.substring(0, 16)}...`);
+			if (messageHash.toUpperCase() === transactionHash) {
+				console.log(`Transaction ${shortHash}... confirmed`);
+				confirmed = true;
+			}
+		} else {
+			const messageHash = body.meta.hash.data;
+			if (messageHash.toUpperCase() === transactionHash) {
+				console.log(
+					'unconfirmed: hash=' +
+					`${messageHash.substring(0, 16)}...`);
+			}
+		}
+	};
+	for (const [channel, id] of Object.entries(channels)) {
+		client.subscribe(channel, onMessage, { id });
+		console.log(`Subscribed to ${channel} channel`);
+	}
+	// [<step-4]
+	// Register the account and confirm it is active [>step-5]
+	client.publish({
+		destination: '/w/api/account/get',
+		body: JSON.stringify({ account: MONITOR_ADDRESS })
+	});
+	await registered;
+	console.log('Account registered');
 	// [<step-5]
 	// Announce the transaction and wait for it to confirm [>step-6]
-	const shortHash = transactionHash.substring(0, 16);
-	const confirmed = new Promise(resolve => {
-		handleMessage = message => {
-			const pair = JSON.parse(message.body);
-			const messageHash = pair.meta.hash.data;
-			const messageShort = messageHash.substring(0, 16);
-			const status = message.headers.destination
-				.includes('/transactions/') ? 'confirmed' : 'unconfirmed';
-			console.log(`${status}: hash=${messageShort}...`);
-			if ('confirmed' === status &&
-				messageHash.toUpperCase() === transactionHash) {
-				console.log(`Transaction ${shortHash}... confirmed`);
-				resolve();
-			}
-		};
-	});
 	console.log(`Announcing transaction ${shortHash}...`);
 	const response = await fetch(`${NODE_URL}/transaction/announce`, {
 		method: 'POST',
@@ -104,7 +117,7 @@ try {
 	});
 	const announceResult = await response.json();
 	if ('SUCCESS' === announceResult.message)
-		await confirmed;
+		await done;
 	else
 		console.log(`Transaction rejected: ${announceResult.message}`);
 	// [<step-6]
