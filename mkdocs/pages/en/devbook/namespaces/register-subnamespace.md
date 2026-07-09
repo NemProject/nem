@@ -63,9 +63,9 @@ The main difference when registering a subnamespace is in the transaction descri
     For example, to create `company.product`, where `company` is the root, you would set
     {{ tutorial.var("`name: 'product'`") }} and {{ tutorial.var("`parent_name: 'company'`") }}.
 
-    To ensure the subnamespace name is unique across multiple runs of the tutorial, a timestamp is added to the name.
-    In practice, programs would use a fixed name for their namespaces, which can be set with the `SUBNAMESPACE`
-    environment variable.
+    To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
+    In practice, however, programs would use a fixed name for their namespaces.
+    You can force the tutorial to use a fixed name through the `SUBNAMESPACE` environment variable.
 
 * {{ tutorial.var('rental_fee') }}: The lease fee, which is 10 XEM for subnamespaces, paid to the same
     [sink account](./register-root-namespace.md#building-the-transaction) as root namespaces.
