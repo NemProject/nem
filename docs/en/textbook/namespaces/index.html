@@ -1271,6 +1271,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../devbook/namespaces/register-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/namespaces/register-subnamespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Subnamespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/namespaces/extend-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extend Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../devbook/namespaces/get-namespace-info/" class="md-nav__link">
         
   
@@ -7407,12 +7491,12 @@
 	<a id="2f0cefc8ad477caf4f66272797ede73d">Namespace</a> 
 </dt>
 <dd>A registered name leased to an <a class="mkdocs-ezglossary-link"
-	id="4415118be2d5ecf32b87e88b81795389"
+	id="76dc3d16926fbc1b03b9011455037b7a"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
 	href="../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a>, used to prefix and group <a class="mkdocs-ezglossary-link"
-	id="2f85d67780de3ab792ab502e5dd0c8ab"
+	id="1c53acfd37d520da2f3ac745741d8b32"
 	title="A representation of an asset on the NEM blockchain, commonly called tokens on other protocols.
 For example: currencies, licenses, collectibles, access rights, or voting power."
 	name="_:Mosaic"
@@ -7421,7 +7505,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 </dl>
 <p>Namespaces let an account group related mosaics under a meaningful prefix like <code>mycompany.tokens</code>.
 The network's own currency follows the same pattern: <code>nem:xem</code>, commonly known as <a class="mkdocs-ezglossary-link"
-	id="c4244d7ba9aa910047f21a6a1badca7c"
+	id="e7f16aa19a33c210d1990d3842debc8e"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, lives in the <code>nem</code> namespace.</p>
@@ -7463,14 +7547,14 @@ Subnamespaces expire when the root namespace expires (see <a href="#duration">Du
 <p>Once registered, a name cannot be changed.</p>
 <h2 id="duration">Duration<a class="headerlink" href="#duration" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>When a root namespace is registered, it is leased for approximately one year (525600 blocks on <a class="mkdocs-ezglossary-link"
-	id="eed83bf17cdac04288d837e2f524ce0c"
+	id="eee9b3915a19c300bf295da1c0294fff"
 	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
 	name="_:mainnet"
 	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>).
 During this time, the owner can perform operations such as:</p>
 <ul>
 <li>Define <a class="mkdocs-ezglossary-link"
-	id="1c53acfd37d520da2f3ac745741d8b32"
+	id="193af8ff377bbfdf2c634f1631598120"
 	title="A representation of an asset on the NEM blockchain, commonly called tokens on other protocols.
 For example: currencies, licenses, collectibles, access rights, or voting power."
 	name="_:Mosaic"
@@ -7481,7 +7565,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 </ul>
 <p>Renewal while the namespace is registered is restricted to the <strong>last 43200 blocks before expiration</strong>
 (approximately 30 days on <a class="mkdocs-ezglossary-link"
-	id="eee9b3915a19c300bf295da1c0294fff"
+	id="339d75fd3c96ddc8040418cb0e6f848c"
 	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
 	name="_:mainnet"
 	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>).
@@ -7533,14 +7617,14 @@ Once the grace period ends, the namespace is fully released and becomes availabl
 <div class="admonition note">
 <p class="admonition-title">The <code>nem</code> namespace never expires</p>
 <p>The <code>nem</code> namespace, which holds <a class="mkdocs-ezglossary-link"
-	id="6b9c146f68a9a4685cff85f84aea5294"
+	id="65cb88036245436b2b807e5d4a30b1e9"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, is permanently active and is exempt from the lease and renewal cycle.</p>
 </div>
 <h2 id="lease-fee">Lease Fee<a class="headerlink" href="#lease-fee" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Registering a namespace requires paying a lease fee in the network currency (<a class="mkdocs-ezglossary-link"
-	id="d8271a980dbeb9f851cfdd0f55db8e08"
+	id="bb1f2f0794d3c58c318296dc21a6b0d5"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>):</p>

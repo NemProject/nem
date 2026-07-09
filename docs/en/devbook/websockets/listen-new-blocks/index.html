@@ -1278,6 +1278,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../namespaces/register-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../namespaces/register-subnamespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Subnamespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../namespaces/extend-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extend Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../namespaces/get-namespace-info/" class="md-nav__link">
         
   
@@ -7487,8 +7571,12 @@
 <div class="tutorial_level-container"><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span></div>
 
 <p>The <code><a class="mkdocs-ezglossary-link"
-	id="d8fbfd15f21f706f71ea7360eed2806f"
-	title="Notifies subscribed clients every time a new block is added to the chain."
+	id="5869554b48628375e110e314101bae61"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
 	name="ws:blocks"
 	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> <a class="mkdocs-ezglossary-link"
 	id="e1fe4860ed8491ab8c45b1fc42d65aa3"
@@ -7813,7 +7901,8 @@ and participates in consensus and block creation."
 	href="../../../textbook/nodes/#bc6d0fc1a92ae07d7739daed957574ab">node</a>.
 If no value is provided, a default one is used.</p>
 <p><code>WS_URL</code> defines the WebSocket endpoint for the same node.
-It is derived from <code>NODE_URL</code> by replacing port <code>7890</code> with <code>7778</code>.</p>
+It is derived from <code>NODE_URL</code> by replacing port <code>7890</code>, the default HTTP API port, with <code>7778</code>, the default NIS
+WebSocket port.</p>
 <p>The program runs until interrupted with <code>Ctrl+C</code>, which triggers the unsubscribe step before closing the connection.</p>
 <h2 id="code-explanation">Code Explanation<a class="headerlink" href="#code-explanation" title="Anchor link to this section for reference">⚓︎</a></h2>
 <h3 id="connecting-to-the-websocket">Connecting to the WebSocket<a class="headerlink" href="#connecting-to-the-websocket" title="Anchor link to this section for reference">⚓︎</a></h3>
@@ -7888,11 +7977,18 @@ over it.</p>
 </div>
 </div>
 <p>The code subscribes to the <code><a class="mkdocs-ezglossary-link"
-	id="ef8d40ef2ed9d7c2b1641c7c6b7bf22c"
-	title="Notifies subscribed clients every time a new block is added to the chain."
+	id="dff0092823ccf4af4bdec77252e4aaed"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
 	name="ws:blocks"
 	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> channel.
 The node then notifies subscribers every time a new block is added to the chain (approximately every minute).</p>
+<p>Notifications are not always evenly spaced.
+When the node adds several blocks at once, for example while catching up with its peers, the channel delivers them in
+a quick burst, still one notification per block.</p>
 <p>The subscription is given an <code>id</code> (<code>id-0</code>) which is used to unsubscribe on exit.</p>
 <p>Each incoming message is then passed to the formatting logic below.</p>
 <h3 id="formatting-the-message">Formatting the Message<a class="headerlink" href="#formatting-the-message" title="Anchor link to this section for reference">⚓︎</a></h3>
@@ -7942,7 +8038,7 @@ schema.</p>
 <ul>
 <li><code>height</code>: The height of the new block.</li>
 <li><code>signer</code>: The public key of the <a class="mkdocs-ezglossary-link"
-	id="413da4802e046b97acabd2e841062822"
+	id="9d29c4724e8b41b57eb842141998b554"
 	title="An account participating in harvesting.
 Its importance determines its chance of producing blocks, and it receives the rewards from each block it harvests."
 	name="_:Harvester account"
@@ -7963,7 +8059,9 @@ Until enough subsequent blocks surpass the <a class="mkdocs-ezglossary-link"
 typically after a fork is resolved."
 	name="_:Rollback"
 	href="../../../textbook/consensus/#fa68d384bf5dbf284e2a6a02fb2ef92d">rollbacks</a> are still possible.
-The <a href="../../chain/chain-heights/">Querying Chain and Irreversible Height</a> tutorial shows how to calculate the
+After a rollback, the channel can even report a block with a lower height than one already received, because the
+incoming blocks replace blocks that were reported earlier.</p>
+<p>The <a href="../../chain/chain-heights/">Querying Chain and Irreversible Height</a> tutorial shows how to calculate the
 irreversible height.</p>
 </div>
 <h3 id="unsubscribing-on-exit">Unsubscribing on Exit<a class="headerlink" href="#unsubscribing-on-exit" title="Anchor link to this section for reference">⚓︎</a></h3>
@@ -8042,8 +8140,12 @@ This ensures a clean disconnection from the node.</p>
 <tr>
 <td><a href="#subscribing-to-the-channel">Subscribe to the block channel</a></td>
 <td><code><a class="mkdocs-ezglossary-link"
-	id="5869554b48628375e110e314101bae61"
-	title="Notifies subscribed clients every time a new block is added to the chain."
+	id="6344422d7c8d04008b32029b03a0120e"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
 	name="ws:blocks"
 	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code></td>
 </tr>
@@ -8075,7 +8177,7 @@ This ensures a clean disconnection from the node.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 9, 2026</span>
   </span>
 
     

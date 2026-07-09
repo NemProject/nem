@@ -1276,6 +1276,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../namespaces/register-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../namespaces/register-subnamespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Register Subnamespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../namespaces/extend-root-namespace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extend Root Namespace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../namespaces/get-namespace-info/" class="md-nav__link">
         
   
@@ -7744,7 +7828,8 @@ made of a command, optional <code>header:value</code> lines, and an optional bod
 <h3 id="connect"><code>CONNECT</code><a class="headerlink" href="#connect" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Starts the STOMP session.
 The client must send this frame once, right after the connection opens.
-See the <a href="https://stomp.github.io/stomp-specification-1.2.html#CONNECT_or_STOMP_Frame">STOMP specification</a> for full details.</p>
+See the <a href="https://stomp.github.io/stomp-specification-1.2.html#CONNECT_or_STOMP_Frame">STOMP specification</a> for full
+details.</p>
 <div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CONNECT</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">accept-version</span><span class="p">:</span><span class="s">1.2</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">heart-beat</span><span class="p">:</span><span class="s">0,0</span>
@@ -7827,7 +7912,17 @@ Clients subscribe to each channel whose notifications they want to receive.</dd>
 <dt>
 	<a id="2d83c2a9b904295b0a52f932c25b03d8">blocks</a> 
 </dt>
-<dd>Notifies subscribed clients every time a new block is added to the chain.</dd>
+<dd><p>Notifies subscribed clients each time a new block is added to the chain.</p>
+<p>If multiple blocks are added at once, for example while the node catches up with its peers or after a <a class="mkdocs-ezglossary-link"
+	id="3043a48efcba823763eb106f49f36e52"
+	title="The process of discarding one or more recently added blocks when a node switches to a better chain,
+typically after a fork is resolved."
+	name="_:Rollback"
+	href="../../../textbook/consensus/#fa68d384bf5dbf284e2a6a02fb2ef92d">rollback</a>,
+the channel sends a <strong>burst</strong>: one notification per block, delivered in quick succession and in chain order.</p>
+<p>After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -7838,12 +7933,15 @@ Clients subscribe to each channel whose notifications they want to receive.</dd>
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -7851,6 +7949,7 @@ Clients subscribe to each channel whose notifications they want to receive.</dd>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/Block">Block</a> JSON body.
 </td>
 </tr>
@@ -7861,8 +7960,29 @@ Followed by a <a href="../rest/nem/#model/Block">Block</a> JSON body.
 <dt>
 	<a id="5fe03cbb8c1ce080243fff5646e72e13">blocks&#47;new</a> 
 </dt>
-<dd>Notifies subscribed clients of the new chain height every time a new block is added.
-A lighter alternative to <code>/blocks</code> when only the height is needed.</dd>
+<dd><p>Notifies subscribed clients each time the chain changes, with one notification per chain update that contains the
+height of the first block added or replaced.</p>
+<p>Unlike <code><a class="mkdocs-ezglossary-link"
+	id="06bf8d0a123089b2abb64897fdc93b08"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
+	name="ws:blocks"
+	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>, this channel sends a single notification for each chain update, regardless of how many blocks it
+contains.
+For example, if five blocks are added at once, <code><a class="mkdocs-ezglossary-link"
+	id="d8fbfd15f21f706f71ea7360eed2806f"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
+	name="ws:blocks"
+	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> sends five notifications while this channel sends only
+one, containing the height of the first block.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -7873,12 +7993,15 @@ A lighter alternative to <code>/blocks</code> when only the height is needed.</d
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks/new</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks/new</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -7886,6 +8009,7 @@ A lighter alternative to <code>/blocks</code> when only the height is needed.</d
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>{ &quot;height&quot;: 1234567 }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -7897,12 +8021,26 @@ A lighter alternative to <code>/blocks</code> when only the height is needed.</d
 <dt>
 	<a id="415fb07f4d6a2177323308b27f2e7357">unconfirmed</a> 
 </dt>
-<dd>Notifies subscribed clients every time a transaction enters the <a class="mkdocs-ezglossary-link"
+<dd><p>Notifies subscribed clients every time a transaction enters the <a class="mkdocs-ezglossary-link"
 	id="e5da1c62b540828e62e316038ed976a4"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>, regardless of the accounts
-involved.</dd>
+involved.</p>
+<p>Every transaction type appears here, including <a class="mkdocs-ezglossary-link"
+	id="4c0fc4018df638d90f8c273471a52d3e"
+	title="When a transaction requires signatures from multiple accounts, the additional signatures are called cosignatures."
+	name="_:Cosignature"
+	href="../../../textbook/transactions/#d14dfb1cfc7b4e3ae407fa46774259d2">cosignatures</a>, which are not reported on any of the
+<a href="#account-channels">account channels</a>.
+A <a class="mkdocs-ezglossary-link"
+	id="c220d89b39c354322f9c7b3ba56e7afe"
+	title="A multisig transaction wraps a single inner transaction issued on behalf of a
+multisig account, and requires signatures from the configured number of cosignatories
+before it can be included in a block."
+	name="_:Multisig Transaction"
+	href="../../../textbook/transactions/#cd67e9d12c32c41b198b86d6cf7b1333">multisig transaction</a> appears as the outer multisig transaction, with the inner transaction nested inside.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -7913,12 +8051,15 @@ involved.</dd>
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -7926,6 +8067,7 @@ involved.</dd>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/Transaction">Transaction</a> JSON body.
 </td>
 </tr>
@@ -7941,13 +8083,85 @@ namespaces it owns.</p>
 uppercase letters and digits, without hyphens.</p>
 <p><strong>Example:</strong> <code>TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4</code>.</p>
 </div>
+<p>Account channels send a notification whenever the account is <strong>involved</strong> in a transaction, even if the account
+state does not change.</p>
+<p>The accounts considered involved depend on the transaction type:</p>
+<table>
+<thead>
+<tr>
+<th>Transaction type</th>
+<th>Involved accounts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transfer</td>
+<td>The signer and the recipient.</td>
+</tr>
+<tr>
+<td>Importance transfer</td>
+<td>The signer and the remote account.</td>
+</tr>
+<tr>
+<td>Multisig aggregate modification</td>
+<td>The signer and every cosignatory added or removed.</td>
+</tr>
+<tr>
+<td>Provision namespace</td>
+<td>The signer.</td>
+</tr>
+<tr>
+<td>Mosaic definition creation</td>
+<td>The signer, plus the levy recipient if the definition includes a levy.</td>
+</tr>
+<tr>
+<td>Mosaic supply change</td>
+<td>The signer, plus the levy recipient if the mosaic definition includes a levy.</td>
+</tr>
+<tr>
+<td>Multisig</td>
+<td>The initiating cosignatory, the multisig account, and others in the inner transaction.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Multisig transactions</p>
+<p>An account that has multiple roles, for example the initiating cosignatory and the recipient of the inner transfer,
+receives one notification for each role.</p>
+<p>When a <a class="mkdocs-ezglossary-link"
+	id="11fa47c75345ea594a8d3e2e5d813151"
+	title="A multisig transaction wraps a single inner transaction issued on behalf of a
+multisig account, and requires signatures from the configured number of cosignatories
+before it can be included in a block."
+	name="_:Multisig Transaction"
+	href="../../../textbook/transactions/#cd67e9d12c32c41b198b86d6cf7b1333">multisig transaction</a> requires multiple signatures, each additional cosignatory approves it by submitting a
+separate <a class="mkdocs-ezglossary-link"
+	id="821d4824aa56d0e59aba1aced1800c65"
+	title="When a transaction requires signatures from multiple accounts, the additional signatures are called cosignatures."
+	name="_:Cosignature"
+	href="../../../textbook/transactions/#d14dfb1cfc7b4e3ae407fa46774259d2">cosignature transaction</a>.
+Cosignatures appear only on the global <code><a class="mkdocs-ezglossary-link"
+	id="8088f3a04e57eedc0ec9f9a2b48918fd"
+	title="Notifies subscribed clients every time a transaction enters the unconfirmed pool, regardless of the accounts
+involved.
+Every transaction type appears here, including cosignatures, which are not reported on any of the
+account channels.
+A multisig transaction appears as the outer multisig transaction, with the inner transaction nested inside."
+	name="ws:unconfirmed"
+	href="../../../devbook/reference/websockets/#415fb07f4d6a2177323308b27f2e7357">unconfirmed</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> channel.
+They never reach account channels, not even the multisig account's or the submitting cosignatory's.</p>
+</div>
 <h4 id="accountaddress"><code>/account/{address}</code><a class="headerlink" href="#accountaddress" title="Anchor link to this section for reference">⚓︎</a></h4>
 <dl>
 <dt>
 	<a id="b06780f6cbc593394a929f87c1036d72">account&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients when the account's state, such as its balance, changes.
-Requires the address to be <a href="#registration-requests">registered</a> first.</dd>
+<dd><p>Notifies subscribed clients of the account's current state every time a confirmed block involves the address,
+either through a transaction it is <a href="#account-channels">involved in</a> or by harvesting the block.
+Requires the address to be <a href="#registration-requests">registered</a> first.</p>
+<p>Involvement in a transaction does not mean that the account changed.
+For example, the recipient of a transfer of zero XEM is notified even though its balance stays the same.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -7958,12 +8172,15 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/{address}</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -7971,6 +8188,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by an <a href="../rest/nem/#model/AccountMetaDataPair">AccountMetaDataPair</a> JSON body.
 </td>
 </tr>
@@ -7981,12 +8199,16 @@ Followed by an <a href="../rest/nem/#model/AccountMetaDataPair">AccountMetaDataP
 <dt>
 	<a id="8e1ffb4fe8c1eaaa7e75437c500450da">unconfirmed&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients every time a transaction involving the account enters the <a class="mkdocs-ezglossary-link"
+<dd><p>Notifies subscribed clients every time a transaction <a href="#account-channels">involving</a> the account enters the
+<a class="mkdocs-ezglossary-link"
 	id="e23e29d325adb0aa3786dbf3ddb23bda"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.
-Requires the address to be <a href="#registration-requests">registered</a> first.</dd>
+Requires the address to be <a href="#registration-requests">registered</a> first.</p>
+<p>Since the transaction is not yet included in a block, the <code>meta.height</code> field contains the placeholder value
+<code>9007199254740991</code>, the largest integer that JSON parsers can represent safely.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -7997,12 +8219,15 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed/{address}</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8010,6 +8235,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
 </span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMetaDataPair</a> JSON body.
 </td>
 </tr>
@@ -8020,7 +8246,8 @@ Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMe
 <dt>
 	<a id="b342f959069ee92de08344b64f0dd66a">transactions&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients when a transaction involving the account is confirmed.
+<dd>Notifies subscribed clients every time a confirmed block includes a transaction <a href="#account-channels">involving</a>
+the account.
 Requires the address to be <a href="#registration-requests">registered</a> first.</dd>
 
 </dl>
@@ -8032,12 +8259,15 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/transactions/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/transactions/{address}</span>
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8045,6 +8275,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
 </span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMetaDataPair</a> JSON body.
 </td>
 </tr>
@@ -8055,7 +8286,17 @@ Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMe
 <dt>
 	<a id="3d436550703d113584a1a8a5456e08b2">account&#47;mosaic&#47;owned&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients when a block changes the mosaics the account owns.</dd>
+<dd><p>Notifies subscribed clients of the account's mosaics, every time a confirmed block might have changed them.
+The account's mosaics are the ones it holds a balance of, together with any it created.</p>
+<p>A notification burst is sent when a block contains a mosaic-related transaction <a href="#account-channels">involving</a> the
+account.
+A transfer that carries mosaics notifies the signer, the recipient, and any levy recipients.
+Mosaic definition creation and mosaic supply changes instead notify the mosaic's creator, plus any levy recipient.</p>
+<p>The transaction does not need to change the account's mosaics.
+For example, a transfer of zero units of a mosaic still notifies both the sender and the recipient.</p>
+<p>Each burst contains the account's full mosaic list, with one notification per mosaic, regardless of which mosaics
+changed.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -8066,12 +8307,15 @@ Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMe
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/{address}</span>
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8079,6 +8323,7 @@ Followed by a <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMe
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/Mosaic">Mosaic</a> JSON body.
 </td>
 </tr>
@@ -8089,7 +8334,13 @@ Followed by a <a href="../rest/nem/#model/Mosaic">Mosaic</a> JSON body.
 <dt>
 	<a id="4eb08aa07bc0c822af230ba4beecbed5">account&#47;mosaic&#47;owned&#47;definition&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients when a block changes the mosaic definitions the account owns.</dd>
+<dd><p>Notifies subscribed clients of the definitions of the account's mosaics, every time a confirmed block might have
+changed them.</p>
+<p>This channel is triggered by the same transactions as <ws:account/mosaic/owned/{address}>&nbsp;<code class="rest-method rest-method-ws">WS</code> and covers the same
+mosaics.
+Each burst contains the account's full list of mosaic definitions, with one notification per definition, regardless
+of which mosaics changed.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -8100,12 +8351,15 @@ Followed by a <a href="../rest/nem/#model/Mosaic">Mosaic</a> JSON body.
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/definition/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/definition/{address}</span>
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8113,6 +8367,7 @@ Followed by a <a href="../rest/nem/#model/Mosaic">Mosaic</a> JSON body.
 </span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
 </span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/MosaicDefinitionSupplyTuple">MosaicDefinitionSupplyTuple</a> JSON body.
 </td>
 </tr>
@@ -8123,7 +8378,11 @@ Followed by a <a href="../rest/nem/#model/MosaicDefinitionSupplyTuple">MosaicDef
 <dt>
 	<a id="c7f7a7c02d3c4078f24a65794797bd3e">account&#47;namespace&#47;owned&#47;{address}</a> 
 </dt>
-<dd>Notifies subscribed clients when a block changes the namespaces the account owns.</dd>
+<dd><p>Notifies subscribed clients of the namespaces the account owns, every time a confirmed block might have
+changed them.</p>
+<p>A notification burst is sent when a block contains a provision namespace transaction signed by the account.
+Each burst contains the account's full list of owned namespaces, with one notification per namespace.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -8134,12 +8393,15 @@ Followed by a <a href="../rest/nem/#model/MosaicDefinitionSupplyTuple">MosaicDef
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/namespace/owned/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/namespace/owned/{address}</span>
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8147,6 +8409,7 @@ Followed by a <a href="../rest/nem/#model/MosaicDefinitionSupplyTuple">MosaicDef
 </span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
 </span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/Namespace">Namespace</a> JSON body.
 </td>
 </tr>
@@ -8160,8 +8423,9 @@ Followed by a <a href="../rest/nem/#model/Namespace">Namespace</a> JSON body.
 <dd>Notifies subscribed clients of the account's 25 most recent confirmed transactions, only in response to
 <code><a class="mkdocs-ezglossary-link"
 	id="097b640360f4e9d2f002bceb2f6f9c8e"
-	title="Forces the node to send a notification containing the account's 25 most recent confirmed transactions
-to recenttransactions/{address} WS, and another with up to 10 pending ones to unconfirmed/{address} WS."
+	title="Forces the node to send the account's up to 25 most recent confirmed transactions to
+recenttransactions/{address} WS, plus its pending transactions exactly as
+w/api/account/transfers/unconfirmed REQ does."
 	name="req:w&#47;api&#47;account&#47;transfers&#47;all"
 	href="../../../devbook/reference/websockets/#48b33db9308007572c757405350ebd2d">w&#47;api&#47;account&#47;transfers&#47;all</a></code>&nbsp;<code class="rest-method rest-method-req">REQ</code>.</dd>
 
@@ -8174,12 +8438,15 @@ to recenttransactions/{address} WS, and another with up to 10 pending ones to u
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/recenttransactions/{address}</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/recenttransactions/{address}</span>
 </span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8187,6 +8454,7 @@ to recenttransactions/{address} WS, and another with up to 10 pending ones to u
 </span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>
 </span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a list of <a href="../rest/nem/#model/TransactionMetaDataPair">TransactionMetaDataPair</a> wrapped in a <code>data</code> field.
 </td>
 </tr>
@@ -8214,12 +8482,15 @@ Followed by a list of <a href="../rest/nem/#model/TransactionMetaDataPair">Trans
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/node/info</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/node/info</span>
 </span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8227,6 +8498,7 @@ Followed by a list of <a href="../rest/nem/#model/TransactionMetaDataPair">Trans
 </span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>
 </span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>{ ... }
 </span></code></pre></div>
+
 Followed by a <a href="../rest/nem/#model/Node">Node</a> JSON body.
 </td>
 </tr>
@@ -8256,12 +8528,15 @@ dropped.</dd>
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/errors</span>
 </span></code></pre></div>
+
 </td>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/errors</span>
 </span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
@@ -8274,6 +8549,7 @@ dropped.</dd>
 </span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>    &quot;message&quot;: &quot;account is not valid&quot;
 </span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a>}
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8294,6 +8570,13 @@ Some requests return no answer, while others return results through one of the <
 <h3 id="registration-requests">Registration Requests<a class="headerlink" href="#registration-requests" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Some <a href="#account-channels">account channels</a> stay silent until the address is registered.
 These requests perform that registration, so those channels begin delivering notifications.</p>
+<div class="admonition note">
+<p class="admonition-title">Registrations are shared</p>
+<p>The node maintains a single list of registered addresses that is shared by all connected clients.
+After any client registers an address, all clients subscribed to that account's channels receive notifications for
+that address without registering it again.
+The registration remains active until the node restarts.</p>
+</div>
 <h4 id="wapiaccountsubscribe"><code>/w/api/account/subscribe</code><a class="headerlink" href="#wapiaccountsubscribe" title="Anchor link to this section for reference">⚓︎</a></h4>
 <dl>
 <dt>
@@ -8309,11 +8592,13 @@ These requests perform that registration, so those channels begin delivering not
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">SEND</span>
 </span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/subscribe</span>
 </span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
 </span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8330,8 +8615,11 @@ These requests perform that registration, so those channels begin delivering not
 	href="../../../devbook/reference/websockets/#ed44be7ac296278a7d352f979f35d1ac">w&#47;api&#47;account&#47;subscribe</a></code>&nbsp;<code class="rest-method rest-method-req">REQ</code>, and forces the node to send a
 notification containing the account's current state to <code><a class="mkdocs-ezglossary-link"
 	id="e21a152177fa0306c5dc7da8d0ee88df"
-	title="Notifies subscribed clients when the account's state, such as its balance, changes.
-Requires the address to be registered first."
+	title="Notifies subscribed clients of the account's current state every time a confirmed block involves the address,
+either through a transaction it is involved in or by harvesting the block.
+Requires the address to be registered first.
+Involvement in a transaction does not mean that the account changed.
+For example, the recipient of a transfer of zero XEM is notified even though its balance stays the same."
 	name="ws:account&#47;{address}"
 	href="../../../devbook/reference/websockets/#b06780f6cbc593394a929f87c1036d72">account&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
 
@@ -8343,11 +8631,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">SEND</span>
 </span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/get</span>
 </span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
 </span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8361,18 +8651,19 @@ event.</p>
 <dt>
 	<a id="48b33db9308007572c757405350ebd2d">w&#47;api&#47;account&#47;transfers&#47;all</a> 
 </dt>
-<dd>Forces the node to send a notification containing the account's 25 most recent confirmed transactions
-to <code><a class="mkdocs-ezglossary-link"
+<dd>Forces the node to send the account's up to 25 most recent confirmed transactions to
+<code><a class="mkdocs-ezglossary-link"
 	id="26cce4728b09d7203b370b14a9aedffc"
 	title="Notifies subscribed clients of the account's 25 most recent confirmed transactions, only in response to
 w/api/account/transfers/all REQ."
 	name="ws:recenttransactions&#47;{address}"
-	href="../../../devbook/reference/websockets/#abb811dbcfcc87c8705bd2cc0d8dcbd5">recenttransactions&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>, and another with up to 10 pending ones to <code><a class="mkdocs-ezglossary-link"
-	id="1199ba9f82bd64d054502fc404c57099"
-	title="Notifies subscribed clients every time a transaction involving the account enters the unconfirmed pool.
-Requires the address to be registered first."
-	name="ws:unconfirmed&#47;{address}"
-	href="../../../devbook/reference/websockets/#8e1ffb4fe8c1eaaa7e75437c500450da">unconfirmed&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
+	href="../../../devbook/reference/websockets/#abb811dbcfcc87c8705bd2cc0d8dcbd5">recenttransactions&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>, plus its pending transactions exactly as
+<code><a class="mkdocs-ezglossary-link"
+	id="26da9890cb8556e7fcb290ed35750c13"
+	title="Forces the node to send up to 10 of the account's most recent pending transactions to
+unconfirmed/{address} WS and the global unconfirmed WS channel."
+	name="req:w&#47;api&#47;account&#47;transfers&#47;unconfirmed"
+	href="../../../devbook/reference/websockets/#bf6f8736dc1627f974e2ba2f2c4616a2">w&#47;api&#47;account&#47;transfers&#47;unconfirmed</a></code>&nbsp;<code class="rest-method rest-method-req">REQ</code> does.</dd>
 
 </dl>
 <div class="frame-table">
@@ -8382,11 +8673,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">SEND</span>
 </span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/transfers/all</span>
 </span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
 </span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8396,13 +8689,24 @@ Requires the address to be registered first."
 <dt>
 	<a id="bf6f8736dc1627f974e2ba2f2c4616a2">w&#47;api&#47;account&#47;transfers&#47;unconfirmed</a> 
 </dt>
-<dd>Forces the node to send a notification containing up to 10 of the account's most recent pending
-transactions to <code><a class="mkdocs-ezglossary-link"
-	id="b877af563a6c85427e2c293bc3a19167"
-	title="Notifies subscribed clients every time a transaction involving the account enters the unconfirmed pool.
-Requires the address to be registered first."
+<dd>Forces the node to send up to 10 of the account's most recent pending transactions to
+<code><a class="mkdocs-ezglossary-link"
+	id="1199ba9f82bd64d054502fc404c57099"
+	title="Notifies subscribed clients every time a transaction involving the account enters the
+unconfirmed pool.
+Requires the address to be registered first.
+Since the transaction is not yet included in a block, the meta.height field contains the placeholder value
+9007199254740991, the largest integer that JSON parsers can represent safely."
 	name="ws:unconfirmed&#47;{address}"
-	href="../../../devbook/reference/websockets/#8e1ffb4fe8c1eaaa7e75437c500450da">unconfirmed&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
+	href="../../../devbook/reference/websockets/#8e1ffb4fe8c1eaaa7e75437c500450da">unconfirmed&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> and the global <code><a class="mkdocs-ezglossary-link"
+	id="96fe2b342fd30c85c30963243d5507fd"
+	title="Notifies subscribed clients every time a transaction enters the unconfirmed pool, regardless of the accounts
+involved.
+Every transaction type appears here, including cosignatures, which are not reported on any of the
+account channels.
+A multisig transaction appears as the outer multisig transaction, with the inner transaction nested inside."
+	name="ws:unconfirmed"
+	href="../../../devbook/reference/websockets/#415fb07f4d6a2177323308b27f2e7357">unconfirmed</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code> channel.</dd>
 
 </dl>
 <div class="frame-table">
@@ -8412,11 +8716,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">SEND</span>
 </span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/transfers/unconfirmed</span>
 </span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
 </span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8429,7 +8735,16 @@ Requires the address to be registered first."
 <dd>Forces the node to send a notification containing the mosaics the account owns to
 <code><a class="mkdocs-ezglossary-link"
 	id="06c23e01e074659ac716fb46a271a4c5"
-	title="Notifies subscribed clients when a block changes the mosaics the account owns."
+	title="Notifies subscribed clients of the account's mosaics, every time a confirmed block might have changed them.
+The account's mosaics are the ones it holds a balance of, together with any it created.
+A notification burst is sent when a block contains a mosaic-related transaction involving the
+account.
+A transfer that carries mosaics notifies the signer, the recipient, and any levy recipients.
+Mosaic definition creation and mosaic supply changes instead notify the mosaic's creator, plus any levy recipient.
+The transaction does not need to change the account's mosaics.
+For example, a transfer of zero units of a mosaic still notifies both the sender and the recipient.
+Each burst contains the account's full mosaic list, with one notification per mosaic, regardless of which mosaics
+changed."
 	name="ws:account&#47;mosaic&#47;owned&#47;{address}"
 	href="../../../devbook/reference/websockets/#3d436550703d113584a1a8a5456e08b2">account&#47;mosaic&#47;owned&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
 
@@ -8441,11 +8756,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">SEND</span>
 </span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/mosaic/owned</span>
 </span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
 </span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8458,7 +8775,12 @@ Requires the address to be registered first."
 <dd>Forces the node to send a notification containing the mosaic definitions the account owns to
 <code><a class="mkdocs-ezglossary-link"
 	id="62729039324ea58dcbd9ec42ebffe30a"
-	title="Notifies subscribed clients when a block changes the mosaic definitions the account owns."
+	title="Notifies subscribed clients of the definitions of the account's mosaics, every time a confirmed block might have
+changed them.
+This channel is triggered by the same transactions as account/mosaic/owned/{address} WS and covers the same
+mosaics.
+Each burst contains the account's full list of mosaic definitions, with one notification per definition, regardless
+of which mosaics changed."
 	name="ws:account&#47;mosaic&#47;owned&#47;definition&#47;{address}"
 	href="../../../devbook/reference/websockets/#4eb08aa07bc0c822af230ba4beecbed5">account&#47;mosaic&#47;owned&#47;definition&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
 
@@ -8470,11 +8792,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">SEND</span>
 </span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/mosaic/owned/definition</span>
 </span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>
 </span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8487,7 +8811,10 @@ Requires the address to be registered first."
 <dd>Forces the node to send a notification containing the namespaces the account owns to
 <code><a class="mkdocs-ezglossary-link"
 	id="6b8be695f23d9ab9c6e413e95ffbeedf"
-	title="Notifies subscribed clients when a block changes the namespaces the account owns."
+	title="Notifies subscribed clients of the namespaces the account owns, every time a confirmed block might have
+changed them.
+A notification burst is sent when a block contains a provision namespace transaction signed by the account.
+Each burst contains the account's full list of owned namespaces, with one notification per namespace."
 	name="ws:account&#47;namespace&#47;owned&#47;{address}"
 	href="../../../devbook/reference/websockets/#c7f7a7c02d3c4078f24a65794797bd3e">account&#47;namespace&#47;owned&#47;{address}</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
 
@@ -8499,11 +8826,13 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">SEND</span>
 </span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/namespace/owned</span>
 </span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
 </span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8513,11 +8842,18 @@ Requires the address to be registered first."
 <dt>
 	<a id="35640ab6e3620bbd7b4ce98a7c5bdd2f">w&#47;api&#47;block&#47;last</a> 
 </dt>
-<dd>Forces the node to send a notification containing the latest block to <code><a class="mkdocs-ezglossary-link"
-	id="06bf8d0a123089b2abb64897fdc93b08"
-	title="Notifies subscribed clients every time a new block is added to the chain."
+<dd><p>Forces the node to send a notification containing the latest block to <code><a class="mkdocs-ezglossary-link"
+	id="ef8d40ef2ed9d7c2b1641c7c6b7bf22c"
+	title="Notifies subscribed clients each time a new block is added to the chain.
+If multiple blocks are added at once, for example while the node catches up with its peers or after a rollback,
+the channel sends a burst: one notification per block, delivered in quick succession and in chain order.
+After a rollback, a notification can report a lower block height than a previously received notification because the
+new blocks replace blocks that were already reported."
 	name="ws:blocks"
-	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</dd>
+	href="../../../devbook/reference/websockets/#2d83c2a9b904295b0a52f932c25b03d8">blocks</a></code>&nbsp;<code class="rest-method rest-method-ws">WS</code>.</p>
+<p>The node processes the block as if it had just been added, so the <a href="#account-channels">account channels</a> related
+to the accounts involved in it are notified again as well.</p>
+</dd>
 
 </dl>
 <div class="frame-table">
@@ -8527,9 +8863,11 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">SEND</span>
 </span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/block/last</span>
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
@@ -8553,9 +8891,11 @@ Requires the address to be registered first."
 </tr>
 <tr>
 <td>
+
 <div class="highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">SEND</span>
 </span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/node/info</span>
 </span></code></pre></div>
+
 </td>
 </tr>
 </table>
