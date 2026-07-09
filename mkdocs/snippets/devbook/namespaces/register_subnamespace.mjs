@@ -9,7 +9,7 @@ import {
 const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
 console.log('Using node', NODE_URL);
-// [>step-1]
+
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
 	'0000000000000000000000000000000000000000000000000000000000000000';
 const signerKeyPair = new NemFacade.KeyPair(
@@ -19,9 +19,9 @@ const facade = new NemFacade('testnet');
 const signerAddress = facade.network.publicKeyToAddress(
 	signerKeyPair.publicKey);
 console.log('Signer address:', signerAddress.toString());
-// [<step-1]
+
 try {
-	// Fetch current network time [>step-2]
+	// Fetch current network time
 	const timePath = '/time-sync/network-time';
 	console.log('Fetching current network time from', timePath);
 	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
@@ -33,13 +33,16 @@ try {
 	// Derived fields from network time
 	const timestamp = networkTime;
 	const deadline = networkTime + (2 * 60 * 60);
-	// [<step-2]
-	// Build the transaction [>step-3]
-	const namespaceName = process.env.ROOT_NAMESPACE ||
-		`ns_${Math.floor(Date.now() / 1000)}`;
-	console.log('Creating root namespace:', namespaceName);
 
-	const rentalFee = calculateNamespaceRentalFee(true);
+	// Build the transaction [>step-1]
+	const rootNamespaceName = process.env.ROOT_NAMESPACE || 'ns_root';
+	const childNamespaceName = process.env.SUBNAMESPACE ||
+		`sub_${Math.floor(Date.now() / 1000)}`;
+	const fullNamespaceName =
+		`${rootNamespaceName}.${childNamespaceName}`;
+	console.log('Creating subnamespace:', fullNamespaceName);
+
+	const rentalFee = calculateNamespaceRentalFee(false);
 	console.log('  Namespace lease fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
@@ -50,14 +53,15 @@ try {
 		deadline,
 		rentalFeeSink: 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
 		rentalFee,
-		name: namespaceName
+		parentName: rootNamespaceName,
+		name: childNamespaceName
 	});
 
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-3]
-	// Sign transaction and generate final payload [>step-4]
+	// [<step-1]
+	// Sign transaction and generate final payload
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
@@ -74,8 +78,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-4]
-	// Wait for confirmation [>step-5]
+
+	// Wait for confirmation
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -101,9 +105,9 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-5]
-	// Retrieve the namespace [>step-6]
-	const namespacePath = `/namespace?namespace=${namespaceName}`;
+
+	// Retrieve the namespace [>step-2]
+	const namespacePath = `/namespace?namespace=${fullNamespaceName}`;
 	console.log('Fetching namespace information from', namespacePath);
 	const namespaceResponse = await fetch(`${NODE_URL}${namespacePath}`);
 	const namespaceInfo = await namespaceResponse.json();
@@ -111,7 +115,7 @@ try {
 	console.log('  Name:', namespaceInfo.fqn);
 	console.log('  Owner:', namespaceInfo.owner);
 	console.log('  Registration height:', namespaceInfo.height);
-	// [<step-6]
+	// [<step-2]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }
