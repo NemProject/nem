@@ -13,7 +13,7 @@ from symbolchain.nem.FeeCalculator import (
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
-# [>step-1]
+
 SIGNER_PRIVATE_KEY = os.getenv(
 	'SIGNER_PRIVATE_KEY',
 	'0000000000000000000000000000000000000000000000000000000000000000')
@@ -23,9 +23,9 @@ facade = NemFacade('testnet')
 signer_address = facade.network.public_key_to_address(
 	signer_key_pair.public_key)
 print(f'Signer address: {signer_address}')
-# [<step-1]
+
 try:
-	# Fetch current network time [>step-2]
+	# Fetch current network time
 	time_path = '/time-sync/network-time'
 	print(f'Fetching current network time from {time_path}')
 	with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
@@ -36,12 +36,16 @@ try:
 	# Derived fields from network time
 	timestamp = network_time
 	deadline = network_time + 2 * 60 * 60
-	# [<step-2]
-	# Build the transaction [>step-3]
-	namespace_name = os.getenv('ROOT_NAMESPACE', f'ns_{int(time.time())}')
-	print(f'Creating root namespace: {namespace_name}')
 
-	rental_fee = calculate_namespace_rental_fee(True)
+	# Build the transaction [>step-1]
+	root_namespace_name = os.getenv('ROOT_NAMESPACE', 'ns_root')
+	child_namespace_name = os.getenv(
+		'SUBNAMESPACE', f'sub_{int(time.time())}')
+	full_namespace_name = (
+		f'{root_namespace_name}.{child_namespace_name}')
+	print(f'Creating subnamespace: {full_namespace_name}')
+
+	rental_fee = calculate_namespace_rental_fee(False)
 	print(f'  Namespace lease fee: {rental_fee / 1_000_000} XEM')
 
 	transaction = facade.transaction_factory.create({
@@ -51,14 +55,15 @@ try:
 		'deadline': deadline,
 		'rental_fee_sink': 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
 		'rental_fee': rental_fee,
-		'name': namespace_name
+		'parent_name': root_namespace_name,
+		'name': child_namespace_name
 	})
 
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-3]
-	# Sign transaction and generate final payload [>step-4]
+	# [<step-1]
+	# Sign transaction and generate final payload
 	signature = facade.sign_transaction(signer_key_pair, transaction)
 	json_payload = facade.transaction_factory.attach_signature(
 		transaction, signature)
@@ -77,8 +82,8 @@ try:
 	with urllib.request.urlopen(announce_request) as response:
 		announce_result = json.loads(response.read().decode())
 	print(f'  Result: {announce_result['message']}')
-	# [<step-4]
-	# Wait for confirmation [>step-5]
+
+	# Wait for confirmation
 	if 'SUCCESS' == announce_result['message']:
 		status_path = (
 			f'/transaction/get?hash={
@@ -102,9 +107,9 @@ try:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result['message']}')
-	# [<step-5]
-	# Retrieve the namespace [>step-6]
-	namespace_path = f'/namespace?namespace={namespace_name}'
+
+	# Retrieve the namespace [>step-2]
+	namespace_path = f'/namespace?namespace={full_namespace_name}'
 	print(f'Fetching namespace information from {namespace_path}')
 	with urllib.request.urlopen(
 		f'{NODE_URL}{namespace_path}'
@@ -114,6 +119,6 @@ try:
 		print(f'  Name: {namespace_info["fqn"]}')
 		print(f'  Owner: {namespace_info["owner"]}')
 		print(f'  Registration height: {namespace_info["height"]}')
-	# [<step-6]
+	# [<step-2]
 except urllib.error.URLError as e:
 	print(e.reason)
