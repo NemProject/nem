@@ -85,3 +85,4 @@ The network resets the total supply to `initialSupply` and assigns the entire su
 
 Because of this behavior, the creator must own the entire supply before changing any property other than the
 description.
+Otherwise, the network rejects the transaction.
