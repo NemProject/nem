@@ -192,9 +192,8 @@ After creation, the original creator can modify a mosaic's **definition**.
 Each field has its own rule:
 
 * **Description**: can be changed at any time.
+* **Transferability** and **name**: cannot be changed once set.
 * **Divisibility**, **initial supply**, **supply mutability**, and **levy**: can be changed only while the creator holds
     the entire mosaic supply.
-* **Transferability**: cannot be changed once set.
-* **Name**: cannot be changed.
 
 The total supply can be changed (mint or burn) if [supply mutability](#supply-mutability) is enabled.
