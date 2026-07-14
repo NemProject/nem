@@ -1,0 +1,64 @@
+Using node http://libertalia.nemtest.net:7890
+Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Mosaic ID: my_namespace:token
+Fetching current network time from /time-sync/network-time
+  Network time: 356366691 s since the nemesis block
+
+--- Increasing supply (minting) ---
+Supply before minting: 1000
+Built supply increase transaction:
+{
+  "type": 16386,
+  "version": 1,
+  "network": 152,
+  "timestamp": 356366691,
+  "signer_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+  "signature": "47A61EFCFFBF72C84F4BC06D45422F62CF4A1173D2F58820A3A9EE7B1EECD85641E3EAAC6260F3D3B90FBD5EB167921F4FFF5952BF17DF583BED6C9355D4ED08",
+  "fee": "150000",
+  "deadline": 356373891,
+  "mosaic_id": {
+    "namespace_id": {
+      "name": "6d795f6e616d657370616365"
+    },
+    "name": "746f6b656e"
+  },
+  "action": 1,
+  "delta": "500"
+}
+Announcing supply increase to /transaction/announce
+  Result: SUCCESS
+Waiting for supply increase confirmation from /transaction/get?hash=7D9EAF91CF91F699E2BD50F16F3F21872319570D64BECA35F24742F6C8F03993
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+supply increase confirmed in block 699605
+Supply after minting: 1500
+
+--- Decreasing supply (burning) ---
+Built supply decrease transaction:
+{
+  "type": 16386,
+  "version": 1,
+  "network": 152,
+  "timestamp": 356366691,
+  "signer_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+  "signature": "F3383125C6849AD2C4AFC020331B44F489F0A62302DF76AD15363350C2E99507CD04F6AD3F4026157FF42719EBFC6A7B49122AAC5696338DBCFE07E56A25E509",
+  "fee": "150000",
+  "deadline": 356373891,
+  "mosaic_id": {
+    "namespace_id": {
+      "name": "6d795f6e616d657370616365"
+    },
+    "name": "746f6b656e"
+  },
+  "action": 2,
+  "delta": "500"
+}
+Announcing supply decrease to /transaction/announce
+  Result: SUCCESS
+Waiting for supply decrease confirmation from /transaction/get?hash=2E5F803F30B941671C86481B6646B8AD252D05CBF41F77B438D508F1232E99B5
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+supply decrease confirmed in block 699606
+Supply after burning: 1000
