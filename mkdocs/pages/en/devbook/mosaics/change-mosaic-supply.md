@@ -8,6 +8,10 @@ tutorial_level: intermediate
 <mosaics:|Mosaics> created with a [mutable supply](../../textbook/mosaics.md#supply-mutability) can have their total
 supply increased or decreased after creation.
 
+Only the mosaic creator can change the supply.
+Supply changes affect only the creator's balance: minted units are added to it, and burned units are removed from it.
+The balances of all other accounts that hold the mosaic remain unchanged.
+
 This tutorial shows how to change a mosaic's supply by minting and burning units.
 
 ## Prerequisites
@@ -42,7 +46,7 @@ and then poll the network until it is included in a block.
 A third helper, {{ tutorial.var('fetch_supply') }}, reads the mosaic's current supply from <get:/mosaic/supply>, so
 that the effect of each transaction can be observed.
 
-### Setting Up the Account
+### Setting Up the Account and the Mosaic
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
@@ -52,6 +56,14 @@ The signer must be the creator of the mosaic.
 
 The mosaic to update is read from the `NAMESPACE` and `MOSAIC` environment variables, which default to
 `my_namespace:token`.
+
+!!! warning "Use a mosaic created by the signer"
+
+    By default, the code uses the test account referenced by `SIGNER_PRIVATE_KEY` and a mosaic named
+    `my_namespace:token`.
+
+    If you come from the [Creating a Mosaic](./create-mosaic.md) tutorial, update `SIGNER_PRIVATE_KEY`, `NAMESPACE`, and
+    `MOSAIC` to match the account and mosaic you created there, or any other mosaic that the signer owns.
 
 ### Fetching Network Time
 
@@ -85,10 +97,29 @@ To mint new units, the transaction sets:
     [whole units](../../textbook/mosaics.md#divisibility) to add.
     The resulting total supply cannot exceed the [maximum supply](../../textbook/mosaics.md#initial-supply).
 
+    !!! note "The cap is expressed in atomic units"
+
+        The maximum supply is fixed at $9 \cdot 10^{15}$ **atomic** units, while {{ tutorial.var('delta') }} is
+        expressed in **whole** units.
+
+        The maximum value of {{ tutorial.var('delta') }} therefore depends on the mosaic's
+        [divisibility](../../textbook/mosaics.md#divisibility):
+
+        \[
+        \text{max\_whole\_units} = \frac{9 \cdot 10^{15}}{10^{\text{divisibility}}}
+        \]
+
+        The mosaic in this tutorial has a divisibility of `2`, so one whole unit corresponds to $100$ atomic units and
+        the supply can grow up to $9 \cdot 10^{13}$ whole units.
+
 The transaction fee is then calculated and the transaction is signed, announced, and confirmed, following the same
 process as in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
 
+Mosaic supply change transactions pay a fixed transaction fee of 0.15 XEM, as shown in the
+[fee schedule](../../textbook/transactions.md#fee-schedule).
+
 Once confirmed, the supply is read again to show the resulting supply.
+The minted units are credited to the creator's account.
 
 ### Decreasing Supply (Burning)
 
@@ -97,7 +128,9 @@ Once confirmed, the supply is read again to show the resulting supply.
 To burn existing units, the same transaction type is used with {{ tutorial.var('action') }} set to `decrease` and
 {{ tutorial.var('delta') }} set to the number of whole units to remove.
 
-If the creator does not hold enough units, the transaction fails with a validation error.
+The burned units are taken from the creator's account, so only units the creator still holds can be burned.
+Units already distributed to other accounts remain in their balances, and the transaction fails if the creator's own
+balance does not cover {{ tutorial.var('delta') }}.
 
 Once confirmed, the supply is read again to show the burned units.
 Because this tutorial increases and then decreases the supply by the same amount, the final supply matches the value
@@ -128,12 +161,12 @@ Some highlights from the output:
 
 This tutorial showed how to:
 
-| Step                                                          | Related documentation                      |
-| ------------------------------------------------------------- | ------------------------------------------ |
-| [Mint mosaic supply](#increasing-supply-minting)              | <dy:TransactionFactory.create>             |
-| [Burn mosaic supply](#decreasing-supply-burning)              | <dy:TransactionFactory.create>             |
-| [Calculate the transaction fee](#increasing-supply-minting)   | <dy:FeeCalculator.calculateTransactionFee> |
-| [Read the mosaic supply](#increasing-supply-minting)          | <get:/mosaic/supply>                       |
+| Step                                                          | Related documentation                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Mint mosaic supply](#increasing-supply-minting)              | <dy:TransactionFactory.create>, <ser:MosaicSupplyChangeTransactionV1>     |
+| [Burn mosaic supply](#decreasing-supply-burning)              | <dy:TransactionFactory.create>, <ser:MosaicSupplyChangeTransactionV1>     |
+| [Calculate the transaction fee](#increasing-supply-minting)   | <dy:FeeCalculator.calculateTransactionFee>                                |
+| [Read the mosaic supply](#increasing-supply-minting)          | <get:/mosaic/supply>                                                      |
 
 ## Next Steps
 

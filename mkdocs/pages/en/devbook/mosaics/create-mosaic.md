@@ -12,7 +12,11 @@ and require no additional coding to use.
 Their properties are configurable to support various use cases, from simple currencies to tokens with custom supply
 and transfer rules.
 
-This tutorial shows how to create a mosaic and configure its initial properties.
+Every mosaic belongs to a registered <namespace:>, which provides the first half of its
+[fully qualified name](../../textbook/mosaics.md#fully-qualified-name), such as `my_namespace:token`.
+A namespace must therefore be registered before a mosaic can be created.
+
+This tutorial shows how to create a mosaic under an existing namespace and configure its initial properties.
 
 ## Prerequisites
 
@@ -46,7 +50,7 @@ transactions are announced and confirmed.
 The snippet reads the signer's private key from the `SIGNER_PRIVATE_KEY` environment variable, which defaults to a
 test key if not set.
 The signer's address is derived from the public key.
-This account will own the created mosaic and must also own the namespace that holds it.
+This account will own the created mosaic and must also own the namespace that will hold it.
 
 ### Fetching Network Time
 
@@ -59,13 +63,21 @@ are derived from it, following the process described in the [Transfer XEM](../tr
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-A mosaic is identified by its [fully qualified name](../../textbook/mosaics.md#fully-qualified-name), which combines
-its namespace with a mosaic name, producing a mosaic ID such as `my_namespace:token`.
+The mosaic ID is assembled from an existing namespace and a mosaic name.
 See [Name](../../textbook/mosaics.md#name) in the Textbook for the naming rules.
 
 To avoid collisions across multiple runs of the tutorial, a timestamp is added to the mosaic name.
 In practice, however, programs would use a fixed name for their mosaics.
 You can force the tutorial to use fixed names through the `NAMESPACE` and `MOSAIC` environment variables.
+
+!!! warning "Use a namespace owned by the signer"
+
+    By default, the code uses the test account referenced by `SIGNER_PRIVATE_KEY` and a namespace named
+    `my_namespace`.
+
+    If you come from the [Registering a Root Namespace](../namespaces/register-root-namespace.md) tutorial, update
+    `SIGNER_PRIVATE_KEY` and `NAMESPACE` to match the account and namespace you created there,
+    or any other namespace that the signer owns.
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
@@ -73,7 +85,8 @@ The mosaic definition transaction then registers the mosaic on the network, spec
 
 * {{ tutorial.var('type') }}: Mosaic definition transactions use the type <ser:MosaicDefinitionTransactionV1>.
 
-* {{ tutorial.var('signer_public_key') }}: The account that signs the transaction and pays the fees.
+* {{ tutorial.var('signer_public_key') }}: The account that signs the transaction and pays the fees, which must be the
+    owner of the namespace that will hold the mosaic.
     It becomes the owner of the created mosaic.
 
 * {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
@@ -104,6 +117,7 @@ The mosaic definition transaction then registers the mosaic on the network, spec
     * {{ tutorial.var('description') }}: Text [describing](../../textbook/mosaics.md#description) the mosaic.
 
     * {{ tutorial.var('properties') }}: A set of key-value pairs that configure the mosaic behavior:
+
         * {{ tutorial.var('divisibility') }}: The number of decimal places the mosaic supports.
             For example, a value of `2` means each whole unit can be divided into 100 (10^2^) atomic units.
             See [Divisibility](../../textbook/mosaics.md#divisibility) in the Textbook.
@@ -112,11 +126,13 @@ The mosaic definition transaction then registers the mosaic on the network, spec
             See [Initial Supply](../../textbook/mosaics.md#initial-supply) in the Textbook.
         * {{ tutorial.var('supplyMutable') }}: Whether the total supply can be changed after creation.
             See [Supply Mutability](../../textbook/mosaics.md#supply-mutability) in the Textbook.
-        * {{ tutorial.var('transferable') }}: Whether the mosaic can be sent between any two accounts.
+        * {{ tutorial.var('transferable') }}: Whether the mosaic can be sent between any two accounts other than the
+            creator.
             See [Transferability](../../textbook/mosaics.md#transferability) in the Textbook.
 
-        In this example, the mosaic is divisible to two decimal places, starts with a supply of `1000`, and has both
-        a mutable supply and free transferability.
+        In this example, the mosaic is divisible to two decimal places and starts with a supply of `1000.00` whole
+        units.
+        Its supply can be changed after creation, and its units can be freely transferred between accounts.
 
 !!! note "Optional levy"
 
@@ -176,11 +192,11 @@ Some highlights from the output:
 
 This tutorial showed how to:
 
-| Step                                                                      | Related documentation                       |
-| ------------------------------------------------------------------------- | ------------------------------------------- |
-| [Define the mosaic](#building-the-mosaic-definition-transaction)          | <dy:TransactionFactory.create>              |
-| [Calculate the creation fee](#building-the-mosaic-definition-transaction) | <dy:FeeCalculator.calculateMosaicRentalFee> |
-| [Retrieve the mosaic](#retrieving-the-mosaic)                             | <get:/mosaic/definition>                    |
+| Step                                                                      | Related documentation                                                       |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| [Define the mosaic](#building-the-mosaic-definition-transaction)          | <dy:TransactionFactory.create>, <ser:MosaicDefinitionTransactionV1>         |
+| [Calculate the creation fee](#building-the-mosaic-definition-transaction) | <dy:FeeCalculator.calculateMosaicRentalFee>                                 |
+| [Retrieve the mosaic](#retrieving-the-mosaic)                             | <get:/mosaic/definition>                                                    |
 
 ## Next Steps
 
