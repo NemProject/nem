@@ -75,8 +75,8 @@ You can force the tutorial to use fixed names through the `NAMESPACE` and `MOSAI
     By default, the code uses the test account referenced by `SIGNER_PRIVATE_KEY` and a namespace named
     `my_namespace`.
 
-    If you come from the [Registering a Root Namespace](../namespaces/register-root-namespace.md) tutorial, update
-    `SIGNER_PRIVATE_KEY` and `NAMESPACE` to match the account and namespace you created there,
+    If you come from the [Registering a Root Namespace](../namespaces/register-root-namespace.md) tutorial, set the
+    `SIGNER_PRIVATE_KEY` and `NAMESPACE` environment variables to match the account and namespace you created there,
     or any other namespace that the signer owns.
 
 {{ tutorial.code_snippet_tagged('step-4') }}

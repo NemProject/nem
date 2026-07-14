@@ -62,8 +62,9 @@ The mosaic to update is read from the `NAMESPACE` and `MOSAIC` environment varia
     By default, the code uses the test account referenced by `SIGNER_PRIVATE_KEY` and a mosaic named
     `my_namespace:token`.
 
-    If you come from the [Creating a Mosaic](./create-mosaic.md) tutorial, update `SIGNER_PRIVATE_KEY`, `NAMESPACE`, and
-    `MOSAIC` to match the account and mosaic you created there, or any other mosaic that the signer owns.
+    If you come from the [Creating a Mosaic](./create-mosaic.md) tutorial, set the `SIGNER_PRIVATE_KEY`, `NAMESPACE`,
+    and `MOSAIC` environment variables to match the account and mosaic you created there, or any other mosaic that the
+    signer owns.
 
 ### Fetching Network Time
 
