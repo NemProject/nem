@@ -177,7 +177,9 @@ See [Namespace duration](./namespaces.md#duration) for the namespace lease lifec
 Registering a new mosaic requires paying a one-time _creation fee_ of **10 XEM**.
 
 The fee must be paid at the time of creation and is non-refundable.
-It is transferred to a _sink account_, managed by the NEM team, that collects mosaic creation fees.
+It is transferred to a _sink account_, a network account that collects mosaic creation fees.
+Since block 3,481,580 on <mainnet:>, the network rejects any transaction from the sink account.
+As a result, the collected fees are effectively burned.
 
 !!! note "Transaction fee vs. creation fee"
     Creating a mosaic requires announcing a transaction, which also has an associated fee.
