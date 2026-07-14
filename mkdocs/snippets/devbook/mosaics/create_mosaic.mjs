@@ -1,7 +1,7 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
-	calculateNamespaceRentalFee,
+	calculateMosaicRentalFee,
 	calculateTransactionFee,
 	models
 } from 'symbol-sdk/nem';
@@ -34,42 +34,57 @@ try {
 	const timestamp = networkTime;
 	const deadline = networkTime + (2 * 60 * 60);
 	// [<step-2]
-	// Build the namespace name [>step-3]
-	const namespaceName = process.env.ROOT_NAMESPACE ||
-		`ns_${Math.floor(Date.now() / 1000)}`;
-	console.log('Creating root namespace:', namespaceName);
+	// Build the mosaic ID [>step-3]
+	const namespaceName = process.env.NAMESPACE || 'my_namespace';
+	const mosaicName = process.env.MOSAIC ||
+		`token_${Math.floor(Date.now() / 1000)}`;
+	const mosaicId = `${namespaceName}:${mosaicName}`;
+	console.log('Creating mosaic:', mosaicId);
 	// [<step-3]
-	// Build the transaction [>step-4]
-	const rentalFee = calculateNamespaceRentalFee(true);
-	console.log('  Namespace lease fee:',
+	// Build the mosaic definition transaction [>step-4]
+	const rentalFee = calculateMosaicRentalFee();
+	console.log('  Mosaic creation fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
 	const transaction = facade.transactionFactory.create({
-		type: 'namespace_registration_transaction_v1',
+		type: 'mosaic_definition_transaction_v1',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
 		timestamp,
 		deadline,
-		rentalFeeSink: 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
+		rentalFeeSink: 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
 		rentalFee,
-		name: namespaceName
+		mosaicDefinition: {
+			ownerPublicKey: signerKeyPair.publicKey.toString(),
+			id: {
+				namespaceId: { name: namespaceName },
+				name: mosaicName
+			},
+			description: 'My tutorial mosaic',
+			properties: [
+				{ property: { name: 'divisibility', value: '2' } },
+				{ property: { name: 'initialSupply', value: '1000' } },
+				{ property: { name: 'supplyMutable', value: 'true' } },
+				{ property: { name: 'transferable', value: 'true' } }
+			]
+		}
 	});
 
 	// [<step-4]
 	// Calculate and attach the transaction fee [>step-5]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
-	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
+	console.log('  Transaction fee:', `${Number(fee) / 1_000_000} XEM`);
 	// [<step-5]
-	// Sign transaction and generate final payload [>step-6]
+	// Sign and generate final payload [>step-6]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
-	console.log('Built transaction:');
+	console.log('Built mosaic definition transaction:');
 	console.dir(transaction.toJson(), { colors: true });
 
 	// Announce the transaction
 	const announcePath = '/transaction/announce';
-	console.log('Announcing namespace registration to', announcePath);
+	console.log('Announcing mosaic definition to', announcePath);
 	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -105,15 +120,20 @@ try {
 		console.log('Transaction rejected:', announceResult.message);
 	}
 	// [<step-7]
-	// Retrieve the namespace [>step-8]
-	const namespacePath = `/namespace?namespace=${namespaceName}`;
-	console.log('Fetching namespace information from', namespacePath);
-	const namespaceResponse = await fetch(`${NODE_URL}${namespacePath}`);
-	const namespaceInfo = await namespaceResponse.json();
-	console.log('Namespace information:');
-	console.log('  Name:', namespaceInfo.fqn);
-	console.log('  Owner:', namespaceInfo.owner);
-	console.log('  Registration height:', namespaceInfo.height);
+	// Retrieve the mosaic [>step-8]
+	const definitionPath = `/mosaic/definition?mosaicId=${mosaicId}`;
+	console.log('Fetching mosaic information from', definitionPath);
+	const definitionResponse = await fetch(
+		`${NODE_URL}${definitionPath}`);
+	const mosaicInfo = await definitionResponse.json();
+	const properties = Object.fromEntries(
+		mosaicInfo.properties.map(prop => [prop.name, prop.value]));
+	console.log('Mosaic information:');
+	console.log('  Creator:', mosaicInfo.creator);
+	console.log('  Divisibility:', properties.divisibility);
+	console.log('  Initial supply:', properties.initialSupply);
+	console.log('  Supply mutable:', properties.supplyMutable);
+	console.log('  Transferable:', properties.transferable);
 	// [<step-8]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');

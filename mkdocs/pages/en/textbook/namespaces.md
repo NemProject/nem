@@ -105,6 +105,9 @@ Registering a namespace requires paying a lease fee in the network currency (<XE
 This reflects the fact that namespaces are a limited global resource and helps prevent name squatting.
 
 The fee must be paid at the time of registration or renewal, and is non-refundable.
+It is transferred to a _sink account_, a network account that collects namespace creation fees.
+Since block 3,481,580 on <mainnet:>, the network rejects any transaction from the sink account.
+As a result, the collected fees are effectively burned.
 
 !!! note "Transaction fee vs. lease fee"
     Registering or renewing any kind of namespace requires announcing a transaction, which also has an associated fee.
