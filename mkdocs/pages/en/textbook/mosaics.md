@@ -187,7 +187,7 @@ As a result, the collected fees are effectively burned.
 
 ## Modifying a Mosaic
 
-After creation, the original creator can modify a mosaic's **definition**.
+After creation, the original creator can modify part of a mosaic's **definition**.
 
 Each field has its own rule:
 

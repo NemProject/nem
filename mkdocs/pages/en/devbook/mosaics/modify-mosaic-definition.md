@@ -31,15 +31,13 @@ The [description](../../textbook/mosaics.md#description) can be changed at any t
 The [transferability](../../textbook/mosaics.md#transferability) and the [name](../../textbook/mosaics.md#name) can
 never be changed.
 
-Changing any other property requires the creator to still own the entire mosaic supply.
+Changing the [divisibility](../../textbook/mosaics.md#divisibility),
+[initial supply](../../textbook/mosaics.md#initial-supply),
+[supply mutability](../../textbook/mosaics.md#supply-mutability), or [levy](../../textbook/mosaics.md#levy) requires
+the creator to still own the entire mosaic supply.
 In practice, most mosaic definitions can only be modified before the mosaic is distributed.
 
 For the complete rules, see [Modifying a Mosaic](../../textbook/mosaics.md#modifying-a-mosaic) in the Textbook.
-
-!!! tip "Consider creating a new mosaic instead"
-
-    [Creating a new mosaic](./create-mosaic.md) is easier than modifying an existing one.
-    Understanding how modification works is still important to know when a mosaic's definition can no longer be edited.
 
 ## Procedure
 
@@ -50,21 +48,25 @@ To modify a mosaic definition, reuse the steps from the [Creating a Mosaic](./cr
 
 2. Build a new <ser:MosaicDefinitionTransactionV1>, as described in
     [Building the Mosaic Definition Transaction](./create-mosaic.md#building-the-mosaic-definition-transaction),
-    using the **same mosaic identifier**.
+    using the **same mosaic identifier** (namespace name and mosaic name), signed by the **mosaic creator** account.
 
-    The transaction must include the complete mosaic definition.
+    The transaction must include the complete mosaic definition, including the
+    [description](../../textbook/mosaics.md#description), the
+    [mosaic properties](../../textbook/mosaics.md#properties), and the [levy](../../textbook/mosaics.md#levy).
     Resend the definition retrieved in the previous step, changing only the values that should be updated.
 
-    !!! warning "Resend all properties"
+    !!! warning "Resend the complete definition"
 
-        Properties omitted from the transaction are reset to their default values:
+        The description is replaced with the one in the transaction, and cannot be left empty.
+
+        Mosaic properties omitted from the transaction are reset to their default values:
 
         * `divisibility`: `0`
         * `initialSupply`: `1000`
         * `supplyMutable`: `false`
         * `transferable`: `true`
 
-        An omitted [levy](../../textbook/mosaics.md#levy) is removed from the mosaic.
+        An omitted levy is removed from the mosaic.
 
 3. Submit the transaction, as described in
     [Submitting the Mosaic Definition](./create-mosaic.md#submitting-the-mosaic-definition).
@@ -72,7 +74,8 @@ To modify a mosaic definition, reuse the steps from the [Creating a Mosaic](./cr
 4. Retrieve the definition again to confirm that the mosaic holds the updated values.
 
 The transaction pays the full [creation fee](../../textbook/mosaics.md#creation-fee) of 10 XEM, the same amount as
-the transaction that created the mosaic, in addition to the regular transaction fee.
+the transaction that created the mosaic, in addition to the fixed transaction fee of 0.15 XEM shown in the
+[fee schedule](../../textbook/transactions.md#fee-schedule).
 For example, changing only the description costs the same as creating a new mosaic.
 
 ## Outcome
