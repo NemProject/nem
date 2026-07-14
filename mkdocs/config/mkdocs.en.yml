@@ -96,6 +96,7 @@ nav:
               - devbook/mosaics/create-mosaic.md
               - devbook/mosaics/get-mosaic-info.md
               - devbook/mosaics/change-mosaic-supply.md
+              - devbook/mosaics/modify-mosaic-definition.md
           - Namespaces:
               - devbook/namespaces/register-root-namespace.md
               - devbook/namespaces/register-subnamespace.md
