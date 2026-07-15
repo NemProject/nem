@@ -43,7 +43,27 @@ try:
 	mosaic_id = f'{namespace_name}:{mosaic_name}'
 	print(f'Creating mosaic: {mosaic_id}')
 	# [<step-3]
-	# Build the mosaic definition transaction [>step-4]
+	# Define the mosaic [>step-4]
+	mosaic_definition = {
+		'owner_public_key': signer_key_pair.public_key,
+		'id': {
+			'namespace_id': {'name': namespace_name},
+			'name': mosaic_name
+		},
+		'description': 'My tutorial mosaic',
+		'properties': [
+			{'property_': {
+				'name': b'divisibility', 'value': b'2'}},
+			{'property_': {
+				'name': b'initialSupply', 'value': b'1000'}},
+			{'property_': {
+				'name': b'supplyMutable', 'value': b'true'}},
+			{'property_': {
+				'name': b'transferable', 'value': b'true'}}
+		]
+	}
+	# [<step-4]
+	# Build the mosaic definition transaction [>step-5]
 	rental_fee = calculate_mosaic_rental_fee()
 	print(f'  Mosaic creation fee: {rental_fee / 1_000_000} XEM')
 
@@ -54,33 +74,15 @@ try:
 		'deadline': deadline,
 		'rental_fee_sink': 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
 		'rental_fee': rental_fee,
-		'mosaic_definition': {
-			'owner_public_key': signer_key_pair.public_key,
-			'id': {
-				'namespace_id': {'name': namespace_name},
-				'name': mosaic_name
-			},
-			'description': 'My tutorial mosaic',
-			'properties': [
-				{'property_': {
-					'name': b'divisibility', 'value': b'2'}},
-				{'property_': {
-					'name': b'initialSupply', 'value': b'1000'}},
-				{'property_': {
-					'name': b'supplyMutable', 'value': b'true'}},
-				{'property_': {
-					'name': b'transferable', 'value': b'true'}}
-			]
-		}
+		'mosaic_definition': mosaic_definition
 	})
-
-	# [<step-4]
-	# Calculate and attach the transaction fee [>step-5]
+	# [<step-5]
+	# Calculate and attach the transaction fee [>step-6]
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-5]
-	# Sign and generate final payload [>step-6]
+	# [<step-6]
+	# Sign and generate final payload [>step-7]
 	signature = facade.sign_transaction(signer_key_pair, transaction)
 	json_payload = facade.transaction_factory.attach_signature(
 		transaction, signature)
@@ -99,8 +101,8 @@ try:
 	with urllib.request.urlopen(announce_request) as response:
 		announce_result = json.loads(response.read().decode())
 	print(f'  Result: {announce_result["message"]}')
-	# [<step-6]
-	# Wait for confirmation [>step-7]
+	# [<step-7]
+	# Wait for confirmation [>step-8]
 	if 'SUCCESS' == announce_result['message']:
 		transaction_hash = facade.hash_transaction(transaction)
 		status_path = f'/transaction/get?hash={transaction_hash}'
@@ -123,8 +125,8 @@ try:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result["message"]}')
-	# [<step-7]
-	# Retrieve the mosaic [>step-8]
+	# [<step-8]
+	# Retrieve the mosaic [>step-9]
 	definition_path = f'/mosaic/definition?mosaicId={mosaic_id}'
 	print(f'Fetching mosaic information from {definition_path}')
 	with urllib.request.urlopen(
@@ -141,6 +143,6 @@ try:
 		print(f'  Initial supply: {properties["initialSupply"]}')
 		print(f'  Supply mutable: {properties["supplyMutable"]}')
 		print(f'  Transferable: {properties["transferable"]}')
-	# [<step-8]
+	# [<step-9]
 except urllib.error.URLError as e:
 	print(e.reason)
