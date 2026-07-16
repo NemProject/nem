@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://nemproject.github.io/nem-docs/en/devbook/mosaics/get-mosaic-info/">
       
       
-        <link rel="prev" href="../../transactions/typed-descriptors/">
+        <link rel="prev" href="../create-mosaic/">
       
       
-        <link rel="next" href="../../namespaces/register-root-namespace/">
+        <link rel="next" href="../change-mosaic-supply/">
       
       
         
@@ -1191,6 +1191,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../create-mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create Mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1364,6 +1392,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../change-mosaic-supply/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change Mosaic Supply
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modify-mosaic-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modify Mosaic Definition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -7579,7 +7663,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 <p>This tutorial shows how to retrieve a mosaic's properties and its current supply.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>This tutorial only reads data from the network. No <a class="mkdocs-ezglossary-link"
-	id="398c57727cbe064080385d822c9e4b77"
+	id="8b8d6e3a9d0c478738f19ba3ce7923d3"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7786,7 +7870,7 @@ It functions similarly to a safe deposit box in traditional banking."
 </div>
 <p>The snippet uses the <code>NODE_URL</code> environment variable to set the NEM API node.
 If no value is provided, a default <a class="mkdocs-ezglossary-link"
-	id="1fd91f69f04fa7013a3cad50f97866ab"
+	id="b07df6e09dfe46e36e040772f6640de5"
 	title="NEM's Test Network, intended for development.
 Test XEM can be freely obtained from a faucet, so transactions on this
 network do not have real value, as opposed to transactions on the mainnet."
@@ -7795,7 +7879,7 @@ network do not have real value, as opposed to transactions on the mainnet."
 <p>The <code>MOSAIC_ID</code> environment variable specifies which mosaic to query, given as its
 <a href="../../../textbook/mosaics/#fully-qualified-name">fully qualified name</a>.
 If not set, it defaults to the <a class="mkdocs-ezglossary-link"
-	id="e232d605be3de90801a7bf39639ffc2e"
+	id="e3e5202b003e67e12a665e1b6261b49e"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> mosaic (<code>nem:xem</code>).</p>
@@ -7901,7 +7985,7 @@ If not set, it defaults to the <a class="mkdocs-ezglossary-link"
 <ul>
 <li><strong>Description:</strong> Text <a href="../../../textbook/mosaics/#description">describing</a> the mosaic.</li>
 <li><strong>Creator:</strong> The <a class="mkdocs-ezglossary-link"
-	id="f826b51a28c5087721b73e8a4e21ff2c"
+	id="11a2e7bb422fb8cf52980bddd0ab9f08"
 	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
 It can be used to prove that the private key is known without revealing it.
 Although mathematically derived from the private key, the reverse operation is practically impossible with

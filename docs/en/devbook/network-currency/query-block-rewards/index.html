@@ -1192,6 +1192,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../mosaics/create-mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create Mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../mosaics/get-mosaic-info/" class="md-nav__link">
         
   
@@ -1200,6 +1228,62 @@
     
   
     Get Mosaic Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mosaics/change-mosaic-supply/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change Mosaic Supply
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mosaics/modify-mosaic-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modify Mosaic Definition
   
 
     
@@ -7575,7 +7659,7 @@
 	title="A block records a set of transactions confirmed at a specific point in time."
 	name="_:Block"
 	href="../../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">block</a> on NEM is produced by a single <a class="mkdocs-ezglossary-link"
-	id="543233367a6aa8b6e53a8836fbea70b4"
+	id="b3fb06370dbea5e4119cb7e1fa99a883"
 	title="An account participating in harvesting.
 Its importance determines its chance of producing blocks, and it receives the rewards from each block it harvests."
 	name="_:Harvester account"
@@ -7591,12 +7675,12 @@ paid in full to the harvester that produced it.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Before you start, <a href="../../start/setup/">set up your development environment</a>.</p>
 <p>This tutorial only reads data from the network. No <a class="mkdocs-ezglossary-link"
-	id="aa275b9fbbd0a752a967f1a3b6bada21"
+	id="b9a7f365d1a0ebe5596454f8f22bf70c"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
 	href="../../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a> or <a class="mkdocs-ezglossary-link"
-	id="a9ebc0e4a01979b431f3faf47de68fc1"
+	id="5e20065608edbdae330f0db00f5e0512"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> balance is required.</p>
@@ -7801,7 +7885,7 @@ It functions similarly to a safe deposit box in traditional banking."
 </div>
 <p>The snippet uses the <code>NODE_URL</code> environment variable to set the NEM API node.
 If no value is provided, a default <a class="mkdocs-ezglossary-link"
-	id="3a2031bbd70fd345486636f5c24bf16d"
+	id="2b873dd9478efee3b219fcd5eb9d1e74"
 	title="NEM's Test Network, intended for development.
 Test XEM can be freely obtained from a faucet, so transactions on this
 network do not have real value, as opposed to transactions on the mainnet."
@@ -7897,7 +7981,7 @@ including the list of transactions present in the block.</p>
 </div>
 </div>
 <p>The <code>signer</code> field holds the <a class="mkdocs-ezglossary-link"
-	id="11a2e7bb422fb8cf52980bddd0ab9f08"
+	id="2d09fa6eaad18a0f118dd92c7d02677e"
 	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
 It can be used to prove that the private key is known without revealing it.
 Although mathematically derived from the private key, the reverse operation is practically impossible with
@@ -7926,7 +8010,7 @@ letters and numbers. It is typically a synonym for account."
 The node signs produced blocks using the operator's main key, which must be stored on the machine."
 	name="_:Local Harvesting"
 	href="../../../textbook/harvesting/#5fba655c1c99e3ec0970be9fc61ee673">local harvesting</a>, the <code>signer</code> is the <a class="mkdocs-ezglossary-link"
-	id="b3fb06370dbea5e4119cb7e1fa99a883"
+	id="e680db12de77cd49aef7f59ec1667bb1"
 	title="An account participating in harvesting.
 Its importance determines its chance of producing blocks, and it receives the rewards from each block it harvests."
 	name="_:Harvester account"
@@ -8030,7 +8114,7 @@ An empty block has no fees, and therefore no reward.</p>
 <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Harvesting/getHarvestedBlocks" title="Retrieve the list of blocks harvested by an account"><code>/account/harvests</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.
 It returns one entry per harvested block, including a <code>totalFee</code> field with the reward earned for that block.</p>
 <p>The endpoint accepts the address of the <a class="mkdocs-ezglossary-link"
-	id="e680db12de77cd49aef7f59ec1667bb1"
+	id="413da4802e046b97acabd2e841062822"
 	title="An account participating in harvesting.
 Its importance determines its chance of producing blocks, and it receives the rewards from each block it harvests."
 	name="_:Harvester account"

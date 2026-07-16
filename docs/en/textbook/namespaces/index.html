@@ -1185,6 +1185,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../devbook/mosaics/create-mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create Mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../devbook/mosaics/get-mosaic-info/" class="md-nav__link">
         
   
@@ -1193,6 +1221,62 @@
     
   
     Get Mosaic Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/mosaics/change-mosaic-supply/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change Mosaic Supply
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/mosaics/modify-mosaic-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modify Mosaic Definition
   
 
     
@@ -7491,12 +7575,12 @@
 	<a id="2f0cefc8ad477caf4f66272797ede73d">Namespace</a> 
 </dt>
 <dd>A registered name leased to an <a class="mkdocs-ezglossary-link"
-	id="76dc3d16926fbc1b03b9011455037b7a"
+	id="728584158d8f246ef12353e45ba8b2b2"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
 	href="../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a>, used to prefix and group <a class="mkdocs-ezglossary-link"
-	id="1c53acfd37d520da2f3ac745741d8b32"
+	id="2c034060b5bb8ecd144490f1af62472c"
 	title="A representation of an asset on the NEM blockchain, commonly called tokens on other protocols.
 For example: currencies, licenses, collectibles, access rights, or voting power."
 	name="_:Mosaic"
@@ -7505,7 +7589,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 </dl>
 <p>Namespaces let an account group related mosaics under a meaningful prefix like <code>mycompany.tokens</code>.
 The network's own currency follows the same pattern: <code>nem:xem</code>, commonly known as <a class="mkdocs-ezglossary-link"
-	id="e7f16aa19a33c210d1990d3842debc8e"
+	id="4f0508e90f3451dd431d2bcf43d1a6f7"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, lives in the <code>nem</code> namespace.</p>
@@ -7547,14 +7631,14 @@ Subnamespaces expire when the root namespace expires (see <a href="#duration">Du
 <p>Once registered, a name cannot be changed.</p>
 <h2 id="duration">Duration<a class="headerlink" href="#duration" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>When a root namespace is registered, it is leased for approximately one year (525600 blocks on <a class="mkdocs-ezglossary-link"
-	id="eee9b3915a19c300bf295da1c0294fff"
+	id="f3b9977be3020ec45431f5d9a9d592b6"
 	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
 	name="_:mainnet"
 	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>).
 During this time, the owner can perform operations such as:</p>
 <ul>
 <li>Define <a class="mkdocs-ezglossary-link"
-	id="193af8ff377bbfdf2c634f1631598120"
+	id="bafc17f66c5ac17549b10fe8fac09191"
 	title="A representation of an asset on the NEM blockchain, commonly called tokens on other protocols.
 For example: currencies, licenses, collectibles, access rights, or voting power."
 	name="_:Mosaic"
@@ -7565,7 +7649,7 @@ For example: currencies, licenses, collectibles, access rights, or voting power.
 </ul>
 <p>Renewal while the namespace is registered is restricted to the <strong>last 43200 blocks before expiration</strong>
 (approximately 30 days on <a class="mkdocs-ezglossary-link"
-	id="339d75fd3c96ddc8040418cb0e6f848c"
+	id="add6d2ef0336d2e4bf65851578eb35fb"
 	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
 	name="_:mainnet"
 	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>).
@@ -7617,14 +7701,14 @@ Once the grace period ends, the namespace is fully released and becomes availabl
 <div class="admonition note">
 <p class="admonition-title">The <code>nem</code> namespace never expires</p>
 <p>The <code>nem</code> namespace, which holds <a class="mkdocs-ezglossary-link"
-	id="65cb88036245436b2b807e5d4a30b1e9"
+	id="0071c4bafc6612106a420d334721d9cb"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>, is permanently active and is exempt from the lease and renewal cycle.</p>
 </div>
 <h2 id="lease-fee">Lease Fee<a class="headerlink" href="#lease-fee" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Registering a namespace requires paying a lease fee in the network currency (<a class="mkdocs-ezglossary-link"
-	id="bb1f2f0794d3c58c318296dc21a6b0d5"
+	id="e5a8712d1af918b475032c1794de1ebd"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a>):</p>
@@ -7633,7 +7717,14 @@ Once the grace period ends, the namespace is fully released and becomes availabl
 <li><strong>Subnamespace:</strong> 10 XEM, paid once at registration.</li>
 </ul>
 <p>This reflects the fact that namespaces are a limited global resource and helps prevent name squatting.</p>
-<p>The fee must be paid at the time of registration or renewal, and is non-refundable.</p>
+<p>The fee must be paid at the time of registration or renewal, and is non-refundable.
+It is transferred to a <em>sink account</em>, a network account that collects namespace creation fees.
+Since block 3,481,580 on <a class="mkdocs-ezglossary-link"
+	id="7ac1fb277dbcbc508f6ee985293f8d80"
+	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
+	name="_:mainnet"
+	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>, the network rejects any transaction from the sink account.
+As a result, the collected fees are effectively burned.</p>
 <div class="admonition note">
 <p class="admonition-title">Transaction fee vs. lease fee</p>
 <p>Registering or renewing any kind of namespace requires announcing a transaction, which also has an associated fee.
@@ -7720,7 +7811,7 @@ approve transactions."
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 14, 2026</span>
   </span>
 
     

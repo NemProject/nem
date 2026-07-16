@@ -1185,6 +1185,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../devbook/mosaics/create-mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create Mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../devbook/mosaics/get-mosaic-info/" class="md-nav__link">
         
   
@@ -1193,6 +1221,62 @@
     
   
     Get Mosaic Information
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/mosaics/change-mosaic-supply/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change Mosaic Supply
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/mosaics/modify-mosaic-definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modify Mosaic Definition
   
 
     
@@ -7648,7 +7732,7 @@ such as paintings or <a class="mkdocs-ezglossary-link"
 	name="_:NFT"
 	href="../../textbook/glossary/#991e45b8165abd1db1e24f8dc0f4e14a">NFTs</a>, where each unit is unique.</p>
 <p>A mosaic lives under a registered <a class="mkdocs-ezglossary-link"
-	id="2d63f346f5b315d41b3149b5ee4256fd"
+	id="eab0d628ecafb9ac2e0dfd197a48fd89"
 	title="A registered name leased to an account, used to prefix and group mosaics defined under it."
 	name="_:Namespace"
 	href="../../textbook/namespaces/#2f0cefc8ad477caf4f66272797ede73d">namespace</a>, is identified by a <a href="#fully-qualified-name">fully qualified name</a>,
@@ -7810,21 +7894,27 @@ Accounts holding the mosaic lose access to their balances and the mosaic cannot 
 <p>See <a href="../namespaces/#duration">Namespace duration</a> for the namespace lease lifecycle.</p>
 <h2 id="creation-fee">Creation Fee<a class="headerlink" href="#creation-fee" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Registering a new mosaic requires paying a one-time <em>creation fee</em> of <strong>10 XEM</strong>.</p>
-<p>The fee must be paid at the time of creation and is non-refundable.</p>
+<p>The fee must be paid at the time of creation and is non-refundable.
+It is transferred to a <em>sink account</em>, a network account that collects mosaic creation fees.
+Since block 3,481,580 on <a class="mkdocs-ezglossary-link"
+	id="339d75fd3c96ddc8040418cb0e6f848c"
+	title="NEM's Main Network, where transactions with real value happen, as opposed to the testnet."
+	name="_:mainnet"
+	href="../../textbook/glossary/#8090d075d831e0084c0d37e35154dd05">mainnet</a>, the network rejects any transaction from the sink account.
+As a result, the collected fees are effectively burned.</p>
 <div class="admonition note">
 <p class="admonition-title">Transaction fee vs. creation fee</p>
 <p>Creating a mosaic requires announcing a transaction, which also has an associated fee.
 However, this transaction fee is typically negligible compared to the creation fee.</p>
 </div>
 <h2 id="modifying-a-mosaic">Modifying a Mosaic<a class="headerlink" href="#modifying-a-mosaic" title="Anchor link to this section for reference">⚓︎</a></h2>
-<p>After creation, the original creator can modify a mosaic's <strong>definition</strong>.</p>
+<p>After creation, the original creator can modify part of a mosaic's <strong>definition</strong>.</p>
 <p>Each field has its own rule:</p>
 <ul>
 <li><strong>Description</strong>: can be changed at any time.</li>
+<li><strong>Transferability</strong> and <strong>name</strong>: cannot be changed once set.</li>
 <li><strong>Divisibility</strong>, <strong>initial supply</strong>, <strong>supply mutability</strong>, and <strong>levy</strong>: can be changed only while the creator holds
     the entire mosaic supply.</li>
-<li><strong>Transferability</strong>: cannot be changed once set.</li>
-<li><strong>Name</strong>: cannot be changed.</li>
 </ul>
 <p>The total supply can be changed (mint or burn) if <a href="#supply-mutability">supply mutability</a> is enabled.</p>
 
@@ -7849,7 +7939,7 @@ However, this transaction fee is typically negligible compared to the creation f
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 1, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 14, 2026</span>
   </span>
 
     
