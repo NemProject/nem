@@ -228,7 +228,7 @@ This tutorial showed how to:
 | Step                                                              | Related documentation                                                      |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | [Obtain the network time](#fetching-network-time)                 | <get:/time-sync/network-time>                                              |
-| [Build the transaction](#building-the-transaction)                | <dy:TransactionFactory.create>                                             |
+| [Build the transaction](#building-the-transaction)                | <dy:TransactionFactory.create>, <ser:TransferTransactionV2>                |
 | [Calculate the transaction fee](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee>                                 |
 | [Sign the transaction](#signing-and-serializing)                  | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature> |
 | [Announce the transaction](#announcing-the-transaction)           | <post:/transaction/announce>                                               |

@@ -37,14 +37,15 @@ try:
 	timestamp = network_time
 	deadline = network_time + 2 * 60 * 60
 
-	# Build the transaction [>step-1]
+	# Choose the subnamespace name [>step-1]
 	root_namespace_name = os.getenv('ROOT_NAMESPACE', 'ns_root')
 	child_namespace_name = os.getenv(
 		'SUBNAMESPACE', f'sub_{int(time.time())}')
 	full_namespace_name = (
 		f'{root_namespace_name}.{child_namespace_name}')
 	print(f'Creating subnamespace: {full_namespace_name}')
-
+	# [<step-1]
+	# Build the transaction [>step-2]
 	rental_fee = calculate_namespace_rental_fee(False)
 	print(f'  Namespace lease fee: {rental_fee / 1_000_000} XEM')
 
@@ -62,7 +63,7 @@ try:
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-1]
+	# [<step-2]
 	# Sign transaction and generate final payload
 	signature = facade.sign_transaction(signer_key_pair, transaction)
 	json_payload = facade.transaction_factory.attach_signature(
@@ -107,8 +108,7 @@ try:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result['message']}')
-
-	# Retrieve the namespace [>step-2]
+	# Retrieve the namespace [>step-3]
 	namespace_path = f'/namespace?namespace={full_namespace_name}'
 	print(f'Fetching namespace information from {namespace_path}')
 	with urllib.request.urlopen(
@@ -119,6 +119,6 @@ try:
 		print(f'  Name: {namespace_info["fqn"]}')
 		print(f'  Owner: {namespace_info["owner"]}')
 		print(f'  Registration height: {namespace_info["height"]}')
-	# [<step-2]
+	# [<step-3]
 except urllib.error.URLError as e:
 	print(e.reason)

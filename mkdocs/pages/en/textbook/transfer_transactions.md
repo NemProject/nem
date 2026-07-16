@@ -82,10 +82,9 @@ Quantities are integers counted in the mosaic's **atomic units**.
 A mosaic's `divisibility` property, set when the mosaic is created and ranging from `0` to `6`,
 defines how many atomic units make one whole unit.
 XEM, for example, has divisibility `6`, so `1'000'000` atomic units equal one whole XEM.
+Learn more about converting between atomic and whole units on the [Mosaics](./mosaics.md#divisibility) page.
 
-Full details appear in the [Mosaics](./mosaics.md) page.
-
-The network rejects the transaction if the sender does not hold enough of any listed mosaic.
+The network rejects the transaction if the sender does not hold enough units of any listed mosaic.
 
 !!! tip "Sending XEM alongside other mosaics"
 

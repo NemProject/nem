@@ -209,9 +209,9 @@ The hash is printed in the line that says `Waiting for confirmation from /transa
 
 This tutorial showed how to:
 
-| Step                                                                        | Related documentation                                              |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| [Fetch a mosaic's divisibility](#fetching-the-mosaic-definition-and-supply) | <get:/mosaic/definition>                                           |
-| [Fetch a mosaic's supply](#fetching-the-mosaic-definition-and-supply)       | <get:/mosaic/supply>                                               |
-| [Build a mosaic transfer](#building-the-transaction)                        | <dy:TransactionFactory.create>                                     |
-| [Calculate the transaction fee](#calculating-the-transaction-fee)           | <dy:FeeCalculator.calculateTransactionFee>                         |
+| Step                                                                        | Related documentation                                       |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [Fetch a mosaic's divisibility](#fetching-the-mosaic-definition-and-supply) | <get:/mosaic/definition>                                    |
+| [Fetch a mosaic's supply](#fetching-the-mosaic-definition-and-supply)       | <get:/mosaic/supply>                                        |
+| [Build a mosaic transfer](#building-the-transaction)                        | <dy:TransactionFactory.create>, <ser:TransferTransactionV2> |
+| [Calculate the transaction fee](#calculating-the-transaction-fee)           | <dy:FeeCalculator.calculateTransactionFee>                  |

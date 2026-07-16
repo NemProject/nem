@@ -59,7 +59,7 @@ This account will own the created mosaic and must also own the namespace that wi
 Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
 are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
 
-### Building the Mosaic Definition Transaction
+### Choosing the Mosaic Name
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
@@ -79,9 +79,48 @@ You can force the tutorial to use fixed names through the `NAMESPACE` and `MOSAI
     `SIGNER_PRIVATE_KEY` and `NAMESPACE` environment variables to match the account and namespace you created there,
     or any other namespace that the signer owns.
 
+### Defining the Mosaic
+
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-The mosaic definition transaction then registers the mosaic on the network, specifying:
+The mosaic definition describes the asset itself, separately from the transaction that registers it:
+
+* {{ tutorial.var('owner_public_key') }}: The <public key:> of the account creating the mosaic, which must match
+    {{ tutorial.var('signer_public_key') }}.
+    The network rejects transactions where the two differ.
+
+* {{ tutorial.var('id') }}: The mosaic identifier, formed from the namespace and the mosaic name.
+
+* {{ tutorial.var('description') }}: Text [describing](../../textbook/mosaics.md#description) the mosaic.
+
+* {{ tutorial.var('properties') }}: A set of key-value pairs that configure the mosaic behavior:
+
+    * {{ tutorial.var('divisibility') }}: The number of decimal places the mosaic supports.
+        For example, a value of `2` means each whole unit can be divided into 100 (10^2^) atomic units.
+        See [Divisibility](../../textbook/mosaics.md#divisibility) in the Textbook.
+    * {{ tutorial.var('initialSupply') }}: The number of whole units minted to the creator when the mosaic is
+        defined.
+        See [Initial Supply](../../textbook/mosaics.md#initial-supply) in the Textbook.
+    * {{ tutorial.var('supplyMutable') }}: Whether the total supply can be changed after creation.
+        See [Supply Mutability](../../textbook/mosaics.md#supply-mutability) in the Textbook.
+    * {{ tutorial.var('transferable') }}: Whether the mosaic can be sent between any two accounts other than the
+        creator.
+        See [Transferability](../../textbook/mosaics.md#transferability) in the Textbook.
+
+    In this example, the mosaic is divisible to two decimal places and starts with a supply of `1000.00` whole
+    units.
+    Its supply can be changed after creation, and its units can be freely transferred between accounts.
+
+!!! note "Optional levy"
+
+    A mosaic definition can also include an optional [levy](../../textbook/mosaics.md#levy).
+    For more information, see the [Creating a Mosaic with a Levy](./mosaic-levy.md) tutorial.
+
+### Building the Mosaic Definition Transaction
+
+{{ tutorial.code_snippet_tagged('step-5') }}
+
+The mosaic definition transaction registers the mosaic on the network, specifying:
 
 * {{ tutorial.var('type') }}: Mosaic definition transactions use the type <ser:MosaicDefinitionTransactionV1>.
 
@@ -106,40 +145,9 @@ The mosaic definition transaction then registers the mosaic on the network, spec
     The network rejects transactions that pay less than this fee.
     Larger amounts are accepted, but the entire amount is transferred to the sink account.
 
-* {{ tutorial.var('mosaic_definition') }}: The definition of the mosaic, which contains:
+* {{ tutorial.var('mosaic_definition') }}: The mosaic definition built in the previous step.
 
-    * {{ tutorial.var('owner_public_key') }}: The <public key:> of the account creating the mosaic, which must match
-        {{ tutorial.var('signer_public_key') }}.
-        The network rejects transactions where the two differ.
-
-    * {{ tutorial.var('id') }}: The mosaic identifier, formed from the namespace and the mosaic name.
-
-    * {{ tutorial.var('description') }}: Text [describing](../../textbook/mosaics.md#description) the mosaic.
-
-    * {{ tutorial.var('properties') }}: A set of key-value pairs that configure the mosaic behavior:
-
-        * {{ tutorial.var('divisibility') }}: The number of decimal places the mosaic supports.
-            For example, a value of `2` means each whole unit can be divided into 100 (10^2^) atomic units.
-            See [Divisibility](../../textbook/mosaics.md#divisibility) in the Textbook.
-        * {{ tutorial.var('initialSupply') }}: The number of whole units minted to the creator when the mosaic is
-            defined.
-            See [Initial Supply](../../textbook/mosaics.md#initial-supply) in the Textbook.
-        * {{ tutorial.var('supplyMutable') }}: Whether the total supply can be changed after creation.
-            See [Supply Mutability](../../textbook/mosaics.md#supply-mutability) in the Textbook.
-        * {{ tutorial.var('transferable') }}: Whether the mosaic can be sent between any two accounts other than the
-            creator.
-            See [Transferability](../../textbook/mosaics.md#transferability) in the Textbook.
-
-        In this example, the mosaic is divisible to two decimal places and starts with a supply of `1000.00` whole
-        units.
-        Its supply can be changed after creation, and its units can be freely transferred between accounts.
-
-!!! note "Optional levy"
-
-    A mosaic definition can also include an optional [levy](../../textbook/mosaics.md#levy).
-    For more information, see the [Creating a Mosaic with a Levy](./mosaic-levy.md) tutorial.
-
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -149,19 +157,19 @@ Mosaic definition transactions pay a fixed transaction fee of 0.15 XEM, as shown
 
 ### Submitting the Mosaic Definition
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 The mosaic definition transaction is signed and announced following the same process as in the
 [Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 The code then waits for the transaction to be confirmed by polling the <get:/transaction/get> endpoint until the
 transaction is included in a block.
 
 ### Retrieving the Mosaic
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-9') }}
 
 To verify the mosaic was created successfully, the code retrieves its definition from the <get:/mosaic/definition>
 endpoint and displays its properties.
@@ -194,7 +202,7 @@ This tutorial showed how to:
 
 | Step                                                                      | Related documentation                                                       |
 | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [Define the mosaic](#building-the-mosaic-definition-transaction)          | <dy:TransactionFactory.create>, <ser:MosaicDefinitionTransactionV1>         |
+| [Define the mosaic](#defining-the-mosaic)                                 | <dy:TransactionFactory.create>, <ser:MosaicDefinitionTransactionV1>         |
 | [Calculate the creation fee](#building-the-mosaic-definition-transaction) | <dy:FeeCalculator.calculateMosaicRentalFee>                                 |
 | [Retrieve the mosaic](#retrieving-the-mosaic)                             | <get:/mosaic/definition>                                                    |
 

@@ -116,7 +116,8 @@ The transaction is then signed and announced following the same process as in
     Sender and recipient must agree in advance on whether messages are encrypted and the cipher used.
 
     <dy:MessageEncoder.encode> implements **AES-GCM**, the convention used by most wallets and applications.
-    The class also provides <dy:MessageEncoder.encodeDeprecated> for compatibility with legacy AES-CBC messages.
+    The class also provides <dy:MessageEncoder.encodeDeprecated> for compatibility with legacy AES-CBC messages,
+    the convention used by the earliest NEM wallets and applications.
     <dy:MessageEncoder.tryDecode> automatically detects and decodes both schemes.
 
 
