@@ -41,7 +41,23 @@ try {
 	const mosaicId = `${namespaceName}:${mosaicName}`;
 	console.log('Creating mosaic:', mosaicId);
 	// [<step-3]
-	// Build the mosaic definition transaction [>step-4]
+	// Define the mosaic [>step-4]
+	const mosaicDefinition = {
+		ownerPublicKey: signerKeyPair.publicKey.toString(),
+		id: {
+			namespaceId: { name: namespaceName },
+			name: mosaicName
+		},
+		description: 'My tutorial mosaic',
+		properties: [
+			{ property: { name: 'divisibility', value: '2' } },
+			{ property: { name: 'initialSupply', value: '1000' } },
+			{ property: { name: 'supplyMutable', value: 'true' } },
+			{ property: { name: 'transferable', value: 'true' } }
+		]
+	};
+	// [<step-4]
+	// Build the mosaic definition transaction [>step-5]
 	const rentalFee = calculateMosaicRentalFee();
 	console.log('  Mosaic creation fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
@@ -53,29 +69,15 @@ try {
 		deadline,
 		rentalFeeSink: 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
 		rentalFee,
-		mosaicDefinition: {
-			ownerPublicKey: signerKeyPair.publicKey.toString(),
-			id: {
-				namespaceId: { name: namespaceName },
-				name: mosaicName
-			},
-			description: 'My tutorial mosaic',
-			properties: [
-				{ property: { name: 'divisibility', value: '2' } },
-				{ property: { name: 'initialSupply', value: '1000' } },
-				{ property: { name: 'supplyMutable', value: 'true' } },
-				{ property: { name: 'transferable', value: 'true' } }
-			]
-		}
+		mosaicDefinition
 	});
-
-	// [<step-4]
-	// Calculate and attach the transaction fee [>step-5]
+	// [<step-5]
+	// Calculate and attach the transaction fee [>step-6]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log('  Transaction fee:', `${Number(fee) / 1_000_000} XEM`);
-	// [<step-5]
-	// Sign and generate final payload [>step-6]
+	// [<step-6]
+	// Sign and generate final payload [>step-7]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
@@ -92,8 +94,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-6]
-	// Wait for confirmation [>step-7]
+	// [<step-7]
+	// Wait for confirmation [>step-8]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -119,8 +121,8 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-7]
-	// Retrieve the mosaic [>step-8]
+	// [<step-8]
+	// Retrieve the mosaic [>step-9]
 	const definitionPath = `/mosaic/definition?mosaicId=${mosaicId}`;
 	console.log('Fetching mosaic information from', definitionPath);
 	const definitionResponse = await fetch(
@@ -134,7 +136,7 @@ try {
 	console.log('  Initial supply:', properties.initialSupply);
 	console.log('  Supply mutable:', properties.supplyMutable);
 	console.log('  Transferable:', properties.transferable);
-	// [<step-8]
+	// [<step-9]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

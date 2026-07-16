@@ -34,14 +34,15 @@ try {
 	const timestamp = networkTime;
 	const deadline = networkTime + (2 * 60 * 60);
 
-	// Build the transaction [>step-1]
+	// Choose the subnamespace name [>step-1]
 	const rootNamespaceName = process.env.ROOT_NAMESPACE || 'ns_root';
 	const childNamespaceName = process.env.SUBNAMESPACE ||
 		`sub_${Math.floor(Date.now() / 1000)}`;
 	const fullNamespaceName =
 		`${rootNamespaceName}.${childNamespaceName}`;
 	console.log('Creating subnamespace:', fullNamespaceName);
-
+	// [<step-1]
+	// Build the transaction [>step-2]
 	const rentalFee = calculateNamespaceRentalFee(false);
 	console.log('  Namespace lease fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
@@ -60,7 +61,7 @@ try {
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-1]
+	// [<step-2]
 	// Sign transaction and generate final payload
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
@@ -105,8 +106,7 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-
-	// Retrieve the namespace [>step-2]
+	// Retrieve the namespace [>step-3]
 	const namespacePath = `/namespace?namespace=${fullNamespaceName}`;
 	console.log('Fetching namespace information from', namespacePath);
 	const namespaceResponse = await fetch(`${NODE_URL}${namespacePath}`);
@@ -115,7 +115,7 @@ try {
 	console.log('  Name:', namespaceInfo.fqn);
 	console.log('  Owner:', namespaceInfo.owner);
 	console.log('  Registration height:', namespaceInfo.height);
-	// [<step-2]
+	// [<step-3]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

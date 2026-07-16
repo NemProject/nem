@@ -52,7 +52,7 @@ This account will own the registered namespace.
 Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
 are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
 
-### Building the Transaction
+### Choosing the Namespace Name
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
@@ -62,6 +62,8 @@ See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rul
 To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
 In practice, however, programs would use a fixed name for their namespaces.
 You can force the tutorial to use a fixed name through the `ROOT_NAMESPACE` environment variable.
+
+### Building the Transaction
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
@@ -147,11 +149,11 @@ Some highlights from the output:
 
 This tutorial showed how to:
 
-| Step                                                                     | Related documentation                          |
-|--------------------------------------------------------------------------|------------------------------------------------|
-| [Build a namespace registration transaction](#building-the-transaction)  | <dy:TransactionFactory.create>                 |
-| [Calculate the lease fee](#building-the-transaction)                     | <dy:FeeCalculator.calculateNamespaceRentalFee> |
-| [Retrieve the namespace](#retrieving-the-namespace)                      | <get:/namespace>                               |
+| Step                                                                    | Related documentation                                                    |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Build a namespace registration transaction](#building-the-transaction) | <dy:TransactionFactory.create>, <ser:NamespaceRegistrationTransactionV1> |
+| [Calculate the lease fee](#building-the-transaction)                    | <dy:FeeCalculator.calculateNamespaceRentalFee>                           |
+| [Retrieve the namespace](#retrieving-the-namespace)                     | <get:/namespace>                                                         |
 
 ## Next Steps
 
