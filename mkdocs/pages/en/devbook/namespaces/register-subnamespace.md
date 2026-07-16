@@ -43,29 +43,41 @@ For detailed explanations of the common steps (setting up the account, fetching 
 transaction descriptor fields shared with a root namespace,
 see [Registering a Root Namespace](./register-root-namespace.md).
 
-### Building the Transaction
+### Choosing the Subnamespace Name
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
+A subnamespace is identified by its full name, which joins the parent namespace name and the child name with a dot,
+such as `ns_root.product`.
+See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
+
+To avoid collisions across multiple runs of the tutorial, a timestamp is added to the child name.
+In practice, however, programs would use a fixed name for their subnamespaces.
+You can force the tutorial to use fixed names through the `ROOT_NAMESPACE` and `SUBNAMESPACE` environment variables.
+
+!!! warning "Use a parent namespace owned by the signer"
+
+    By default, the code uses the test account referenced by `SIGNER_PRIVATE_KEY` and a parent namespace named
+    `ns_root`.
+
+    If you come from the [Registering a Root Namespace](./register-root-namespace.md) tutorial, set the
+    `SIGNER_PRIVATE_KEY` and `ROOT_NAMESPACE` environment variables to match the account and namespace you created
+    there, or any other namespace that the signer owns.
+
+### Building the Transaction
+
+{{ tutorial.code_snippet_tagged('step-2') }}
+
 The main difference when registering a subnamespace is in the transaction descriptor:
 
-* {{ tutorial.var('parent_name') }}: The name of the parent namespace.
-    The parent must be an existing namespace owned by the signer, either a root namespace or another subnamespace
-    (if creating a third-level namespace).
+* {{ tutorial.var('parent_name') }}: The name of the parent namespace, defined in the previous step.
+    It can be a root namespace or another subnamespace.
 
-    In this example, the parent name defaults to `ns_root` and can be set with the `ROOT_NAMESPACE` environment
-    variable.
-
-* {{ tutorial.var('name') }}: The name of the subnamespace.
-    See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
+* {{ tutorial.var('name') }}: The name of the subnamespace, chosen in the previous step.
 
     Note that this is just the name of the subnamespace, not the full path.
     For example, to create `company.product`, where `company` is the root, you would set
     {{ tutorial.var("`name: 'product'`") }} and {{ tutorial.var("`parent_name: 'company'`") }}.
-
-    To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
-    In practice, however, programs would use a fixed name for their namespaces.
-    You can force the tutorial to use a fixed name through the `SUBNAMESPACE` environment variable.
 
 * {{ tutorial.var('rental_fee') }}: The lease fee, which is 10 XEM for subnamespaces, paid to the same
     [sink account](./register-root-namespace.md#building-the-transaction) as root namespaces.
@@ -78,7 +90,7 @@ The transaction is then signed, announced, and confirmed following the same proc
 
 ### Retrieving the Subnamespace
 
-{{ tutorial.code_snippet_tagged('step-2') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 To verify the subnamespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint
 and displays its properties.
@@ -119,11 +131,11 @@ Some highlights from the output:
 
 This tutorial showed how to:
 
-| Step                                                                        | Related documentation                          |
-|-----------------------------------------------------------------------------|------------------------------------------------|
-| [Calculate the lease fee](#building-the-transaction)                        | <dy:FeeCalculator.calculateNamespaceRentalFee> |
-| [Build a subnamespace registration transaction](#building-the-transaction)  | <dy:TransactionFactory.create>                 |
-| [Retrieve the subnamespace](#retrieving-the-subnamespace)                   | <get:/namespace>                               |
+| Step                                                                       | Related documentation                                                    |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Build a subnamespace registration transaction](#building-the-transaction) | <dy:TransactionFactory.create>, <ser:NamespaceRegistrationTransactionV1> |
+| [Calculate the lease fee](#building-the-transaction)                       | <dy:FeeCalculator.calculateNamespaceRentalFee>                           |
+| [Retrieve the subnamespace](#retrieving-the-subnamespace)                  | <get:/namespace>                                                         |
 
 ## Next Steps
 
