@@ -215,7 +215,7 @@ and becomes harvesting-eligible at that point.
         That difference must be at least 1'000 XEM to contribute to the score.
 
     The full algorithm is the _Proof-of-Importance_ (PoI) scheme described in the
-    [NEM Technical Reference](site:/assets/pdfs/NEM_techRef.pdf), section 7.
+    [NEM Technical Reference](../devbook/reference/whitepaper/index.md), section 7.
 
 !!! note
     Importance scores are recalculated every 359 blocks (roughly 6 hours), and the recalculated value applies to all
