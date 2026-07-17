@@ -72,6 +72,7 @@ nav:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
           - NEM REST API: devbook/reference/rest/nem.md
+          - devbook/reference/whitepaper/index.md
   - 教科書:
       - textbook/intro.md
       - textbook/glossary.md
