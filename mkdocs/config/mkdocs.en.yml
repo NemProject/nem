@@ -117,6 +117,7 @@ nav:
           - NEM REST API: devbook/reference/rest/nem.md
           - Serialization: devbook/reference/serialization/index.md
           - WebSockets: devbook/reference/websockets/index.md
+          - devbook/reference/whitepaper/index.md
   - Textbook:
       - textbook/intro.md
       - textbook/cryptography.md
