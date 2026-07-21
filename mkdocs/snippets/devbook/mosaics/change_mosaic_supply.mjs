@@ -1,6 +1,7 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
+	NetworkTimestamp,
 	calculateTransactionFee,
 	models
 } from 'symbol-sdk/nem';
@@ -78,8 +79,8 @@ try {
 		's since the nemesis block');
 
 	// Derived fields from network time
-	const timestamp = networkTime;
-	const deadline = networkTime + (2 * 60 * 60);
+	const timestamp = new NetworkTimestamp(networkTime);
+	const deadline = timestamp.addHours(2);
 	// [<step-2]
 	// --- INCREASING SUPPLY (MINTING) ---
 	console.log('\n--- Increasing supply (minting) ---');
@@ -89,8 +90,8 @@ try {
 	const increaseTx = facade.transactionFactory.create({
 		type: 'mosaic_supply_change_transaction_v1',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp,
-		deadline,
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
 		mosaicId: {
 			namespaceId: { name: namespaceName },
 			name: mosaicName
@@ -124,8 +125,8 @@ try {
 	const decreaseTx = facade.transactionFactory.create({
 		type: 'mosaic_supply_change_transaction_v1',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp,
-		deadline,
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
 		mosaicId: {
 			namespaceId: { name: namespaceName },
 			name: mosaicName

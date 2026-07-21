@@ -83,9 +83,9 @@ For example, changing only the description costs the same as creating a new mosa
 If only the description changes, the network preserves the existing supply and the balances of all accounts that hold
 the mosaic.
 
-If any other property changes, the network rebuilds the mosaic from the new definition.
-The network resets the total supply to `initialSupply` and assigns the entire supply to the creator account.
+If any other property changes, which is only allowed while the creator owns the entire supply, the network rebuilds the
+mosaic from the new definition.
+The rebuild resets the total supply to `initialSupply` and assigns the entire supply to the creator account.
 
-Because of this behavior, the creator must own the entire supply before changing any property other than the
-description.
-Otherwise, the network rejects the transaction.
+Because the creator is the only holder at that point, no other account balances are affected.
+Once the mosaic has been distributed, the network rejects transactions that modify these properties.
