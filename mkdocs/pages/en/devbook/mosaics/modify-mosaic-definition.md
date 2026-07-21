@@ -88,4 +88,4 @@ mosaic from the new definition.
 The rebuild resets the total supply to `initialSupply` and assigns the entire supply to the creator account.
 
 Because the creator is the only holder at that point, no other account balances are affected.
-Once the mosaic has been distributed, the network rejects transactions that modify these properties.
+Once the mosaic has been distributed, the network rejects transactions that modify these other properties.
