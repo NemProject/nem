@@ -1,6 +1,7 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
+	NetworkTimestamp,
 	calculateMosaicRentalFee,
 	calculateTransactionFee,
 	models
@@ -31,8 +32,8 @@ try {
 		's since the nemesis block');
 
 	// Derived fields from network time
-	const timestamp = networkTime;
-	const deadline = networkTime + (2 * 60 * 60);
+	const timestamp = new NetworkTimestamp(networkTime);
+	const deadline = timestamp.addHours(2);
 	// [<step-2]
 	// Build the mosaic ID [>step-3]
 	const namespaceName = process.env.NAMESPACE || 'my_namespace';
@@ -65,8 +66,8 @@ try {
 	const transaction = facade.transactionFactory.create({
 		type: 'mosaic_definition_transaction_v1',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp,
-		deadline,
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
 		rentalFeeSink: 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
 		rentalFee,
 		mosaicDefinition

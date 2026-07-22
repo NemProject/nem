@@ -30,11 +30,12 @@ You can extend a namespace in two situations:
     expiration.
     Extending it restores the namespace to active status immediately.
 
-!!! note "Extending Subnamespaces"
+!!! note "Extending Subnamespaces and Mosaics"
 
     Only root namespaces need to be extended.
-    <Subnamespaces:> inherit the duration of their root namespace, so when you extend a root namespace, all its
-    subnamespaces are automatically extended as well.
+    <Subnamespaces:> and all associated <mosaics:> inherit the root namespace's lifetime.
+
+    Extending a root namespace therefore automatically keeps all of its subnamespaces and mosaics usable.
 
 ## Procedure
 
