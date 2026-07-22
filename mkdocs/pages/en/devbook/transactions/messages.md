@@ -5,7 +5,7 @@ tutorial_level: intermediate
 
 # Sending Messages with Transfer Transactions
 
-<Transfer transaction:|Transfer transactions> can include an optional message field, which allows attaching up to 1,024
+<Transfer transaction:|Transfer transactions> can include an optional message field, which allows attaching up to 1024
 bytes of data to the transaction.
 Messages can be sent as plain text or encrypted using the recipient's public key, ensuring only the intended recipient
 can read them.
@@ -70,13 +70,13 @@ The transaction is then signed and announced following the same process as in
 
 **Message constraints:**
 
-* **Maximum size:** 1,024 bytes (the network rejects larger messages).
+* **Maximum size:** 1024 bytes (the network rejects larger messages).
 * **Encoding:** UTF-8 by convention, though the protocol does not enforce a standard.
 * **Privacy:** All messages are publicly visible on the blockchain unless encrypted.
 
 !!! tip "Handling larger data"
 
-    For applications requiring more than 1,024 bytes of data, common approaches include:
+    For applications requiring more than 1024 bytes of data, common approaches include:
 
     * **On-chain storage:** Split the data across multiple <transfer transactions:>, allowing you to keep everything on
         the blockchain.

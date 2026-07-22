@@ -94,6 +94,7 @@ nav:
               - devbook/transactions/typed-descriptors.md
           - Mosaics:
               - devbook/mosaics/create-mosaic.md
+              - devbook/mosaics/mosaic-levy.md
               - devbook/mosaics/get-mosaic-info.md
               - devbook/mosaics/change-mosaic-supply.md
               - devbook/mosaics/modify-mosaic-definition.md
