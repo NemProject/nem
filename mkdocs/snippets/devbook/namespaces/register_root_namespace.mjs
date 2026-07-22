@@ -1,6 +1,7 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
+	NetworkTimestamp,
 	calculateNamespaceRentalFee,
 	calculateTransactionFee,
 	models
@@ -31,8 +32,8 @@ try {
 		's since the nemesis block');
 
 	// Derived fields from network time
-	const timestamp = networkTime;
-	const deadline = networkTime + (2 * 60 * 60);
+	const timestamp = new NetworkTimestamp(networkTime);
+	const deadline = timestamp.addHours(2);
 	// [<step-2]
 	// Build the namespace name [>step-3]
 	const namespaceName = process.env.ROOT_NAMESPACE ||
@@ -47,8 +48,8 @@ try {
 	const transaction = facade.transactionFactory.create({
 		type: 'namespace_registration_transaction_v1',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp,
-		deadline,
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
 		rentalFeeSink: 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
 		rentalFee,
 		name: namespaceName

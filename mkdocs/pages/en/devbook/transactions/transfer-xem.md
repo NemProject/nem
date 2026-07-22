@@ -86,7 +86,6 @@ the number of seconds since the NEM nemesis block:
     This example sets it two hours after the timestamp, well within the limit.
 
 Building a transfer therefore needs an accurate network time.
-
 The <get:/time-sync/network-time> endpoint reports the node's current network time.
 The node returns this value in milliseconds, so the code divides it by 1000 to obtain the seconds that transactions
 expect.
@@ -94,6 +93,9 @@ expect.
 However, applications do not need to query the network time before every transaction.
 It can be fetched once and then adjusted using the local system clock when needed.
 This provides a good balance between accuracy and performance.
+
+The code wraps the seconds value in the SDK's <dy:NetworkTimestamp> class to obtain the `timestamp`, and derives the
+`deadline` from it with the <dy:NetworkTimestamp.addHours> helper.
 
 ### Building the Transaction
 
@@ -227,7 +229,7 @@ This tutorial showed how to:
 
 | Step                                                              | Related documentation                                                      |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Obtain the network time](#fetching-network-time)                 | <get:/time-sync/network-time>                                              |
+| [Obtain the network time](#fetching-network-time)                 | <get:/time-sync/network-time>, <dy:NetworkTimestamp>                       |
 | [Build the transaction](#building-the-transaction)                | <dy:TransactionFactory.create>, <ser:TransferTransactionV2>                |
 | [Calculate the transaction fee](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee>                                 |
 | [Sign the transaction](#signing-and-serializing)                  | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature> |

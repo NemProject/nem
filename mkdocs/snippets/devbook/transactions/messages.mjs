@@ -2,6 +2,7 @@ import { PrivateKey, PublicKey } from 'symbol-sdk';
 import {
 	MessageEncoder,
 	NemFacade,
+	NetworkTimestamp,
 	calculateTransactionFee,
 	models
 } from 'symbol-sdk/nem';
@@ -58,8 +59,8 @@ console.log('Fetching current network time from', timePath);
 const timeResponse = await fetch(`${NODE_URL}${timePath}`);
 const timeJSON = await timeResponse.json();
 const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-const timestamp = networkTime;
-const deadline = networkTime + (2 * 60 * 60);
+const timestamp = new NetworkTimestamp(networkTime);
+const deadline = timestamp.addHours(2);
 console.log('  Network time:', networkTime,
 	's since the nemesis block', '\n');
 
@@ -75,8 +76,8 @@ console.log('Plain message:',
 const plainTransaction = facade.transactionFactory.create({
 	type: 'transfer_transaction_v2',
 	signerPublicKey: senderKeyPair.publicKey.toString(),
-	timestamp,
-	deadline,
+	timestamp: timestamp.timestamp,
+	deadline: deadline.timestamp,
 	recipientAddress: recipientAddress.toString(),
 	amount: 0n,
 	message: {
@@ -136,8 +137,8 @@ console.log('Encrypted payload:',
 const encryptedTransaction = facade.transactionFactory.create({
 	type: 'transfer_transaction_v2',
 	signerPublicKey: senderKeyPair.publicKey.toString(),
-	timestamp,
-	deadline,
+	timestamp: timestamp.timestamp,
+	deadline: deadline.timestamp,
 	recipientAddress: recipientAddress.toString(),
 	amount: 0n,
 	message: {

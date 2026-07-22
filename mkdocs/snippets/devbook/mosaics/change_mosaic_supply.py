@@ -7,6 +7,7 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
+from symbolchain.nem.Network import NetworkTimestamp
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
@@ -85,8 +86,8 @@ try:
 		print(f'  Network time: {network_time} s since the nemesis block')
 
 	# Derived fields from network time
-	timestamp = network_time
-	deadline = network_time + 2 * 60 * 60
+	timestamp = NetworkTimestamp(network_time)
+	deadline = timestamp.add_hours(2)
 	# [<step-2]
 	# --- INCREASING SUPPLY (MINTING) ---
 	print('\n--- Increasing supply (minting) ---')
@@ -96,8 +97,8 @@ try:
 	increase_tx = facade.transaction_factory.create({
 		'type': 'mosaic_supply_change_transaction_v1',
 		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp,
-		'deadline': deadline,
+		'timestamp': timestamp.timestamp,
+		'deadline': deadline.timestamp,
 		'mosaic_id': {
 			'namespace_id': {'name': namespace_name},
 			'name': mosaic_name
@@ -125,8 +126,8 @@ try:
 	decrease_tx = facade.transaction_factory.create({
 		'type': 'mosaic_supply_change_transaction_v1',
 		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp,
-		'deadline': deadline,
+		'timestamp': timestamp.timestamp,
+		'deadline': deadline.timestamp,
 		'mosaic_id': {
 			'namespace_id': {'name': namespace_name},
 			'name': mosaic_name
