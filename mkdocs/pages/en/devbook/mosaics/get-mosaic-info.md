@@ -84,7 +84,7 @@ Some highlights from the output:
 
 * **Creator** (line 7): The public key of the account that created the mosaic.
 
-* **Divisibility** (line 8): The value `6` means 1 XEM = 1,000,000 (10^6^) atomic units.
+* **Divisibility** (line 8): The value `6` means 1 XEM = 1'000'000 (10^6^) atomic units.
 
 * **Initial supply** (line 9): The supply at creation time, in whole units.
 
