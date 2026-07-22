@@ -120,27 +120,77 @@ Levy
 :   An optional fee attached to a mosaic, paid to a designated account on every transfer of that mosaic, on top of the
     transaction fee.
 
+A typical use of levies is funding the account behind an asset, for example by charging a commission or a royalty on
+every transfer.
+
 A levy specifies four fields:
 
-| Field         | Description                                                                                                                                                                                                                        |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type**      | `Absolute` (fixed quantity) or `Percentile` (proportional to the amount transferred).                                                                                                                                              |
-| **Recipient** | Account that receives the levy on every transfer.                                                                                                                                                                                  |
-| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.                                                                                                                                             |
-| **Fee**       | Quantity of the levy mosaic. For `Absolute`, it is the exact quantity charged on every transfer in atomic units. For `Percentile`, it is interpreted in **basis points**: the levy equals `Fee / 10000` of the transferred amount. |
+| Field         | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **Type**      | **Absolute** (fixed quantity) or **Percentile** (proportional to the amount transferred). |
+| **Recipient** | Account that receives the levy on every transfer.                                         |
+| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.    |
+| **Fee**       | Quantity of the levy mosaic charged on every transfer.<ul><li>For absolute levies, this value is an exact quantity, in atomic units.</li><li>For percentile levies, this value is a percentage of the transferred amount, in [basis points](https://en.wikipedia.org/wiki/Basis_point) (10'000 basis points = 100%)</li></ul> |
 
-When a transfer transaction includes a mosaic with a levy, the network charges the levy to the sender and credits it
-to the levy recipient, in addition to the regular transaction fee.
+### How Levies Are Charged
+
+When a transfer transaction includes a mosaic with a levy, the network automatically charges the levy to the sender and
+credits it to the levy recipient, in addition to the regular transaction fee.
 
 The levy is paid on top of the transferred amount: the recipient receives the full quantity sent, and the sender is
-debited for both the transfer and the levy.
+debited for both the transfer and the levy (and the transaction fee).
 
-For example, a `Percentile` levy with `Fee = 100` (100 basis points) charges 1% of the transferred amount.
-Sending `1 000` atomic units debits the sender `1 010` in total: `1 000` credited to the recipient and `10` credited
-to the levy recipient.
+#### Absolute Levy Calculation
+
+For an absolute levy, the fee is the exact quantity charged on every transfer, expressed in the atomic units of the
+levy mosaic.
+
+For example, with an absolute levy of `10` atomic units paid in the transferred mosaic itself, sending `1'000`
+atomic units debits the sender `1'010` in total:
+`1'000` credited to the recipient and `10` credited to the levy recipient.
+
+#### Percentile Levy Calculation
+
+For a percentile levy, the fee is interpreted in basis points, where one basis point is one hundredth of a percent.
+E. g. A fee of `100` charges 1%, and a fee of `10'000` charges 100%.
+
+The levy is calculated from the transferred amount in **atomic units**:
+
+$$
+\text{levy} = \left\lfloor \frac{\text{fee} \cdot \text{transferred amount}}{\text{10'000}} \right\rfloor
+$$
+
+The result is the number of atomic units charged in the levy mosaic.
+A levy that rounds down to zero is not charged.
+
+!!! note "The divisibility of both mosaics affects the charge"
+
+    For percentile levies, the network does not convert between the transferred mosaic and the levy mosaic before
+    applying the percentage.
+    It calculates the levy from the transferred amount's atomic-unit count, then treats the result as an atomic-unit
+    count of the levy mosaic.
+
+    This means the configured percentage is exact only at the atomic-unit level.
+    If the two mosaics have different <divisibility:>, the visible amount charged in whole units can look much larger
+    or smaller than the same percentage of the visible amount sent.
+
+    For example, consider a mosaic with divisibility 2 whose 1% levy is paid in `nem:xem`, with divisibility 6:
+
+    * Sending 50 whole units transfers `5'000` atomic units of the first mosaic.
+    * The 1% levy is calculated as 1% of `5'000`, so the result is `50`.
+    * That result is charged as `50` atomic units of `nem:xem`.
+    * Because `nem:xem` has divisibility 6, `50` atomic units are only 0.00005 XEM, far less than 1% of 50 XEM.
+
+### Transfer Requirements
 
 The sender must hold enough balance to cover the transferred amount and the levy in the levy mosaic, which may differ
 from the one being transferred.
+
+The levy mosaic must also still exist on the network when the transfer takes place.
+If the levy mosaic is [lost](#lifetime), for example because its namespace expired and was not renewed, transfers of
+the mosaic with the levy are rejected.
+
+### Limitations
 
 Levies are not recursive.
 If the mosaic used to pay the levy carries its own levy, that second levy is not applied.
@@ -148,8 +198,10 @@ If the mosaic used to pay the levy carries its own levy, that second levy is not
 !!! warning "A levy is not a guaranteed charge"
 
     Because levies are not recursive, they can be sidestepped.
+
     For example, if mosaic `A`'s levy is paid in mosaic `B`, and another mosaic `C`'s levy is paid in `A`, transferring
     `C` moves `A` as `C`'s levy without triggering `A`'s levy.
+
     A levy is therefore a best-effort fee, not an enforceable guarantee on every transfer.
 
 ## Lifetime
