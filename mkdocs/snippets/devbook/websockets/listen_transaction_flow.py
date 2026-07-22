@@ -10,6 +10,7 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
+from symbolchain.nem.Network import NetworkTimestamp
 from websockets import connect
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
@@ -93,11 +94,13 @@ async def main():
 	) as resp:
 		network_time = json.loads(
 			resp.read().decode())['receiveTimeStamp'] // 1000
+	timestamp = NetworkTimestamp(network_time)
+	deadline = timestamp.add_hours(2)
 	transaction = facade.transaction_factory.create({
 		'type': 'transfer_transaction_v2',
 		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': network_time,
-		'deadline': network_time + 2 * 60 * 60,
+		'timestamp': timestamp.timestamp,
+		'deadline': deadline.timestamp,
 		'recipient_address': MONITOR_ADDRESS,
 		'amount': 0,
 	})

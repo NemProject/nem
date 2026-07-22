@@ -56,7 +56,7 @@ are derived from it, following the process described in the [Transfer XEM](../tr
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-A namespace is identified by its name, which the transaction registers on the network for one year.
+A namespace is identified by its name, which the transaction reserves on the network for one year.
 See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
 
 To avoid collisions across multiple runs of the tutorial, a timestamp is added to the name.
