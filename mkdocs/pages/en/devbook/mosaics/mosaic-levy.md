@@ -189,5 +189,5 @@ This tutorial showed how to:
 Now that you have created a mosaic with a levy, you can:
 
 * [Send your mosaic with a transfer transaction](../transactions/transfer-mosaics.md) to see the levy charged to the
-    sender
-* [Get mosaic information](./get-mosaic-info.md) to inspect the levy of any mosaic
+    sender.
+* [Get mosaic information](./get-mosaic-info.md) to inspect the levy of any mosaic.

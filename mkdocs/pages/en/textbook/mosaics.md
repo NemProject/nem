@@ -125,20 +125,20 @@ every transfer.
 
 A levy specifies four fields:
 
-| Field         | Description                                                                                                                                                                                                                     |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Type**      | Absolute (fixed quantity) or Percentile (proportional to the amount transferred).                                                                                                                                               |
-| **Recipient** | Account that receives the levy on every transfer.                                                                                                                                                                               |
-| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.                                                                                                                                          |
-| **Fee**       | Quantity of the levy mosaic. For Absolute, it is the exact quantity charged on every transfer in atomic units. For Percentile, it is interpreted in **basis points**: the levy equals `fee / 10'000` of the transferred amount. |
+| Field         | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **Type**      | **Absolute** (fixed quantity) or **Percentile** (proportional to the amount transferred). |
+| **Recipient** | Account that receives the levy on every transfer.                                         |
+| **Mosaic ID** | The mosaic in which the levy is paid. It may differ from the mosaic being transferred.    |
+| **Fee**       | Quantity of the levy mosaic charged on every transfer.<ul><li>For absolute levies, this value is an exact quantity, in atomic units.</li><li>For percentile levies, this value is a percentage of the transferred amount, in [basis points](https://en.wikipedia.org/wiki/Basis_point) (10'000 basis points = 100%)</li></ul> |
 
 ### How Levies Are Charged
 
-When a transfer transaction includes a mosaic with a levy, the network charges the levy to the sender and credits it
-to the levy recipient, in addition to the regular transaction fee.
+When a transfer transaction includes a mosaic with a levy, the network automatically charges the levy to the sender and
+credits it to the levy recipient, in addition to the regular transaction fee.
 
 The levy is paid on top of the transferred amount: the recipient receives the full quantity sent, and the sender is
-debited for both the transfer and the levy.
+debited for both the transfer and the levy (and the transaction fee).
 
 #### Absolute Levy Calculation
 
@@ -152,7 +152,7 @@ atomic units debits the sender `1'010` in total:
 #### Percentile Levy Calculation
 
 For a percentile levy, the fee is interpreted in basis points, where one basis point is one hundredth of a percent.
-To charge a percentage, multiply it by 100: a fee of `100` charges 1%, and a fee of `250` charges 2.5%.
+E. g. A fee of `100` charges 1%, and a fee of `10'000` charges 100%.
 
 The levy is calculated from the transferred amount in **atomic units**:
 
@@ -165,15 +165,21 @@ A levy that rounds down to zero is not charged.
 
 !!! note "The divisibility of both mosaics affects the charge"
 
-    If the transferred mosaic and the levy mosaic have different <divisibility:>, the charge in whole units is not
-    the same percentage of the whole units sent.
+    For percentile levies, the network does not convert between the transferred mosaic and the levy mosaic before
+    applying the percentage.
+    It calculates the levy from the transferred amount's atomic-unit count, then treats the result as an atomic-unit
+    count of the levy mosaic.
+
+    This means the configured percentage is exact only at the atomic-unit level.
+    If the two mosaics have different <divisibility:>, the visible amount charged in whole units can look much larger
+    or smaller than the same percentage of the visible amount sent.
 
     For example, consider a mosaic with divisibility 2 whose 1% levy is paid in `nem:xem`, with divisibility 6:
 
-    * A transfer of 50 whole units moves `5'000` atomic units.
-    * The levy is 1% of `5'000`: `50` atomic units, charged in the levy mosaic.
-    * In `nem:xem`, with divisibility 6, those `50` atomic units are only 0.00005 XEM, far less than 1% of the 50
-        whole units sent.
+    * Sending 50 whole units transfers `5'000` atomic units of the first mosaic.
+    * The 1% levy is calculated as 1% of `5'000`, so the result is `50`.
+    * That result is charged as `50` atomic units of `nem:xem`.
+    * Because `nem:xem` has divisibility 6, `50` atomic units are only 0.00005 XEM, far less than 1% of 50 XEM.
 
 ### Transfer Requirements
 
