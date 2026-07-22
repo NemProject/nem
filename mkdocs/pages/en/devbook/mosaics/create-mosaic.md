@@ -176,6 +176,12 @@ endpoint and displays its properties.
 
 A successful response confirms the mosaic exists on the network with the expected properties.
 
+!!! note "Mosaic lifetime"
+
+    A mosaic has no duration of its own and becomes inactive when its parent namespace expires.
+    [Extending the root namespace](../namespaces/extend-root-namespace.md) keeps its mosaics usable.
+    See [Lifetime](../../textbook/mosaics.md#lifetime) in the Textbook.
+
 ## Output
 
 The output shown below corresponds to a typical run of the program.

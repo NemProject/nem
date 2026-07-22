@@ -9,6 +9,9 @@ tutorial_level: intermediate
 
 This tutorial shows how to register a subnamespace under an existing <root namespace:>.
 
+To learn how to register a root namespace instead, read the [Registering a Root Namespace](./register-root-namespace.md)
+guide.
+
 ## Prerequisites
 
 Before you start, make sure to:

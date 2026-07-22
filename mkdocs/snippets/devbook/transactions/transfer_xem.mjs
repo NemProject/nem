@@ -1,6 +1,7 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
+	NetworkTimestamp,
 	calculateTransactionFee,
 	models
 } from 'symbol-sdk/nem';
@@ -35,15 +36,15 @@ try {
 		's since the nemesis block');
 
 	// Derived fields from network time
-	const timestamp = networkTime;
-	const deadline = networkTime + (2 * 60 * 60);
+	const timestamp = new NetworkTimestamp(networkTime);
+	const deadline = timestamp.addHours(2);
 	// [<step-3]
 	// Build the transaction [>step-4]
 	const transaction = facade.transactionFactory.create({
 		type: 'transfer_transaction_v2',
 		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp,
-		deadline,
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
 		recipientAddress: RECIPIENT_ADDRESS,
 		amount
 	});
