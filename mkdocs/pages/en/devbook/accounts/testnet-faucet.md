@@ -37,7 +37,7 @@ Open your web browser and navigate to the NEM testnet faucet at [testnet.nem.too
 {{ tutorial.step_begin("faucet-sign-in.jpg") }}
 Click **Sign in with Twitter** (now 𝕏) and follow the authentication flow.
 
-This step limits the amount of test funds to 10,000 XEM per account, to help prevent abuse of the faucet.
+This step limits the amount of test funds to 10'000 XEM per account, to help prevent abuse of the faucet.
 {{ tutorial.step_end() }}
 
 {{ tutorial.step_begin("faucet-authorize.jpg") }}
@@ -55,7 +55,7 @@ Make sure the address starts with `T`, meaning it is a testnet account.
 
 {{ tutorial.step_begin("faucet-xem.jpg") }}
 In the **XEM Amount** field, specify how much XEM you want to claim.
-The maximum amount per request is 10,000 XEM.
+The maximum amount per request is 10'000 XEM.
 {{ tutorial.step_end() }}
 
 {{ tutorial.step_begin("faucet-claim.jpg") }}

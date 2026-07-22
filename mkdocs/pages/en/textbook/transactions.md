@@ -313,5 +313,5 @@ A higher fee than the minimum is accepted and increases the chance of inclusion:
 * During network congestion, a node's spam filter ranks pending transactions by a combination of the signer's
     <importance:> and a small fee bonus, so higher-fee transactions are more likely to enter the <unconfirmed pool:>.
 
-`Multisig Cosignature` fees are additionally capped at 1000 XEM, which protects the multisig account from being drained
+`Multisig Cosignature` fees are additionally capped at 1'000 XEM, which protects the multisig account from being drained
 by a single cosignatory bidding an extreme fee.

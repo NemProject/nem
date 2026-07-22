@@ -60,7 +60,7 @@ It serves two purposes depending on the [mosaic list](#list-of-transferred-mosai
     The same multiplier applies to all mosaics in the list.
 
     For example, `2'000'000` yields a multiplier of `2`, doubling every mosaic quantity in the list.
-    A list entry of `500` units is delivered as `1000` units to the recipient.
+    A list entry of `500` units is delivered as `1'000` units to the recipient.
 
 !!! note "Multiplier rules"
 
@@ -85,6 +85,10 @@ XEM, for example, has divisibility `6`, so `1'000'000` atomic units equal one wh
 Learn more about converting between atomic and whole units on the [Mosaics](./mosaics.md#divisibility) page.
 
 The network rejects the transaction if the sender does not hold enough units of any listed mosaic.
+
+If a listed mosaic has a <levy:>, the network charges the levy to the sender on top of the transferred quantity and
+credits it to the levy recipient.
+See [How Levies Are Charged](./mosaics.md#how-levies-are-charged) on the Mosaics page for the rules.
 
 !!! tip "Sending XEM alongside other mosaics"
 
