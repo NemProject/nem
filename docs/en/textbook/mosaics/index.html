@@ -1213,6 +1213,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../devbook/mosaics/mosaic-levy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create Mosaic with Levy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../devbook/mosaics/get-mosaic-info/" class="md-nav__link">
         
   
@@ -7295,6 +7323,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Levy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-levies-are-charged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Levies Are Charged
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transfer-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transfer Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7645,6 +7712,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Levy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-levies-are-charged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Levies Are Charged
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transfer-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transfer Requirements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7732,7 +7838,7 @@ such as paintings or <a class="mkdocs-ezglossary-link"
 	name="_:NFT"
 	href="../../textbook/glossary/#991e45b8165abd1db1e24f8dc0f4e14a">NFTs</a>, where each unit is unique.</p>
 <p>A mosaic lives under a registered <a class="mkdocs-ezglossary-link"
-	id="eab0d628ecafb9ac2e0dfd197a48fd89"
+	id="04ebaa4a9d11d2409496f33a956d9e5b"
 	title="A registered name leased to an account, used to prefix and group mosaics defined under it."
 	name="_:Namespace"
 	href="../../textbook/namespaces/#2f0cefc8ad477caf4f66272797ede73d">namespace</a>, is identified by a <a href="#fully-qualified-name">fully qualified name</a>,
@@ -7829,6 +7935,8 @@ If disabled, every transfer must involve the creator's account as either sender 
 transaction fee.</dd>
 
 </dl>
+<p>A typical use of levies is funding the account behind an asset, for example by charging a commission or a royalty on
+every transfer.</p>
 <p>A levy specifies four fields:</p>
 <table>
 <thead>
@@ -7840,7 +7948,7 @@ transaction fee.</dd>
 <tbody>
 <tr>
 <td><strong>Type</strong></td>
-<td><code>Absolute</code> (fixed quantity) or <code>Percentile</code> (proportional to the amount transferred).</td>
+<td><strong>Absolute</strong> (fixed quantity) or <strong>Percentile</strong> (proportional to the amount transferred).</td>
 </tr>
 <tr>
 <td><strong>Recipient</strong></td>
@@ -7852,27 +7960,68 @@ transaction fee.</dd>
 </tr>
 <tr>
 <td><strong>Fee</strong></td>
-<td>Quantity of the levy mosaic. For <code>Absolute</code>, it is the exact quantity charged on every transfer in atomic units. For <code>Percentile</code>, it is interpreted in <strong>basis points</strong>: the levy equals <code>Fee / 10000</code> of the transferred amount.</td>
+<td>Quantity of the levy mosaic charged on every transfer.<ul><li>For absolute levies, this value is an exact quantity, in atomic units.</li><li>For percentile levies, this value is a percentage of the transferred amount, in <a href="https://en.wikipedia.org/wiki/Basis_point">basis points</a> (10'000 basis points = 100%)</li></ul></td>
 </tr>
 </tbody>
 </table>
-<p>When a transfer transaction includes a mosaic with a levy, the network charges the levy to the sender and credits it
-to the levy recipient, in addition to the regular transaction fee.</p>
+<h3 id="how-levies-are-charged">How Levies Are Charged<a class="headerlink" href="#how-levies-are-charged" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>When a transfer transaction includes a mosaic with a levy, the network automatically charges the levy to the sender and
+credits it to the levy recipient, in addition to the regular transaction fee.</p>
 <p>The levy is paid on top of the transferred amount: the recipient receives the full quantity sent, and the sender is
-debited for both the transfer and the levy.</p>
-<p>For example, a <code>Percentile</code> levy with <code>Fee = 100</code> (100 basis points) charges 1% of the transferred amount.
-Sending <code>1 000</code> atomic units debits the sender <code>1 010</code> in total: <code>1 000</code> credited to the recipient and <code>10</code> credited
-to the levy recipient.</p>
+debited for both the transfer and the levy (and the transaction fee).</p>
+<h4 id="absolute-levy-calculation">Absolute Levy Calculation<a class="headerlink" href="#absolute-levy-calculation" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>For an absolute levy, the fee is the exact quantity charged on every transfer, expressed in the atomic units of the
+levy mosaic.</p>
+<p>For example, with an absolute levy of <code>10</code> atomic units paid in the transferred mosaic itself, sending <code>1'000</code>
+atomic units debits the sender <code>1'010</code> in total:
+<code>1'000</code> credited to the recipient and <code>10</code> credited to the levy recipient.</p>
+<h4 id="percentile-levy-calculation">Percentile Levy Calculation<a class="headerlink" href="#percentile-levy-calculation" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>For a percentile levy, the fee is interpreted in basis points, where one basis point is one hundredth of a percent.
+E. g. A fee of <code>100</code> charges 1%, and a fee of <code>10'000</code> charges 100%.</p>
+<p>The levy is calculated from the transferred amount in <strong>atomic units</strong>:</p>
+<div class="arithmatex">\[
+\text{levy} = \left\lfloor \frac{\text{fee} \cdot \text{transferred amount}}{\text{10'000}} \right\rfloor
+\]</div>
+<p>The result is the number of atomic units charged in the levy mosaic.
+A levy that rounds down to zero is not charged.</p>
+<div class="admonition note">
+<p class="admonition-title">The divisibility of both mosaics affects the charge</p>
+<p>For percentile levies, the network does not convert between the transferred mosaic and the levy mosaic before
+applying the percentage.
+It calculates the levy from the transferred amount's atomic-unit count, then treats the result as an atomic-unit
+count of the levy mosaic.</p>
+<p>This means the configured percentage is exact only at the atomic-unit level.
+If the two mosaics have different <a class="mkdocs-ezglossary-link"
+	id="3515cc19ae433b229679fd7941362522"
+	title="Defines how many decimal places a mosaic quantity can have.
+A mosaic with divisibility 0 is indivisible: it can only be transferred in whole units.
+Higher values allow fractional units."
+	name="_:Divisibility"
+	href="../../textbook/mosaics/#783c502ee601c11d67d1b8147a2a5841">divisibility</a>, the visible amount charged in whole units can look much larger
+or smaller than the same percentage of the visible amount sent.</p>
+<p>For example, consider a mosaic with divisibility 2 whose 1% levy is paid in <code>nem:xem</code>, with divisibility 6:</p>
+<ul>
+<li>Sending 50 whole units transfers <code>5'000</code> atomic units of the first mosaic.</li>
+<li>The 1% levy is calculated as 1% of <code>5'000</code>, so the result is <code>50</code>.</li>
+<li>That result is charged as <code>50</code> atomic units of <code>nem:xem</code>.</li>
+<li>Because <code>nem:xem</code> has divisibility 6, <code>50</code> atomic units are only 0.00005 XEM, far less than 1% of 50 XEM.</li>
+</ul>
+</div>
+<h3 id="transfer-requirements">Transfer Requirements<a class="headerlink" href="#transfer-requirements" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The sender must hold enough balance to cover the transferred amount and the levy in the levy mosaic, which may differ
 from the one being transferred.</p>
+<p>The levy mosaic must also still exist on the network when the transfer takes place.
+If the levy mosaic is <a href="#lifetime">lost</a>, for example because its namespace expired and was not renewed, transfers of
+the mosaic with the levy are rejected.</p>
+<h3 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Levies are not recursive.
 If the mosaic used to pay the levy carries its own levy, that second levy is not applied.</p>
 <div class="admonition warning">
 <p class="admonition-title">A levy is not a guaranteed charge</p>
-<p>Because levies are not recursive, they can be sidestepped.
-For example, if mosaic <code>A</code>'s levy is paid in mosaic <code>B</code>, and another mosaic <code>C</code>'s levy is paid in <code>A</code>, transferring
-<code>C</code> moves <code>A</code> as <code>C</code>'s levy without triggering <code>A</code>'s levy.
-A levy is therefore a best-effort fee, not an enforceable guarantee on every transfer.</p>
+<p>Because levies are not recursive, they can be sidestepped.</p>
+<p>For example, if mosaic <code>A</code>'s levy is paid in mosaic <code>B</code>, and another mosaic <code>C</code>'s levy is paid in <code>A</code>, transferring
+<code>C</code> moves <code>A</code> as <code>C</code>'s levy without triggering <code>A</code>'s levy.</p>
+<p>A levy is therefore a best-effort fee, not an enforceable guarantee on every transfer.</p>
 </div>
 <h2 id="lifetime">Lifetime<a class="headerlink" href="#lifetime" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>A mosaic has no duration of its own.
@@ -7939,7 +8088,7 @@ However, this transaction fee is typically negligible compared to the creation f
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 14, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 22, 2026</span>
   </span>
 
     
