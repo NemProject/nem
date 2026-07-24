@@ -86,6 +86,7 @@ nav:
               - devbook/accounts/create-from-mnemonic.md
               - devbook/accounts/testnet-faucet.md
               - devbook/accounts/query-balance.md
+              - devbook/accounts/configure-multisig.md
           - Transactions:
               - devbook/transactions/transfer-xem.md
               - devbook/transactions/transfer-mosaics.md
