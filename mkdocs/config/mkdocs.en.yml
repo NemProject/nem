@@ -75,6 +75,8 @@ nav:
   - index.md
   - User Manual:
       - userbook/intro.md
+      - Node Operation:
+          - userbook/node/install.md
   - Developer Manual:
       - devbook/intro.md
       - Getting Started:
