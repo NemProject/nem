@@ -1,6 +1,24 @@
 <!doctype html>
 <html>
 	<head>
-		<meta http-equiv="refresh" content="0; url=404/" />
+		<meta charset="utf-8">
+		<script>
+			var supportedLanguages = [
+				
+					"en",
+				
+					"ja"
+				
+			];
+			var defaultLanguage = supportedLanguages[0];
+			var match = location.pathname.match(/^\/([^/]+)\//);
+			var language = match && supportedLanguages.indexOf(match[1]) >= 0 ? match[1] : defaultLanguage;
+
+			if (language) {
+				var target = "/" + language + "/404/";
+				if (location.pathname !== target)
+					location.replace(target);
+			}
+		</script>
 	</head>
 </html>

@@ -296,6 +296,19 @@ aside.md-source-file {
 	margin-right: 36px;
 }
 
+/* Colors for zoomed-in images */
+.gslide-desc a {
+	color: var(--md-typeset-a-color);
+}
+
+.gslide-desc a:hover {
+	color: var(--md-accent-fg-color);
+}
+
+.gslide-desc code {
+	background: var(--md-code-bg-color);
+}
+
 /* Links to other sections use the color of that section */
 .md-content a[href*="userbook"][href^='..'],
 .gslide-desc a[href*="userbook"][href^='..'] {
@@ -868,4 +881,10 @@ code.doc-symbol-interface::after {
 .dark-mode:has(.scalar-app) {
 	--scalar-background-1: var(--md-default-bg-color);
 	--scalar-color-accent: var(--devbook-color);
+}
+
+/* CATS documentation placeholders, such as <TypeName>. */
+.md-typeset .language-cats .nt {
+	font-style: italic;
+	color: var(--md-code-hl-generic-color);
 }

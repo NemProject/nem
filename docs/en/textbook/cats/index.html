@@ -511,6 +511,120 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Node Operation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Node Operation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../userbook/node/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Node Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../userbook/node/supernode-program/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supernode Program
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -6914,6 +7028,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/reference/whitepaper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Whitepaper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -7802,99 +7944,99 @@ written using the <a href="https://lark-parser.readthedocs.io">Lark parsing lang
 <p>All CATS statements end with a line feed (semicolons are not used), but whitespace is otherwise not significant.</p>
 <p>Indentation is not required by the parsers, but is conventionally used to add clarity.</p>
 </div>
-<p>A CATS file is composed of four top-level keywords: <code>import</code>, <code>using</code>, <code>enum</code>, and <code>struct</code>.
+<p>A CATS file is composed of four top-level keywords: <code class="language-cats highlight"><span class="k">import</span></code>, <code class="language-cats highlight"><span class="k">using</span></code>, <code class="language-cats highlight"><span class="k">enum</span></code>, and <code class="language-cats highlight"><span class="k">struct</span></code>.
 Each of these is described in the sections below.</p>
-<h2 id="import"><code>import</code><a class="headerlink" href="#import" title="Anchor link to this section for reference">⚓︎</a></h2>
-<p>CATS files can include other CATS files using the <code>import</code> statement.
+<h2 id="import"><code class="language-cats highlight"><span class="k">import</span></code><a class="headerlink" href="#import" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>CATS files can include other CATS files using the <code class="language-cats highlight"><span class="k">import</span></code> statement.
 This allows schema definitions to be modular and reusable.</p>
 <p>To import another CATS file, specify its filename in quotes:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span> <span class="err">&quot;</span><span class="n">other</span><span class="err">.</span><span class="n">cats</span><span class="err">&quot;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span> <span class="s2">&quot;other.cats&quot;</span>
 </span></code></pre></div>
 <p>Imported filenames are resolved relative to the include path passed to the parser.</p>
-<h2 id="using"><code>using</code><a class="headerlink" href="#using" title="Anchor link to this section for reference">⚓︎</a></h2>
+<h2 id="using"><code class="language-cats highlight"><span class="k">using</span></code><a class="headerlink" href="#using" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>The <code>using</code> statement defines a <strong>type alias</strong> for a built-in primitive type.
 These aliases are treated as distinct types by the parser and generators,
 enabling strict typing even when two types share the same underlying representation.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span> <span class="err">&lt;</span><span class="n">TypeAlias</span><span class="err">&gt;</span> <span class="err">=</span> <span class="err">&lt;</span><span class="n">Built</span><span class="err">-</span><span class="n">in</span> <span class="n">type</span><span class="err">&gt;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span> <span class="nt">&lt;TypeAlias&gt;</span> <span class="p">=</span> <span class="nt">&lt;Built-in type&gt;</span>
 </span></code></pre></div>
 <p>CATS supports aliases for two categories of built-in types:</p>
 <ul>
 <li><strong>Integer types</strong>:<ul>
-<li>Unsigned: <code>uint8</code>, <code>uint16</code>, <code>uint32</code>, <code>uint64</code></li>
-<li>Signed: <code>int8</code>, <code>int16</code>, <code>int32</code>, <code>int64</code></li>
+<li>Unsigned: <code class="language-cats highlight"><span class="kt">uint8</span></code>, <code class="language-cats highlight"><span class="kt">uint16</span></code>, <code class="language-cats highlight"><span class="kt">uint32</span></code>, <code class="language-cats highlight"><span class="kt">uint64</span></code></li>
+<li>Signed: <code class="language-cats highlight"><span class="kt">int8</span></code>, <code class="language-cats highlight"><span class="kt">int16</span></code>, <code class="language-cats highlight"><span class="kt">int32</span></code>, <code class="language-cats highlight"><span class="kt">int64</span></code></li>
 </ul>
 </li>
-<li><strong>Fixed-size binary buffers</strong>: <code>binary_fixed(N)</code> defines an N-bytes long buffer.</li>
+<li><strong>Fixed-size binary buffers</strong>: <code class="language-cats highlight"><span class="nb">binary_fixed</span><span class="p">(</span><span class="n">N</span><span class="p">)</span></code> defines an N-bytes long buffer.</li>
 </ul>
-<p>For example, to define a <code>Height</code> type as an 8-byte unsigned integer:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">using</span> <span class="n">Height</span> <span class="err">=</span> <span class="kt">uint64</span>
+<p>For example, to define a <code class="language-cats highlight"><span class="nc">Height</span></code> type as an 8-byte unsigned integer:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">using</span> <span class="nc">Height</span> <span class="p">=</span> <span class="kt">uint64</span>
 </span></code></pre></div>
-<p>To define a <code>PublicKey</code> type as a 32-byte binary buffer:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">using</span> <span class="n">PublicKey</span> <span class="err">=</span> <span class="k">binary_fixed</span><span class="err">(</span><span class="m">32</span><span class="err">)</span>
+<p>To define a <code class="language-cats highlight"><span class="nc">PublicKey</span></code> type as a 32-byte binary buffer:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">using</span> <span class="nc">PublicKey</span> <span class="p">=</span> <span class="nb">binary_fixed</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Although in the following example both <code>Height</code> and <code>Weight</code> are based on <code>uint64</code>,
+<p>Although in the following example both <code class="language-cats highlight"><span class="nc">Height</span></code> and <code class="language-cats highlight"><span class="nc">Weight</span></code> are based on <code class="language-cats highlight"><span class="kt">uint64</span></code>,
 they are treated as <strong>distinct types</strong> and cannot be used interchangeably:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">using</span> <span class="n">Height</span> <span class="err">=</span> <span class="kt">uint64</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">using</span> <span class="n">Weight</span> <span class="err">=</span> <span class="kt">uint64</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">using</span> <span class="nc">Height</span> <span class="p">=</span> <span class="kt">uint64</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">using</span> <span class="nc">Weight</span> <span class="p">=</span> <span class="kt">uint64</span>
 </span></code></pre></div>
-<h2 id="enum"><code>enum</code><a class="headerlink" href="#enum" title="Anchor link to this section for reference">⚓︎</a></h2>
-<p>The <code>enum</code> statement defines an <strong>enumeration</strong>, a type consisting of named constants backed by an integer type.</p>
+<h2 id="enum"><code class="language-cats highlight"><span class="k">enum</span></code><a class="headerlink" href="#enum" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>The <code class="language-cats highlight"><span class="k">enum</span></code> statement defines an <strong>enumeration</strong>, a type consisting of named constants backed by an integer type.</p>
 <p>Each enumeration must specify its backing type explicitly, and any of the built-in integer types can be used.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">enum</span> <span class="err">&lt;</span><span class="n">TypeName</span><span class="err">&gt;</span> <span class="err">:</span> <span class="err">&lt;</span><span class="n">Backing</span> <span class="n">type</span><span class="err">&gt;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="err">&lt;</span><span class="n">ConstantName</span><span class="err">&gt;</span> <span class="err">=</span> <span class="err">&lt;</span><span class="n">Value</span><span class="err">&gt;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">enum</span> <span class="nt">&lt;TypeName&gt;</span> <span class="p">:</span> <span class="nt">&lt;Backing type&gt;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="nt">&lt;ConstantName&gt;</span> <span class="p">=</span> <span class="nt">&lt;Value&gt;</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="err">...</span>
 </span></code></pre></div>
-<p>Enumeration members are defined on the lines below the <code>enum</code> declaration.
+<p>Enumeration members are defined on the lines below the <code class="language-cats highlight"><span class="k">enum</span></code> declaration.
 Each member must be assigned a constant integer value.</p>
-<p>For example, to define a <code>TransportMode</code> enum backed by a 32-bit unsigned integer:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">enum</span> <span class="n">TransportMode</span> <span class="err">:</span> <span class="kt">uint32</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">ROAD</span> <span class="err">=</span> <span class="m">0x0001</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">SEA</span> <span class="err">=</span> <span class="m">0x0002</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">SKY</span> <span class="err">=</span> <span class="m">0x0004</span>
+<p>For example, to define a <code class="language-cats highlight"><span class="nc">TransportMode</span></code> enum backed by a 32-bit unsigned integer:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">enum</span> <span class="nc">TransportMode</span> <span class="p">:</span> <span class="kt">uint32</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="no">ROAD</span> <span class="p">=</span> <span class="mh">0x0001</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="no">SEA</span> <span class="p">=</span> <span class="mh">0x0002</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="no">SKY</span> <span class="p">=</span> <span class="mh">0x0004</span>
 </span></code></pre></div>
 <h3 id="enum-attributes">Enum Attributes<a class="headerlink" href="#enum-attributes" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Enumerations support attributes that modify their behavior.
-Each attributes starts with <code>@</code> and must appear on the line above the enum declaration.
+Each attribute starts with <code>@</code> and must appear on the line above the enum declaration.
 Currently, the only supported attribute is:</p>
 <ul>
 <li>
-<p><code>@is_bitwise</code>: indicates that the enumeration represents a bit field (i.e. a set of flags)
+<p><code class="language-cats highlight"><span class="nd">@is_bitwise</span></code>: indicates that the enumeration represents a bit field (i.e. a set of flags)
     and should support bitwise operations in the generated code.</p>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">@is_bitwise</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">enum</span> <span class="n">TransportMode</span> <span class="err">:</span> <span class="kt">uint32</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">ROAD</span> <span class="err">=</span> <span class="m">0x0001</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">SEA</span> <span class="err">=</span> <span class="m">0x0002</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">SKY</span> <span class="err">=</span> <span class="m">0x0004</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@is_bitwise</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">enum</span> <span class="nc">TransportMode</span> <span class="p">:</span> <span class="kt">uint32</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="no">ROAD</span> <span class="p">=</span> <span class="mh">0x0001</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="no">SEA</span> <span class="p">=</span> <span class="mh">0x0002</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="no">SKY</span> <span class="p">=</span> <span class="mh">0x0004</span>
 </span></code></pre></div>
 <p>This tells the generator that enum values can be combined using bitwise OR,
 and that individual flags may be checked using bitwise AND.</p>
 </li>
 </ul>
-<h2 id="struct"><code>struct</code><a class="headerlink" href="#struct" title="Anchor link to this section for reference">⚓︎</a></h2>
-<p>The <code>struct</code> statement defines a <strong>structured binary layout</strong> composed of named fields.</p>
+<h2 id="struct"><code class="language-cats highlight"><span class="k">struct</span></code><a class="headerlink" href="#struct" title="Anchor link to this section for reference">⚓︎</a></h2>
+<p>The <code class="language-cats highlight"><span class="k">struct</span></code> statement defines a <strong>structured binary layout</strong> composed of named fields.</p>
 <p>Structures are the most important building block in CATS: they are used to describe transactions, blocks,
 and all other composite objects.</p>
-<p>Each structure declaration starts with the <code>struct</code> keyword, optionally preceded by a <em>modifier</em>.
+<p>Each structure declaration starts with the <code class="language-cats highlight"><span class="k">struct</span></code> keyword, optionally preceded by a <em>modifier</em>.
 Fields are then defined on the lines following the declaration, giving them a name and a type:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="err">[</span><span class="n">Optional</span> <span class="n">modifier</span><span class="err">]</span> <span class="k">struct</span> <span class="err">&lt;</span><span class="n">StructName</span><span class="err">&gt;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="err">&lt;</span><span class="n">FieldName</span><span class="err">&gt;</span> <span class="err">=</span> <span class="err">&lt;</span><span class="n">FieldType</span><span class="err">&gt;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">[Optional modifier]</span> <span class="k">struct</span> <span class="nt">&lt;StructName&gt;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nt">&lt;FieldName&gt;</span> <span class="p">=</span> <span class="nt">&lt;FieldType&gt;</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="err">...</span>
 </span></code></pre></div>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">weight</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">wheel_count</span> <span class="err">=</span> <span class="kt">uint8</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="nv">weight</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="nv">wheel_count</span> <span class="p">=</span> <span class="kt">uint8</span>
 </span></code></pre></div>
 <h3 id="modifiers">Modifiers<a class="headerlink" href="#modifiers" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>CATS supports the following modifiers:</p>
 <ul>
 <li>
-<p><code>abstract</code>: defines a base struct for inheritance.
+<p><code class="language-cats highlight"><span class="kd">abstract</span></code>: defines a base struct for inheritance.
     Generators produce a factory to instantiate the appropriate derived type.</p>
 </li>
 <li>
-<p><code>inline</code>: indicates that the struct is used only for composition and should not be emitted as a standalone type.</p>
+<p><code class="language-cats highlight"><span class="kd">inline</span></code>: indicates that the struct is used only for composition and should not be emitted as a standalone type.</p>
 </li>
 </ul>
 <p>If no modifier is specified, the struct is included in the generated output as-is.</p>
@@ -7902,32 +8044,32 @@ Fields are then defined on the lines following the declaration, giving them a na
 <p>Fields may also be declared using special constructors instead of a type:</p>
 <ul>
 <li>
-<p><code>make_const(type, value)</code>: defines a constant.
+<p><code class="language-cats highlight"><span class="nb">make_const</span><span class="p">(</span><span class="nv">type</span><span class="p">,</span> <span class="nv">value</span><span class="p">)</span></code>: defines a constant.
     This field does not appear in the layout. Instead, it becomes a constant accessible as
-    <code>&lt;StructName&gt;.&lt;FieldName&gt;</code> in generated code.</p>
-<p>In this example, <code>TRANSPORT_MODE</code> is not serialized, but results in a constant <code>Car.TRANSPORT_MODE</code>
-of type <code>TransportMode</code> with value <code>ROAD</code>.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">struct</span> <span class="n">Car</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">TRANSPORT_MODE</span> <span class="err">=</span> <span class="k">make_const</span><span class="err">(</span><span class="n">TransportMode</span><span class="err">,</span> <span class="n">ROAD</span><span class="err">)</span>
+    <code class="language-cats highlight"><span class="nt">&lt;StructName&gt;</span><span class="err">.</span><span class="nt">&lt;FieldName&gt;</span></code> in generated code.</p>
+<p>In this example, <code class="language-cats highlight"><span class="no">TRANSPORT_MODE</span></code> is not serialized, but results in a constant <code class="language-cats highlight"><span class="nc">Car</span><span class="err">.</span><span class="no">TRANSPORT_MODE</span></code>
+of type <code class="language-cats highlight"><span class="nc">TransportMode</span></code> with value <code class="language-cats highlight"><span class="no">ROAD</span></code>.</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">struct</span> <span class="nc">Car</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="no">TRANSPORT_MODE</span> <span class="p">=</span> <span class="nb">make_const</span><span class="p">(</span><span class="nc">TransportMode</span><span class="p">,</span> <span class="no">ROAD</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 <li>
-<p><code>make_reserved(type, value)</code>: defines a reserved field with a fixed value.
+<p><code class="language-cats highlight"><span class="nb">make_reserved</span><span class="p">(</span><span class="nv">type</span><span class="p">,</span> <span class="nv">value</span><span class="p">)</span></code>: defines a reserved field with a fixed value.
     This field is stored in the layout, and always has the provided value.</p>
-<p>In the example below, the field <code>wheel_count</code> is stored as a <code>uint8</code> with the fixed value <code>4</code>.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">struct</span> <span class="n">Car</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">wheel_count</span> <span class="err">=</span> <span class="k">make_reserved</span><span class="err">(</span><span class="kt">uint8</span><span class="err">,</span> <span class="m">4</span><span class="err">)</span>
+<p>In the example below, the field <code class="language-cats highlight"><span class="nv">wheel_count</span></code> is stored as a <code class="language-cats highlight"><span class="kt">uint8</span></code> with the fixed value <code class="language-cats highlight"><span class="mi">4</span></code>.</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">struct</span> <span class="nc">Car</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="nv">wheel_count</span> <span class="p">=</span> <span class="nb">make_reserved</span><span class="p">(</span><span class="kt">uint8</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 <li>
-<p><code>sizeof(type, reference)</code>: defines a field automatically filled with the size (in bytes) of another field.
+<p><code class="language-cats highlight"><span class="nb">sizeof</span><span class="p">(</span><span class="nv">type</span><span class="p">,</span> <span class="nv">reference</span><span class="p">)</span></code>: defines a field automatically filled with the size (in bytes) of another field.
     This makes structures easier to maintain, since changing a referenced type does not require manually updating
     size fields.</p>
-<p>Here, <code>car_size</code> is an <code>uint16</code> that always contains the size, in bytes, of the field <code>car</code>,
-which has type <code>Car</code>.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">struct</span> <span class="n">SingleCarGarage</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">car_size</span> <span class="err">=</span> <span class="k">sizeof</span><span class="err">(</span><span class="kt">uint16</span><span class="err">,</span> <span class="n">car</span><span class="err">)</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">car</span> <span class="err">=</span> <span class="n">Car</span>
+<p>Here, <code class="language-cats highlight"><span class="nv">car_size</span></code> is an <code class="language-cats highlight"><span class="kt">uint16</span></code> that always contains the size, in bytes, of the field <code class="language-cats highlight"><span class="nv">car</span></code>,
+which has type <code class="language-cats highlight"><span class="nc">Car</span></code>.</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">struct</span> <span class="nc">SingleCarGarage</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="nv">car_size</span> <span class="p">=</span> <span class="nb">sizeof</span><span class="p">(</span><span class="kt">uint16</span><span class="p">,</span> <span class="nv">car</span><span class="p">)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="nv">car</span> <span class="p">=</span> <span class="nc">Car</span>
 </span></code></pre></div>
 </li>
 </ul>
@@ -7935,58 +8077,60 @@ which has type <code>Car</code>.</p>
 <p>Fields can be made <strong>conditionally present</strong> based on the value of another field.
 This can be used to represent mutually exclusive layouts, similar to unions in other languages.</p>
 <p>Conditional fields use the following syntax:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>    <span class="err">&lt;</span><span class="n">FieldName</span><span class="err">&gt;</span> <span class="err">=</span> <span class="err">&lt;</span><span class="n">FieldType</span><span class="err">&gt;</span> <span class="k">if</span> <span class="err">&lt;</span><span class="n">ConstantValue</span><span class="err">&gt;</span> <span class="err">&lt;</span><span class="n">Operator</span><span class="err">&gt;</span> <span class="err">&lt;</span><span class="n">SelectorField</span><span class="err">&gt;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>    <span class="nt">&lt;FieldName&gt;</span> <span class="p">=</span> <span class="nt">&lt;FieldType&gt;</span> <span class="k">if</span> <span class="nt">&lt;ConstantValue&gt;</span> <span class="nt">&lt;Operator&gt;</span> <span class="nt">&lt;SelectorField&gt;</span>
 </span></code></pre></div>
 <p>CATS supports the following conditional operators:</p>
 <ul>
-<li><code>equals</code>: include the field if the selector field exactly matches the constant value.</li>
-<li><code>not equals</code>: include the field if the selector field does not match the constant value.</li>
-<li><code>has</code>: include the field if all bits in the constant value are set in the selector field (for bit flags).</li>
-<li><code>not has</code>: include the field if any bits in the constant value are <strong>not</strong> set in the selector field.</li>
+<li><code class="language-cats highlight"><span class="ow">equals</span></code>: include the field if the selector field exactly matches the constant value.</li>
+<li><code class="language-cats highlight"><span class="ow">not equals</span></code>: include the field if the selector field does not match the constant value.</li>
+<li><code class="language-cats highlight"><span class="ow">in</span></code>: include the field if the constant is present in the selector field (for bit flags).</li>
+<li><code class="language-cats highlight"><span class="ow">not in</span></code>: include the field if the constant is not present in the selector field.</li>
 </ul>
-<p>For example, the field <code>buoyancy</code> is only included when <code>transport_mode</code> is equal to <code>SEA</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="n">transport_mode</span> <span class="err">=</span> <span class="n">TransportMode</span>
+<p>For example, the field <code class="language-cats highlight"><span class="nv">buoyancy</span></code> is only included when <code class="language-cats highlight"><span class="nv">transport_mode</span></code> is equal to <code class="language-cats highlight"><span class="no">SEA</span></code>:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="nv">transport_mode</span> <span class="p">=</span> <span class="nc">TransportMode</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">buoyancy</span> <span class="err">=</span> <span class="kt">uint32</span> <span class="k">if</span> <span class="n">SEA</span> <span class="k">equals</span> <span class="n">transport_mode</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="nv">buoyancy</span> <span class="p">=</span> <span class="kt">uint32</span> <span class="k">if</span> <span class="no">SEA</span> <span class="ow">equals</span> <span class="nv">transport_mode</span>
 </span></code></pre></div>
 <h3 id="array-fields">Array Fields<a class="headerlink" href="#array-fields" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>CATS supports both static and dynamically sized arrays, where all elements have the same type.</p>
 <p>The syntax is:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>    <span class="err">&lt;</span><span class="n">FieldName</span><span class="err">&gt;</span> <span class="err">=</span> <span class="k">array</span><span class="err">(&lt;</span><span class="n">ElementType</span><span class="err">&gt;,</span> <span class="err">&lt;</span><span class="n">NumberOfElements</span><span class="err">&gt;)</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>    <span class="nt">&lt;FieldName&gt;</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="nt">&lt;ElementType&gt;</span><span class="p">,</span> <span class="nt">&lt;NumberOfElements&gt;</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Where <code>NumberOfElements</code> can be:</p>
+<p>Where <code class="language-cats highlight"><span class="nt">&lt;NumberOfElements&gt;</span></code> can be:</p>
 <ul>
 <li>
 <p>A constant, producing a statically-sized array.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">struct</span> <span class="n">SmallGarage</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">vehicles</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="n">Vehicle</span><span class="err">,</span> <span class="m">4</span><span class="err">)</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">struct</span> <span class="nc">SmallGarage</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="nv">vehicles</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="nc">Vehicle</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 <li>
 <p>A reference to another field, producing a dynamically-sized array.</p>
-<p>For example, the following struct defines a field <code>vehicles</code> containing <code>vehicles_count</code> elements of type <code>Vehicle</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">struct</span> <span class="n">Garage</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">vehicles_count</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="n">vehicles</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="n">Vehicle</span><span class="err">,</span> <span class="n">vehicles_count</span><span class="err">)</span>
+<p>For example, the following struct defines a field <code class="language-cats highlight"><span class="nv">vehicles</span></code> containing <code class="language-cats highlight"><span class="nv">vehicles_count</span></code> elements of
+type <code class="language-cats highlight"><span class="nc">Vehicle</span></code>:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">struct</span> <span class="nc">Garage</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="nv">vehicles_count</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="nv">vehicles</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="nc">Vehicle</span><span class="p">,</span> <span class="nv">vehicles_count</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 <li>
-<p>The special keyword <code>__FILL__</code> can be used to indicate that the array should extend until the end of the structure.</p>
-<p>In that case, the struct must be annotated with the <code>@size</code> attribute (<a href="#struct-attributes">see below</a>),
+<p>The special keyword <code class="language-cats highlight"><span class="kp">__FILL__</span></code> can be used to indicate that the array should extend until the end of the structure.</p>
+<p>In that case, the struct must be annotated with the <code class="language-cats highlight"><span class="nd">@size</span></code> attribute (<a href="#struct-attributes">see below</a>),
 referencing a field that holds the total size in bytes.</p>
-<div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">@size</span><span class="err">(</span><span class="n">garage_byte_size</span><span class="err">)</span> <span class="k">struct</span> <span class="n">Garage</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">garage_byte_size</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">vehicles</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="n">Vehicle</span><span class="err">,</span> <span class="k">__FILL__</span><span class="err">)</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@size</span><span class="p">(</span><span class="nv">garage_byte_size</span><span class="p">)</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">struct</span> <span class="nc">Garage</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="nv">garage_byte_size</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="nv">vehicles</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="nc">Vehicle</span><span class="p">,</span> <span class="kp">__FILL__</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>ElementType</code> must either be:</p>
+<p><code class="language-cats highlight"><span class="nt">&lt;ElementType&gt;</span></code> must either be:</p>
 <ul>
 <li>A fixed-size struct, or</li>
-<li>A variable-size struct annotated with its own <code>@size</code> attribute</li>
+<li>A variable-size struct annotated with its own <code class="language-cats highlight"><span class="nd">@size</span></code> attribute</li>
 </ul>
 <p>Otherwise, the parser cannot determine how many elements to read from the byte stream.</p>
 </div>
@@ -7994,101 +8138,100 @@ referencing a field that holds the total size in bytes.</p>
 <p>Array fields can be annotated with attributes to control how they are sized, aligned, or sorted.</p>
 <p>Supported attributes include:</p>
 <ul>
-<li><code>@is_byte_constrained</code>: interprets the array size as a number of bytes instead of element count.</li>
+<li><code class="language-cats highlight"><span class="nd">@is_byte_constrained</span></code>: interprets the array size as a number of bytes instead of element count.</li>
 <li>
-<p><code>@alignment(x [, [not] pad_last])</code>: aligns elements to <code>x</code>-byte boundaries; optionally pads the last element.</p>
+<p><code class="language-cats highlight"><span class="nd">@alignment</span><span class="p">(</span><span class="nv">x</span> <span class="nt">[, [not] pad_last]</span><span class="p">)</span></code>: aligns elements to <code>x</code>-byte boundaries; optionally pads the last element.</p>
 <p>By default, when alignment is used, the final element is padded.
-This can be disabled using the <code>not pad_last</code> qualifier.</p>
+This can be disabled using the <code class="language-cats highlight"><span class="ow">not</span> <span class="kp">pad_last</span></code> qualifier.</p>
 </li>
 <li>
-<p><code>@sort_key(x)</code>: ensures the array is sorted by the given property.</p>
-<p>For example, this array of <code>Vehicle</code> structs is sorted by weight:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">struct</span> <span class="n">Garage</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="k">@sort_key</span><span class="err">(</span><span class="n">weight</span><span class="err">)</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="k">@alignment</span><span class="err">(</span><span class="m">8</span><span class="err">,</span> <span class="k">not pad_last</span><span class="err">)</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="n">vehicles</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="n">Vehicle</span><span class="err">,</span> <span class="k">__FILL__</span><span class="err">)</span>
+<p><code class="language-cats highlight"><span class="nd">@sort_key</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span></code>: ensures the array is sorted by the given property.</p>
+<p>For example, this array of <code class="language-cats highlight"><span class="nc">Vehicle</span></code> structs is sorted by weight:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">struct</span> <span class="nc">Garage</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="nd">@sort_key</span><span class="p">(</span><span class="nv">weight</span><span class="p">)</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="nd">@alignment</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="ow">not</span> <span class="kp">pad_last</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="nv">vehicles</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="nc">Vehicle</span><span class="p">,</span> <span class="kp">__FILL__</span><span class="p">)</span>
 </span></code></pre></div>
 </li>
 </ul>
 <h3 id="inlines">Inlines<a class="headerlink" href="#inlines" title="Anchor link to this section for reference">⚓︎</a></h3>
-<p>A structure can be <strong>inlined</strong> within another using the <code>inline</code> modifier.
+<p>A structure can be <strong>inlined</strong> within another using the <code class="language-cats highlight"><span class="kd">inline</span></code> modifier.
 This allows the fields of one struct to be inserted directly into another without nesting.</p>
-<p>For example, the following definition inlines the contents of <code>Vehicle</code> into <code>Car</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">weight</span> <span class="err">=</span> <span class="kt">uint32</span>
+<p>For example, the following definition inlines the contents of <code class="language-cats highlight"><span class="nc">Vehicle</span></code> into <code class="language-cats highlight"><span class="nc">Car</span></code>:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="nv">weight</span> <span class="p">=</span> <span class="kt">uint32</span>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="k">struct</span> <span class="n">Car</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="k">inline</span> <span class="n">Vehicle</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="n">max_clearance</span> <span class="err">=</span> <span class="n">Height</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="n">has_left_steering_wheel</span> <span class="err">=</span> <span class="kt">uint8</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="k">struct</span> <span class="nc">Car</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="kd">inline</span> <span class="nc">Vehicle</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="nv">max_clearance</span> <span class="p">=</span> <span class="nc">Height</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="nv">has_left_steering_wheel</span> <span class="p">=</span> <span class="kt">uint8</span>
 </span></code></pre></div>
-<p>Since the inlined fields are expanded in place the final layout of <code>Car</code> is equivalent to:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">struct</span> <span class="n">Car</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">weight</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="n">max_clearance</span> <span class="err">=</span> <span class="n">Height</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">has_left_steering_wheel</span> <span class="err">=</span> <span class="kt">uint8</span>
+<p>Since the inlined fields are expanded in place the final layout of <code class="language-cats highlight"><span class="nc">Car</span></code> is equivalent to:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">struct</span> <span class="nc">Car</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="nv">weight</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="nv">max_clearance</span> <span class="p">=</span> <span class="nc">Height</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="nv">has_left_steering_wheel</span> <span class="p">=</span> <span class="kt">uint8</span>
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Named inlines</p>
 <p>A struct can also be inlined with a <strong>name</strong>, which causes its fields to be renamed with that prefix:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="err">&lt;</span><span class="n">FieldName</span><span class="err">&gt;</span> <span class="err">=</span> <span class="k">inline</span> <span class="err">&lt;</span><span class="n">StructName</span><span class="err">&gt;</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nt">&lt;FieldName&gt;</span> <span class="p">=</span> <span class="kd">inline</span> <span class="nt">&lt;StructName&gt;</span>
 </span></code></pre></div>
-<p>In this example, <code>SizePrefixedString</code> is inlined into <code>Vehicle</code> as <code>friendly_name</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">struct</span> <span class="n">SizePrefixedString</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="n">size</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="k">__value__</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="kt">int8</span><span class="err">,</span> <span class="n">size</span><span class="err">)</span>
+<p>In this example, <code class="language-cats highlight"><span class="nc">SizePrefixedString</span></code> is inlined into <code class="language-cats highlight"><span class="nc">Vehicle</span></code> as <code class="language-cats highlight"><span class="nv">friendly_name</span></code>:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">struct</span> <span class="nc">SizePrefixedString</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="nv">size</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="kp">__value__</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="kt">int8</span><span class="p">,</span> <span class="nv">size</span><span class="p">)</span>
 </span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    <span class="n">weight</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    <span class="n">friendly_name</span> <span class="err">=</span> <span class="k">inline</span> <span class="n">SizePrefixedString</span>
-</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>    <span class="n">year</span> <span class="err">=</span> <span class="kt">uint16</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    <span class="nv">weight</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    <span class="nv">friendly_name</span> <span class="p">=</span> <span class="kd">inline</span> <span class="nc">SizePrefixedString</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>    <span class="nv">year</span> <span class="p">=</span> <span class="kt">uint16</span>
 </span></code></pre></div>
 <p>This expands to:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="n">weight</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="n">friendly_name_size</span> <span class="err">=</span> <span class="kt">uint32</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="n">friendly_name</span> <span class="err">=</span> <span class="k">array</span><span class="err">(</span><span class="kt">int8</span><span class="err">,</span> <span class="n">friendly_name_size</span><span class="err">)</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>    <span class="n">year</span> <span class="err">=</span> <span class="kt">uint16</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="nv">weight</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="nv">friendly_name_size</span> <span class="p">=</span> <span class="kt">uint32</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="nv">friendly_name</span> <span class="p">=</span> <span class="nb">array</span><span class="p">(</span><span class="kt">int8</span><span class="p">,</span> <span class="nv">friendly_name_size</span><span class="p">)</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>    <span class="nv">year</span> <span class="p">=</span> <span class="kt">uint16</span>
 </span></code></pre></div>
-<p>The special field <code>__value__</code> is renamed to match the name given to the inline (<code>friendly_name</code>).
-All other fields are renamed with a prefix and underscore, such as <code>size</code> becoming <code>friendly_name_size</code>.</p>
+<p>The special field <code class="language-cats highlight"><span class="kp">__value__</span></code> is renamed to match the name given to the inline (<code class="language-cats highlight"><span class="nv">friendly_name</span></code>).
+All other fields are renamed with a prefix and underscore, such as <code class="language-cats highlight"><span class="nv">size</span></code> becoming <code class="language-cats highlight"><span class="nv">friendly_name_size</span></code>.</p>
 </div>
 <h3 id="struct-attributes">Struct Attributes<a class="headerlink" href="#struct-attributes" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Structures can include attributes that provide hints to code generators or affect layout behavior.
-Attributes appear above the <code>struct</code> declaration, starting with <code>@</code>.</p>
+Attributes appear above the <code class="language-cats highlight"><span class="k">struct</span></code> declaration, starting with <code>@</code>.</p>
 <p>CATS supports the following struct-level attributes:</p>
 <ul>
-<li><code>@is_aligned</code>: forces all fields to be aligned to their natural boundaries.</li>
-<li><code>@is_size_implicit</code>: allows the struct to be referenced in a <code>sizeof(x)</code> expression.</li>
-<li><code>@size(x)</code>: declares that the field <code>x</code> contains the full size of the struct in bytes.</li>
-<li><code>@initializes(x, Y)</code>: initializes field <code>x</code> with the constant <code>Y</code> defined elsewhere.</li>
-<li><code>@discriminator(x [, y...])</code>: used with <code>abstract</code> structs to select the appropriate derived type when decoding,
+<li><code class="language-cats highlight"><span class="nd">@is_aligned</span></code>: forces all fields to be aligned to their natural boundaries.</li>
+<li><code class="language-cats highlight"><span class="nd">@is_size_implicit</span></code>: allows the struct to be referenced by a <code class="language-cats highlight"><span class="nb">sizeof</span><span class="p">(</span><span class="nv">type</span><span class="p">,</span> <span class="nv">field</span><span class="p">)</span></code> expression.</li>
+<li><code class="language-cats highlight"><span class="nd">@size</span><span class="p">(</span><span class="nv">x</span><span class="p">)</span></code>: declares that the field <code>x</code> contains the full size of the struct in bytes.</li>
+<li><code class="language-cats highlight"><span class="nd">@initializes</span><span class="p">(</span><span class="nv">x</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span></code>: initializes field <code>x</code> with the constant <code>Y</code> defined elsewhere.</li>
+<li><code class="language-cats highlight"><span class="nd">@discriminator</span><span class="p">(</span><span class="nv">x</span> <span class="nt">[, y...]</span><span class="p">)</span></code>: used with <code class="language-cats highlight"><span class="kd">abstract</span></code> structs to select the appropriate derived type when decoding,
     based on the indicated properties.</li>
-<li><code>@comparer(x [!transform] [, y...])</code>: defines which properties to use to sort or compare instances.
+<li><code class="language-cats highlight"><span class="nd">@comparer</span><span class="p">(</span><span class="nv">x</span> <span class="nt">[!transform] [, y...]</span><span class="p">)</span></code>: defines which properties to use to sort or compare instances.
     The optional transforms are applied prior to property comparison.
-    Currently, the only transform supported is <code>ripemd_keccak_256</code> for backwards compatibility with NEM.</li>
+    Currently, the only transform supported is <code class="language-cats highlight"><span class="nf">ripemd_keccak_256</span></code> for backwards compatibility with NEM.</li>
 </ul>
-<p>For example, this links the field <code>transport_mode</code> in <code>Vehicle</code> to a constant defined in a derived struct:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">@initializes</span><span class="err">(</span><span class="n">transport_mode</span><span class="err">,</span> <span class="n">TRANSPORT_MODE</span><span class="err">)</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="k">abstract</span> <span class="k">struct</span> <span class="n">Vehicle</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="n">transport_mode</span> <span class="err">=</span> <span class="n">TransportMode</span>
+<p>For example, this links the field <code class="language-cats highlight"><span class="nv">transport_mode</span></code> in <code class="language-cats highlight"><span class="nc">Vehicle</span></code> to a constant defined in a derived struct:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nd">@initializes</span><span class="p">(</span><span class="nv">transport_mode</span><span class="p">,</span> <span class="no">TRANSPORT_MODE</span><span class="p">)</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="kd">abstract</span> <span class="k">struct</span> <span class="nc">Vehicle</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="nv">transport_mode</span> <span class="p">=</span> <span class="nc">TransportMode</span>
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="k">struct</span> <span class="n">Car</span>
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    <span class="n">TRANSPORT_MODE</span> <span class="err">=</span> <span class="k">make_const</span><span class="err">(</span><span class="n">TransportMode</span><span class="err">,</span> <span class="n">ROAD</span><span class="err">)</span>
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>    <span class="k">inline</span> <span class="n">Vehicle</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="k">struct</span> <span class="nc">Car</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    <span class="no">TRANSPORT_MODE</span> <span class="p">=</span> <span class="nb">make_const</span><span class="p">(</span><span class="nc">TransportMode</span><span class="p">,</span> <span class="no">ROAD</span><span class="p">)</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>    <span class="kd">inline</span> <span class="nc">Vehicle</span>
 </span></code></pre></div>
-<p>The constant <code>TRANSPORT_MODE</code> can be defined in any struct that extends <code>Vehicle</code>.</p>
-<hr />
+<p>The constant <code class="language-cats highlight"><span class="no">TRANSPORT_MODE</span></code> can be defined in any struct that extends <code class="language-cats highlight"><span class="nc">Vehicle</span></code>.</p>
 <h3 id="integer-field-attributes">Integer Field Attributes<a class="headerlink" href="#integer-field-attributes" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Integer fields support one attribute:</p>
 <ul>
 <li>
-<p><code>@sizeref(x [, y])</code>: sets the value of the field to the size of <code>x</code>, optionally adjusted by an offset <code>y</code>.</p>
-<p>For example, to store the combined size of <code>vehicle_size</code> and <code>vehicle</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">struct</span> <span class="n">Garage</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="k">@sizeref</span><span class="err">(</span><span class="n">vehicle</span><span class="err">,</span> <span class="m">2</span><span class="err">)</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="n">vehicle_size</span> <span class="err">=</span> <span class="kt">uint16</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="n">vehicle</span> <span class="err">=</span> <span class="n">Vehicle</span>
+<p><code class="language-cats highlight"><span class="nd">@sizeref</span><span class="p">(</span><span class="nv">x</span> <span class="nt">[, y]</span><span class="p">)</span></code>: sets the value of the field to the size of <code>x</code>, optionally adjusted by an offset <code>y</code>.</p>
+<p>For example, to store the combined size of <code class="language-cats highlight"><span class="nv">vehicle_size</span></code> and <code class="language-cats highlight"><span class="nv">vehicle</span></code>:</p>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">struct</span> <span class="nc">Garage</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="nd">@sizeref</span><span class="p">(</span><span class="nv">vehicle</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="nv">vehicle_size</span> <span class="p">=</span> <span class="kt">uint16</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="nv">vehicle</span> <span class="p">=</span> <span class="nc">Vehicle</span>
 </span></code></pre></div>
 </li>
 </ul>
@@ -8098,11 +8241,11 @@ Attributes appear above the <code>struct</code> declaration, starting with <code
 However, if a comment is placed immediately before a declaration or field, it is treated as <strong>documentation</strong>
 and may be preserved in the generated output.</p>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># This comment is ignored</span>
+<div class="language-cats highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="cm"># This comment is ignored</span>
 </span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="c1"># This comment is included as documentation</span>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># and will be associated with the `Height` alias.</span>
-</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="k">using</span> <span class="n">Height</span> <span class="err">=</span> <span class="kt">uint64</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="cm"># This comment is included as documentation</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="cm"># and will be associated with the `#!cats Height` alias.</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="k">using</span> <span class="nc">Height</span> <span class="p">=</span> <span class="kt">uint64</span>
 </span></code></pre></div>
 <p>This convention allows adding inline documentation to schemas without affecting the binary layout.</p>
 
@@ -8127,7 +8270,7 @@ and may be preserved in the generated output.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 21, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">June 26, 2026</span>
   </span>
 
     
@@ -8147,12 +8290,13 @@ and may be preserved in the generated output.</p>
   <span class="md-source-file__fact">
     <span class="md-icon" title="Contributors">
       
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 5.5A3.5 3.5 0 0 1 15.5 9a3.5 3.5 0 0 1-3.5 3.5A3.5 3.5 0 0 1 8.5 9 3.5 3.5 0 0 1 12 5.5M5 8c.56 0 1.08.15 1.53.42-.15 1.43.27 2.85 1.13 3.96C7.16 13.34 6.16 14 5 14a3 3 0 0 1-3-3 3 3 0 0 1 3-3m14 0a3 3 0 0 1 3 3 3 3 0 0 1-3 3c-1.16 0-2.16-.66-2.66-1.62a5.54 5.54 0 0 0 1.13-3.96c.45-.27.97-.42 1.53-.42M5.5 18.25c0-2.07 2.91-3.75 6.5-3.75s6.5 1.68 6.5 3.75V20h-13zM0 20v-1.5c0-1.39 1.89-2.56 4.45-2.9-.59.68-.95 1.62-.95 2.65V20zm24 0h-3.5v-1.75c0-1.03-.36-1.97-.95-2.65 2.56.34 4.45 1.51 4.45 2.9z"/></svg>
       
     </span>
     <nav>
       
-        <a href="mailto:zero4862@pm.me">zero</a>
+        <a href="mailto:zero4862@pm.me">zero</a>, 
+        <a href="mailto:xavi@symbolsyndicate.us">segfaultxavi</a>
     </nav>
   </span>
 

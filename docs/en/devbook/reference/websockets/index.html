@@ -14,7 +14,7 @@
         <link rel="prev" href="../serialization/">
       
       
-        <link rel="next" href="../../../textbook/intro/">
+        <link rel="next" href="../whitepaper/">
       
       
         
@@ -506,6 +506,120 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Node Operation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Node Operation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../userbook/node/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Node Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../userbook/node/supernode-program/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supernode Program
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -7175,6 +7289,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../whitepaper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Whitepaper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -7942,7 +8084,7 @@ made of a command, optional <code>header:value</code> lines, and an optional bod
 The client must send this frame once, right after the connection opens.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#CONNECT_or_STOMP_Frame">STOMP specification</a> for full
 details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CONNECT</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CONNECT</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">accept-version</span><span class="p">:</span><span class="s">1.2</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">heart-beat</span><span class="p">:</span><span class="s">0,0</span>
 </span></code></pre></div>
@@ -7954,7 +8096,7 @@ Clients subscribe to each channel whose notifications they want to receive."
 	name="_:WebSocket Channel"
 	href="../../../devbook/reference/websockets/#917bf8c3f504e6f666dd06aa41ce373e">channel</a>, with a client-chosen <code>id</code> and <code>destination</code>.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#SUBSCRIBE">STOMP specification</a> for full details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span></code></pre></div>
@@ -7967,7 +8109,7 @@ See the <a href="https://stomp.github.io/stomp-specification-1.2.html#SUBSCRIBE"
 <p>Delivers channel data from the node.
 It is the only frame type the node sends.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#MESSAGE">STOMP specification</a> for full details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">befkedjj-6247</span>
@@ -7990,7 +8132,7 @@ snapshot of the state of the blockchain."
 	name="_:WebSocket Request"
 	href="../../../devbook/reference/websockets/#bfa0c5c6746e44b132d5f5d0b8e0201b">request</a> to a <code>/w/api</code> destination.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#SEND">STOMP specification</a> for full details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SEND</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/subscribe</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -7998,13 +8140,13 @@ See the <a href="https://stomp.github.io/stomp-specification-1.2.html#SEND">STOM
 <h3 id="unsubscribe"><code>UNSUBSCRIBE</code><a class="headerlink" href="#unsubscribe" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Cancels a subscription by its <code>id</code>.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#UNSUBSCRIBE">STOMP specification</a> for full details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">UNSUBSCRIBE</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">UNSUBSCRIBE</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span></code></pre></div>
 <h3 id="disconnect"><code>DISCONNECT</code><a class="headerlink" href="#disconnect" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Ends the session.
 See the <a href="https://stomp.github.io/stomp-specification-1.2.html#DISCONNECT">STOMP specification</a> for full details.</p>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">DISCONNECT</span>
+<div class="language-stomp highlight"><span class="filename">Example</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">DISCONNECT</span>
 </span></code></pre></div>
 <h2 id="channels">Channels<a class="headerlink" href="#channels" title="Anchor link to this section for reference">⚓︎</a></h2>
 <dl>
@@ -8046,7 +8188,7 @@ new blocks replace blocks that were already reported.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span></code></pre></div>
@@ -8054,7 +8196,7 @@ new blocks replace blocks that were already reported.</p>
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8106,7 +8248,7 @@ one, containing the height of the first block.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks/new</span>
 </span></code></pre></div>
@@ -8114,7 +8256,7 @@ one, containing the height of the first block.</p>
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/blocks/new</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8164,7 +8306,7 @@ before it can be included in a block."
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed</span>
 </span></code></pre></div>
@@ -8172,7 +8314,7 @@ before it can be included in a block."
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8285,7 +8427,7 @@ For example, the recipient of a transfer of zero XEM is notified even though its
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/{address}</span>
 </span></code></pre></div>
@@ -8293,7 +8435,7 @@ For example, the recipient of a transfer of zero XEM is notified even though its
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/{address}</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8332,7 +8474,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed/{address}</span>
 </span></code></pre></div>
@@ -8340,7 +8482,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/unconfirmed/{address}</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8372,7 +8514,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/transactions/{address}</span>
 </span></code></pre></div>
@@ -8380,7 +8522,7 @@ Requires the address to be <a href="#registration-requests">registered</a> first
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/transactions/{address}</span>
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8420,7 +8562,7 @@ changed.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/{address}</span>
 </span></code></pre></div>
@@ -8428,7 +8570,7 @@ changed.</p>
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/{address}</span>
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8464,7 +8606,7 @@ of which mosaics changed.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/definition/{address}</span>
 </span></code></pre></div>
@@ -8472,7 +8614,7 @@ of which mosaics changed.</p>
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/mosaic/owned/definition/{address}</span>
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8506,7 +8648,7 @@ Each burst contains the account's full list of owned namespaces, with one notifi
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/namespace/owned/{address}</span>
 </span></code></pre></div>
@@ -8514,7 +8656,7 @@ Each burst contains the account's full list of owned namespaces, with one notifi
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/account/namespace/owned/{address}</span>
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8551,7 +8693,7 @@ w/api/account/transfers/unconfirmed REQ does."
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/recenttransactions/{address}</span>
 </span></code></pre></div>
@@ -8559,7 +8701,7 @@ w/api/account/transfers/unconfirmed REQ does."
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/recenttransactions/{address}</span>
 </span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8595,7 +8737,7 @@ Followed by a list of <a href="../rest/nem/#model/TransactionMetaDataPair">Trans
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/node/info</span>
 </span></code></pre></div>
@@ -8603,7 +8745,7 @@ Followed by a list of <a href="../rest/nem/#model/TransactionMetaDataPair">Trans
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/node/info</span>
 </span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8641,7 +8783,7 @@ dropped.</dd>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">SUBSCRIBE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">SUBSCRIBE</span>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="na">id</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="na">destination</span><span class="p">:</span><span class="s">/errors</span>
 </span></code></pre></div>
@@ -8649,7 +8791,7 @@ dropped.</dd>
 </td>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">MESSAGE</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">MESSAGE</span>
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/errors</span>
 </span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="na">subscription</span><span class="p">:</span><span class="s">sub-0</span>
 </span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="na">message-id</span><span class="p">:</span><span class="s">...</span>
@@ -8705,7 +8847,7 @@ The registration remains active until the node restarts.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">SEND</span>
 </span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/subscribe</span>
 </span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
 </span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8744,7 +8886,7 @@ For example, the recipient of a transfer of zero XEM is notified even though its
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">SEND</span>
 </span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/get</span>
 </span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
 </span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8786,7 +8928,7 @@ unconfirmed/{address} WS and the global unconfirmed WS channel."
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">SEND</span>
 </span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/transfers/all</span>
 </span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
 </span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8829,7 +8971,7 @@ A multisig transaction appears as the outer multisig transaction, with the inner
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">SEND</span>
 </span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/transfers/unconfirmed</span>
 </span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
 </span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8869,7 +9011,7 @@ changed."
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">SEND</span>
 </span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/mosaic/owned</span>
 </span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
 </span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8905,7 +9047,7 @@ of which mosaics changed."
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">SEND</span>
 </span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/mosaic/owned/definition</span>
 </span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>
 </span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8939,7 +9081,7 @@ Each burst contains the account's full list of owned namespaces, with one notifi
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">SEND</span>
 </span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/account/namespace/owned</span>
 </span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
 </span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>{ &quot;account&quot;: &quot;{address}&quot; }
@@ -8976,7 +9118,7 @@ to the accounts involved in it are notified again as well.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">SEND</span>
 </span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/block/last</span>
 </span></code></pre></div>
 
@@ -9004,7 +9146,7 @@ to the accounts involved in it are notified again as well.</p>
 <tr>
 <td>
 
-<div class="highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">SEND</span>
+<div class="language-stomp highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">SEND</span>
 </span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="na">destination</span><span class="p">:</span><span class="s">/w/api/node/info</span>
 </span></code></pre></div>
 
