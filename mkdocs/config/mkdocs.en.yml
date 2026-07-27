@@ -77,6 +77,7 @@ nav:
       - userbook/intro.md
       - Node Operation:
           - userbook/node/install.md
+          - userbook/node/supernode-program.md
   - Developer Manual:
       - devbook/intro.md
       - Getting Started:
