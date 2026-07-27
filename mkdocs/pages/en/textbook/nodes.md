@@ -219,30 +219,9 @@ The Supernode Program offsets this by paying daily rewards to nodes that prove t
 The program runs entirely off-chain, and NIS itself plays no part: a separate, centrally operated service called the
 _controller_ tests participating nodes and pays out the rewards.
 
-A node qualifies for a day's reward by holding at least 10'000 <XEM:> and passing a battery of automated tests that
-confirm it is in sync, up to date, and running on hardware and a network connection capable of serving peers reliably.
-
-Testing happens in four rounds spaced six hours apart, and a node must pass every test in every round to be eligible.
-Each round runs the eight tests below, several of them measured against a trusted _reference node_ that the controller
-knows to be healthy:
-
-| Test                | A node passes when                                                                                     |
-| ------------------- | -------------------------------------------------------------------------------------------------------|
-| **Chain height**    | Its chain is no more than 4 blocks behind the reference node.                                          |
-| **Chain part**      | A random sequence of 60 to 100 recent blocks matches the reference node exactly, including signatures. |
-| **Balance**         | Its main account holds at least 10'000 XEM.                                                            |
-| **Computing power** | It completes 10'000 successive key derivations, round trip included, in 5 seconds or less.             |
-| **Version**         | It runs a client version at least as recent as the reference node's.                                   |
-| **Ping**            | Across pings to 5 random peers, at most one ping fails and the average round trip stays under 200 ms.  |
-| **Bandwidth**       | A bulk hashing exchange with a peer runs at an effective transfer speed of at least 5 Mbit/s.          |
-| **Responsiveness**  | It answers 10 chain-height requests in 1 second or less, with at least 9 succeeding.                   |
-
-The ping and bandwidth tests reach out to other peers on the network, so a node's score reflects how it performs with
-the wider network rather than just its exchange with the reference node.
-
-Rewards come from a fixed daily pool of 25'500 XEM, and each qualifying node earns at most 500 XEM per day.
-When 51 or fewer nodes qualify, each receives the full 500 XEM.
-Beyond that, the pool is divided equally, so per-node rewards fall as the network grows.
+A node qualifies for a day's reward by holding a minimum <XEM:> balance and passing automated checks that confirm it is
+in sync, up to date, and reachable by other peers.
+These checks are designed to reward nodes that improve the network's reliability, not just nodes that are online.
 
 Enrollment is optional.
-Step-by-step instructions are available on the [NEM Supernode page](https://nem.io/supernode/).
+Operational details are available in the [Supernode Program guide](../userbook/node/supernode-program.md).
