@@ -688,10 +688,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#configuring-the-node" class="md-nav__link">
+  <a href="#manually" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuring the Node
+        Manually
       
     </span>
   </a>
@@ -699,32 +699,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuring-the-servant" class="md-nav__link">
+  <a href="#using-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuring the Servant
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#opening-the-required-ports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Opening the Required Ports
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#starting-the-servant" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Starting the Servant
+        Using Docker
       
     </span>
   </a>
@@ -7716,10 +7694,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#configuring-the-node" class="md-nav__link">
+  <a href="#manually" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuring the Node
+        Manually
       
     </span>
   </a>
@@ -7727,32 +7705,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuring-the-servant" class="md-nav__link">
+  <a href="#using-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuring the Servant
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#opening-the-required-ports" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Opening the Required Ports
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#starting-the-servant" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Starting the Servant
+        Using Docker
       
     </span>
   </a>
@@ -7853,7 +7809,7 @@ Because all <a class="mkdocs-ezglossary-link"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> was created in the genesis block, NEM has no block subsidy.
-Instead, 10,000,000 XEM was set aside for the Supernode Program.</p>
+A quantity of XEM was set aside for the Supernode Program.</p>
 <p>Reward eligibility is checked daily in four rounds, one round every six hours.
 A participating node must pass every test in every round to qualify for that day's reward.</p>
 <p>Testing is performed by a centrally managed Supernode monitoring service called the <em>controller</em>.
@@ -7933,6 +7889,7 @@ It allows a node to harvest on behalf of another account without exposing the ac
 <li>
 <p>A synchronized public node.
     Follow the <a href="../install/">node installation guide</a> if you do not have one yet.</p>
+<p>Make sure the <code>nis.shouldAutoHarvestOnBoot</code> property is set to <code>true</code> or not set.</p>
 </li>
 <li>
 <p>A stable public IP address or domain name for the node.</p>
@@ -7948,44 +7905,19 @@ The delegated private key only controls delegated harvesting and can be replaced
 <p>To find the delegated private key in NEM NanoWallet, open <strong>Services</strong>, then <strong>Delegated Harvesting</strong>, then
 <strong>Manage Delegated Account</strong>.
 Select <strong>Show delegated account keys</strong> and enter the wallet password to reveal the delegated private key.</p>
-<h3 id="configuring-the-node">Configuring the Node<a class="headerlink" href="#configuring-the-node" title="Anchor link to this section for reference">⚓︎</a></h3>
-<ol>
-<li>
-<p>Stop the NIS client if it is running.</p>
-</li>
-<li>
-<p>Open the <code>nis/config.properties</code> file in the NIS1 home folder.</p>
-</li>
-<li>
-<p>Set <code>nis.bootKey</code> to the delegated private key.
-    If the line is commented, remove the leading <code>#</code>.</p>
-</li>
-<li>
-<p>Set <code>nis.bootName</code> to the public name of the node.
-    If the line is commented, remove the leading <code>#</code>.</p>
-</li>
-<li>
-<p>Set <code>nis.shouldAutoHarvestOnBoot</code> to <code>true</code>.</p>
-</li>
-<li>
-<p>Optionally, set <code>nem.host</code> to the node's domain name or public IP address.
-    The node tries to detect its public address automatically when this property is not defined.</p>
-</li>
-<li>
-<p>Save the file and restart the node.
-    The node should boot and synchronize automatically.</p>
-</li>
-</ol>
-<h3 id="configuring-the-servant">Configuring the Servant<a class="headerlink" href="#configuring-the-servant" title="Anchor link to this section for reference">⚓︎</a></h3>
+<h3 id="manually">Manually<a class="headerlink" href="#manually" title="Anchor link to this section for reference">⚓︎</a></h3>
+<h4 id="configuring-the-servant">Configuring the Servant<a class="headerlink" href="#configuring-the-servant" title="Anchor link to this section for reference">⚓︎</a></h4>
 <ol>
 <li>
 <p>Download the <a href="https://bob.nem.ninja/servant_0_0_4.zip">Node Servant</a>.</p>
 </li>
 <li>
-<p>Unzip the file and open the <code>servant</code> folder.</p>
+<p>Unzip the file in the folder that becomes the Servant installation folder.
+    It does not need to be the same as the NIS1 installation folder.
+    Open the <code>servant</code> folder.</p>
 </li>
 <li>
-<p>Open the Servant <code>config.properties</code> file.</p>
+<p>Open the Servant <code>config-user.properties</code> file.</p>
 </li>
 <li>
 <p>Set <code>nem.host</code> to the node's static IP address or domain name.
@@ -7997,27 +7929,12 @@ Select <strong>Show delegated account keys</strong> and enter the wallet passwor
 <li>
 <p>Save the file.</p>
 </li>
+<li>
+<p>Open inbound and outbound TCP port <strong>7880</strong> so the Servant can receive Supernode Program tests.</p>
+</li>
 </ol>
-<h3 id="opening-the-required-ports">Opening the Required Ports<a class="headerlink" href="#opening-the-required-ports" title="Anchor link to this section for reference">⚓︎</a></h3>
-<p>Open the following inbound and outbound TCP ports:</p>
-<ul>
-<li>
-<p><code>7890</code>: NIS.
-    This port allows the node to operate as a full public node.</p>
-</li>
-<li>
-<p><code>7880</code>: Servant.
-    This port allows the Servant to receive Supernode Program tests.</p>
-</li>
-<li>
-<p><code>7778</code>: WebSocket.
-    This port allows NEM NanoWallet to connect to the server through WebSockets.</p>
-</li>
-</ul>
-<p>After port <code>7890</code> is available, the node should appear in the <a href="https://explorer.nemtool.com/">node explorer</a>.
-This can take several minutes.</p>
-<h3 id="starting-the-servant">Starting the Servant<a class="headerlink" href="#starting-the-servant" title="Anchor link to this section for reference">⚓︎</a></h3>
-<p>Start NIS and let it synchronize before starting the Servant.</p>
+<h4 id="starting-the-servant">Starting the Servant<a class="headerlink" href="#starting-the-servant" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>Start NIS and let it synchronize before starting the Servant with:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux and macOS</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -8027,13 +7944,27 @@ This can take several minutes.</p>
 <div class="tabbed-block">
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sh<span class="w"> </span>startservant.sh
 </span></code></pre></div>
+<p>Run the Servant in the background with a tool such as <code>screen</code> or <code>nohup</code>.</p>
 </div>
 </div>
 </div>
-<p>On Linux and macOS, run the Servant in the background with a tool such as <code>screen</code> or <code>nohup</code>.</p>
+<h3 id="using-docker">Using Docker<a class="headerlink" href="#using-docker" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>These instructions only work for Linux systems, including the Windows Subsystem for Linux.</p>
+<h4 id="configuring-the-servant_1">Configuring the Servant<a class="headerlink" href="#configuring-the-servant_1" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>If you installed your node using Docker as explained in the <a href="../install/#using-docker">Installation guide for Docker</a>,
+you already have the Servant installed and you only need to configure it.</p>
+<p>Stop the NIS1 client if it is running, as explained in <a href="../install/#controlling-the-node">Controlling the node</a>.</p>
+<p>Inside the <code>custom-configs</code> folder, copy the <code>servant.config.properties.sample</code> file into <code>servant.config.properties</code>
+and edit it.
+Provide values for at least the <code>nem.host</code> and <code>servant.key</code> properties.</p>
+<p>Restart the NIS1 client.</p>
+<h4 id="starting-the-servant_1">Starting the Servant<a class="headerlink" href="#starting-the-servant_1" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>Once the NIS1 client is running, start the Servant with:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./service.sh<span class="w"> </span>start<span class="w"> </span>servant
+</span></code></pre></div>
 <h3 id="sending-the-enrollment">Sending the Enrollment<a class="headerlink" href="#sending-the-enrollment" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The monthly enrollment address is announced through the NEM community channels.</p>
-<p>To enroll with NEM NanoWallet:</p>
+<h4 id="enrolling-with-nem-nanowallet">Enrolling with NEM NanoWallet<a class="headerlink" href="#enrolling-with-nem-nanowallet" title="Anchor link to this section for reference">⚓︎</a></h4>
 <ol>
 <li>
 <p>Open <strong>Services</strong>.</p>
@@ -8049,24 +7980,63 @@ This can take several minutes.</p>
 </li>
 <li>
 <p>Enter the current enrollment address and the node host.</p>
+<p>The host must match the host returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</p>
 </li>
 <li>
 <p>Send the enrollment transaction.</p>
 </li>
 </ol>
-<p>The host must match the host returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</p>
-<p>To enroll manually, send a transfer transaction to the current enrollment address with this message:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>enroll &lt;NODE_HOST&gt; &lt;CODEWORD_HASH&gt;
+<h4 id="enrolling-manually">Enrolling Manually<a class="headerlink" href="#enrolling-manually" title="Anchor link to this section for reference">⚓︎</a></h4>
+<p>Enrolling manually requires sending a transfer transaction to the current enrollment address with the following
+unencrypted message:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>enroll &lt;NODE_HOST&gt; &lt;CODEWORD_HASH&gt;
 </span></code></pre></div>
-<p>Use the host returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint as <code>&lt;NODE_HOST&gt;</code>.
-Fetch the current <code>&lt;CODEWORD_HASH&gt;</code> for the account with the account's main public key:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>https://nem.io/supernode/api/codeword/&lt;MAIN_PUBLIC_KEY&gt;
+<ul>
+<li><code>&lt;NODE_HOST&gt;</code> as returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</li>
+<li>
+<p><code>&lt;CODEWORD_HASH&gt;</code> as returned by the following query:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://nem.io/supernode/api/codeword/&lt;MAIN_PUBLIC_KEY&gt;
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Use the Public Key</p>
-<p>Use the main public key in the codeword API URL.
-Do not use the main private key.</p>
+<ul>
+<li>
+<p>Use the main <a class="mkdocs-ezglossary-link"
+	id="21f638b05f79210ee26f4274519e4447"
+	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
+It can be used to prove that the private key is known without revealing it.
+Although mathematically derived from the private key, the reverse operation is practically impossible with
+current technology."
+	name="_:Public Key"
+	href="../../../textbook/cryptography/#17f7d52090c7c880d909358ef3c0e17f">public key</a> in the codeword API URL, not the <a class="mkdocs-ezglossary-link"
+	id="afb56707aeb014b34893419fbcd59fbe"
+	title="A very long, secret number.
+The actual value of the private key is meaningless, and it is meant to be kept secret.
+It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
+it is extremely unlikely that the same number is generated twice by chance."
+	name="_:Private Key"
+	href="../../../textbook/cryptography/#890b9584bd9860118fc3d58c24a6dbd9">private key</a>.</p>
+</li>
+<li>
+<p>Use the <a class="mkdocs-ezglossary-link"
+	id="7c7da18d08f1479703d5c94c212a4325"
+	title="Key pair associated with every account.
+Its private key identifies the account owner and grants full control over the account, including the ability to
+transfer funds and announce transactions."
+	name="_:Main Key"
+	href="../../../textbook/cryptography/#a291244137ae0c728b9d1cea6494128c">main public key</a> of the account enrolled in the program, not the <a class="mkdocs-ezglossary-link"
+	id="cf52583a2c8c48adce1fb5f80a5f912b"
+	title="Key pair associated with every remote harvesting account.
+It allows a node to harvest on behalf of another account without exposing the account's main key."
+	name="_:Remote Key"
+	href="../../../textbook/cryptography/#fdb843cdeea7bb265f839f24adc30f4f">remote key</a> used to
+    harvest on the node.</p>
+<p>Please note that <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> returns the remote key.</p>
+</li>
+</ul>
 </div>
+</li>
+</ul>
 <h2 id="reviewing-test-results">Reviewing Test Results<a class="headerlink" href="#reviewing-test-results" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Review the node's test results on the <a href="https://nem.io/supernode/">Supernode Program page</a>.
 Results do not appear immediately after enrollment.</p>
@@ -8100,7 +8070,7 @@ Repeat the <a href="#sending-the-enrollment">enrollment process</a> each month w
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 28, 2026</span>
   </span>
 
     

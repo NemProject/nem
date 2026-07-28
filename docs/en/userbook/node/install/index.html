@@ -637,6 +637,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#hardware-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#manual-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -671,7 +682,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#manual-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
         Configuration
@@ -721,10 +732,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#installation_1" class="md-nav__link">
+  <a href="#docker-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
         Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
       
     </span>
   </a>
@@ -777,6 +799,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Updating a Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-docker_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7721,6 +7771,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#hardware-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#manual-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7755,7 +7816,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#manual-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
         Configuration
@@ -7805,10 +7866,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#installation_1" class="md-nav__link">
+  <a href="#docker-installation" class="md-nav__link">
     <span class="md-ellipsis">
       
         Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
       
     </span>
   </a>
@@ -7862,6 +7934,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Updating a Node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manually
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-docker_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -7899,14 +7999,14 @@
 
 <h1 id="installing-the-node-client">Installing the Node Client<a class="headerlink" href="#installing-the-node-client" title="Anchor link to this section for reference">⚓︎</a></h1>
 <p>This guide explains how to deploy a NEM node, either <a href="#manual-installation">manually</a> or <a href="#using-docker">using Docker</a>.</p>
-<p>Hardware requirements:</p>
+<h2 id="hardware-requirements">Hardware Requirements<a class="headerlink" href="#hardware-requirements" title="Anchor link to this section for reference">⚓︎</a></h2>
 <ul>
 <li>
 <p>A machine connected to the internet with approximately 30 GB of disk space for database and log files, and 16 GB of
     RAM as of July 2026.</p>
 </li>
 <li>
-<p>If the node needs to participate in <a class="mkdocs-ezglossary-link"
+<p>For optimum participation in <a class="mkdocs-ezglossary-link"
 	id="02103e76f60defc2fa28299cbf9d1cea"
 	title="The process by which all nodes in the network agree on the current state of the blockchain."
 	name="_:Consensus"
@@ -7915,9 +8015,24 @@
 	title="The process by which NEM adds new blocks to the chain and distributes rewards to participating accounts.
 It plays a similar role to mining in PoW or staking in PoS."
 	name="_:Harvesting"
-	href="../../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>, it must have a publicly reachable IP
-    address.</p>
-<p>Without a public IP address, the node can still synchronize with the rest of the network and answer local queries.</p>
+	href="../../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>, the node must have a publicly reachable IP address
+    and TCP port <strong>7890</strong> must be open for inbound and outbound connections.</p>
+<p>Without a public IP address, your node can still produce new blocks and submit them to the network,
+but peer nodes will not be able to inform your node about new blocks and transactions they discover.
+In this case your node resorts to periodically polling its peers, which is slower.</p>
+<p>Additionally, a public IP address is required to participate in the <a class="mkdocs-ezglossary-link"
+	id="00818d7585a0c3cc1fe8f1cde2bf127e"
+	title="An off-chain, community-funded program that rewards reliable public nodes."
+	name="_:Supernode Program"
+	href="../../../textbook/nodes/#74e6d1e76b06867da93582d7ca521342">Supernode Program</a>.</p>
+</li>
+<li>
+<p>For applications like wallets to be able to communicate with the network through your node,
+    the following TCP ports should be open:</p>
+<ul>
+<li><strong>7890</strong> for <a href="../../../devbook/reference/rest/nem/">REST</a> requests.</li>
+<li><strong>7778</strong> for <a href="../../../devbook/reference/websockets/">WebSockets</a> requests.</li>
+</ul>
 </li>
 </ul>
 <h2 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Anchor link to this section for reference">⚓︎</a></h2>
@@ -7932,20 +8047,29 @@ It plays a similar role to mining in PoW or staking in PoS."
 <p><a href="https://github.com/NemProject/nem/releases">Download the latest binary</a>.</p>
 </li>
 <li>
-<p>Unzip the file in the folder that becomes the NIS1 home folder.</p>
+<p>Unzip the file in the folder that becomes the NIS1 <em>installation</em> folder.</p>
 </li>
 </ul>
-<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Anchor link to this section for reference">⚓︎</a></h3>
-<p>Edit the <code>nis/config.properties</code> file:</p>
+<h3 id="manual-configuration">Configuration<a class="headerlink" href="#manual-configuration" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>Create a new <code>nis/config-user.properties</code> file with the following content, adapted to your case:</p>
+<div class="language-ini highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="na">nem.folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">%h/nem</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="na">nis.bootName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">my-server</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="na">nis.bootKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef</span>
+</span></code></pre></div>
 <ul>
 <li>
-<p>Set the <code>nem.folder</code> property to point to the NIS1 home folder.
-    Backslashes on Windows need to be doubled: <code>\\</code>.
-    For example, use <code>D:\\NEM\\nis1-home</code>, or <code>%h/nem</code> to start from the user's home folder.</p>
+<p>Set the <code>nem.folder</code> property to point to the NIS1 <em>home</em> folder.
+    This can be different from the installation folder and will store the program's logs and database files.</p>
+<p>Do not use <code>~</code> to refer to your user's home folder, use <code>%h</code> instead.
+The default location is <code>%h/nem</code>.</p>
+<p>Backslashes on Windows need to be doubled: <code>\\</code>.
+For example, <code>D:\\NEM\\nis1-home</code>.</p>
 </li>
 <li>
 <p>Set <code>nis.bootName</code> to the name you want for your server.
-    This is merely informational.</p>
+    This is merely informational.
+    Leading and trailing spaces are removed, but the name can contain spaces in the middle.
+    Avoid using characters outside the ASCII range.</p>
 </li>
 <li>
 <p>Set <code>nis.bootKey</code> to the <a class="mkdocs-ezglossary-link"
@@ -7991,6 +8115,9 @@ The node signs produced blocks using the operator's main key, which must be stor
 <p class="admonition-title">This key must be kept secret at all times</p>
 </div>
 </li>
+<li>
+<p>Set <code>nis.shouldAutoHarvestOnBoot</code> to <code>true</code> if you want the node to harvest.</p>
+</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Speed Up the First Run of the Node</p>
@@ -7999,19 +8126,41 @@ The node signs produced blocks using the operator's main key, which must be stor
 <li>Go to <a href="https://bob.nem.ninja/">https://bob.nem.ninja/</a> and download the most recent <code>nis5_mainnet-*.mv.db</code> file.
     For example, <a href="https://bob.nem.ninja/nis5_mainnet-5-565-850.mv.db.gz">nis5_mainnet-5-565-850.mv.db.gz</a>.</li>
 <li>Unzip the file inside a folder named <code>nis/data</code> inside the NIS1 home folder.
-    You should get a file named <code>{nem.folder}/nis/data/nis5_mainnet.mv.db</code>.</li>
+    Rename the extracted file to <code>nis5_mainnet.mv.db</code>.</li>
 </ul>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Running a Testnet Node</p>
+<p>If you want to run a <a class="mkdocs-ezglossary-link"
+	id="a5598eaba76682a1cb87d9a15e1b4072"
+	title="NEM's Test Network, intended for development.
+Test XEM can be freely obtained from a faucet, so transactions on this
+network do not have real value, as opposed to transactions on the mainnet."
+	name="_:testnet"
+	href="../../../textbook/glossary/#262d64215cb8a7e5964c686c42e15de0">testnet</a> node, add the following properties to your <code>config-user.properties</code> file:</p>
+<div class="language-ini highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">nem.network</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">testnet</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="na">nis.treasuryReissuanceForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="na">nis.treasuryReissuanceForkTransactionHashes</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="na">nis.treasuryReissuanceForkFallbackTransactionHashes</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="na">nis.multisigMOfNForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="na">nis.mosaicsForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="na">nis.firstFeeForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="na">nis.secondFeeForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="na">nis.remoteAccountForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="na">nis.mosaicRedefinitionForkHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span></code></pre></div>
 </div>
 <h3 id="launch">Launch<a class="headerlink" href="#launch" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Open a terminal and locate the appropriate launch script for your operating system:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>runNis.bat
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>runNis.bat
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>nix.runNis.sh
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>nix.runNis.sh
 </span></code></pre></div>
 </div>
 </div>
@@ -8019,7 +8168,7 @@ The node signs produced blocks using the operator's main key, which must be stor
 <div class="admonition note">
 <p class="admonition-title">Out of Memory Issues</p>
 <p>If you encounter memory issues, edit the launch script and
-<a href="https://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/jrdocs/refman/optionX.html">increase the <code>-Xmx</code> parameter</a>.</p>
+<a href="https://docs.oracle.com/en/java/javase/11/tools/java.html#GUID-3B1CE181-CD30-4178-9602-230B800D4FAE__GUID-98AC4535-A539-406D-9AC5-390C1AF143F0">increase the <code>-Xmx</code> parameter</a>.</p>
 </div>
 <p>Launch the script.
 The console output indicates that the node is running.</p>
@@ -8034,21 +8183,26 @@ The console output indicates that the node is running.</p>
 <p><a href="https://git-scm.com">Git</a>.</p>
 </li>
 </ul>
-<h3 id="installation_1">Installation<a class="headerlink" href="#installation_1" title="Anchor link to this section for reference">⚓︎</a></h3>
+<h3 id="docker-installation">Installation<a class="headerlink" href="#docker-installation" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>Clone the <a href="https://github.com/NemProject/nem-docker">nem-docker</a> repository:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NemProject/nem-docker.git
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>nem-docker
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NemProject/nem-docker.git
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>nem-docker
 </span></code></pre></div>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Anchor link to this section for reference">⚓︎</a></h3>
+<p>Upon first run, the client asks for the <strong>boot name</strong> and <strong>boot key</strong> properties (described in the manual
+<a href="#manual-configuration">Configuration</a> section above) and stores them.</p>
+<p>If you want to edit these settings manually, before starting the client create a new file called
+<code>custom-configs/nis.config-user.properties</code> with the content described above.</p>
 <h3 id="controlling-the-node">Controlling the Node<a class="headerlink" href="#controlling-the-node" title="Anchor link to this section for reference">⚓︎</a></h3>
 <ul>
 <li>
 <p>To start the node:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./boot.sh
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>./boot.sh
 </span></code></pre></div>
 </li>
 <li>
 <p>To stop the node:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./stop.sh
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./stop.sh
 </span></code></pre></div>
 </li>
 </ul>
@@ -8062,7 +8216,7 @@ blocks, significantly reducing the synchronization time.</p>
 <ul>
 <li>
 <p>If you have a public IP, a few minutes after launching your node it should appear in the public list
-    of nodes at <a href="https://nemnodes.org/nodes/">nemnodes.org</a>.
+    of nodes at <a href="https://nodewatch.symbol.tools/nem/nodes">nodewatch.symbol.tools</a>.
     Its reported chain height increases as the node catches up with the rest of the network.</p>
 </li>
 <li>
@@ -8077,18 +8231,33 @@ blocks, significantly reducing the synchronization time.</p>
 <p>For the full list of URLs that can be queried, see the <a href="../../../devbook/reference/rest/nem/">REST API specification</a>.</p>
 <h2 id="updating-a-node">Updating a Node<a class="headerlink" href="#updating-a-node" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>Updating the NIS1 client to the latest protocol version is straightforward:</p>
+<h3 id="manually">Manually<a class="headerlink" href="#manually" title="Anchor link to this section for reference">⚓︎</a></h3>
 <ul>
 <li>
 <p>Stop the server by pressing <code>Ctrl+C</code> or killing the process.</p>
 </li>
 <li>
-<p>Remove the old package. This means all files you <a href="#installation">installed previously</a> <strong>except</strong> the <code>*.config</code> files and the <code>nis/data</code> folder.</p>
+<p>Remove the old package.
+    This means all files in the <a href="#installation">NIS1 installation folder</a> <strong>except</strong> the <code>config-user.properties</code>.
+    Everything in the NIS1 home folder should remain.</p>
 </li>
 <li>
 <p><a href="https://github.com/NemProject/nem/releases">Download the latest binary</a> and extract it in the same folder.</p>
 </li>
 <li>
 <p>Start the server again with <a href="#launch">the same command used to launch it</a>.</p>
+</li>
+</ul>
+<h3 id="using-docker_1">Using Docker<a class="headerlink" href="#using-docker_1" title="Anchor link to this section for reference">⚓︎</a></h3>
+<ul>
+<li>
+<p>Stop the server with <code>./stop.sh</code></p>
+</li>
+<li>
+<p>Update the repository that you cloned in the <a href="#docker-installation">Installation</a> step with <code>git pull</code></p>
+</li>
+<li>
+<p>Restart the server with <code>./boot.sh</code></p>
 </li>
 </ul>
 
@@ -8113,7 +8282,7 @@ blocks, significantly reducing the synchronization time.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 24, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">July 28, 2026</span>
   </span>
 
     
