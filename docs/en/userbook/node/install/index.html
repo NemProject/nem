@@ -8018,8 +8018,8 @@ It plays a similar role to mining in PoW or staking in PoS."
 	href="../../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a>, the node must have a publicly reachable IP address
     and TCP port <strong>7890</strong> must be open for inbound and outbound connections.</p>
 <p>Without a public IP address, your node can still produce new blocks and submit them to the network,
-but peer nodes will not be able to inform your node about new blocks and transactions they discover.
-In this case your node resorts to periodically polling its peers, which is slower.</p>
+but peer nodes will not be able to notify your node about new blocks and transactions they discover.
+In this case, your node resorts to periodically polling its peers, which is slower.</p>
 <p>Additionally, a public IP address is required to participate in the <a class="mkdocs-ezglossary-link"
 	id="00818d7585a0c3cc1fe8f1cde2bf127e"
 	title="An off-chain, community-funded program that rewards reliable public nodes."
@@ -8069,7 +8069,8 @@ For example, <code>D:\\NEM\\nis1-home</code>.</p>
 <p>Set <code>nis.bootName</code> to the name you want for your server.
     This is merely informational.
     Leading and trailing spaces are removed, but the name can contain spaces in the middle.
-    Avoid using characters outside the ASCII range.</p>
+    Avoid using characters outside the ASCII range, even though UTF8 is supported via escaping
+    (e.g. <code>\u3053\u3093\u306B\u3061\u306F</code>).</p>
 </li>
 <li>
 <p>Set <code>nis.bootKey</code> to the <a class="mkdocs-ezglossary-link"

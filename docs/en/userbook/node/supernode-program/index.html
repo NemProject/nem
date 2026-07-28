@@ -7954,13 +7954,19 @@ Select <strong>Show delegated account keys</strong> and enter the wallet passwor
 <p>If you installed your node using Docker as explained in the <a href="../install/#using-docker">Installation guide for Docker</a>,
 you already have the Servant installed and you only need to configure it.</p>
 <p>Stop the NIS1 client if it is running, as explained in <a href="../install/#controlling-the-node">Controlling the node</a>.</p>
-<p>Inside the <code>custom-configs</code> folder, copy the <code>servant.config.properties.sample</code> file into <code>servant.config.properties</code>
-and edit it.
-Provide values for at least the <code>nem.host</code> and <code>servant.key</code> properties.</p>
-<p>Restart the NIS1 client.</p>
+<p>Inside the <code>custom-configs</code> folder:</p>
+<ul>
+<li>Copy the <code>servant.config.properties.sample</code> file into <code>servant.config.properties</code> and edit it.
+    Provide values for at least the <code>nem.host</code> and <code>servant.key</code> properties.</li>
+<li>Copy the <code>supervisord.conf.sample</code> file into <code>supervisord.conf</code> and edit it.
+    Set <code>autostart=true</code> in both the <code>[program:nis]</code> and <code>[program:servant]</code> sections.</li>
+</ul>
 <h4 id="starting-the-servant_1">Starting the Servant<a class="headerlink" href="#starting-the-servant_1" title="Anchor link to this section for reference">⚓︎</a></h4>
-<p>Once the NIS1 client is running, start the Servant with:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./service.sh<span class="w"> </span>start<span class="w"> </span>servant
+<p>The Servant now starts every time the NIS1 client is started with:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./boot.sh
+</span></code></pre></div>
+<p>You can verify it with:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./service.sh<span class="w"> </span>status
 </span></code></pre></div>
 <h3 id="sending-the-enrollment">Sending the Enrollment<a class="headerlink" href="#sending-the-enrollment" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The monthly enrollment address is announced through the NEM community channels.</p>
@@ -7989,13 +7995,13 @@ Provide values for at least the <code>nem.host</code> and <code>servant.key</cod
 <h4 id="enrolling-manually">Enrolling Manually<a class="headerlink" href="#enrolling-manually" title="Anchor link to this section for reference">⚓︎</a></h4>
 <p>Enrolling manually requires sending a transfer transaction to the current enrollment address with the following
 unencrypted message:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>enroll &lt;NODE_HOST&gt; &lt;CODEWORD_HASH&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>enroll &lt;NODE_HOST&gt; &lt;CODEWORD_HASH&gt;
 </span></code></pre></div>
 <ul>
 <li><code>&lt;NODE_HOST&gt;</code> as returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</li>
 <li>
 <p><code>&lt;CODEWORD_HASH&gt;</code> as returned by the following query:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://nem.io/supernode/api/codeword/&lt;MAIN_PUBLIC_KEY&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>https://nem.io/supernode/api/codeword/&lt;MAIN_PUBLIC_KEY&gt;
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Use the Public Key</p>
