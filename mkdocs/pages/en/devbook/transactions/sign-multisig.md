@@ -30,6 +30,12 @@ digraph "Multisignature Tree" {
 }
 ```
 
+!!! note "Alternative: WebSockets"
+
+    In this tutorial, the cosignatory discovers the pending transaction by querying the node.
+    For a WebSocket-based approach, where the cosignatory is notified in real time, see the
+    [Listening to Multisig Transaction Flow](../websockets/listen-multisig-transaction-flow.md) tutorial.
+
 ## Prerequisites
 
 Before you start, make sure to:
@@ -66,6 +72,9 @@ since this is the origin of the funds.
 Cosignatory 0 signs and announces the wrapper, and the transaction remains pending until Cosignatory 1 provides the
 second required cosignature.
 
+In practice, each cosignatory would run its own part on a different machine, holding only its own private key.
+This tutorial combines both roles in a single program for simplicity.
+
 The code defines two helper functions for announcing a transaction and waiting for its confirmation.
 For details on how these work, see the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
 
@@ -93,9 +102,6 @@ If the default values are used, this account may already be funded.
 
 The snippet above derives and stores the <key pair:> of each cosignatory, and the multisig account's <address:>,
 for later use.
-
-In practice, each cosignatory would run its own part on a different machine, holding only its own private key.
-This tutorial combines both roles in a single program for simplicity.
 
 ### Fetching Network Time
 
