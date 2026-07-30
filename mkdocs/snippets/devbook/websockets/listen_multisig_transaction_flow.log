@@ -1,0 +1,19 @@
+Using node http://libertalia.nemtest.net:7890
+Multisig address: TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6
+Cosignatory 0 public key: AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3
+Cosignatory 1 public key: 26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23
+[Cosignatory 0] Built multisig transaction 844BBBB420167B0D...
+[Cosignatory 1] Connected to http://libertalia.nemtest.net:7778
+[Cosignatory 1] Subscribed to /account/TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6 channel
+[Cosignatory 1] Subscribed to /unconfirmed/TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6 channel
+[Cosignatory 1] Subscribed to /transactions/TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6 channel
+Account update: balance=9959750000
+[Cosignatory 1] Multisig account registered
+[Cosignatory 0] Announcing multisig transaction 844BBBB420167B0D...
+unconfirmed: innerHash=3e1fba4d39d9f053...
+[Cosignatory 1] Announced cosignature
+confirmed: innerHash=3e1fba4d39d9f053...
+Multisig transaction confirmed
+confirmed: innerHash=3e1fba4d39d9f053...
+Account update: balance=9959400000
+[Cosignatory 1] Unsubscribed from all channels

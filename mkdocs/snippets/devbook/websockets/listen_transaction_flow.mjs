@@ -55,13 +55,7 @@ try {
 	});
 	console.log(`Connected to ${WS_URL}`);
 	// [<step-3]
-	// Subscribe to the account and transaction channels [>step-4]
-	const accountChannel = `/account/${MONITOR_ADDRESS}`;
-	const channels = {
-		[accountChannel]: 'id-0',
-		[`/unconfirmed/${MONITOR_ADDRESS}`]: 'id-1',
-		[`/transactions/${MONITOR_ADDRESS}`]: 'id-2'
-	};
+	// Wait for the transaction to confirm [>step-7]
 	let confirmed = false;
 	let resolveRegistered;
 	let resolveDone;
@@ -71,34 +65,46 @@ try {
 	const done = new Promise(resolve => {
 		resolveDone = resolve;
 	});
-	const onMessage = message => {
-		const body = JSON.parse(message.body);
-		const { destination } = message.headers;
-		if (accountChannel === destination) {
-			const { balance } = body.account;
-			console.log(`Account update: balance=${balance}`);
-			resolveRegistered();
-			if (confirmed)
-				resolveDone();
-		} else if (destination.includes('/transactions/')) {
-			const messageHash = body.meta.hash.data;
+	const onUnconfirmed = message => {
+		const messageHash = JSON.parse(message.body).meta.hash.data;
+		if (messageHash.toUpperCase() === transactionHash) {
 			console.log(
-				`confirmed: hash=${messageHash.substring(0, 16)}...`);
-			if (messageHash.toUpperCase() === transactionHash) {
-				console.log(`Transaction ${shortHash}... confirmed`);
-				confirmed = true;
-			}
-		} else {
-			const messageHash = body.meta.hash.data;
-			if (messageHash.toUpperCase() === transactionHash) {
-				console.log(
-					'unconfirmed: hash=' +
-					`${messageHash.substring(0, 16)}...`);
-			}
+				`unconfirmed: hash=${messageHash.substring(0, 16)}...`);
 		}
 	};
-	for (const [channel, id] of Object.entries(channels)) {
-		client.subscribe(channel, onMessage, { id });
+	const onConfirmed = message => {
+		const messageHash = JSON.parse(message.body).meta.hash.data;
+		console.log(`confirmed: hash=${messageHash.substring(0, 16)}...`);
+		if (messageHash.toUpperCase() === transactionHash) {
+			console.log(`Transaction ${shortHash}... confirmed`);
+			confirmed = true;
+		}
+	};
+	const onAccountUpdate = message => {
+		const { balance } = JSON.parse(message.body).account;
+		console.log(`Account update: balance=${balance}`);
+		resolveRegistered();
+		if (confirmed)
+			resolveDone();
+	};
+	// [<step-7]
+	// Subscribe to the account and transaction channels [>step-4]
+	const accountChannel = `/account/${MONITOR_ADDRESS}`;
+	const subscriptions = [
+		{ channel: accountChannel, handler: onAccountUpdate, id: 'id-0' },
+		{
+			channel: `/unconfirmed/${MONITOR_ADDRESS}`,
+			handler: onUnconfirmed,
+			id: 'id-1'
+		},
+		{
+			channel: `/transactions/${MONITOR_ADDRESS}`,
+			handler: onConfirmed,
+			id: 'id-2'
+		}
+	];
+	for (const { channel, handler, id } of subscriptions) {
+		client.subscribe(channel, handler, { id });
 		console.log(`Subscribed to ${channel} channel`);
 	}
 	// [<step-4]
@@ -110,7 +116,7 @@ try {
 	await registered;
 	console.log('Account registered');
 	// [<step-5]
-	// Announce the transaction and wait for it to confirm [>step-6]
+	// Announce the transaction [>step-6]
 	console.log(`Announcing transaction ${shortHash}...`);
 	const response = await fetch(`${NODE_URL}/transaction/announce`, {
 		method: 'POST',
@@ -118,16 +124,17 @@ try {
 		body: jsonPayload
 	});
 	const announceResult = await response.json();
+	// [<step-6]
+	// Wait for the transaction to confirm
 	if ('SUCCESS' === announceResult.message)
 		await done;
 	else
 		console.log(`Transaction rejected: ${announceResult.message}`);
-	// [<step-6]
-	// Unsubscribe before closing [>step-7]
-	for (const id of Object.values(channels))
+	// Unsubscribe before closing [>step-8]
+	for (const { id } of subscriptions)
 		client.unsubscribe(id);
 	console.log('Unsubscribed from all channels');
-	client.deactivate(); // [<step-7]
+	client.deactivate(); // [<step-8]
 } catch (error) {
 	console.error(error);
 }
