@@ -96,6 +96,7 @@ nav:
               - devbook/transactions/messages.md
               - devbook/transactions/monitoring-status.md
               - devbook/transactions/typed-descriptors.md
+              - devbook/transactions/sign-multisig.md
           - Mosaics:
               - devbook/mosaics/create-mosaic.md
               - devbook/mosaics/mosaic-levy.md
