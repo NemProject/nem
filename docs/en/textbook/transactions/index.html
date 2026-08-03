@@ -1036,6 +1036,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/accounts/configure-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure a Multisig
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1221,6 +1249,34 @@
     
   
     Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/sign-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign a Multisig
   
 
     
@@ -1903,6 +1959,34 @@
     
   
     Transaction Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-multisig-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multisig Transaction Flow
   
 
     
@@ -8024,7 +8108,7 @@
 </dt>
 <dd>A transaction represents an action to perform on the NEM blockchain,
 like moving funds from one <a class="mkdocs-ezglossary-link"
-	id="d3802c26f598a139731d676b38a4a000"
+	id="13a485f0b57c27b67233a08f5b27bb9b"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -8071,12 +8155,12 @@ requiring only that account's <a class="mkdocs-ezglossary-link"
 	<a id="cd67e9d12c32c41b198b86d6cf7b1333">Multisig Transaction</a> 
 </dt>
 <dd>A multisig transaction wraps a single <a class="mkdocs-ezglossary-link"
-	id="8cac4f7c1a475b26ccfef298b0ae09b0"
+	id="3071e47407362426a567d05a099b086e"
 	title="The basic transaction wrapped inside a multisig transaction is called the inner transaction."
 	name="_:Inner Transaction"
 	href="../../textbook/transactions/#d25826900a0d03f77e5916ce92b2a363">inner transaction</a> issued on behalf of a
 <a class="mkdocs-ezglossary-link"
-	id="707c0a650a428780e3781b9553820c14"
+	id="fd323770d18230c45994fd8e83e5bb56"
 	title="An account (called multisig) requiring signature from multiple parties (called cosignatories) to
 approve transactions."
 	name="_:Multisignature Account"
@@ -8095,13 +8179,13 @@ to be valid.</p>
 </dl>
 <p>On NEM, each cosignature is delivered as its own <em>Multisig Cosignature</em> transaction that references the
 <a class="mkdocs-ezglossary-link"
-	id="86c49bc73b879d52f00a8add3bbd35ad"
+	id="34636fb070afe1d84deb647e0811dd04"
 	title="The basic transaction wrapped inside a multisig transaction is called the inner transaction."
 	name="_:Inner Transaction"
 	href="../../textbook/transactions/#d25826900a0d03f77e5916ce92b2a363">inner transaction</a> by hash, allowing cosignatories to sign independently and at different times.
 Multiple coordinated actions must therefore be issued as separate multisig transactions, one per inner transaction.</p>
 <p>These cosignatures accumulate on the pending multisig transaction in the <a class="mkdocs-ezglossary-link"
-	id="c69a138c3ef4fc82d961c5759854d6a4"
+	id="aeb25990e434c1ff9a606fedf2aceb34"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>, and the transaction
@@ -8125,7 +8209,7 @@ Once the threshold is reached, the transfer executes, and <code>S</code> receive
 	<a id="d25826900a0d03f77e5916ce92b2a363">Inner Transaction</a> 
 </dt>
 <dd>The <a class="mkdocs-ezglossary-link"
-	id="027746c93d0492a5c509a7790b415973"
+	id="6ae6a3f1e432e09d6a83c337cf4b4da8"
 	title="A basic transaction represents a single action, initiated by a single account,
 requiring only that account's signature."
 	name="_:Basic Transaction"
@@ -8161,7 +8245,7 @@ before it can be included in a block."
 <h3 id="1-creation-and-signature">1. Creation and Signature<a class="headerlink" href="#1-creation-and-signature" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>A software client, typically an app, creates the transaction and fills in all its parameters.
 For example, a transfer transaction requires the source <a class="mkdocs-ezglossary-link"
-	id="13a485f0b57c27b67233a08f5b27bb9b"
+	id="a3b2adddf64590ed17c1692943385cf6"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -8169,7 +8253,7 @@ It functions similarly to a safe deposit box in traditional banking."
 <p>This step also involves signing the transaction.
 Signatures prove that the signing account has authorized the transaction, since only the holder of an account's
 <a class="mkdocs-ezglossary-link"
-	id="805b0338c3948d0af829756e87a00694"
+	id="85a10c78da1728f74c8505cdc6502935"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -8180,7 +8264,7 @@ it is extremely unlikely that the same number is generated twice by chance."
 Other cosignatories provide their cosignatures separately, via multisig cosignature transactions.</p>
 <h3 id="2-announcement">2. Announcement<a class="headerlink" href="#2-announcement" title="Anchor link to this section for reference">⚓︎</a></h3>
 <p>The client application submits the transaction to a connected <a class="mkdocs-ezglossary-link"
-	id="c4061ac8ded6c9d554c95df985b25d3a"
+	id="43dea7810280de23cacf29eb2583bc30"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -8358,7 +8442,7 @@ and validation steps, but differ in purpose and required fields.</p>
 <tbody>
 <tr>
 <td><strong><a class="mkdocs-ezglossary-link"
-	id="1c826b83d68f51ba2c22d3dc6b803bc6"
+	id="eea024de8cde2ca8f0a9fbe8c8a4c35e"
 	title="A transaction that allows sending XEM, mosaics, and optional messages from one account to another."
 	name="_:Transfer Transaction"
 	href="../../textbook/transfer_transactions/#a47f82e755a85fdf1032ffa5d9a5ba5b">Transfer Transactions</a></strong></td>
@@ -8372,7 +8456,7 @@ and validation steps, but differ in purpose and required fields.</p>
 For example: currencies, licenses, collectibles, access rights, or voting power."
 	name="_:Mosaic"
 	href="../../textbook/mosaics/#1ce1007d637826ac3e2531934a09da3f">mosaics</a> and an optional message between two <a class="mkdocs-ezglossary-link"
-	id="4c9b15601a467c39cd5fd3d8187fe6c7"
+	id="344556f7ce2e0cf0a189a68bc5d69aa2"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -8393,7 +8477,7 @@ It plays a similar role to mining in PoW or staking in PoS."
 </tr>
 <tr>
 <td><strong><a class="mkdocs-ezglossary-link"
-	id="78c0ea9154b0aa2cbde3aae3423c648a"
+	id="c405bc8eb92eb231d91ae8f2aeb1c962"
 	title="An account (called multisig) requiring signature from multiple parties (called cosignatories) to
 approve transactions."
 	name="_:Multisignature Account"
@@ -8521,7 +8605,7 @@ transfers to other accounts.
 This score determines the account's chances of harvesting a block."
 	name="_:Importance"
 	href="../../textbook/accounts/#76ca9920588d90f42b544215c87ec7d4">importance</a> and a small fee bonus, so higher-fee transactions are more likely to enter the <a class="mkdocs-ezglossary-link"
-	id="80459d41a2f76d3669dba3e03fae0d44"
+	id="5ba4165bf1d14a3e283f24153e720118"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.</li>

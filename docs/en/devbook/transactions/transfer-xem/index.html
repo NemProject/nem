@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://nemproject.github.io/nem-docs/en/devbook/transactions/transfer-xem/">
       
       
-        <link rel="prev" href="../../accounts/query-balance/">
+        <link rel="prev" href="../../accounts/configure-multisig/">
       
       
         <link rel="next" href="../transfer-mosaics/">
@@ -1043,6 +1043,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../accounts/configure-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure a Multisig
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1428,6 +1456,34 @@
     
   
     Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sign-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign a Multisig
   
 
     
@@ -2110,6 +2166,34 @@
     
   
     Transaction Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../websockets/listen-multisig-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multisig Transaction Flow
   
 
     
@@ -7913,11 +7997,11 @@
 <div class="tutorial_level-container"><span class="tutorial_level tutorial_level-beginner" title="Tutorial level">BEGINNER</span></div>
 
 <p>Sending <a class="mkdocs-ezglossary-link"
-	id="c4244d7ba9aa910047f21a6a1badca7c"
+	id="e7f16aa19a33c210d1990d3842debc8e"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> from one <a class="mkdocs-ezglossary-link"
-	id="96373ff71ea1666b67eff65614c7f7f7"
+	id="63b755c58cc148607c9c023c56960adc"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7930,7 +8014,7 @@ like moving funds from one account to another, or registering a new mosaic."
 	href="../../../textbook/transactions/#dbaff459c19d2574b92538a13b4b8910">transaction</a> follows the same general pattern.</p>
 <p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="200pt" height="44pt" viewBox="0.00 0.00 200.00 44.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 40)"><title>Transfer XEM</title><polygon fill="none" stroke="none" points="-4,4 -4,-40 196,-40 196,4 -4,4"/><!-- A --><g id="node1" class="node"><title>A</title><ellipse fill="none" stroke="#789abc" cx="27" cy="-18" rx="27" ry="18"/><text xml:space="preserve" text-anchor="middle" x="27" y="-13.72" font-family="Times,serif" font-size="12.00" fill="#789abc">A</text></g><!-- B --><g id="node2" class="node"><title>B</title><ellipse fill="none" stroke="#789abc" cx="165" cy="-18" rx="27" ry="18"/><text xml:space="preserve" text-anchor="middle" x="165" y="-13.72" font-family="Times,serif" font-size="12.00" fill="#789abc">B</text></g><!-- A&#45;&gt;B --><g id="edge1" class="edge"><title>A&#45;&gt;B</title><path fill="none" stroke="#789abc" d="M54.22,-18C74.73,-18 103.51,-18 126.46,-18"/><polygon fill="#789abc" stroke="#789abc" points="126.34,-21.5 136.34,-18 126.34,-14.5 126.34,-21.5"/><text xml:space="preserve" text-anchor="middle" x="96" y="-21.95" font-family="Times,serif" font-size="14.00" fill="#789abc">1 XEM</text></g></g></svg></p>
 <p>This tutorial shows how to create, sign, and announce a <a class="mkdocs-ezglossary-link"
-	id="e2406182c6b55735f5e3b44dc6e99955"
+	id="1c826b83d68f51ba2c22d3dc6b803bc6"
 	title="A transaction that allows sending XEM, mosaics, and optional messages from one account to another."
 	name="_:Transfer Transaction"
 	href="../../../textbook/transfer_transactions/#a47f82e755a85fdf1032ffa5d9a5ba5b">transfer transaction</a> that sends 1 XEM between two accounts,
@@ -7940,7 +8024,7 @@ and then poll the transaction's status until it is confirmed.</p>
 <ul>
 <li><a href="../../start/setup/">Set Up your Development Environment</a>.</li>
 <li>Create an <a class="mkdocs-ezglossary-link"
-	id="63b755c58cc148607c9c023c56960adc"
+	id="53034ae777f8ee5f93d000c36273cdb3"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7948,7 +8032,7 @@ It functions similarly to a safe deposit box in traditional banking."
     <a href="../../accounts/create-from-private-key/">from code</a> or
     <a href="../../userbook/wallet/create-account.md">by using a wallet</a>.</li>
 <li>Obtain <a class="mkdocs-ezglossary-link"
-	id="6b9c146f68a9a4685cff85f84aea5294"
+	id="65cb88036245436b2b807e5d4a30b1e9"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> to pay for the transaction fee and transfer amount.
@@ -8427,7 +8511,7 @@ but applications will probably want to use more fine-grained control.</p>
 </div>
 <p>Every transfer transaction involves two accounts: a <strong>sender</strong> and a <strong>recipient</strong>.</p>
 <p>The <strong>sender</strong> is the <a class="mkdocs-ezglossary-link"
-	id="53034ae777f8ee5f93d000c36273cdb3"
+	id="26552828d03b3124affcca33a75ab932"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -8436,7 +8520,7 @@ Its private key is loaded from the <code>SIGNER_PRIVATE_KEY</code> environment v
 If not provided, a test key is used as default.</p>
 <p>The <strong>recipient</strong> is the account that receives the XEM.
 Its <a class="mkdocs-ezglossary-link"
-	id="9df626224b4c709c9a3cfeac4fea76e7"
+	id="6ebec1b5e930d35a627882b57a2cca56"
 	title="A convenient, shorter form of a public key, that simplifies sharing it by requiring only
 letters and numbers. It is typically a synonym for account."
 	name="_:Address"
@@ -8705,7 +8789,7 @@ Its importance determines its chance of producing blocks, and it receives the re
 	href="../../../textbook/harvesting/#7798e0800b7d0879282c6ab468d6f21e">harvester account</a> that includes it in a block.</p>
 <p>Rather than implement NEM's <a href="../../../textbook/transfer_transactions/#fees">fixed fee schedule</a> by hand,
 the snippet calls the SDK's <span markdown class="dylink"><input type="radio" name="rGroup1003" id="Python" /><label class="dylink-option" for="Python" markdown><code><a class="mkdocs-ezglossary-link"
-	id="92f3e29d45a7e100b85eee58fc4187b6"
+	id="847191732ccba33888d41ae992f6fd97"
 	title="Calculates the minimum required transaction fee for a transaction.
 mosaic_information_lookup looks up mosaic information ({supply, divisibility}) given mosaic identifier.
 When a function, mosaic identifier will be passed as parameter.
@@ -8713,7 +8797,7 @@ When an object map, fully qualified mosaic identifier will be used as an index.
 When None, this function will be unable to calculate fees for custom mosaic transfers."
 	name="py:FeeCalculator.calculate_transaction_fee"
 	href="../../../devbook/reference/py/nem/FeeCalculator/#FeeCalculator.calculate_transaction_fee">FeeCalculator.calculate_transaction_fee</a></code></label><input type="radio" name="rGroup1003" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code><a class="mkdocs-ezglossary-link"
-	id="c917648485fc3961a5c37a323c4e1300"
+	id="58c1375ec0f24de2c427ef90f2668435"
 	title="Calculates the minimum required transaction fee for a transaction."
 	name="js:calculateTransactionFee"
 	href="../../../devbook/reference/ts/nem/functions/calculateTransactionFee/#calculatetransactionfee">calculateTransactionFee</a></code></label></span> helper, which reads the XEM amount directly from
@@ -8756,11 +8840,11 @@ The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to 
 <p>Once the transaction is created, it must be signed with the signing account's private key.
 Signing ensures the transaction is authentic and authorized by the sender.</p>
 <p><span markdown class="dylink"><input type="radio" name="rGroup1004" id="Python" /><label class="dylink-option" for="Python" markdown><code><a class="mkdocs-ezglossary-link"
-	id="effdfe92878955a7f7366b72999f4dc1"
+	id="b4dbe884669db42864f93cb7a413f1c5"
 	title="Signs a NEM transaction."
 	name="py:NemFacade.sign_transaction"
 	href="../../../devbook/reference/py/facade/NemFacade/#NemFacade.sign_transaction">NemFacade.sign_transaction</a></code></label><input type="radio" name="rGroup1004" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code><a class="mkdocs-ezglossary-link"
-	id="67980914d4bb24f1f30441e1d7053141"
+	id="5196ddbdea6f9718ece10d0633b53758"
 	title="Signs a NEM transaction."
 	name="js:NemFacade.signTransaction"
 	href="../../../devbook/reference/ts/nem/classes/NemFacade/#signtransaction">NemFacade.signTransaction</a></code></label></span> returns a <a class="mkdocs-ezglossary-link"
@@ -8839,7 +8923,7 @@ and participates in consensus and block creation."
 	href="../../../textbook/nodes/#bc6d0fc1a92ae07d7739daed957574ab">node</a>.</p>
 <p>The node validates the transaction as soon as it is announced and reports the outcome in the response.
 A result of <code>SUCCESS</code> means the transaction passed this first check and was added to the <a class="mkdocs-ezglossary-link"
-	id="fe5222e2c850c0ccad31603e40dc4cc9"
+	id="bdcf7abe2e9c1adbb414bbab693bbd1b"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a>.
@@ -9126,7 +9210,7 @@ When unset, descriptor arrays will be presumed to be already sorted."
 <tr>
 <td><a href="#calculating-the-transaction-fee">Calculate the transaction fee</a></td>
 <td><span markdown class="dylink"><input type="radio" name="rGroup1007" id="Python" /><label class="dylink-option" for="Python" markdown><code><a class="mkdocs-ezglossary-link"
-	id="a9b3077529dc5605be6d5bf414621918"
+	id="184f25fde11a185ba37567e836abdf89"
 	title="Calculates the minimum required transaction fee for a transaction.
 mosaic_information_lookup looks up mosaic information ({supply, divisibility}) given mosaic identifier.
 When a function, mosaic identifier will be passed as parameter.
@@ -9134,7 +9218,7 @@ When an object map, fully qualified mosaic identifier will be used as an index.
 When None, this function will be unable to calculate fees for custom mosaic transfers."
 	name="py:FeeCalculator.calculate_transaction_fee"
 	href="../../../devbook/reference/py/nem/FeeCalculator/#FeeCalculator.calculate_transaction_fee">FeeCalculator.calculate_transaction_fee</a></code></label><input type="radio" name="rGroup1007" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code><a class="mkdocs-ezglossary-link"
-	id="aaf47a003bdea4afb356d7d5c18d45b0"
+	id="12d8be43bf08f087f53b6d59a6d25f1a"
 	title="Calculates the minimum required transaction fee for a transaction."
 	name="js:calculateTransactionFee"
 	href="../../../devbook/reference/ts/nem/functions/calculateTransactionFee/#calculatetransactionfee">calculateTransactionFee</a></code></label></span></td>
@@ -9142,11 +9226,11 @@ When None, this function will be unable to calculate fees for custom mosaic tran
 <tr>
 <td><a href="#signing-and-serializing">Sign the transaction</a></td>
 <td><span markdown class="dylink"><input type="radio" name="rGroup1008" id="Python" /><label class="dylink-option" for="Python" markdown><code><a class="mkdocs-ezglossary-link"
-	id="b4dbe884669db42864f93cb7a413f1c5"
+	id="31c27edc0a389200d90ef683d0701e70"
 	title="Signs a NEM transaction."
 	name="py:NemFacade.sign_transaction"
 	href="../../../devbook/reference/py/facade/NemFacade/#NemFacade.sign_transaction">NemFacade.sign_transaction</a></code></label><input type="radio" name="rGroup1008" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code><a class="mkdocs-ezglossary-link"
-	id="5196ddbdea6f9718ece10d0633b53758"
+	id="a740497e50046d8cb87ac59bbac6f697"
 	title="Signs a NEM transaction."
 	name="js:NemFacade.signTransaction"
 	href="../../../devbook/reference/ts/nem/classes/NemFacade/#signtransaction">NemFacade.signTransaction</a></code></label></span><br/><span markdown class="dylink"><input type="radio" name="rGroup1009" id="Python" /><label class="dylink-option" for="Python" markdown><code><a class="mkdocs-ezglossary-link"

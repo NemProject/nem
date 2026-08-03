@@ -1036,6 +1036,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/accounts/configure-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure a Multisig
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1221,6 +1249,34 @@
     
   
     Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/sign-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign a Multisig
   
 
     
@@ -1903,6 +1959,34 @@
     
   
     Transaction Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-multisig-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multisig Transaction Flow
   
 
     
@@ -7770,7 +7854,7 @@ it is extremely unlikely that the same number is generated twice by chance.</dd>
 	<a id="17f7d52090c7c880d909358ef3c0e17f">Public Key</a> 
 </dt>
 <dd><p>A very long number that serves as the public identifier of a <a class="mkdocs-ezglossary-link"
-	id="3ffe13b35f4566ad8ecebc44a7a2576c"
+	id="87fac920475a3f03bc06e52efd56cfb0"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -7789,14 +7873,14 @@ current technology.</p>
 	<a id="d2ea30f34aa8993ee9cbd363be7ecb50">Key Pair</a> 
 </dt>
 <dd>A matched set consisting of a <a class="mkdocs-ezglossary-link"
-	id="bced13934cd713756d56a347aacce791"
+	id="2cc7130955563684bff3c45beb6964b5"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
 it is extremely unlikely that the same number is generated twice by chance."
 	name="_:Private Key"
 	href="../../textbook/cryptography/#890b9584bd9860118fc3d58c24a6dbd9">private key</a> and its corresponding <a class="mkdocs-ezglossary-link"
-	id="e695ac1b307afc67a797eb87d0d072d3"
+	id="ca8ceab08d0cf7709a5e81642898c970"
 	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
 It can be used to prove that the private key is known without revealing it.
 Although mathematically derived from the private key, the reverse operation is practically impossible with
@@ -7819,7 +7903,7 @@ The private key is kept secret by the owner, while the public key is distributed
 Together, they enable secure cryptographic operations such as digital signatures and encryption."
 	name="_:Key Pair"
 	href="../../textbook/cryptography/#d2ea30f34aa8993ee9cbd363be7ecb50">Key pair</a> associated with every <a class="mkdocs-ezglossary-link"
-	id="76dc3d16926fbc1b03b9011455037b7a"
+	id="850116f87ad46866388020161c47da5f"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7887,7 +7971,7 @@ using <a href="https://ed25519.cr.yp.to">Ed25519</a>, which is defined over a
 	<a id="64c803c8046a084f159cb3fa471c7450">Signature</a> 
 </dt>
 <dd>A digital attachment to a document that certifies that the document is approved by a given <a class="mkdocs-ezglossary-link"
-	id="850116f87ad46866388020161c47da5f"
+	id="9dd83f547d6c701fad7cd6902efe0ed9"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7895,7 +7979,7 @@ It functions similarly to a safe deposit box in traditional banking."
 
 </dl>
 <p>The signature is obtained by processing the document with the <a class="mkdocs-ezglossary-link"
-	id="87fac920475a3f03bc06e52efd56cfb0"
+	id="e12691560a8ee37cf064d95cb9cac76e"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -7908,7 +7992,7 @@ but only the owner of the private key can produce an identical signature.</p>
 For example, transferring assets from a single-owner account to another only requires the signature of the
 source account's private key.</p>
 <p>However, transferring assets from a <a class="mkdocs-ezglossary-link"
-	id="cd159ad011a8282ba939efe0c8b2f9fd"
+	id="4cb566be54465401e9afa27055f79766"
 	title="An account (called multisig) requiring signature from multiple parties (called cosignatories) to
 approve transactions."
 	name="_:Multisignature Account"
@@ -7924,7 +8008,7 @@ Unlike standard Ed25519, which relies on SHA-512, NEM uses the <strong>Keccak-51
 	<a id="1d724e052438d54ca474b7ddbf21c36d">Address</a> 
 </dt>
 <dd>A convenient, shorter form of a <a class="mkdocs-ezglossary-link"
-	id="5863149f2dca44b74e67a4c943b403d4"
+	id="978e3fec27ad329b4fa7f91c7fff7fd0"
 	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
 It can be used to prove that the private key is known without revealing it.
 Although mathematically derived from the private key, the reverse operation is practically impossible with
@@ -7932,7 +8016,7 @@ current technology."
 	name="_:Public Key"
 	href="../../textbook/cryptography/#17f7d52090c7c880d909358ef3c0e17f">public key</a>, that simplifies sharing it by requiring only
 letters and numbers. It is typically a synonym for <a class="mkdocs-ezglossary-link"
-	id="9dd83f547d6c701fad7cd6902efe0ed9"
+	id="728584158d8f246ef12353e45ba8b2b2"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"

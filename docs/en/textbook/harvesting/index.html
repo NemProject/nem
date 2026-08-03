@@ -1036,6 +1036,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/accounts/configure-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure a Multisig
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1221,6 +1249,34 @@
     
   
     Typed Descriptors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/transactions/sign-multisig/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign a Multisig
   
 
     
@@ -1903,6 +1959,34 @@
     
   
     Transaction Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../devbook/websockets/listen-multisig-transaction-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multisig Transaction Flow
   
 
     
@@ -7783,7 +7867,7 @@
 	title="A block records a set of transactions confirmed at a specific point in time."
 	name="_:Block"
 	href="../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">blocks</a> to the chain and distributes rewards to participating <a class="mkdocs-ezglossary-link"
-	id="f287da5608b588e0d79572f5bcd10e5b"
+	id="4c9b15601a467c39cd5fd3d8187fe6c7"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
@@ -7800,7 +7884,7 @@ It plays a similar role to <strong>mining</strong> in <a class="mkdocs-ezglossar
 
 </dl>
 <p>Each new block is produced by a single <a class="mkdocs-ezglossary-link"
-	id="e833c1dcc317b1d5e4c275d4e29165e3"
+	id="e4f168c5ed945975367f8960b1f8fae3"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -7839,14 +7923,14 @@ importance backed the block.</p>
 	name="_:PoW"
 	href="../../textbook/glossary/#b44cd155e0856aea66e55f8246392df2">PoW</a>, harvesting does not require specialized hardware.</p>
 <p>Participation in harvesting is open to any <a class="mkdocs-ezglossary-link"
-	id="728584158d8f246ef12353e45ba8b2b2"
+	id="7610dcf930385df8b441ccd4601f5efb"
 	title="A secure place where digital assets like cryptocurrencies or NFTs can be stored.
 It functions similarly to a safe deposit box in traditional banking."
 	name="_:Account"
 	href="../../textbook/accounts/#78f9b58b98e4ce5893a0c349aeed5a87">account</a> that:</p>
 <ul>
 <li>Holds at least 10'000 <a class="mkdocs-ezglossary-link"
-	id="4f0508e90f3451dd431d2bcf43d1a6f7"
+	id="ff8dfdf0bde25d9c5e3aae945fc748d8"
 	title="The native currency of the NEM blockchain."
 	name="_:XEM"
 	href="../../textbook/glossary/#04217a131a6d677380e3032d20267959">XEM</a> in <a class="mkdocs-ezglossary-link"
@@ -7857,7 +7941,7 @@ start harvesting immediately."
 	name="_:Vesting"
 	href="../../textbook/accounts/#395978848b2adf35ba928aff499f7e01">vested</a> balance.</li>
 <li>Is connected to a <a class="mkdocs-ezglossary-link"
-	id="e4f168c5ed945975367f8960b1f8fae3"
+	id="2e22b0fe1d4a44035664535b145215b6"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -7873,7 +7957,7 @@ This score determines the account's chances of harvesting a block."
 <h2 id="harvesting-process">Harvesting Process<a class="headerlink" href="#harvesting-process" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>NEM has no central coordinator to determine which node will harvest the next block.
 Instead, every <a class="mkdocs-ezglossary-link"
-	id="2e22b0fe1d4a44035664535b145215b6"
+	id="fdade8ceff8dacc19c589454eeeb335f"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -7896,7 +7980,7 @@ The higher the importance, the higher its target will be.</p>
 <a href="../blocks/#derived-fields">generation hash</a>.</p>
 <p>If any of its harvester accounts produces a hit below the target, the node assembles a candidate block
 from the <a class="mkdocs-ezglossary-link"
-	id="2bc53df7df61e246851c5cf82fe55e6e"
+	id="f249575873f60ee6fa8d3d4ab58e01b8"
 	title="A list of validated transactions awaiting inclusion in a block, maintained by each node in the network."
 	name="_:Unconfirmed pool"
 	href="../../textbook/transactions/#90027de0459d0c0423628636c2148dc4">unconfirmed pool</a> and announces it to the rest of the network.</p>
@@ -7957,7 +8041,7 @@ This score determines the account's chances of harvesting a block."
 <li>
 <p>The <strong>hit</strong> is derived deterministically from the block's <a href="../blocks/#derived-fields">generation hash</a>, which is
     itself the hash of the previous block's generation hash combined with the harvester's <a class="mkdocs-ezglossary-link"
-	id="829a656dd499c17278e2794a435c8ea0"
+	id="88a298d6c144ba531bbe5848fccdcf6d"
 	title="A very long number that serves as the public identifier of a private key and can be disseminated widely.
 It can be used to prove that the private key is known without revealing it.
 Although mathematically derived from the private key, the reverse operation is practically impossible with
@@ -7988,7 +8072,7 @@ It plays a similar role to mining in PoW or staking in PoS."
 	name="_:Harvesting"
 	href="../../textbook/harvesting/#4da2a5a68444f540bbf5e10a08b085e4">harvesting</a> where the rewards are sent directly to the harvester account.
 The <a class="mkdocs-ezglossary-link"
-	id="fdade8ceff8dacc19c589454eeeb335f"
+	id="c4061ac8ded6c9d554c95df985b25d3a"
 	title="A computer running the NEM software which shares information with peer nodes, validates incoming transactions,
 and participates in consensus and block creation."
 	name="_:Node"
@@ -8052,7 +8136,7 @@ transfer funds and announce transactions."
 </dl>
 <p>The remote account holds no funds and exists only to sign blocks on behalf of the harvester's main account.
 Because its <a class="mkdocs-ezglossary-link"
-	id="2cc7130955563684bff3c45beb6964b5"
+	id="a15a6f34bc87a2ef1c632323c0ba0888"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -8124,7 +8208,7 @@ in full.
 The arrangement lets an account earn rewards without running a node of its own.</p>
 <p>Delegated harvesting uses the same remote account setup as remote harvesting.
 The delegator provides the remote account's <a class="mkdocs-ezglossary-link"
-	id="e12691560a8ee37cf064d95cb9cac76e"
+	id="805b0338c3948d0af829756e87a00694"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -8135,7 +8219,7 @@ harvests for and signs blocks on the delegator's behalf.</p>
 <p>Whether the node accepts the remote account depends on the operator's policy, and the delegator can revoke the
 arrangement at any time by changing its linked key.</p>
 <p>As with remote harvesting, block signing is performed by an account other than the delegator, so its <a class="mkdocs-ezglossary-link"
-	id="a15a6f34bc87a2ef1c632323c0ba0888"
+	id="7a97c441409c02478a36121db73ff7bf"
 	title="A very long, secret number.
 The actual value of the private key is meaningless, and it is meant to be kept secret.
 It should be impossible to guess by unauthorized parties, and, although it is commonly randomly-generated,
@@ -8151,7 +8235,7 @@ delegated harvesting the account harvests through a third party's node.</p>
 </div>
 <h2 id="reward-distribution">Reward Distribution<a class="headerlink" href="#reward-distribution" title="Anchor link to this section for reference">⚓︎</a></h2>
 <p>When a <a class="mkdocs-ezglossary-link"
-	id="31ed8ca00a40e8bf92121fee0603de1f"
+	id="d414d43db5bb4025006689b2f60b86db"
 	title="A block records a set of transactions confirmed at a specific point in time."
 	name="_:Block"
 	href="../../textbook/blocks/#d8d197f74217a4d5592af902262cb05b">block</a> is harvested, the harvester receives the sum of fees from every <a class="mkdocs-ezglossary-link"
