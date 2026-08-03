@@ -98,6 +98,17 @@ are derived from it, following the process described in the [Transfer XEM](../tr
 This helper retrieves the list of current cosignatories for a given address using the <get:/account/get> endpoint.
 If it returns an empty list, the account is not currently configured as a multisig account.
 
+!!! warning "Check the existing multisig configuration"
+
+    For simplicity, the tutorial assumes that if the list of cosignatories is _not_ empty, then the account is a
+    multisig configured by the tutorial itself.
+
+    If the configuration is not the expected one, for example, because the cosignatories are different,
+    the removal transactions will be rejected.
+
+    Applications should always check the current configuration before trying to modify it, including the full list of
+    cosignatories and the minimum number of signatures required.
+
 {{ tutorial.code_snippet_tagged('step-4') }}
 
 The returned cosignatories determine whether the account is configured as a multisig account, and therefore whether to
