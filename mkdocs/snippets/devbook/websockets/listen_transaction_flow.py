@@ -116,6 +116,7 @@ async def main():
 	async with connect(sockjs_url(endpoint)) as websocket:
 		await stomp_connect(websocket)
 		print(f'Connected to {WS_URL}')
+		frames = stomp_frames(websocket)
 		# [<step-3]
 		# Subscribe to the account and transaction channels [>step-4]
 		account_channel = f'/account/{MONITOR_ADDRESS}'
@@ -131,7 +132,7 @@ async def main():
 		# Register the account and confirm it is active [>step-5]
 		await stomp_send(websocket, '/w/api/account/get',
 			json.dumps({'account': MONITOR_ADDRESS}))
-		async for frame in stomp_frames(websocket):
+		async for frame in frames:
 			if account_channel == frame['headers']['destination']:
 				balance = json.loads(
 					frame['body'])['account']['balance']
@@ -139,7 +140,7 @@ async def main():
 				break
 		print('Account registered')
 		# [<step-5]
-		# Announce the transaction and wait for it to confirm [>step-6]
+		# Announce the transaction [>step-6]
 		print(f'Announcing transaction {transaction_hash[:16]}...')
 		announce_request = urllib.request.Request(
 			f'{NODE_URL}/transaction/announce',
@@ -149,10 +150,11 @@ async def main():
 		)
 		with urllib.request.urlopen(announce_request) as resp:
 			result = json.loads(resp.read().decode())
-
+		# [<step-6]
+		# Wait for the transaction to confirm [>step-7]
 		if 'SUCCESS' == result['message']:
 			confirmed = False
-			async for frame in stomp_frames(websocket):
+			async for frame in frames:
 				destination = frame['headers']['destination']
 				body = json.loads(frame['body'])
 				if account_channel == destination:
@@ -173,12 +175,12 @@ async def main():
 						print(f'unconfirmed: hash={message_hash[:16]}...')
 		else:
 			print(f'Transaction rejected: {result["message"]}')
-		# [<step-6]
-		# Unsubscribe before closing [>step-7]
+		# [<step-7]
+		# Unsubscribe before closing [>step-8]
 		for sub_id in channels.values():
 			await stomp_unsubscribe(websocket, sub_id)
 		print('Unsubscribed from all channels')
-		await stomp_disconnect(websocket)  # [<step-7]
+		await stomp_disconnect(websocket)  # [<step-8]
 
 
 try:
