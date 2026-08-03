@@ -1,6 +1,6 @@
 ---
 title: Transaction Flow
-tutorial_level: beginner
+tutorial_level: intermediate
 ---
 
 # Listening to Transaction Flow
@@ -56,17 +56,17 @@ See the [WebSocket reference](../reference/websockets/index.md) for details on t
 
 {{ tutorial.code_full_tagged('devbook/websockets/listen_transaction_flow', ['py', 'js']) }}
 
-!!! note
-
-    There is no SockJS client library for Python, so a few small helper methods are defined at the top of the file
-    for convenience.
-
 The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 If no value is provided, a default one is used.
 
 `WS_URL` defines the WebSocket endpoint for the same node.
 It is derived from `NODE_URL` by replacing port `7890`, the default HTTP API port, with `7778`, the default NIS
 WebSocket port.
+
+!!! note "Python SockJS helpers"
+
+    There is no SockJS client library for Python, so a few small helper methods are defined at the top of the file
+    for convenience.
 
 ## Code Explanation
 
@@ -99,12 +99,12 @@ signing it.
 
 Signing the transaction produces its hash, which uniquely identifies it.
 The code stores this hash because transaction channel notifications include the transaction hash.
-The message handler, defined later, compares each received hash with the stored value to identify notifications for this
+Later, the code compares each received hash with the stored value to identify notifications for this
 transaction.
 
-The transaction is prepared, but it is not [announced](#announcing-and-waiting-for-confirmation) yet.
-The announcement happens after the channel subscriptions are established, so the notifications it triggers are not
-missed.
+The transaction is prepared, but it is not [announced](#announcing-the-transaction) yet.
+The announcement happens after the channel subscriptions are established, ensuring that the resulting notifications are
+not missed.
 
 ### Connecting to the WebSocket
 
@@ -128,6 +128,12 @@ The code subscribes to three address-scoped channels:
 
 The subscriptions use the IDs `id-0`, `id-1` and `id-2`, which identify them when the code unsubscribes at the end.
 
+!!! note "Message handling differences"
+
+    In JavaScript, each channel is subscribed with a dedicated handler function, defined in the
+    [confirmation](#waiting-for-confirmation) step below.
+    In Python, messages are instead read sequentially from the connection as they arrive.
+
 All three channels stay silent until the address is registered, which the next step performs.
 
 ### Registering the Account
@@ -136,7 +142,7 @@ All three channels stay silent until the address is registered, which the next s
 
 To receive notifications on an account's channels, the address must first be **registered** with the node.
 
-The code sends a <req:w&#47;api&#47;account&#47;get> request, which registers the address and also forces the node to
+The code sends a request to <req:w&#47;api&#47;account&#47;get>, which registers the address and also forces the node to
 send the account's current state on the <ws:account&#47;{address}> channel.
 
 The code waits for this first account notification, which confirms that the registration is active.
@@ -145,7 +151,7 @@ The notification follows the [AccountMetaDataPair](../reference/rest/nem.md#mode
 The subscription to the account channel stays open for the rest of the run, so the account notification triggered by
 the transaction confirmation also appears in the output.
 
-### Announcing and Waiting for Confirmation
+### Announcing the Transaction
 
 {{ tutorial.code_snippet_tagged('step-6') }}
 
@@ -157,11 +163,16 @@ the transaction confirmation also appears in the output.
 The code announces the transaction to the <post:/transaction/announce> endpoint and checks the result.
 If the node rejects it, the code prints the rejection reason and stops.
 
-Otherwise, the code waits for confirmation, printing each message from the subscribed channels.
+### Waiting for Confirmation
+
+{{ tutorial.code_snippet_tagged('step-7') }}
+
+If accepted, the code waits for confirmation, printing each message from the subscribed channels.
+
 Messages from the transaction channels follow the
 [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) schema, whose
 `meta.hash.data` field holds the transaction hash.
-As each one arrives, the message handler compares that hash against the stored value to recognize this transaction
+As each message arrives, the code compares that hash against the stored value to recognize this transaction
 among the channel notifications.
 
 The expected sequence for a successful transaction is described in the
@@ -179,7 +190,7 @@ Once this final notification arrives, the program moves on to the cleanup step.
 
 ### Unsubscribing from Channels
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 After confirmation, the code unsubscribes from the three channels and ends the STOMP session before the connection
 closes.
@@ -216,4 +227,4 @@ This tutorial showed how to:
 | [Subscribe to the unconfirmed channel](#subscribing-to-the-channels)    | <ws:unconfirmed&#47;{address}>                                                    |
 | [Subscribe to the transactions channel](#subscribing-to-the-channels)   | <ws:transactions&#47;{address}>                                                   |
 | [Register the account](#registering-the-account)                        | <req:w&#47;api&#47;account&#47;get>                                               |
-| [Handle transaction messages](#announcing-and-waiting-for-confirmation) | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) |
+| [Handle transaction messages](#waiting-for-confirmation)                | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) |
