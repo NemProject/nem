@@ -38,6 +38,10 @@ digraph "Multisignature Tree" {
 
 ## Prerequisites
 
+{# Early initialization so we can use the var() macro #}
+{% import 'tutorial.jinja2' as tutorial with context %}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js'], show=false) }}
+
 Before you start, make sure to:
 
 * Set up your development environment.
@@ -45,20 +49,24 @@ Before you start, make sure to:
 
 * Complete the [Configuring a Multisignature Account](../accounts/configure-multisig.md) tutorial.
 
-    !!! note "Configure a 2-of-2 multisig"
+    !!! warning "Configure and clean up the 2-of-2 multisig"
 
         The multisig configured in that tutorial is a **1-of-2**, where a single cosignatory signature is enough.
         This tutorial instead requires the stricter **2-of-2** configuration described above.
 
-        To create it, set `min_approval_delta` to `2` instead of `1` when
-        [enabling the multisig](../accounts/configure-multisig.md#enabling-the-multisig).
+        To create it, run [the configure tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
+        changing the last parameter of {{ tutorial.var('multisig_enable_transaction()') }} from `1` to `2`.
+
+        After running this tutorial, remember that the configure tutorial's default disable path assumes a **1-of-2**
+        multisig.
+        To disable the **2-of-2** multisig, remove cosignatory 1 first with `min_approval_delta` set to `-1`, and have
+        both cosignatories sign that removal.
+        Once confirmed, remove cosignatory 0 with `min_approval_delta` set to `-1` as usual.
 
 Additionally, review the [Transfer XEM](../transactions/transfer-xem.md) tutorial to understand how transactions are
 announced and confirmed.
 
 ## Full Code
-
-{% import 'tutorial.jinja2' as tutorial with context %}
 
 {{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js']) }}
 
