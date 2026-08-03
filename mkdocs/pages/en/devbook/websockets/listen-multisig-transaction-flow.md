@@ -40,6 +40,10 @@ account's WebSocket channels, cosigns, and waits for confirmation.
 
 ## Prerequisites
 
+{# Early initialization so we can use the var() macro #}
+{% import 'tutorial.jinja2' as tutorial with context %}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js'], show=false) }}
+
 Before you start, make sure to:
 
 * Set up your development environment.
@@ -47,13 +51,19 @@ Before you start, make sure to:
 
 * Complete the [Configuring a Multisignature Account](../accounts/configure-multisig.md) tutorial.
 
-    !!! note "Configure a 2-of-2 multisig"
+    !!! warning "Configure and clean up the 2-of-2 multisig"
 
         The multisig configured in that tutorial is a **1-of-2**, where a single cosignatory signature is enough.
         This tutorial instead requires the stricter **2-of-2** configuration described above.
 
-        To create it, set `min_approval_delta` to `2` instead of `1` when
-        [enabling the multisig](../accounts/configure-multisig.md#enabling-the-multisig).
+        To create it, run [the configure tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
+        changing the last parameter of {{ tutorial.var('multisig_enable_transaction()') }} from `1` to `2`.
+
+        After running this tutorial, remember that the configure tutorial's default disable path assumes a **1-of-2**
+        multisig.
+        To disable the **2-of-2** multisig, remove cosignatory 1 first with `min_approval_delta` set to `-1`, and have
+        both cosignatories sign that removal.
+        Once confirmed, remove cosignatory 0 with `min_approval_delta` set to `-1` as usual.
 
 Additionally, NEM serves WebSockets using the [STOMP](https://stomp.github.io/) messaging protocol over
 [SockJS](https://github.com/sockjs/sockjs-client), so a STOMP client and a WebSocket transport are required:
@@ -229,7 +239,7 @@ For multisig transactions, the `meta` field contains an additional `innerHash` f
 
 A cosignatory can have multiple pending multisig transactions awaiting approval.
 In this example, the code selects the transaction issued by the multisig account.
-This is sufficient for the tutorial because only one pending transaction is expected from that account.
+This is enough for the tutorial because only one pending transaction is expected from that account.
 
 In real applications, however, this filter is not enough if the multisig account has multiple pending transactions.
 Instead, inspect the content of each pending transaction, such as its type, recipient, and amount, before selecting the
@@ -256,11 +266,12 @@ Instead, the network attaches it to the pending multisig transaction, which trig
 <ws:unconfirmed&#47;{address}> channel.
 Since this update only reflects the addition of a cosignature, the code ignores it.
 
-If the multisig transaction requires additional cosignatures, it remains in the unconfirmed pool until all required cosignatures have been collected.
+If the multisig transaction requires additional cosignatures, it remains in the unconfirmed pool until all required
+cosignatures have been collected.
 In this tutorial, the second cosignature satisfies the multisig requirements, so the transaction leaves the unconfirmed
 pool and, if valid, is confirmed in the next block.
 
-The confirmation is notified on the <ws:transactions&#47;{address}> channel.
+The confirmation arrives on the <ws:transactions&#47;{address}> channel.
 Since both the sender and the recipient of the inner transfer are the multisig account, this notification is delivered
 twice, once for each role.
 The code prints both notifications, but reports the confirmation only once.
