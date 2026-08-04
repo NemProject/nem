@@ -23,31 +23,37 @@ try {
 	const divisibility = parseInt(properties.divisibility, 10);
 	// [<step-2]
 	// [>step-3]
+	const scale = 10n ** BigInt(divisibility);
+
+	const fmtAtomic = atomic =>
+		`${(atomic / scale).toLocaleString('en-US')}.` +
+		`${(atomic % scale).toString().padStart(divisibility, '0')}`;
+
 	const NON_CIRCULATING_ADDRESSES = [
 		['Treasury', 'NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK'],
 		['Nemesis', 'NANEMOABLAGR72AZ2RV3V4ZHDCXW25XQ73O7OBT5'],
 		['Namespace rental', 'NAMESPACEWH4MKFMBCVFERDPOOP4FK7MTBXDPZZA'],
 		['Mosaic rental', 'NBMOSAICOD4F54EE5CDMR23CCBGOAM2XSIUX6TRS']
 	];
-	let nonCirculatingSupply = 0;
+	let nonCirculatingSupply = 0n;
 	for (const [label, address] of NON_CIRCULATING_ADDRESSES) {
 		const accountPath = `/account/get?address=${address}`;
 		const accountResponse = await fetch(`${NODE_URL}${accountPath}`);
 		const accountInfo = await accountResponse.json();
-		const balance =
-			accountInfo.account.balance / (10 ** divisibility);
+		const balance = BigInt(accountInfo.account.balance);
 		nonCirculatingSupply += balance;
-		console.log(`  ${label}: ${fmt(balance)} ${MOSAIC_ID}`);
+		console.log(`  ${label}: ${fmtAtomic(balance)} ${MOSAIC_ID}`);
 	}
 	console.log(
 		'Non-circulating supply: ' +
-		`${fmt(nonCirculatingSupply)} ${MOSAIC_ID}`
+		`${fmtAtomic(nonCirculatingSupply)} ${MOSAIC_ID}`
 	); // [<step-3]
 	// [>step-4]
-	const circulatingSupply = totalSupply - nonCirculatingSupply;
+	const circulatingSupply =
+		(BigInt(totalSupply) * scale) - nonCirculatingSupply;
 	console.log(
 		'Circulating supply: ' +
-		`${fmt(circulatingSupply)} ${MOSAIC_ID}`
+		`${fmtAtomic(circulatingSupply)} ${MOSAIC_ID}`
 	); // [<step-4]
 } catch (error) {
 	console.log(error);

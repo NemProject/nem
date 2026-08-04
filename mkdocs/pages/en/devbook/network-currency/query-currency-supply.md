@@ -73,16 +73,24 @@ A portion of the total supply is held by accounts that are not part of the open 
 * **Mosaic rental sink:** Collects the fees paid to create <mosaics:>.
 
 The code queries each account with the <get:/account/get> endpoint and sums their balances.
-Each balance is divided by 10^divisibility^, using the divisibility value fetched in the previous step, to convert it
-from atomic units to whole units.
-For `nem:xem`, this divisor is 1'000'000.
+
+The balances are added up in atomic units.
+They are only converted to whole XEM when printed: dividing by `scale` (1'000'000 for `nem:xem`) gives the whole part,
+and the remainder gives the 6 decimal digits.
+
+Doing this with a regular division instead would produce a float, and these balances are so large that a float can get
+the last digit wrong.
 
 ### Deriving the Circulating Supply
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
 The circulating supply is the total supply minus the non-circulating balances.
+
 This is the amount of XEM that is freely available on the open market.
+
+The total supply from <get:/mosaic/supply> is in whole units, so the code multiplies it by `scale` to bring it
+to atomic units before subtracting, then prints the result.
 
 ## Output
 
