@@ -25,6 +25,11 @@ try:
 	divisibility = int(properties['divisibility'])
 	# [<step-2]
 	# [>step-3]
+	scale = 10 ** divisibility
+
+	def fmt_atomic(atomic):
+		return f'{atomic // scale:,}.{atomic % scale:0{divisibility}d}'
+
 	NON_CIRCULATING_ADDRESSES = [
 		('Treasury', 'NCHESTYVD2P6P646AMY7WSNG73PCPZDUQNSD6JAK'),
 		('Nemesis', 'NANEMOABLAGR72AZ2RV3V4ZHDCXW25XQ73O7OBT5'),
@@ -38,15 +43,14 @@ try:
 			f'{NODE_URL}{account_path}'
 		) as response:
 			account_info = json.loads(response.read().decode())
-		balance = (account_info['account']['balance']
-			/ (10 ** divisibility))
+		balance = account_info['account']['balance']
 		non_circulating_supply += balance
-		print(f'  {label}: {balance:,.6f} {MOSAIC_ID}')
+		print(f'  {label}: {fmt_atomic(balance)} {MOSAIC_ID}')
 	print(
 		f'Non-circulating supply: '
-		f'{non_circulating_supply:,.6f} {MOSAIC_ID}')  # [<step-3]
+		f'{fmt_atomic(non_circulating_supply)} {MOSAIC_ID}')  # [<step-3]
 	# [>step-4]
-	circulating_supply = total_supply - non_circulating_supply
-	print(f'Circulating supply: {circulating_supply:,.6f} {MOSAIC_ID}')  # [<step-4]
+	circulating_supply = total_supply * scale - non_circulating_supply
+	print(f'Circulating supply: {fmt_atomic(circulating_supply)} {MOSAIC_ID}')  # [<step-4]
 except Exception as error:
 	print(error)
