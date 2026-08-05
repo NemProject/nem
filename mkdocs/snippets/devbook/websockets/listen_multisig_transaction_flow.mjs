@@ -163,9 +163,12 @@ try {
 	};
 	// [<step-9]
 	// [Cosignatory 1] Subscribe to the multisig account channels [>step-4]
-	const accountChannel = `/account/${multisigAddress}`;
 	const subscriptions = [
-		{ channel: accountChannel, handler: onAccountUpdate, id: 'id-0' },
+		{
+			channel: `/account/${multisigAddress}`,
+			handler: onAccountUpdate,
+			id: 'id-0'
+		},
 		{
 			channel: `/unconfirmed/${multisigAddress}`,
 			handler: onUnconfirmed,

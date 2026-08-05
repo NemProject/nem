@@ -215,12 +215,37 @@ Cosignatories never pay fees for the transactions they initiate on behalf of a m
 
 {{ tutorial.code_snippet_tagged('step-11') }}
 
-Finally, the multisig transaction is signed by a cosignatory.
-In this case, both multisig transactions are initiated by {{ tutorial.var('cosignatory_key_pairs[0]') }}, whose
-signature alone is enough to approve them without additional cosignatures.
+Finally, each multisig transaction is signed by the cosignatory that initiates it, the one set as the wrapper's
+{{ tutorial.var('signer_public_key') }}.
+Here, both removals are initiated and signed by {{ tutorial.var('cosignatory_key_pairs[0]') }}.
+
+In this case, a single signature is enough because this multisig requires only one cosignature.
+In stricter configurations, a removal requires approval from additional cosignatories, like any other transaction,
+although the signature of the cosignatory being removed never counts toward the requirement.
+
+The removal of the last remaining cosignatory is a special case.
+Only cosignatories can sign transactions on behalf of the multisig account, so the last cosignatory signs its own
+removal, as the second transaction in this tutorial shows.
 
 The cosignatories could also have been removed in the opposite order.
 The only difference would be which cosignatory initiates and signs each transaction.
+
+!!! note "Disabling other configurations"
+
+    If the removal transactions are rejected, the account may have been configured differently from this tutorial's
+    default, such as a **2-of-2** multisig instead of a **1-of-2**.
+
+    Check the number of required cosignatures in the `minCosignatories` field returned by <get:/account/get>, and
+    adjust the removal transactions as needed.
+
+    For example, to disable a **2-of-2** multisig:
+
+    1. Remove Cosignatory 1 with `min_approval_delta` set to `-1`,
+       because the account cannot keep requiring two cosignatures once a single cosignatory remains.
+    2. Once confirmed, remove Cosignatory 0 with `min_approval_delta` set to `-1`.
+
+    In this case, Cosignatory 0 can still sign both removals, since the signature of the cosignatory being removed
+    never counts toward the required approvals.
 
 ### Submitting the Transactions
 
