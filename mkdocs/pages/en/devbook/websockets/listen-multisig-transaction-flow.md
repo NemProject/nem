@@ -15,7 +15,7 @@ This tutorial recreates the transfer from the
 full multisig lifecycle using [WebSocket](../reference/websockets/index.md) channels instead of polling.
 
 The multisig account used in this tutorial is configured as a **2-of-2** multisig.
-It has two cosignatories, and both signatures are required to approve a transaction:
+It has two cosignatories, and both signatures are required to approve the transfer:
 
 ```dot
 digraph "Multisignature Tree" {
@@ -49,21 +49,11 @@ Before you start, make sure to:
 * Set up your development environment.
   See [Setting Up a Development Environment](../start/setup.md).
 
-* Complete the [Configuring a Multisignature Account](../accounts/configure-multisig.md) tutorial.
-
-    !!! warning "Configure and clean up the 2-of-2 multisig"
-
-        The multisig configured in that tutorial is a **1-of-2**, where a single cosignatory signature is enough.
-        This tutorial instead requires the stricter **2-of-2** configuration described above.
-
-        To create it, run [the configure tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
-        changing the last parameter of {{ tutorial.var('multisig_enable_transaction()') }} from `1` to `2`.
-
-        After running this tutorial, remember that the configure tutorial's default disable path assumes a **1-of-2**
-        multisig.
-        To disable the **2-of-2** multisig, remove cosignatory 1 first with `min_approval_delta` set to `-1`, and have
-        both cosignatories sign that removal.
-        Once confirmed, remove cosignatory 0 with `min_approval_delta` set to `-1` as usual.
+* Create a **2-of-2** multisig account.
+    To create it, run the [configure multisig tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
+    changing {{ tutorial.var('min_approval_delta') }} from `1` to `2`.
+    If the account is already a multisig with a different configuration,
+    [disable it](../accounts/configure-multisig.md#disabling-the-multisig) first.
 
 Additionally, NEM serves WebSockets using the [STOMP](https://stomp.github.io/) messaging protocol over
 [SockJS](https://github.com/sockjs/sockjs-client), so a STOMP client and a WebSocket transport are required:
@@ -109,6 +99,7 @@ WebSocket port.
 A multisig transaction involves two distinct roles: an **initiator** (Cosignatory 0) that builds, signs, and
 announces the multisig transaction, and one or more **cosignatories** (Cosignatory 1 in this tutorial) that monitor
 WebSocket channels and cosign after verifying the transaction.
+Any cosignatory of the multisig account can take either role.
 
 In practice, each role runs as a separate program on a separate machine, holding only its own private key.
 This tutorial combines both roles in a single script for simplicity.
@@ -176,16 +167,13 @@ Cosignatory 1 subscribes to the same three address-scoped channels used in the
 
 The subscriptions use the IDs `id-0`, `id-1` and `id-2`, which identify them when the code unsubscribes at the end.
 
-The difference is the address that each channel is scoped to.
-For a pending multisig transaction, the node sends notifications to the initiating cosignatory and to the accounts
-involved in the inner transaction.
+Unlike the non-multisig case, the channels listen to the activity of the **multisig account**, not the cosignatory
+account.
 
-In this example, the notified accounts are Cosignatory 0, as the initiator, and the multisig account, which is
-both the sender and the recipient of the inner transfer.
-Other cosignatories, such as Cosignatory 1, do not receive notifications.
-
-As a result, a cosignatory that is waiting to approve transactions must subscribe to the **multisig account's address**,
-not the cosignatory's own address.
+The reason is that the node only notifies the initiating cosignatory and the accounts involved in the inner transaction,
+Cosignatory 0 and the multisig account in this example.
+Cosignatories waiting to approve the transaction, such as Cosignatory 1, receive no notifications on their own
+addresses, so they must subscribe to the multisig account's address instead.
 
 !!! note "Message handling differences"
 
@@ -241,9 +229,9 @@ A cosignatory can have multiple pending multisig transactions awaiting approval.
 In this example, the code selects the transaction issued by the multisig account.
 This is enough for the tutorial because only one pending transaction is expected from that account.
 
-In real applications, however, this filter is not enough if the multisig account has multiple pending transactions.
-Instead, inspect the content of each pending transaction, such as its type, recipient, and amount, before selecting the
-one to cosign.
+In real applications, however, this filter is not enough.
+Nothing guarantees that a pending transaction is the expected one, so inspect the content of each pending transaction,
+such as its type, recipient, and amount, before selecting the one to cosign.
 
 !!! warning "Verify before cosigning"
 
@@ -315,9 +303,9 @@ The output shows:
 
 This tutorial showed how to:
 
-| Step                                                                                          | Related documentation                                                              |
-|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| [Subscribe to the multisig account's channels](#cosignatory-subscribing-to-the-channels)      | <ws:unconfirmed&#47;{address}><br/><ws:transactions&#47;{address}>                 |
-| [Register the multisig account](#cosignatory-registering-the-multisig-account)                | <req:w&#47;api&#47;account&#47;get>                                                |
-| [Handle pending multisig messages](#cosignatory-cosigning-the-pending-transaction)            | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair)  |
-| [Cosign on an unconfirmed notification](#cosignatory-cosigning-the-pending-transaction)       | <ser:CosignatureV1>                                                                |
+| Step                                                                                     | Related documentation                                                                             |
+|------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| [Subscribe to the multisig account's channels](#cosignatory-subscribing-to-the-channels) | <ws:account&#47;{address}><br/><ws:unconfirmed&#47;{address}><br/><ws:transactions&#47;{address}> |
+| [Register the multisig account](#cosignatory-registering-the-multisig-account)           | <req:w&#47;api&#47;account&#47;get>                                                               |
+| [Handle pending multisig messages](#cosignatory-cosigning-the-pending-transaction)       | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair)                 |
+| [Cosign on an unconfirmed notification](#cosignatory-cosigning-the-pending-transaction)  | <ser:CosignatureV1>                                                                               |
