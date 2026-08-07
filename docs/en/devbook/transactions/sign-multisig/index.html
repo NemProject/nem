@@ -7994,7 +7994,7 @@ approve transactions."
 and therefore it cannot initiate or sign transactions on its own.
 Instead, it relies on its cosignatory accounts to create transactions and sign them on its behalf.</p>
 <p>The multisig account used in this tutorial is configured as a <strong>2-of-2</strong> multisig.
-It has two cosignatories, and both signatures are required to approve a transaction.</p>
+It has two cosignatories, and both signatures are required to approve the transfer.</p>
 <p><strong>Cosignatory 0</strong> initiates the transfer, and <strong>Cosignatory 1</strong> provides the second required cosignature:</p>
 <p><span class="graphviz-light-dark" data-library-default="#789abc" data-default="#789abc" data-light="#000000" data-dark="#ffffff"></span><svg width="282pt" height="116pt" viewBox="0.00 0.00 282.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="graphviz dot"><g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)"><title>Multisignature Tree</title><polygon fill="none" stroke="none" points="-4,4 -4,-112 278.16,-112 278.16,4 -4,4"/><!-- Multisignature Account --><g id="node1" class="node"><title>Multisignature Account</title><ellipse fill="none" stroke="#789abc" cx="137.08" cy="-90" rx="100.33" ry="18"/><text xml:space="preserve" text-anchor="middle" x="137.08" y="-85.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Multisignature Account</text></g><!-- Cosignatory 0 --><g id="node2" class="node"><title>Cosignatory 0</title><ellipse fill="none" stroke="#789abc" cx="64.08" cy="-18" rx="64.08" ry="18"/><text xml:space="preserve" text-anchor="middle" x="64.08" y="-13.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Cosignatory 0</text></g><!-- Cosignatory 0&#45;&gt;Multisignature Account --><g id="edge1" class="edge"><title>Cosignatory 0&#45;&gt;Multisignature Account</title><path fill="none" stroke="#789abc" d="M81.38,-35.59C90.18,-44.03 101.07,-54.47 110.88,-63.88"/><polygon fill="#789abc" stroke="#789abc" points="108.41,-66.36 118.05,-70.75 113.25,-61.3 108.41,-66.36"/></g><!-- Cosignatory 1 --><g id="node3" class="node"><title>Cosignatory 1</title><ellipse fill="none" stroke="#789abc" cx="210.08" cy="-18" rx="64.08" ry="18"/><text xml:space="preserve" text-anchor="middle" x="210.08" y="-13.72" font-family="Times,serif" font-size="12.00" fill="#789abc">Cosignatory 1</text></g><!-- Cosignatory 1&#45;&gt;Multisignature Account --><g id="edge2" class="edge"><title>Cosignatory 1&#45;&gt;Multisignature Account</title><path fill="none" stroke="#789abc" d="M192.78,-35.59C183.97,-44.03 173.09,-54.47 163.28,-63.88"/><polygon fill="#789abc" stroke="#789abc" points="160.91,-61.3 156.11,-70.75 165.75,-66.36 160.91,-61.3"/></g></g></svg></p>
 <div class="admonition note">
@@ -8011,19 +8011,11 @@ For a WebSocket-based approach, where the cosignatory is notified in real time, 
     See <a href="../../start/setup/">Setting Up a Development Environment</a>.</p>
 </li>
 <li>
-<p>Complete the <a href="../../accounts/configure-multisig/">Configuring a Multisignature Account</a> tutorial.</p>
-<div class="admonition warning">
-<p class="admonition-title">Configure and clean up the 2-of-2 multisig</p>
-<p>The multisig configured in that tutorial is a <strong>1-of-2</strong>, where a single cosignatory signature is enough.
-This tutorial instead requires the stricter <strong>2-of-2</strong> configuration described above.</p>
-<p>To create it, run <a href="../../accounts/configure-multisig/#enabling-the-multisig">the configure tutorial</a>,
-changing the last parameter of <span markdown class="dylink"><input type="radio" name="rGroup99" id="Python" /><label class="dylink-option" for="Python" markdown><code>multisig_enable_transaction()</code></label><input type="radio" name="rGroup99" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>multisigEnableTransaction()</code></label></span> from <code>1</code> to <code>2</code>.</p>
-<p>After running this tutorial, remember that the configure tutorial's default disable path assumes a <strong>1-of-2</strong>
-multisig.
-To disable the <strong>2-of-2</strong> multisig, remove cosignatory 1 first with <code>min_approval_delta</code> set to <code>-1</code>, and have
-both cosignatories sign that removal.
-Once confirmed, remove cosignatory 0 with <code>min_approval_delta</code> set to <code>-1</code> as usual.</p>
-</div>
+<p>Create a <strong>2-of-2</strong> multisig account.
+    To create it, run the <a href="../../accounts/configure-multisig/#enabling-the-multisig">configure multisig tutorial</a>,
+    changing <span markdown class="dylink"><input type="radio" name="rGroup99" id="Python" /><label class="dylink-option" for="Python" markdown><code>min_approval_delta</code></label><input type="radio" name="rGroup99" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>minApprovalDelta</code></label></span> from <code>1</code> to <code>2</code>.
+    If the account is already a multisig with a different configuration,
+    <a href="../../accounts/configure-multisig/#disabling-the-multisig">disable it</a> first.</p>
 </li>
 </ul>
 <p>Additionally, review the <a href="../transfer-xem/">Transfer XEM</a> tutorial to understand how transactions are
@@ -9308,10 +9300,14 @@ awaiting their signature.</p>
 that a cosignature must reference.</p>
 <p>A cosignatory can have multiple pending multisig transactions awaiting approval.
 In this example, the code selects the transaction issued by the multisig account.
-This is sufficient for the tutorial because only one pending transaction is expected from that account.</p>
-<p>In real applications, however, this filter is not enough if the multisig account has multiple pending transactions.
-Instead, inspect the content of each pending transaction, such as its type, recipient, and amount, before selecting the
-one to cosign.</p>
+This approach is sufficient for the tutorial because only one pending transaction is expected from that account, and
+Cosignatory 1 has no prior knowledge of the transaction to match more precisely.</p>
+<p>Alternatively, the initiator can share the inner transaction hash with the other cosignatories through an off-chain
+channel.
+The cosignatories can then match this hash to select the exact transaction.</p>
+<p>In real applications, however, filtering by the issuing account is not enough.
+Nothing guarantees that a pending transaction is the expected one, so inspect the content of each pending transaction,
+such as its type, recipient, and amount, before selecting the one to cosign.</p>
 <div class="admonition warning">
 <p class="admonition-title">Verify before cosigning</p>
 <p>Always verify the contents of a transaction before cosigning it.
@@ -9529,10 +9525,6 @@ The following table summarizes the most common error sources:</p>
 <td><code>FAILURE_MULTISIG_NO_MATCHING_MULTISIG</code></td>
 <td>The cosignature does not match a pending multisig transaction, or its signer is not a cosignatory.</td>
 </tr>
-<tr>
-<td><code>FAILURE_SIGNATURE_NOT_VERIFIABLE</code></td>
-<td>The signature attached to a transaction does not match its <span markdown class="dylink"><input type="radio" name="rGroup108" id="Python" /><label class="dylink-option" for="Python" markdown><code>signer_public_key</code></label><input type="radio" name="rGroup108" id="JavaScript" /><label class="dylink-option" for="JavaScript" markdown><code>signerPublicKey</code></label></span>.</td>
-</tr>
 </tbody>
 </table>
 <h2 id="output">Output<a class="headerlink" href="#output" title="Anchor link to this section for reference">⚓︎</a></h2>
@@ -9743,7 +9735,7 @@ approve transactions."
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">August 3, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">August 7, 2026</span>
   </span>
 
     
