@@ -144,9 +144,8 @@ async def main():
 		frames = stomp_frames(websocket)
 		# [<step-3]
 		# [Cosignatory 1] Subscribe to the multisig account channels [>step-4]
-		account_channel = f'/account/{multisig_address}'
 		channels = {
-			account_channel: 'id-0',
+			f'/account/{multisig_address}': 'id-0',
 			f'/unconfirmed/{multisig_address}': 'id-1',
 			f'/transactions/{multisig_address}': 'id-2',
 		}
@@ -158,7 +157,7 @@ async def main():
 		await stomp_send(websocket, '/w/api/account/get',
 			json.dumps({'account': multisig_address}))
 		async for frame in frames:
-			if account_channel == frame['headers']['destination']:
+			if '/account/' in frame['headers']['destination']:
 				balance = json.loads(
 					frame['body'])['account']['balance']
 				print(f'Account update: balance={balance}')
@@ -235,7 +234,7 @@ async def main():
 		async for frame in frames:
 			destination = frame['headers']['destination']
 			body = json.loads(frame['body'])
-			if account_channel == destination:
+			if '/account/' in destination:
 				balance = body['account']['balance']
 				print(f'Account update: balance={balance}')
 				if confirmed:

@@ -13,7 +13,7 @@ and therefore it cannot initiate or sign transactions on its own.
 Instead, it relies on its cosignatory accounts to create transactions and sign them on its behalf.
 
 The multisig account used in this tutorial is configured as a **2-of-2** multisig.
-It has two cosignatories, and both signatures are required to approve a transaction.
+It has two cosignatories, and both signatures are required to approve the transfer.
 
 **Cosignatory 0** initiates the transfer, and **Cosignatory 1** provides the second required cosignature:
 
@@ -47,21 +47,11 @@ Before you start, make sure to:
 * Set up your development environment.
     See [Setting Up a Development Environment](../start/setup.md).
 
-* Complete the [Configuring a Multisignature Account](../accounts/configure-multisig.md) tutorial.
-
-    !!! warning "Configure and clean up the 2-of-2 multisig"
-
-        The multisig configured in that tutorial is a **1-of-2**, where a single cosignatory signature is enough.
-        This tutorial instead requires the stricter **2-of-2** configuration described above.
-
-        To create it, run [the configure tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
-        changing the last parameter of {{ tutorial.var('multisig_enable_transaction()') }} from `1` to `2`.
-
-        After running this tutorial, remember that the configure tutorial's default disable path assumes a **1-of-2**
-        multisig.
-        To disable the **2-of-2** multisig, remove cosignatory 1 first with `min_approval_delta` set to `-1`, and have
-        both cosignatories sign that removal.
-        Once confirmed, remove cosignatory 0 with `min_approval_delta` set to `-1` as usual.
+* Create a **2-of-2** multisig account.
+    To create it, run the [configure multisig tutorial](../accounts/configure-multisig.md#enabling-the-multisig),
+    changing {{ tutorial.var('min_approval_delta') }} from `1` to `2`.
+    If the account is already a multisig with a different configuration,
+    [disable it](../accounts/configure-multisig.md#disabling-the-multisig) first.
 
 Additionally, review the [Transfer XEM](../transactions/transfer-xem.md) tutorial to understand how transactions are
 announced and confirmed.
@@ -187,11 +177,16 @@ that a cosignature must reference.
 
 A cosignatory can have multiple pending multisig transactions awaiting approval.
 In this example, the code selects the transaction issued by the multisig account.
-This is sufficient for the tutorial because only one pending transaction is expected from that account.
+This approach is sufficient for the tutorial because only one pending transaction is expected from that account, and
+Cosignatory 1 has no prior knowledge of the transaction to match more precisely.
 
-In real applications, however, this filter is not enough if the multisig account has multiple pending transactions.
-Instead, inspect the content of each pending transaction, such as its type, recipient, and amount, before selecting the
-one to cosign.
+Alternatively, the initiator can share the inner transaction hash with the other cosignatories through an off-chain
+channel.
+The cosignatories can then match this hash to select the exact transaction.
+
+In real applications, however, filtering by the issuing account is not enough.
+Nothing guarantees that a pending transaction is the expected one, so inspect the content of each pending transaction,
+such as its type, recipient, and amount, before selecting the one to cosign.
 
 !!! warning "Verify before cosigning"
 
@@ -242,7 +237,6 @@ The following table summarizes the most common error sources:
 | `FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG` | The multisig account tried to announce the transfer itself.                                                   |
 | `FAILURE_MULTISIG_NOT_A_COSIGNER`              | The signer of the multisig transaction is not in the cosignatories list.                                      |
 | `FAILURE_MULTISIG_NO_MATCHING_MULTISIG`        | The cosignature does not match a pending multisig transaction, or its signer is not a cosignatory.            |
-| `FAILURE_SIGNATURE_NOT_VERIFIABLE`             | The signature attached to a transaction does not match its {{ tutorial.var('signer_public_key') }}.           |
 
 ## Output
 
