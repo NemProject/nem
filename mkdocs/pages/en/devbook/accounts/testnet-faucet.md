@@ -67,7 +67,7 @@ If the request is successful, the faucet will transfer the specified amount of X
 Click **View in Explorer** in the top-right corner notification to verify that the transaction was processed.
 
 The explorer will display the transaction details, including its confirmation status.
-The transaction should confirm in less than a minute under normal network conditions.
+The transaction should confirm in about a minute under normal network conditions.
 
 You can also monitor the transfer from your <wallet:> if you have one set up.
 {{ tutorial.step_end() }}
