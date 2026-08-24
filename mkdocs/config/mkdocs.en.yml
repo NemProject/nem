@@ -1,7 +1,7 @@
 INHERIT: ./mkdocs.base.yml
 
 site_name: NEM Docs WIP 🚧
-site_url: https://nemproject.github.io/nem-docs/en
+site_url: https://docs.nemtest.net/en
 docs_dir: ../pages/en
 site_dir: ../../docs/en
 edit_uri: blob/new-docs/mkdocs/pages/en
@@ -57,7 +57,7 @@ extra:
       make our documentation better.
   social:
     - icon: fontawesome/solid/house
-      link: https://nemproject.github.io/nem-docs
+      link: https://docs.nemtest.net
       name: Go to the home page
     - icon: fontawesome/brands/x-twitter
       link: https://x.com/SymbolSyndicate
@@ -68,7 +68,7 @@ extra:
     - icon: fontawesome/brands/discord
       link: https://discord.gg/J38KwW5ZuG
       name: Join our Discord server
-    - icon: fontawesome/solid/handshake-simple
+    - icon: fontawesome/solid/mountain
       link: https://nemproject.github.io/nem-docs
       name: Visit the legacy documentation site
 nav:
