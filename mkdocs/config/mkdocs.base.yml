@@ -132,7 +132,7 @@ theme:
     - search.highlight  # Highlight searched term
     - search.share  # Add share button for deep-linking to search results
 extra:
-  homepage: https://nemproject.github.io/nem-docs
+  homepage: https://docs.nemtest.net
   alternate:
     - name: English
       link: /en/
