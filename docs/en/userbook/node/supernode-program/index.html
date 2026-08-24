@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://nemproject.github.io/nem-docs/en/userbook/node/supernode-program/">
+        <link rel="canonical" href="https://docs.nemtest.net/en/userbook/node/supernode-program/">
       
       
         <link rel="prev" href="../install/">
@@ -125,7 +125,7 @@
 
 <header class="md-header" data-md-component="header">
 	<nav class="md-header__inner md-grid" aria-label="Header">
-		<a href="https://nemproject.github.io/nem-docs" title="NEM Docs WIP 🚧" class="md-header__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
+		<a href="https://docs.nemtest.net" title="NEM Docs WIP 🚧" class="md-header__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
 			
   <img src="../../../assets/images/nem-logo.svg" alt="logo">
 
@@ -392,7 +392,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="https://nemproject.github.io/nem-docs" title="NEM Docs WIP 🚧" class="md-nav__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
+    <a href="https://docs.nemtest.net" title="NEM Docs WIP 🚧" class="md-nav__button md-logo" aria-label="NEM Docs WIP 🚧" data-md-component="logo">
       
   <img src="../../../assets/images/nem-logo.svg" alt="logo">
 
@@ -7904,18 +7904,18 @@ The Servant performs Supernode Program tests and exposes the <code>/nr/...</code
 <p>Each testing round includes the following checks:</p>
 <ul>
 <li>
-<p><strong>Chain height:</strong> The node reports its current height through the <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Chain/getChainHeight" title="Return blockchain height"><code>/chain/height</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
+<p><strong>Chain height:</strong> The node reports its current height through the <a href="/en/devbook/reference/rest/nem#tag/Chain/getChainHeight" title="Return blockchain height"><code>/chain/height</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
     The test passes if the height is no more than 4 blocks behind the reference node.</p>
 </li>
 <li>
 <p><strong>Chain part:</strong> The node serves a random group of 60 to 100 recent blocks through the
-    <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Block/getLocalBlocksAfterHeight" title="Return blocks after block height"><code>/local/chain/blocks-after</code>&nbsp;<code class="rest-method rest-method-post">POST</code></a> API.
+    <a href="/en/devbook/reference/rest/nem#tag/Block/getLocalBlocksAfterHeight" title="Return blocks after block height"><code>/local/chain/blocks-after</code>&nbsp;<code class="rest-method rest-method-post">POST</code></a> API.
     The controller verifies the block signatures and compares a composite hash of those blocks with the same hash
     calculated from the reference node.</p>
 </li>
 <li>
 <p><strong>Balance:</strong> The node's main account has at least 10,000 XEM.
-    The controller checks this through the <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Account/getAccountByForwardedAddress" title="Request original account data for delegated account"><code>/account/get/forwarded</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API, routed through the reference node.</p>
+    The controller checks this through the <a href="/en/devbook/reference/rest/nem#tag/Account/getAccountByForwardedAddress" title="Request original account data for delegated account"><code>/account/get/forwarded</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API, routed through the reference node.</p>
 </li>
 <li>
 <p><strong>Computing power:</strong> The node completes 10,000 repeated public-key derivations from a random hash.
@@ -7923,7 +7923,7 @@ The Servant performs Supernode Program tests and exposes the <code>/nr/...</code
     less.</p>
 </li>
 <li>
-<p><strong>Version:</strong> The node reports a NIS client version through the <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
+<p><strong>Version:</strong> The node reports a NIS client version through the <a href="/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
     The test passes if the version is at least as recent as the reference node's version.</p>
 </li>
 <li>
@@ -7938,7 +7938,7 @@ The Servant performs Supernode Program tests and exposes the <code>/nr/...</code
     The test passes if both hash results match and the measured transfer speed is at least 5 Mbit/s.</p>
 </li>
 <li>
-<p><strong>Responsiveness:</strong> The controller sends 10 requests to the <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Chain/getChainHeight" title="Return blockchain height"><code>/chain/height</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
+<p><strong>Responsiveness:</strong> The controller sends 10 requests to the <a href="/en/devbook/reference/rest/nem#tag/Chain/getChainHeight" title="Return blockchain height"><code>/chain/height</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> API.
     The test passes if at least 9 requests succeed and all requests complete in 1 second or less.
     If only the time limit fails, the controller retries this test up to 4 times.</p>
 </li>
@@ -8070,7 +8070,7 @@ you already have the Servant installed and you only need to configure it.</p>
 </li>
 <li>
 <p>Enter the current enrollment address and the node host.</p>
-<p>The host must match the host returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</p>
+<p>The host must match the host returned by the node's <a href="/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</p>
 </li>
 <li>
 <p>Send the enrollment transaction.</p>
@@ -8082,7 +8082,7 @@ unencrypted message:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>enroll &lt;NODE_HOST&gt; &lt;CODEWORD_HASH&gt;
 </span></code></pre></div>
 <ul>
-<li><code>&lt;NODE_HOST&gt;</code> as returned by the node's <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</li>
+<li><code>&lt;NODE_HOST&gt;</code> as returned by the node's <a href="/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> endpoint.</li>
 <li>
 <p><code>&lt;CODEWORD_HASH&gt;</code> as returned by the following query:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>https://nem.io/supernode/api/codeword/&lt;MAIN_PUBLIC_KEY&gt;
@@ -8121,7 +8121,7 @@ It allows a node to harvest on behalf of another account without exposing the ac
 	name="_:Remote Key"
 	href="../../../textbook/cryptography/#fdb843cdeea7bb265f839f24adc30f4f">remote key</a> used to
     harvest on the node.</p>
-<p>Please note that <a href="/nem-docs/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> returns the remote key.</p>
+<p>Please note that <a href="/en/devbook/reference/rest/nem#tag/Node/getNodeInfo" title="Return basic node information"><code>/node/info</code>&nbsp;<code class="rest-method rest-method-get">GET</code></a> returns the remote key.</p>
 </li>
 </ul>
 </div>
@@ -8310,7 +8310,7 @@ Repeat the <a href="#sending-the-enrollment">enrollment process</a> each month w
     
     
     
-    <a href="https://nemproject.github.io/nem-docs" target="_blank" rel="noopener" title="Go to the home page" class="md-social__link">
+    <a href="https://docs.nemtest.net" target="_blank" rel="noopener" title="Go to the home page" class="md-social__link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
     </a>
   
@@ -8343,7 +8343,7 @@ Repeat the <a href="#sending-the-enrollment">enrollment process</a> each month w
     
     
     <a href="https://nemproject.github.io/nem-docs" target="_blank" rel="noopener" title="Visit the legacy documentation site" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M268.9 85.2 152.3 214.8c-4.6 5.1-4.4 13 .5 17.9 30.5 30.5 80 30.5 110.5 0l31.8-31.8c4.2-4.2 9.5-6.5 14.9-6.9 6.8-.6 13.8 1.7 19 6.9L505.6 376l70.4-56V32L464 96l-23.8-15.9A96.2 96.2 0 0 0 386.9 64h-70.4c-1.1 0-2.3 0-3.4.1-16.9.9-32.8 8.5-44.2 21.1m-152.3 97.5L223.4 64h-39.6c-25.5 0-49.9 10.1-67.9 28.1L112 96 0 32v288l156.4 130.3c23 19.2 52 29.7 81.9 29.7H254l-7-7c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l41 41h9c19.1 0 37.8-4.3 54.8-12.3L359 441c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l32 32 17.5-17.5c8.9-8.9 11.5-21.8 7.6-33.1L312.1 251.7l-14.9 14.9c-49.3 49.3-129.1 49.3-178.4 0-23-23-23.9-59.9-2.2-84z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M256.5 0c14.7 0 28.2 8.1 35.2 21l216 400c6.7 12.4 6.4 27.4-.8 39.5S486.6 480 472.6 480h-432c-14.1 0-27.1-7.4-34.3-19.5s-7.5-27.1-.8-39.5l216-400 2.9-4.6C231.7 6.2 243.6 0 256.5 0m-86.1 249.9 26.8 26.8c6.2 6.2 16.4 6.2 22.6 0l43.3-43.3c6-6 14.1-9.4 22.6-9.4h42.8L256.4 90.5l-86.1 159.4z"/></svg>
     </a>
   
 </div>
