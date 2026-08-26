@@ -75,4 +75,15 @@ nav:
           - devbook/reference/whitepaper/index.md
   - 教科書:
       - textbook/intro.md
+      - textbook/cryptography.md
+      - textbook/accounts.md
+      - textbook/consensus.md
+      - textbook/transactions.md
+      - textbook/transfer_transactions.md
+      - textbook/mosaics.md
+      - textbook/namespaces.md
+      - textbook/blocks.md
+      - textbook/nodes.md
+      - textbook/harvesting.md
+      - textbook/cats.md
       - textbook/glossary.md
