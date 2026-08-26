@@ -14,7 +14,7 @@ disable_actions: true
 <a href="userbook/intro/index.html" class="userbook">
   <div></div>
   <h2>ユーザーマニュアル</h2>
-  <p>コーディングなしで何かをすることを学ぶ。</p>
+  <p>コーディングなしで、色々なことをする方法を学びます</p>
 </a>
 </div>
 
@@ -22,15 +22,15 @@ disable_actions: true
 <a href="devbook/intro/index.html" class="devbook">
   <div></div>
   <h2>開発者マニュアル</h2>
-  <p>コーディングで何かを学ぶ。</p>
+  <p>コーディングして、色々なことをする方法を学びます</p>
 </a>
 </div>
 
 <div class="card">
 <a href="textbook/intro/index.html" class="textbook">
   <div></div>
-  <h2>教科書</h2>
-  <p>物の仕組みを学ぶ。</p>
+  <h2>テキストブック</h2>
+  <p>仕組みを学びます</p>
 </a>
 </div>
 
