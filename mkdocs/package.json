@@ -1,0 +1,19 @@
+{
+  "name": "nem-docs",
+  "description": "NEM Docs",
+  "scripts": {
+    "lint": "eslint snippets --ext .mjs"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "^7.3.0",
+    "sockjs-client": "^1.6.1",
+    "symbol-sdk": "^3.3.2",
+    "typedoc": "0.28.0",
+    "typedoc-plugin-markdown": "4.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-jsdoc": "^62.0.0"
+  }
+}

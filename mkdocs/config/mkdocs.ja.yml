@@ -1,0 +1,89 @@
+INHERIT: ./mkdocs.base.yml
+
+site_name: NEMドキュメント WIP ⚠
+site_url: https://docs.nemtest.net/ja
+docs_dir: ../pages/ja
+site_dir: ../../docs/ja
+edit_uri: blob/new-docs/mkdocs/pages/ja
+plugins:
+  search:
+    lang: ja
+  mkdoxy:  # Generate API reference docs for Java
+    projects:
+      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
+        doxy-cfg:  # standard doxygen configuration (key: value)
+          OUTPUT_LANGUAGE: Japanese
+markdown_extensions:
+  toc:
+    permalink_title: 参照用にこのセクションへのアンカーリンク
+    title: このページに
+theme:
+  language: ja
+  palette:
+    # Palette toggle for automatic mode
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/brightness-auto
+        name: ライトモードに切り替える
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: ダークモードに切り替える
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: システム設定に切り替える
+extra:
+  consent:
+    title: クッキーの同意
+    description: >-
+      当社では、お客様の繰り返しのアクセスや好みを認識するため、
+      また、当社のドキュメントの有効性やユーザーが探しているものを見つけられるかどうかを測定するために Cookie を使用しています。
+      お客様の同意により、当社はドキュメントの改善に協力することになります。
+  social:
+    - icon: fontawesome/solid/house
+      link: https://docs.nemtest.net
+      name: ホームページ
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/SymbolSyndicate
+      name: X (旧Twitter)
+    - icon: fontawesome/brands/github
+      link: https://github.com/NemProject
+      name: リポジトリ
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/J38KwW5ZuG
+      name: Discordサーバー
+    - icon: fontawesome/solid/mountain
+      link: https://nemproject.github.io/nem-docs
+      name: 旧ドキュメントサイト
+nav:
+  - index.md
+  - ユーザーマニュアル:
+      - userbook/intro.md
+  - 開発者マニュアル:
+      - devbook/intro.md
+      - リファレンスガイド:
+          - Python SDK: devbook/reference/py/
+          - TypeScript SDK: devbook/reference/ts/
+          - NEM REST API: devbook/reference/rest/nem.md
+          - devbook/reference/whitepaper/index.md
+  - 教科書:
+      - textbook/intro.md
+      - textbook/cryptography.md
+      - textbook/accounts.md
+      - textbook/consensus.md
+      - textbook/transactions.md
+      - textbook/transfer_transactions.md
+      - textbook/mosaics.md
+      - textbook/namespaces.md
+      - textbook/blocks.md
+      - textbook/nodes.md
+      - textbook/harvesting.md
+      - textbook/cats.md
+      - textbook/glossary.md

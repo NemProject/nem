@@ -1,0 +1,890 @@
+@font-face {
+  font-family: "Nunito Sans";
+  font-style: normal;
+  font-weight: 200 1000;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/nunitosans/v19/pe0AMImSLYBIv1o4X1M8ce2xCx3yop4tQpF_MeTm0lfUVwoNnq4CLz0_kJ3xzA.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Colors */
+:root {
+	--userbook-color: #FAB600;
+	--userbook-color--dark: #997000;
+	--userbook-color--light: #FFD462;
+	--userbook-color--transparent: #FAB60020;
+	--devbook-color: #67B8E8;
+	--devbook-color--dark: #2389C5;
+	--devbook-color--light: #C7E8FB;
+	--devbook-color--transparent: #67B8E820;
+	--textbook-color: #4FBAAF;
+	--textbook-color--dark: #159083;
+	--textbook-color--light: #B0ECE6;
+	--textbook-color--transparent: #4FBAAF20;
+	--example-admonition-color: #4CAF50;
+	--example-admonition-color--transparent: #4CAF5020;
+
+	/* Scalar REST API reference */
+	--scalar-font-size: 0.8rem;
+	--scalar-small-font-size: 0.7rem;
+	--scalar-font: var(--scalar-font-size);
+	--scalar-font-size-3: var(--scalar-small-font-size);
+	--scalar-font-size-4: var(--scalar-small-font-size);
+	--scalar-small: var(--scalar-small-font-size);
+	--scalar-micro: var(--scalar-small-font-size);
+	--scalar-mini: var(--scalar-small-font-size);
+
+}
+
+[data-md-color-scheme=slate][data-md-color-primary=indigo] {
+	--md-typeset-a-color: var(--md-primary-fg-color--light);
+	--md-accent-fg-color: var(--md-primary-fg-color);
+	--md-accent-fg-color--light: var(--md-primary-fg-color--dark);
+	--md-accent-fg-color--dark: var(--md-primary-fg-color--light);
+	--md-default-bg-color--light: #333;
+	--md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+	--md-footer-fg-color: var(--md-primary-fg-color);
+	--md-blanket-color: #000C;
+	--md-code-bg-color: var(--md-accent-fg-color--transparent);
+	--md-typeset-mark-color: inherit;
+	--md-code-hl-string-color: #d59781;
+	--md-code-hl-comment-color: green;
+	--md-typeset-table-color: var(--md-primary-fg-color);
+	--md-typeset-table-color--light: var(--md-accent-fg-color--transparent);
+	--userbook-a-color: var(--userbook-color--light);
+	--userbook-a-hl-color: var(--userbook-color);
+	--devbook-a-color: var(--devbook-color--light);
+	--devbook-a-hl-color: var(--devbook-color);
+	--textbook-a-color: var(--textbook-color--light);
+	--textbook-a-hl-color: var(--textbook-color);
+}
+
+[data-md-color-scheme=default][data-md-color-primary=indigo] {
+	--md-typeset-a-color: var(--md-primary-fg-color);
+	--md-accent-fg-color: var(--md-primary-fg-color--dark);
+	--md-accent-fg-color--light: var(--md-primary-fg-color--light);
+	--md-accent-fg-color--dark: var(--md-primary-fg-color--dark);
+	--md-default-bg-color--light: #DDD;
+	--md-footer-bg-color--dark: var(--md-primary-fg-color--dark);
+	--md-footer-fg-color: var(--md-primary-fg-color);
+	--md-blanket-color: #CCCE;
+	--md-code-bg-color: var(--md-accent-fg-color--transparent);
+	--md-code-hl-string-color: #d59781;
+	--md-code-hl-comment-color: green;
+	--md-typeset-table-color: var(--md-primary-fg-color);
+	--md-typeset-table-color--light: var(--md-accent-fg-color--transparent);
+	--userbook-a-color: var(--userbook-color);
+	--userbook-a-hl-color: var(--userbook-color--dark);
+	--devbook-a-color: var(--devbook-color);
+	--devbook-a-hl-color: var(--devbook-color--dark);
+	--textbook-a-color: var(--textbook-color);
+	--textbook-a-hl-color: var(--textbook-color--dark);
+}
+
+/* Home page cards */
+.userbook div {
+	min-width: 300px;
+	min-height: 300px;
+	background: url("../images/userbook.svg") no-repeat center / contain;
+}
+
+.devbook div {
+	min-width: 300px;
+	min-height: 300px;
+	background: url("../images/devbook.svg") no-repeat center / contain;
+}
+
+.textbook div {
+	min-width: 300px;
+	min-height: 300px;
+	background: url("../images/textbook.svg") no-repeat center / contain;
+}
+
+.userbook:hover div {
+	background: url("../images/userbook-selected.svg") no-repeat center / contain;
+}
+
+.devbook:hover div {
+	background: url("../images/devbook-selected.svg") no-repeat center / contain;
+}
+
+.textbook:hover div {
+	background: url("../images/textbook-selected.svg") no-repeat center / contain;
+}
+
+.md-typeset .grid .card {
+	text-align: center;
+	padding: 0;
+	border: 0;
+}
+
+.md-typeset .grid .card:hover {
+	box-shadow: none;
+}
+
+.md-typeset .grid a.userbook:hover h2,
+.md-typeset .grid a.userbook:hover p {
+	color: var(--userbook-a-hl-color);
+}
+.md-typeset .grid a.devbook:hover h2,
+.md-typeset .grid a.devbook:hover p {
+	color: var(--devbook-a-hl-color);
+}
+.md-typeset .grid a.textbook:hover h2,
+.md-typeset .grid a.textbook:hover p {
+	color: var(--textbook-a-hl-color);
+}
+
+.md-typeset .grid .card a {
+	display: block;
+	padding: 10px;
+	height: 100%;
+}
+
+.md-typeset .grid .card h2 {
+	margin: 10px 0 0 0;
+	font-size: 1.5rem;
+	font-family: "Nunito Sans";
+	color: var(--md-default-fg-color);
+}
+
+.md-typeset .grid .card p {
+	margin: 0;
+	font-size: 1rem;
+	color: var(--md-default-fg-color--light);
+}
+
+/* Top navigation tab style: centered, with icons and custom font*/
+.md-tabs .md-tabs__item:first-child {
+	display: none;
+}
+
+.md-tabs .md-tabs__item a {
+	padding-left: 2rem;
+	font-size: 2em;
+	font-family: "Nunito Sans";
+	line-height: 2.4em;
+	margin-top: 0;
+}
+
+.md-tabs .md-tabs__item:nth-child(2) {
+	background: url("../images/userbook.svg") no-repeat;
+	background-size: 1.4rem;
+	background-position: left center;
+	filter: opacity(50%);
+}
+
+.md-tabs .md-tabs__item:nth-child(3) {
+	background: url("../images/devbook.svg") no-repeat;
+	background-size: 1.4rem;
+	background-position: left center;
+	filter: opacity(50%);
+}
+
+.md-tabs .md-tabs__item:nth-child(4) {
+	background: url("../images/textbook.svg") no-repeat;
+	background-size: 1.4rem;
+	background-position: left center;
+	filter: opacity(50%);
+}
+
+.md-tabs .md-tabs__item:nth-child(2):hover,
+.md-tabs .md-tabs__item:nth-child(3):hover,
+.md-tabs .md-tabs__item:nth-child(4):hover {
+	filter: opacity(75%);
+}
+
+.md-tabs .md-tabs__item--active:nth-child(2) {
+	background: url("../images/userbook-selected.svg") no-repeat;
+	background-size: 2.4rem;
+	background-position: left center;
+	filter: none;
+}
+
+.md-tabs .md-tabs__item--active:nth-child(3) {
+	background: url("../images/devbook-selected.svg") no-repeat;
+	background-size: 2.4rem;
+	background-position: left center;
+	filter: none;
+}
+
+.md-tabs .md-tabs__item--active:nth-child(4) {
+	background: url("../images/textbook-selected.svg") no-repeat;
+	background-size: 2.4rem;
+	background-position: left center;
+	filter: none;
+}
+
+.md-tabs[hidden] .md-tabs__item {
+	background: none;
+}
+
+.md-tabs__list {
+	justify-content: center;
+	gap: 30px;
+	margin-bottom: 10px;
+}
+
+/* Bigger logo */
+[dir=ltr] .md-header__title {
+	margin-left: 0;
+}
+
+.md-header__button.md-logo {
+	margin: 0;
+	padding: .4rem;
+}
+
+.md-header__button.md-logo img {
+	height: 2rem;
+}
+
+/* Page background */
+[data-md-color-scheme=default] .md-main,
+[data-md-color-scheme=slate] .md-main {
+	background: transparent;
+}
+
+/* Header  & Footer*/
+.md-tabs,
+.md-header,
+.md-footer {
+	background: url("../images/watercolor-dark.webp") repeat;
+	background-attachment: fixed;
+	background-size: contain;
+}
+
+.md-footer-meta {
+	background: url("../images/watercolor-dark.webp") repeat;
+	background-size: contain;
+}
+
+.md-header--shadow {
+	box-shadow: none;
+}
+
+.md-header__source {
+	display: none;
+}
+
+.md-header__button:hover {
+	color: var(--md-primary-fg-color);
+	opacity: 1;
+}
+
+/* Language logo in the header for sections that have it */
+.md-header__topic svg {
+	height: 1.5rem;
+	vertical-align: middle;
+	fill: var(--md-primary-bg-color);
+	margin-right: 0.5rem;
+}
+
+/* Separator for source file facts at page bottom */
+aside.md-source-file {
+	border-top: 1px solid var(--md-primary-fg-color);
+	padding-top: 0.5rem;
+	margin-top: 2rem;
+}
+
+/* Footer */
+.md-copyright {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-right: 36px;
+}
+
+/* Colors for zoomed-in images */
+.gslide-desc a {
+	color: var(--md-typeset-a-color);
+}
+
+.gslide-desc a:hover {
+	color: var(--md-accent-fg-color);
+}
+
+.gslide-desc code {
+	background: var(--md-code-bg-color);
+}
+
+/* Links to other sections use the color of that section */
+.md-content a[href*="userbook"][href^='..'],
+.gslide-desc a[href*="userbook"][href^='..'] {
+	color: var(--userbook-a-color);
+}
+
+.md-content a[href*="userbook"][href^='..']:hover,
+.gslide-desc a[href*="userbook"][href^='..']:hover {
+	color: var(--userbook-a-hl-color);
+}
+
+.md-content a[href*="devbook"][href^='..'],
+.gslide-desc a[href*="devbook"][href^='..'] {
+	color: var(--devbook-a-color);
+}
+
+.md-content a[href*="devbook"][href^='..']:hover,
+.gslide-desc a[href*="devbook"][href^='..']:hover {
+	color: var(--devbook-a-hl-color);
+}
+
+.md-content a[href*="textbook"][href^='..'],
+.gslide-desc a[href*="textbook"][href^='..'] {
+	color: var(--textbook-a-color);
+}
+
+.md-content a[href*="textbook"][href^='..']:hover,
+.gslide-desc a[href*="textbook"][href^='..']:hover {
+	color: var(--textbook-a-hl-color);
+}
+
+/* Anchors (links without href target) have no color */
+.md-content a:not([href]) {
+	color: var(--md-default-fg-color);
+}
+
+/* Add icon indicating external links */
+.md-content .md-typeset a:not(.md-icon) {
+	&[href^="//"]::after,
+	&[href^="http://"]::after,
+	&[href^="https://"]::after {
+		content: "↗";
+		font-size: smaller;
+		margin-left: .2em;
+		vertical-align: top;
+	}
+}
+
+/* Tooltips */
+.md-tooltip__inner,
+[role=tooltip]>.md-tooltip2__inner {
+	font-size: 0.75rem;
+	font-weight: normal;
+	background-color: var(--md-default-bg-color--light);
+	border-radius: 4px;
+}
+
+/* Search box */
+.md-search__form {
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 2px solid var(--md-primary-fg-color);
+	border-radius: 0.4rem;
+}
+
+.md-search__icon svg {
+	fill: var(--md-primary-fg-color);
+}
+
+.md-search__input::placeholder {
+	color: var(--md-primary-fg-color);
+	opacity: 1;
+}
+
+/* Hide definition list terms generated automatically for the reference guide */
+.automatic-reference-term dt {
+	display: none;
+}
+
+/* Glossaries */
+.md-content dl:not(.automatic-reference-term) {
+	border: 1px solid var(--md-primary-fg-color);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.md-content dt {
+	background-color: var(--md-accent-fg-color--transparent);
+	padding: 8px;
+}
+
+.md-content dd {
+	margin-right: 1.875em;
+}
+
+.md-content dt:has(a:target) {
+	background-color: var(--md-primary-fg-color--light);
+	display: block;
+}
+
+.md-content dt a:target {
+	color: var(--md-default-bg-color);
+	font-weight: bold;
+}
+
+/* Dynamic links */
+.md-typeset .dylink input,
+.md-typeset .dylink label {
+	display: none;
+}
+
+.md-typeset .dylink input[type=radio]:checked+.dylink-option {
+	display: inline;
+}
+
+/* TypeScript reference guide */
+
+#extended-by+ul, #extends+ul {
+	display: inline;
+	list-style: none;
+	margin: 0;
+}
+
+#extended-by+ul li, #extends+ul li {
+	display: inline;
+	margin: 0;
+}
+
+/* Java reference decorators inherited from MkDocStrings */
+:root, :host,
+[data-md-color-scheme="default"] {
+  --doc-symbol-parameter-fg-color: #df50af;
+  --doc-symbol-attribute-fg-color: #953800;
+  --doc-symbol-function-fg-color: #8250df;
+  --doc-symbol-method-fg-color: #8250df;
+  --doc-symbol-class-fg-color: #0550ae;
+  --doc-symbol-module-fg-color: #5cad0f;
+
+  --doc-symbol-parameter-bg-color: #df50af1a;
+  --doc-symbol-attribute-bg-color: #9538001a;
+  --doc-symbol-function-bg-color: #8250df1a;
+  --doc-symbol-method-bg-color: #8250df1a;
+  --doc-symbol-class-bg-color: #0550ae1a;
+  --doc-symbol-module-bg-color: #5cad0f1a;
+}
+
+[data-md-color-scheme="slate"] {
+  --doc-symbol-parameter-fg-color: #ffa8cc;
+  --doc-symbol-attribute-fg-color: #ffa657;
+  --doc-symbol-function-fg-color: #d2a8ff;
+  --doc-symbol-method-fg-color: #d2a8ff;
+  --doc-symbol-class-fg-color: #79c0ff;
+  --doc-symbol-module-fg-color: #baff79;
+
+  --doc-symbol-parameter-bg-color: #ffa8cc1a;
+  --doc-symbol-attribute-bg-color: #ffa6571a;
+  --doc-symbol-function-bg-color: #d2a8ff1a;
+  --doc-symbol-method-bg-color: #d2a8ff1a;
+  --doc-symbol-class-bg-color: #79c0ff1a;
+  --doc-symbol-module-bg-color: #baff791a;
+}
+
+code.doc-symbol {
+  border-radius: .1rem;
+  font-size: .85em;
+  padding: 0 .3em;
+  font-weight: bold;
+}
+
+code.doc-symbol-parameter,
+a code.doc-symbol-parameter {
+  color: var(--doc-symbol-parameter-fg-color);
+  background-color: var(--doc-symbol-parameter-bg-color);
+}
+
+code.doc-symbol-parameter::after {
+  content: "param";
+}
+
+code.doc-symbol-attribute,
+a code.doc-symbol-attribute,
+code.doc-symbol-variable,
+a code.doc-symbol-variable {
+  color: var(--doc-symbol-attribute-fg-color);
+  background-color: var(--doc-symbol-attribute-bg-color);
+}
+
+code.doc-symbol-attribute::after,
+code.doc-symbol-variable::after {
+  content: "attr";
+}
+
+code.doc-symbol-function,
+a code.doc-symbol-function {
+  color: var(--doc-symbol-function-fg-color);
+  background-color: var(--doc-symbol-function-bg-color);
+}
+
+code.doc-symbol-function::after {
+  content: "func";
+}
+
+code.doc-symbol-method,
+a code.doc-symbol-method {
+  color: var(--doc-symbol-method-fg-color);
+  background-color: var(--doc-symbol-method-bg-color);
+}
+
+code.doc-symbol-method::after {
+  content: "meth";
+}
+
+code.doc-symbol-class,
+a code.doc-symbol-class {
+  color: var(--doc-symbol-class-fg-color);
+  background-color: var(--doc-symbol-class-bg-color);
+}
+
+code.doc-symbol-class::after {
+  content: "class";
+}
+
+code.doc-symbol-module,
+a code.doc-symbol-module {
+  color: var(--doc-symbol-module-fg-color);
+  background-color: var(--doc-symbol-module-bg-color);
+}
+
+code.doc-symbol-module::after {
+  content: "mod";
+}
+
+code.doc-symbol-interface,
+a code.doc-symbol-interface {
+	color: var(--doc-symbol-module-fg-color);
+	background-color: var(--doc-symbol-module-bg-color);
+}
+
+code.doc-symbol-interface::after {
+	content: "interface";
+}
+
+.md-code__nav,
+:hover>.md-code__nav {
+	background-color: transparent;
+}
+
+/* Reset admonition text size to normal */
+.md-typeset .admonition,
+.md-typeset details {
+	font-size: inherit;
+}
+
+/* Different color for the Example admonition, because the default is too close
+	to the textbook's purple. */
+.md-typeset .admonition.example,
+.md-typeset details.example {
+	border-color: var(--example-admonition-color);
+}
+
+.md-typeset .example>.admonition-title,
+.md-typeset .example>summary {
+	background-color: var(--example-admonition-color--transparent);
+}
+
+.md-typeset .example>.admonition-title::before,
+.md-typeset .example>summary::before {
+	background-color: var(--example-admonition-color);
+}
+
+/* Custom borderless admonition, just to help position images. Use with: */
+/* !!! image inline end "" */
+.md-typeset .admonition.image,
+.md-typeset details.image {
+	border: 0;
+	box-shadow: none;
+	background-color: transparent;
+}
+
+/* Invert black images so they are visible in dark mode. */
+[data-md-color-scheme=slate] img.invertible {
+	filter: invert(1) brightness(0.8);
+}
+
+/* GLightBox images and descriptions */
+.md-typeset a.glightbox img {
+	transition: box-shadow 0.25s;
+	box-shadow: none;
+	border-radius: 0.4rem;
+}
+
+.md-typeset a.glightbox img:hover {
+	transition: box-shadow 0.25s;
+	box-shadow: 0 0 0 2px var(--md-accent-fg-color);
+}
+
+.glightbox-clean .gcontainer .gslide-description {
+	background: var(--md-default-bg-color);
+}
+
+.glightbox-clean .gcontainer .gslide-desc {
+	font-family: "Nunito Sans";
+	font-size: inherit;
+}
+
+.glightbox-container .goverlay {
+	background: var(--md-blanket-color);
+}
+
+.glightbox-container .twemoji svg {
+	fill: currentcolor;
+	width: 1.125em;
+	vertical-align: text-bottom;
+}
+
+/* Tutorial steps */
+.big-number {
+	font-size: x-large;
+	color: var(--md-primary-fg-color);
+}
+
+.md-typeset table.tutorial {
+	border: 0;
+	font-size: inherit;
+}
+
+.md-typeset table.tutorial tr:hover {
+	background-color: var(--md-typeset-table-color--light);
+}
+
+.md-typeset .tutorial img {
+	float: right;
+	width: 50%;
+	margin-left: 1em;
+}
+
+.md-typeset .tutorial td {
+	padding: 1em;
+	border-top: 1px solid var(--md-default-bg-color--light);
+	border-bottom: 1px solid var(--md-default-bg-color--light);
+}
+
+/* Tutorial level badge */
+.md-typeset .tutorial_level {
+	border-radius: 0.5rem;
+	font-size: initial;
+	font-weight: normal;
+	padding: 0 10px;
+}
+
+.md-typeset h1:has(+ .tutorial_level-container) {
+	margin-bottom: 0.5rem;
+}
+.md-typeset .tutorial_level-container {
+	margin: 0 0 1.2em;
+}
+
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-beginner {
+	background-color: #1F7A3E;
+	color: #B6F2C8;
+}
+.md-typeset .tutorial_level-beginner {
+	background-color: #DFF5E6;
+	color: #1F7A3E;
+}
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-intermediate {
+	background-color: #8A6D1A;
+	color: #FFF1B8;
+}
+.md-typeset .tutorial_level-intermediate {
+	background-color: #FFF4CC;
+	color: #8A6D1A;
+}
+
+[data-md-color-scheme=slate] .md-typeset .tutorial_level-advanced {
+	background-color: #8C2F39;
+	color: #FFD1D6;
+}
+
+.md-typeset .tutorial_level-advanced {
+	background-color: #FDE2E4;
+	color: #8C2F39;
+}
+
+/* Links around code blocks */
+.md-typeset p:has(.source-link) {
+	margin-top: 0;
+	font-size: small;
+	float: right;
+}
+
+/* Decorators for links to REST API */
+.md-typeset code.rest-method {
+	color: white;
+	border-radius: 0.25rem;
+	font-size: .5rem;
+	font-family: sans-serif;
+	font-weight: bold;
+	padding: 2px 6px;
+	line-height: 1;
+	vertical-align: middle;
+}
+
+[data-md-color-scheme=slate] .md-typeset a code.rest-method-get {
+	background-color: #2a69a7;
+}
+
+[data-md-color-scheme=slate] .md-typeset a code.rest-method-put {
+	background-color: #d59d58
+}
+
+[data-md-color-scheme=slate] .md-typeset a code.rest-method-post {
+	background-color: #48cb90
+}
+
+[data-md-color-scheme=default] .md-typeset a code.rest-method-get {
+	background-color: #61affe;
+}
+
+[data-md-color-scheme=default] .md-typeset a code.rest-method-put {
+	background-color: #fca130
+}
+
+[data-md-color-scheme=default] .md-typeset a code.rest-method-post {
+	background-color: #49cc90
+}
+
+.md-typeset code.rest-method-ws {
+	background-color: #b50505;
+}
+
+.md-typeset code.rest-method-req {
+	background-color: #8e6fc9;
+}
+
+/* Graphviz diagrams */
+.graphviz {
+	display: block;
+	margin: auto;
+}
+
+.graphviz text {
+	fill: var(--md-default-fg-color);
+	font-family: "Nunito Sans";
+}
+
+.graphviz .edge text {
+	fill: var(--md-default-fg-color--light);
+}
+
+.graphviz .edge path {
+	stroke: var(--md-primary-fg-color--light);
+}
+
+.graphviz .edge polygon {
+	stroke: var(--md-primary-fg-color--light);
+	fill: var(--md-primary-fg-color--light);
+}
+
+.graphviz .node path:not([fill="transparent"]),
+.graphviz .node polygon:not([fill="transparent"]),
+.graphviz .node ellipse:not([fill="transparent"]) {
+	stroke: var(--md-accent-fg-color--dark);
+	fill: var(--md-accent-fg-color--transparent);
+	transition: fill 0.25s;
+}
+
+.graphviz .node:hover a:any-link path,
+.graphviz .node:hover a:any-link polygon,
+.graphviz .node:hover a:any-link ellipse,
+.graphviz .edge:hover a:any-link text {
+	/* Highlight on hover only if there's a link target */
+	fill: var(--md-primary-fg-color--light);
+	transition: fill 0.25s;
+}
+
+.graphviz .node:hover a:any-link text {
+	fill: var(--md-primary-fg-color--dark);
+}
+
+.graphviz .cluster polygon {
+	stroke: var(--md-primary-fg-color--light);
+}
+
+.graphviz .node.metadata polygon {
+	fill: var(--md-accent-fg-color--light);
+}
+
+/* General tables customization */
+.md-typeset table:not([class]) th {
+	color: var(--md-primary-fg-color--light);
+	background: var(--md-accent-fg-color--transparent);
+}
+
+[data-md-color-scheme=default] .md-typeset table:not([class]) th {
+	color: var(--md-typeset-color);
+}
+
+.centered .md-typeset__table {
+	display: table;
+	margin: 0 auto;
+}
+
+.md-typeset .frame-table table:not([class]) {
+	display: table;
+	width: 100%;
+	table-layout: fixed;
+}
+
+/* Tables with subsections */
+.md-typeset .subsections table td:not(:has(strong)):first-child {
+	padding-left: 2rem;
+	border-style: hidden;
+	white-space: nowrap;
+}
+
+/* Tables with an unbroken first column */
+
+.md-typeset .keyed-table table td:first-child code {
+	white-space: nowrap;
+}
+
+.md-typeset .subsections table td:not(:has(strong)):first-child+td {
+	border-style: hidden;
+}
+
+/* Font for book title in nav bar */
+.md-nav--lifted>.md-nav__list>.md-nav__item>[for] {
+	font-size: 1rem;
+	font-family: "Nunito Sans";
+	font-weight: normal;
+}
+
+/* Lists representing operations */
+.operation-item {
+	list-style-type: "⟹";
+	padding-left: 0.5rem;
+}
+
+/* Lists that use big icons instead of bullets */
+.md-typeset .icon-list>ul {
+	list-style: none;
+	margin-left: 0;
+}
+
+.md-typeset .icon-list>ul>li {
+	padding-left: 3em;
+	margin-bottom: 1rem;
+	position: relative;
+}
+
+.md-typeset .icon-list>ul>li>p:first-child>.twemoji {
+	position: absolute;
+	left: 0px;
+	height: 2em;
+}
+
+.md-typeset .icon-list>ul>li>p:first-child>.twemoji>svg {
+	width: 2em;
+}
+
+/* Scalar REST API reference */
+.scalar-app {
+	font-size: 0.8rem;
+}
+
+.light-mode:has(.scalar-app) {
+	--scalar-color-accent: var(--devbook-color--dark);
+}
+
+.dark-mode:has(.scalar-app) {
+	--scalar-background-1: var(--md-default-bg-color);
+	--scalar-color-accent: var(--devbook-color);
+}
+
+/* CATS documentation placeholders, such as <TypeName>. */
+.md-typeset .language-cats .nt {
+	font-style: italic;
+	color: var(--md-code-hl-generic-color);
+}

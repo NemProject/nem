@@ -1,0 +1,95 @@
+{% set ns = namespace(step_count=1) %}
+{% set ns.group_count = 99 %}
+{% set lang_name = {"py":"Python", "js":"JavaScript"} %}
+{% set lang_icon = {"py":":simple-python:", "js":":simple-javascript:"} %}
+{% set lang_ext = {"py":"py", "js":"mjs"} %}
+
+{% macro list_begin() -%}
+{% set ns.step_count = 1 %}
+<table markdown class="tutorial">
+{%- endmacro %}
+
+{% macro list_end() -%}
+</table>
+{%- endmacro %}
+
+{% macro step_begin(fname) -%}
+<tr markdown><td markdown>![]({{ fname }}){ data-description=".step-{{ ns.step_count }}" }<div markdown class="step-{{ ns.step_count }}"><span class="big-number">{{ ns.step_count }}. </span>
+{%- endmacro -%}
+
+{% macro step_end() -%}
+</div></td></tr>
+{% set ns.step_count = ns.step_count + 1 %}
+{%- endmacro %}
+
+{% macro code_full_tagged(filename, langs, show=true) -%}
+{%- set ns.filename = filename -%}
+
+{# Convert list to dictionary with empty values #}
+{%- if langs is sequence -%}
+    {%- set parsed = {} -%}
+    {%- for l in langs -%}
+        {%- set _ = parsed.update({ l: {} }) -%}
+    {%- endfor -%}
+    {%- set langs = parsed %}
+{%- endif -%}
+{%- set ns.langs = langs -%}
+
+{# Now iterate over the normalized dictionary #}
+{%- if show -%}
+{%- for l, props in langs.items() -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{ l }} linenums="1"
+    {% for line in config['extra']['nem']['tutorial_code'][filename ~ '.' ~ lang_ext[l]]['full'].split('\n') %}
+    {{- line }}
+    {% endfor %}
+    ```
+
+    [Download source]({{ config.repo_url }}/raw/refs/heads/{{config.extra.nem.branch}}/mkdocs/overrides/{{filename}}.{{lang_ext[l]}}){ .source-link }
+
+{% endfor %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro code_snippet_tagged(section) -%}
+{# Iterate over the langs of the full code #}
+{%- for l, props in ns.langs.items() -%}
+{%- set snippet = config['extra']['nem']['tutorial_code'][ns.filename ~ '.' ~ lang_ext[l]]['snippets'][section] -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{ l }} linenums="{{snippet['start_line']}}"
+    {% for line in snippet['code'].split('\n') %}
+    {{- line }}
+    {% endfor %}
+    ```
+
+{% endfor %}
+{%- endmacro %}
+
+{% macro to_camel_case(name) -%}
+{%- set parts = name.split('_') -%}
+{{ parts[0] }}{{ parts[1:] | map('title') | join('') }}
+{%- endmacro %}
+
+{% macro var(name) -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display_name = name if 'py' == l else to_camel_case(name) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display_name }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
+{%- endmacro %}
+
+{# Renders a language-specific literal (e.g. Python True -> JavaScript true) as a language-switching dylink. #}
+{% macro lit(value) -%}
+{%- set js_literals = {"True": "true", "False": "false", "None": "null"} -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display = value if 'py' == l else js_literals.get(value, value) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
+{%- endmacro %}

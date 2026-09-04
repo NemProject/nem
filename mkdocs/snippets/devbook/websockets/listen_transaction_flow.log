@@ -1,0 +1,14 @@
+Using node http://libertalia.nemtest.net:7890
+Monitoring address: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4
+Connected to http://libertalia.nemtest.net:7778
+Subscribed to /account/TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4 channel
+Subscribed to /unconfirmed/TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4 channel
+Subscribed to /transactions/TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4 channel
+Account update: balance=10035200000
+Account registered
+Announcing transaction 2928C2D9554AE127...
+unconfirmed: hash=2928c2d9554ae127...
+confirmed: hash=2928c2d9554ae127...
+Transaction 2928C2D9554AE127... confirmed
+Account update: balance=10035200000
+Unsubscribed from all channels

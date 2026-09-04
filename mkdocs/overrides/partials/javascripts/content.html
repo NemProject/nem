@@ -1,0 +1,51 @@
+<!-- User-preference: link content tabs -->
+{% if "content.tabs.link" in features %}
+	<script>
+		var tabs = __md_get("__tabs") || ["Python"]
+		main: for (var set of document.querySelectorAll(".tabbed-set")) {
+			var labels = set.querySelector(".tabbed-labels")
+			for (var tab of tabs)
+				for (var label of labels.getElementsByTagName("label"))
+					if (label.innerText.trim() === tab) {
+						var input = document.getElementById(label.htmlFor)
+						input.checked = true
+						continue main
+					}
+		}
+		// Initialize dynamic links
+		main2: for (var set of document.querySelectorAll(".dylink")) {
+			var labels = set.querySelectorAll(".dylink-option")
+			for (var tab of tabs)
+				for (var label of labels)
+					if (label.htmlFor === tab) {
+						var input = set.querySelector(`#${label.htmlFor}`)
+						input.checked = true
+						continue main2
+					}
+		}
+		// Link dynamic links to their tabs
+		var tab_groups = document.getElementsByClassName("tabbed-labels");
+		for (var tab_group of tab_groups) {
+				labels = tab_group.getElementsByTagName("label");
+				for (var label of labels) {
+						label.addEventListener("click", function(e){
+								tab_name = e.target.innerText.trim();
+								dylink_options = document.getElementsByClassName("dylink-option");
+								for (var dylink_option of dylink_options) {
+										if (dylink_option.htmlFor === tab_name) {
+												document.querySelectorAll(`#${dylink_option.htmlFor}`).forEach(
+													radio => radio.checked = true);
+										}
+								}
+						})
+				}
+		}
+	</script>
+{% endif %}
+
+<!-- Switch to content tab target -->
+<script>
+	var target = document.getElementById(location.hash.slice(1))
+	if (target && target.name)
+		target.checked = target.name.startsWith("__tabbed_")
+</script>

@@ -1,0 +1,140 @@
+INHERIT: ./mkdocs.base.yml
+
+site_name: NEM Docs WIP 🚧
+site_url: https://docs.nemtest.net/en
+docs_dir: ../pages/en
+site_dir: ../../docs/en
+edit_uri: blob/new-docs/mkdocs/pages/en
+plugins:
+  search:
+    lang: en
+  mkdoxy:  # Generate API reference docs for Java
+    projects:
+      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
+        doxy-cfg:  # standard doxygen configuration (key: value)
+          OUTPUT_LANGUAGE: English
+markdown_extensions:
+  toc:
+    permalink_title: Anchor link to this section for reference
+    title: On this page
+theme:
+  language: en
+  font:
+    text: Nunito Sans
+  palette:
+    # Palette toggle for automatic mode
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+extra:
+  nem:
+    tutorial_level: Tutorial level
+    tutorial_level_labels:
+      beginner: BEGINNER
+      intermediate: INTERMEDIATE
+      advanced: ADVANCED
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+  social:
+    - icon: fontawesome/solid/house
+      link: https://docs.nemtest.net
+      name: Go to the home page
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/SymbolSyndicate
+      name: Follow us on X
+    - icon: fontawesome/brands/github
+      link: https://github.com/NemProject
+      name: Explore our repos
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/J38KwW5ZuG
+      name: Join our Discord server
+    - icon: fontawesome/solid/mountain
+      link: https://nemproject.github.io/nem-docs
+      name: Visit the legacy documentation site
+nav:
+  - index.md
+  - User Manual:
+      - userbook/intro.md
+      - Node Operation:
+          - userbook/node/install.md
+          - userbook/node/supernode-program.md
+  - Developer Manual:
+      - devbook/intro.md
+      - Getting Started:
+          - devbook/start/setup.md
+          - devbook/start/hello-world.md
+      - Tutorials:
+          - Accounts:
+              - devbook/accounts/create-from-private-key.md
+              - devbook/accounts/create-from-mnemonic.md
+              - devbook/accounts/testnet-faucet.md
+              - devbook/accounts/query-balance.md
+              - devbook/accounts/configure-multisig.md
+          - Transactions:
+              - devbook/transactions/transfer-xem.md
+              - devbook/transactions/transfer-mosaics.md
+              - devbook/transactions/messages.md
+              - devbook/transactions/monitoring-status.md
+              - devbook/transactions/typed-descriptors.md
+              - devbook/transactions/sign-multisig.md
+          - Mosaics:
+              - devbook/mosaics/create-mosaic.md
+              - devbook/mosaics/mosaic-levy.md
+              - devbook/mosaics/get-mosaic-info.md
+              - devbook/mosaics/change-mosaic-supply.md
+              - devbook/mosaics/modify-mosaic-definition.md
+          - Namespaces:
+              - devbook/namespaces/register-root-namespace.md
+              - devbook/namespaces/register-subnamespace.md
+              - devbook/namespaces/extend-root-namespace.md
+              - devbook/namespaces/get-namespace-info.md
+          - Network Currency:
+              - devbook/network-currency/query-currency-supply.md
+              - devbook/network-currency/query-block-rewards.md
+          - Chain State:
+              - devbook/chain/chain-heights.md
+          - WebSockets:
+              - devbook/websockets/listen-new-blocks.md
+              - devbook/websockets/listen-transaction-flow.md
+              - devbook/websockets/listen-multisig-transaction-flow.md
+      - Reference Guides:
+          - Python SDK: devbook/reference/py/
+          - TypeScript SDK: devbook/reference/ts/
+          - NEM REST API: devbook/reference/rest/nem.md
+          - Serialization: devbook/reference/serialization/index.md
+          - WebSockets: devbook/reference/websockets/index.md
+          - devbook/reference/whitepaper/index.md
+  - Textbook:
+      - textbook/intro.md
+      - textbook/cryptography.md
+      - textbook/accounts.md
+      - textbook/consensus.md
+      - textbook/transactions.md
+      - textbook/transfer_transactions.md
+      - textbook/mosaics.md
+      - textbook/namespaces.md
+      - textbook/blocks.md
+      - textbook/nodes.md
+      - textbook/harvesting.md
+      - textbook/cats.md
+      - textbook/glossary.md
