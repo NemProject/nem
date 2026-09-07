@@ -18,7 +18,7 @@ tutorial_level: intermediate
 * 開発環境をセットアップする。
   [開発環境のセットアップ](../start/setup.md) を参照してください。
 * ネームスペースを登録する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
-* トランザクションとリース手数料を支払うための [XEM](default:XEM) を用意する。
+* トランザクションとレンタル手数料を支払うための [XEM](default:XEM) を用意する。
   [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
 
 さらに、トランザクションのアナウンスと承認の方法を理解するため、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルを確認してください。
@@ -70,15 +70,15 @@ tutorial_level: intermediate
 
 * {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
 
-* {{ tutorial.var('rental_fee_sink') }}: ネームスペースの [リース手数料](../../textbook/namespaces.md#lease-fee) を集める特別なアカウント。
+* {{ tutorial.var('rental_fee_sink') }}: ネームスペースの [レンタル手数料](../../textbook/namespaces.md#lease-fee) を集める特別なアカウント。
     各ネットワークには固定されたシンクアドレスがあります。
 
     * [メインネット](default:メインネット): `NAMESPACEWH4MKFMBCVFERDPOOP4FK7MTBXDPZZA`
     * [テストネット](default:テストネット): `TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35`
 
-    ネットワークは、リース手数料を他のアドレスへ送るトランザクションを拒否します。
+    ネットワークは、レンタル手数料を他のアドレスへ送るトランザクションを拒否します。
 
-* {{ tutorial.var('rental_fee') }}: ルートネームスペースのリース手数料である 100 XEM。
+* {{ tutorial.var('rental_fee') }}: ルートネームスペースのレンタル手数料である 100 XEM。
     SDK の <dy:FeeCalculator.calculateNamespaceRentalFee> ヘルパーは、必要な金額を返します。
     {{ tutorial.lit('True') }} 引数は、ルートネームスペースの手数料を要求します。
 
@@ -90,7 +90,7 @@ tutorial_level: intermediate
 {{ tutorial.code_snippet_tagged('step-5') }}
 
 最後に、<dy:FeeCalculator.calculateTransactionFee> でトランザクション手数料を計算し、トランザクションに付加します。
-リース手数料とは異なり、トランザクション手数料は [ハーベスターアカウント](default:ハーベスターアカウント) に支払われます。
+レンタル手数料とは異なり、トランザクション手数料は [ハーベスターアカウント](default:ハーベスターアカウント) に支払われます。
 ネームスペース登録トランザクションの固定手数料は 0.15 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 
 ### トランザクションを送信する {: #submitting-the-transaction }
@@ -126,7 +126,7 @@ tutorial_level: intermediate
 * **ネームスペース名**（5 行目）: 選択した名前 `ns_1783091378` には、一意性を確保するためのタイムスタンプが含まれています。
     この名前を [NEM テストネットエクスプローラー](https://testnet.nem.fyi/) で検索すると、ネームスペースの詳細を確認できます。
 
-* **リース手数料とトランザクション手数料**（6～7 行目）: ルートネームスペースなのでリース手数料は 100 XEM です（[サブネームスペース](default:サブネームスペース) は代わりに 10 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
+* **レンタル手数料とトランザクション手数料**（6～7 行目）: ルートネームスペースなのでレンタル手数料は 100 XEM です（[サブネームスペース](default:サブネームスペース) は代わりに 10 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
 
 * **ネームスペース情報**（31～33 行目）: 登録されたネームスペース、その所有者（署名者のアドレス）、登録時の高さ。リースが開始したブロックの高さです。
 
@@ -137,7 +137,7 @@ tutorial_level: intermediate
 | 手順 | 関連ドキュメント |
 | --- | --- |
 | [ネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:NamespaceRegistrationTransactionV1> |
-| [リース手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
+| [レンタル手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
 | [ネームスペースを取得する](#retrieving-the-namespace) | <get:/namespace> |
 
 ## 次のステップ {: #next-steps }

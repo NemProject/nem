@@ -24,7 +24,7 @@ tutorial_level: intermediate
         このチュートリアルの例では、`ns_root` という名前のルートネームスペースを使用します。
         コードを自分のルートネームスペース名に更新してください。
 
-* トランザクションとリース手数料を支払うための [XEM](default:XEM) を用意する。
+* トランザクションとレンタル手数料を支払うための [XEM](default:XEM) を用意する。
   [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
 
 さらに、トランザクションのアナウンスと承認の方法を理解するため、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルを確認してください。
@@ -73,7 +73,7 @@ tutorial_level: intermediate
     これはサブネームスペースの名前だけで、完全なパスではないことに注意してください。
     例えば、ルートが `company` の `company.product` を作成する場合は、{{ tutorial.var("`name: 'product'`") }} と {{ tutorial.var("`parent_name: 'company'`") }} を設定します。
 
-* {{ tutorial.var('rental_fee') }}: サブネームスペースのリース手数料である 10 XEM。ルートネームスペースと同じ [シンクアカウント](./register-root-namespace.md#building-the-transaction) に支払います。
+* {{ tutorial.var('rental_fee') }}: サブネームスペースのレンタル手数料である 10 XEM。ルートネームスペースと同じ [シンクアカウント](./register-root-namespace.md#building-the-transaction) に支払います。
 
     SDK の <dy:FeeCalculator.calculateNamespaceRentalFee> ヘルパーは、必要な金額を返します。
     {{ tutorial.lit('False') }} 引数は、サブネームスペースの手数料を要求します。
@@ -109,7 +109,7 @@ tutorial_level: intermediate
 
 * **完全なネームスペースパス**（5 行目）: `ns_root.sub_1783411728` は、親ネームスペース `ns_root` とトランザクションで設定したサブネームスペース名を組み合わせたものです。
 
-* **リース手数料とトランザクション手数料**（6～7 行目）: サブネームスペースなのでリース手数料は 10 XEM です（ルートネームスペースは代わりに 100 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
+* **レンタル手数料とトランザクション手数料**（6～7 行目）: サブネームスペースなのでレンタル手数料は 10 XEM です（ルートネームスペースは代わりに 100 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
 
 * **ネームスペース情報**（32～34 行目）: 登録されたサブネームスペース、その所有者（署名者のアドレス）、登録時の高さ。ルートネームスペースのリースが開始したブロックの高さをサブネームスペースが継承しています。
 
@@ -120,7 +120,7 @@ tutorial_level: intermediate
 | 手順 | 関連ドキュメント |
 | --- | --- |
 | [サブネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:NamespaceRegistrationTransactionV1> |
-| [リース手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
+| [レンタル手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
 | [サブネームスペースを取得する](#retrieving-the-subnamespace) | <get:/namespace> |
 
 ## 次のステップ {: #next-steps }

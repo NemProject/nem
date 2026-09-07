@@ -14,7 +14,7 @@ tutorial_level: beginner
 
 * アクティブなルートネームスペースを所有する [アカウント](default:アカウント)。
     [ルートネームスペースを登録する](./register-root-namespace.md) を参照してください。
-* トランザクションとリース手数料を支払うための [XEM](default:XEM)。
+* トランザクションとレンタル手数料を支払うための [XEM](default:XEM)。
 
 ## 延長するタイミング {: #when-to-extend }
 
@@ -35,7 +35,7 @@ tutorial_level: beginner
 
 ## 手順 {: #procedure }
 
-ネームスペースを延長するには、**同じルートネームスペース名** を使って [登録手順](./register-root-namespace.md) を繰り返し、**100 XEM のリース手数料**をもう一度支払います。
+ネームスペースを延長するには、**同じルートネームスペース名** を使って [登録手順](./register-root-namespace.md) を繰り返し、**100 XEM のレンタル手数料**をもう一度支払います。
 
 トランザクションに署名するアカウントは、ネームスペースの所有者でなければなりません。
 
