@@ -26,7 +26,7 @@ digraph "Transfer XEM" {
 始める前に、次の準備をしてください。
 
 * [開発環境をセットアップ](../start/setup.md) する。
-* 転送トランザクションを送信する [アカウント](default:アカウント) を、[コードから](../accounts/create-from-private-key.md) または [ウォレットを使って](../../userbook/wallet/create-account.md) 作成する。
+* 転送トランザクションを送信する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
 * トランザクション手数料と転送額を支払うための [XEM](default:XEM) を用意する。
     [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
 
@@ -61,7 +61,7 @@ digraph "Transfer XEM" {
 スニペットでは、`XEM_AMOUNT` 環境変数から数値として読み込んだ送金額を、`xem` 変数に定義します。
 指定されていない場合は、デフォルト値として 1 XEM を使います。
 
-トランザクションの `amount` フィールドには、XEM の全単位ではなく [原子単位](../../textbook/mosaics.md#divisibility) が必要です。
+トランザクションの `amount` フィールドには、XEM 単位ではなく [原子単位](../../textbook/mosaics.md#divisibility) が必要です。
 XEM の [可分性](default:可分性) は 6 なので、1 XEM は 100 万原子単位です。
 スニペットでは `xem` に 1'000'000 を掛けて `amount` を導出します。
 
@@ -73,27 +73,27 @@ NEM のすべてのトランザクションには 2 つの時刻フィールド�
 
 * `timestamp`: トランザクションが作成された時点。ここでは現在のネットワーク時刻を設定します。
 * `deadline`: トランザクションを破棄する前に、ネットワークが承認を試み続ける期間。
-    タイムスタンプより後で、[24 時間](../../textbook/transactions.md#common-transaction-structure) 以内でなければなりません。
-    そうでなければ、ノードはトランザクションを拒否します。
-    この例では、制限内であるタイムスタンプの 2 時間後に設定します。
+    タイムスタンプより後の時間で、[24 時間](../../textbook/transactions.md#common-transaction-structure) 以内でなければなりません。
+    範囲外の時間を指定した場合、ノードはトランザクションを拒否します。
+    この例では、範囲内であるタイムスタンプの 2 時間後に設定します。
 
-したがって、送金を構築するには正確なネットワーク時刻が必要です。
+送金のトランザクションを構築するには正確なネットワーク時刻が必要です。
 <get:/time-sync/network-time> エンドポイントは、ノードの現在のネットワーク時刻を返します。
 ノードはこの値をミリ秒で返すため、コードでは 1000 で割って、トランザクションが必要とする秒数を取得します。
 
 ただし、アプリケーションがトランザクションごとにネットワーク時刻を照会する必要はありません。
 一度取得した後、必要に応じてローカルシステムの時計を使って調整できます。
-これにより、正確さと性能のバランスを取れます。
+これにより、正確さと性能のバランスが取れます。
 
-コードは秒数を SDK の <dy:NetworkTimestamp> クラスでラップして `timestamp` を取得し、<dy:NetworkTimestamp.addHours> ヘルパーでそこから `deadline` を導出します。
+コードは秒数を SDK の <dy:NetworkTimestamp> クラスでラップして `timestamp` を取得し、<dy:NetworkTimestamp.addHours> ヘルパーで `deadline` を導出します。
 
 ### トランザクションを構築する {: #building-the-transaction }
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-スニペットは、転送トランザクションのプロパティを指定する記述子を使って <dy:TransactionFactory.create> を呼び出します。
+スニペットは、転送トランザクションのプロパティを指定するディスクリプタを使って <dy:TransactionFactory.create> を呼び出します。
 
-* {{ tutorial.var('type') }}: このチュートリアルでは、現在の送金バージョンである <ser:TransferTransactionV2> を使用します。XEM と他の [モザイク](default:モザイク) の両方を運べます。
+* {{ tutorial.var('type') }}: このチュートリアルでは、現在の送金バージョンである <ser:TransferTransactionV2> を使用します。XEM と他の [モザイク](default:モザイク) の両方を送信できます。
     ここではモザイクを付加しないため、トランザクションは XEM だけを送信します。
 
 * {{ tutorial.var('signer_public_key') }}: 署名者は手数料を支払うアカウントです。
@@ -107,7 +107,7 @@ NEM のすべてのトランザクションには 2 つの時刻フィールド�
 
 !!! info "モザイクまたはメッセージを送信する"
 
-    <ser:TransferTransactionV2> は、XEM の代わりに他の [モザイク](default:モザイク) を運んだり、メッセージを含めたりできます。それぞれの場合で手数料の計算方法は異なります。
+    <ser:TransferTransactionV2> は、XEM の代わりに他の [モザイク](default:モザイク) を送信したり、メッセージを含めたりできます。それぞれの場合で手数料の計算方法は異なります。
     詳細については、[モザイクを送信する](./transfer-mosaics.md) と [メッセージ付きで送信する](./messages.md) チュートリアルを参照してください。
 
 ### トランザクション手数料を計算する {: #calculating-the-transaction-fee }
@@ -126,7 +126,7 @@ NEM の [固定手数料表](../../textbook/transfer_transactions.md#fees) を�
 {{ tutorial.code_snippet_tagged('step-6') }}
 
 トランザクションを作成したら、署名アカウントの秘密鍵で署名する必要があります。
-署名により、トランザクションが本物で送信者によって承認されたことを保証します。
+署名により、トランザクションが本物であり、送信者によって承認されたことを保証します。
 
 <dy:NemFacade.signTransaction> は [署名](default:署名) を返します。
 <dy:TransactionFactory.attachSignature> は署名をトランザクションに追加し、ノードへ直接送信してアナウンスできる JSON ペイロードにシリアライズします。
@@ -141,11 +141,11 @@ NEM の [固定手数料表](../../textbook/transfer_transactions.md#fees) を�
 `SUCCESS` はトランザクションが最初のチェックに合格し、[未承認トランザクションプール](default:未承認トランザクションプール) に追加されたことを意味します。
 それ以外の結果はノードが受け付けなかったことを意味し、例えばアカウントが金額と手数料をカバーできる XEM を保有していないなど、その理由をレスポンスメッセージで説明します。
 
-!!! warning "未承認トランザクションに依存しないでください"
+!!! warning "未承認トランザクションを信頼しないでください"
 
     `SUCCESS` の結果は、トランザクションが未承認プールに到達したことだけを意味します。
     ブロックに含まれることはまだ保証されていません。
-    [承認](#waiting-for-confirmation) されるまで、できれば [書き換え制限](default:書き換え制限) を過ぎるまで待ってから依存してください。
+    [承認](#waiting-for-confirmation) されるまで、できれば [書き換え制限](default:書き換え制限) を過ぎるまで待ってから信頼してください。
 
 ### 承認を待つ {: #waiting-for-confirmation }
 
@@ -168,7 +168,7 @@ NEM はおよそ 1 分に 1 ブロックを生成するため、通常、承認�
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="11 13 15 16 17 20 21 34"
 --8<-- 'devbook/transactions/transfer_xem.log'

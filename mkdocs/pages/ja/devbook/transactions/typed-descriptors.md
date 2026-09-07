@@ -1,9 +1,9 @@
 ---
-title: 型付き記述子
+title: 型付きディスクリプタ
 tutorial_level: beginner
 ---
 
-# JavaScript で型付き記述子を使ってトランザクションを作成する
+# JavaScript で型付きディスクリプタを使ってトランザクションを作成する
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 {{ tutorial.code_full_tagged('devbook/transactions/transfer_xem.typed', ['js'], show=false) }}
@@ -25,13 +25,13 @@ tutorial_level: beginner
 
 ## 作成手順 {: #creation-process }
 
-トランザクションは、型安全な方法で次の 2 段階により作成します。トランザクション記述子を作成し、その記述子からトランザクション自体を作成します。
+トランザクションは、型安全な方法で次の 2 段階により作成します。トランザクションディスクリプタを作成し、そのディスクリプタからトランザクション自体を作成します。
 
-### 記述子を作成する {: #creating-the-descriptor }
+### ディスクリプタを作成する {: #creating-the-descriptor }
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-JavaScript でトランザクションを構築するとき、構造化されたパラメーターを持つコンストラクターによって型安全性を提供するのが型付き記述子です。
+JavaScript でトランザクションを構築するとき、構造化されたパラメーターを持つコンストラクターによって型安全性を提供するのが型付きディスクリプタです。
 
 例えば、コードで使われている <js:TransferTransactionV2Descriptor> を参照してください。
 
@@ -39,7 +39,7 @@ JavaScript でトランザクションを構築するとき、構造化された
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-記述子の準備ができたら、トランザクションの作成は簡単です。記述子を <js:NemFacade.createTransactionFromTypedDescriptor> メソッドに渡し、必要な手数料と期限を指定します。
+ディスクリプタの準備ができたら、トランザクションの作成は簡単です。ディスクリプタを <js:NemFacade.createTransactionFromTypedDescriptor> メソッドに渡し、必要な手数料と期限を指定します。
 
 [転送トランザクションを作成する](./transfer-xem.md#calculating-the-transaction-fee) チュートリアルと同じく、トランザクションの内容によって手数料が決まるため、構築後に手数料を計算する必要があります。
 

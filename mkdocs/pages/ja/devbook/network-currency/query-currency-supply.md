@@ -42,16 +42,16 @@ HTTP リクエストを送信する方法だけが必要です。
 コードは、XEM モザイク識別子 `nem:xem` を `mosaicId` クエリパラメーターとして渡し、<get:/mosaic/supply> エンドポイントへ `GET` リクエストを送信します。
 
 レスポンスは、モザイク識別子と現在の `supply` を含む JSON オブジェクトです。
-`supply` は [全単位](../../textbook/mosaics.md#divisibility) で表されます。
+`supply` は [全体単位](../../textbook/mosaics.md#divisibility) で表されます。
 
 ### モザイクの可分性を読み取る {: #reading-the-mosaics-divisibility }
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-前の手順で取得した供給量はすでに全単位ですが、次の手順で読み取るアカウント残高は [原子単位](../../textbook/mosaics.md#divisibility) で報告されます。
+前の手順で取得した供給量はすでに全体単位ですが、次の手順で読み取るアカウント残高は [原子単位](../../textbook/mosaics.md#divisibility) で報告されます。
 
 値を同じ単位に変換するため、この手順ではまずモザイクの [可分性](default:可分性) を取得します。
-その値を使って、残高を原子単位から全単位へ変換します。
+その値を使って、残高を原子単位から全体単位へ変換します。
 
 <get:/mosaic/definition> エンドポイントは、可分性を含むモザイク定義を返します。
 `nem:xem` の可分性は 6 です。
@@ -83,7 +83,7 @@ HTTP リクエストを送信する方法だけが必要です。
 
 これは、公開市場で自由に利用できる XEM の量です。
 
-<get:/mosaic/supply> の総供給量は全単位なので、コードは差し引く前に `scale` を掛けて原子単位に変換し、その結果を表示します。
+<get:/mosaic/supply> の総供給量は全体単位なので、コードは差し引く前に `scale` を掛けて原子単位に変換し、その結果を表示します。
 
 ## 出力 {: #output }
 

@@ -22,8 +22,8 @@ tutorial_level: intermediate
 
 * 開発環境をセットアップする。
     [開発環境のセットアップ](../start/setup.md) を参照してください。
-* モザイクを所有する [アカウント](default:アカウント) を、[コードから](../accounts/create-from-private-key.md) または [ウォレットを使って](../../userbook/wallet/create-account.md) 作成する。
-* モザイクを置く [ネームスペース](default:ネームスペース) を登録する。
+* モザイクを所有する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
+* モザイクが属する [ネームスペース](default:ネームスペース) を登録する。
     [ルートネームスペースを登録する](../namespaces/register-root-namespace.md) を参照してください。
 * トランザクションと作成手数料を支払うための [XEM](default:XEM) を用意する。
     [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
@@ -45,7 +45,7 @@ tutorial_level: intermediate
 スニペットは、署名者の秘密鍵を `SIGNER_PRIVATE_KEY` 環境変数から読み込みます。
 設定されていない場合は、テスト用のデフォルトキーを使用します。
 署名者のアドレスは公開鍵から導出されます。
-このアカウントが作成したモザイクを所有し、モザイクを置くネームスペースも所有していなければなりません。
+このアカウントが作成したモザイクを所有し、モザイクが属するネームスペースも所有していなければなりません。
 
 ### ネットワーク時刻を取得する {: #fetching-network-time }
 
@@ -53,7 +53,7 @@ tutorial_level: intermediate
 
 ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
 
-### モザイク名を選択する {: #choosing-the-mosaic-name }
+### モザイク名を設定する {: #choosing-the-mosaic-name }
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
@@ -74,7 +74,7 @@ tutorial_level: intermediate
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-モザイク定義は、モザイクを登録するトランザクションとは別に、資産自体を説明します。
+モザイクの定義では、資産そのものを、それを登録するトランザクションとは区別して記述しています：
 
 * {{ tutorial.var('owner_public_key') }}: モザイクを作成するアカウントの [公開鍵](default:公開鍵)。{{ tutorial.var('signer_public_key') }} と一致しなければなりません。
     2 つが異なるトランザクションはネットワークに拒否されます。
@@ -86,16 +86,16 @@ tutorial_level: intermediate
 * {{ tutorial.var('properties') }}: モザイクの動作を設定するキーと値の組。
 
     * {{ tutorial.var('divisibility') }}: モザイクがサポートする小数桁数（可分性）。
-        例えば `2` は、1 全単位を 100（10^2^）原子単位に分割できることを意味します。
+        例えば `2` は、1 全体単位を 100（10^2^）原子単位に分割できることを意味します。
         テキストブックの [可分性](default:可分性) を参照してください。
-    * {{ tutorial.var('initialSupply') }}: モザイク定義時に作成者へ発行される全単位の数。
+    * {{ tutorial.var('initialSupply') }}: モザイク定義時に作成者へ発行される全体単位の数。
         テキストブックの [初期供給量](../../textbook/mosaics.md#initial-supply) を参照してください。
     * {{ tutorial.var('supplyMutable') }}: 作成後に総供給量を変更できるかどうか。
         テキストブックの [供給量の可変性](../../textbook/mosaics.md#supply-mutability) を参照してください。
     * {{ tutorial.var('transferable') }}: 作成者以外の任意の 2 アカウント間でモザイクを送信できるかどうか。
         テキストブックの [転送可能性](../../textbook/mosaics.md#transferability) を参照してください。
 
-    この例では、モザイクは小数点以下 2 桁まで分割可能で、`1000.00` 全単位の供給量で始まります。
+    この例では、モザイクは小数点以下 2 桁まで分割可能で、`1000.00` 全体単位の供給量で始まります。
     作成後に供給量を変更でき、アカウント間で自由に転送できます。
 
 !!! note "オプションの徴収手数料"
@@ -111,7 +111,7 @@ tutorial_level: intermediate
 
 * {{ tutorial.var('type') }}: モザイク定義トランザクションでは、タイプ <ser:MosaicDefinitionTransactionV1> を使用します。
 
-* {{ tutorial.var('signer_public_key') }}: トランザクションに署名して手数料を支払うアカウント。モザイクを置くネームスペースの所有者でなければなりません。
+* {{ tutorial.var('signer_public_key') }}: トランザクションに署名して手数料を支払うアカウント。モザイクが属するネームスペースの所有者でなければなりません。
     作成したモザイクの所有者になります。
 
 * {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
@@ -154,17 +154,17 @@ tutorial_level: intermediate
 
 モザイクが正常に作成されたことを確認するため、コードは <get:/mosaic/definition> エンドポイントから定義を取得し、そのプロパティを表示します。
 
-成功したレスポンスは、期待したプロパティを持つモザイクがネットワーク上に存在することを確認します。
+レスポンスが成功すると、そのモザイクがネットワーク上に存在し、期待したプロパティを持っていることを確認できます。
 
 !!! note "モザイクの有効期間"
 
-    モザイク自身に期間はなく、親ネームスペースの有効期限が切れると非アクティブになります。
-    [ルートネームスペースを延長する](../namespaces/extend-root-namespace.md) と、そのモザイクを使用可能な状態に保てます。
+    モザイク自身に有効期間はなく、親ネームスペースの有効期限が切れると非アクティブになります。
+    [ルートネームスペースを延長する](../namespaces/extend-root-namespace.md) と、モザイクが使用可能な状態を維持できます。
     詳細については、テキストブックの [有効期間](../../textbook/mosaics.md#lifetime) を参照してください。
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="5 6 7 67 68 69 70"
 --8<-- 'devbook/mosaics/create_mosaic.log'
@@ -193,7 +193,7 @@ tutorial_level: intermediate
 
 モザイクを作成できたので、次のことを行えます。
 
-* [供給量が可変](../../textbook/mosaics.md#supply-mutability) として作成したモザイクの単位を発行または焼却するために、[モザイクの供給量を変更する](./change-mosaic-supply.md)
+* [供給量が可変](../../textbook/mosaics.md#supply-mutability) として作成したモザイクを発行または焼却するために、[モザイクの供給量を変更する](./change-mosaic-supply.md)
 * [転送トランザクションでモザイクを送信する](../transactions/transfer-mosaics.md) ことで、他のアカウントに配布する
 * [モザイク情報を取得する](./get-mosaic-info.md) ことで、任意のモザイクのプロパティと供給量を確認する
 * 配布前にプロパティを変更するために、[モザイク定義を変更する](./modify-mosaic-definition.md)

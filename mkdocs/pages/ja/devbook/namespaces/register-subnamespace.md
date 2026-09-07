@@ -40,9 +40,9 @@ tutorial_level: intermediate
 コードは [ルートネームスペースを登録する](./register-root-namespace.md) チュートリアルと同じパターンに従います。
 このセクションでは、主な違いだけに焦点を当てます。
 
-共通手順（アカウントのセットアップ、ネットワーク時刻の取得、アナウンス）とルートネームスペースで共有されるトランザクション記述子フィールドの詳細な説明については、[ルートネームスペースを登録する](./register-root-namespace.md) を参照してください。
+共通手順（アカウントのセットアップ、ネットワーク時刻の取得、アナウンス）とルートネームスペースで共有されるトランザクションディスクリプタフィールドの詳細な説明については、[ルートネームスペースを登録する](./register-root-namespace.md) を参照してください。
 
-### サブネームスペース名を選択する {: #choosing-the-subnamespace-name }
+### サブネームスペース名を設定する {: #choosing-the-subnamespace-name }
 
 {{ tutorial.code_snippet_tagged('step-1') }}
 
@@ -63,12 +63,12 @@ tutorial_level: intermediate
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-サブネームスペースを登録する場合の主な違いは、トランザクション記述子にあります。
+サブネームスペースを登録する場合の主な違いは、トランザクションディスクリプタにあります。
 
 * {{ tutorial.var('parent_name') }}: 前の手順で定義した親ネームスペースの名前。
     ルートネームスペースでも、別のサブネームスペースでも構いません。
 
-* {{ tutorial.var('name') }}: 前の手順で選択したサブネームスペースの名前。
+* {{ tutorial.var('name') }}: 前の手順で設定したサブネームスペースの名前。
 
     これはサブネームスペースの名前だけで、完全なパスではないことに注意してください。
     例えば、ルートが `company` の `company.product` を作成する場合は、{{ tutorial.var("`name: 'product'`") }} と {{ tutorial.var("`parent_name: 'company'`") }} を設定します。
@@ -99,7 +99,7 @@ tutorial_level: intermediate
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="5 6 7 32-34"
 --8<-- 'devbook/namespaces/register_subnamespace.log'

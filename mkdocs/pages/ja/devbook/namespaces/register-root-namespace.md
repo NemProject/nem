@@ -17,7 +17,7 @@ tutorial_level: intermediate
 
 * 開発環境をセットアップする。
   [開発環境のセットアップ](../start/setup.md) を参照してください。
-* ネームスペースを登録する [アカウント](default:アカウント) を、[コードから](../accounts/create-from-private-key.md) または [ウォレットを使って](../../userbook/wallet/create-account.md) 作成する。
+* ネームスペースを登録する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
 * トランザクションとリース手数料を支払うための [XEM](default:XEM) を用意する。
   [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
 
@@ -46,7 +46,7 @@ tutorial_level: intermediate
 
 ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
 
-### ネームスペース名を選択する {: #choosing-the-namespace-name }
+### ネームスペース名を設定する {: #choosing-the-namespace-name }
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
@@ -115,7 +115,7 @@ tutorial_level: intermediate
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="5 6 7 31-33"
 --8<-- 'devbook/namespaces/register_root_namespace.log'

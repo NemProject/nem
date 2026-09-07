@@ -29,7 +29,7 @@ tutorial_level: intermediate
 
 [転送可能性](../../textbook/mosaics.md#transferability) と [名前](../../textbook/mosaics.md#name) は変更できません。
 
-[可分性](default:可分性)、[初期供給量](../../textbook/mosaics.md#initial-supply)、[供給量の可変性](../../textbook/mosaics.md#supply-mutability)、[徴収手数料](default:徴収手数料（levy）) を変更するには、作成者がモザイクの供給量全体をまだ所有している必要があります。
+[可分性](default:可分性)、[初期供給量](../../textbook/mosaics.md#initial-supply)、[供給量の可変性](../../textbook/mosaics.md#supply-mutability)、[徴収手数料](default:徴収手数料（levy）) を変更するには、作成者がモザイクの供給量全体を所有している必要があります。
 実際には、ほとんどのモザイク定義は、モザイクを配布する前にしか変更できません。
 
 完全なルールについては、テキストブックの [モザイクを変更する](../../textbook/mosaics.md#modifying-a-mosaic) を参照してください。

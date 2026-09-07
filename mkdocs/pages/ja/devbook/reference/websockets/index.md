@@ -656,7 +656,7 @@ destination:/w/api/account/get
 #### `/w/api/account/transfers/all` {: #wapiaccounttransfersall }
 
 req:w&#47;api&#47;account&#47;transfers&#47;all
-:   アカウントの最新 25 件までの承認済みトランザクションを <ws:recenttransactions&#47;{address}> に送信し、<req:w&#47;api&#47;account&#47;transfers&#47;unconfirmed> と同じ方法で保留中のトランザクションも送信するようノードに要求します。
+:   アカウントの最新 25 件までの承認済みトランザクションを <ws:recenttransactions&#47;{address}> に送信し、<req:w&#47;api&#47;account&#47;transfers&#47;unconfirmed> と同じ方法で承認待ちのトランザクションも送信するようノードに要求します。
 
 <div class="frame-table" markdown>
 <table markdown>
@@ -675,7 +675,7 @@ destination:/w/api/account/transfers/all
 #### `/w/api/account/transfers/unconfirmed` {: #wapiaccounttransfersunconfirmed }
 
 req:w&#47;api&#47;account&#47;transfers&#47;unconfirmed
-:   アカウントの最新の保留中トランザクションを最大 10 件、<ws:unconfirmed&#47;{address}> とグローバルな <ws:unconfirmed> チャネルに送信するようノードに要求します。
+:   アカウントの最新の承認待ちトランザクションを最大 10 件、<ws:unconfirmed&#47;{address}> とグローバルな <ws:unconfirmed> チャネルに送信するようノードに要求します。
 
 <div class="frame-table" markdown>
 <table markdown>

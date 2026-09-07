@@ -31,7 +31,7 @@ digraph "Multisignature Tree" {
 
 !!! note "別の方法: ポーリング"
 
-    連署者がノードを照会して保留中のトランザクションを見つけるポーリングの方法については、[マルチシグアカウントからトランザクションに署名する](../transactions/sign-multisig.md) チュートリアルを参照してください。
+    連署者がノードを照会して承認待ちのトランザクションを見つけるポーリングの方法については、[マルチシグアカウントからトランザクションに署名する](../transactions/sign-multisig.md) チュートリアルを参照してください。
 
 ## 前提条件 {: #prerequisites }
 
@@ -177,7 +177,7 @@ digraph "Multisignature Tree" {
     リスナーの準備ができていることを確実にするため、トランザクションは必ず WebSocket チャネルをサブスクライブした**後**にアナウンスしてください。
     そうしないと、WebSocket がリッスンする前に通知が届く可能性があります。
 
-    例えばアナウンス後にサブスクライブしたため通知を取り逃した連署者でも、<get:/account/unconfirmedTransactions> をポーリングして保留中のトランザクションを見つけることはできます。
+    例えばアナウンス後にサブスクライブしたため通知を取り逃した連署者でも、<get:/account/unconfirmedTransactions> をポーリングして承認待ちのトランザクションを見つけることはできます。
 
 連署者 1 がサブスクライブしたら、連署者 0 は <post:/transaction/announce> エンドポイントへマルチシグトランザクションをアナウンスし、結果を確認します。
 ノードが拒否した場合は、拒否理由を表示して停止します。
@@ -185,19 +185,19 @@ digraph "Multisignature Tree" {
 有効であればネットワークはトランザクションを受け付けますが、まだ承認されていません。
 マルチシグアカウントには 2 つの連署が必要なのに 1 つしか提供されていないため、不足している連署が到着するまでトランザクションは [未承認トランザクションプール](default:未承認トランザクションプール) で待機します。
 
-### 連署者: 保留中のトランザクションに連署する {: #cosignatory-cosigning-the-pending-transaction }
+### 連署者: 承認待ちのトランザクションに連署する {: #cosignatory-cosigning-the-pending-transaction }
 
 {{ tutorial.code_snippet_tagged('step-7') }}
 
-保留中のマルチシグトランザクションは、[TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) として <ws:unconfirmed&#47;{address}> チャネルに届きます。
+承認待ちのマルチシグトランザクションは、[TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) として <ws:unconfirmed&#47;{address}> チャネルに届きます。
 マルチシグトランザクションでは、`meta` フィールドに追加の `innerHash` フィールドが含まれ、**内部トランザクション** のハッシュ、つまり連署が参照する値を保持します。
 
-連署者は、承認を待つ保留中のマルチシグトランザクションを複数持つ可能性があります。
+連署者は、承認待ちのマルチシグトランザクションを複数持つ可能性があります。
 この例では、マルチシグアカウントが発行したトランザクションを選択します。
-そのアカウントからの保留中トランザクションは 1 件だけであると想定するため、チュートリアルにはこれで十分です。
+そのアカウントからの承認待ちトランザクションは 1 件だけであると想定するため、チュートリアルにはこれで十分です。
 
 ただし、実際のアプリケーションでは、このフィルターだけでは不十分です。
-保留中のトランザクションが期待したものだと保証するものはないため、連署するものを選ぶ前に、タイプ、受取人、金額など、保留中の各トランザクションの内容を確認してください。
+承認待ちのトランザクションが期待したものだと保証するものはないため、連署するものを選ぶ前に、タイプ、受取人、金額など、承認待ちの各トランザクションの内容を確認してください。
 
 !!! warning "連署する前に確認してください"
 
@@ -214,7 +214,7 @@ digraph "Multisignature Tree" {
 {{ tutorial.code_snippet_tagged('step-9') }}
 
 アナウンスした連署は独立したトランザクションとして [未承認トランザクションプール](default:未承認トランザクションプール) に表示されないため、独自の通知は発生しません。
-代わりにネットワークが保留中のマルチシグトランザクションに付加し、<ws:unconfirmed&#47;{address}> チャネルで新しい通知が発生します。
+代わりにネットワークが承認待ちのマルチシグトランザクションに付加し、<ws:unconfirmed&#47;{address}> チャネルで新しい通知が発生します。
 この更新は連署が追加されたことだけを示すため、コードは無視します。
 
 マルチシグトランザクションに追加の連署が必要なら、必要な連署がすべて集まるまで未承認プールに残ります。
@@ -247,7 +247,7 @@ digraph "Multisignature Tree" {
 * **サブスクリプション**（7～9 行目）: マルチシグアカウントのアドレスに対応付けられた 3 チャネルをサブスクライブします。
 * **登録**（11 行目）: マルチシグアカウントの現在の状態がアカウントチャネルに届き、登録を確認します。
 * **アナウンス**（12 行目）: 連署者 0 がマルチシグトランザクションをアナウンスします。
-* **連署**（13～14 行目）: 内部トランザクションハッシュを含む保留中のマルチシグトランザクションが未承認チャネルに届き、連署者 1 が連署をアナウンスします。
+* **連署**（13～14 行目）: 内部トランザクションハッシュを含む承認待ちのマルチシグトランザクションが未承認チャネルに届き、連署者 1 が連署をアナウンスします。
 * **承認**（15～17 行目）: 完了したトランザクションがブロックで承認されます。内部送金の送信者と受取人がどちらもマルチシグアカウントなので、通知は 2 回届きます。
 * **アカウント更新**（18 行目）: トランザクションを含むブロックが最後のアカウント通知を発生させます。送信した 1 XEM が送信者へ戻るため、残高は [手数料](../../textbook/transactions.md#fee-schedule) の 0.35 XEM だけ減ります。
 * **サブスクライブ解除**（19 行目）: コードが 3 つのチャネルのサブスクライブを解除します。
@@ -260,5 +260,5 @@ digraph "Multisignature Tree" {
 | --- | --- |
 | [マルチシグアカウントのチャネルをサブスクライブする](#cosignatory-subscribing-to-the-channels) | <ws:account&#47;{address}><br/><ws:unconfirmed&#47;{address}><br/><ws:transactions&#47;{address}> |
 | [マルチシグアカウントを登録する](#cosignatory-registering-the-multisig-account) | <req:w&#47;api&#47;account&#47;get> |
-| [保留中のマルチシグメッセージを処理する](#cosignatory-cosigning-the-pending-transaction) | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) |
+| [承認待ちのマルチシグメッセージを処理する](#cosignatory-cosigning-the-pending-transaction) | [TransactionMetaDataPair](../reference/rest/nem.md#model/TransactionMetaDataPair) |
 | [未承認通知に対して連署する](#cosignatory-cosigning-the-pending-transaction) | <ser:CosignatureV1> |

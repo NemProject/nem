@@ -8,10 +8,10 @@ tutorial_level: intermediate
 [供給量が可変](../../textbook/mosaics.md#supply-mutability) として作成された [モザイク](default:モザイク) は、作成後に総供給量を増減できます。
 
 供給量を変更できるのはモザイクの作成者だけです。
-供給量の変更が影響するのは作成者の残高だけです。発行した単位は追加され、焼却した単位は削除されます。
+供給量の変更が影響するのは作成者の残高だけです。追加発行したモザイクは追加され、焼却したモザイクは削除されます。
 モザイクを保有する他のアカウントの残高は変わりません。
 
-このチュートリアルでは、単位の発行と焼却によってモザイクの供給量を変更する方法を説明します。
+このチュートリアルでは、モザイクの追加発行と焼却によってモザイクの供給量を変更する方法を説明します。
 
 ## 前提条件 {: #prerequisites }
 
@@ -35,7 +35,7 @@ tutorial_level: intermediate
 ## コードの説明 {: #code-explanation }
 
 モザイクの供給量を変更するには、<ser:MosaicSupplyChangeTransactionV1> トランザクションを使います。
-このチュートリアルでは、単位を発行するものと焼却するものの 2 つをアナウンスします。
+このチュートリアルでは、モザイクを追加発行するものと焼却するものの 2 つをアナウンスします。
 
 どちらのトランザクションも同じ方法で送信するため、スニペットでは {{ tutorial.var('announce_transaction') }} と {{ tutorial.var('wait_for_confirmation') }} の 2 つのヘルパーを定義します。これらはトランザクションをアナウンスし、ブロックに含まれるまでネットワークをポーリングします。
 
@@ -63,13 +63,13 @@ tutorial_level: intermediate
 
 ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
 
-### 供給量を増やす（発行） {: #increasing-supply-minting }
+### 供給量を増やす（追加発行） {: #increasing-supply-minting }
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-スニペットはまずモザイクの供給量を読み取り、トランザクションが承認されたときに新しく発行された単位を確認できるようにします。
+スニペットはまずモザイクの供給量を読み取り、トランザクションが承認されたときに新しく発行されたモザイク数量を確認できるようにします。
 
-新しい単位を発行するには、トランザクションに次の値を設定します。
+追加発行するには、トランザクションに次の値を設定します。
 
 * {{ tutorial.var('type') }}: モザイク供給量変更トランザクションでは、タイプ <ser:MosaicSupplyChangeTransactionV1> を使用します。
 
@@ -79,14 +79,14 @@ tutorial_level: intermediate
 
 * {{ tutorial.var('mosaic_id') }}: 更新するモザイクの [完全修飾名](../../textbook/mosaics.md#fully-qualified-name)。
 
-* {{ tutorial.var('action') }}: `increase` の値は、新しい単位を発行します。
+* {{ tutorial.var('action') }}: `increase` の値は、モザイクを追加発行します。
 
-* {{ tutorial.var('delta') }}: 追加する [全単位](../../textbook/mosaics.md#divisibility) の数。
+* {{ tutorial.var('delta') }}: 追加する [全体単位](../../textbook/mosaics.md#divisibility) の数。
     結果として得られる総供給量は [最大供給量](../../textbook/mosaics.md#initial-supply) を超えられません。
 
     !!! note "上限は原子単位で表されます"
 
-        最大供給量は $9 \cdot 10^{15}$ **原子**単位で固定されていますが、{{ tutorial.var('delta') }} は **全単位**で表されます。
+        最大供給量は $9 \cdot 10^{15}$ **原子**単位で固定されていますが、{{ tutorial.var('delta') }} は **全体単位**で表されます。
 
         したがって、{{ tutorial.var('delta') }} の最大値はモザイクの [可分性](default:可分性) によって異なります。
 
@@ -94,30 +94,30 @@ tutorial_level: intermediate
         \text{max\_whole\_units} = \frac{9 \cdot 10^{15}}{10^{\text{divisibility}}}
         \]
 
-        このチュートリアルのモザイクの可分性は `2` なので、1 全単位は $100$ 原子単位に相当し、供給量は最大 $9 \cdot 10^{13}$ 全単位まで増やせます。
+        このチュートリアルのモザイクの可分性は `2` なので、1 全体単位は $100$ 原子単位に相当し、供給量は最大 $9 \cdot 10^{13}$ 全体単位まで増やせます。
 
 その後、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルと同じ手順で、トランザクション手数料を計算し、トランザクションに署名して、アナウンスし、承認を待ちます。
 
 モザイク供給量変更トランザクションの固定手数料は 0.15 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 
 承認されたら、供給量をもう一度読み取り、結果の供給量を表示します。
-発行された単位は作成者のアカウントに加算されます。
+追加発行されたモザイクは作成者のアカウントに加算されます。
 
 ### 供給量を減らす（焼却） {: #decreasing-supply-burning }
 
 {{ tutorial.code_snippet_tagged('step-4') }}
 
-既存の単位を焼却するには、同じトランザクションタイプを使い、{{ tutorial.var('action') }} を `decrease` に、{{ tutorial.var('delta') }} を削除する全単位数に設定します。
+既存のモザイクを焼却するには、同じトランザクションタイプを使い、{{ tutorial.var('action') }} を `decrease` に、{{ tutorial.var('delta') }} を削除する全体単位数に設定します。
 
-焼却する単位は作成者のアカウントから取得されるため、作成者がまだ保有している単位だけを焼却できます。
-他のアカウントにすでに配布された単位はその残高に残り、作成者自身の残高が {{ tutorial.var('delta') }} をカバーできない場合はトランザクションが失敗します。
+焼却するモザイクは作成者のアカウントから取得されるため、作成者がまだ保有している量だけを焼却できます。
+他のアカウントにすでに配布されたモザイクは、そのアカウントの残高に残り、作成者自身の残高が {{ tutorial.var('delta') }} をカバーできない場合はトランザクションが失敗します。
 
-承認されたら、供給量をもう一度読み取り、焼却された単位を表示します。
+承認されたら、供給量をもう一度読み取り、焼却された量を表示します。
 このチュートリアルでは供給量を同じ量だけ増やしてから減らすため、最終的な供給量は変更前の値と一致します。
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="8 25-26 35 54-55 64"
 --8<-- 'devbook/mosaics/change_mosaic_supply.log'
@@ -125,11 +125,11 @@ tutorial_level: intermediate
 
 出力の要点は次のとおりです。
 
-* **発行前の供給量**（8 行目）: モザイクは 1000 全単位の供給量で始まります。
+* **発行前の供給量**（8 行目）: モザイクは 1000 全体単位の供給量で始まります。
 
-* **供給量の増加**（25～26 行目）: デルタが `500` の `increase` アクションにより、作成者の残高に新しい単位が発行されます。
+* **供給量の増加**（25～26 行目）: デルタが `500` の `increase` アクションにより、500 全体単位が作成者の残高に追加されます。
 
-* **発行後の供給量**（35 行目）: 供給量が 1500 全単位に増えます。
+* **発行後の供給量**（35 行目）: 供給量が 1500 全体単位に増えます。
 
 * **供給量の減少**（54～55 行目）: 同じデルタの `decrease` アクションによって、それらの単位が焼却されます。
 
@@ -141,8 +141,8 @@ tutorial_level: intermediate
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [モザイクの供給量を発行する](#increasing-supply-minting) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
-| [モザイクの供給量を焼却する](#decreasing-supply-burning) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
+| [モザイクの供給量を増やす（追加発行）](#increasing-supply-minting) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
+| [モザイクの供給量を減らす（焼却）](#decreasing-supply-burning) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
 | [トランザクション手数料を計算する](#increasing-supply-minting) | <dy:FeeCalculator.calculateTransactionFee> |
 | [モザイクの供給量を読み取る](#increasing-supply-minting) | <get:/mosaic/supply> |
 

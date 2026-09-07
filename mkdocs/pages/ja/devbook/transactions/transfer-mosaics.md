@@ -5,7 +5,7 @@ tutorial_level: intermediate
 
 # 転送トランザクションでモザイクを送信する
 
-[転送トランザクション](default:転送トランザクション) には、[XEM](default:XEM) の代わりに、または XEM とともに、他の [モザイク](default:モザイク) を含められます。
+[転送トランザクション](default:転送トランザクション) には、[XEM](default:XEM) の代わりに、または XEM と一緒に、他の [モザイク](default:モザイク) を含められます。
 
 このチュートリアルでは、通常の [XEM 送信](./transfer-xem.md) と異なる部分に焦点を当て、モザイクを送信する方法を説明します。
 
@@ -29,7 +29,7 @@ digraph "Transfer company:token" {
 始める前に、次の準備をしてください。
 
 * [開発環境をセットアップ](../start/setup.md) する。
-* 転送トランザクションを送信する [アカウント](default:アカウント) を、[コードから](../accounts/create-from-private-key.md) または [ウォレットを使って](../../userbook/wallet/create-account.md) 作成する。
+* 転送トランザクションを送信する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
 * トランザクション手数料と転送額を支払うための [XEM](default:XEM) を用意する。
     [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
 * 送信する [モザイク](default:モザイク) を十分に保有する。
@@ -42,8 +42,8 @@ digraph "Transfer company:token" {
 
 ## コードの説明 {: #code-explanation }
 
-署名、アナウンス、承認待ちは [XEM を送信する](./transfer-xem.md) チュートリアルと同じなので、ここでは繰り返しません。
-以下では異なる手順だけを説明します。
+署名、アナウンス、承認待ちは [XEM を送信する](./transfer-xem.md) チュートリアルと同じなので、ここでは説明しません。
+以下では、異なる手順だけを説明します。
 
 ### アカウントをセットアップする {: #setting-up-the-accounts }
 
@@ -69,7 +69,7 @@ digraph "Transfer company:token" {
 送信するモザイクは `MOSAIC_ID` で指定します。これは `<namespace>:<mosaic_name>` 形式の [完全修飾名](../../textbook/mosaics.md#fully-qualified-name) で、デフォルト値は `company:token` です。
 設定すれば、署名アカウントが所有する他のモザイクをチュートリアルで指定できます。
 
-`QUANTITY` は、送信するモザイクの量を [全単位](../../textbook/mosaics.md#divisibility) で指定する値で、デフォルトは 100 です。
+`QUANTITY` は、送信するモザイクの量を [全体単位](../../textbook/mosaics.md#divisibility) で指定する値で、デフォルトは 100 です。
 
 ### ネットワーク時刻を取得する {: #fetching-network-time }
 
@@ -91,7 +91,7 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 トランザクションを構築する前に、両方をノードから取得します。
 
 * <get:/mosaic/definition> エンドポイントは、`divisibility` などのプロパティを含むモザイク定義を返します。
-* <get:/mosaic/supply> エンドポイントは、現在の総供給量を [全単位](../../textbook/mosaics.md#divisibility) で返します。
+* <get:/mosaic/supply> エンドポイントは、現在の総供給量を [全体単位](../../textbook/mosaics.md#divisibility) で返します。
 
 ネットワーク時刻と同じく、転送ごとにこれらの値を取得する必要はありません。
 モザイクの可分性は作成時に固定され、供給量は供給量を可変として作成された場合だけ変化するため、アプリケーションは両方を一度取得してキャッシュし、必要に応じて供給量を更新できます。
@@ -100,18 +100,18 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
-スニペットはまず、前の手順で取得した可分性を使って、`QUANTITY` を全単位から原子単位へ変換します。
+スニペットはまず、前の手順で取得した可分性を使って、`QUANTITY` を全体単位から原子単位へ変換します。
 
-!!! note "全単位から原子単位へ"
+!!! note "全体単位から原子単位へ"
 
     作成時に設定され 0～6 の範囲を取るモザイクの `divisibility` は、次の変換を定義します。
-    1 全単位は 10^divisibility^ [原子単位](../../textbook/mosaics.md#divisibility) に相当します。
+    1 全体単位は 10^divisibility^ [原子単位](../../textbook/mosaics.md#divisibility) に相当します。
 
     ここで使う `company:token` モザイクの可分性は 0 なので、10^0^ = 1 であり、`QUANTITY` 100 は 100 原子単位としてエンコードされます。
 
-    一方、可分性が 2 のモザイクでは、1 全単位あたり 10^2^ = 100 原子単位です。そのため同じ `QUANTITY` 100 は 10'000 原子単位としてエンコードされます。
+    一方、可分性が 2 のモザイクでは、1 全体単位あたり 10^2^ = 100 原子単位です。そのため同じ `QUANTITY` 100 は 10'000 原子単位としてエンコードされます。
 
-次にスニペットは、追加の `mosaics` フィールドを持つ <ser:TransferTransactionV2> 記述子を使って <dy:TransactionFactory.create> を呼び出します。`mosaics` フィールドには最大 10 件を指定できます。
+次にスニペットは、追加の `mosaics` フィールドを持つ <ser:TransferTransactionV2> ディスクリプタを使って <dy:TransactionFactory.create> を呼び出します。`mosaics` フィールドには最大 10 件を指定できます。
 各エントリでは、モザイクと送信量を指定します。
 
 * モザイクを所有する [ネームスペース](default:ネームスペース)。
@@ -135,7 +135,7 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 モザイク転送の手数料は、各モザイクの供給量、可分性、転送する数量によって決まります。
 NEM の固定手数料表を手動で実装する代わりに、スニペットは SDK の <dy:FeeCalculator.calculateTransactionFee> ヘルパーを呼び出します。
 
-ヘルパーは前の手順で構築したトランザクションから転送数量を直接読み取り、トランザクションに保存されない値なので、各モザイクの `supply`（[全単位](../../textbook/mosaics.md#divisibility)）と `divisibility` を 2 つ目の引数として受け取ります。
+ヘルパーは前の手順で構築したトランザクションから転送数量を直接読み取り、トランザクションに保存されない値なので、各モザイクの `supply`（[全体単位](../../textbook/mosaics.md#divisibility)）と `divisibility` を 2 つ目の引数として受け取ります。
 
 返された手数料は、署名前に `transaction.fee` へ割り当てます。
 
@@ -152,7 +152,7 @@ NEM の固定手数料表を手動で実装する代わりに、スニペット�
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="8 18 21 22-29"
 --8<-- 'devbook/transactions/transfer_mosaics.log'

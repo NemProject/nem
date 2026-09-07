@@ -18,8 +18,8 @@ tutorial_level: advanced
 
 * 開発環境をセットアップする。
     [開発環境のセットアップ](../start/setup.md) を参照してください。
-* モザイクを所有する [アカウント](default:アカウント) を、[コードから](../accounts/create-from-private-key.md) または [ウォレットを使って](../../userbook/wallet/create-account.md) 作成する。
-* モザイクを置く [ネームスペース](default:ネームスペース) を登録する。
+* モザイクを所有する [アカウント](default:アカウント) を、[コード](../accounts/create-from-private-key.md) または [ウォレット](../../userbook/wallet/create-account.md) を使って作成する。
+* モザイクが属する [ネームスペース](default:ネームスペース) を登録する。
     [ルートネームスペースを登録する](../namespaces/register-root-namespace.md) を参照してください。
 * トランザクションと作成手数料を支払うための [XEM](default:XEM) を用意する。
     [フォーセットからテストネットの資金を取得する](../accounts/testnet-faucet.md) を参照してください。
@@ -131,7 +131,7 @@ tutorial_level: advanced
 
 ## 出力 {: #output }
 
-以下の出力は、プログラムを通常実行した場合の例です。
+以下は、プログラムの実行時の出力例です。
 
 ```text linenums="1" hl_lines="3 6-10 58-68 82-85"
 --8<-- 'devbook/mosaics/mosaic_levy.log'
