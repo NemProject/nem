@@ -40,6 +40,12 @@ theme:
         icon: material/brightness-4
         name: システム設定に切り替える
 extra:
+  nem:
+    tutorial_level: チュートリアルの難易度
+    tutorial_level_labels:
+      beginner: 初級
+      intermediate: 中級
+      advanced: 上級
   consent:
     title: クッキーの同意
     description: >-
@@ -68,10 +74,49 @@ nav:
       - userbook/intro.md
   - 開発者マニュアル:
       - devbook/intro.md
+      - はじめに:
+          - devbook/start/setup.md
+          - devbook/start/hello-world.md
+      - チュートリアル:
+          - アカウント:
+              - devbook/accounts/create-from-private-key.md
+              - devbook/accounts/create-from-mnemonic.md
+              - devbook/accounts/testnet-faucet.md
+              - devbook/accounts/query-balance.md
+              - devbook/accounts/configure-multisig.md
+          - トランザクション:
+              - devbook/transactions/transfer-xem.md
+              - devbook/transactions/transfer-mosaics.md
+              - devbook/transactions/messages.md
+              - devbook/transactions/monitoring-status.md
+              - devbook/transactions/typed-descriptors.md
+              - devbook/transactions/sign-multisig.md
+          - モザイク:
+              - devbook/mosaics/create-mosaic.md
+              - devbook/mosaics/mosaic-levy.md
+              - devbook/mosaics/get-mosaic-info.md
+              - devbook/mosaics/change-mosaic-supply.md
+              - devbook/mosaics/modify-mosaic-definition.md
+          - ネームスペース:
+              - devbook/namespaces/register-root-namespace.md
+              - devbook/namespaces/register-subnamespace.md
+              - devbook/namespaces/extend-root-namespace.md
+              - devbook/namespaces/get-namespace-info.md
+          - ネットワーク通貨:
+              - devbook/network-currency/query-currency-supply.md
+              - devbook/network-currency/query-block-rewards.md
+          - チェーン状態:
+              - devbook/chain/chain-heights.md
+          - WebSocket:
+              - devbook/websockets/listen-new-blocks.md
+              - devbook/websockets/listen-transaction-flow.md
+              - devbook/websockets/listen-multisig-transaction-flow.md
       - リファレンスガイド:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
           - NEM REST API: devbook/reference/rest/nem.md
+          - シリアライズ: devbook/reference/serialization/index.md
+          - WebSocket: devbook/reference/websockets/index.md
           - devbook/reference/whitepaper/index.md
   - 教科書:
       - textbook/intro.md
