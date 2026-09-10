@@ -1,0 +1,38 @@
+---
+brief: True
+details: True
+implements: True
+url_source: True
+---
+
+{# This template is used inside of member.py #}
+{% filter indent(config.get('indent_level', 0), True) %}
+
+### <code class="doc-symbol doc-symbol-heading doc-symbol-{{node.kind.value}}"></code> {{node.name_long if node.is_group else node.name_short}} {{node.overload_suffix}}
+
+{% if configMemDef.get('brief') -%}
+{% if node.has_brief -%}
+<dl class="automatic-reference-term" markdown><dt>Java:{{ node.name_long|replace("::",".") }}</dt><dd>
+{{node.brief + "\n"}}
+</dd></dl>
+{%- endif -%}
+{%- endif %}
+
+{{node.codeblock | use_code_language(node.code_language)}}
+
+
+{% if configMemDef.get('details') -%}
+{% if node.has_details -%}
+{{node.details | use_code_language(node.code_language)}}
+{%- endif -%}
+{%- endif -%}
+
+{% if configMemDef.get('implements') -%}
+{% if node.reimplements %}
+Implements <Java:{{node.reimplements.name_long|replace("::",".")}}|{{node.reimplements.name_long}}>
+{% endif %}
+{%- endif -%}
+
+{% endfilter %}
+
+<hr>

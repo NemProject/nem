@@ -1,0 +1,55 @@
+Using node http://libertalia.nemtest.net:7890
+Multisig public key: D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2
+Cosignatory 0 public key: AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3
+Cosignatory 1 public key: 26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23
+Fetching current network time from /time-sync/network-time
+  Network time: 357569945 s since the nemesis block
+Built multisig transaction:
+{
+  "type": 4100,
+  "version": 1,
+  "network": 152,
+  "timestamp": 357569945,
+  "signer_public_key": "AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3",
+  "signature": "DD065509918473534035EEFE9258E515861B250BBCF8208A77B12FE6A1AFF42F0C3D51D9A74E7A09F39C29C0CDFF860FF76F597FCE62A28433AFC8D95926A70E",
+  "fee": "150000",
+  "deadline": 357577145,
+  "inner_transaction": {
+    "type": 257,
+    "version": 2,
+    "network": 152,
+    "timestamp": 357569945,
+    "signer_public_key": "D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2",
+    "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "fee": "50000",
+    "deadline": 357577145,
+    "recipient_address": "54424C58494F554F34455035595237344859585333424642474F4E5A42554850334E495332484A36",
+    "amount": "1000000",
+    "mosaics": []
+  },
+  "cosignatures": []
+}
+Announcing multisig transaction to /transaction/announce
+  Result: SUCCESS
+Fetching pending transactions from /account/unconfirmedTransactions?address=TC7BQFXISQEOPN2PCPPPOM3V4R3XDPNVEHEQLID4
+  Inner transaction hash: 24a1079e4dd5063c3a938675653a7525c640824470764cc34ab2a64c0c614c4d
+Built cosignature:
+{
+  "type": 4098,
+  "version": 1,
+  "network": 152,
+  "timestamp": 357569945,
+  "signer_public_key": "26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23",
+  "signature": "A094A18F4E63745B4939BB6979BD293856765E25A96B244AC7AB5E7334398802A824E800206DA62888DB474A1C64EBEBB285EC05EB3D08C8F4EA8C40A221A30D",
+  "fee": "150000",
+  "deadline": 357577145,
+  "other_transaction_hash": "24A1079E4DD5063C3A938675653A7525C640824470764CC34AB2A64C0C614C4D",
+  "multisig_account_address": "54424C58494F554F34455035595237344859585333424642474F4E5A42554850334E495332484A36"
+}
+Announcing cosignature to /transaction/announce
+  Result: SUCCESS
+Waiting for multisig transaction confirmation from /transaction/get?hash=12282A1E794D5D230EC8D0093E925F1BD83BB156F460DC2775045B61A779B8AA
+  Transaction status: pending
+  Transaction status: pending
+  ...
+multisig transaction confirmed in block 719496

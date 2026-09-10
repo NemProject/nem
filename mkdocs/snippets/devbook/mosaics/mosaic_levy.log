@@ -1,0 +1,85 @@
+Using node http://libertalia.nemtest.net:7890
+Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Creating mosaic: my_namespace:token_1784625719
+Fetching current network time from /time-sync/network-time
+  Network time: 357038135 s since the nemesis block
+Levy:
+  Type: absolute
+  Recipient: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4
+  Mosaic: nem:xem
+  Fee: 1000000
+  Mosaic creation fee: 10.0 XEM
+  Transaction fee: 0.15 XEM
+Built mosaic definition transaction:
+{
+  "type": 16385,
+  "version": 1,
+  "network": 152,
+  "timestamp": 357038135,
+  "signer_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+  "signature": "3B240EE7E5B6EDEEDA676ECA2D54039E45089CEE7DE2958350F9A63E168F6DFF0B8380B2B0917C4BDE662E6531C3151EFB999DA3E0330B5C0A6895CD04A40808",
+  "fee": "150000",
+  "deadline": 357045335,
+  "mosaic_definition": {
+    "owner_public_key": "462EE976890916E54FA825D26BDD0235F5EB5B6A143C199AB0AE5EE9328E08CE",
+    "id": {
+      "namespace_id": {
+        "name": "6d795f6e616d657370616365"
+      },
+      "name": "746f6b656e5f31373834363235373139"
+    },
+    "description": "4d79207475746f7269616c206d6f7361696320776974682061206c657679",
+    "properties": [
+      {
+        "property": {
+          "name": "64697669736962696c697479",
+          "value": "32"
+        }
+      },
+      {
+        "property": {
+          "name": "696e697469616c537570706c79",
+          "value": "31303030"
+        }
+      },
+      {
+        "property": {
+          "name": "737570706c794d757461626c65",
+          "value": "74727565"
+        }
+      },
+      {
+        "property": {
+          "name": "7472616e7366657261626c65",
+          "value": "74727565"
+        }
+      }
+    ],
+    "levy": {
+      "transfer_fee_type": 1,
+      "recipient_address": "5442554C4541554732435A51495355523434324857413655414B47574958484441424A5649505334",
+      "mosaic_id": {
+        "namespace_id": {
+          "name": "6e656d"
+        },
+        "name": "78656d"
+      },
+      "fee": "1000000"
+    }
+  },
+  "rental_fee_sink": "54424D4F534149434F443446353445453543444D523233434342474F414D3258534A4252354F4C43",
+  "rental_fee": "10000000"
+}
+Announcing mosaic definition to /transaction/announce
+  Result: SUCCESS
+Waiting for confirmation from /transaction/get?hash=190340818E859F24FD570CD5D54153DD3E5E192F2026F23E079522AC9BA56456
+  Transaction status: pending
+  Transaction status: pending
+  Transaction status: pending
+Transaction confirmed in block 710705
+Fetching mosaic information from /mosaic/definition?mosaicId=my_namespace:token_1784625719
+Levy information:
+  Type: absolute
+  Recipient: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4
+  Mosaic: nem:xem
+  Fee: 1000000

@@ -1,0 +1,43 @@
+Using node http://libertalia.nemtest.net:7890
+Multisig address: TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6 (public key D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2)
+Cosignatory 0 address: TAWOQNIMCCFO6MT7JLLFER746HKBBUVU7KQUSDJX (public key AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3)
+Cosignatory 1 address: TC7BQFXISQEOPN2PCPPPOM3V4R3XDPNVEHEQLID4 (public key 26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23)
+Fetching current network time from /time-sync/network-time
+  Network time: 357324103 s since the nemesis block
+Getting cosignatories from /account/get?address=TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6
+  Response: No cosignatories
+  Transaction fee: 0.5 XEM
+Enabling the multisig with the modification transaction:
+{
+  "type": 4097,
+  "version": 2,
+  "network": 152,
+  "timestamp": 357324103,
+  "signer_public_key": "D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2",
+  "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "fee": "500000",
+  "deadline": 357331303,
+  "modifications": [
+    {
+      "modification": {
+        "modification_type": 1,
+        "cosignatory_public_key": "AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3"
+      }
+    },
+    {
+      "modification": {
+        "modification_type": 1,
+        "cosignatory_public_key": "26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23"
+      }
+    }
+  ],
+  "min_approval_delta": 1
+}
+Built transaction with hash: 4F50710F7AB5C92ED1913D0EB4EE2E29D2AA6CC9C5C6509FB1C43BFDAF124C8B
+Announcing transaction to /transaction/announce
+  Result: SUCCESS
+Waiting for transaction confirmation from /transaction/get?hash=4F50710F7AB5C92ED1913D0EB4EE2E29D2AA6CC9C5C6509FB1C43BFDAF124C8B
+  Transaction status: pending
+  Transaction status: pending
+  ...
+transaction confirmed in block 715434

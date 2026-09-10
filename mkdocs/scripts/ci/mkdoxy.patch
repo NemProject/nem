@@ -1,0 +1,11 @@
+--- generatorBase.py	2026-04-07 18:46:54.307700752 +0200
++++ generatorBase.py.ORG	2026-04-07 18:46:48.875973948 +0200
+@@ -21,7 +21,7 @@
+ log: logging.Logger = logging.getLogger("mkdocs")
+ 
+ 
+-LETTERS = string.ascii_lowercase + "~_@\\"
++LETTERS = string.ascii_lowercase + "~_@\\["
+ 
+ 
+ class GeneratorBase:

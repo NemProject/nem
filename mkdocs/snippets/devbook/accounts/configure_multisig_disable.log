@@ -1,0 +1,88 @@
+Using node http://libertalia.nemtest.net:7890
+Multisig address: TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6 (public key D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2)
+Cosignatory 0 address: TAWOQNIMCCFO6MT7JLLFER746HKBBUVU7KQUSDJX (public key AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3)
+Cosignatory 1 address: TC7BQFXISQEOPN2PCPPPOM3V4R3XDPNVEHEQLID4 (public key 26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23)
+Fetching current network time from /time-sync/network-time
+  Network time: 357324204 s since the nemesis block
+Getting cosignatories from /account/get?address=TBLXIOUO4EP5YR74HYXS3BFBGONZBUHP3NIS2HJ6
+  Response: ['TC7BQFXISQEOPN2PCPPPOM3V4R3XDPNVEHEQLID4', 'TAWOQNIMCCFO6MT7JLLFER746HKBBUVU7KQUSDJX']
+  Transaction fee: 0.65 XEM
+Disabling the multisig with the multisig transaction:
+{
+  "type": 4100,
+  "version": 1,
+  "network": 152,
+  "timestamp": 357324204,
+  "signer_public_key": "AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3",
+  "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "fee": "150000",
+  "deadline": 357331404,
+  "inner_transaction": {
+    "type": 4097,
+    "version": 2,
+    "network": 152,
+    "timestamp": 357324204,
+    "signer_public_key": "D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2",
+    "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "fee": "500000",
+    "deadline": 357331404,
+    "modifications": [
+      {
+        "modification": {
+          "modification_type": 2,
+          "cosignatory_public_key": "26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23"
+        }
+      }
+    ],
+    "min_approval_delta": 0
+  },
+  "cosignatures": []
+}
+  Transaction fee: 0.65 XEM
+Disabling the multisig with the multisig transaction:
+{
+  "type": 4100,
+  "version": 1,
+  "network": 152,
+  "timestamp": 357324204,
+  "signer_public_key": "AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3",
+  "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "fee": "150000",
+  "deadline": 357331404,
+  "inner_transaction": {
+    "type": 4097,
+    "version": 2,
+    "network": 152,
+    "timestamp": 357324204,
+    "signer_public_key": "D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2",
+    "signature": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "fee": "500000",
+    "deadline": 357331404,
+    "modifications": [
+      {
+        "modification": {
+          "modification_type": 2,
+          "cosignatory_public_key": "AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3"
+        }
+      }
+    ],
+    "min_approval_delta": -1
+  },
+  "cosignatures": []
+}
+Built transaction with hash: E66D3B5D36D7711C5A3C0D99C502258345E086241DF7CCD810DFB4A0ED8CC90D
+Announcing transaction to /transaction/announce
+  Result: SUCCESS
+Waiting for transaction confirmation from /transaction/get?hash=E66D3B5D36D7711C5A3C0D99C502258345E086241DF7CCD810DFB4A0ED8CC90D
+  Transaction status: pending
+  Transaction status: pending
+  ...
+transaction confirmed in block 715438
+Built transaction with hash: 70CAE1EEF8432A834C0E4EBE3A1EB6A1774F4AE42939E05AE9F120A9AF456051
+Announcing transaction to /transaction/announce
+  Result: SUCCESS
+Waiting for transaction confirmation from /transaction/get?hash=70CAE1EEF8432A834C0E4EBE3A1EB6A1774F4AE42939E05AE9F120A9AF456051
+  Transaction status: pending
+  Transaction status: pending
+  ...
+transaction confirmed in block 715439

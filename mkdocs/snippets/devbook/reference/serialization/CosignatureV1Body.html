@@ -1,0 +1,52 @@
+<table style="width: 100%;"><tr><td>
+    <div class="side-info"><table>
+    <tr><td class="side-info-icon">&varr;</td><td>Size: 89 bytes = 0x59</td></tr>
+    <tr><td class="side-info-icon"><i class="fab fa-github"></i></td><td><a href="https://github.com/symbol/symbol/blob/main/catbuffer/schemas/nem/multisig/multisig.cats#L4">schema</a></td></tr>
+    </table></div>
+    <dl markdown><dt><code>ser:CosignatureV1Body</code></dt><dd>shared content between V1 verifiable and non-verifiable cosignature transactions </dd></dl>
+</td></tr></table>
+
+<div class="big-table6">
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_VERSION</code></div>
+   <div>byte[1]</div>
+   <div class="description"><b>const</b> <code class="docutils literal">1</code><br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_TYPE</code></div>
+   <div><a href="#transactiontype" title="enumeration of transaction types">TransactionType</a></div>
+   <div class="description"><b>const</b> <code class="docutils literal">MULTISIG_COSIGNATURE</code> (<code class="docutils literal">0x1002</code>)<br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">other_&ZeroWidthSpace;transaction_&ZeroWidthSpace;hash_&ZeroWidthSpace;outer_&ZeroWidthSpace;size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">36</code><br/><p>other transaction hash outer size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">other_transaction_hash_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">32</code><br/><p>other transaction hash size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">other_transaction_hash</code></div>
+   <div><a href="#hash256" title="">Hash256</a></div>
+   <div class="description"><p>other transaction hash </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">multisig_account_address_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">40</code><br/><p>multisig account address size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">multisig_account_address</code></div>
+   <div><a href="#address" title="">Address</a></div>
+   <div class="description"><p>multisig account address </p></div>
+</div>
