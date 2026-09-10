@@ -72,6 +72,9 @@ nav:
   - index.md
   - ユーザーマニュアル:
       - userbook/intro.md
+      - ノード運用:
+          - userbook/node/install.md
+          - userbook/node/supernode-program.md
   - 開発者マニュアル:
       - devbook/intro.md
       - はじめに:
