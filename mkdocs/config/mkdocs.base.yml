@@ -20,28 +20,11 @@ plugins:
       - req
       - ser
       - _
-  mkdoxy:  # Generate API reference docs for Java
-    enabled: !ENV [NEM_DOCS_JAVA, false]
-    save-api: .doxy
-    projects:
-      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
-        src-dirs: ../core/src/main/java ../nis/src/main/java ../peer/src/main/java  # path to source code (support multiple paths separated by space) => INPUT
-        template-dir: templates/mkdoxy
-        full-doc: !ENV [NEM_DOCS_FULL, true]  # if you want to generate full documentation
-        api-path: devbook/reference/java
-        doxy-cfg:  # standard doxygen configuration (key: value)
-          FILE_PATTERNS: "*.java"  # specify file patterns to filter out
-          OPTIMIZE_OUTPUT_JAVA: true
-          JAVADOC_AUTOBRIEF: true
-          STRIP_FROM_PATH: !relative $config_dir/../..
-          SOURCE_BROWSER: true
-          SOURCE_TOOLTIPS: true
-          INLINE_SOURCES: true
   gen-files:  # Generate stub files for API reference docs and link.md files for literate-nav
     scripts:
-      - ../scripts/gen_ref_pages_java.py
       - ../scripts/gen_ref_pages_py.py
       - ../scripts/gen_ref_pages_ts.py
+      - ../scripts/gen_ref_pages_java.py
   mkdocstrings:  # Generate API reference docs for Python
     default_handler: python
     custom_templates: ../templates/mkdocstrings
@@ -143,12 +126,26 @@ extra:
   nem:
     branch: new-docs
     java-sdk:
-      include-prefixes: [classorg, interfaceorg]
+      disabled: !ENV [NEM_DOCS_DISABLE_JAVA, false]
+      javadoc_build_dir: ../../_symbol/sdk/java/build/docs/javadoc/org/symbol/sdk  # Where the Java SDK writes the docs
+      output_dir: devbook/reference/java  # Generated markdown files
+      ignore-files:
+        - SymbolFacade
+        - SymbolFacade.SymbolAccount
+        - SymbolFacade.SymbolPublicAccount
+      ignore-folders:
+        - symbol
+        - impl
+      class-remaps:
+        NemTransactionFactory: TransactionFactory
+        generateKey: metadataGenerateKey
+        updateValue: metadataUpdateValue
+        getPublicKey: publicKey
     py-sdk:  # Symbol SDK is shared with NEM; exclude the Symbol-only parts
       ignore-files:
         - __main__
         - symbolchain
-        - nem
+        - symbol
         - sc
         - nc
         - SymbolFacade
@@ -176,3 +173,4 @@ extra_css:
   - https://unpkg.com/katex@0/dist/katex.min.css
 not_in_nav: |
   /404.md
+  /devbook/reference/java/links.md

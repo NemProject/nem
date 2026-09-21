@@ -9,7 +9,7 @@
 {% block docstring scoped %}
 	<dl class="automatic-reference-term"><dt>py:{{ attribute.parent.name }}.{{ attribute.name }}</dt><dd>
 	{%- with docstring_sections = attribute.docstring.parsed -%}
-		{%- include "docstring"|get_template with context -%}
+		{%- include "docstring.html.jinja" with context -%}
 	{%- endwith -%}
 	</dd></dl>
 {% endblock docstring %}

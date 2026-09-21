@@ -8,11 +8,6 @@ edit_uri: blob/new-docs/mkdocs/pages/en
 plugins:
   search:
     lang: en
-  mkdoxy:  # Generate API reference docs for Java
-    projects:
-      JavaSDK:  # name of project must be alphanumeric + numbers (without spaces)
-        doxy-cfg:  # standard doxygen configuration (key: value)
-          OUTPUT_LANGUAGE: English
 markdown_extensions:
   toc:
     permalink_title: Anchor link to this section for reference
@@ -120,6 +115,7 @@ nav:
       - Reference Guides:
           - Python SDK: devbook/reference/py/
           - TypeScript SDK: devbook/reference/ts/
+          - Java SDK: devbook/reference/java/
           - NEM REST API: devbook/reference/rest/nem.md
           - Serialization: devbook/reference/serialization/index.md
           - WebSockets: devbook/reference/websockets/index.md

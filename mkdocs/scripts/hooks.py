@@ -68,20 +68,14 @@ def parse_page_header(text: str) -> tuple[dict, str | None]:
 @mkdocs.plugins.event_priority(-50)
 def on_files(in_files: files.Files, config: base.Config) -> files.Files:
 	"""
-	Exclude from processing files we don't care about:
-		Doxygen-generated: We only keep filenames starting with configured prefixes.
+	Exclude from processing files we don't care about.
 	Parse frontmatter of developer tutorials to find their level and store it for later.
 	"""
 	out_files: list[File] = []
-	prefixes = tuple(config["extra"]["nem"]["java-sdk"]["include-prefixes"] + ["links"])
 	config['extra']['nem']['tutorials'] = {}
 	nav_order, nav_section = build_nav_order_and_section(config)
 	section_order = {}
 	for f in in_files:
-		if f.src_uri.startswith("devbook/reference/java"):
-			if not f.name.startswith(prefixes):
-				log.debug(f"Custom hook: Removing {f.name}")
-				continue
 		out_files.append(f)
 
 		if not f.src_path.startswith("devbook/") or not f.src_path.endswith(".md"):
@@ -129,7 +123,7 @@ COMMENT_RE = re.compile(r"(?P<prefix>[ \t]*(#|//))\s*(?P<body>.*)$")
 
 def extract_tutorial_code(config: base.Config) -> None:
 	"""
-	Scans all .py and .mjs files under snippets/devbook and reads all tutorial code, separating it into
+	Scans all .py, .mjs, and .java files under snippets/devbook and reads all tutorial code, separating it into
 	sections using [>start] and [<end] markers, and removing the markers.
 	Stores the result in config.extra.nem.tutorial_code:
 	{
@@ -264,7 +258,7 @@ def extract_tutorial_code(config: base.Config) -> None:
 		if not path.is_file():
 			continue
 
-		if path.suffix not in {".py", ".mjs"}:
+		if path.suffix not in {".py", ".mjs", ".java"}:
 			continue
 
 		rel_path = path.relative_to(root).as_posix()
@@ -375,8 +369,8 @@ def page_markdown_dylinks(content, page, config, files):
 	- The dictionary extra.nem.method-remaps translates method names before converting them to Python snake_case.
 	- The array extra.nem.global-namespaces lists class names which do not exist in JS and must be removed.
 	"""
-	langs = ['py', 'js']
-	lang_names = ['Python', 'JavaScript']
+	langs = ['py', 'js', 'java']
+	lang_names = ['Python', 'JavaScript', 'Java']
 	class_remaps = config['extra']['nem']['class-remaps']
 	method_remaps = config['extra']['nem']['method-remaps']
 	global_namespaces = config['extra']['nem']['global-namespaces']

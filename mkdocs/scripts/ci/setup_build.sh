@@ -11,6 +11,11 @@ npm install
 npx tsc -p ./tsconfig/build-bindings.json
 popd
 
+# Call Javadoc
+pushd ../_symbol/sdk/java
+bash scripts/generate_docs.sh
+popd
+
 # Build OpenAPI spec
 pushd ../openapi
 npm install
