@@ -1,4 +1,6 @@
 Using node http://libertalia.nemtest.net:7890
+Fetching current network time from /time-sync/network-time
+  Network time: 351947283 s since the nemesis block
   Transaction fee: 0.05 XEM
 Built transaction:
 {
@@ -17,16 +19,6 @@ Built transaction:
 Announcing transaction to /transaction/announce
   Result: SUCCESS
 Waiting for confirmation from /transaction/get?hash=436A43BDD3CE1F0A5A5EFC40A9027D3732D59AB3C507818A1B436EC7B32BF099
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
-  Transaction status: pending
   Transaction status: pending
   Transaction status: pending
 Transaction confirmed in block 626588

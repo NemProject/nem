@@ -1,7 +1,5 @@
 Using node http://libertalia.nemtest.net:7890
 Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
-Fetching current network time from /time-sync/network-time
-  Network time: 355824143 s since the nemesis block
 Creating subnamespace: ns_root.sub_1783411728
   Namespace lease fee: 10.0 XEM
   Transaction fee: 0.15 XEM

@@ -1,8 +1,6 @@
 Using node http://libertalia.nemtest.net:7890
 Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
 Creating mosaic: my_namespace:token_1784625719
-Fetching current network time from /time-sync/network-time
-  Network time: 357038135 s since the nemesis block
 Levy:
   Type: absolute
   Recipient: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4

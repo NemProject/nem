@@ -52,7 +52,6 @@ digraph "Multisignature Tree" {
 残りのヘルパー関数については、以下のセクションで説明します。
 
 次に、マルチシグアカウントに必要な [キーをセットアップ](#setting-up-the-accounts) し、
-[現在のネットワーク時刻を取得](#fetching-network-time) して、
 マルチシグアカウントの [現在の設定を判定](#determining-the-multisig-operation) します。
 
 アカウントがすでにマルチシグとして設定されているかどうかに応じて、
@@ -80,15 +79,9 @@ digraph "Multisignature Tree" {
 
 上記のスニペットでは、後で使用するために各アカウントの [キーペア](default:キーペア) と [アドレス](default:アドレス) を導出して保存します。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### マルチシグ操作を判定する {: #determining-the-multisig-operation }
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 このヘルパーは <get:/account/get> エンドポイントを使い、指定したアドレスの現在の連署人一覧を取得します。
 空のリストが返された場合、そのアカウントはマルチシグアカウントとして設定されていません。
@@ -101,7 +94,7 @@ digraph "Multisignature Tree" {
 
     アプリケーションでは、変更を試みる前に、連署人の完全なリストと必要な署名の最小数を含む現在の設定を必ず確認してください。
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 返された連署人によって、アカウントがマルチシグとして設定されているかどうかが決まり、マルチシグを有効化または無効化するトランザクションを作成するかどうかも決まります。
 
@@ -109,17 +102,13 @@ digraph "Multisignature Tree" {
 
 ### マルチシグを有効化する {: #enabling-the-multisig }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 連署人の追加や削除を含むアカウントのマルチシグ設定変更は、すべて <ser:MultisigAccountModificationTransactionV2> を使って行います。
 
 トランザクションでは、次の項目を指定します。
 
-* {{ tutorial.var('type') }}: マルチシグ設定の変更では、タイプ <ser:MultisigAccountModificationTransactionV2> を使用します。
-
-* {{ tutorial.var('signer_public_key') }}: マルチシグ設定を変更するアカウントの [公開鍵](default:公開鍵)。
-
-* {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
+* **トランザクションタイプ:** マルチシグ設定の変更では <ser:MultisigAccountModificationTransactionV2> を使用します。
 
 * {{ tutorial.var('min_approval_delta') }}: マルチシグアカウントからのトランザクションを承認するために必要な連署数の _希望値_ と _現在値_ の差分。
 
@@ -133,6 +122,8 @@ digraph "Multisignature Tree" {
 
     この場合、`add_cosignatory` 変更を 2 つ使って、[セットアップ段階](#setting-up-the-accounts) で準備した連署人を追加します。
 
+ファサードはマルチシグ設定を変更するアカウントを署名者として追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
+
 !!! note "安全対策"
 
     プロトコルには、アカウントが無効な状態に固定されることを防ぐ安全機構が含まれています。
@@ -145,12 +136,12 @@ digraph "Multisignature Tree" {
     * 1 つのトランザクションで複数の連署人を削除する
     * マルチシグアカウントを連署人として追加する
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 トランザクション手数料は <dy:FeeCalculator.calculateTransactionFee> で計算し、トランザクションに付加します。
 マルチシグアカウント変更トランザクションの固定手数料は 0.5 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 最後に、トランザクションに署名します。
 この場合、マルチシグに変換するアカウントの署名だけが必要です。
@@ -167,11 +158,11 @@ digraph "Multisignature Tree" {
 手順は有効化の場合と似ていますが、2 つの重要な違いがあります。
 連署人は 1 人ずつ削除する必要があり、マルチシグアカウント自身はトランザクションに署名できません。
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 このヘルパーは、連署人を削除する <ser:MultisigAccountModificationTransactionV2> を構築します。
 削除する連署人と適用する承認差分をパラメーターとして受け取ります。
-設定を変更する対象がマルチシグアカウントであるため、{{ tutorial.var('signer_public_key') }} にはマルチシグアカウントの公開鍵を設定します。
+設定を変更する対象がマルチシグアカウントであるため、その公開鍵を署名者としてファサードに渡します。
 
 [マルチシグ操作を判定する](#determining-the-multisig-operation) で示したように、このヘルパーは 2 回呼び出されます。
 
@@ -179,21 +170,21 @@ digraph "Multisignature Tree" {
 
 2 回目の呼び出しでは、残った連署人を承認差分 `-1` で削除し、必要な連署数を `1` から `0` に減らします。
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 マルチシグアカウントは自分でトランザクションに署名できないため、それぞれの変更を <ser:MultisigTransactionV1> でラップします。
 
 内部の変更トランザクションは <dy:TransactionFactory.toNonVerifiableTransaction> で変換し、ラップ用のマルチシグトランザクションに埋め込めるようにします。
 
-{{ tutorial.code_snippet_tagged('step-10') }}
+{{ tutorial.code_snippet_tagged('step-9') }}
 
 内部トランザクションとラッパーの両方に手数料がかかります。変更には 0.5 XEM、マルチシグラッパーには 0.15 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 どちらの手数料もマルチシグアカウントから差し引かれます。
 マルチシグに代わってトランザクションを開始する連署人が手数料を支払うことはありません。
 
-{{ tutorial.code_snippet_tagged('step-11') }}
+{{ tutorial.code_snippet_tagged('step-10') }}
 
-最後に、それぞれのマルチシグトランザクションに、それを開始する連署人、つまりラッパーの {{ tutorial.var('signer_public_key') }} に設定された連署人が署名します。
+最後に、それぞれのマルチシグトランザクションに、それを開始し、ラッパーの署名者としてファサードに公開鍵を渡した連署人が署名します。
 ここでは、2 つの削除を {{ tutorial.var('cosignatory_key_pairs[0]') }} が開始して署名します。
 
 このマルチシグでは必要な署名が 1 つだけなので、署名は 1 つで十分です。
@@ -220,7 +211,7 @@ digraph "Multisignature Tree" {
 
 ### トランザクションを送信する {: #submitting-the-transactions }
 
-{{ tutorial.code_snippet_tagged('step-12') }}
+{{ tutorial.code_snippet_tagged('step-11') }}
 
 最後の手順では、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明したように、トランザクションをアナウンスして承認を待ちます。
 
@@ -233,29 +224,29 @@ digraph "Multisignature Tree" {
 
 === ":material-plus-thick: マルチシグを有効化する"
 
-    ```text linenums="1" hl_lines="2-4 8 24 30 34"
+    ```text linenums="1" hl_lines="2-4 6 22 28 32"
     --8<-- 'devbook/accounts/configure_multisig_enable.log'
     ```
 
     出力の要点は次のとおりです。
 
     * **2～4 行目**: 関係するすべてのアカウントのアドレスと公開鍵。
-    * **8 行目**（`Response: No cosignatories`）: 現在、連署人が設定されていない。
-    * **24 行目と 30 行目**（`cosignatory_public_key`）: 追加される連署人の公開鍵。
-    * **34 行目**（`"min_approval_delta": 1`）: 必要な署名数が 1 つ増える。
+    * **6 行目**（`Response: No cosignatories`）: 現在、連署人が設定されていない。
+    * **22 行目と 28 行目**（`cosignatory_public_key`）: 追加される連署人の公開鍵。
+    * **32 行目**（`"min_approval_delta": 1`）: 必要な署名数が 1 つ増える。
 
 === ":material-minus-thick: マルチシグを無効化する"
 
-    ```text linenums="1" hl_lines="2-4 8 29-37 61-69"
+    ```text linenums="1" hl_lines="2-4 6 27-35 59-67"
     --8<-- 'devbook/accounts/configure_multisig_disable.log'
     ```
 
     出力の要点は次のとおりです。
 
     * **2～4 行目**: 関係するすべてのアカウントのアドレスと公開鍵。
-    * **8 行目**（`Response: [ ... ]`）: 既存の連署人が検出された。
-    * **29～37 行目**（1 つ目のマルチシグトランザクション）: 必要な署名数は変わらず、既存の連署人が 1 人削除される。
-    * **61～69 行目**（2 つ目のマルチシグトランザクション）: 必要な署名数が 1 つ減り、最後に残った連署人が削除される。
+    * **6 行目**（`Response: [ ... ]`）: 既存の連署人が検出された。
+    * **27～35 行目**（1 つ目のマルチシグトランザクション）: 必要な署名数は変わらず、既存の連署人が 1 人削除される。
+    * **59～67 行目**（2 つ目のマルチシグトランザクション）: 必要な署名数が 1 つ減り、最後に残った連署人が削除される。
 
 出力に表示されたトランザクションハッシュを使って、[NEM テストネットエクスプローラー](https://testnet.nem.fyi/) でトランザクションを検索できます。
 

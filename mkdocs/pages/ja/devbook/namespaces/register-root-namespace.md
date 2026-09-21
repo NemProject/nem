@@ -40,15 +40,9 @@ tutorial_level: intermediate
 署名者のアドレスは公開鍵から導出されます。
 このアカウントが登録したネームスペースを所有します。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### ネームスペース名を設定する {: #choosing-the-namespace-name }
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 ネームスペースは名前で識別され、その名前をトランザクションによってネットワーク上で 1 年間予約します。
 命名規則については、テキストブックの [名前](../../textbook/namespaces.md#name) を参照してください。
@@ -59,16 +53,11 @@ tutorial_level: intermediate
 
 ### トランザクションを構築する {: #building-the-transaction }
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 ネームスペース登録トランザクションでは、次の項目を指定してネットワークにネームスペースを登録します。
 
-* {{ tutorial.var('type') }}: ネームスペース登録トランザクションでは、タイプ <ser:NamespaceRegistrationTransactionV1> を使用します。
-
-* {{ tutorial.var('signer_public_key') }}: トランザクションに署名して手数料を支払うアカウント。
-    登録したネームスペースの所有者になります。
-
-* {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
+* **トランザクションタイプ:** ネームスペース登録トランザクションでは <ser:NamespaceRegistrationTransactionV1> を使用します。
 
 * {{ tutorial.var('rental_fee_sink') }}: ネームスペースの [レンタル手数料](../../textbook/namespaces.md#lease-fee) を集める特別なアカウント。
     各ネットワークには固定されたシンクアドレスがあります。
@@ -87,7 +76,10 @@ tutorial_level: intermediate
 
 * {{ tutorial.var('name') }}: ルートネームスペースの名前。
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+ファサードは署名者を追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
+署名者は登録したネームスペースの所有者になります。
+
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 最後に、<dy:FeeCalculator.calculateTransactionFee> でトランザクション手数料を計算し、トランザクションに付加します。
 レンタル手数料とは異なり、トランザクション手数料は [ハーベスターアカウント](default:ハーベスターアカウント) に支払われます。
@@ -95,17 +87,17 @@ tutorial_level: intermediate
 
 ### トランザクションを送信する {: #submitting-the-transaction }
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 [XEM を送信する](../transactions/transfer-xem.md#announcing-the-transaction) チュートリアルと同じ手順で、トランザクションに署名してアナウンスします。
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 次にコードは、トランザクションがブロックに含まれるまで <get:/transaction/get> エンドポイントをポーリングし、承認を待ちます。
 
 ### ネームスペースを取得する {: #retrieving-the-namespace }
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 ネームスペースが登録されたことを確認するため、コードは <get:/namespace> エンドポイントを使ってネットワークから取得し、そのプロパティを表示します。
 
@@ -117,18 +109,18 @@ tutorial_level: intermediate
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="5 6 7 31-33"
+```text linenums="1" hl_lines="3 4 5 29-31"
 --8<-- 'devbook/namespaces/register_root_namespace.log'
 ```
 
 出力の要点は次のとおりです。
 
-* **ネームスペース名**（5 行目）: 選択した名前 `ns_1783091378` には、一意性を確保するためのタイムスタンプが含まれています。
+* **ネームスペース名**（3 行目）: 選択した名前 `ns_1783091378` には、一意性を確保するためのタイムスタンプが含まれています。
     この名前を [NEM テストネットエクスプローラー](https://testnet.nem.fyi/) で検索すると、ネームスペースの詳細を確認できます。
 
-* **レンタル手数料とトランザクション手数料**（6～7 行目）: ルートネームスペースなのでレンタル手数料は 100 XEM です（[サブネームスペース](default:サブネームスペース) は代わりに 10 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
+* **レンタル手数料とトランザクション手数料**（4～5 行目）: ルートネームスペースなのでレンタル手数料は 100 XEM です（[サブネームスペース](default:サブネームスペース) は代わりに 10 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
 
-* **ネームスペース情報**（31～33 行目）: 登録されたネームスペース、その所有者（署名者のアドレス）、登録時の高さ。リースが開始したブロックの高さです。
+* **ネームスペース情報**（29～31 行目）: 登録されたネームスペース、その所有者（署名者のアドレス）、登録時の高さ。リースが開始したブロックの高さです。
 
 ## まとめ {: #conclusion }
 
@@ -136,7 +128,7 @@ tutorial_level: intermediate
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [ネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:NamespaceRegistrationTransactionV1> |
+| [ネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:NamespaceRegistrationTransactionV1> |
 | [レンタル手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
 | [ネームスペースを取得する](#retrieving-the-namespace) | <get:/namespace> |
 

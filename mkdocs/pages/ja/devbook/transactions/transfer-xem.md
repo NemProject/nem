@@ -65,45 +65,31 @@ digraph "Transfer XEM" {
 XEM の [可分性](default:可分性) は 6 なので、1 XEM は 100 万原子単位です。
 スニペットでは `xem` に 1'000'000 を掛けて `amount` を導出します。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
+### トランザクションを構築する {: #building-the-transaction }
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-NEM のすべてのトランザクションには 2 つの時刻フィールドがあり、どちらも [ネットワーク時刻](default:ネットワーク時刻) で表します。これは NEM のネメシスブロックからの経過秒数です。
+スニペットは、トランザクションのディスクリプタと、すべてのトランザクションに共通する値（署名者の公開鍵、初期手数料 0、2 時間のデッドライン期間）をファサードの作成メソッドに渡します。
+SDK は署名者を設定し、ローカル時計からタイムスタンプを設定して、その期間からデッドラインを導出します。
 
-* `timestamp`: トランザクションが作成された時点。ここでは現在のネットワーク時刻を設定します。
-* `deadline`: トランザクションを破棄する前に、ネットワークが承認を試み続ける期間。
-    タイムスタンプより後の時間で、[24 時間](../../textbook/transactions.md#common-transaction-structure) 以内でなければなりません。
-    範囲外の時間を指定した場合、ノードはトランザクションを拒否します。
-    この例では、範囲内であるタイムスタンプの 2 時間後に設定します。
+!!! info "ネットワーク時刻"
 
-送金のトランザクションを構築するには正確なネットワーク時刻が必要です。
-<get:/time-sync/network-time> エンドポイントは、ノードの現在のネットワーク時刻を返します。
-ノードはこの値をミリ秒で返すため、コードでは 1000 で割って、トランザクションが必要とする秒数を取得します。
+    NEM のすべてのトランザクションには `timestamp` と `deadline` があり、どちらも NEM のネメシスブロックからの経過秒数で表します。
+    デッドラインはタイムスタンプより後の時間で、[24 時間](../../textbook/transactions.md#common-transaction-structure) 以内でなければなりません。
 
-ただし、アプリケーションがトランザクションごとにネットワーク時刻を照会する必要はありません。
-一度取得した後、必要に応じてローカルシステムの時計を使って調整できます。
-これにより、正確さと性能のバランスが取れます。
+    ファサードはこれらの値にローカルシステムの時計を使います。
+    アプリケーションはノードの時計と比較する必要があれば <get:/time-sync/network-time> を照会できますが、トランザクションを作成するたびにネットワーク時刻を取得する必要はありません。
 
-コードは秒数を SDK の <dy:NetworkTimestamp> クラスでラップして `timestamp` を取得し、<dy:NetworkTimestamp.addHours> ヘルパーで `deadline` を導出します。
+ディスクリプタは、転送固有のプロパティを次の順序で指定します。
 
-### トランザクションを構築する {: #building-the-transaction }
-
-{{ tutorial.code_snippet_tagged('step-4') }}
-
-スニペットは、転送トランザクションのプロパティを指定するディスクリプタを使って <dy:TransactionFactory.create> を呼び出します。
-
-* {{ tutorial.var('type') }}: このチュートリアルでは、現在の送金バージョンである <ser:TransferTransactionV2> を使用します。XEM と他の [モザイク](default:モザイク) の両方を送信できます。
+* **トランザクションタイプ:** このチュートリアルでは、現在の送金バージョンである <ser:TransferTransactionV2> を使用します。XEM と他の [モザイク](default:モザイク) の両方を送信できます。
     ここではモザイクを付加しないため、トランザクションは XEM だけを送信します。
-
-* {{ tutorial.var('signer_public_key') }}: 署名者は手数料を支払うアカウントです。
-    転送トランザクションでは、送られる XEM の送信元でもあります。
-
-* {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
 
 * {{ tutorial.var('recipient_address') }}: XEM を受け取るアドレス。
 
 * {{ tutorial.var('amount') }}: 前の手順で計算した原子単位の数量。1 XEM の場合は `1_000_000` です。
+
+<dy:NemFacade.createTransactionFromTypedDescriptor> に別途渡す署名者が、手数料を支払い、転送する XEM を提供します。
 
 !!! info "モザイクまたはメッセージを送信する"
 
@@ -112,7 +98,7 @@ NEM のすべてのトランザクションには 2 つの時刻フィールド�
 
 ### トランザクション手数料を計算する {: #calculating-the-transaction-fee }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 すべてのトランザクションは、ブロックに含める [ハーベスターアカウント](default:ハーベスターアカウント) に手数料を支払います。
 
@@ -123,7 +109,7 @@ NEM の [固定手数料表](../../textbook/transfer_transactions.md#fees) を�
 
 ### 署名してシリアライズする {: #signing-and-serializing }
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 トランザクションを作成したら、署名アカウントの秘密鍵で署名する必要があります。
 署名により、トランザクションが本物であり、送信者によって承認されたことを保証します。
@@ -133,7 +119,7 @@ NEM の [固定手数料表](../../textbook/transfer_transactions.md#fees) を�
 
 ### トランザクションをアナウンスする {: #announcing-the-transaction }
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 署名済みペイロードは、任意の NEM [ノード](default:ノード) の <post:/transaction/announce> エンドポイントに送信します。
 
@@ -149,7 +135,7 @@ NEM の [固定手数料表](../../textbook/transfer_transactions.md#fees) を�
 
 ### 承認を待つ {: #waiting-for-confirmation }
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 上記のスニペットは、アナウンスしたトランザクションのハッシュを使って <get:/transaction/get> エンドポイントを繰り返し照会します。
 
@@ -170,21 +156,21 @@ NEM はおよそ 1 分に 1 ブロックを生成するため、通常、承認�
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="11 13 15 16 17 20 21 34"
+```text linenums="1" hl_lines="9 11 13 14 15 18 19 32"
 --8<-- 'devbook/transactions/transfer_xem.log'
 ```
 
 出力の要点は次のとおりです。
 
-* **署名者の公開鍵**（11 行目）: トランザクションに署名して XEM を送るアカウント。
-* **トランザクション手数料**（13 行目）: `50000` 原子単位（`0.05` XEM）。デフォルトの 1 XEM を送る手数料です。
-* **受取人アドレス**（15 行目）: XEM を受け取るアカウント。
+* **署名者の公開鍵**（9 行目）: トランザクションに署名して XEM を送るアカウント。
+* **トランザクション手数料**（11 行目）: `50000` 原子単位（`0.05` XEM）。デフォルトの 1 XEM を送る手数料です。
+* **受取人アドレス**（13 行目）: XEM を受け取るアカウント。
     これは同じ `RECIPIENT_ADDRESS` ですが、NEM のトランザクション形式では Base32 テキストの各文字を 16 進数の ASCII コードとしてエンコードするため、見た目が異なります。そのため `5442...` は `TBUL...` にデコードされます（`54` は `T`、`42` は `B` など）。
-* **転送額**（16 行目）: `1000000` 原子単位で、1 XEM に相当します。
-* **モザイクなし**（17 行目）: モザイク配列が空なので、トランザクションは XEM だけを送信します。
-* **アナウンス結果**（20 行目）: `SUCCESS` はノードがトランザクションを未承認プールに受け入れたことを意味します。
-* **トランザクションハッシュ**（21 行目）: ネットワーク上でトランザクションを一意に識別するハッシュ。
-* **承認**（34 行目）: トランザクションがブロック `626588` に含まれています。
+* **転送額**（14 行目）: `1000000` 原子単位で、1 XEM に相当します。
+* **モザイクなし**（15 行目）: モザイク配列が空なので、トランザクションは XEM だけを送信します。
+* **アナウンス結果**（18 行目）: `SUCCESS` はノードがトランザクションを未承認プールに受け入れたことを意味します。
+* **トランザクションハッシュ**（19 行目）: ネットワーク上でトランザクションを一意に識別するハッシュ。
+* **承認**（32 行目）: トランザクションがブロック `626588` に含まれています。
 
 `pending` のチェック回数は、次のブロックがハーベスティングされるまでの時間によって変わるため、実行ごとに異なります。
 
@@ -197,8 +183,7 @@ NEM はおよそ 1 分に 1 ブロックを生成するため、通常、承認�
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [ネットワーク時刻を取得する](#fetching-network-time) | <get:/time-sync/network-time>、<dy:NetworkTimestamp> |
-| [トランザクションを構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:TransferTransactionV2> |
+| [トランザクションを構築する](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:TransferTransactionV2> |
 | [トランザクション手数料を計算する](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee> |
 | [トランザクションに署名する](#signing-and-serializing) | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature> |
 | [トランザクションをアナウンスする](#announcing-the-transaction) | <post:/transaction/announce> |

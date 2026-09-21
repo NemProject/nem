@@ -1,16 +1,15 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
-	Address,
 	NemFacade,
+	NetworkTimestamp,
 	calculateTransactionFee,
-	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
 const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
 console.log('Using node', NODE_URL);
-
+// [>step-1]
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
 	'0000000000000000000000000000000000000000000000000000000000000000';
 const signerKeyPair = new NemFacade.KeyPair(
@@ -18,15 +17,16 @@ const signerKeyPair = new NemFacade.KeyPair(
 
 const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
-
+// [<step-1]
 const facade = new NemFacade('testnet');
 
-// Define the amount of XEM to transfer
+// Define the amount of XEM to transfer [>step-2]
 const xem = parseFloat(process.env.XEM_AMOUNT || '1');
 const amount = BigInt(Math.round(xem * 1_000_000));
+// [<step-2]
 
 try {
-	// Fetch current network time
+	// Fetch current network time [>step-3]
 	const timePath = '/time-sync/network-time';
 	console.log('Fetching current network time from', timePath);
 	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
@@ -35,30 +35,33 @@ try {
 	console.log('  Network time:', networkTime,
 		's since the nemesis block');
 
-	// [>step-1]
-	// Build the transaction [>step-2]
-	const typedDescriptor =
-		new descriptors.TransferTransactionV2Descriptor(
-			new Address(RECIPIENT_ADDRESS),
-			new models.Amount(amount)
-		);
-	// [<step-2]
-
-	// [>step-3]
-	const transaction = facade.createTransactionFromTypedDescriptor(
-		typedDescriptor, signerKeyPair.publicKey, 0n, 2 * 60 * 60);
-	transaction.fee = new models.Amount(
-		calculateTransactionFee(transaction)); // [<step-3]
-	// [<step-1]
-
-	// Sign transaction and generate final payload
+	// Derived fields from network time
+	const timestamp = new NetworkTimestamp(networkTime);
+	const deadline = timestamp.addHours(2);
+	// [<step-3]
+	// Build the transaction [>step-4]
+	const transaction = facade.transactionFactory.create({
+		type: 'transfer_transaction_v2',
+		signerPublicKey: signerKeyPair.publicKey.toString(),
+		timestamp: timestamp.timestamp,
+		deadline: deadline.timestamp,
+		recipientAddress: RECIPIENT_ADDRESS,
+		amount
+	});
+	// [<step-4]
+	// Calculate and attach the transaction fee [>step-5]
+	const fee = calculateTransactionFee(transaction);
+	transaction.fee = new models.Amount(fee);
+	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
+	// [<step-5]
+	// Sign transaction and generate final payload [>step-6]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
 	console.log('Built transaction:');
 	console.dir(transaction.toJson(), { colors: true });
-
-	// Announce the transaction
+	// [<step-6]
+	// Announce the transaction [>step-7]
 	const announcePath = '/transaction/announce';
 	console.log('Announcing transaction to', announcePath);
 	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
@@ -68,8 +71,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-
-	// Wait for confirmation
+	// [<step-7]
+	// Wait for confirmation [>step-8]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -95,6 +98,7 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
+	// [<step-8]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

@@ -1,9 +1,10 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
+	Address,
 	NemFacade,
-	NetworkTimestamp,
 	calculateMosaicRentalFee,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -22,63 +23,50 @@ const signerAddress = facade.network.publicKeyToAddress(
 console.log('Signer address:', signerAddress.toString());
 // [<step-1]
 try {
-	// Fetch current network time [>step-2]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	// [<step-2]
-	// Build the mosaic ID [>step-3]
+	// Build the mosaic ID [>step-2]
 	const namespaceName = process.env.NAMESPACE || 'my_namespace';
 	const mosaicName = process.env.MOSAIC ||
 		`token_${Math.floor(Date.now() / 1000)}`;
 	const mosaicId = `${namespaceName}:${mosaicName}`;
 	console.log('Creating mosaic:', mosaicId);
+	// [<step-2]
+	// Define the mosaic [>step-3]
+	const mosaicDefinition = new descriptors.MosaicDefinitionDescriptor(
+		signerKeyPair.publicKey,
+		new descriptors.MosaicIdDescriptor(
+			new descriptors.NamespaceIdDescriptor(namespaceName),
+			mosaicName),
+		'My tutorial mosaic',
+		[
+			['divisibility', '2'],
+			['initialSupply', '1000'],
+			['supplyMutable', 'true'],
+			['transferable', 'true']
+		].map(([name, value]) =>
+			new descriptors.SizePrefixedMosaicPropertyDescriptor(
+				new descriptors.MosaicPropertyDescriptor(
+					name, value))));
 	// [<step-3]
-	// Define the mosaic [>step-4]
-	const mosaicDefinition = {
-		ownerPublicKey: signerKeyPair.publicKey.toString(),
-		id: {
-			namespaceId: { name: namespaceName },
-			name: mosaicName
-		},
-		description: 'My tutorial mosaic',
-		properties: [
-			{ property: { name: 'divisibility', value: '2' } },
-			{ property: { name: 'initialSupply', value: '1000' } },
-			{ property: { name: 'supplyMutable', value: 'true' } },
-			{ property: { name: 'transferable', value: 'true' } }
-		]
-	};
-	// [<step-4]
-	// Build the mosaic definition transaction [>step-5]
+	// Build the mosaic definition transaction [>step-4]
 	const rentalFee = calculateMosaicRentalFee();
 	console.log('  Mosaic creation fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
-	const transaction = facade.transactionFactory.create({
-		type: 'mosaic_definition_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		rentalFeeSink: 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
-		rentalFee,
-		mosaicDefinition
-	});
-	// [<step-5]
-	// Calculate and attach the transaction fee [>step-6]
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MosaicDefinitionTransactionV1Descriptor(
+			mosaicDefinition,
+			new Address('TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC'),
+			new models.Amount(rentalFee)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
+	// [<step-4]
+	// Calculate and attach the transaction fee [>step-5]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log('  Transaction fee:', `${Number(fee) / 1_000_000} XEM`);
-	// [<step-6]
-	// Sign and generate final payload [>step-7]
+	// [<step-5]
+	// Sign and generate final payload [>step-6]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
@@ -95,8 +83,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-7]
-	// Wait for confirmation [>step-8]
+	// [<step-6]
+	// Wait for confirmation [>step-7]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -122,8 +110,8 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-8]
-	// Retrieve the mosaic [>step-9]
+	// [<step-7]
+	// Retrieve the mosaic [>step-8]
 	const definitionPath = `/mosaic/definition?mosaicId=${mosaicId}`;
 	console.log('Fetching mosaic information from', definitionPath);
 	const definitionResponse = await fetch(
@@ -137,7 +125,7 @@ try {
 	console.log('  Initial supply:', properties.initialSupply);
 	console.log('  Supply mutable:', properties.supplyMutable);
 	console.log('  Transferable:', properties.transferable);
-	// [<step-9]
+	// [<step-8]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

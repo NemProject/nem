@@ -372,11 +372,13 @@ def page_markdown_dylinks(content, page, config, files):
 	Accepts JavaScript.camelCase and reformats to Python.snake_case.
 	Settings in mkdocs.base.yml:
 	- The dictionary extra.nem.class-remaps translates from Python names to JS names, because sometimes they're different.
+	- The dictionary extra.nem.method-remaps translates method names before converting them to Python snake_case.
 	- The array extra.nem.global-namespaces lists class names which do not exist in JS and must be removed.
 	"""
 	langs = ['py', 'js']
 	lang_names = ['Python', 'JavaScript']
 	class_remaps = config['extra']['nem']['class-remaps']
+	method_remaps = config['extra']['nem']['method-remaps']
 	global_namespaces = config['extra']['nem']['global-namespaces']
 	rgroup_id = 999
 
@@ -406,6 +408,8 @@ def page_markdown_dylinks(content, page, config, files):
 			if l == 'py':
 				if class_name in class_remaps:
 					class_name = class_remaps[class_name]
+				if method_name in method_remaps:
+					method_name = method_remaps[method_name]
 				method_name = camel_to_snake(method_name)
 			if l == 'js' and class_name in global_namespaces:
 				class_name = ""

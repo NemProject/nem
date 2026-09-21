@@ -2,7 +2,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { PrivateKey } from 'symbol-sdk';
 import {
-	NemFacade, NetworkTimestamp, calculateTransactionFee, models
+	Address, NemFacade, calculateTransactionFee, descriptors, models
 } from 'symbol-sdk/nem';
 
 const NODE_URL = process.env.NODE_URL ||
@@ -22,20 +22,13 @@ const signerKeyPair = new NemFacade.KeyPair(
 
 try {
 	// Build and sign a transfer to the monitored address [>step-2]
-	const timeResponse = await fetch(
-		`${NODE_URL}/time-sync/network-time`);
-	const networkTime = Math.floor(
-		(await timeResponse.json()).receiveTimeStamp / 1000);
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	const transaction = facade.transactionFactory.create({
-		type: 'transfer_transaction_v2',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		recipientAddress: MONITOR_ADDRESS,
-		amount: 0n
-	});
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.TransferTransactionV2Descriptor(
+			new Address(MONITOR_ADDRESS),
+			new models.Amount(0n)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 	transaction.fee = new models.Amount(
 		calculateTransactionFee(transaction));
 	const signature = facade.signTransaction(signerKeyPair, transaction);

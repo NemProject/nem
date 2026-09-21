@@ -52,16 +52,9 @@ test key if not set.
 The signer's address is derived from the public key.
 This account will own the created mosaic and must also own the namespace that will hold it.
 
-### Fetching Network Time
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Choosing the Mosaic Name
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 The mosaic ID is assembled from an existing namespace and a mosaic name.
 See [Name](../../textbook/mosaics.md#name) in the Textbook for the naming rules.
@@ -81,7 +74,7 @@ You can force the tutorial to use fixed names through the `NAMESPACE` and `MOSAI
 
 ### Defining the Mosaic
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 The mosaic definition describes the asset itself, separately from the transaction that registers it:
 
@@ -118,17 +111,11 @@ The mosaic definition describes the asset itself, separately from the transactio
 
 ### Building the Mosaic Definition Transaction
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 The mosaic definition transaction registers the mosaic on the network, specifying:
 
-* {{ tutorial.var('type') }}: Mosaic definition transactions use the type <ser:MosaicDefinitionTransactionV1>.
-
-* {{ tutorial.var('signer_public_key') }}: The account that signs the transaction and pays the fees, which must be the
-    owner of the namespace that will hold the mosaic.
-    It becomes the owner of the created mosaic.
-
-* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
+* **Transaction type:** Mosaic definition transactions use <ser:MosaicDefinitionTransactionV1>.
 
 * {{ tutorial.var('rental_fee_sink') }}: The special account that collects mosaic
     [creation fees](../../textbook/mosaics.md#creation-fee).
@@ -147,7 +134,10 @@ The mosaic definition transaction registers the mosaic on the network, specifyin
 
 * {{ tutorial.var('mosaic_definition') }}: The mosaic definition built in the previous step.
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+The facade adds the signer, which must own the namespace and becomes the mosaic owner, and derives the timestamp and
+deadline from the two-hour deadline duration.
+
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -157,19 +147,19 @@ Mosaic definition transactions pay a fixed transaction fee of 0.15 XEM, as shown
 
 ### Submitting the Mosaic Definition
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 The mosaic definition transaction is signed and announced following the same process as in the
 [Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 The code then waits for the transaction to be confirmed by polling the <get:/transaction/get> endpoint until the
 transaction is included in a block.
 
 ### Retrieving the Mosaic
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 To verify the mosaic was created successfully, the code retrieves its definition from the <get:/mosaic/definition>
 endpoint and displays its properties.
@@ -186,20 +176,20 @@ A successful response confirms the mosaic exists on the network with the expecte
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="5 6 7 67 68 69 70"
+```text linenums="1" hl_lines="3 4 5 65 66 67 68"
 --8<-- 'devbook/mosaics/create_mosaic.log'
 ```
 
 Some highlights from the output:
 
-* **Mosaic ID** (line 5): The mosaic is identified by its fully qualified name, combining the namespace
+* **Mosaic ID** (line 3): The mosaic is identified by its fully qualified name, combining the namespace
     `my_namespace` and a timestamped mosaic name.
     Search for this name in the [NEM testnet explorer](https://testnet.nem.fyi/) to view the mosaic details.
 
-* **Creation fee and transaction fee** (lines 6-7): The creation fee is 10 XEM, while the transaction fee is
+* **Creation fee and transaction fee** (lines 4-5): The creation fee is 10 XEM, while the transaction fee is
     0.15 XEM.
 
-* **Verified properties** (lines 67-70): The mosaic is retrieved from the network, confirming the expected
+* **Verified properties** (lines 65-68): The mosaic is retrieved from the network, confirming the expected
     divisibility, the initial supply of `1000`, and that the mosaic is both supply mutable and transferable.
 
 ## Conclusion
@@ -208,7 +198,7 @@ This tutorial showed how to:
 
 | Step                                                                      | Related documentation                                                       |
 | ------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [Define the mosaic](#defining-the-mosaic)                                 | <dy:TransactionFactory.create>, <ser:MosaicDefinitionTransactionV1>         |
+| [Define the mosaic](#defining-the-mosaic)                                 | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:MosaicDefinitionTransactionV1> |
 | [Calculate the creation fee](#building-the-mosaic-definition-transaction) | <dy:FeeCalculator.calculateMosaicRentalFee>                                 |
 | [Retrieve the mosaic](#retrieving-the-mosaic)                             | <get:/mosaic/definition>                                                    |
 

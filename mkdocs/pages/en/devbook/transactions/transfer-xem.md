@@ -71,51 +71,35 @@ The transaction's `amount` field requires [atomic units](../../textbook/mosaics.
 XEM has a <divisibility:> of 6, so one XEM equals one million atomic units.
 The snippet derives `amount` by multiplying `xem` by 1'000'000.
 
-### Fetching Network Time
+### Building the Transaction
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-Every NEM transaction contains two time fields, both expressed in <network time:>,
-the number of seconds since the NEM nemesis block:
+The snippet calls the facade's creation method with the transaction's descriptor and the values common to every
+transaction: the signer's public key, an initial fee of zero, and a deadline duration of two hours.
+The SDK fills the signer, sets the timestamp from the local clock, and derives the deadline from that duration.
 
-* `timestamp`: The moment the transaction is created, set here to the current network time.
-* `deadline`: How long the network keeps trying to confirm the transaction before discarding it.
-    It must be after the timestamp and no more than
+!!! info "Network time"
+
+    Every NEM transaction contains a `timestamp` and `deadline`, both expressed as the number of seconds since the NEM
+    nemesis block. The deadline must be after the timestamp and no more than
     [24 hours](../../textbook/transactions.md#common-transaction-structure) later.
-    Otherwise, the node rejects the transaction.
-    This example sets it two hours after the timestamp, well within the limit.
 
-Building a transfer therefore needs an accurate network time.
-The <get:/time-sync/network-time> endpoint reports the node's current network time.
-The node returns this value in milliseconds, so the code divides it by 1000 to obtain the seconds that transactions
-expect.
+    The facade uses the local system clock for these values. Applications that need to compare it with a node's clock
+    can query <get:/time-sync/network-time>, but do not need to fetch network time before creating every transaction.
 
-However, applications do not need to query the network time before every transaction.
-It can be fetched once and then adjusted using the local system clock when needed.
-This provides a good balance between accuracy and performance.
+The descriptor supplies the transfer-specific properties, in this order:
 
-The code wraps the seconds value in the SDK's <dy:NetworkTimestamp> class to obtain the `timestamp`, and derives the
-`deadline` from it with the <dy:NetworkTimestamp.addHours> helper.
-
-### Building the Transaction
-
-{{ tutorial.code_snippet_tagged('step-4') }}
-
-The snippet calls <dy:TransactionFactory.create> with a descriptor that supplies the transfer transaction's
-properties:
-
-* {{ tutorial.var('type') }}: This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry both XEM and
-    other <mosaics:>.
+* **Transaction type:** This tutorial uses <ser:TransferTransactionV2>, the current transfer version, which can carry
+    both XEM and other <mosaics:>.
     No mosaics are attached here, so the transaction sends XEM only.
-
-* {{ tutorial.var('signer_public_key') }}: The signer is the account that will pay the fee.
-    In a transfer transaction, it is also the source of the transferred XEM.
-
-* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
 
 * {{ tutorial.var('recipient_address') }}: The address that will receive the XEM.
 
 * {{ tutorial.var('amount') }}: The atomic-unit value computed earlier. For 1 XEM, this is `1_000_000`.
+
+The signer passed separately to <dy:NemFacade.createTransactionFromTypedDescriptor> pays the fee and supplies the
+transferred XEM.
 
 !!! info "Sending a mosaic or a message"
 
@@ -125,7 +109,7 @@ properties:
 
 ### Calculating the Transaction Fee
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 Every transaction pays a fee to the <harvester account:> that includes it in a block.
 
@@ -138,7 +122,7 @@ The fee starts at 0.05 XEM for small amounts and grows with the XEM sent, up to 
 
 ### Signing and Serializing
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 Once the transaction is created, it must be signed with the signing account's private key.
 Signing ensures the transaction is authentic and authorized by the sender.
@@ -149,7 +133,7 @@ ready to be submitted directly to a node for announcement.
 
 ### Announcing the Transaction
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 The signed payload is submitted to the <post:/transaction/announce> endpoint of any NEM <node:>.
 
@@ -167,7 +151,7 @@ account does not hold enough XEM to cover the amount and the fee.
 
 ### Waiting for Confirmation
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 The snippet above repeatedly queries the <get:/transaction/get> endpoint using the hash of the announced transaction.
 
@@ -191,31 +175,31 @@ NEM produces a block roughly once per minute, so confirmation usually takes from
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="11 13 15 16 17 20 21 34"
+```text linenums="1" hl_lines="9 11 13 14 15 18 19 32"
 --8<-- 'devbook/transactions/transfer_xem.log'
 ```
 
 Some highlights from the output:
 
-* **Signer public key** (line 11): The account that signs the transaction and sends the XEM.
+* **Signer public key** (line 9): The account that signs the transaction and sends the XEM.
 
-* **Transaction fee** (line 13): `50000` atomic units (`0.05` XEM), the fee for sending the default amount of 1 XEM.
+* **Transaction fee** (line 11): `50000` atomic units (`0.05` XEM), the fee for sending the default amount of 1 XEM.
 
-* **Recipient address** (line 15): The account that receives the XEM.
+* **Recipient address** (line 13): The account that receives the XEM.
     This is the same `RECIPIENT_ADDRESS`, but it looks different because NEM's transaction format encodes each character
     of its Base32 text as an ASCII code in hexadecimal, so `5442...` decodes back to `TBUL...`
     (`54` is `T`, `42` is `B`, and so on).
 
-* **Transfer amount** (line 16): `1000000` atomic units, equal to 1 XEM.
+* **Transfer amount** (line 14): `1000000` atomic units, equal to 1 XEM.
 
-* **No mosaics** (line 17): An empty mosaics array means the transaction sends XEM only.
+* **No mosaics** (line 15): An empty mosaics array means the transaction sends XEM only.
 
-* **Announcement result** (line 20): A result of `SUCCESS` means the node accepted the transaction into the unconfirmed
+* **Announcement result** (line 18): A result of `SUCCESS` means the node accepted the transaction into the unconfirmed
     pool.
 
-* **Transaction hash** (line 21): The hash that uniquely identifies the transaction on the network.
+* **Transaction hash** (line 19): The hash that uniquely identifies the transaction on the network.
 
-* **Confirmation** (line 34): The transaction is included in block `626588`.
+* **Confirmation** (line 32): The transaction is included in block `626588`.
 
 The number of `pending` checks depends on how soon the next block is harvested, so it varies between runs.
 
@@ -227,13 +211,12 @@ The hash is printed in the line that says `Waiting for confirmation from /transa
 
 This tutorial showed how to:
 
-| Step                                                              | Related documentation                                                      |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Obtain the network time](#fetching-network-time)                 | <get:/time-sync/network-time>, <dy:NetworkTimestamp>                       |
-| [Build the transaction](#building-the-transaction)                | <dy:TransactionFactory.create>, <ser:TransferTransactionV2>                |
-| [Calculate the transaction fee](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee>                                 |
-| [Sign the transaction](#signing-and-serializing)                  | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature> |
-| [Announce the transaction](#announcing-the-transaction)           | <post:/transaction/announce>                                               |
-| [Wait for confirmation](#waiting-for-confirmation)                | <get:/transaction/get>                                                     |
+| Step                                                              | Related documentation                                                            |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [Build the transaction](#building-the-transaction)                | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:TransferTransactionV2> |
+| [Calculate the transaction fee](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee>                                       |
+| [Sign the transaction](#signing-and-serializing)                  | <dy:NemFacade.signTransaction><br/><dy:TransactionFactory.attachSignature>       |
+| [Announce the transaction](#announcing-the-transaction)           | <post:/transaction/announce>                                                     |
+| [Wait for confirmation](#waiting-for-confirmation)                | <get:/transaction/get>                                                           |
 
 Most other NEM transaction types are created, signed, and announced in the same way.

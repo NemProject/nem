@@ -7,7 +7,6 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
-from symbolchain.nem.Network import NetworkTimestamp
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
@@ -77,35 +76,20 @@ mosaic_id = f'{namespace_name}:{mosaic_name}'
 print(f'Mosaic ID: {mosaic_id}')
 # [<step-1]
 try:
-	# Fetch current network time [>step-2]
-	time_path = '/time-sync/network-time'
-	print(f'Fetching current network time from {time_path}')
-	with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
-		response_json = json.loads(response.read().decode())
-		network_time = response_json['receiveTimeStamp'] // 1000
-		print(f'  Network time: {network_time} s since the nemesis block')
-
-	# Derived fields from network time
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-	# [<step-2]
 	# --- INCREASING SUPPLY (MINTING) ---
 	print('\n--- Increasing supply (minting) ---')
-	# [>step-3]
+	# [>step-2]
 	print(f'Supply before minting: {fetch_supply(mosaic_id)}')
 
-	increase_tx = facade.transaction_factory.create({
+	increase_tx = facade.create_transaction_from_descriptor({
 		'type': 'mosaic_supply_change_transaction_v1',
-		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'mosaic_id': {
 			'namespace_id': {'name': namespace_name},
 			'name': mosaic_name
 		},
 		'action': 'increase',
 		'delta': 500
-	})
+	}, signer_key_pair.public_key, 0, 2 * 60 * 60)
 	increase_tx.fee = Amount(calculate_transaction_fee(increase_tx))
 
 	signature = facade.sign_transaction(signer_key_pair, increase_tx)
@@ -119,22 +103,19 @@ try:
 		print(f'Supply after minting: {fetch_supply(mosaic_id)}')
 	else:
 		print('Supply increase rejected')
-	# [<step-3]
+	# [<step-2]
 	# --- DECREASING SUPPLY (BURNING) ---
 	print('\n--- Decreasing supply (burning) ---')
-	# [>step-4]
-	decrease_tx = facade.transaction_factory.create({
+	# [>step-3]
+	decrease_tx = facade.create_transaction_from_descriptor({
 		'type': 'mosaic_supply_change_transaction_v1',
-		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'mosaic_id': {
 			'namespace_id': {'name': namespace_name},
 			'name': mosaic_name
 		},
 		'action': 'decrease',
 		'delta': 500
-	})
+	}, signer_key_pair.public_key, 0, 2 * 60 * 60)
 	decrease_tx.fee = Amount(calculate_transaction_fee(decrease_tx))
 
 	signature = facade.sign_transaction(signer_key_pair, decrease_tx)
@@ -148,6 +129,6 @@ try:
 		print(f'Supply after burning: {fetch_supply(mosaic_id)}')
 	else:
 		print('Supply decrease rejected')
-	# [<step-4]
+	# [<step-3]
 except urllib.error.URLError as e:
 	print(e.reason)

@@ -7,7 +7,6 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
-from symbolchain.nem.Network import NetworkTimestamp
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
@@ -74,7 +73,7 @@ def wait_for_confirmation(tx_hash, label):
 		print(f'{label} confirmation took too long.')
 
 
-# Returns the cosignatory addresses of the provided multisig [>step-3]
+# Returns the cosignatory addresses of the provided multisig [>step-2]
 # account, or an empty list if the account is not multisig
 def get_multisig_cosignatories(address):
 	account_path = f'/account/get?address={address}'
@@ -90,13 +89,12 @@ def get_multisig_cosignatories(address):
 			print('  Response: No cosignatories')
 			return []
 		print(f'  Response: {found_cosignatories}')
-		return found_cosignatories  # [<step-3]
+		return found_cosignatories  # [<step-2]
 
 
-# [>step-5]
+# [>step-4]
 # Returns a transaction that turns a regular account into a multisig
-def multisig_enable_transaction(tx_timestamp, tx_deadline,
-		approval_delta):
+def multisig_enable_transaction(approval_delta):
 	# Create a multisig account modification transaction
 	# that adds the cosignatories
 	modifications = [
@@ -106,112 +104,99 @@ def multisig_enable_transaction(tx_timestamp, tx_deadline,
 		}}
 		for key_pair in cosignatory_key_pairs
 	]
-	transaction = facade.transaction_factory.create({
-		'type': 'multisig_account_modification_transaction_v2',
+	transaction = facade.create_transaction_from_descriptor(
+		{
+			'type': 'multisig_account_modification_transaction_v2',
+			# Change of the number of cosignatures
+			# required to approve transactions
+			'min_approval_delta': approval_delta,
+			'modifications': modifications
+		},
 		# This is the account that will be turned into a multisig
-		'signer_public_key': multisig_key_pair.public_key,
-		'timestamp': tx_timestamp.timestamp,
-		'deadline': tx_deadline.timestamp,
-		# Change of the number of cosignatures
-		# required to approve transactions
-		'min_approval_delta': approval_delta,
-		'modifications': modifications
-	})
-	# [<step-5]
-	# Calculate and attach the transaction fee [>step-6]
+		multisig_key_pair.public_key,
+		0,
+		2 * 60 * 60)
+	# [<step-4]
+	# Calculate and attach the transaction fee [>step-5]
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
 	print('Enabling the multisig with the modification transaction:')
 	print(json.dumps(transaction.to_json(), indent=2))
-	# [<step-6]
-	# Sign the transaction with the multisig's key [>step-7]
+	# [<step-5]
+	# Sign the transaction with the multisig's key [>step-6]
 	signature = facade.sign_transaction(multisig_key_pair, transaction)
 	facade.transaction_factory.attach_signature(transaction, signature)
-	return transaction  # [<step-7]
+	return transaction  # [<step-6]
 
 
-# [>step-8]
+# [>step-7]
 # Returns a transaction that removes one cosignatory from the multisig
-def multisig_removal_transaction(tx_timestamp, tx_deadline,
-		removed_key_pair, approval_delta):
+def multisig_removal_transaction(removed_key_pair, approval_delta):
 	# Create a multisig account modification transaction
 	# that removes a single cosignatory
-	inner_transaction = facade.transaction_factory.create({
-		'type': 'multisig_account_modification_transaction_v2',
+	inner_transaction = facade.create_transaction_from_descriptor(
+		{
+			'type': 'multisig_account_modification_transaction_v2',
+			# Change of the number of cosignatures
+			# required to approve transactions
+			'min_approval_delta': approval_delta,
+			'modifications': [
+				{'modification': {
+					'modification_type': 'delete_cosignatory',
+					'cosignatory_public_key': removed_key_pair.public_key
+				}}
+			]
+		},
 		# This is the multisig account that will be modified
-		'signer_public_key': multisig_key_pair.public_key,
-		'timestamp': tx_timestamp.timestamp,
-		'deadline': tx_deadline.timestamp,
-		# Change of the number of cosignatures
-		# required to approve transactions
-		'min_approval_delta': approval_delta,
-		'modifications': [
-			{'modification': {
-				'modification_type': 'delete_cosignatory',
-				'cosignatory_public_key': removed_key_pair.public_key
-			}}
-		]
-	})
-	# [<step-8]
-	# Wrap the modification in a multisig transaction [>step-9]
+		multisig_key_pair.public_key,
+		0,
+		2 * 60 * 60)
+	# [<step-7]
+	# Wrap the modification in a multisig transaction [>step-8]
 	inner_fee = calculate_transaction_fee(inner_transaction)
 	inner_transaction.fee = Amount(inner_fee)
-	transaction = facade.transaction_factory.create({
-		'type': 'multisig_transaction_v1',
+	transaction = facade.create_transaction_from_descriptor(
+		{
+			'type': 'multisig_transaction_v1',
+			'inner_transaction':
+				facade.transaction_factory.to_non_verifiable_transaction(
+					inner_transaction)
+		},
 		# This is the cosignatory that initiates the removal
-		'signer_public_key': cosignatory_key_pairs[0].public_key,
-		'timestamp': tx_timestamp.timestamp,
-		'deadline': tx_deadline.timestamp,
-		'inner_transaction':
-			facade.transaction_factory.to_non_verifiable_transaction(
-				inner_transaction)
-	})
-	# [<step-9]
-	# Calculate and attach the transaction fee [>step-10]
+		cosignatory_key_pairs[0].public_key,
+		0,
+		2 * 60 * 60)
+	# [<step-8]
+	# Calculate and attach the transaction fee [>step-9]
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {(inner_fee + fee) / 1_000_000} XEM')
 	print('Disabling the multisig with the multisig transaction:')
 	print(json.dumps(transaction.to_json(), indent=2))
-	# [<step-10]
-	# Sign the transaction with the cosignatory's key [>step-11]
+	# [<step-9]
+	# Sign the transaction with the cosignatory's key [>step-10]
 	signature = facade.sign_transaction(
 		cosignatory_key_pairs[0], transaction)
 	facade.transaction_factory.attach_signature(transaction, signature)
-	return transaction  # [<step-11]
+	return transaction  # [<step-10]
 
 
 try:
-	# Fetch current network time [>step-2]
-	time_path = '/time-sync/network-time'
-	print(f'Fetching current network time from {time_path}')
-	with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
-		response_json = json.loads(response.read().decode())
-		network_time = response_json['receiveTimeStamp'] // 1000
-		print(f'  Network time: {network_time} s since the nemesis block')
-
-	# Derived fields from network time
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-	# [<step-2]
-	# Get current state of the multisig account and decide which [>step-4]
+	# Get current state of the multisig account and decide which [>step-3]
 	# operation to perform
 	cosignatories = get_multisig_cosignatories(multisig_address)
 	if len(cosignatories) == 0:
 		# Enable the multisig
-		transactions = [multisig_enable_transaction(
-			timestamp, deadline, 1)]
+		transactions = [multisig_enable_transaction(1)]
 	else:
 		# Disable the multisig
 		transactions = [
-			multisig_removal_transaction(
-				timestamp, deadline, cosignatory_key_pairs[1], 0),
-			multisig_removal_transaction(
-				timestamp, deadline, cosignatory_key_pairs[0], -1)
+			multisig_removal_transaction(cosignatory_key_pairs[1], 0),
+			multisig_removal_transaction(cosignatory_key_pairs[0], -1)
 		]
-	# [<step-4]
-	# Announce each transaction and wait for confirmation [>step-12]
+	# [<step-3]
+	# Announce each transaction and wait for confirmation [>step-11]
 	for signed_transaction in transactions:
 		transaction_hash = facade.hash_transaction(signed_transaction)
 		print(f'Built transaction with hash: {transaction_hash}')
@@ -223,6 +208,6 @@ try:
 			print('Transaction rejected')
 			break
 		wait_for_confirmation(transaction_hash, 'transaction')
-	# [<step-12]
+	# [<step-11]
 except Exception as e:
 	print(e)

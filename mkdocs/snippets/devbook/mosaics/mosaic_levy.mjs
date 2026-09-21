@@ -1,9 +1,10 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
+	Address,
 	NemFacade,
-	NetworkTimestamp,
 	calculateMosaicRentalFee,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -28,20 +29,7 @@ const mosaicId = `${namespaceName}:${mosaicName}`;
 console.log('Creating mosaic:', mosaicId);
 // [<step-1]
 try {
-	// Fetch current network time [>step-2]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	// [<step-2]
-	// Describe the levy [>step-3]
+	// Describe the levy [>step-2]
 	const LEVY_RECIPIENT = process.env.LEVY_RECIPIENT ||
 		'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
 
@@ -60,42 +48,48 @@ try {
 	console.log('  Mosaic:',
 		`${levy.mosaicId.namespaceId.name}:${levy.mosaicId.name}`);
 	console.log('  Fee:', levy.fee);
-	// [<step-3]
-	// Build the mosaic definition transaction [>step-4]
+	// [<step-2]
+	// Build the mosaic definition transaction [>step-3]
 	const rentalFee = calculateMosaicRentalFee();
 	console.log('  Mosaic creation fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
-	const transaction = facade.transactionFactory.create({
-		type: 'mosaic_definition_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		rentalFeeSink: 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
-		rentalFee,
-		mosaicDefinition: {
-			ownerPublicKey: signerKeyPair.publicKey.toString(),
-			id: {
-				namespaceId: { name: namespaceName },
-				name: mosaicName
-			},
-			description: 'My tutorial mosaic with a levy',
-			properties: [
-				{ property: { name: 'divisibility', value: '2' } },
-				{ property: { name: 'initialSupply', value: '1000' } },
-				{ property: { name: 'supplyMutable', value: 'true' } },
-				{ property: { name: 'transferable', value: 'true' } }
-			],
-			levy
-		}
-	});
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MosaicDefinitionTransactionV1Descriptor(
+			new descriptors.MosaicDefinitionDescriptor(
+				signerKeyPair.publicKey,
+				new descriptors.MosaicIdDescriptor(
+					new descriptors.NamespaceIdDescriptor(namespaceName),
+					mosaicName),
+				'My tutorial mosaic with a levy',
+				[
+					['divisibility', '2'],
+					['initialSupply', '1000'],
+					['supplyMutable', 'true'],
+					['transferable', 'true']
+				].map(([name, value]) =>
+					new descriptors.SizePrefixedMosaicPropertyDescriptor(
+						new descriptors.MosaicPropertyDescriptor(
+							name, value))),
+				new descriptors.MosaicLevyDescriptor(
+					models.MosaicTransferFeeType.ABSOLUTE,
+					new Address(LEVY_RECIPIENT),
+					new descriptors.MosaicIdDescriptor(
+						new descriptors.NamespaceIdDescriptor('nem'),
+						'xem'),
+					new models.Amount(BigInt(levy.fee)))),
+			new Address('TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC'),
+			new models.Amount(rentalFee)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 
 	// Calculate and attach the transaction fee
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log('  Transaction fee:', `${Number(fee) / 1_000_000} XEM`);
-	// [<step-4]
-	// Sign, announce and wait for confirmation [>step-5]
+	// [<step-3]
+	// Sign, announce and wait for confirmation [>step-4]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
@@ -137,8 +131,8 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-5]
-	// Retrieve the levy [>step-6]
+	// [<step-4]
+	// Retrieve the levy [>step-5]
 	const definitionPath = `/mosaic/definition?mosaicId=${mosaicId}`;
 	console.log('Fetching mosaic information from', definitionPath);
 	const definitionResponse = await fetch(
@@ -153,7 +147,7 @@ try {
 	console.log('  Mosaic:',
 		`${levyMosaicId.namespaceId}:${levyMosaicId.name}`);
 	console.log('  Fee:', levyInfo.fee);
-	// [<step-6]
+	// [<step-5]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

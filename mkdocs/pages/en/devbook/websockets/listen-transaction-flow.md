@@ -93,9 +93,9 @@ This tutorial builds a minimal <Transfer Transaction:> to the monitored address,
 no message.
 A transfer is used for simplicity, but any transaction type triggers the same WebSocket notifications.
 
-The transaction is built the same way as in the
-[Transfer XEM](../transactions/transfer-xem.md) tutorial: fetching the network time, creating the transaction, and
-signing it.
+The transaction is built and signed in the same way as in the
+[Transfer XEM](../transactions/transfer-xem.md) tutorial.
+The facade adds the signer and derives the timestamp and deadline from the two-hour deadline duration.
 
 Signing the transaction produces its hash, which uniquely identifies it.
 The code stores this hash because transaction channel notifications include the transaction hash.

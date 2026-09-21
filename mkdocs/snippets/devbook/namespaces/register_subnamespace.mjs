@@ -1,9 +1,10 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
+	Address,
 	NemFacade,
-	NetworkTimestamp,
 	calculateNamespaceRentalFee,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -22,19 +23,6 @@ const signerAddress = facade.network.publicKeyToAddress(
 console.log('Signer address:', signerAddress.toString());
 
 try {
-	// Fetch current network time
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-
 	// Choose the subnamespace name [>step-1]
 	const rootNamespaceName = process.env.ROOT_NAMESPACE || 'ns_root';
 	const childNamespaceName = process.env.SUBNAMESPACE ||
@@ -48,16 +36,15 @@ try {
 	console.log('  Namespace lease fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
-	const transaction = facade.transactionFactory.create({
-		type: 'namespace_registration_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		rentalFeeSink: 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
-		rentalFee,
-		parentName: rootNamespaceName,
-		name: childNamespaceName
-	});
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.NamespaceRegistrationTransactionV1Descriptor(
+			new Address('TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35'),
+			new models.Amount(rentalFee),
+			childNamespaceName,
+			rootNamespaceName),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);

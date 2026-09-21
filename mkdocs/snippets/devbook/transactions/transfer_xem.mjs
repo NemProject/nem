@@ -1,8 +1,9 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
+	Address,
 	NemFacade,
-	NetworkTimestamp,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -26,42 +27,28 @@ const amount = BigInt(Math.round(xem * 1_000_000));
 // [<step-2]
 
 try {
-	// Fetch current network time [>step-3]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
+	// Build the transaction [>step-3]
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.TransferTransactionV2Descriptor(
+			new Address(RECIPIENT_ADDRESS),
+			new models.Amount(amount)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 	// [<step-3]
-	// Build the transaction [>step-4]
-	const transaction = facade.transactionFactory.create({
-		type: 'transfer_transaction_v2',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		recipientAddress: RECIPIENT_ADDRESS,
-		amount
-	});
-	// [<step-4]
-	// Calculate and attach the transaction fee [>step-5]
+	// Calculate and attach the transaction fee [>step-4]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-5]
-	// Sign transaction and generate final payload [>step-6]
+	// [<step-4]
+	// Sign transaction and generate final payload [>step-5]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
 	console.log('Built transaction:');
 	console.dir(transaction.toJson(), { colors: true });
-	// [<step-6]
-	// Announce the transaction [>step-7]
+	// [<step-5]
+	// Announce the transaction [>step-6]
 	const announcePath = '/transaction/announce';
 	console.log('Announcing transaction to', announcePath);
 	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
@@ -71,8 +58,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-7]
-	// Wait for confirmation [>step-8]
+	// [<step-6]
+	// Wait for confirmation [>step-7]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -98,7 +85,7 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-8]
+	// [<step-7]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

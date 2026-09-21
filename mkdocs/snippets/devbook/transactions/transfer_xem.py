@@ -7,7 +7,6 @@ from symbolchain.CryptoTypes import PrivateKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
-from symbolchain.nem.Network import NetworkTimestamp
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
@@ -29,41 +28,26 @@ amount = round(xem * 1_000_000)
 # [<step-2]
 
 try:
-	# Fetch current network time [>step-3]
-	time_path = '/time-sync/network-time'
-	print(f'Fetching current network time from {time_path}')
-	with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
-		response_json = json.loads(response.read().decode())
-		network_time = response_json['receiveTimeStamp'] // 1000
-		print(f'  Network time: {network_time} s since the nemesis block')
-
-	# Derived fields from network time
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-	# [<step-3]
-	# Build the transaction [>step-4]
-	transaction = facade.transaction_factory.create({
+	# Build the transaction [>step-3]
+	transaction = facade.create_transaction_from_descriptor({
 		'type': 'transfer_transaction_v2',
-		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'recipient_address': RECIPIENT_ADDRESS,
 		'amount': amount
-	})
-	# [<step-4]
-	# Calculate and attach the transaction fee [>step-5]
+	}, signer_key_pair.public_key, 0, 2 * 60 * 60)
+	# [<step-3]
+	# Calculate and attach the transaction fee [>step-4]
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-5]
-	# Sign transaction and generate final payload [>step-6]
+	# [<step-4]
+	# Sign transaction and generate final payload [>step-5]
 	signature = facade.sign_transaction(signer_key_pair, transaction)
 	json_payload = facade.transaction_factory.attach_signature(
 		transaction, signature)
 	print('Built transaction:')
 	print(json.dumps(transaction.to_json(), indent=2))
-	# [<step-6]
-	# Announce the transaction [>step-7]
+	# [<step-5]
+	# Announce the transaction [>step-6]
 	announce_path = '/transaction/announce'
 	print(f'Announcing transaction to {announce_path}')
 	announce_request = urllib.request.Request(
@@ -75,8 +59,8 @@ try:
 	with urllib.request.urlopen(announce_request) as response:
 		announce_result = json.loads(response.read().decode())
 	print(f'  Result: {announce_result['message']}')
-	# [<step-7]
-	# Wait for confirmation [>step-8]
+	# [<step-6]
+	# Wait for confirmation [>step-7]
 	if 'SUCCESS' == announce_result['message']:
 		status_path = (
 			f'/transaction/get?hash={
@@ -100,6 +84,6 @@ try:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result['message']}')
-	# [<step-8]
+	# [<step-7]
 except urllib.error.URLError as e:
 	print(e.reason)

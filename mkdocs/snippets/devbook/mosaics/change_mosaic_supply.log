@@ -1,8 +1,6 @@
 Using node http://libertalia.nemtest.net:7890
 Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
 Mosaic ID: my_namespace:token
-Fetching current network time from /time-sync/network-time
-  Network time: 356366691 s since the nemesis block
 
 --- Increasing supply (minting) ---
 Supply before minting: 1000

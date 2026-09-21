@@ -66,28 +66,16 @@ The mosaic to update is read from the `NAMESPACE` and `MOSAIC` environment varia
     and `MOSAIC` environment variables to match the account and mosaic you created there, or any other mosaic that the
     signer owns.
 
-### Fetching Network Time
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Increasing Supply (Minting)
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 The snippet first reads the mosaic's supply, so that the newly minted units can be seen once the transaction is
 confirmed.
 
 To mint new units, the transaction sets:
 
-* {{ tutorial.var('type') }}: Mosaic supply change transactions use the type <ser:MosaicSupplyChangeTransactionV1>.
-
-* {{ tutorial.var('signer_public_key') }}: The account that signs the transaction and pays the fees.
-    It must be the creator of the mosaic.
-
-* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
+* **Transaction type:** Mosaic supply change transactions use <ser:MosaicSupplyChangeTransactionV1>.
 
 * {{ tutorial.var('mosaic_id') }}: The [fully qualified name](../../textbook/mosaics.md#fully-qualified-name) of the
     mosaic to update.
@@ -115,6 +103,8 @@ To mint new units, the transaction sets:
 
 The transaction fee is then calculated and the transaction is signed, announced, and confirmed, following the same
 process as in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
+The facade adds the mosaic creator as signer and derives the timestamp and deadline from the two-hour deadline
+duration.
 
 Mosaic supply change transactions pay a fixed transaction fee of 0.15 XEM, as shown in the
 [fee schedule](../../textbook/transactions.md#fee-schedule).
@@ -124,7 +114,7 @@ The minted units are credited to the creator's account.
 
 ### Decreasing Supply (Burning)
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 To burn existing units, the same transaction type is used with {{ tutorial.var('action') }} set to `decrease` and
 {{ tutorial.var('delta') }} set to the number of whole units to remove.
@@ -141,22 +131,22 @@ before the changes.
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="8 25-26 35 54-55 64"
+```text linenums="1" hl_lines="6 23-24 33 52-53 62"
 --8<-- 'devbook/mosaics/change_mosaic_supply.log'
 ```
 
 Some highlights from the output:
 
-* **Supply before minting** (line 8): The mosaic starts with a supply of `1000` whole units.
+* **Supply before minting** (line 6): The mosaic starts with a supply of `1000` whole units.
 
-* **Supply increase** (lines 25-26): The `increase` action with a delta of `500` mints new units into the creator's
+* **Supply increase** (lines 23-24): The `increase` action with a delta of `500` mints new units into the creator's
     balance.
 
-* **Supply after minting** (line 35): The supply rises to `1500` whole units.
+* **Supply after minting** (line 33): The supply rises to `1500` whole units.
 
-* **Supply decrease** (lines 54-55): The `decrease` action with the same delta burns those units.
+* **Supply decrease** (lines 52-53): The `decrease` action with the same delta burns those units.
 
-* **Supply after burning** (line 64): The supply returns to `1000`, because the increase and decrease cancel out.
+* **Supply after burning** (line 62): The supply returns to `1000`, because the increase and decrease cancel out.
 
 ## Conclusion
 
@@ -164,8 +154,8 @@ This tutorial showed how to:
 
 | Step                                                          | Related documentation                                                     |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [Mint mosaic supply](#increasing-supply-minting)              | <dy:TransactionFactory.create>, <ser:MosaicSupplyChangeTransactionV1>     |
-| [Burn mosaic supply](#decreasing-supply-burning)              | <dy:TransactionFactory.create>, <ser:MosaicSupplyChangeTransactionV1>     |
+| [Mint mosaic supply](#increasing-supply-minting)              | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:MosaicSupplyChangeTransactionV1> |
+| [Burn mosaic supply](#decreasing-supply-burning)              | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:MosaicSupplyChangeTransactionV1> |
 | [Calculate the transaction fee](#increasing-supply-minting)   | <dy:FeeCalculator.calculateTransactionFee>                                |
 | [Read the mosaic supply](#increasing-supply-minting)          | <get:/mosaic/supply>                                                      |
 

@@ -1,8 +1,8 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
-	NetworkTimestamp,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -69,36 +69,21 @@ const mosaicId = `${namespaceName}:${mosaicName}`;
 console.log('Mosaic ID:', mosaicId);
 // [<step-1]
 try {
-	// Fetch current network time [>step-2]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	// [<step-2]
 	// --- INCREASING SUPPLY (MINTING) ---
 	console.log('\n--- Increasing supply (minting) ---');
-	// [>step-3]
+	// [>step-2]
 	console.log('Supply before minting:', await fetchSupply(mosaicId));
 
-	const increaseTx = facade.transactionFactory.create({
-		type: 'mosaic_supply_change_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		mosaicId: {
-			namespaceId: { name: namespaceName },
-			name: mosaicName
-		},
-		action: 'increase',
-		delta: 500n
-	});
+	const increaseTx = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MosaicSupplyChangeTransactionV1Descriptor(
+			new descriptors.MosaicIdDescriptor(
+				new descriptors.NamespaceIdDescriptor(namespaceName),
+				mosaicName),
+			models.MosaicSupplyChangeAction.INCREASE,
+			new models.Amount(500n)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 	increaseTx.fee = new models.Amount(
 		calculateTransactionFee(increaseTx));
 
@@ -118,22 +103,20 @@ try {
 	} else {
 		console.log('Supply increase rejected');
 	}
-	// [<step-3]
+	// [<step-2]
 	// --- DECREASING SUPPLY (BURNING) ---
 	console.log('\n--- Decreasing supply (burning) ---');
-	// [>step-4]
-	const decreaseTx = facade.transactionFactory.create({
-		type: 'mosaic_supply_change_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		mosaicId: {
-			namespaceId: { name: namespaceName },
-			name: mosaicName
-		},
-		action: 'decrease',
-		delta: 500n
-	});
+	// [>step-3]
+	const decreaseTx = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MosaicSupplyChangeTransactionV1Descriptor(
+			new descriptors.MosaicIdDescriptor(
+				new descriptors.NamespaceIdDescriptor(namespaceName),
+				mosaicName),
+			models.MosaicSupplyChangeAction.DECREASE,
+			new models.Amount(500n)),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 	decreaseTx.fee = new models.Amount(
 		calculateTransactionFee(decreaseTx));
 
@@ -153,7 +136,7 @@ try {
 	} else {
 		console.log('Supply decrease rejected');
 	}
-	// [<step-4]
+	// [<step-3]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

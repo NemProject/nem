@@ -54,13 +54,9 @@ tutorial_level: advanced
 
     [ルートネームスペースを登録する](../namespaces/register-root-namespace.md) チュートリアルから続けている場合は、`SIGNER_PRIVATE_KEY` と `NAMESPACE` 環境変数を、そこで作成したアカウントとネームスペース、または署名者が所有する別のネームスペースに合わせて設定してください。
 
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### 徴収手数料を記述する {: #describing-the-levy }
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 徴収手数料は、次の 4 つのフィールドを持つ <ser:MosaicLevy> 構造体です。
 
@@ -89,22 +85,23 @@ tutorial_level: advanced
 
 ### モザイク定義に徴収手数料を付加する {: #attaching-the-levy-to-the-mosaic-definition }
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 徴収手数料はモザイク定義の一部なので、[モザイクを作成する](./create-mosaic.md#building-the-mosaic-definition-transaction) で使う <ser:MosaicDefinitionTransactionV1> と同じものを使って設定します。
 このチュートリアルでは同じトランザクションを再利用し、{{ tutorial.var('mosaic_definition') }} フィールドに徴収手数料を追加します。
+ファサードは署名者を追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
 
 [作成手数料](../../textbook/mosaics.md#creation-fee) は 10 XEM、トランザクション手数料は固定の 0.15 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 
 ### モザイク定義を送信する {: #submitting-the-mosaic-definition }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 [XEM を送信する](../transactions/transfer-xem.md#announcing-the-transaction) チュートリアルと同じ手順で、トランザクションに署名し、アナウンスして、承認を待ちます。
 
 ### 徴収手数料を検証する {: #verifying-the-levy }
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 徴収手数料付きモザイクが作成されたことを確認するため、コードは <get:/mosaic/definition> エンドポイントからモザイク定義を取得します。レスポンスにはモザイクプロパティとともに徴収手数料が返されます。
 
@@ -133,7 +130,7 @@ tutorial_level: advanced
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="3 6-10 58-68 82-85"
+```text linenums="1" hl_lines="3 4-8 56-66 80-83"
 --8<-- 'devbook/mosaics/mosaic_levy.log'
 ```
 
@@ -142,11 +139,11 @@ tutorial_level: advanced
 * **モザイク ID**（3 行目）: モザイクは、ネームスペース `my_namespace` とタイムスタンプ付きモザイク名を組み合わせた完全修飾名で識別されます。
     [NEM テストネットエクスプローラー](https://testnet.nem.fyi/) でこの名前を検索すると、モザイクの詳細を確認できます。
 
-* **徴収手数料のフィールド**（6～10 行目）: 作成する徴収手数料。`nem:xem` の原子単位 1'000'000（1 XEM）の `absolute` 手数料で、転送ごとに徴収手数料の受取人へ支払われます。
+* **徴収手数料のフィールド**（4～8 行目）: 作成する徴収手数料。`nem:xem` の原子単位 1'000'000（1 XEM）の `absolute` 手数料で、転送ごとに徴収手数料の受取人へ支払われます。
 
-* **トランザクション内の徴収手数料**（58～68 行目）: 徴収手数料はモザイク定義の内部で定義されます。受取人アドレス、徴収手数料のモザイク名、モザイク名はペイロード内で 16 進数にエンコードされ、この `absolute` 徴収手数料は原子単位で表されます。
+* **トランザクション内の徴収手数料**（56～66 行目）: 徴収手数料はモザイク定義の内部で定義されます。受取人アドレス、徴収手数料のモザイク名、モザイク名はペイロード内で 16 進数にエンコードされ、この `absolute` 徴収手数料は原子単位で表されます。
 
-* **検証された徴収手数料**（82～85 行目）: ネットワークからモザイクを取得し、徴収手数料のタイプ、受取人、支払いに使うモザイク、その金額を確認します。
+* **検証された徴収手数料**（80～83 行目）: ネットワークからモザイクを取得し、徴収手数料のタイプ、受取人、支払いに使うモザイク、その金額を確認します。
 
 ## まとめ {: #conclusion }
 
@@ -155,7 +152,7 @@ tutorial_level: advanced
 | 手順 | 関連ドキュメント |
 | --- | --- |
 | [徴収手数料を記述する](#describing-the-levy) | <ser:MosaicLevy> |
-| [モザイクに徴収手数料を付加する](#attaching-the-levy-to-the-mosaic-definition) | <dy:TransactionFactory.create>、<ser:MosaicDefinitionTransactionV1> |
+| [モザイクに徴収手数料を付加する](#attaching-the-levy-to-the-mosaic-definition) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:MosaicDefinitionTransactionV1> |
 | [徴収手数料を検証する](#verifying-the-levy) | <get:/mosaic/definition> |
 
 ## 次のステップ {: #next-steps }

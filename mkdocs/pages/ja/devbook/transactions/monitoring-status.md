@@ -142,7 +142,7 @@ HTTP リクエストを送信する方法だけが必要です。
     アナウンスの拒否はすぐ返されるため、最終的な判定は **deadline** です。
     [ネットワーク時刻](default:ネットワーク時刻) が deadline を過ぎると、トランザクションをブロックに含めることはできなくなり、代わりのトランザクションをアナウンスしても安全です。
 
-    [トランザクションの構築](./transfer-xem.md#fetching-network-time) で選択した deadline と、<get:/time-sync/network-time> が返すネットワーク時刻を比較してください。
+    [トランザクションの構築](./transfer-xem.md#building-the-transaction) で設定した deadline と、<get:/time-sync/network-time> が返すネットワーク時刻を比較してください。
 
 ## 出力 {: #output }
 

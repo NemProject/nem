@@ -1,7 +1,5 @@
 Using node http://libertalia.nemtest.net:7890
 Signer address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
-Fetching current network time from /time-sync/network-time
-  Network time: 356000940 s since the nemesis block
 Creating mosaic: my_namespace:token_1783588525
   Mosaic creation fee: 10.0 XEM
   Transaction fee: 0.15 XEM

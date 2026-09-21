@@ -45,16 +45,9 @@ key if not set.
 The signer's address is derived from the public key.
 This account will own the registered namespace.
 
-### Fetching Network Time
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Choosing the Namespace Name
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 A namespace is identified by its name, which the transaction reserves on the network for one year.
 See [Name](../../textbook/namespaces.md#name) in the Textbook for the naming rules.
@@ -65,16 +58,11 @@ You can force the tutorial to use a fixed name through the `ROOT_NAMESPACE` envi
 
 ### Building the Transaction
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 The namespace registration transaction then registers the namespace on the network, specifying:
 
-* {{ tutorial.var('type') }}: Namespace registration transactions use the type <ser:NamespaceRegistrationTransactionV1>.
-
-* {{ tutorial.var('signer_public_key') }}: The account that signs the transaction and pays the fees.
-    It becomes the owner of the registered namespace.
-
-* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
+* **Transaction type:** Namespace registration transactions use <ser:NamespaceRegistrationTransactionV1>.
 
 * {{ tutorial.var('rental_fee_sink') }}: The special account that collects namespace
     [lease fees](../../textbook/namespaces.md#lease-fee).
@@ -94,7 +82,10 @@ The namespace registration transaction then registers the namespace on the netwo
 
 * {{ tutorial.var('name') }}: The name of the root namespace.
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+The facade adds the signer, which becomes the namespace owner, and derives the timestamp and deadline from the
+two-hour deadline duration.
+
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 Finally, the transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the
 transaction.
@@ -104,19 +95,19 @@ Namespace registration transactions pay a fixed transaction fee of 0.15 XEM, as 
 
 ### Submitting the Transaction
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 The transaction is signed and announced following the same process as in the
 [Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 The code then waits for the transaction to be confirmed by polling the <get:/transaction/get> endpoint until the
 transaction is included in a block.
 
 ### Retrieving the Namespace
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 To verify the namespace was registered, the code retrieves it from the network using the <get:/namespace> endpoint and
 displays its properties.
@@ -130,19 +121,19 @@ marking the start of the one-year lease.
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="5 6 7 31-33"
+```text linenums="1" hl_lines="3 4 5 29-31"
 --8<-- 'devbook/namespaces/register_root_namespace.log'
 ```
 
 Some highlights from the output:
 
-* **Namespace name** (line 5): The chosen name `ns_1783091378` includes a timestamp to ensure uniqueness.
+* **Namespace name** (line 3): The chosen name `ns_1783091378` includes a timestamp to ensure uniqueness.
     Search for this name in the [NEM testnet explorer](https://testnet.nem.fyi/) to view the namespace details.
 
-* **Lease fee and transaction fee** (lines 6-7): The lease fee is 100 XEM because this is a root namespace
+* **Lease fee and transaction fee** (lines 4-5): The lease fee is 100 XEM because this is a root namespace
     (<subnamespaces:> pay 10 XEM instead), while the transaction fee is 0.15 XEM.
 
-* **Namespace information** (lines 31-33): The registered namespace, its owner (the signer's address), and the
+* **Namespace information** (lines 29-31): The registered namespace, its owner (the signer's address), and the
     registration height, which is the block at which the lease began.
 
 ## Conclusion
@@ -151,7 +142,7 @@ This tutorial showed how to:
 
 | Step                                                                    | Related documentation                                                    |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [Build a namespace registration transaction](#building-the-transaction) | <dy:TransactionFactory.create>, <ser:NamespaceRegistrationTransactionV1> |
+| [Build a namespace registration transaction](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:NamespaceRegistrationTransactionV1> |
 | [Calculate the lease fee](#building-the-transaction)                    | <dy:FeeCalculator.calculateNamespaceRentalFee>                           |
 | [Retrieve the namespace](#retrieving-the-namespace)                     | <get:/namespace>                                                         |
 

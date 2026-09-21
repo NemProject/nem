@@ -169,7 +169,7 @@ Only when the transaction is waiting in the unconfirmed pool does the snippet ca
     Once <network time:> passes the deadline, the transaction can no longer be included in a block and it is safe
     to announce a replacement transaction.
 
-    Compare the deadline chosen when [building the transaction](./transfer-xem.md#fetching-network-time) against the
+    Compare the deadline chosen when [building the transaction](./transfer-xem.md#building-the-transaction) against the
     network time returned by <get:/time-sync/network-time>.
 
 ## Output

@@ -165,6 +165,8 @@ extra:
       options: config/typedoc.json
       disabled: !ENV [NEM_DOCS_DISABLE_TS, false]
     class-remaps: {}
+    method-remaps:
+      createTransactionFromTypedDescriptor: createTransactionFromDescriptor
     global-namespaces:
       - FeeCalculator
 copyright: >

@@ -57,25 +57,15 @@ tutorial_level: intermediate
 
     [モザイクを作成する](./create-mosaic.md) チュートリアルから続けている場合は、`SIGNER_PRIVATE_KEY`、`NAMESPACE`、`MOSAIC` 環境変数を、そこで作成したアカウントとモザイク、または署名者が所有する別のモザイクに合わせて設定してください。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### 供給量を増やす（追加発行） {: #increasing-supply-minting }
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 スニペットはまずモザイクの供給量を読み取り、トランザクションが承認されたときに新しく発行されたモザイク数量を確認できるようにします。
 
 追加発行するには、トランザクションに次の値を設定します。
 
-* {{ tutorial.var('type') }}: モザイク供給量変更トランザクションでは、タイプ <ser:MosaicSupplyChangeTransactionV1> を使用します。
-
-* {{ tutorial.var('signer_public_key') }}: トランザクションに署名して手数料を支払うアカウント。モザイクの作成者でなければなりません。
-
-* {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
+* **トランザクションタイプ:** モザイク供給量変更トランザクションでは <ser:MosaicSupplyChangeTransactionV1> を使用します。
 
 * {{ tutorial.var('mosaic_id') }}: 更新するモザイクの [完全修飾名](../../textbook/mosaics.md#fully-qualified-name)。
 
@@ -97,6 +87,7 @@ tutorial_level: intermediate
         このチュートリアルのモザイクの可分性は `2` なので、1 全体単位は $100$ 原子単位に相当し、供給量は最大 $9 \cdot 10^{13}$ 全体単位まで増やせます。
 
 その後、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルと同じ手順で、トランザクション手数料を計算し、トランザクションに署名して、アナウンスし、承認を待ちます。
+ファサードはモザイクの作成者を署名者として追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
 
 モザイク供給量変更トランザクションの固定手数料は 0.15 XEM で、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 
@@ -105,7 +96,7 @@ tutorial_level: intermediate
 
 ### 供給量を減らす（焼却） {: #decreasing-supply-burning }
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 既存のモザイクを焼却するには、同じトランザクションタイプを使い、{{ tutorial.var('action') }} を `decrease` に、{{ tutorial.var('delta') }} を削除する全体単位数に設定します。
 
@@ -119,21 +110,21 @@ tutorial_level: intermediate
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="8 25-26 35 54-55 64"
+```text linenums="1" hl_lines="6 23-24 33 52-53 62"
 --8<-- 'devbook/mosaics/change_mosaic_supply.log'
 ```
 
 出力の要点は次のとおりです。
 
-* **発行前の供給量**（8 行目）: モザイクは 1000 全体単位の供給量で始まります。
+* **発行前の供給量**（6 行目）: モザイクは 1000 全体単位の供給量で始まります。
 
-* **供給量の増加**（25～26 行目）: デルタが `500` の `increase` アクションにより、500 全体単位が作成者の残高に追加されます。
+* **供給量の増加**（23～24 行目）: デルタが `500` の `increase` アクションにより、500 全体単位が作成者の残高に追加されます。
 
-* **発行後の供給量**（35 行目）: 供給量が 1500 全体単位に増えます。
+* **発行後の供給量**（33 行目）: 供給量が 1500 全体単位に増えます。
 
-* **供給量の減少**（54～55 行目）: 同じデルタの `decrease` アクションによって、それらの単位が焼却されます。
+* **供給量の減少**（52～53 行目）: 同じデルタの `decrease` アクションによって、それらの単位が焼却されます。
 
-* **焼却後の供給量**（64 行目）: 増加と減少が相殺されるため、供給量は 1000 に戻ります。
+* **焼却後の供給量**（62 行目）: 増加と減少が相殺されるため、供給量は 1000 に戻ります。
 
 ## まとめ {: #conclusion }
 
@@ -141,8 +132,8 @@ tutorial_level: intermediate
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [モザイクの供給量を増やす（追加発行）](#increasing-supply-minting) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
-| [モザイクの供給量を減らす（焼却）](#decreasing-supply-burning) | <dy:TransactionFactory.create>、<ser:MosaicSupplyChangeTransactionV1> |
+| [モザイクの供給量を増やす（追加発行）](#increasing-supply-minting) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:MosaicSupplyChangeTransactionV1> |
+| [モザイクの供給量を減らす（焼却）](#decreasing-supply-burning) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:MosaicSupplyChangeTransactionV1> |
 | [トランザクション手数料を計算する](#increasing-supply-minting) | <dy:FeeCalculator.calculateTransactionFee> |
 | [モザイクの供給量を読み取る](#increasing-supply-minting) | <get:/mosaic/supply> |
 

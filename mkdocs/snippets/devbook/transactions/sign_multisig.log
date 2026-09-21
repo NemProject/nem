@@ -2,8 +2,6 @@ Using node http://libertalia.nemtest.net:7890
 Multisig public key: D656155B48D4E71E4C59EC6FAEB5EB4F214DE8BC3C65D5BF6A3D9931B4E5ACF2
 Cosignatory 0 public key: AC1FC0D95CA3255D20C57C179EE6E694A47A725C48DB362CC4978D7745C6A5C3
 Cosignatory 1 public key: 26D999AD34795F20D33886047A8CB7DE1ED0042AB7ED1017C602222C8B2A4C23
-Fetching current network time from /time-sync/network-time
-  Network time: 357569945 s since the nemesis block
 Built multisig transaction:
 {
   "type": 4100,

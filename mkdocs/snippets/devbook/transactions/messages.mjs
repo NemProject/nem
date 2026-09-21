@@ -1,9 +1,10 @@
 import { PrivateKey, PublicKey } from 'symbol-sdk';
 import {
+	Address,
 	MessageEncoder,
 	NemFacade,
-	NetworkTimestamp,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -53,18 +54,7 @@ const recipientAddress = facade.network.publicKeyToAddress(
 console.log('Sender address:', senderAddress.toString());
 console.log('Recipient address:', recipientAddress.toString(), '\n');
 // [<step-1]
-// Fetch current network time
-const timePath = '/time-sync/network-time';
-console.log('Fetching current network time from', timePath);
-const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-const timeJSON = await timeResponse.json();
-const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-const timestamp = new NetworkTimestamp(networkTime);
-const deadline = timestamp.addHours(2);
-console.log('  Network time:', networkTime,
-	's since the nemesis block', '\n');
-
-// ===== PLAIN TEXT MESSAGE =====
+// --- PLAIN TEXT MESSAGE ---
 console.log('==> Sending Plain Text Message'); // [>step-2]
 
 // Create a plain text message
@@ -73,18 +63,16 @@ console.log('Plain message:',
 	new TextDecoder().decode(plainMessage));
 
 // Build transfer transaction with plain message
-const plainTransaction = facade.transactionFactory.create({
-	type: 'transfer_transaction_v2',
-	signerPublicKey: senderKeyPair.publicKey.toString(),
-	timestamp: timestamp.timestamp,
-	deadline: deadline.timestamp,
-	recipientAddress: recipientAddress.toString(),
-	amount: 0n,
-	message: {
-		messageType: 'plain',
-		message: plainMessage
-	}
-}); // [<step-2]
+const plainTransaction = facade.createTransactionFromTypedDescriptor(
+	new descriptors.TransferTransactionV2Descriptor(
+		new Address(recipientAddress.toString()),
+		new models.Amount(0n),
+		new descriptors.MessageDescriptor(
+			models.MessageType.PLAIN,
+			plainMessage)),
+	senderKeyPair.publicKey,
+	0n,
+	2 * 60 * 60); // [<step-2]
 plainTransaction.fee = new models.Amount(
 	calculateTransactionFee(plainTransaction));
 
@@ -104,7 +92,7 @@ await fetch(`${NODE_URL}/transaction/announce`, {
 });
 console.log('Plain message transaction announced\n');
 
-// ===== RECEIVING PLAIN TEXT MESSAGE =====
+// --- RECEIVING PLAIN TEXT MESSAGE ---
 console.log('<== Receiving Plain Text Message'); // [>step-3]
 
 // Wait for confirmation
@@ -117,7 +105,7 @@ const receivedPlainMessage = Buffer.from(
 console.log('Received plain message:',
 	new TextDecoder().decode(receivedPlainMessage), '\n');
 // [<step-3]
-// ===== ENCRYPTED MESSAGE =====
+// --- ENCRYPTED MESSAGE ---
 console.log('==> Sending Encrypted Message'); // [>step-4]
 
 // Create a message encoder with sender's key pair
@@ -134,18 +122,16 @@ console.log('Encrypted payload:',
 	Buffer.from(encryptedMessage.message).toString('hex'));
 
 // Build transfer transaction with encrypted message
-const encryptedTransaction = facade.transactionFactory.create({
-	type: 'transfer_transaction_v2',
-	signerPublicKey: senderKeyPair.publicKey.toString(),
-	timestamp: timestamp.timestamp,
-	deadline: deadline.timestamp,
-	recipientAddress: recipientAddress.toString(),
-	amount: 0n,
-	message: {
-		messageType: 'encrypted',
-		message: encryptedMessage.message
-	}
-}); // [<step-4]
+const encryptedTransaction = facade.createTransactionFromTypedDescriptor(
+	new descriptors.TransferTransactionV2Descriptor(
+		new Address(recipientAddress.toString()),
+		new models.Amount(0n),
+		new descriptors.MessageDescriptor(
+			models.MessageType.ENCRYPTED,
+			encryptedMessage.message)),
+	senderKeyPair.publicKey,
+	0n,
+	2 * 60 * 60); // [<step-4]
 encryptedTransaction.fee = new models.Amount(
 	calculateTransactionFee(encryptedTransaction));
 
@@ -165,7 +151,7 @@ await fetch(`${NODE_URL}/transaction/announce`, {
 });
 console.log('Encrypted message transaction announced\n');
 
-// ===== RECEIVING ENCRYPTED MESSAGE =====
+// --- RECEIVING ENCRYPTED MESSAGE ---
 console.log('<== Receiving Encrypted Message'); // [>step-5]
 
 // Wait for confirmation

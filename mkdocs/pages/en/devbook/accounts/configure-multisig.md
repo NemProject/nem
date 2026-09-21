@@ -55,8 +55,7 @@ The code defines two helper functions, for announcing a transaction and waiting 
 For details on how these work, see the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
 The remaining helper functions are described in the sections below.
 
-The tutorial then proceeds to [set up the required keys](#setting-up-the-accounts),
-[fetch the current network time](#fetching-network-time), and
+The tutorial then proceeds to [set up the required keys](#setting-up-the-accounts) and
 [detect the current configuration](#determining-the-multisig-operation) of the multisig account.
 
 Depending on whether the account is already configured as a multisig,
@@ -84,16 +83,9 @@ If the default values are used, this account may already be funded.
 
 The snippet above derives and stores the <key pair:> and <address:> of each account for later use.
 
-### Fetching Network Time
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transactions' `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Determining the Multisig Operation
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 This helper retrieves the list of current cosignatories for a given address using the <get:/account/get> endpoint.
 If it returns an empty list, the account is not currently configured as a multisig account.
@@ -109,7 +101,7 @@ If it returns an empty list, the account is not currently configured as a multis
     Applications should always check the current configuration before trying to modify it, including the full list of
     cosignatories and the minimum number of signatures required.
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 The returned cosignatories determine whether the account is configured as a multisig account, and therefore whether to
 create the transactions to enable or disable multisig.
@@ -118,19 +110,14 @@ The functions that build them and the delta values they use are described in the
 
 ### Enabling the Multisig
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 All changes to the multisig configuration of an account, including adding or removing cosignatories,
 are performed using a <ser:MultisigAccountModificationTransactionV2>.
 
 The transaction specifies:
 
-* {{ tutorial.var('type') }}: Multisig configuration changes use the type
-    <ser:MultisigAccountModificationTransactionV2>.
-
-* {{ tutorial.var('signer_public_key') }}: <public key:> of the account whose multisig configuration will be modified.
-
-* {{ tutorial.var('timestamp') }} and {{ tutorial.var('deadline') }}: The values computed in the network time step.
+* **Transaction type:** Multisig configuration changes use <ser:MultisigAccountModificationTransactionV2>.
 
 * {{ tutorial.var('min_approval_delta') }}: difference between the _desired value_ and the _current value_ of the
     number of cosignatures required to approve transactions from the multisig account.
@@ -147,6 +134,9 @@ The transaction specifies:
     In this case, two `add_cosignatory` modifications add the cosignatories prepared during the
     [setup phase](#setting-up-the-accounts).
 
+The facade adds the account whose multisig configuration will be modified as signer and derives the timestamp and
+deadline from the two-hour deadline duration.
+
 !!! note "Safety measures"
 
     The protocol includes safety mechanisms that help prevent locking an account into an invalid state.
@@ -159,13 +149,13 @@ The transaction specifies:
     * More than one cosignatory is removed in a single transaction
     * A multisig account is added as a cosignatory
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 The transaction fee is calculated with <dy:FeeCalculator.calculateTransactionFee> and attached to the transaction.
 Multisig account modification transactions pay a fixed transaction fee of 0.5 XEM, as shown in the
 [fee schedule](../../textbook/transactions.md#fee-schedule).
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 Finally, the transaction is signed.
 In this case, only the signature of the account being converted into a multisig is required.
@@ -183,12 +173,11 @@ Disabling a multisig configuration requires removing all cosignatories.
 The process is similar to enabling it, with two key differences:
 cosignatories must be removed one by one, and the multisig account itself cannot sign the transactions.
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 This helper builds a <ser:MultisigAccountModificationTransactionV2> that removes a cosignatory.
 It takes the cosignatory to remove and the approval delta to apply as parameters.
-{{ tutorial.var('signer_public_key') }} is set to the multisig account's public key because its configuration is being
-modified.
+The multisig account's public key is passed as the signer because its configuration is being modified.
 
 As shown in [Determining the Multisig Operation](#determining-the-multisig-operation), the helper is called twice.
 
@@ -198,7 +187,7 @@ cosignatory still remains.
 The second removes the remaining cosignatory with an approval delta of `-1`, reducing the approval requirement from `1`
 back to `0`.
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 Since a multisig account cannot sign transactions on its own, each modification is wrapped in a
 <ser:MultisigTransactionV1>.
@@ -206,17 +195,17 @@ Since a multisig account cannot sign transactions on its own, each modification 
 The inner modification transaction is converted with <dy:TransactionFactory.toNonVerifiableTransaction> so it can be
 embedded in the wrapping multisig transaction.
 
-{{ tutorial.code_snippet_tagged('step-10') }}
+{{ tutorial.code_snippet_tagged('step-9') }}
 
 Both the inner transaction and the wrapper pay a transaction fee: 0.5 XEM for the modification and 0.15 XEM for the
 multisig wrapper, as shown in the [fee schedule](../../textbook/transactions.md#fee-schedule).
 Both fees are deducted from the multisig account.
 Cosignatories never pay fees for the transactions they initiate on behalf of a multisig.
 
-{{ tutorial.code_snippet_tagged('step-11') }}
+{{ tutorial.code_snippet_tagged('step-10') }}
 
-Finally, each multisig transaction is signed by the cosignatory that initiates it, the one set as the wrapper's
-{{ tutorial.var('signer_public_key') }}.
+Finally, each multisig transaction is signed by the cosignatory that initiates it, whose public key is passed to the
+facade as the wrapper's signer.
 Here, both removals are initiated and signed by {{ tutorial.var('cosignatory_key_pairs[0]') }}.
 
 In this case, a single signature is enough because this multisig requires only one cosignature.
@@ -249,7 +238,7 @@ The only difference would be which cosignatory initiates and signs each transact
 
 ### Submitting the Transactions
 
-{{ tutorial.code_snippet_tagged('step-12') }}
+{{ tutorial.code_snippet_tagged('step-11') }}
 
 The final step is to announce the transactions and wait for their confirmation, as described in the
 [Transfer XEM](../transactions/transfer-xem.md) tutorial.
@@ -264,30 +253,30 @@ The output shown below corresponds to two typical runs of the program.
 
 === ":material-plus-thick: Enabling the Multisig"
 
-    ```text linenums="1" hl_lines="2-4 8 24 30 34"
+    ```text linenums="1" hl_lines="2-4 6 22 28 32"
     --8<-- 'devbook/accounts/configure_multisig_enable.log'
     ```
 
     Key points in the output:
 
     * **Lines 2-4**: Addresses and public keys of all involved accounts.
-    * **Line 8** (`Response: No cosignatories`): No cosignatories are currently configured.
-    * **Lines 24 and 30** (`cosignatory_public_key`): Public keys of the cosignatories that will be added.
-    * **Line 34** (`"min_approval_delta": 1`): The number of required cosignatures will be increased by one.
+    * **Line 6** (`Response: No cosignatories`): No cosignatories are currently configured.
+    * **Lines 22 and 28** (`cosignatory_public_key`): Public keys of the cosignatories that will be added.
+    * **Line 32** (`"min_approval_delta": 1`): The number of required cosignatures will be increased by one.
 
 === ":material-minus-thick: Disabling the Multisig"
 
-    ```text linenums="1" hl_lines="2-4 8 29-37 61-69"
+    ```text linenums="1" hl_lines="2-4 6 27-35 59-67"
     --8<-- 'devbook/accounts/configure_multisig_disable.log'
     ```
 
     Key points in the output:
 
     * **Lines 2-4**: Addresses and public keys of all involved accounts.
-    * **Line 8** (`Response: [ ... ]`): Existing cosignatories have been detected.
-    * **Lines 29-37** (First multisig transaction): The number of required cosignatures will remain unchanged and one
+    * **Line 6** (`Response: [ ... ]`): Existing cosignatories have been detected.
+    * **Lines 27-35** (First multisig transaction): The number of required cosignatures will remain unchanged and one
         existing cosignatory will be removed.
-    * **Lines 61-69** (Second multisig transaction): The number of required cosignatures will be decreased by one and
+    * **Lines 59-67** (Second multisig transaction): The number of required cosignatures will be decreased by one and
         the last remaining cosignatory will be removed.
 
 The transaction hashes shown in the output can be used to look up the transactions in the

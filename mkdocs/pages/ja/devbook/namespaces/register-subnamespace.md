@@ -40,7 +40,7 @@ tutorial_level: intermediate
 コードは [ルートネームスペースを登録する](./register-root-namespace.md) チュートリアルと同じパターンに従います。
 このセクションでは、主な違いだけに焦点を当てます。
 
-共通手順（アカウントのセットアップ、ネットワーク時刻の取得、アナウンス）とルートネームスペースで共有されるトランザクションディスクリプタフィールドの詳細な説明については、[ルートネームスペースを登録する](./register-root-namespace.md) を参照してください。
+共通手順（アカウントのセットアップ、トランザクションの作成、アナウンス）とルートネームスペースで共有されるトランザクションディスクリプタフィールドの詳細な説明については、[ルートネームスペースを登録する](./register-root-namespace.md) を参照してください。
 
 ### サブネームスペース名を設定する {: #choosing-the-subnamespace-name }
 
@@ -65,13 +65,13 @@ tutorial_level: intermediate
 
 サブネームスペースを登録する場合の主な違いは、トランザクションディスクリプタにあります。
 
-* {{ tutorial.var('parent_name') }}: 前の手順で定義した親ネームスペースの名前。
-    ルートネームスペースでも、別のサブネームスペースでも構いません。
-
 * {{ tutorial.var('name') }}: 前の手順で設定したサブネームスペースの名前。
 
     これはサブネームスペースの名前だけで、完全なパスではないことに注意してください。
     例えば、ルートが `company` の `company.product` を作成する場合は、{{ tutorial.var("`name: 'product'`") }} と {{ tutorial.var("`parent_name: 'company'`") }} を設定します。
+
+* {{ tutorial.var('parent_name') }}: 前の手順で定義した親ネームスペースの名前。
+    ルートネームスペースでも、別のサブネームスペースでも構いません。
 
 * {{ tutorial.var('rental_fee') }}: サブネームスペースのレンタル手数料である 10 XEM。ルートネームスペースと同じ [シンクアカウント](./register-root-namespace.md#building-the-transaction) に支払います。
 
@@ -79,6 +79,7 @@ tutorial_level: intermediate
     {{ tutorial.lit('False') }} 引数は、サブネームスペースの手数料を要求します。
 
 その後、[ルートネームスペースを登録する](./register-root-namespace.md#submitting-the-transaction) チュートリアルと同じ手順で、トランザクションに署名し、アナウンスして、承認を待ちます。
+ファサードは署名者を追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
 
 ### サブネームスペースを取得する {: #retrieving-the-subnamespace }
 
@@ -101,17 +102,17 @@ tutorial_level: intermediate
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="5 6 7 32-34"
+```text linenums="1" hl_lines="3 4 5 30-32"
 --8<-- 'devbook/namespaces/register_subnamespace.log'
 ```
 
 出力の要点は次のとおりです。
 
-* **完全なネームスペースパス**（5 行目）: `ns_root.sub_1783411728` は、親ネームスペース `ns_root` とトランザクションで設定したサブネームスペース名を組み合わせたものです。
+* **完全なネームスペースパス**（3 行目）: `ns_root.sub_1783411728` は、親ネームスペース `ns_root` とトランザクションで設定したサブネームスペース名を組み合わせたものです。
 
-* **レンタル手数料とトランザクション手数料**（6～7 行目）: サブネームスペースなのでレンタル手数料は 10 XEM です（ルートネームスペースは代わりに 100 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
+* **レンタル手数料とトランザクション手数料**（4～5 行目）: サブネームスペースなのでレンタル手数料は 10 XEM です（ルートネームスペースは代わりに 100 XEM を支払います）。トランザクション手数料は 0.15 XEM です。
 
-* **ネームスペース情報**（32～34 行目）: 登録されたサブネームスペース、その所有者（署名者のアドレス）、登録時の高さ。ルートネームスペースのリースが開始したブロックの高さをサブネームスペースが継承しています。
+* **ネームスペース情報**（30～32 行目）: 登録されたサブネームスペース、その所有者（署名者のアドレス）、登録時の高さ。ルートネームスペースのリースが開始したブロックの高さをサブネームスペースが継承しています。
 
 ## まとめ {: #conclusion }
 
@@ -119,7 +120,7 @@ tutorial_level: intermediate
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [サブネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:NamespaceRegistrationTransactionV1> |
+| [サブネームスペース登録トランザクションを構築する](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:NamespaceRegistrationTransactionV1> |
 | [レンタル手数料を計算する](#building-the-transaction) | <dy:FeeCalculator.calculateNamespaceRentalFee> |
 | [サブネームスペースを取得する](#retrieving-the-subnamespace) | <get:/namespace> |
 

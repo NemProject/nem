@@ -10,7 +10,6 @@ from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount, Message, MessageType
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
 from symbolchain.nem.MessageEncoder import MessageEncoder
-from symbolchain.nem.Network import NetworkTimestamp
 
 # Configuration
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
@@ -68,17 +67,7 @@ recipient_address = facade.network.public_key_to_address(
 print(f'Sender address: {sender_address}')
 print(f'Recipient address: {recipient_address}\n')
 # [<step-1]
-# Fetch current network time
-time_path = '/time-sync/network-time'
-print(f'Fetching current network time from {time_path}')
-with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
-	response_json = json.loads(response.read().decode())
-	network_time = response_json['receiveTimeStamp'] // 1000
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-	print(f'  Network time: {network_time} s since the nemesis block\n')
-
-# ===== PLAIN TEXT MESSAGE =====
+# --- PLAIN TEXT MESSAGE ---
 print('==> Sending Plain Text Message')  # [>step-2]
 
 # Create a plain text message
@@ -86,19 +75,19 @@ plain_message = 'Hello, NEM!'.encode('utf-8')
 print(f'Plain message: {plain_message.decode("utf-8")}')
 
 # Build transfer transaction with plain message
-plain_transaction = facade.transaction_factory.create(
+plain_transaction = facade.create_transaction_from_descriptor(
 	{
 		'type': 'transfer_transaction_v2',
-		'signer_public_key': sender_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'recipient_address': recipient_address,
 		'amount': 0,
 		'message': {
 			'message_type': 'plain',
 			'message': plain_message,
 		},
-	}
+	},
+	sender_key_pair.public_key,
+	0,
+	2 * 60 * 60
 )  # [<step-2]
 plain_transaction.fee = Amount(
 	calculate_transaction_fee(plain_transaction))
@@ -124,7 +113,7 @@ plain_announce_request = urllib.request.Request(
 with urllib.request.urlopen(plain_announce_request) as response:
 	print('Plain message transaction announced\n')
 
-# ===== RECEIVING PLAIN TEXT MESSAGE =====
+# --- RECEIVING PLAIN TEXT MESSAGE ---
 print('<== Receiving Plain Text Message')  # [>step-3]
 
 # Wait for confirmation
@@ -140,7 +129,7 @@ print(
 	f'Received plain message: {received_plain_message.decode("utf-8")}\n'
 )
 # [<step-3]
-# ===== ENCRYPTED MESSAGE =====
+# --- ENCRYPTED MESSAGE ---
 print('==> Sending Encrypted Message')  # [>step-4]
 
 # Create a message encoder with sender's key pair
@@ -156,19 +145,19 @@ encrypted_payload = hexlify(encrypted_message.message).decode('utf-8')
 print(f'Encrypted payload: {encrypted_payload}')
 
 # Build transfer transaction with encrypted message
-encrypted_transaction = facade.transaction_factory.create(
+encrypted_transaction = facade.create_transaction_from_descriptor(
 	{
 		'type': 'transfer_transaction_v2',
-		'signer_public_key': sender_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'recipient_address': recipient_address,
 		'amount': 0,
 		'message': {
 			'message_type': 'encrypted',
 			'message': encrypted_message.message,
 		},
-	}
+	},
+	sender_key_pair.public_key,
+	0,
+	2 * 60 * 60
 )  # [<step-4]
 encrypted_transaction.fee = Amount(
 	calculate_transaction_fee(encrypted_transaction))
@@ -194,7 +183,7 @@ encrypted_announce_request = urllib.request.Request(
 with urllib.request.urlopen(encrypted_announce_request) as response:
 	print('Encrypted message transaction announced\n')
 
-# ===== RECEIVING ENCRYPTED MESSAGE =====
+# --- RECEIVING ENCRYPTED MESSAGE ---
 print('<== Receiving Encrypted Message')  # [>step-5]
 
 # Wait for confirmation

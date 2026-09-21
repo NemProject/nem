@@ -134,8 +134,9 @@ The WebSocket channels subscribed later are scoped to this address.
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-Cosignatory 0 fetches the network time, builds an <inner transaction:|inner> transfer of 1 <XEM:> from the multisig
-account to itself, wraps it in a <ser:MultisigTransactionV1>, and signs it.
+Cosignatory 0 builds an <inner transaction:|inner> transfer of 1 <XEM:> from the multisig account to itself, wraps it
+in a <ser:MultisigTransactionV1>, and signs it.
+The facade derives each transaction's timestamp and deadline from the two-hour deadline duration.
 The implementation follows the same pattern described in the
 [Signing a Transaction from a Multisignature Account](../transactions/sign-multisig.md#building-the-transaction)
 tutorial.

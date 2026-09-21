@@ -71,21 +71,9 @@ digraph "Transfer company:token" {
 
 `QUANTITY` は、送信するモザイクの量を [全体単位](../../textbook/mosaics.md#divisibility) で指定する値で、デフォルトは 100 です。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-3') }}
-
-NEM のすべてのトランザクションには、作成時点を示す `timestamp` と、ネットワークが承認を試み続ける期間を示す `deadline` が必要です。どちらも [ネットワーク時刻](default:ネットワーク時刻) で表します。
-
-スニペットは <get:/time-sync/network-time> から現在のネットワーク時刻を取得し、`timestamp` に設定して、2 時間後を `deadline` に設定します。
-
-エンドポイントは時刻をミリ秒で返すため、コードでは 1000 で割って、トランザクションが必要とする秒数を取得します。
-
-キャッシュ戦略を含む詳細については、XEM 送信の [ネットワーク時刻を取得する](./transfer-xem.md#fetching-network-time) を参照してください。
-
 ### モザイク定義と供給量を取得する {: #fetching-the-mosaic-definition-and-supply }
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 モザイクの [可分性](default:可分性) を使って転送量を [原子単位](../../textbook/mosaics.md#divisibility) に変換し、現在の供給量とともに手数料を決定します。
 トランザクションを構築する前に、両方をノードから取得します。
@@ -93,12 +81,12 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 * <get:/mosaic/definition> エンドポイントは、`divisibility` などのプロパティを含むモザイク定義を返します。
 * <get:/mosaic/supply> エンドポイントは、現在の総供給量を [全体単位](../../textbook/mosaics.md#divisibility) で返します。
 
-ネットワーク時刻と同じく、転送ごとにこれらの値を取得する必要はありません。
+転送ごとにこれらの値を取得する必要はありません。
 モザイクの可分性は作成時に固定され、供給量は供給量を可変として作成された場合だけ変化するため、アプリケーションは両方を一度取得してキャッシュし、必要に応じて供給量を更新できます。
 
 ### トランザクションを構築する {: #building-the-transaction }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 スニペットはまず、前の手順で取得した可分性を使って、`QUANTITY` を全体単位から原子単位へ変換します。
 
@@ -111,7 +99,7 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 
     一方、可分性が 2 のモザイクでは、1 全体単位あたり 10^2^ = 100 原子単位です。そのため同じ `QUANTITY` 100 は 10'000 原子単位としてエンコードされます。
 
-次にスニペットは、追加の `mosaics` フィールドを持つ <ser:TransferTransactionV2> ディスクリプタを使って <dy:TransactionFactory.create> を呼び出します。`mosaics` フィールドには最大 10 件を指定できます。
+次にスニペットは、最大 10 件を指定できる `mosaics` フィールドを含むトランザクションのディスクリプタから <ser:TransferTransactionV2> を作成します。
 各エントリでは、モザイクと送信量を指定します。
 
 * モザイクを所有する [ネームスペース](default:ネームスペース)。
@@ -121,6 +109,7 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 モザイクを付加すると、最上位の `amount` は [XEM の金額](../../textbook/transfer_transactions.md#xem-amount) ではなくなります。
 列挙したすべてのモザイクに適用する乗数になり、`1_000_000` は係数 1 を表します。
 `amount` を `1_000_000` に設定すると、各モザイクをエントリに指定した数量で送信します。
+ファサードは署名者を追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
 
 !!! info "他のモザイクと一緒に XEM を送信する"
 
@@ -130,7 +119,7 @@ NEM のすべてのトランザクションには、作成時点を示す `times
 
 ### トランザクション手数料を計算する {: #calculating-the-transaction-fee }
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 モザイク転送の手数料は、各モザイクの供給量、可分性、転送する数量によって決まります。
 NEM の固定手数料表を手動で実装する代わりに、スニペットは SDK の <dy:FeeCalculator.calculateTransactionFee> ヘルパーを呼び出します。
@@ -154,16 +143,16 @@ NEM の固定手数料表を手動で実装する代わりに、スニペット�
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="8 18 21 22-29"
+```text linenums="1" hl_lines="6 16 19 20-27"
 --8<-- 'devbook/transactions/transfer_mosaics.log'
 ```
 
 通常の XEM 転送と異なる部分に焦点を当てた、出力の要点は次のとおりです。
 
-* **定義と供給量**（8 行目）: 可分性（`0`）と現在の供給量（`1000000`）を持つ `company:token` モザイク。数量を原子単位へ変換し、手数料を計算するために取得します。
-* **トランザクション手数料**（18 行目）: モザイクの供給量、可分性、転送量から導出した `350000` 原子単位（`0.35` XEM）。
-* **乗数としての amount**（21 行目）: モザイクを付加すると、`amount` は XEM の金額ではなく `1000000`（係数 1）になります。
-* **モザイク配列**（22～29 行目）: 転送に含まれるモザイク。ここでは数量 `100` のエントリ 1 件です。
+* **定義と供給量**（6 行目）: 可分性（`0`）と現在の供給量（`1000000`）を持つ `company:token` モザイク。数量を原子単位へ変換し、手数料を計算するために取得します。
+* **トランザクション手数料**（16 行目）: モザイクの供給量、可分性、転送量から導出した `350000` 原子単位（`0.35` XEM）。
+* **乗数としての amount**（19 行目）: モザイクを付加すると、`amount` は XEM の金額ではなく `1000000`（係数 1）になります。
+* **モザイク配列**（20～27 行目）: 転送に含まれるモザイク。ここでは数量 `100` のエントリ 1 件です。
     ネームスペースと名前はアドレスと同じように 16 進数でエンコードされるため、`636F6D70616E79` と `746F6B656E` は `company` と `token` にデコードされます。
 
 ネットワーク側からトランザクションを確認するには、[NEM テストネットエクスプローラー](https://testnet.nem.fyi/) でトランザクションハッシュを検索できます。
@@ -177,5 +166,5 @@ NEM の固定手数料表を手動で実装する代わりに、スニペット�
 | --- | --- |
 | [モザイクの可分性を取得する](#fetching-the-mosaic-definition-and-supply) | <get:/mosaic/definition> |
 | [モザイクの供給量を取得する](#fetching-the-mosaic-definition-and-supply) | <get:/mosaic/supply> |
-| [モザイク転送を構築する](#building-the-transaction) | <dy:TransactionFactory.create>、<ser:TransferTransactionV2> |
+| [モザイク転送を構築する](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:TransferTransactionV2> |
 | [トランザクション手数料を計算する](#calculating-the-transaction-fee) | <dy:FeeCalculator.calculateTransactionFee> |

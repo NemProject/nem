@@ -101,13 +101,6 @@ If the default values are used, this account may already be funded.
 The snippet above derives and stores the <key pair:> of each cosignatory, and the multisig account's <address:>,
 for later use.
 
-### Fetching Network Time
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transactions' `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Building the Transaction
 
 The transaction wrapped inside a multisig transaction is called the <inner transaction:>, and can be any
@@ -115,12 +108,9 @@ The transaction wrapped inside a multisig transaction is called the <inner trans
 [Configuring a Multisignature Account](../accounts/configure-multisig.md).
 Multisig transactions cannot be nested.
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 The inner <transfer transaction:|transfer transaction> includes the following fields:
-
-* {{ tutorial.var('signer_public_key') }}: <public key:> of the account whose funds are being transferred, that is,
-    the multisignature account.
 
 * {{ tutorial.var('recipient_address') }}: in this particular example, the funds are sent back to the sender, so the
     recipient is also the multisig account.
@@ -131,13 +121,11 @@ The inner <transfer transaction:|transfer transaction> includes the following fi
 The inner transaction has its own transaction fee, calculated with <dy:FeeCalculator.calculateTransactionFee>.
 For the 1 XEM sent here, the fee is 0.05 XEM, as shown in the
 [transfer fee schedule](../../textbook/transfer_transactions.md#fees).
+The multisig account's public key is passed separately to the facade as the signer.
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 The transfer transaction is then wrapped in a <ser:MultisigTransactionV1>. Its most relevant fields are:
-
-* {{ tutorial.var('signer_public_key') }}: this time, it is the <public key:> of the cosignatory that initiates the
-    transaction.
 
 * {{ tutorial.var('inner_transaction') }}: the wrapped transfer transaction, converted with
     <dy:TransactionFactory.toNonVerifiableTransaction> so it can be embedded without a signature of its own.
@@ -145,10 +133,12 @@ The transfer transaction is then wrapped in a <ser:MultisigTransactionV1>. Its m
 The multisig wrapper also has its own transaction fee of 0.15 XEM, as shown in the
 [fee schedule](../../textbook/transactions.md#fee-schedule).
 All fees, and the transferred amount, are deducted from the multisig account once the transaction is confirmed.
+The initiating cosignatory's public key is passed separately to the facade as the wrapper's signer.
+For both transactions, the facade derives the timestamp and deadline from the two-hour deadline duration.
 
 ### Initiator: Announcing the Multisig Transaction
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 In this case, Cosignatory 0 is the initiator of the multisig transaction.
 It signs the transaction and announces it to the network.
@@ -166,7 +156,7 @@ the transaction waits in the <unconfirmed pool:> until the missing cosignature a
 
 ### Cosignatory: Retrieving the Pending Transaction
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 At this point, Cosignatory 1 takes over.
 Cosignatories can use the <get:/account/unconfirmedTransactions> endpoint to discover pending multisig transactions
@@ -195,12 +185,10 @@ such as its type, recipient, and amount, before selecting the one to cosign.
 
 ### Cosignatory: Cosigning the Transaction
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 Cosignatory 1 provides the missing signature by announcing a <ser:CosignatureV1>.
 The cosignature specifies:
-
-* {{ tutorial.var('signer_public_key') }}: <public key:> of the cosignatory providing the signature.
 
 * {{ tutorial.var('other_transaction_hash') }}: hash of the inner transfer transaction retrieved in the previous step.
 
@@ -208,8 +196,9 @@ The cosignature specifies:
 
 The cosignature has a 0.15 XEM fee.
 The fee is also deducted from the multisig account once the multisig transaction is confirmed.
+The cosignatory's public key is passed separately to the facade as the signer.
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 Cosignatory 1 then signs the cosignature and announces it to the network.
 
@@ -225,7 +214,7 @@ in the next block.
 
 ### Waiting for Confirmation
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 Once all required cosignatures have been collected, the multisig transaction is confirmed as a single unit.
 
@@ -242,22 +231,22 @@ The following table summarizes the most common error sources:
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="2-4 13 22 35 42 46 51"
+```text linenums="1" hl_lines="2-4 11 20 33 40 44 49"
 --8<-- 'devbook/transactions/sign_multisig.log'
 ```
 
 Key points in the output:
 
 * **Lines 2-4**: Public keys of all involved accounts.
-* **Line 13** (`signer_public_key`): Signer of the multisig transaction.
+* **Line 11** (`signer_public_key`): Signer of the multisig transaction.
     Note that it matches Cosignatory 0.
-* **Line 22** (`signer_public_key`): Signer of the inner transfer transaction.
+* **Line 20** (`signer_public_key`): Signer of the inner transfer transaction.
     Note that it matches the multisig account.
-* **Line 35** (`Inner transaction hash`): Hash of the pending inner transaction, retrieved from the network.
-* **Line 42** (`signer_public_key`): Signer of the cosignature.
+* **Line 33** (`Inner transaction hash`): Hash of the pending inner transaction, retrieved from the network.
+* **Line 40** (`signer_public_key`): Signer of the cosignature.
     Note that it matches Cosignatory 1.
-* **Line 46** (`other_transaction_hash`): The inner transaction hash referenced by the cosignature.
-* **Line 51**: Hash of the multisig transaction, which uniquely identifies it on the network.
+* **Line 44** (`other_transaction_hash`): The inner transaction hash referenced by the cosignature.
+* **Line 49**: Hash of the multisig transaction, which uniquely identifies it on the network.
 
 The multisig transaction hash shown in the output can be used to look up the confirmed transaction in the
 [NEM testnet explorer](https://testnet.nem.fyi/).

@@ -121,7 +121,8 @@ digraph "Multisignature Tree" {
 
 {{ tutorial.code_snippet_tagged('step-2') }}
 
-連署人 0 はネットワーク時刻を取得し、マルチシグアカウントから自身へ 1 [XEM](default:XEM) を送る [内部トランザクション](default:内部トランザクション) を構築し、<ser:MultisigTransactionV1> にラップして署名します。
+連署人 0 はマルチシグアカウントから自身へ 1 [XEM](default:XEM) を送る [内部トランザクション](default:内部トランザクション) を構築し、<ser:MultisigTransactionV1> にラップして署名します。
+ファサードは 2 時間のデッドライン期間から各トランザクションのタイムスタンプとデッドラインを導出します。
 実装は、[マルチシグアカウントからトランザクションに署名する](../transactions/sign-multisig.md#building-the-transaction) チュートリアルで説明したパターンに従います。
 
 トランザクションは準備されますが、まだ [アナウンス](#initiator-announcing-the-multisig-transaction) されません。

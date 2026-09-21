@@ -1,8 +1,8 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
 	NemFacade,
-	NetworkTimestamp,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -72,7 +72,7 @@ async function waitForConfirmation(transactionHash, label) {
 		console.warn(`${label} confirmation took too long.`);
 }
 
-// Returns the cosignatory addresses of the provided multisig [>step-3]
+// Returns the cosignatory addresses of the provided multisig [>step-2]
 // account, or an empty list if the account is not multisig
 async function getMultisigCosignatories(address) {
 	const accountPath = `/account/get?address=${address}`;
@@ -88,86 +88,76 @@ async function getMultisigCosignatories(address) {
 	console.log('  Response:', JSON.stringify(foundCosignatories));
 	return foundCosignatories;
 }
-// [<step-3]
-// [>step-5]
+// [<step-2]
+// [>step-4]
 // Returns a transaction that turns a regular account into a multisig
-function multisigEnableTransaction(timestamp, deadline, approvalDelta) {
+function multisigEnableTransaction(approvalDelta) {
 	// Create a multisig account modification transaction
 	// that adds the cosignatories
-	const modifications = cosignatoryKeyPairs.map(keyPair => ({
-		modification: {
-			modificationType: 'add_cosignatory',
-			cosignatoryPublicKey: keyPair.publicKey.toString()
-		}
-	}));
-	const transaction = facade.transactionFactory.create({
-		type: 'multisig_account_modification_transaction_v2',
-		// This is the account that will be turned into a multisig
-		signerPublicKey: multisigKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
+	const modifications = cosignatoryKeyPairs.map(keyPair =>
+		new descriptors.SizePrefixedMultisigAccountModificationDescriptor(
+			new descriptors.MultisigAccountModificationDescriptor(
+				models.MultisigAccountModificationType.ADD_COSIGNATORY,
+				keyPair.publicKey)));
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MultisigAccountModificationTransactionV2Descriptor(
 		// Change of the number of cosignatures
 		// required to approve transactions
-		minApprovalDelta: approvalDelta,
-		modifications
-	});
-	// [<step-5]
-	// Calculate and attach the transaction fee [>step-6]
+			approvalDelta,
+			modifications),
+		// This is the account that will be turned into a multisig
+		multisigKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
+	// [<step-4]
+	// Calculate and attach the transaction fee [>step-5]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
 	console.log(
 		'Enabling the multisig with the modification transaction:');
 	console.log(JSON.stringify(transaction.toJson(), null, 2));
-	// [<step-6]
-	// Sign the transaction with the multisig's key [>step-7]
+	// [<step-5]
+	// Sign the transaction with the multisig's key [>step-6]
 	const signature = facade.signTransaction(
 		multisigKeyPair, transaction);
 	facade.transactionFactory.static.attachSignature(
 		transaction, signature);
-	return transaction; // [<step-7]
+	return transaction; // [<step-6]
 }
 
-// [>step-8]
+// [>step-7]
 // Returns a transaction that removes one cosignatory from the multisig
-function multisigRemovalTransaction(timestamp, deadline,
-	removedKeyPair, approvalDelta) {
+function multisigRemovalTransaction(removedKeyPair, approvalDelta) {
 	// Create a multisig account modification transaction
 	// that removes a single cosignatory
-	const innerTransaction = facade.transactionFactory.create({
-		type: 'multisig_account_modification_transaction_v2',
-		// This is the multisig account that will be modified
-		signerPublicKey: multisigKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
+	const innerTransaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MultisigAccountModificationTransactionV2Descriptor(
 		// Change of the number of cosignatures
 		// required to approve transactions
-		minApprovalDelta: approvalDelta,
-		modifications: [
-			{
-				modification: {
-					modificationType: 'delete_cosignatory',
-					cosignatoryPublicKey:
-						removedKeyPair.publicKey.toString()
-				}
-			}
-		]
-	});
-	// [<step-8]
-	// Wrap the modification in a multisig transaction [>step-9]
+			approvalDelta,
+			[new descriptors.SizePrefixedMultisigAccountModificationDescriptor(
+				new descriptors.MultisigAccountModificationDescriptor(
+					models.MultisigAccountModificationType.DELETE_COSIGNATORY,
+					removedKeyPair.publicKey))]),
+		// This is the multisig account that will be modified
+		multisigKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
+	// [<step-7]
+	// Wrap the modification in a multisig transaction [>step-8]
 	const innerFee = calculateTransactionFee(innerTransaction);
 	innerTransaction.fee = new models.Amount(innerFee);
-	const transaction = facade.transactionFactory.create({
-		type: 'multisig_transaction_v1',
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MultisigTransactionV1Descriptor(
+			facade.transactionFactory.static.toNonVerifiableTransaction(
+				innerTransaction)),
 		// This is the cosignatory that initiates the removal
-		signerPublicKey: cosignatoryKeyPairs[0].publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		innerTransaction: facade.transactionFactory.static
-			.toNonVerifiableTransaction(innerTransaction)
-	});
-	// [<step-9]
-	// Calculate and attach the transaction fee [>step-10]
+		cosignatoryKeyPairs[0].publicKey,
+		0n,
+		2 * 60 * 60);
+	// [<step-8]
+	// Calculate and attach the transaction fee [>step-9]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log('  Transaction fee:',
@@ -175,48 +165,32 @@ function multisigRemovalTransaction(timestamp, deadline,
 	console.log(
 		'Disabling the multisig with the multisig transaction:');
 	console.log(JSON.stringify(transaction.toJson(), null, 2));
-	// [<step-10]
-	// Sign the transaction with the cosignatory's key [>step-11]
+	// [<step-9]
+	// Sign the transaction with the cosignatory's key [>step-10]
 	const signature = facade.signTransaction(
 		cosignatoryKeyPairs[0], transaction);
 	facade.transactionFactory.static
 		.attachSignature(transaction, signature);
-	return transaction; // [<step-11]
+	return transaction; // [<step-10]
 }
 
 try {
-	// Fetch current network time [>step-2]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	// [<step-2]
-	// Get current state of the multisig account and decide [>step-4]
+	// Get current state of the multisig account and decide [>step-3]
 	// which operation to perform
 	const cosignatories = await getMultisigCosignatories(multisigAddress);
 	let transactions;
 	if (0 === cosignatories.length) {
 		// Enable the multisig
-		transactions = [multisigEnableTransaction(
-			timestamp, deadline, 1)];
+		transactions = [multisigEnableTransaction(1)];
 	} else {
 		// Disable the multisig
 		transactions = [
-			multisigRemovalTransaction(
-				timestamp, deadline, cosignatoryKeyPairs[1], 0),
-			multisigRemovalTransaction(
-				timestamp, deadline, cosignatoryKeyPairs[0], -1)
+			multisigRemovalTransaction(cosignatoryKeyPairs[1], 0),
+			multisigRemovalTransaction(cosignatoryKeyPairs[0], -1)
 		];
 	}
-	// [<step-4]
-	// Announce each transaction and wait for confirmation [>step-12]
+	// [<step-3]
+	// Announce each transaction and wait for confirmation [>step-11]
 	for (const signedTransaction of transactions) {
 		const transactionHash = facade.hashTransaction(signedTransaction)
 			.toString();
@@ -231,7 +205,7 @@ try {
 		}
 		await waitForConfirmation(transactionHash, 'transaction');
 	}
-	// [<step-12]
+	// [<step-11]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

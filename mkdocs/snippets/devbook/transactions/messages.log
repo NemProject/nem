@@ -2,9 +2,6 @@ Using node http://libertalia.nemtest.net:7890
 Sender address: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
 Recipient address: TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4
 
-Fetching current network time from /time-sync/network-time
-  Network time: 355248540 s since the nemesis block
-
 ==> Sending Plain Text Message
 Plain message: Hello, NEM!
 Transaction hash: 2F8F20CAF8F6FA42ADE05ED85FED0B4D1DA88051972405C4AE2D181B01FB69C3

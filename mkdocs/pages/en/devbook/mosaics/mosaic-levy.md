@@ -62,14 +62,9 @@ You can force the tutorial to use fixed names through the `NAMESPACE` and `MOSAI
     `SIGNER_PRIVATE_KEY` and `NAMESPACE` environment variables to match the account and namespace you created there,
     or any other namespace that the signer owns.
 
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-Network time is fetched from <get:/time-sync/network-time>, and the transaction's `timestamp` and `deadline` fields
-are derived from it, following the process described in the [Transfer XEM](../transactions/transfer-xem.md) tutorial.
-
 ### Describing the Levy
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 The levy is a <ser:MosaicLevy> structure with four fields:
 
@@ -102,25 +97,26 @@ The levy is a <ser:MosaicLevy> structure with four fields:
 
 ### Attaching the Levy to the Mosaic Definition
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 A levy is part of the mosaic definition, so it is set with the same <ser:MosaicDefinitionTransactionV1> used in
 [Creating a Mosaic](./create-mosaic.md#building-the-mosaic-definition-transaction).
 This tutorial reuses the same transaction, with the levy added to the {{ tutorial.var('mosaic_definition') }} field.
+The facade adds the signer and derives the timestamp and deadline from the two-hour deadline duration.
 
 The [creation fee](../../textbook/mosaics.md#creation-fee) is 10 XEM, and the transaction fee is a fixed 0.15 XEM, as
 shown in the [fee schedule](../../textbook/transactions.md#fee-schedule).
 
 ### Submitting the Mosaic Definition
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 The transaction is then signed, announced, and confirmed following the same process as in the
 [Transfer XEM](../transactions/transfer-xem.md#announcing-the-transaction) tutorial.
 
 ### Verifying the Levy
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 To verify the mosaic with the levy was created, the code retrieves the mosaic definition from the
 <get:/mosaic/definition> endpoint, which returns the levy alongside the mosaic properties.
@@ -154,7 +150,7 @@ If the levy is paid in another mosaic, the sender must also hold a sufficient ba
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="3 6-10 58-68 82-85"
+```text linenums="1" hl_lines="3 4-8 56-66 80-83"
 --8<-- 'devbook/mosaics/mosaic_levy.log'
 ```
 
@@ -164,14 +160,14 @@ Some highlights from the output:
     `my_namespace` and a timestamped mosaic name.
     Search for this name in the [NEM testnet explorer](https://testnet.nem.fyi/) to view the mosaic details.
 
-* **Levy fields** (lines 6-10): The levy to create, an `absolute` fee of 1'000'000 atomic units of `nem:xem` (1 XEM),
+* **Levy fields** (lines 4-8): The levy to create, an `absolute` fee of 1'000'000 atomic units of `nem:xem` (1 XEM),
     paid to the levy recipient on every transfer.
 
-* **Levy in the transaction** (lines 58-68): The levy is defined inside the mosaic definition.
+* **Levy in the transaction** (lines 56-66): The levy is defined inside the mosaic definition.
     The recipient address, the levy mosaic name, and the mosaic name are hex-encoded in the payload, while the fee of
     this `absolute` levy is expressed in atomic units.
 
-* **Verified levy** (lines 82-85): The mosaic is retrieved from the network, confirming the levy type, its recipient,
+* **Verified levy** (lines 80-83): The mosaic is retrieved from the network, confirming the levy type, its recipient,
     the mosaic in which it is paid, and its amount.
 
 ## Conclusion
@@ -181,7 +177,7 @@ This tutorial showed how to:
 | Step                                                                        | Related documentation                                               |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | [Describe the levy](#describing-the-levy)                                   | <ser:MosaicLevy>                                                    |
-| [Attach the levy to a mosaic](#attaching-the-levy-to-the-mosaic-definition) | <dy:TransactionFactory.create>, <ser:MosaicDefinitionTransactionV1> |
+| [Attach the levy to a mosaic](#attaching-the-levy-to-the-mosaic-definition) | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:MosaicDefinitionTransactionV1> |
 | [Verify the levy](#verifying-the-levy)                                      | <get:/mosaic/definition>                                            |
 
 ## Next Steps

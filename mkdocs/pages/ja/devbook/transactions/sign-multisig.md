@@ -91,22 +91,14 @@ digraph "Multisignature Tree" {
 
 上記のスニペットでは、後で使用するために各連署人の [キーペア](default:キーペア) と、マルチシグアカウントの [アドレス](default:アドレス) を導出して保存します。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### トランザクションを構築する {: #building-the-transaction }
 
 マルチシグトランザクションの内部にラップするトランザクションは [内部トランザクション](default:内部トランザクション) と呼ばれ、このチュートリアルで使う転送や、[マルチシグアカウントを設定する](../accounts/configure-multisig.md) で使う変更など、任意の [基本トランザクション](default:基本トランザクション) を指定できます。
 マルチシグトランザクションを入れ子にすることはできません。
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 内部の [転送トランザクション](default:転送トランザクション) には次のフィールドが含まれます。
-
-* {{ tutorial.var('signer_public_key') }}: 資金を送るアカウント、つまりマルチシグアカウントの [公開鍵](default:公開鍵)。
 
 * {{ tutorial.var('recipient_address') }}: この例では資金を送信者へ戻すため、受取人もマルチシグアカウントです。
 
@@ -114,21 +106,22 @@ digraph "Multisignature Tree" {
 
 内部トランザクションには固有のトランザクション手数料があり、<dy:FeeCalculator.calculateTransactionFee> で計算します。
 ここで送る 1 XEM の手数料は 0.05 XEM で、[送金手数料表](../../textbook/transfer_transactions.md#fees) に示されています。
+マルチシグアカウントの公開鍵は、署名者としてファサードに別途渡します。
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 次に転送トランザクションを <ser:MultisigTransactionV1> にラップします。主なフィールドは次のとおりです。
-
-* {{ tutorial.var('signer_public_key') }}: 今回は、トランザクションを開始する連署人の [公開鍵](default:公開鍵) です。
 
 * {{ tutorial.var('inner_transaction') }}: ラップした転送トランザクション。<dy:TransactionFactory.toNonVerifiableTransaction> で変換し、独自の署名なしで埋め込めるようにします。
 
 マルチシグラッパーにも 0.15 XEM の固有のトランザクション手数料があり、[手数料表](../../textbook/transactions.md#fee-schedule) に示されています。
 トランザクションが承認されると、すべての手数料と送金額がマルチシグアカウントから差し引かれます。
+開始する連署人の公開鍵は、ラッパーの署名者としてファサードに別途渡します。
+どちらのトランザクションも、ファサードが 2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
 
 ### 開始者: マルチシグトランザクションをアナウンスする {: #initiator-announcing-the-multisig-transaction }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 この場合、連署人 0 がマルチシグトランザクションの開始者です。
 トランザクションに署名してネットワークにアナウンスします。
@@ -143,7 +136,7 @@ digraph "Multisignature Tree" {
 
 ### 連署人: 承認待ちのトランザクションを取得する {: #cosignatory-retrieving-the-pending-transaction }
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 ここで連署人 1 が処理を引き継ぎます。
 連署人は <get:/account/unconfirmedTransactions> エンドポイントを使って、署名を待っている承認待ちのマルチシグトランザクションを見つけられます。
@@ -167,12 +160,10 @@ digraph "Multisignature Tree" {
 
 ### 連署人: トランザクションに連署する {: #cosignatory-cosigning-the-transaction }
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 連署人 1 は <ser:CosignatureV1> をアナウンスして、不足している署名を提供します。
 連署には次の内容を指定します。
-
-* {{ tutorial.var('signer_public_key') }}: 署名を提供する連署人の [公開鍵](default:公開鍵)。
 
 * {{ tutorial.var('other_transaction_hash') }}: 前の手順で取得した内部転送トランザクションのハッシュ。
 
@@ -180,8 +171,9 @@ digraph "Multisignature Tree" {
 
 連署の手数料は 0.15 XEM です。
 マルチシグトランザクションが承認されると、この手数料もマルチシグアカウントから差し引かれます。
+連署人の公開鍵は、署名者としてファサードに別途渡します。
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 次に連署人 1 が連署に署名してネットワークにアナウンスします。
 
@@ -195,7 +187,7 @@ digraph "Multisignature Tree" {
 
 ### 承認を待つ {: #waiting-for-confirmation }
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 必要な連署がすべて集まると、マルチシグトランザクションは 1 つの単位として承認されます。
 
@@ -212,22 +204,22 @@ digraph "Multisignature Tree" {
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="2-4 13 22 35 42 46 51"
+```text linenums="1" hl_lines="2-4 11 20 33 40 44 49"
 --8<-- 'devbook/transactions/sign_multisig.log'
 ```
 
 出力の要点は次のとおりです。
 
 * **2～4 行目**: 関係するすべてのアカウントの公開鍵。
-* **13 行目**（`signer_public_key`）: マルチシグトランザクションの署名者。
+* **11 行目**（`signer_public_key`）: マルチシグトランザクションの署名者。
     連署人 0 と一致することに注意してください。
-* **22 行目**（`signer_public_key`）: 内部転送トランザクションの署名者。
+* **20 行目**（`signer_public_key`）: 内部転送トランザクションの署名者。
     マルチシグアカウントと一致することに注意してください。
-* **35 行目**（`Inner transaction hash`）: ネットワークから取得した承認待ちの内部トランザクションのハッシュ。
-* **42 行目**（`signer_public_key`）: 連署の署名者。
+* **33 行目**（`Inner transaction hash`）: ネットワークから取得した承認待ちの内部トランザクションのハッシュ。
+* **40 行目**（`signer_public_key`）: 連署の署名者。
     連署人 1 と一致することに注意してください。
-* **46 行目**（`other_transaction_hash`）: 連署が参照する内部トランザクションのハッシュ。
-* **51 行目**: ネットワーク上でマルチシグトランザクションを一意に識別するハッシュ。
+* **44 行目**（`other_transaction_hash`）: 連署が参照する内部トランザクションのハッシュ。
+* **49 行目**: ネットワーク上でマルチシグトランザクションを一意に識別するハッシュ。
 
 出力に表示されたマルチシグトランザクションのハッシュを使って、[NEM テストネットエクスプローラー](https://testnet.nem.fyi/) で承認済みトランザクションを検索できます。
 

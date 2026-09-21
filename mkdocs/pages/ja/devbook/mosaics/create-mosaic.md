@@ -47,15 +47,9 @@ tutorial_level: intermediate
 署名者のアドレスは公開鍵から導出されます。
 このアカウントが作成したモザイクを所有し、モザイクが属するネームスペースも所有していなければなりません。
 
-### ネットワーク時刻を取得する {: #fetching-network-time }
-
-{{ tutorial.code_snippet_tagged('step-2') }}
-
-ネットワーク時刻は <get:/time-sync/network-time> から取得し、[XEM を送信する](../transactions/transfer-xem.md) チュートリアルで説明されている手順に従って、トランザクションの `timestamp` と `deadline` フィールドを導出します。
-
 ### モザイク名を設定する {: #choosing-the-mosaic-name }
 
-{{ tutorial.code_snippet_tagged('step-3') }}
+{{ tutorial.code_snippet_tagged('step-2') }}
 
 モザイク ID は、既存のネームスペースとモザイク名から組み立てられます。
 命名規則については、テキストブックの [名前](../../textbook/mosaics.md#name) を参照してください。
@@ -72,7 +66,7 @@ tutorial_level: intermediate
 
 ### モザイクを定義する {: #defining-the-mosaic }
 
-{{ tutorial.code_snippet_tagged('step-4') }}
+{{ tutorial.code_snippet_tagged('step-3') }}
 
 モザイクの定義では、資産そのものを、それを登録するトランザクションとは区別して記述しています：
 
@@ -105,16 +99,11 @@ tutorial_level: intermediate
 
 ### モザイク定義トランザクションを構築する {: #building-the-mosaic-definition-transaction }
 
-{{ tutorial.code_snippet_tagged('step-5') }}
+{{ tutorial.code_snippet_tagged('step-4') }}
 
 モザイク定義トランザクションでは、次の項目を指定してネットワークにモザイクを登録します。
 
-* {{ tutorial.var('type') }}: モザイク定義トランザクションでは、タイプ <ser:MosaicDefinitionTransactionV1> を使用します。
-
-* {{ tutorial.var('signer_public_key') }}: トランザクションに署名して手数料を支払うアカウント。モザイクが属するネームスペースの所有者でなければなりません。
-    作成したモザイクの所有者になります。
-
-* {{ tutorial.var('timestamp') }} と {{ tutorial.var('deadline') }}: ネットワーク時刻の手順で計算した値。
+* **トランザクションタイプ:** モザイク定義トランザクションでは <ser:MosaicDefinitionTransactionV1> を使用します。
 
 * {{ tutorial.var('rental_fee_sink') }}: モザイクの [作成手数料](../../textbook/mosaics.md#creation-fee) を集める特別なアカウント。
     各ネットワークには固定されたシンクアドレスがあります。
@@ -132,7 +121,10 @@ tutorial_level: intermediate
 
 * {{ tutorial.var('mosaic_definition') }}: 前の手順で構築したモザイク定義。
 
-{{ tutorial.code_snippet_tagged('step-6') }}
+ファサードは署名者を追加し、2 時間のデッドライン期間からタイムスタンプとデッドラインを導出します。
+署名者はネームスペースを所有している必要があり、作成したモザイクの所有者になります。
+
+{{ tutorial.code_snippet_tagged('step-5') }}
 
 最後に、<dy:FeeCalculator.calculateTransactionFee> でトランザクション手数料を計算し、トランザクションに付加します。
 作成手数料とは異なり、トランザクション手数料は [ハーベスターアカウント](default:ハーベスターアカウント) に支払われます。
@@ -140,17 +132,17 @@ tutorial_level: intermediate
 
 ### モザイク定義を送信する {: #submitting-the-mosaic-definition }
 
-{{ tutorial.code_snippet_tagged('step-7') }}
+{{ tutorial.code_snippet_tagged('step-6') }}
 
 [XEM を送信する](../transactions/transfer-xem.md#announcing-the-transaction) チュートリアルと同じ手順で、モザイク定義トランザクションに署名してアナウンスします。
 
-{{ tutorial.code_snippet_tagged('step-8') }}
+{{ tutorial.code_snippet_tagged('step-7') }}
 
 次にコードは、トランザクションがブロックに含まれるまで <get:/transaction/get> エンドポイントをポーリングし、承認を待ちます。
 
 ### モザイクを取得する {: #retrieving-the-mosaic }
 
-{{ tutorial.code_snippet_tagged('step-9') }}
+{{ tutorial.code_snippet_tagged('step-8') }}
 
 モザイクが正常に作成されたことを確認するため、コードは <get:/mosaic/definition> エンドポイントから定義を取得し、そのプロパティを表示します。
 
@@ -166,18 +158,18 @@ tutorial_level: intermediate
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="5 6 7 67 68 69 70"
+```text linenums="1" hl_lines="3 4 5 65 66 67 68"
 --8<-- 'devbook/mosaics/create_mosaic.log'
 ```
 
 出力の要点は次のとおりです。
 
-* **モザイク ID**（5 行目）: モザイクは、ネームスペース `my_namespace` とタイムスタンプ付きモザイク名を組み合わせた完全修飾名で識別されます。
+* **モザイク ID**（3 行目）: モザイクは、ネームスペース `my_namespace` とタイムスタンプ付きモザイク名を組み合わせた完全修飾名で識別されます。
     [NEM テストネットエクスプローラー](https://testnet.nem.fyi/) でこの名前を検索すると、モザイクの詳細を確認できます。
 
-* **作成手数料とトランザクション手数料**（6～7 行目）: 作成手数料は 10 XEM、トランザクション手数料は 0.15 XEM です。
+* **作成手数料とトランザクション手数料**（4～5 行目）: 作成手数料は 10 XEM、トランザクション手数料は 0.15 XEM です。
 
-* **確認されたプロパティ**（67～70 行目）: ネットワークからモザイクを取得し、可分性、初期供給量 `1000`、供給量が可変で転送可能であることを確認します。
+* **確認されたプロパティ**（65～68 行目）: ネットワークからモザイクを取得し、可分性、初期供給量 `1000`、供給量が可変で転送可能であることを確認します。
 
 ## まとめ {: #conclusion }
 
@@ -185,7 +177,7 @@ tutorial_level: intermediate
 
 | 手順 | 関連ドキュメント |
 | --- | --- |
-| [モザイクを定義する](#defining-the-mosaic) | <dy:TransactionFactory.create>、<ser:MosaicDefinitionTransactionV1> |
+| [モザイクを定義する](#defining-the-mosaic) | <dy:NemFacade.createTransactionFromTypedDescriptor>、<ser:MosaicDefinitionTransactionV1> |
 | [作成手数料を計算する](#building-the-mosaic-definition-transaction) | <dy:FeeCalculator.calculateMosaicRentalFee> |
 | [モザイクを取得する](#retrieving-the-mosaic) | <get:/mosaic/definition> |
 

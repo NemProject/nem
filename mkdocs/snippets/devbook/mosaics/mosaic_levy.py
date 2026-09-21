@@ -10,7 +10,6 @@ from symbolchain.nem.FeeCalculator import (
 	calculate_mosaic_rental_fee,
 	calculate_transaction_fee
 )
-from symbolchain.nem.Network import NetworkTimestamp
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
@@ -31,19 +30,7 @@ mosaic_id = f'{namespace_name}:{mosaic_name}'
 print(f'Creating mosaic: {mosaic_id}')
 # [<step-1]
 try:
-	# Fetch current network time [>step-2]
-	time_path = '/time-sync/network-time'
-	print(f'Fetching current network time from {time_path}')
-	with urllib.request.urlopen(f'{NODE_URL}{time_path}') as response:
-		response_json = json.loads(response.read().decode())
-		network_time = response_json['receiveTimeStamp'] // 1000
-		print(f'  Network time: {network_time} s since the nemesis block')
-
-	# Derived fields from network time
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-	# [<step-2]
-	# Describe the levy [>step-3]
+	# Describe the levy [>step-2]
 	LEVY_RECIPIENT = os.getenv(
 		'LEVY_RECIPIENT',
 		'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4')
@@ -64,16 +51,13 @@ try:
 	print(f'  Mosaic: {levy_mosaic_id["namespace_id"]["name"]}:'
 		f'{levy_mosaic_id["name"]}')
 	print(f'  Fee: {levy["fee"]}')
-	# [<step-3]
-	# Build the mosaic definition transaction [>step-4]
+	# [<step-2]
+	# Build the mosaic definition transaction [>step-3]
 	rental_fee = calculate_mosaic_rental_fee()
 	print(f'  Mosaic creation fee: {rental_fee / 1_000_000} XEM')
 
-	transaction = facade.transaction_factory.create({
+	transaction = facade.create_transaction_from_descriptor({
 		'type': 'mosaic_definition_transaction_v1',
-		'signer_public_key': signer_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'rental_fee_sink': 'TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC',
 		'rental_fee': rental_fee,
 		'mosaic_definition': {
@@ -95,14 +79,14 @@ try:
 			],
 			'levy': levy
 		}
-	})
+	}, signer_key_pair.public_key, 0, 2 * 60 * 60)
 
 	# Calculate and attach the transaction fee
 	fee = calculate_transaction_fee(transaction)
 	transaction.fee = Amount(fee)
 	print(f'  Transaction fee: {fee / 1_000_000} XEM')
-	# [<step-4]
-	# Sign, announce and wait for confirmation [>step-5]
+	# [<step-3]
+	# Sign, announce and wait for confirmation [>step-4]
 	signature = facade.sign_transaction(signer_key_pair, transaction)
 	json_payload = facade.transaction_factory.attach_signature(
 		transaction, signature)
@@ -143,8 +127,8 @@ try:
 			print('Confirmation took too long.')
 	else:
 		print(f'Transaction rejected: {announce_result["message"]}')
-	# [<step-5]
-	# Retrieve the levy [>step-6]
+	# [<step-4]
+	# Retrieve the levy [>step-5]
 	definition_path = f'/mosaic/definition?mosaicId={mosaic_id}'
 	print(f'Fetching mosaic information from {definition_path}')
 	with urllib.request.urlopen(
@@ -160,6 +144,6 @@ try:
 		print(f'  Mosaic: '
 			f'{levy_mosaic_id["namespaceId"]}:{levy_mosaic_id["name"]}')
 		print(f'  Fee: {levy_info["fee"]}')
-	# [<step-6]
+	# [<step-5]
 except urllib.error.URLError as e:
 	print(e.reason)

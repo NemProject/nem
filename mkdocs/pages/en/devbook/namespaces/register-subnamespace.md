@@ -42,7 +42,7 @@ transactions are announced and confirmed.
 The code follows the same pattern as the [Registering a Root Namespace](./register-root-namespace.md) tutorial.
 This section focuses only on the key differences.
 
-For detailed explanations of the common steps (setting up the account, fetching network time, announcing) and the
+For detailed explanations of the common steps (setting up the account, creating a transaction, announcing) and the
 transaction descriptor fields shared with a root namespace,
 see [Registering a Root Namespace](./register-root-namespace.md).
 
@@ -73,14 +73,14 @@ You can force the tutorial to use fixed names through the `ROOT_NAMESPACE` and `
 
 The main difference when registering a subnamespace is in the transaction descriptor:
 
-* {{ tutorial.var('parent_name') }}: The name of the parent namespace, defined in the previous step.
-    It can be a root namespace or another subnamespace.
-
 * {{ tutorial.var('name') }}: The name of the subnamespace, chosen in the previous step.
 
     Note that this is just the name of the subnamespace, not the full path.
     For example, to create `company.product`, where `company` is the root, you would set
     {{ tutorial.var("`name: 'product'`") }} and {{ tutorial.var("`parent_name: 'company'`") }}.
+
+* {{ tutorial.var('parent_name') }}: The name of the parent namespace, defined in the previous step.
+    It can be a root namespace or another subnamespace.
 
 * {{ tutorial.var('rental_fee') }}: The lease fee, which is 10 XEM for subnamespaces, paid to the same
     [sink account](./register-root-namespace.md#building-the-transaction) as root namespaces.
@@ -90,6 +90,7 @@ The main difference when registering a subnamespace is in the transaction descri
 
 The transaction is then signed, announced, and confirmed following the same process as in the
 [Registering a Root Namespace](./register-root-namespace.md#submitting-the-transaction) tutorial.
+The facade adds the signer and derives the timestamp and deadline from the two-hour deadline duration.
 
 ### Retrieving the Subnamespace
 
@@ -115,19 +116,19 @@ because subnamespaces inherit their root namespace's [lease](../../textbook/name
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="5 6 7 32-34"
+```text linenums="1" hl_lines="3 4 5 30-32"
 --8<-- 'devbook/namespaces/register_subnamespace.log'
 ```
 
 Some highlights from the output:
 
-* **Full namespace path** (line 5): `ns_root.sub_1783411728` combines the parent namespace `ns_root` with the
+* **Full namespace path** (line 3): `ns_root.sub_1783411728` combines the parent namespace `ns_root` with the
     subnamespace name set in the transaction.
 
-* **Lease fee and transaction fee** (lines 6-7): The lease fee is 10 XEM because this is a subnamespace
+* **Lease fee and transaction fee** (lines 4-5): The lease fee is 10 XEM because this is a subnamespace
     (root namespaces pay 100 XEM instead), while the transaction fee is 0.15 XEM.
 
-* **Namespace information** (lines 32-34): The registered subnamespace, its owner (the signer's address), and the
+* **Namespace information** (lines 30-32): The registered subnamespace, its owner (the signer's address), and the
     registration height, which is the block at which the root namespace's lease began, inherited by the subnamespace.
 
 ## Conclusion
@@ -136,7 +137,7 @@ This tutorial showed how to:
 
 | Step                                                                       | Related documentation                                                    |
 | -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [Build a subnamespace registration transaction](#building-the-transaction) | <dy:TransactionFactory.create>, <ser:NamespaceRegistrationTransactionV1> |
+| [Build a subnamespace registration transaction](#building-the-transaction) | <dy:NemFacade.createTransactionFromTypedDescriptor>, <ser:NamespaceRegistrationTransactionV1> |
 | [Calculate the lease fee](#building-the-transaction)                       | <dy:FeeCalculator.calculateNamespaceRentalFee>                           |
 | [Retrieve the subnamespace](#retrieving-the-subnamespace)                  | <get:/namespace>                                                         |
 

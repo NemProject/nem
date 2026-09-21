@@ -24,8 +24,8 @@ Before you start, make sure to:
 * Obtain <XEM:> to pay for the transaction fee.
     See [Getting Testnet Funds from the Faucet](../accounts/testnet-faucet.md).
 
-Additionally, check the [Transfer transaction](./transfer-xem.md) tutorial to understand how fee
-calculation, network time, and transaction confirmation work.
+Additionally, check the [Transfer transaction](./transfer-xem.md) tutorial to understand how transaction creation,
+fee calculation, and confirmation work.
 
 ## Full Code
 
@@ -36,7 +36,7 @@ calculation, network time, and transaction confirmation work.
 ## Code Explanation
 
 This tutorial focuses on the message-specific aspects of transfer transactions.
-The parts about fetching network time, calculating fees, and announcing transactions have been explained in the
+The parts about calculating fees and announcing transactions have been explained in the
 [Transfer Transaction](./transfer-xem.md) tutorial and are skipped here for brevity.
 
 ### Setting Up Accounts
@@ -64,6 +64,7 @@ The recipient's public key and address are derived from their private key.
 
 You can combine mosaic transfers with messages by including both the `mosaics` and `message` fields in the transaction
 descriptor.
+The facade adds the signer and derives the timestamp and deadline from the two-hour deadline duration.
 
 The transaction is then signed and announced following the same process as in
 [Sending XEM with a Transfer Transaction](./transfer-xem.md).
@@ -155,25 +156,25 @@ If decryption fails, possible causes include:
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="9 16 19 20 27"
+```text linenums="1" hl_lines="6 13 16 17 24"
 --8<-- 'devbook/transactions/messages.log'
 ```
 
 Some highlights from the output:
 
-* **Plain message** (line 9): The message attached to the first transaction.
+* **Plain message** (line 6): The message attached to the first transaction.
     Because it is not encrypted, anyone inspecting the blockchain can read it.
 
-* **Received plain message** (line 16): The same message, recovered from the confirmed transaction by converting the
+* **Received plain message** (line 13): The same message, recovered from the confirmed transaction by converting the
     hexadecimal payload back to UTF-8.
 
-* **Original message** (line 19): The secret message before encryption.
+* **Original message** (line 16): The secret message before encryption.
 
-* **Encrypted payload** (line 20): The result of encrypting the previous message with <dy:MessageEncoder.encode>,
+* **Encrypted payload** (line 17): The result of encrypting the previous message with <dy:MessageEncoder.encode>,
     shown as a hexadecimal string.
     This is what gets stored on the blockchain.
 
-* **Recipient decrypted message** (line 27): The original message, retrieved from the confirmed transaction and
+* **Recipient decrypted message** (line 24): The original message, retrieved from the confirmed transaction and
     decrypted by <dy:MessageEncoder.tryDecode> using the recipient's private key and the sender's public key.
 
 You can view the transactions on the [NEM testnet explorer](https://testnet.nem.fyi/) by searching for the

@@ -10,7 +10,6 @@ from symbolchain.CryptoTypes import PrivateKey, PublicKey
 from symbolchain.facade.NemFacade import NemFacade
 from symbolchain.nc import Amount
 from symbolchain.nem.FeeCalculator import calculate_transaction_fee
-from symbolchain.nem.Network import NetworkTimestamp
 from websockets import connect
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
@@ -98,34 +97,20 @@ print(f'Cosignatory 1 public key: {cosignatory1_key_pair.public_key}')
 
 async def main():
 	# [Cosignatory 0] Build and sign the multisig transaction [>step-2]
-	with urllib.request.urlopen(
-		f'{NODE_URL}/time-sync/network-time'
-	) as resp:
-		network_time = json.loads(
-			resp.read().decode())['receiveTimeStamp'] // 1000
-	timestamp = NetworkTimestamp(network_time)
-	deadline = timestamp.add_hours(2)
-
-	transfer_transaction = facade.transaction_factory.create({
+	transfer_transaction = facade.create_transaction_from_descriptor({
 		'type': 'transfer_transaction_v2',
-		'signer_public_key': multisig_public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'recipient_address': multisig_address,
 		'amount': 1_000_000  # 1 XEM
-	})
+	}, multisig_public_key, 0, 2 * 60 * 60)
 	transfer_transaction.fee = Amount(
 		calculate_transaction_fee(transfer_transaction))
 
-	transaction = facade.transaction_factory.create({
+	transaction = facade.create_transaction_from_descriptor({
 		'type': 'multisig_transaction_v1',
-		'signer_public_key': cosignatory0_key_pair.public_key,
-		'timestamp': timestamp.timestamp,
-		'deadline': deadline.timestamp,
 		'inner_transaction':
 			facade.transaction_factory.to_non_verifiable_transaction(
 				transfer_transaction)
-	})
+	}, cosignatory0_key_pair.public_key, 0, 2 * 60 * 60)
 	transaction.fee = Amount(calculate_transaction_fee(transaction))
 
 	signature = facade.sign_transaction(
@@ -196,17 +181,13 @@ async def main():
 				f'{inner_transaction_hash[:16]}...')
 			# [<step-7]
 			# [Cosignatory 1] Cosign the pending transaction [>step-8]
-			cosignature = facade.transaction_factory.create({
+			cosignature = facade.create_transaction_from_descriptor({
 				'type': 'cosignature_v1',
-				# This is the cosignatory providing the second signature
-				'signer_public_key': cosignatory1_key_pair.public_key,
-				'timestamp': timestamp.timestamp,
-				'deadline': deadline.timestamp,
 				# Hash of the inner transfer transaction
 				'other_transaction_hash': inner_transaction_hash,
 				# Address of the multisig account
 				'multisig_account_address': multisig_address
-			})
+			}, cosignatory1_key_pair.public_key, 0, 2 * 60 * 60)
 			cosignature.fee = Amount(
 				calculate_transaction_fee(cosignature))
 			cosignature_signature = facade.sign_transaction(

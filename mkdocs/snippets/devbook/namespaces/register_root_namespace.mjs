@@ -1,9 +1,10 @@
 import { PrivateKey } from 'symbol-sdk';
 import {
+	Address,
 	NemFacade,
-	NetworkTimestamp,
 	calculateNamespaceRentalFee,
 	calculateTransactionFee,
+	descriptors,
 	models
 } from 'symbol-sdk/nem';
 
@@ -22,46 +23,32 @@ const signerAddress = facade.network.publicKeyToAddress(
 console.log('Signer address:', signerAddress.toString());
 // [<step-1]
 try {
-	// Fetch current network time [>step-2]
-	const timePath = '/time-sync/network-time';
-	console.log('Fetching current network time from', timePath);
-	const timeResponse = await fetch(`${NODE_URL}${timePath}`);
-	const timeJSON = await timeResponse.json();
-	const networkTime = Math.floor(timeJSON.receiveTimeStamp / 1000);
-	console.log('  Network time:', networkTime,
-		's since the nemesis block');
-
-	// Derived fields from network time
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-	// [<step-2]
-	// Build the namespace name [>step-3]
+	// Build the namespace name [>step-2]
 	const namespaceName = process.env.ROOT_NAMESPACE ||
 		`ns_${Math.floor(Date.now() / 1000)}`;
 	console.log('Creating root namespace:', namespaceName);
-	// [<step-3]
-	// Build the transaction [>step-4]
+	// [<step-2]
+	// Build the transaction [>step-3]
 	const rentalFee = calculateNamespaceRentalFee(true);
 	console.log('  Namespace lease fee:',
 		`${Number(rentalFee) / 1_000_000} XEM`);
 
-	const transaction = facade.transactionFactory.create({
-		type: 'namespace_registration_transaction_v1',
-		signerPublicKey: signerKeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		rentalFeeSink: 'TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35',
-		rentalFee,
-		name: namespaceName
-	});
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.NamespaceRegistrationTransactionV1Descriptor(
+			new Address('TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35'),
+			new models.Amount(rentalFee),
+			namespaceName),
+		signerKeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 
-	// [<step-4]
-	// Calculate and attach the transaction fee [>step-5]
+	// [<step-3]
+	// Calculate and attach the transaction fee [>step-4]
 	const fee = calculateTransactionFee(transaction);
 	transaction.fee = new models.Amount(fee);
 	console.log(`  Transaction fee: ${Number(fee) / 1_000_000} XEM`);
-	// [<step-5]
-	// Sign transaction and generate final payload [>step-6]
+	// [<step-4]
+	// Sign transaction and generate final payload [>step-5]
 	const signature = facade.signTransaction(signerKeyPair, transaction);
 	const jsonPayload = facade.transactionFactory.static.attachSignature(
 		transaction, signature);
@@ -78,8 +65,8 @@ try {
 	});
 	const announceResult = await announceResponse.json();
 	console.log('  Result:', announceResult.message);
-	// [<step-6]
-	// Wait for confirmation [>step-7]
+	// [<step-5]
+	// Wait for confirmation [>step-6]
 	if ('SUCCESS' === announceResult.message) {
 		const transactionHash = facade.hashTransaction(transaction)
 			.toString();
@@ -105,8 +92,8 @@ try {
 	} else {
 		console.log('Transaction rejected:', announceResult.message);
 	}
-	// [<step-7]
-	// Retrieve the namespace [>step-8]
+	// [<step-6]
+	// Retrieve the namespace [>step-7]
 	const namespacePath = `/namespace?namespace=${namespaceName}`;
 	console.log('Fetching namespace information from', namespacePath);
 	const namespaceResponse = await fetch(`${NODE_URL}${namespacePath}`);
@@ -115,7 +102,7 @@ try {
 	console.log('  Name:', namespaceInfo.fqn);
 	console.log('  Owner:', namespaceInfo.owner);
 	console.log('  Registration height:', namespaceInfo.height);
-	// [<step-8]
+	// [<step-7]
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

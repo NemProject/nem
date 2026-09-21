@@ -1,8 +1,8 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { PrivateKey, PublicKey } from 'symbol-sdk';
+import { Hash256, PrivateKey, PublicKey } from 'symbol-sdk';
 import {
-	NemFacade, NetworkTimestamp, calculateTransactionFee, models
+	Address, NemFacade, calculateTransactionFee, descriptors, models
 } from 'symbol-sdk/nem';
 
 const NODE_URL = process.env.NODE_URL ||
@@ -32,32 +32,23 @@ console.log(`Cosignatory 1 public key: ${cosignatory1KeyPair.publicKey}`);
 
 try {
 	// [Cosignatory 0] Build and sign the multisig transaction [>step-2]
-	const timeResponse = await fetch(
-		`${NODE_URL}/time-sync/network-time`);
-	const networkTime = Math.floor(
-		(await timeResponse.json()).receiveTimeStamp / 1000);
-	const timestamp = new NetworkTimestamp(networkTime);
-	const deadline = timestamp.addHours(2);
-
-	const transferTransaction = facade.transactionFactory.create({
-		type: 'transfer_transaction_v2',
-		signerPublicKey: multisigPublicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		recipientAddress: multisigAddress,
-		amount: 1_000_000n // 1 XEM
-	});
+	const transferTransaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.TransferTransactionV2Descriptor(
+			new Address(multisigAddress),
+			new models.Amount(1_000_000n)), // 1 XEM
+		multisigPublicKey,
+		0n,
+		2 * 60 * 60);
 	transferTransaction.fee = new models.Amount(
 		calculateTransactionFee(transferTransaction));
 
-	const transaction = facade.transactionFactory.create({
-		type: 'multisig_transaction_v1',
-		signerPublicKey: cosignatory0KeyPair.publicKey.toString(),
-		timestamp: timestamp.timestamp,
-		deadline: deadline.timestamp,
-		innerTransaction: facade.transactionFactory.static
-			.toNonVerifiableTransaction(transferTransaction)
-	});
+	const transaction = facade.createTransactionFromTypedDescriptor(
+		new descriptors.MultisigTransactionV1Descriptor(
+			facade.transactionFactory.static.toNonVerifiableTransaction(
+				transferTransaction)),
+		cosignatory0KeyPair.publicKey,
+		0n,
+		2 * 60 * 60);
 	transaction.fee = new models.Amount(
 		calculateTransactionFee(transaction));
 
@@ -101,17 +92,16 @@ try {
 			`${innerTransactionHash.substring(0, 16)}...`);
 		// [<step-7]
 		// [Cosignatory 1] Cosign the pending transaction [>step-8]
-		const cosignature = facade.transactionFactory.create({
-			type: 'cosignature_v1',
+		const cosignature = facade.createTransactionFromTypedDescriptor(
+			new descriptors.CosignatureV1Descriptor(
+				// Hash of the inner transfer transaction
+				new Hash256(innerTransactionHash),
+				// Address of the multisig account
+				new Address(multisigAddress)),
 			// This is the cosignatory providing the second signature
-			signerPublicKey: cosignatory1KeyPair.publicKey.toString(),
-			timestamp: timestamp.timestamp,
-			deadline: deadline.timestamp,
-			// Hash of the inner transfer transaction
-			otherTransactionHash: innerTransactionHash,
-			// Address of the multisig account
-			multisigAccountAddress: multisigAddress
-		});
+			cosignatory1KeyPair.publicKey,
+			0n,
+			2 * 60 * 60);
 		cosignature.fee = new models.Amount(
 			calculateTransactionFee(cosignature));
 		const cosignatureSignature = facade.signTransaction(
