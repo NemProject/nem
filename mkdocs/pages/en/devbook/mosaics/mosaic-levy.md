@@ -150,7 +150,7 @@ If the levy is paid in another mosaic, the sender must also hold a sufficient ba
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="3 4-8 56-66 80-83"
+```text linenums="1" hl_lines="3 4-8 56-66 81-84"
 --8<-- 'devbook/mosaics/mosaic_levy.log'
 ```
 
@@ -167,7 +167,7 @@ Some highlights from the output:
     The recipient address, the levy mosaic name, and the mosaic name are hex-encoded in the payload, while the fee of
     this `absolute` levy is expressed in atomic units.
 
-* **Verified levy** (lines 80-83): The mosaic is retrieved from the network, confirming the levy type, its recipient,
+* **Verified levy** (lines 81-84): The mosaic is retrieved from the network, confirming the levy type, its recipient,
     the mosaic in which it is paid, and its amount.
 
 ## Conclusion

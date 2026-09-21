@@ -27,6 +27,7 @@ Built multisig transaction:
   },
   "cosignatures": []
 }
+Transaction hash: 12282A1E794D5D230EC8D0093E925F1BD83BB156F460DC2775045B61A779B8AA
 Announcing multisig transaction to /transaction/announce
   Result: SUCCESS
 Fetching pending transactions from /account/unconfirmedTransactions?address=TC7BQFXISQEOPN2PCPPPOM3V4R3XDPNVEHEQLID4

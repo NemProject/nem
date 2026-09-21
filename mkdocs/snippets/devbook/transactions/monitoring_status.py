@@ -100,5 +100,5 @@ try:  # [>step-5]
 		print("\nTransaction confirmed!")
 	else:
 		print("\nTransaction not confirmed within the polling window")
-except urllib.error.URLError as err:
-	print(f"\nCould not reach the node: {err.reason}")  # [<step-5]
+except Exception as error:
+	print(f"\nCould not reach the node: {error}")  # [<step-5]

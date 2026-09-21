@@ -10,6 +10,20 @@ const NODE_URL = process.env.NODE_URL ||
 const WS_URL = NODE_URL.replace(':7890', ':7778');
 console.log(`Using node ${NODE_URL}`);
 
+async function announceTransaction(payload, endpoint, label) {
+	const response = await fetch(`${NODE_URL}${endpoint}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: payload
+	});
+	if (!response.ok)
+		throw new Error(`HTTP ${response.status}`);
+	const result = await response.json();
+	if ('SUCCESS' === result.message)
+		console.log(label);
+	return result.message;
+}
+
 const facade = new NemFacade('testnet');
 // Set up the multisig and cosignatory accounts [>step-1]
 const MULTISIG_PUBLIC_KEY = process.env.MULTISIG_PUBLIC_KEY || (
@@ -108,20 +122,15 @@ try {
 			cosignatory1KeyPair, cosignature);
 		const cosignaturePayload = facade.transactionFactory.static
 			.attachSignature(cosignature, cosignatureSignature);
-		const cosignatureResponse = await fetch(
-			`${NODE_URL}/transaction/announce`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: cosignaturePayload
-			});
-		const cosignatureResult = await cosignatureResponse.json();
-		if ('SUCCESS' !== cosignatureResult.message) {
+		const cosignatureResult = await announceTransaction(
+			cosignaturePayload, '/transaction/announce',
+			'[Cosignatory 1] Announced cosignature');
+		if ('SUCCESS' !== cosignatureResult) {
 			console.log(
-				`Cosignature rejected: ${cosignatureResult.message}`);
+				`Cosignature rejected: ${cosignatureResult}`);
 			resolveCosigned(false);
 			return;
 		}
-		console.log('[Cosignatory 1] Announced cosignature');
 		resolveCosigned(true);
 		// [<step-8]
 	};
@@ -184,16 +193,11 @@ try {
 	console.log('[Cosignatory 1] Multisig account registered');
 	// [<step-5]
 	// [Cosignatory 0] Announce the multisig transaction [>step-6]
-	console.log(
+	const announceResult = await announceTransaction(
+		jsonPayload, '/transaction/announce',
 		'[Cosignatory 0] Announcing multisig transaction ' +
 		`${shortHash}...`);
-	const response = await fetch(`${NODE_URL}/transaction/announce`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: jsonPayload
-	});
-	const announceResult = await response.json();
-	if ('SUCCESS' === announceResult.message) {
+	if ('SUCCESS' === announceResult) {
 		// The transaction is now waiting for the second signature
 		// [<step-6]
 		// Wait for the cosignature to be announced and the
@@ -201,7 +205,7 @@ try {
 		if (await cosigned)
 			await done;
 	} else {
-		console.log(`Transaction rejected: ${announceResult.message}`);
+		console.log(`Transaction rejected: ${announceResult}`);
 	}
 	// [Cosignatory 1] Unsubscribe before closing [>step-10]
 	for (const { id } of subscriptions)

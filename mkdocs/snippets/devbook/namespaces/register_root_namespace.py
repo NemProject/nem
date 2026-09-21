@@ -13,6 +13,46 @@ from symbolchain.nem.FeeCalculator import (
 
 NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
+
+
+# Helper function to announce a transaction
+def announce_transaction(payload, label):
+	announce_path = '/transaction/announce'
+	print(f'Announcing {label} to {announce_path}')
+	request = urllib.request.Request(
+		f'{NODE_URL}{announce_path}',
+		data=payload.encode(),
+		headers={'Content-Type': 'application/json'},
+		method='POST'
+	)
+	with urllib.request.urlopen(request) as announce_response:
+		result = json.loads(announce_response.read().decode())
+	print(f'  Result: {result["message"]}')
+	return result['message']
+
+
+# Helper function to wait for transaction confirmation
+def wait_for_confirmation(tx_hash, label):
+	status_path = f'/transaction/get?hash={tx_hash}'
+	print(f'Waiting for {label} confirmation from {status_path}')
+	is_confirmed = False
+	for _ in range(120):
+		try:
+			with urllib.request.urlopen(
+				f'{NODE_URL}{status_path}'
+			) as status_response:
+				confirmed = json.loads(status_response.read().decode())
+				height = confirmed['meta']['height']
+				print(f'{label} confirmed in block {height}')
+				is_confirmed = True
+				break
+		except urllib.error.HTTPError:
+			print('  Transaction status: pending')
+		time.sleep(1)
+	if not is_confirmed:
+		print(f'{label} confirmation took too long.')
+
+
 # [>step-1]
 SIGNER_PRIVATE_KEY = os.getenv(
 	'SIGNER_PRIVATE_KEY',
@@ -51,44 +91,18 @@ try:
 		transaction, signature)
 	print('Built transaction:')
 	print(json.dumps(transaction.to_json(), indent=2))
+	transaction_hash = facade.hash_transaction(transaction)
+	print(f'Transaction hash: {transaction_hash}')
 
 	# Announce the transaction
-	announce_path = '/transaction/announce'
-	print(f'Announcing namespace registration to {announce_path}')
-	announce_request = urllib.request.Request(
-		f'{NODE_URL}{announce_path}',
-		data=json_payload.encode(),
-		headers={'Content-Type': 'application/json'},
-		method='POST'
-	)
-	with urllib.request.urlopen(announce_request) as response:
-		announce_result = json.loads(response.read().decode())
-	print(f'  Result: {announce_result['message']}')
+	announce_result = announce_transaction(
+		json_payload, 'namespace registration')
 	# [<step-5]
 	# Wait for confirmation [>step-6]
-	if 'SUCCESS' == announce_result['message']:
-		status_path = (
-			f'/transaction/get?hash={
-				facade.hash_transaction(transaction)}')
-		print(f'Waiting for confirmation from {status_path}')
-		is_confirmed = False
-		for attempt in range(120):
-			try:
-				with urllib.request.urlopen(
-					f'{NODE_URL}{status_path}'
-				) as response:
-					confirmed = json.loads(response.read().decode())
-					height = confirmed['meta']['height']
-					print(f'Transaction confirmed in block {height}')
-					is_confirmed = True
-					break
-			except urllib.error.HTTPError:
-				print('  Transaction status: pending')
-			time.sleep(1)
-		if not is_confirmed:
-			print('Confirmation took too long.')
+	if 'SUCCESS' == announce_result:
+		wait_for_confirmation(transaction_hash, 'namespace registration')
 	else:
-		print(f'Transaction rejected: {announce_result['message']}')
+		print(f'Transaction rejected: {announce_result}')
 	# [<step-6]
 	# Retrieve the namespace [>step-7]
 	namespace_path = f'/namespace?namespace={namespace_name}'
@@ -102,5 +116,5 @@ try:
 		print(f'  Owner: {namespace_info["owner"]}')
 		print(f'  Registration height: {namespace_info["height"]}')
 	# [<step-7]
-except urllib.error.URLError as e:
-	print(e.reason)
+except Exception as error:
+	print(error)

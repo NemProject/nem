@@ -9,6 +9,21 @@ const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
 const WS_URL = NODE_URL.replace(':7890', ':7778');
 console.log(`Using node ${NODE_URL}`);
+
+async function announceTransaction(payload, endpoint, label) {
+	const response = await fetch(`${NODE_URL}${endpoint}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: payload
+	});
+	if (!response.ok)
+		throw new Error(`HTTP ${response.status}`);
+	const result = await response.json();
+	if ('SUCCESS' === result.message)
+		console.log(label);
+	return result.message;
+}
+
 // Set up the monitored address and signer [>step-1]
 const MONITOR_ADDRESS = process.env.MONITOR_ADDRESS ||
 	'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
@@ -110,19 +125,15 @@ try {
 	console.log('Account registered');
 	// [<step-5]
 	// Announce the transaction [>step-6]
-	console.log(`Announcing transaction ${shortHash}...`);
-	const response = await fetch(`${NODE_URL}/transaction/announce`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: jsonPayload
-	});
-	const announceResult = await response.json();
+	const announceResult = await announceTransaction(
+		jsonPayload, '/transaction/announce',
+		`Announcing transaction ${shortHash}...`);
 	// [<step-6]
 	// Wait for the transaction to confirm
-	if ('SUCCESS' === announceResult.message)
+	if ('SUCCESS' === announceResult)
 		await done;
 	else
-		console.log(`Transaction rejected: ${announceResult.message}`);
+		console.log(`Transaction rejected: ${announceResult}`);
 	// Unsubscribe before closing [>step-8]
 	for (const { id } of subscriptions)
 		client.unsubscribe(id);

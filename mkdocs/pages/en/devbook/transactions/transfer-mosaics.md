@@ -188,7 +188,7 @@ Some highlights from the output, focusing on the parts that differ from a plain 
 
 To see the transaction from the network's perspective, you can search for the transaction hash on the
 [NEM testnet explorer](https://testnet.nem.fyi/).
-The hash is printed in the line that says `Waiting for confirmation from /transaction/get?hash=...`.
+The hash is printed in the line that starts with `Transaction hash:`.
 
 ## Conclusion
 

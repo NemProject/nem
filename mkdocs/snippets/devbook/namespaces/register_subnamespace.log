@@ -18,13 +18,14 @@ Built transaction:
   "name": "7375625f31373833343131373238",
   "parent_name": "6e735f726f6f74"
 }
+Transaction hash: 79C4412BC6A9AA73DB37AD01ECDC84A17926FB5E152979FFDCCFE567EC4F63ED
 Announcing namespace registration to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=79C4412BC6A9AA73DB37AD01ECDC84A17926FB5E152979FFDCCFE567EC4F63ED
+Waiting for namespace registration confirmation from /transaction/get?hash=79C4412BC6A9AA73DB37AD01ECDC84A17926FB5E152979FFDCCFE567EC4F63ED
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 690650
+namespace registration confirmed in block 690650
 Fetching namespace information from /namespace?namespace=ns_root.sub_1783411728
 Namespace information:
   Name: ns_root.sub_1783411728

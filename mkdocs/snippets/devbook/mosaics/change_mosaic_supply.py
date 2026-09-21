@@ -130,5 +130,5 @@ try:
 	else:
 		print('Supply decrease rejected')
 	# [<step-3]
-except urllib.error.URLError as e:
-	print(e.reason)
+except Exception as error:
+	print(error)

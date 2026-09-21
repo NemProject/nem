@@ -209,5 +209,5 @@ try:
 			break
 		wait_for_confirmation(transaction_hash, 'transaction')
 	# [<step-11]
-except Exception as e:
-	print(e)
+except Exception as error:
+	print(error)

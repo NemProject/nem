@@ -11,6 +11,45 @@ import {
 const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
 console.log('Using node', NODE_URL);
+
+// Helper function to announce a transaction
+async function announceTransaction(payload, label) {
+	const announcePath = '/transaction/announce';
+	console.log(`Announcing ${label} to ${announcePath}`);
+	const response = await fetch(`${NODE_URL}${announcePath}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: payload
+	});
+	if (!response.ok)
+		throw new Error(`HTTP ${response.status}`);
+	const result = await response.json();
+	console.log('  Result:', result.message);
+	return result.message;
+}
+
+// Helper function to wait for transaction confirmation
+async function waitForConfirmation(transactionHash, label) {
+	const statusPath = `/transaction/get?hash=${transactionHash}`;
+	console.log(`Waiting for ${label} confirmation from`, statusPath);
+	let isConfirmed = false;
+	for (let attempt = 1; 120 >= attempt; ++attempt) {
+		const response = await fetch(`${NODE_URL}${statusPath}`);
+		if (!response.ok) {
+			console.log('  Transaction status: pending');
+			await new Promise(resolve => { setTimeout(resolve, 1000); });
+		} else {
+			const confirmed = await response.json();
+			console.log(`${label} confirmed in block`,
+				confirmed.meta.height);
+			isConfirmed = true;
+			break;
+		}
+	}
+	if (!isConfirmed)
+		console.warn(`${label} confirmation took too long.`);
+}
+
 // [>step-1]
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ||
 	'0000000000000000000000000000000000000000000000000000000000000000';
@@ -54,44 +93,18 @@ try {
 		transaction, signature);
 	console.log('Built transaction:');
 	console.dir(transaction.toJson(), { colors: true });
+	const transactionHash = facade.hashTransaction(transaction).toString();
+	console.log('Transaction hash:', transactionHash);
 
 	// Announce the transaction
-	const announcePath = '/transaction/announce';
-	console.log('Announcing namespace registration to', announcePath);
-	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: jsonPayload
-	});
-	const announceResult = await announceResponse.json();
-	console.log('  Result:', announceResult.message);
+	const announceResult = await announceTransaction(
+		jsonPayload, 'namespace registration');
 	// [<step-5]
 	// Wait for confirmation [>step-6]
-	if ('SUCCESS' === announceResult.message) {
-		const transactionHash = facade.hashTransaction(transaction)
-			.toString();
-		const statusPath = `/transaction/get?hash=${transactionHash}`;
-		console.log('Waiting for confirmation from', statusPath);
-
-		let isConfirmed = false;
-		for (let attempt = 1; 120 >= attempt; ++attempt) {
-			const response = await fetch(`${NODE_URL}${statusPath}`);
-
-			if (response.ok) {
-				const confirmed = await response.json();
-				console.log('Transaction confirmed in block',
-					confirmed.meta.height);
-				isConfirmed = true;
-				break;
-			}
-			console.log('  Transaction status: pending');
-			await new Promise(resolve => { setTimeout(resolve, 1000); });
-		}
-		if (!isConfirmed)
-			console.warn('Confirmation took too long.');
-	} else {
-		console.log('Transaction rejected:', announceResult.message);
-	}
+	if ('SUCCESS' === announceResult)
+		await waitForConfirmation(transactionHash, 'namespace registration');
+	else
+		console.log('Transaction rejected:', announceResult);
 	// [<step-6]
 	// Retrieve the namespace [>step-7]
 	const namespacePath = `/namespace?namespace=${namespaceName}`;

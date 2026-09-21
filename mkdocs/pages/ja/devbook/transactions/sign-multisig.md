@@ -204,7 +204,7 @@ digraph "Multisignature Tree" {
 
 以下は、プログラムの実行時の出力例です。
 
-```text linenums="1" hl_lines="2-4 11 20 33 40 44 49"
+```text linenums="1" hl_lines="2-4 11 20 30 34 41 45"
 --8<-- 'devbook/transactions/sign_multisig.log'
 ```
 
@@ -215,11 +215,11 @@ digraph "Multisignature Tree" {
     連署人 0 と一致することに注意してください。
 * **20 行目**（`signer_public_key`）: 内部転送トランザクションの署名者。
     マルチシグアカウントと一致することに注意してください。
-* **33 行目**（`Inner transaction hash`）: ネットワークから取得した承認待ちの内部トランザクションのハッシュ。
-* **40 行目**（`signer_public_key`）: 連署の署名者。
+* **30 行目**: ネットワーク上でマルチシグトランザクションを一意に識別するハッシュ。
+* **34 行目**（`Inner transaction hash`）: ネットワークから取得した承認待ちの内部トランザクションのハッシュ。
+* **41 行目**（`signer_public_key`）: 連署の署名者。
     連署人 1 と一致することに注意してください。
-* **44 行目**（`other_transaction_hash`）: 連署が参照する内部トランザクションのハッシュ。
-* **49 行目**: ネットワーク上でマルチシグトランザクションを一意に識別するハッシュ。
+* **45 行目**（`other_transaction_hash`）: 連署が参照する内部トランザクションのハッシュ。
 
 出力に表示されたマルチシグトランザクションのハッシュを使って、[NEM テストネットエクスプローラー](https://testnet.nem.fyi/) で承認済みトランザクションを検索できます。
 

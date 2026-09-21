@@ -156,7 +156,7 @@ NEM の固定手数料表を手動で実装する代わりに、スニペット�
     ネームスペースと名前はアドレスと同じように 16 進数でエンコードされるため、`636F6D70616E79` と `746F6B656E` は `company` と `token` にデコードされます。
 
 ネットワーク側からトランザクションを確認するには、[NEM テストネットエクスプローラー](https://testnet.nem.fyi/) でトランザクションハッシュを検索できます。
-ハッシュは `Waiting for confirmation from /transaction/get?hash=...` と表示される行に出力されます。
+ハッシュは `Transaction hash:` で始まる行に出力されます。
 
 ## まとめ {: #conclusion }
 

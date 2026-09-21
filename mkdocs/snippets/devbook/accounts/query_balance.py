@@ -99,5 +99,5 @@ try:
 			print(f'  Balance: {formatted_balance}')
 			print(f'  Balance (atomic): {balance}')
 			print(f'  Divisibility: {mosaic_divisibility}')
-except urllib.error.URLError as e:
-	print(e.reason)  # [<step-5]
+except Exception as error:
+	print(error)  # [<step-5]

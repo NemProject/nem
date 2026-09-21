@@ -54,11 +54,12 @@ Built mosaic definition transaction:
 }
 Announcing mosaic definition to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=E52F569372C6079A7A0A35B40A503F68BAF6FBEE455B84182EDA7AEC9F0608C1
+Transaction hash: E52F569372C6079A7A0A35B40A503F68BAF6FBEE455B84182EDA7AEC9F0608C1
+Waiting for mosaic definition confirmation from /transaction/get?hash=E52F569372C6079A7A0A35B40A503F68BAF6FBEE455B84182EDA7AEC9F0608C1
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 693562
+mosaic definition confirmed in block 693562
 Fetching mosaic information from /mosaic/definition?mosaicId=my_namespace:token_1783588525
 Mosaic information:
   Creator: 462ee976890916e54fa825d26bdd0235f5eb5b6a143c199ab0ae5ee9328e08ce

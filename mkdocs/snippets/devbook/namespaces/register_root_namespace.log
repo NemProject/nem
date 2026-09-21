@@ -17,13 +17,14 @@ Built transaction:
   "rental_fee": "100000000",
   "name": "6e735f31373833303931333738"
 }
+Transaction hash: D56EDC5946F1A41304CDDC2BC322793C558DFB57831EF7D45024DE46D6AD827F
 Announcing namespace registration to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=D56EDC5946F1A41304CDDC2BC322793C558DFB57831EF7D45024DE46D6AD827F
+Waiting for namespace registration confirmation from /transaction/get?hash=D56EDC5946F1A41304CDDC2BC322793C558DFB57831EF7D45024DE46D6AD827F
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 685363
+namespace registration confirmed in block 685363
 Fetching namespace information from /namespace?namespace=ns_1783091378
 Namespace information:
   Name: ns_1783091378

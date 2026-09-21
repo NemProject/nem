@@ -28,7 +28,8 @@ Built transaction:
 }
 Announcing transaction to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=FAA9346884DF9AB9CEBD21D18242FEB24559F781F94148FD069165AECB751F65
+Transaction hash: FAA9346884DF9AB9CEBD21D18242FEB24559F781F94148FD069165AECB751F65
+Waiting for transaction confirmation from /transaction/get?hash=FAA9346884DF9AB9CEBD21D18242FEB24559F781F94148FD069165AECB751F65
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
@@ -39,4 +40,4 @@ Waiting for confirmation from /transaction/get?hash=FAA9346884DF9AB9CEBD21D18242
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 649700
+transaction confirmed in block 649700

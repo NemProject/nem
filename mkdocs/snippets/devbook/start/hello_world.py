@@ -24,5 +24,5 @@ try:
 		height = int(response_json['height'])
 		print(f"  Blockchain height: {height:,} blocks")
 
-except urllib.error.URLError as e:
-	print(e.reason)  # [<step-2]
+except Exception as error:
+	print(error)  # [<step-2]

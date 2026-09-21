@@ -121,7 +121,7 @@ marking the start of the one-year lease.
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="3 4 5 29-31"
+```text linenums="1" hl_lines="3 4 5 30-32"
 --8<-- 'devbook/namespaces/register_root_namespace.log'
 ```
 
@@ -133,7 +133,7 @@ Some highlights from the output:
 * **Lease fee and transaction fee** (lines 4-5): The lease fee is 100 XEM because this is a root namespace
     (<subnamespaces:> pay 10 XEM instead), while the transaction fee is 0.15 XEM.
 
-* **Namespace information** (lines 29-31): The registered namespace, its owner (the signer's address), and the
+* **Namespace information** (lines 30-32): The registered namespace, its owner (the signer's address), and the
     registration height, which is the block at which the lease began.
 
 ## Conclusion

@@ -104,6 +104,8 @@ try:
 		transaction, signature)
 	print('Built multisig transaction:')
 	print(json.dumps(transaction.to_json(), indent=2))
+	transaction_hash = facade.hash_transaction(transaction)
+	print(f'Transaction hash: {transaction_hash}')
 	announce_result = announce_transaction(
 		json_payload, 'multisig transaction')
 	# The transaction is now waiting for the second signature
@@ -153,13 +155,11 @@ try:
 		# [<step-7]
 		# Wait for the multisig transaction to be confirmed [>step-8]
 		if 'SUCCESS' == cosignature_result:
-			wait_for_confirmation(
-				facade.hash_transaction(transaction),
-				'multisig transaction')
+			wait_for_confirmation(transaction_hash, 'multisig transaction')
 		else:
 			print(f'Transaction rejected: {cosignature_result}')
 		# [<step-8]
 	else:
 		print(f'Transaction rejected: {announce_result}')
-except urllib.error.URLError as e:
-	print(e.reason)
+except Exception as error:
+	print(error)

@@ -17,6 +17,20 @@ WS_URL = NODE_URL.replace(':7890', ':7778')
 print(f'Using node {NODE_URL}')
 
 
+def announce_transaction(payload, endpoint, label):
+	request = urllib.request.Request(
+		f'{NODE_URL}{endpoint}',
+		data=payload.encode(),
+		headers={'Content-Type': 'application/json'},
+		method='POST'
+	)
+	with urllib.request.urlopen(request) as response:
+		result = json.loads(response.read().decode())
+	if 'SUCCESS' == result['message']:
+		print(label)
+	return result['message']
+
+
 # SockJS has no Python client library.
 # These helpers wrap the raw WebSocket transport to mirror a STOMP client.
 def sockjs_url(endpoint_url):
@@ -150,18 +164,12 @@ async def main():
 		print('[Cosignatory 1] Multisig account registered')
 		# [<step-5]
 		# [Cosignatory 0] Announce the multisig transaction [>step-6]
-		print('[Cosignatory 0] Announcing multisig transaction '
+		announce_result = announce_transaction(
+			json_payload, '/transaction/announce',
+			'[Cosignatory 0] Announcing multisig transaction '
 			f'{transaction_hash[:16]}...')
-		announce_request = urllib.request.Request(
-			f'{NODE_URL}/transaction/announce',
-			data=json_payload.encode(),
-			headers={'Content-Type': 'application/json'},
-			method='POST'
-		)
-		with urllib.request.urlopen(announce_request) as resp:
-			result = json.loads(resp.read().decode())
-		if 'SUCCESS' != result['message']:
-			print(f'Transaction rejected: {result["message"]}')
+		if 'SUCCESS' != announce_result:
+			print(f'Transaction rejected: {announce_result}')
 			return
 		# The transaction is now waiting for the second signature
 		# [<step-6]
@@ -195,19 +203,12 @@ async def main():
 			cosignature_payload = (
 				facade.transaction_factory.attach_signature(
 					cosignature, cosignature_signature))
-			cosignature_request = urllib.request.Request(
-				f'{NODE_URL}/transaction/announce',
-				data=cosignature_payload.encode(),
-				headers={'Content-Type': 'application/json'},
-				method='POST'
-			)
-			with urllib.request.urlopen(cosignature_request) as resp:
-				cosignature_result = json.loads(resp.read().decode())
-			if 'SUCCESS' != cosignature_result['message']:
-				print('Cosignature rejected: '
-					f'{cosignature_result["message"]}')
+			cosignature_result = announce_transaction(
+				cosignature_payload, '/transaction/announce',
+				'[Cosignatory 1] Announced cosignature')
+			if 'SUCCESS' != cosignature_result:
+				print(f'Cosignature rejected: {cosignature_result}')
 				return
-			print('[Cosignatory 1] Announced cosignature')
 			break
 		# [<step-8]
 		# [Cosignatory 1] Wait for confirmation [>step-9]

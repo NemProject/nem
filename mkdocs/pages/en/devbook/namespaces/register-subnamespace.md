@@ -116,7 +116,7 @@ because subnamespaces inherit their root namespace's [lease](../../textbook/name
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="3 4 5 30-32"
+```text linenums="1" hl_lines="3 4 5 31-33"
 --8<-- 'devbook/namespaces/register_subnamespace.log'
 ```
 
@@ -128,7 +128,7 @@ Some highlights from the output:
 * **Lease fee and transaction fee** (lines 4-5): The lease fee is 10 XEM because this is a subnamespace
     (root namespaces pay 100 XEM instead), while the transaction fee is 0.15 XEM.
 
-* **Namespace information** (lines 30-32): The registered subnamespace, its owner (the signer's address), and the
+* **Namespace information** (lines 31-33): The registered subnamespace, its owner (the signer's address), and the
     registration height, which is the block at which the root namespace's lease began, inherited by the subnamespace.
 
 ## Conclusion

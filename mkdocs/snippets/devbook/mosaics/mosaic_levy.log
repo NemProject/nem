@@ -68,13 +68,14 @@ Built mosaic definition transaction:
   "rental_fee_sink": "54424D4F534149434F443446353445453543444D523233434342474F414D3258534A4252354F4C43",
   "rental_fee": "10000000"
 }
+Transaction hash: 190340818E859F24FD570CD5D54153DD3E5E192F2026F23E079522AC9BA56456
 Announcing mosaic definition to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=190340818E859F24FD570CD5D54153DD3E5E192F2026F23E079522AC9BA56456
+Waiting for mosaic definition confirmation from /transaction/get?hash=190340818E859F24FD570CD5D54153DD3E5E192F2026F23E079522AC9BA56456
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 710705
+mosaic definition confirmed in block 710705
 Fetching mosaic information from /mosaic/definition?mosaicId=my_namespace:token_1784625719
 Levy information:
   Type: absolute

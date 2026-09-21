@@ -231,7 +231,7 @@ The following table summarizes the most common error sources:
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="2-4 11 20 33 40 44 49"
+```text linenums="1" hl_lines="2-4 11 20 30 34 41 45"
 --8<-- 'devbook/transactions/sign_multisig.log'
 ```
 
@@ -242,11 +242,11 @@ Key points in the output:
     Note that it matches Cosignatory 0.
 * **Line 20** (`signer_public_key`): Signer of the inner transfer transaction.
     Note that it matches the multisig account.
-* **Line 33** (`Inner transaction hash`): Hash of the pending inner transaction, retrieved from the network.
-* **Line 40** (`signer_public_key`): Signer of the cosignature.
+* **Line 30**: Hash of the multisig transaction, which uniquely identifies it on the network.
+* **Line 34** (`Inner transaction hash`): Hash of the pending inner transaction, retrieved from the network.
+* **Line 41** (`signer_public_key`): Signer of the cosignature.
     Note that it matches Cosignatory 1.
-* **Line 44** (`other_transaction_hash`): The inner transaction hash referenced by the cosignature.
-* **Line 49**: Hash of the multisig transaction, which uniquely identifies it on the network.
+* **Line 45** (`other_transaction_hash`): The inner transaction hash referenced by the cosignature.
 
 The multisig transaction hash shown in the output can be used to look up the confirmed transaction in the
 [NEM testnet explorer](https://testnet.nem.fyi/).

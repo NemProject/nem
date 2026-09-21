@@ -21,6 +21,46 @@ const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS ||
 // [<step-1]
 const facade = new NemFacade('testnet');
 
+// Helper function to announce a transaction [>step-6]
+async function announceTransaction(payload, label) {
+	const announcePath = '/transaction/announce';
+	console.log(`Announcing ${label} to ${announcePath}`);
+	const response = await fetch(`${NODE_URL}${announcePath}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: payload
+	});
+	if (!response.ok)
+		throw new Error(`HTTP ${response.status}`);
+	const result = await response.json();
+	console.log('  Result:', result.message);
+	return result.message;
+}
+// [<step-6]
+
+// Helper function to wait for transaction confirmation [>step-7]
+async function waitForConfirmation(transactionHash, label) {
+	const statusPath = `/transaction/get?hash=${transactionHash}`;
+	console.log(`Waiting for ${label} confirmation from`, statusPath);
+	let isConfirmed = false;
+	for (let attempt = 1; 120 >= attempt; ++attempt) {
+		const response = await fetch(`${NODE_URL}${statusPath}`);
+		if (!response.ok) {
+			console.log('  Transaction status: pending');
+			await new Promise(resolve => { setTimeout(resolve, 1000); });
+		} else {
+			const confirmed = await response.json();
+			console.log(`${label} confirmed in block`,
+				confirmed.meta.height);
+			isConfirmed = true;
+			break;
+		}
+	}
+	if (!isConfirmed)
+		console.warn(`${label} confirmation took too long.`);
+}
+// [<step-7]
+
 // Define the amount of XEM to transfer [>step-2]
 const xem = parseFloat(process.env.XEM_AMOUNT || '1');
 const amount = BigInt(Math.round(xem * 1_000_000));
@@ -48,44 +88,14 @@ try {
 	console.log('Built transaction:');
 	console.dir(transaction.toJson(), { colors: true });
 	// [<step-5]
-	// Announce the transaction [>step-6]
-	const announcePath = '/transaction/announce';
-	console.log('Announcing transaction to', announcePath);
-	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: jsonPayload
-	});
-	const announceResult = await announceResponse.json();
-	console.log('  Result:', announceResult.message);
-	// [<step-6]
-	// Wait for confirmation [>step-7]
-	if ('SUCCESS' === announceResult.message) {
-		const transactionHash = facade.hashTransaction(transaction)
-			.toString();
-		const statusPath = `/transaction/get?hash=${transactionHash}`;
-		console.log('Waiting for confirmation from', statusPath);
-
-		let isConfirmed = false;
-		for (let attempt = 1; 120 >= attempt; ++attempt) {
-			const response = await fetch(`${NODE_URL}${statusPath}`);
-
-			if (response.ok) {
-				const confirmed = await response.json();
-				console.log('Transaction confirmed in block',
-					confirmed.meta.height);
-				isConfirmed = true;
-				break;
-			}
-			console.log('  Transaction status: pending');
-			await new Promise(resolve => { setTimeout(resolve, 1000); });
-		}
-		if (!isConfirmed)
-			console.warn('Confirmation took too long.');
-	} else {
-		console.log('Transaction rejected:', announceResult.message);
-	}
-	// [<step-7]
+	const transactionHash = facade.hashTransaction(transaction).toString();
+	console.log('Transaction hash:', transactionHash);
+	const announceResult = await announceTransaction(
+		jsonPayload, 'transaction');
+	if ('SUCCESS' === announceResult)
+		await waitForConfirmation(transactionHash, 'transaction');
+	else
+		console.log('Transaction rejected:', announceResult);
 } catch (e) {
 	console.error(e.message, '| Cause:', e.cause?.code ?? 'unknown');
 }

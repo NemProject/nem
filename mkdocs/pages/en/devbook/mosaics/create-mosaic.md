@@ -176,7 +176,7 @@ A successful response confirms the mosaic exists on the network with the expecte
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="3 4 5 65 66 67 68"
+```text linenums="1" hl_lines="3 4 5 66 67 68 69"
 --8<-- 'devbook/mosaics/create_mosaic.log'
 ```
 
@@ -189,7 +189,7 @@ Some highlights from the output:
 * **Creation fee and transaction fee** (lines 4-5): The creation fee is 10 XEM, while the transaction fee is
     0.15 XEM.
 
-* **Verified properties** (lines 65-68): The mosaic is retrieved from the network, confirming the expected
+* **Verified properties** (lines 66-69): The mosaic is retrieved from the network, confirming the expected
     divisibility, the initial supply of `1000`, and that the mosaic is both supply mutable and transferable.
 
 ## Conclusion

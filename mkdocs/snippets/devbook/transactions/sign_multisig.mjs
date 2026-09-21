@@ -15,12 +15,14 @@ console.log('Using node', NODE_URL);
 async function announceTransaction(payload, label) {
 	const announcePath = '/transaction/announce';
 	console.log(`Announcing ${label} to ${announcePath}`);
-	const announceResponse = await fetch(`${NODE_URL}${announcePath}`, {
+	const response = await fetch(`${NODE_URL}${announcePath}`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: payload
 	});
-	const result = await announceResponse.json();
+	if (!response.ok)
+		throw new Error(`HTTP ${response.status}`);
+	const result = await response.json();
 	console.log('  Result:', result.message);
 	return result.message;
 }
@@ -32,15 +34,16 @@ async function waitForConfirmation(transactionHash, label) {
 	let isConfirmed = false;
 	for (let attempt = 1; 120 >= attempt; ++attempt) {
 		const response = await fetch(`${NODE_URL}${statusPath}`);
-		if (response.ok) {
+		if (!response.ok) {
+			console.log('  Transaction status: pending');
+			await new Promise(resolve => { setTimeout(resolve, 1000); });
+		} else {
 			const confirmed = await response.json();
 			console.log(`${label} confirmed in block`,
 				confirmed.meta.height);
 			isConfirmed = true;
 			break;
 		}
-		console.log('  Transaction status: pending');
-		await new Promise(resolve => { setTimeout(resolve, 1000); });
 	}
 	if (!isConfirmed)
 		console.warn(`${label} confirmation took too long.`);
@@ -97,6 +100,8 @@ try {
 		transaction, signature);
 	console.log('Built multisig transaction:');
 	console.log(JSON.stringify(transaction.toJson(), null, 2));
+	const transactionHash = facade.hashTransaction(transaction).toString();
+	console.log('Transaction hash:', transactionHash);
 	const announceResult = await announceTransaction(
 		jsonPayload, 'multisig transaction');
 	// The transaction is now waiting for the second signature
@@ -146,8 +151,7 @@ try {
 		// Wait for the multisig transaction to be confirmed [>step-8]
 		if ('SUCCESS' === cosignatureResult) {
 			await waitForConfirmation(
-				facade.hashTransaction(transaction).toString(),
-				'multisig transaction');
+				transactionHash, 'multisig transaction');
 		} else {
 			console.log('Transaction rejected:', cosignatureResult);
 		}

@@ -17,6 +17,20 @@ WS_URL = NODE_URL.replace(':7890', ':7778')
 print(f'Using node {NODE_URL}')
 
 
+def announce_transaction(payload, endpoint, label):
+	request = urllib.request.Request(
+		f'{NODE_URL}{endpoint}',
+		data=payload.encode(),
+		headers={'Content-Type': 'application/json'},
+		method='POST'
+	)
+	with urllib.request.urlopen(request) as response:
+		result = json.loads(response.read().decode())
+	if 'SUCCESS' == result['message']:
+		print(label)
+	return result['message']
+
+
 # SockJS has no Python client library.
 # These helpers wrap the raw WebSocket transport to mirror a STOMP client.
 def sockjs_url(endpoint_url):
@@ -130,18 +144,12 @@ async def main():
 		print('Account registered')
 		# [<step-5]
 		# Announce the transaction [>step-6]
-		print(f'Announcing transaction {transaction_hash[:16]}...')
-		announce_request = urllib.request.Request(
-			f'{NODE_URL}/transaction/announce',
-			data=json_payload.encode(),
-			headers={'Content-Type': 'application/json'},
-			method='POST'
-		)
-		with urllib.request.urlopen(announce_request) as resp:
-			result = json.loads(resp.read().decode())
+		announce_result = announce_transaction(
+			json_payload, '/transaction/announce',
+			f'Announcing transaction {transaction_hash[:16]}...')
 		# [<step-6]
 		# Wait for the transaction to confirm [>step-7]
-		if 'SUCCESS' == result['message']:
+		if 'SUCCESS' == announce_result:
 			confirmed = False
 			async for frame in frames:
 				destination = frame['headers']['destination']
@@ -163,7 +171,7 @@ async def main():
 					if message_hash.upper() == transaction_hash:
 						print(f'unconfirmed: hash={message_hash[:16]}...')
 		else:
-			print(f'Transaction rejected: {result["message"]}')
+			print(f'Transaction rejected: {announce_result}')
 		# [<step-7]
 		# Unsubscribe before closing [>step-8]
 		for sub_id in channels.values():

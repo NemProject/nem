@@ -135,6 +135,10 @@ ready to be submitted directly to a node for announcement.
 
 {{ tutorial.code_snippet_tagged('step-6') }}
 
+The helper receives the JSON payload and a human-readable label.
+The label is only used in log messages, making the same helper reusable in tutorials that announce several
+transactions.
+
 The signed payload is submitted to the <post:/transaction/announce> endpoint of any NEM <node:>.
 
 The node validates the transaction as soon as it is announced and reports the outcome in the response.
@@ -154,6 +158,8 @@ account does not hold enough XEM to cover the amount and the fee.
 {{ tutorial.code_snippet_tagged('step-7') }}
 
 The snippet above repeatedly queries the <get:/transaction/get> endpoint using the hash of the announced transaction.
+Like the announcement helper, it receives a label so its output remains clear when a tutorial announces several
+transactions.
 
 !!! note "Polling vs WebSockets"
 
@@ -163,7 +169,7 @@ The snippet above repeatedly queries the <get:/transaction/get> endpoint using t
     [WebSockets](../websockets/listen-transaction-flow.md) provide a more responsive solution without the overhead of
     repeated API calls.
 
-While the transaction is still unconfirmed, the endpoint responds with an error, and the code waits one second
+While the transaction is still unconfirmed, the endpoint responds with an HTTP error, and the code waits one second
 before retrying, for up to 120 attempts (about two minutes).
 
 Once the transaction is included in a block, the endpoint returns it together with the block height, and the loop
@@ -175,7 +181,7 @@ NEM produces a block roughly once per minute, so confirmation usually takes from
 
 The output shown below corresponds to a typical run of the program.
 
-```text linenums="1" hl_lines="9 11 13 14 15 18 19 32"
+```text linenums="1" hl_lines="9 11 13 14 15 17 19 33"
 --8<-- 'devbook/transactions/transfer_xem.log'
 ```
 
@@ -194,18 +200,18 @@ Some highlights from the output:
 
 * **No mosaics** (line 15): An empty mosaics array means the transaction sends XEM only.
 
-* **Announcement result** (line 18): A result of `SUCCESS` means the node accepted the transaction into the unconfirmed
+* **Transaction hash** (line 17): The hash that uniquely identifies the transaction on the network.
+
+* **Announcement result** (line 19): A result of `SUCCESS` means the node accepted the transaction into the unconfirmed
     pool.
 
-* **Transaction hash** (line 19): The hash that uniquely identifies the transaction on the network.
-
-* **Confirmation** (line 32): The transaction is included in block `626588`.
+* **Confirmation** (line 33): The transaction is included in block `626588`.
 
 The number of `pending` checks depends on how soon the next block is harvested, so it varies between runs.
 
 To see the transaction from the network's perspective, you can search for the transaction hash on the
 [NEM testnet explorer](https://testnet.nem.fyi/).
-The hash is printed in the line that says `Waiting for confirmation from /transaction/get?hash=...`.
+The hash is printed in the line that starts with `Transaction hash:`.
 
 ## Conclusion
 

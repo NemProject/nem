@@ -14,9 +14,10 @@ Built transaction:
   amount: '1000000',
   mosaics: []
 }
+Transaction hash: 436A43BDD3CE1F0A5A5EFC40A9027D3732D59AB3C507818A1B436EC7B32BF099
 Announcing transaction to /transaction/announce
   Result: SUCCESS
-Waiting for confirmation from /transaction/get?hash=436A43BDD3CE1F0A5A5EFC40A9027D3732D59AB3C507818A1B436EC7B32BF099
+Waiting for transaction confirmation from /transaction/get?hash=436A43BDD3CE1F0A5A5EFC40A9027D3732D59AB3C507818A1B436EC7B32BF099
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
@@ -29,4 +30,4 @@ Waiting for confirmation from /transaction/get?hash=436A43BDD3CE1F0A5A5EFC40A902
   Transaction status: pending
   Transaction status: pending
   Transaction status: pending
-Transaction confirmed in block 626588
+transaction confirmed in block 626588

@@ -54,5 +54,5 @@ try:
 			mosaic_id = entry['mosaic']['id']
 			print(f'  {mosaic_id["namespaceId"]}:{mosaic_id["name"]}')
 	# [<step-4]
-except Exception as e:
-	print(e)
+except Exception as error:
+	print(error)

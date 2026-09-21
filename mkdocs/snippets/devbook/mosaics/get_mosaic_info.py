@@ -44,5 +44,5 @@ try:
 	atomic = supply * 10 ** divisibility
 	print(f'\nSupply in atomic units: {atomic}')
 	# [<step-3]
-except Exception as e:
-	print(e)
+except Exception as error:
+	print(error)
