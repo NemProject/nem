@@ -38,6 +38,9 @@ theme:
         name: Switch to system preference
 extra:
   nem:
+    code_full_intro: |
+      The following is the complete code listing for this tutorial.
+      A detailed, step-by-step explanation follows in the next section.
     tutorial_level: Tutorial level
     tutorial_level_labels:
       beginner: BEGINNER

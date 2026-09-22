@@ -57,6 +57,9 @@ That said, if understanding a document requires previous knowledge, you must alw
 * For long documents, it is good to have a table of contents at the end of the introduction of the level one heading section.
 * Always specify the language for code blocks so that neither the syntax highlighter nor the text editor must guess.
     If no specific type makes sense, just use `text`.
+* The CI server performs code linting checks which can be triggered locally by calling `scripts/ci/lint.sh`.
+    Before first use, call `scripts/ci/setup_lint.sh`.
+    The checks cover Python and JavaScript tutorial snippets, plus Java formatting and tutorial line length.
 
 ## Additional Formatting and Macros
 
@@ -82,10 +85,33 @@ Link to glossary terms in the default category using `<glossary_term:>`.
 
 You can provide an alternate text instead of the glossary term using a pipe `|`:
 `<category:glossary_term|alternate_text>`.
-The glossary plugin takes care of plurals, though, so they don't typically require the alternate text.
+This is useful when a plural or another title fits better in a sentence.
 
-Every API class and method defines a term, so they can be linked to using, for example: `<java:NemFacade>`.
-The available categories are `java`, `get`, `post`, `ser`, and `ws`.
+Every SDK API class and method defines a term, so it can be linked to using, for example: `<py:NemFacade>`,
+`<js:NemFacade>`, or `<java:NemFacade>`.
+The glossary categories are `py`, `js`, `java`, `req`, `ser`, and `ws`, in addition to the default category.
+REST endpoints support glossary-like links through the `get`, `put`, and `post` categories.
+These are implemented by `scripts/hooks.py` rather than ezglossary.
+
+### Dynamic SDK Links
+
+The special `dy` category creates an SDK reference link that changes with the language selected in the code tabs.
+Write the class and method names in their JavaScript form.
+
+For example, `<dy:NemFacade.signTransaction>` points to the matching `NemFacade` method in the Python, JavaScript,
+or Java reference, and displays the correct method spelling for the active language.
+
+The conversion is implemented in `scripts/hooks.py` and configured under `extra.nem` in
+`config/mkdocs.base.yml`:
+
+* `class-remaps` maps canonical class names to different Python class names.
+* `method-remaps` maps exceptional method names before converting Python methods to snake case.
+* `global-namespaces` lists JavaScript global-function namespaces whose class prefix must be removed.
+* `java-sdk.class-remaps` defines aliases used when generating Java reference terms.
+
+For example, `<dy:FeeCalculator.calculateTransactionFee>` becomes
+`<py:FeeCalculator.calculate_transaction_fee>`, `<js:calculateTransactionFee>`, and
+`<java:FeeCalculator.calculateTransactionFee>`.
 
 ### Tutorial Steps
 
@@ -111,57 +137,28 @@ Add as many `step_begin()` / `step_end()` pairs as required.
 
 ### Multi-Language Code Snippets
 
-These macros create a tab group with a code block and optional caption.
-
-There are two versions:
-
-The simplified one accepts a list of strings, describing the language and line range, and optionally a caption.
+These macros create a tab group with a code block.
 
 ```jinja
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full("devbook/hello-world", ["py", "js"]) }}
-{{ tutorial.code_snippet(["py:4:4", "js:4:4"])}}
-{{ tutorial.code_snippet(["py:6:16", "js:6:16:The <js:TransferTransactionV1Descriptor> constructor only accepts parameters of the right type, \
-making it easier to use during development. We can do almost any markdown here:\n
-* One **black**\n
-* Two"]) }}
+{{ tutorial.code_full_tagged("devbook/start/hello_world", ["py", "js", "java"]) }}
+{{ tutorial.code_snippet_tagged("step-1") }}
 ```
 
-The extended syntax accepts a list of objects, keyed by language code:
-
-```jinja
-{% import 'tutorial.jinja2' as tutorial with context %}
-
-{{ tutorial.code_snippet({
-  'py': { 'range': [41, 54] },
-  'js': {
-    'range': [40, 52],
-    'descriptor': 'TransferTransactionV1Descriptor'
-  }
-}) }}
-```
-
-Available parameters are:
-
-* `range`: List of two values indicating the start and end lines of the code snippet.
-* `descriptor`: If present, includes an admonition about typed descriptors including a link to this descriptor.
-* `caption`: Free text to add below the snippet.
-
-`code_snippet` uses the filename of the previous `code_full`.
+`code_snippet_tagged` uses the filename and languages from the previous `code_full_tagged` call.
 
 [Usage example](./pages/en/devbook/start/hello-world.md).
 
-`code_full` inserts the whole source file, for all the listed languages, and sets the file name to be used by the snippet macros.
-Each language tab can have an optional caption, separated from the language code by a colon.
+`code_full_tagged` inserts the complete source file for each selected language and initializes the later snippet calls.
+It also adds a short introduction, configured in `config.extra.nem.code_full_intro`, and a source download link.
+The optional `show=false` parameter hides the full listing while still initializing the tutorial variables.
 
-`code_snippet` inserts a range of lines, with an optional caption.
+`code_snippet_tagged` inserts a named range.
+Define ranges in each source file with paired comment tags such as `[>step-1]` and `[<step-1]`.
+[See the tagged source example](./snippets/devbook/start/hello_world.py).
 
-**Captions allow complex markdown like lists and term links, but they are formatted differently.**
-Lines must be continued by escaping the line break, and line breaks are inserted with \n.
-See the example above.
-
-The only supported language is Java (`java`).
+Supported languages are Python (`py`), JavaScript (`js`), and Java (`java`).
 See [`tutorial.jinja2`](./templates/macros/tutorial.jinja2) for details.
 
 ## Technical Writing

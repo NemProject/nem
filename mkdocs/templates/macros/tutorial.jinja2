@@ -61,6 +61,7 @@
 
 {# Now iterate over the normalized dictionary #}
 {%- if show -%}
+{{ config.extra.nem.code_full_intro }}
 {%- for l, props in langs.items() -%}
 {%- set source = source_filename(filename, l) -%}
 === "{{lang_icon[l]}} {{lang_name[l]}}"

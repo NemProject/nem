@@ -36,6 +36,9 @@ theme:
         name: システム設定に切り替える
 extra:
   nem:
+    code_full_intro: |
+      このチュートリアルの完全なコード一覧を以下に示します。
+      詳細な手順ごとの説明は次のセクションで行います。
     tutorial_level: チュートリアルの難易度
     tutorial_level_labels:
       beginner: 初級
