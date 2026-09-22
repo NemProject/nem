@@ -1,0 +1,11 @@
+Using node http://libertalia.nemtest.net:7890
+Fetching balances for TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+Account holds 2 mosaic(s):
+- Mosaic nem:xem
+  Balance: 9883.200000
+  Balance (atomic): 9883200000
+  Divisibility: 6
+- Mosaic company:token
+  Balance: 1000000
+  Balance (atomic): 1000000
+  Divisibility: 0

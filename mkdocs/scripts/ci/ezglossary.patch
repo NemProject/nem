@@ -1,0 +1,12 @@
+--- a/src/mkdocs_ezglossary_plugin/plugin.py
++++ b/src/mkdocs_ezglossary_plugin/plugin.py
+@@ -178 +178 @@
+-            return f"{self._uuid}:{id}:<{text}>"
++            return f"{self._uuid}:{id}:&lt;{text}&gt;"
+@@ -241,0 +242,3 @@
++            entry.definition = re.sub(r'<([^:<]*):>', r'\1', entry.definition)
++            entry.definition = re.sub(r'<[^:<]*:\|([^>]*)>', r'\1', entry.definition)
++
+@@ -255 +258 @@
+-        regex_entities = fr"{self._uuid}:([a-f0-9]{{32}}):&lt;([^&]*)&gt;"
++        regex_entities = fr"{self._uuid}:([a-f0-9]{{32}}):&lt;(.*?)&gt;"

@@ -1,0 +1,88 @@
+<table style="width: 100%;"><tr><td>
+    <div class="side-info"><table>
+    <tr><td class="side-info-icon">&varr;</td><td>Size: 129 bytes = 0x81</td></tr>
+    <tr><td class="side-info-icon"><i class="fab fa-github"></i></td><td><a href="https://github.com/symbol/symbol/blob/main/catbuffer/schemas/nem/multisig/multisig.cats#L63">schema</a></td></tr>
+    </table></div>
+    <dl markdown><dt><code>ser:NonVerifiableMultisigTransactionV1</code></dt><dd>binary layout for a non-verifiable multisig transaction (V1, latest) </dd></dl>
+</td></tr></table>
+
+<div class="big-table6">
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">type</code></div>
+   <div><a href="#transactiontype" title="enumeration of transaction types">TransactionType</a></div>
+   <div class="description"><p>transaction type </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">version</code></div>
+   <div>byte[1]</div>
+   <div class="description"><p>entity version </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">entity_body_reserved_1</code></div>
+   <div>byte[2]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">0</code><br/><p>reserved padding between version and network type </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">network</code></div>
+   <div><a href="#networktype" title="enumeration of network types">NetworkType</a></div>
+   <div class="description"><p>entity network </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">timestamp</code></div>
+   <div><a href="#timestamp" title="">Timestamp</a></div>
+   <div class="description"><p>entity timestamp </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">signer_public_key_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">32</code><br/><p>entity signer public key size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">signer_public_key</code></div>
+   <div><a href="#publickey" title="">PublicKey</a></div>
+   <div class="description"><p>entity signer public key </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">fee</code></div>
+   <div><a href="#amount" title="">Amount</a></div>
+   <div class="description"><p>transaction fee </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">deadline</code></div>
+   <div><a href="#timestamp" title="">Timestamp</a></div>
+   <div class="description"><p>transaction deadline </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_VERSION</code></div>
+   <div>byte[1]</div>
+   <div class="description"><b>const</b> <code class="docutils literal">1</code><br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_TYPE</code></div>
+   <div><a href="#transactiontype" title="enumeration of transaction types">TransactionType</a></div>
+   <div class="description"><b>const</b> <code class="docutils literal">MULTISIG</code> (<code class="docutils literal">0x1004</code>)<br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">inner_transaction_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>inner transaction size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">inner_transaction</code></div>
+   <div><a href="#nonverifiabletransaction" title="binary layout for a non-verifiable transaction">NonVerifiableTransaction</a></div>
+   <div class="description"><p>inner transaction </p></div>
+</div>

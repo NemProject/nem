@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script>
+			var userLang = navigator.language || navigator.userLanguage;
+			var urls = {
+				'en': 'en',
+				'ja': 'ja',
+			};
+			var defaultUrl = 'en';
+
+			var url = urls[userLang] ?? defaultUrl;
+			window.location.href += url;
+		</script>
+	</head>
+	<body>
+		Redirecting to your language...
+		<br/>
+		Use these links if redirection does not work: <a href="en">English</a> <a href="ja">日本語</a>
+	</body>
+</html>
