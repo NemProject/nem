@@ -33,7 +33,7 @@ tutorial_level: intermediate
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/namespaces/register_subnamespace', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/namespaces/register_subnamespace') }}
 
 ## コードの説明 {: #code-explanation }
 

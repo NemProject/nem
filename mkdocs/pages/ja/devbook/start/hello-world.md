@@ -21,7 +21,7 @@ tutorial_level: beginner
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/start/hello_world', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/start/hello_world') }}
 
 ### SDK の呼び出し {: #making-sdk-calls }
 

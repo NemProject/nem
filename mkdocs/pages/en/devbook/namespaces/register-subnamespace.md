@@ -35,7 +35,7 @@ transactions are announced and confirmed.
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/namespaces/register_subnamespace', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/namespaces/register_subnamespace') }}
 
 ## Code Explanation
 

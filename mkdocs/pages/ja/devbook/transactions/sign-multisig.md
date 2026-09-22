@@ -37,7 +37,7 @@ digraph "Multisignature Tree" {
 
 {# Early initialization so we can use the var() macro #}
 {% import 'tutorial.jinja2' as tutorial with context %}
-{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js'], show=false) }}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', show=false) }}
 
 始める前に、次の準備をしてください。
 
@@ -52,7 +52,7 @@ digraph "Multisignature Tree" {
 
 ## 完全なコード {: #full-code }
 
-{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig') }}
 
 ## コードの説明 {: #code-explanation }
 

@@ -16,27 +16,28 @@ NODE_URL = os.getenv('NODE_URL', 'http://libertalia.nemtest.net:7890')
 print(f'Using node {NODE_URL}')
 
 
-# Helper function to poll for confirmed transaction
-def retrieve_confirmed_transaction(hash_value, label):
-	print(f'Polling for {label} confirmation...')
-	attempts = 0
-	max_attempts = 120
-
-	while attempts < max_attempts:
+# Helper function to wait for transaction confirmation
+def wait_for_confirmation(tx_hash, label):
+	status_path = f'/transaction/get?hash={tx_hash}'
+	print(f'Waiting for {label} confirmation from {status_path}')
+	is_confirmed = False
+	confirmed = None
+	for _ in range(120):
 		try:
-			url = f'{NODE_URL}/transaction/get?hash={hash_value}'
-			with urllib.request.urlopen(url) as transaction_confirmed:
-				print(f'  {label} confirmed!')
-				return json.loads(transaction_confirmed.read().decode())
+			with urllib.request.urlopen(
+				f'{NODE_URL}{status_path}'
+			) as status_response:
+				confirmed = json.loads(status_response.read().decode())
+				height = confirmed['meta']['height']
+				print(f'{label} confirmed in block {height}')
+				is_confirmed = True
+				break
 		except urllib.error.HTTPError:
-			# Transaction not yet confirmed
-			pass
-		attempts += 1
-		time.sleep(2)
-
-	raise TimeoutError(
-		f'{label} not confirmed after {max_attempts} attempts'
-	)
+			print('  Transaction status: pending')
+		time.sleep(1)
+	if not is_confirmed:
+		print(f'{label} confirmation took too long.')
+	return confirmed
 
 
 # Set up sender and recipient accounts [>step-1]
@@ -117,7 +118,7 @@ with urllib.request.urlopen(plain_announce_request) as response:
 print('<== Receiving Plain Text Message')  # [>step-3]
 
 # Wait for confirmation
-plain_tx_data = retrieve_confirmed_transaction(
+plain_tx_data = wait_for_confirmation(
 	plain_transaction_hash, 'Plain message transaction'
 )
 
@@ -187,7 +188,7 @@ with urllib.request.urlopen(encrypted_announce_request) as response:
 print('<== Receiving Encrypted Message')  # [>step-5]
 
 # Wait for confirmation
-encrypted_tx_data = retrieve_confirmed_transaction(
+encrypted_tx_data = wait_for_confirmation(
 	encrypted_transaction_hash, 'Encrypted message transaction'
 )
 

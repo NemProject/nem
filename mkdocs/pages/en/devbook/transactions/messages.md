@@ -31,7 +31,7 @@ fee calculation, and confirmation work.
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/transactions/messages', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/messages') }}
 
 ## Code Explanation
 
@@ -88,7 +88,7 @@ The transaction is then signed and announced following the same process as in
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-After announcing the transaction, the {{ tutorial.var('retrieve_confirmed_transaction') }} helper function polls the
+After announcing the transaction, the {{ tutorial.var('wait_for_confirmation') }} helper function polls the
 <get:/transaction/get> endpoint until the transaction is confirmed.
 
 The confirmed transaction contains the message as a hex string.
@@ -128,7 +128,7 @@ The transaction is then signed and announced following the same process as in
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
-After announcing the encrypted message transaction, the {{ tutorial.var('retrieve_confirmed_transaction') }} helper
+After announcing the encrypted message transaction, the {{ tutorial.var('wait_for_confirmation') }} helper
 function polls for confirmation.
 
 To decrypt the message from the confirmed transaction, a <dy:MessageEncoder> is created with the recipient's key pair,

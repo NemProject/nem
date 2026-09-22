@@ -34,13 +34,17 @@ NEM は [SockJS](https://github.com/sockjs/sockjs-client) 上で [STOMP](https:/
     npm install @stomp/stompjs sockjs-client
     ```
 
+=== ":fontawesome-brands-java: Java"
+
+    このチュートリアルでは Tyrus WebSocket クライアントを使用します。これはスニペット内の JBang 依存関係の行によって読み込まれます。
+
 接続プロトコルの詳細については、[WebSocket リファレンス](../reference/websockets/index.md) を参照してください。
 
 ## 完全なコード {: #full-code }
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/websockets/listen_new_blocks', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/websockets/listen_new_blocks') }}
 
 スニペットでは、`NODE_URL` 環境変数を使って NEM [ノード](default:ノード) を指定します。
 値が指定されていない場合は、デフォルト値を使用します。

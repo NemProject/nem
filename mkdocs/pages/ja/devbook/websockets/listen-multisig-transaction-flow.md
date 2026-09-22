@@ -37,7 +37,7 @@ digraph "Multisignature Tree" {
 
 {# Early initialization so we can use the var() macro #}
 {% import 'tutorial.jinja2' as tutorial with context %}
-{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js'], show=false) }}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', show=false) }}
 
 始める前に、次の準備をしてください。
 
@@ -66,13 +66,17 @@ digraph "Multisignature Tree" {
     npm install @stomp/stompjs sockjs-client
     ```
 
+=== ":fontawesome-brands-java: Java"
+
+    このチュートリアルでは Tyrus WebSocket クライアントを使用します。これはスニペット内の JBang 依存関係の行によって読み込まれます。
+
 接続プロトコルの詳細については、[WebSocket リファレンス](../reference/websockets/index.md) を参照してください。
 
 ## 完全なコード {: #full-code }
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/websockets/listen_multisig_transaction_flow', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/websockets/listen_multisig_transaction_flow') }}
 
 スニペットでは、`NODE_URL` 環境変数を使って NEM [ノード](default:ノード) を指定します。
 値が指定されていない場合は、デフォルト値を使用します。

@@ -19,7 +19,7 @@ HTTP リクエストを送信する方法だけが必要です。
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/network-currency/query_currency_supply', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/network-currency/query_currency_supply') }}
 
 スニペットでは、`NODE_URL` 環境変数を使って NEM [メインネット](default:メインネット) ノードを指定します。
 

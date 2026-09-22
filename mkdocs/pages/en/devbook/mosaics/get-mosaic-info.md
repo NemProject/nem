@@ -19,7 +19,7 @@ Before you start, make sure to [set up your development environment](../start/se
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/mosaics/get_mosaic_info', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/mosaics/get_mosaic_info') }}
 
 The snippet uses the `NODE_URL` environment variable to set the NEM API node.
 If no value is provided, a default <testnet:> node is used.

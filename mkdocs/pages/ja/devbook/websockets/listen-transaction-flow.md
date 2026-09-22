@@ -42,13 +42,17 @@ NEM は、特定の [アカウント](default:アカウント) の [トランザ
     npm install @stomp/stompjs sockjs-client
     ```
 
+=== ":fontawesome-brands-java: Java"
+
+    このチュートリアルでは Tyrus WebSocket クライアントを使用します。これはスニペット内の JBang 依存関係の行によって読み込まれます。
+
 接続プロトコルの詳細については、[WebSocket リファレンス](../reference/websockets/index.md) を参照してください。
 
 ## 完全なコード {: #full-code }
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/websockets/listen_transaction_flow', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/websockets/listen_transaction_flow') }}
 
 スニペットでは、`NODE_URL` 環境変数を使って NEM [ノード](default:ノード) を指定します。
 値が指定されていない場合は、デフォルト値を使用します。

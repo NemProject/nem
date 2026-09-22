@@ -38,7 +38,7 @@ digraph "Transfer company:token" {
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/transactions/transfer_mosaics', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/transfer_mosaics') }}
 
 ## コードの説明 {: #code-explanation }
 

@@ -16,7 +16,7 @@ If you have not done so already, start with [Setting Up a Development Environmen
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/accounts/create_from_private_key', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/accounts/create_from_private_key') }}
 
 ## Code Explanation
 

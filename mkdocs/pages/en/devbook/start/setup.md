@@ -16,7 +16,7 @@ Select the language you prefer:
     <table markdown class="setup">
     <tr markdown><td>Prerequisites</td><td markdown>[Python](https://www.python.org/downloads/) 3.10 or later</td></tr>
     <tr markdown><td>Installation</td><td markdown>
-    Install the Symbol SDK version 3.3.1 with:
+    Install the Symbol SDK version 3.3.3 with:
     ```bash
     pip install symbol-sdk-python --upgrade
     ```
@@ -51,7 +51,7 @@ Select the language you prefer:
     <table markdown class="setup">
     <tr markdown><td>Prerequisites</td><td markdown>Any actively supported version of [Node.js](https://nodejs.org/)</td></tr>
     <tr markdown><td>Installation</td><td markdown>
-    Create a project folder and install the Symbol SDK version 3.3.1 as a dependency:
+    Create a project folder and install the Symbol SDK version 3.3.3 as a dependency:
     ```bash
     mkdir nem-dev && cd nem-dev
     npm init -y
@@ -64,6 +64,75 @@ Select the language you prefer:
     node hello-world.mjs
     ```
     </td></tr></table>
+
+=== ":fontawesome-brands-java: Java"
+
+    <table markdown class="setup">
+    <tr markdown><td>Prerequisites</td><td markdown>[JBang](https://www.jbang.dev/download/)
+
+    The tutorials use JBang to simplify Java version and dependency management, but it is not a requirement
+    for applications.</td></tr>
+    <tr markdown><td>Installation</td><td markdown>
+    The Java snippets use JBang comments to select a compatible Java version and load the Symbol SDK directly from Maven Central:
+    ```java
+    //JAVA 21+
+    //DEPS org.symbol:symbol-sdk:3.3.3
+    ```
+
+    When you run a snippet, JBang downloads the Symbol SDK and its dependencies into its local cache.
+    No `pom.xml`, `build.gradle`, or manual classpath setup is required.
+    </td></tr>
+    <tr markdown><td>Running the Sample Code</td><td markdown>
+    Download a sample and run it with:
+    ```bash
+    jbang HelloWorld.java
+    ```
+    </td></tr></table>
+
+    ??? note "Alternate SDK installation"
+
+        If you are building a Java application instead of running standalone snippets, add the Symbol SDK to your
+        project with your build tool.
+
+        === "Gradle"
+
+            ```kotlin
+            repositories {
+                mavenCentral()
+            }
+
+            dependencies {
+                implementation("org.symbol:symbol-sdk:3.3.3")
+            }
+            ```
+
+        === "Maven"
+
+            ```xml
+            <dependency>
+                <groupId>org.symbol</groupId>
+                <artifactId>symbol-sdk</artifactId>
+                <version>3.3.3</version>
+            </dependency>
+            ```
+
+        Use Java 21 or later.
+
+    ??? warning "Troubleshooting"
+
+        * If the `jbang` command is not found after installation, restart your terminal and try again.
+
+        * Java snippets declare `//JAVA 21+`, so JBang will use a compatible JDK when available.
+
+            If JBang cannot find or download one, install a Java 21 or later JDK and run the snippet again.
+
+        * If the Symbol SDK dependency cannot be resolved, check your network connection, clear JBang's cache,
+            and run the snippet again:
+
+            ```bash
+            jbang cache clear
+            jbang HelloWorld.java
+            ```
 
 ## Next Steps
 

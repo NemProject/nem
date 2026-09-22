@@ -71,22 +71,18 @@ try {
 	// Describe the levy [>step-2]
 	const LEVY_RECIPIENT = process.env.LEVY_RECIPIENT ||
 		'TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4';
-
-	const levy = {
-		transferFeeType: 'absolute',
-		recipientAddress: LEVY_RECIPIENT,
-		mosaicId: {
-			namespaceId: { name: 'nem' },
-			name: 'xem'
-		},
-		fee: 1_000_000
-	};
+	const levyFee = 1_000_000;
+	const levy = new descriptors.MosaicLevyDescriptor(
+		models.MosaicTransferFeeType.ABSOLUTE,
+		new Address(LEVY_RECIPIENT),
+		new descriptors.MosaicIdDescriptor(
+			new descriptors.NamespaceIdDescriptor('nem'), 'xem'),
+		new models.Amount(BigInt(levyFee)));
 	console.log('Levy:');
-	console.log('  Type:', levy.transferFeeType);
-	console.log('  Recipient:', levy.recipientAddress);
-	console.log('  Mosaic:',
-		`${levy.mosaicId.namespaceId.name}:${levy.mosaicId.name}`);
-	console.log('  Fee:', levy.fee);
+	console.log('  Type: absolute');
+	console.log('  Recipient:', LEVY_RECIPIENT);
+	console.log('  Mosaic: nem:xem');
+	console.log('  Fee:', levyFee);
 	// [<step-2]
 	// Build the mosaic definition transaction [>step-3]
 	const rentalFee = calculateMosaicRentalFee();
@@ -110,13 +106,7 @@ try {
 					new descriptors.SizePrefixedMosaicPropertyDescriptor(
 						new descriptors.MosaicPropertyDescriptor(
 							name, value))),
-				new descriptors.MosaicLevyDescriptor(
-					models.MosaicTransferFeeType.ABSOLUTE,
-					new Address(LEVY_RECIPIENT),
-					new descriptors.MosaicIdDescriptor(
-						new descriptors.NamespaceIdDescriptor('nem'),
-						'xem'),
-					new models.Amount(BigInt(levy.fee)))),
+				levy),
 			new Address('TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC'),
 			new models.Amount(rentalFee)),
 		signerKeyPair.publicKey,

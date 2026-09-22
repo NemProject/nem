@@ -19,7 +19,7 @@ You only need a way to make HTTP requests.
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/network-currency/query_currency_supply', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/network-currency/query_currency_supply') }}
 
 The snippet uses the `NODE_URL` environment variable to set a NEM <mainnet:> node.
 

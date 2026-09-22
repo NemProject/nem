@@ -18,7 +18,7 @@ HTTP リクエストを送信する方法だけが必要です。
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/accounts/query_balance', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/accounts/query_balance') }}
 
 スニペットでは、`NODE_URL` 環境変数を使って NEM API ノードを指定します。
 値が指定されていない場合は、デフォルト値を使用します。

@@ -26,7 +26,7 @@ tutorial_level: intermediate
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/transactions/messages', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/messages') }}
 
 ## コードの説明 {: #code-explanation }
 
@@ -76,7 +76,7 @@ tutorial_level: intermediate
 
 {{ tutorial.code_snippet_tagged('step-3') }}
 
-トランザクションをアナウンスした後、{{ tutorial.var('retrieve_confirmed_transaction') }} ヘルパー関数はトランザクションが承認されるまで <get:/transaction/get> エンドポイントをポーリングします。
+トランザクションをアナウンスした後、{{ tutorial.var('wait_for_confirmation') }} ヘルパー関数はトランザクションが承認されるまで <get:/transaction/get> エンドポイントをポーリングします。
 
 承認されたトランザクションには、メッセージが 16 進数文字列で含まれています。
 元のメッセージを取得するには、16 進数文字列をバイト列に変換し、UTF-8 としてデコードします。
@@ -111,7 +111,7 @@ tutorial_level: intermediate
 
 {{ tutorial.code_snippet_tagged('step-5') }}
 
-暗号化メッセージのトランザクションをアナウンスした後、{{ tutorial.var('retrieve_confirmed_transaction') }} ヘルパー関数は承認を待ちます。
+暗号化メッセージのトランザクションをアナウンスした後、{{ tutorial.var('wait_for_confirmation') }} ヘルパー関数は承認を待ちます。
 
 承認されたトランザクションのメッセージを復号するには、受取人のキーペアで <dy:MessageEncoder> を作成し、送信者の公開鍵（トランザクションの `signer` フィールドから取得）と暗号化ペイロードを指定して <dy:MessageEncoder.tryDecode> を呼び出します。
 

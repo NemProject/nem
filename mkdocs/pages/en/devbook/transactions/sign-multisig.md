@@ -40,7 +40,7 @@ digraph "Multisignature Tree" {
 
 {# Early initialization so we can use the var() macro #}
 {% import 'tutorial.jinja2' as tutorial with context %}
-{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js'], show=false) }}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', show=false) }}
 
 Before you start, make sure to:
 
@@ -58,7 +58,7 @@ announced and confirmed.
 
 ## Full Code
 
-{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/sign_multisig') }}
 
 ## Code Explanation
 

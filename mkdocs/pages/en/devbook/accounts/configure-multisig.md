@@ -47,7 +47,7 @@ announced and confirmed.
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/accounts/configure_multisig', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/accounts/configure_multisig') }}
 
 ## Code Explanation
 

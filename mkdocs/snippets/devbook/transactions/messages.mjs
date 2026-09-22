@@ -13,25 +13,29 @@ const NODE_URL = process.env.NODE_URL ||
 	'http://libertalia.nemtest.net:7890';
 console.log('Using node', NODE_URL);
 
-// Helper function to poll for confirmed transaction
-async function retrieveConfirmedTransaction(hash, label) {
-	console.log(`Polling for ${label} confirmation...`);
-	let attempts = 0;
-	const maxAttempts = 120;
-
-	while (attempts < maxAttempts) {
+// Helper function to wait for transaction confirmation
+async function waitForConfirmation(transactionHash, label) {
+	const statusPath = `/transaction/get?hash=${transactionHash}`;
+	console.log(`Waiting for ${label} confirmation from`, statusPath);
+	let isConfirmed = false;
+	let confirmed;
+	for (let attempt = 1; 120 >= attempt; ++attempt) {
 		const response = await fetch(
-			`${NODE_URL}/transaction/get?hash=${hash}`);
-		if (response.ok) {
-			console.log(`  ${label} confirmed!`);
-			return response.json();
+			`${NODE_URL}${statusPath}`);
+		if (!response.ok) {
+			console.log('  Transaction status: pending');
+			await new Promise(resolve => { setTimeout(resolve, 1000); });
+		} else {
+			confirmed = await response.json();
+			console.log(`${label} confirmed in block`,
+				confirmed.meta.height);
+			isConfirmed = true;
+			break;
 		}
-		attempts++;
-		await new Promise(resolve => { setTimeout(resolve, 2000); });
 	}
-
-	throw new Error(
-		`${label} not confirmed after ${maxAttempts} attempts`);
+	if (!isConfirmed)
+		console.warn(`${label} confirmation took too long.`);
+	return confirmed;
 }
 
 // Set up sender and recipient accounts [>step-1]
@@ -96,7 +100,7 @@ console.log('Plain message transaction announced\n');
 console.log('<== Receiving Plain Text Message'); // [>step-3]
 
 // Wait for confirmation
-const plainTxData = await retrieveConfirmedTransaction(
+const plainTxData = await waitForConfirmation(
 	plainTransactionHash, 'Plain message transaction');
 
 // Decode plain message from confirmed transaction
@@ -155,7 +159,7 @@ console.log('Encrypted message transaction announced\n');
 console.log('<== Receiving Encrypted Message'); // [>step-5]
 
 // Wait for confirmation
-const encryptedTxData = await retrieveConfirmedTransaction(
+const encryptedTxData = await waitForConfirmation(
 	encryptedTransactionHash, 'Encrypted message transaction');
 
 // Decode encrypted message using recipient's private key

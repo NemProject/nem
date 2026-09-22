@@ -15,7 +15,7 @@ tutorial_level: beginner
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/accounts/create_from_private_key', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/accounts/create_from_private_key') }}
 
 ## コードの説明 {: #code-explanation }
 

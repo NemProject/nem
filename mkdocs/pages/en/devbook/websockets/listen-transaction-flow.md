@@ -48,13 +48,17 @@ Additionally, NEM serves WebSockets using the [STOMP](https://stomp.github.io/) 
     npm install @stomp/stompjs sockjs-client
     ```
 
+=== ":fontawesome-brands-java: Java"
+
+    This tutorial uses the Tyrus WebSocket client, which is loaded by the JBang dependency line in the snippet.
+
 See the [WebSocket reference](../reference/websockets/index.md) for details on the connection protocol.
 
 ## Full Code
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/websockets/listen_transaction_flow', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/websockets/listen_transaction_flow') }}
 
 The snippet uses the `NODE_URL` environment variable to set the NEM <node:>.
 If no value is provided, a default one is used.

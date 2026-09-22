@@ -34,7 +34,7 @@ digraph "Transfer XEM" {
 
 {% import 'tutorial.jinja2' as tutorial with context %}
 
-{{ tutorial.code_full_tagged('devbook/transactions/transfer_xem', ['py', 'js']) }}
+{{ tutorial.code_full_tagged('devbook/transactions/transfer_xem') }}
 
 コード全体を 1 つの `try` ブロックでラップして簡単なエラー処理を行いますが、アプリケーションではより細かな制御が必要になる場合があります。
 
