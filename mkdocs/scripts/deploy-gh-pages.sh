@@ -2,8 +2,14 @@
 
 set -ex
 
-NEM_DOCS_DISABLE_TS=false mkdocs build -f config/mkdocs.en.yml
-NEM_DOCS_DISABLE_TS=false mkdocs build -f config/mkdocs.ja.yml
+export NO_MKDOCS_2_WARNING=1
+export DISABLE_MKDOCS_2_WARNING=true
+export NEM_DOCS_DISABLE_TS=false
+export NEM_DOCS_DISABLE_JAVA=false
+
+mkdocs build -f config/mkdocs.en.yml
+mkdocs build -f config/mkdocs.ja.yml
+
 cd ../docs
 mv en en2
 mv ja ja2
