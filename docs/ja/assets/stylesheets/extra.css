@@ -888,3 +888,218 @@ code.doc-symbol-interface::after {
 	font-style: italic;
 	color: var(--md-code-hl-generic-color);
 }
+
+.javadoc-container {
+	--javadoc-border: var(--md-default-fg-color--lightest);
+	--javadoc-header-bg: var(--md-code-bg-color);
+	--javadoc-row-bg: var(--md-default-bg-color);
+	--javadoc-row-alt-bg: var(--md-default-bg-color);
+	--javadoc-accent-bg: var(--devbook-color--transparent);
+	--javadoc-accent: var(--devbook-a-color);
+	font-size: 0.78rem;
+}
+
+.javadoc-container .header {
+	margin-bottom: 1.2rem;
+}
+
+.javadoc-container .title {
+	margin: 0.2rem 0 0.8rem;
+	color: var(--md-default-fg-color);
+	font-size: 1.7em;
+	line-height: 1.25;
+}
+
+.javadoc-container .sub-title,
+.javadoc-container .package-signature,
+.javadoc-container .type-signature,
+.javadoc-container .member-signature {
+	font-family: var(--md-code-font-family);
+}
+
+.javadoc-container .sub-title,
+.javadoc-container .package-signature {
+	color: var(--md-default-fg-color--light);
+}
+
+.javadoc-container .type-signature,
+.javadoc-container .member-signature {
+	box-sizing: border-box;
+	margin: 0.8rem 0;
+	padding: 0.75rem 0.9rem;
+	overflow-x: auto;
+	border: 1px solid var(--javadoc-border);
+	border-radius: 0.25rem;
+	background: var(--md-code-bg-color);
+	white-space: pre-wrap;
+	line-height: 1.45;
+}
+
+.javadoc-container .inheritance {
+	margin: 0.25rem 0;
+	padding-left: 1rem;
+	border-left: 2px solid var(--javadoc-border);
+	color: var(--md-default-fg-color--light);
+	font-family: var(--md-code-font-family);
+	font-size: 0.9em;
+}
+
+.javadoc-container ul.summary-list,
+.javadoc-container ul.details-list,
+.javadoc-container ul.member-list {
+	margin: 0;
+	padding: 0;
+}
+
+.javadoc-container ul.summary-list>li,
+.javadoc-container ul.details-list>li,
+.javadoc-container ul.member-list>li {
+	list-style: none;
+}
+
+.javadoc-container .summary section,
+.javadoc-container .detail,
+.javadoc-container .inherited-list {
+	margin: 1rem 0;
+}
+
+.javadoc-container .summary h2,
+.javadoc-container .details h2 {
+	margin: 1.6rem 0 0.6rem;
+	font-size: 1.25em;
+}
+
+.javadoc-container .detail,
+.javadoc-container .inherited-list {
+	padding: 0.9rem;
+	border: 1px solid var(--javadoc-border);
+	border-radius: 0.25rem;
+	background: var(--javadoc-row-bg);
+}
+
+.javadoc-container .detail h3,
+.javadoc-container .inherited-list h3 {
+	margin: 0 0 0.6rem;
+	font-size: 1.05em;
+}
+
+.javadoc-container .caption,
+.javadoc-container .table-tabs {
+	margin: 0.8rem 0 0;
+}
+
+.javadoc-container .caption span,
+.javadoc-container .table-tabs button {
+	display: inline-block;
+	padding: 0.35rem 0.6rem;
+	border: 1px solid var(--javadoc-border);
+	border-bottom: 0;
+	border-radius: 0.25rem 0.25rem 0 0;
+	background: var(--javadoc-accent-bg);
+	color: var(--javadoc-accent);
+	font-weight: 700;
+}
+
+.javadoc-container .table-tabs button {
+	margin: 0;
+	cursor: pointer;
+	font: inherit;
+}
+
+.javadoc-container .table-tabs button:not(:first-child) {
+	margin-left: -1px;
+}
+
+.javadoc-container .table-tabs button:not(.active-table-tab) {
+	background: var(--md-default-bg-color);
+	color: var(--md-default-fg-color--light);
+}
+
+.javadoc-container .summary-table {
+	display: grid;
+	width: 100%;
+	overflow-x: auto;
+	border: 1px solid var(--javadoc-border);
+	border-radius: 0 0.25rem 0.25rem 0.25rem;
+}
+
+.javadoc-container .two-column-summary {
+	grid-template-columns: minmax(14rem, max-content) minmax(18rem, 1fr);
+}
+
+.javadoc-container .three-column-summary {
+	grid-template-columns: minmax(10rem, max-content) minmax(14rem, max-content) minmax(18rem, 1fr);
+}
+
+.javadoc-container .summary-table>div {
+	min-width: 0;
+	padding: 0.55rem 0.65rem;
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+
+.javadoc-container .table-header {
+	background: var(--javadoc-header-bg);
+	font-weight: 700;
+}
+
+.javadoc-container .even-row-color {
+	background: var(--javadoc-row-bg);
+}
+
+.javadoc-container .odd-row-color {
+	background: var(--javadoc-row-alt-bg);
+}
+
+.javadoc-container code {
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+.javadoc-container .col-first,
+.javadoc-container .col-second,
+.javadoc-container .col-constructor-name {
+	font-family: var(--md-code-font-family);
+	font-size: 0.9em;
+}
+
+.javadoc-container .col-first a,
+.javadoc-container .col-second a,
+.javadoc-container .col-constructor-name a {
+	font-weight: 700;
+}
+
+.javadoc-container dl.notes {
+	margin: 0.8rem 0 0;
+}
+
+.javadoc-container dl.notes>dt {
+	margin-top: 0.6rem;
+	font-weight: 700;
+}
+
+.javadoc-container dl.notes>dd {
+	margin: 0.2rem 0 0.45rem 1rem;
+}
+
+@media screen and (max-width: 800px) {
+	.javadoc-container .three-column-summary {
+		grid-template-columns: minmax(9rem, max-content) minmax(12rem, 1fr);
+	}
+
+	.javadoc-container .three-column-summary .col-last {
+		grid-column: 1 / -1;
+	}
+}
+
+@media screen and (max-width: 600px) {
+
+	.javadoc-container .two-column-summary,
+	.javadoc-container .three-column-summary {
+		grid-template-columns: 1fr;
+	}
+
+	.javadoc-container .summary-table .table-header {
+		display: none;
+	}
+}

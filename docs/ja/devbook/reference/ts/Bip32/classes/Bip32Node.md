@@ -60,7 +60,7 @@ BIP32 child node.
 derivePath(path): Bip32Node
 ```
 
-Derives a descendent node with specified path.
+Derives a descendant node with the specified path.
 
 #### Parameters
 

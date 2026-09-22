@@ -5,11 +5,11 @@ info:
   description: OpenAPI specification for the NEM client API.
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://libertalia.nemtest.net:7890
+  - url: http://libertalia.nemtest.net:7890
     description: Testnet node
-  - url: https://portobelo.nemmain.net:7890
+  - url: http://portobelo.nemmain.net:7890
     description: Mainnet node
 security:
   - {}
@@ -128,21 +128,23 @@ paths:
       summary: Generate new account data
       description: |
         Generates a new random account key pair and returns the private key, public key, and address.
-        Key pairs can also be generated client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+        Key pairs can also be generated client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk),
         [Python](https://pypi.org/project/symbol-sdk-python/)), without calling this endpoint.
 
-        **How the account is generated:** The key pair is generated using the Ed25519 curve. The private key is 32 random bytes 
-        produced by the JVM's `java.security.SecureRandom` (a cryptographically secure pseudorandom number generator). 
+        **How the account is generated:** The key pair is generated using the Ed25519 curve. The private key is 32 random bytes
+        produced by the JVM's `java.security.SecureRandom` (a cryptographically secure pseudorandom number generator).
         The public key is derived from the private key. No custom or weak RNG is used.
 
         **Security:** For typical use (wallets, client applications), this is considered secure: `SecureRandom` is backed by
-        the operating system's entropy source (e.g. `/dev/urandom` on Linux) and is appropriate for key generation. 
-        If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could theoretically be weaker;
-        the NEM client relies entirely on the JVM and OS for randomness quality and does not perform additional entropy checks or seeding.
+        the operating system's entropy source (e.g. `/dev/urandom` on Linux) and is appropriate for key generation.
+        If the system has low entropy (e.g. fresh VM, embedded device with no good entropy source), the output could
+        theoretically be weaker; the NEM client relies entirely on the JVM and OS for randomness quality and does not perform
+        additional entropy checks or seeding.
 
-        ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted IP addresses.
-        By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        ⚠️ **Local-only**: this endpoint returns sensitive cryptographic material and therefore is only accessible from trusted
+        IP addresses. By default, it is available only from the machine where the REST server is running (localhost).
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: generateAccount
       responses:
         '200':
@@ -296,7 +298,8 @@ paths:
         - Account
       summary: Request account status
       description: |
-        Retrieves only the account metadata for a given address: harvesting status, delegated harvesting status, and multisig relationships (cosignatories).
+        Retrieves only the account metadata for a given address: harvesting status,
+        delegated harvesting status, and multisig relationships (cosignatories).
         It does **not** return account info such as balance, importance, or public key.
       operationId: getAccountStatus
       parameters:
@@ -365,11 +368,12 @@ paths:
 
         ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
 
-        **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`). 
-        The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`; 
+        **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`).
+        The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`;
         the node supports this endpoint if that bit is set.
 
-        **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
+        **Enabling the feature on your own node:** In the NEM client configuration file,
+        set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
         For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
 
         The request returns historical data points between the given block heights (inclusive).
@@ -378,10 +382,10 @@ paths:
         Use `increment=1` for detailed block-by-block analysis, or a larger value (e.g. `increment=1440` for roughly daily samples)
         to observe long-term trends over a wider block range.
 
-        **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`. 
-        The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**. 
-        For example, `startHeight=100`, `endHeight=199`, `increment=1` gives 100 points; the same range with `increment=10` gives 10 points. 
-        This value must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request). 
+        **Number of data points:** You control this via `startHeight`, `endHeight`, and `increment`.
+        The number of points returned is: **`(endHeight − startHeight) ÷ increment + 1`**.
+        For example, `startHeight=100`, `endHeight=199`, `increment=1` gives 100 points; the same range with `increment=10` gives 10 points.
+        This value must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request).
         To stay under the limit, use a larger `increment` and/or a smaller height range.
       operationId: getAccountHistoricalData
       parameters:
@@ -412,11 +416,12 @@ paths:
 
         ⚠️ This endpoint is available **only if the node supports** the optional feature `HISTORICAL_ACCOUNT_DATA`.
 
-        **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`). 
-        The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`; 
+        **Checking if a node supports this feature:** Call GET `/node/extended-info` (or GET `/node/info`).
+        The response includes node metadata with a `features` bitmask. Historical account data corresponds to flag `0x2`;
         the node supports this endpoint if that bit is set.
 
-        **Enabling the feature on your own node:** In the NEM client configuration file, set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
+        **Enabling the feature on your own node:** In the NEM client configuration file,
+        set `nis.optionalFeatures` to include `HISTORICAL_ACCOUNT_DATA`.
         For example: `nis.optionalFeatures = TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA`.
 
         The request returns historical data points for each requested account between the given block heights (inclusive).
@@ -426,10 +431,10 @@ paths:
         to observe long-term trends over a wider block range.
         If any of the provided addresses is invalid, the entire request fails with 400 Bad Request; no partial results are returned.
 
-        **Number of data points:** You control this via `startHeight`, `endHeight`, `incrementBy`, and the number of accounts. 
-        Points per account = **`(endHeight − startHeight) ÷ incrementBy + 1`**. 
-        Total points = **points per account × number of accounts**. 
-        This total must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request). 
+        **Number of data points:** You control this via `startHeight`, `endHeight`, `incrementBy`, and the number of accounts.
+        Points per account = **`(endHeight − startHeight) ÷ incrementBy + 1`**.
+        Total points = **points per account × number of accounts**.
+        This total must not exceed **10,000**; otherwise the request fails with an error (400 Bad Request).
         To stay under the limit, reduce the height range, increase `incrementBy`, and/or request fewer accounts.
       operationId: getAccountHistoricalDataBatch
       requestBody:
@@ -534,7 +539,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getLocalBlockAtHeight
       requestBody:
         $ref: '#/components/requestBodies/blockHeight'
@@ -565,7 +571,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getLocalBlocksAfterHeight
       requestBody:
         $ref: '#/components/requestBodies/blockHeight'
@@ -705,8 +712,16 @@ paths:
       description: |
         Returns a request audit of HTTP requests that other clients or nodes have sent to this node's REST API.
 
-        For each request the node records the caller's host (IP), the API path (e.g. `/chain/score`, `/node/info`), start time, and elapsed time. The response has two lists: **outstanding** (requests currently in progress) and **most-recent** (a sliding window of the latest requests). So you can see who is calling the node, which endpoints are hit, and how long requests take—useful for debugging connectivity, load, or slow endpoints.
-        The node records each incoming request and exposes this trace via the API. It is a request log/trace for inspection, not a security or compliance audit. What is special is that you get a live view of in-flight requests and a short history of recent ones without parsing server logs.
+        For each request the node records the caller's host (IP), the API path
+        (e.g. `/chain/score`, `/node/info`), start time, and elapsed time.
+        The response has two lists: **outstanding** (requests currently in progress) and
+        **most-recent** (a sliding window of the latest requests). So you can see who is calling
+        the node, which endpoints are hit, and how long requests take—useful for debugging
+        connectivity, load, or slow endpoints.
+        The node records each incoming request and exposes this trace via the API. It is a request
+        log/trace for inspection, not a security or compliance audit. What is special is that you
+        get a live view of in-flight requests and a short history of recent ones without parsing
+        server logs.
       operationId: getDebugIncomingConnections
       responses:
         '200':
@@ -780,7 +795,8 @@ paths:
         - `nis.additionalHarvesterPrivateKeys`: additional harvester private keys that are automatically unlocked
           for harvesting on boot (subject to `nis.unlockedLimit` and standard eligibility checks).
 
-        ⚠️ **Security warning:** For non-local network calls, the private key used in the request must always be the private key of the delegated account.
+        ⚠️ **Security warning:** For non-local network calls, the private key used in the request
+        must always be the private key of the delegated account.
         For trusted and local network calls, it is possible, but not recommended, to use the private key of the main account.
       operationId: startHarvesting
       requestBody:
@@ -804,7 +820,8 @@ paths:
       description: |
         Stops harvesting for the specified account.
 
-        ⚠️ **Security warning:** For non-local network calls, the private key used in the request must always be the private key of the delegated account.
+        ⚠️ **Security warning:** For non-local network calls, the private key used in the request
+        must always be the private key of the delegated account.
         For trusted and local network calls, it is possible, but not recommended, to use the private key of the main account.
       operationId: stopHarvesting
       requestBody:
@@ -937,7 +954,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: fetchAccountHarvestingStatus
       requestBody:
         $ref: '#/components/requestBodies/privateKey'
@@ -1035,8 +1053,8 @@ paths:
         the account holds (plus XEM and first‑level levy mosaics) and collects their definitions. Mosaic definitions
         are aggregated across all accounts and deduplicated in the response.
 
-        This is useful when you manage or query many accounts at once (for example, a service that tracks several customers' accounts) 
-        and want to fetch each mosaic definition only once: even if the same mosaic is owned by multiple accounts in the request, 
+        This is useful when you manage or query many accounts at once (for example, a service that tracks several customers' accounts)
+        and want to fetch each mosaic definition only once: even if the same mosaic is owned by multiple accounts in the request,
         its definition appears only a single time in the response.
       operationId: getMosaicOwnedDefinitionBatch
       requestBody:
@@ -1146,13 +1164,15 @@ paths:
         Returns the last known mosaic definition (latest version) for the given mosaic identifier.
 
         Mosaic definitions can be updated over time. If multiple definitions exist for the same `mosaicId`, this endpoint always returns the
-        most recent version known to the node (highest internal database id), regardless of whether the mosaic or its owning namespace has expired.
+        most recent version known to the node (highest internal database id), regardless of whether
+        the mosaic or its owning namespace has expired.
 
         This endpoint does not perform any height-based or expiry checks:
         it simply returns the latest stored definition. For the native XEM mosaic, a predefined static definition is returned.
 
         To check whether a mosaic is still active at a specific block height, use one of the following:
-        - GET /local/mosaic/definition/supply with mosaicId and height to get the definition together with expirationHeight of the owning namespace;
+        - GET /local/mosaic/definition/supply with mosaicId and height to get the definition
+          together with expirationHeight of the owning namespace;
           if height is greater than or equal to expirationHeight, the mosaic is expired at that height.
         - GET /local/mosaics/expired to list mosaics that expire at a given height (requires the `TRACK_EXPIRED_MOSAICS` feature).
       operationId: getLastMosaicDefinition
@@ -1292,7 +1312,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getMosaicDefinitionWithSupply
       parameters:
         - $ref: '#/components/parameters/mosaicId'
@@ -1336,7 +1357,8 @@ paths:
 
          ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
          By default, it is available only from the machine where the REST server is running (localhost).
-         You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+         You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+         in the NEM client configuration file.
       operationId: getMosaicExpired
       parameters:
         - $ref: '#/components/parameters/height'
@@ -1359,7 +1381,7 @@ paths:
         - Namespace
       summary: Retrieve root namespaces
       description: |
-        Gets root namespaces in a paged manner. A **root namespace** is a namespace without a parent (e.g. `alice`); 
+        Gets root namespaces in a paged manner. A **root namespace** is a namespace without a parent (e.g. `alice`);
         sub-namespaces (e.g. `alice.vouchers`) have a parent and are not returned by this endpoint.
         Each returned item contains namespace information together with a database id used for keyset pagination.
       operationId: getRootNamespaces
@@ -1573,7 +1595,7 @@ paths:
       description: |
         Gets a list of **active nodes selected for broadcasts** in the neighborhood.
 
-        These nodes are a subset of reachable nodes and are used by the queried node to 
+        These nodes are a subset of reachable nodes and are used by the queried node to
         broadcast data (e.g. transactions and blocks) across the network.
       operationId: getActiveNodePeerList
       responses:
@@ -1595,8 +1617,8 @@ paths:
         - Node
       summary: Return maximum chain height from active peers
       description: |
-        Makes the queried node request the blockchain height from every node in its active peer list, and returns the maximum height observed
-        (the highest known chain height in the active neighborhood).
+        Makes the queried node request the blockchain height from every node in its active peer list, and returns the maximum
+        height observed (the highest known chain height in the active neighborhood).
       operationId: getActivePeersMaxChainHeight
       responses:
         '200':
@@ -1626,11 +1648,13 @@ paths:
         Boot state is **not persisted**: after restarting the NEM client process, the node must be booted again, either via
         configuration (auto-boot) or by calling this endpoint.
 
-        If you call this endpoint when the node is already booted, the request fails with HTTP `503 Service Unavailable` and message `NIS_ILLEGAL_STATE_ALREADY_BOOTED`.
+        If you call this endpoint when the node is already booted, the request fails with
+        HTTP `503 Service Unavailable` and message `NIS_ILLEGAL_STATE_ALREADY_BOOTED`.
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: bootNode
       requestBody:
         required: true
@@ -1695,7 +1719,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: nodeShutdown
       responses:
         '200':
@@ -1820,11 +1845,12 @@ paths:
         By default, up to **25** transactions are returned.
         The number of returned items can be increased up to **100** by using the `pageSize` query parameter.
 
-        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
-        before the referenced transaction.   
-        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only 
-        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within 
-        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail. See the `hash` and `id` parameter descriptions for details.
+        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly
+        before the referenced transaction.
+        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only
+        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within
+        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail.
+        See the `hash` and `id` parameter descriptions for details.
       operationId: getAllAccountTransactions
       parameters:
         - $ref: '#/components/parameters/address'
@@ -1857,11 +1883,12 @@ paths:
         By default, up to **25** transactions are returned.
         The number of returned items can be increased up to **100** by using the `pageSize` query parameter.
 
-        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
+        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly
         before the referenced transaction.
-        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only 
-        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within 
-        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail. See the `hash` and `id` parameter descriptions for details.
+        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only
+        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within
+        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail.
+        See the `hash` and `id` parameter descriptions for details.
       operationId: getIncomingAccountTransactions
       parameters:
         - $ref: '#/components/parameters/address'
@@ -1894,11 +1921,12 @@ paths:
         By default, up to **25** transactions are returned.
         The number of returned items can be increased up to **100** by using the `pageSize` query parameter.
 
-        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly 
-        before the referenced transaction. 
-        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only 
-        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within 
-        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail. See the `hash` and `id` parameter descriptions for details.
+        Optional pagination parameters (`hash`, `id`) allow fetching transactions that appeared directly
+        before the referenced transaction.
+        Use `id` (from `meta.id` in a previous response) for reliable pagination on any node; use `hash` (from `meta.hash`) only
+        when the node has the **transaction hash lookup (hash retention)** feature and the hash is still within
+        the retention window (`nis.transactionHashRetentionTime`), otherwise the request may fail.
+        See the `hash` and `id` parameter descriptions for details.
       operationId: getOutgoingAccountTransactions
       parameters:
         - $ref: '#/components/parameters/address'
@@ -1929,7 +1957,8 @@ paths:
         **Retention window**
 
         Transactions can be looked up by hash only while the hash is in the node's in-memory cache.
-        Once the retention period expires, the hash is removed and this endpoint can no longer return that transaction, even if it is already in a block.
+        Once the retention period expires, the hash is removed and this endpoint can no longer
+        return that transaction, even if it is already in a block.
 
         The cache duration is set by `nis.transactionHashRetentionTime` (in hours). Default is 36 hours.
         Minimum is 36 hours unless the value is -1 (infinite retention). There is no fixed maximum; it depends on node configuration.
@@ -1939,12 +1968,17 @@ paths:
 
         This endpoint is only available when the node has the transaction-hash-lookup feature (`TRANSACTION_HASH_LOOKUP`) enabled.
         When it is disabled, lookup by hash is not available at all - you cannot search for a transaction by its hash on that node.
-        To check: call `GET /node/info` and inspect `metaData.features`. If `(metaData.features & 0x1) !== 0`, the node supports lookup by hash.
-        There is no single API that returns a list of nodes supporting this feature; you must query each node's info and test the `features` bitmask.
+        To check: call `GET /node/info` and inspect `metaData.features`. If `(metaData.features & 0x1) !== 0`, the node supports
+        lookup by hash. There is no single API that returns a list of nodes supporting this feature;
+        you must query each node's info and test the `features` bitmask.
 
         Errors:
-        - Unsupported feature: HTTP 500 with message like `this node does not support transaction lookup using a hash`. The node does not support this endpoint.
-        - Hash not found: HTTP 400 with message `Hash was not found in cache`. The hash is not in the cache—either it never existed on this node or it has expired from the retention window. The response does not distinguish between these two cases.
+        - Unsupported feature: HTTP 500 with message like
+          `this node does not support transaction lookup using a hash`.
+          The node does not support this endpoint.
+        - Hash not found: HTTP 400 with message `Hash was not found in cache`.
+          The hash is not in the cache—either it never existed on this node or it has expired
+          from the retention window. The response does not distinguish between these two cases.
       operationId: getTransactionByHash
       parameters:
         - $ref: '#/components/parameters/hash'
@@ -1969,14 +2003,15 @@ paths:
       description: |
         Returns incoming and outgoing transactions for an account, including decoded transaction messages.
 
-        This endpoint behaves like `/account/transfers/all`, but if a transaction contains an encrypted message, 
+        This endpoint behaves like `/account/transfers/all`, but if a transaction contains an encrypted message,
         the message is decrypted before being returned.
 
         Transactions are sorted in descending order by insertion time.
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getLocalAllAccountTransactions
       requestBody:
         required: true
@@ -2010,7 +2045,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getLocalIncomingAccountTransactions
       requestBody:
         required: true
@@ -2044,7 +2080,8 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
       operationId: getLocalOutgoingAccountTransactions
       requestBody:
         required: true
@@ -2073,7 +2110,7 @@ paths:
       description: |
         Broadcasts a signed transaction to the network.
         The private key is not needed. The request must contain the serialized transaction data and its corresponding signature.
-        Transactions can be signed client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), 
+        Transactions can be signed client-side using an SDK (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk),
         [Python](https://pypi.org/project/symbol-sdk-python/)) and then announced via this endpoint.
       operationId: announceTransaction
       requestBody:
@@ -2087,7 +2124,7 @@ paths:
           description: |
             Transaction accepted and announced.
             The response body is always an `AnnounceResult`; check `code` and `message` to see whether validation passed
-            (code 1, message SUCCESS, or code 0, message NEUTRAL) or failed (e.g., FAILURE_INSUFFICIENT_BALANCE). 
+            (code 1, message SUCCESS, or code 0, message NEUTRAL) or failed (e.g., FAILURE_INSUFFICIENT_BALANCE).
             A non-success result means the transaction was not added to the unconfirmed cache and will not be further processed.
 
             The most common errors are:
@@ -2132,9 +2169,11 @@ paths:
 
         ⚠️ **Local-only:** for security reasons, this endpoint is only accessible from trusted IP addresses.
         By default, it is available only from the machine where the REST server is running (localhost).
-        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property in the NEM client configuration file.
+        You can allow additional trusted IP addresses by configuring the `nis.additionalLocalIps` property
+        in the NEM client configuration file.
 
-        This endpoint requires the sender’s private key, which the NEM client uses to sign the transaction before announcing it to the network.
+        This endpoint requires the sender’s private key, which the NEM client uses to sign the transaction before announcing it
+        to the network.
       operationId: prepareAnnounceTransaction
       requestBody:
         required: true
@@ -2190,7 +2229,7 @@ components:
       type: string
       description: |
         Represents a unique account address. The first character indicates the network (T for testnet, N for mainnet).
-        Addresses are 40 characters long, Base32-encoded, and include an embedded 4-byte checksum. 
+        Addresses are 40 characters long, Base32-encoded, and include an embedded 4-byte checksum.
         The node validates this checksum, so an address with even a single altered character will be rejected.
       minLength: 40
       maxLength: 40
@@ -2217,9 +2256,13 @@ components:
       type: integer
       format: int64
       description: |
-        Network timestamp in **seconds** since the NEM network epoch (29 March 2015, 00:06:25 UTC), i.e. since the creation of the nemesis (genesis) block.
-        The epoch is hardcoded and **the same for all networks** (mainnet, testnet). Used in transactions, blocks, and deadlines.
-        To convert to a real date: add this value (in seconds) to the Unix timestamp of the NEM epoch (1427587585 s for 29 March 2015 00:06:25 UTC), then use standard date functions.
+        Network timestamp in **seconds** since the NEM network epoch
+        (29 March 2015, 00:06:25 UTC), i.e. since the creation of the nemesis (genesis) block.
+        The epoch is hardcoded and **the same for all networks** (mainnet, testnet).
+        Used in transactions, blocks, and deadlines.
+        To convert to a real date: add this value (in seconds) to the Unix timestamp of the
+        NEM epoch (1427587585 s for 29 March 2015 00:06:25 UTC), then use standard
+        date functions.
       examples:
         - 9108808
     ModelError:
@@ -2304,7 +2347,8 @@ components:
           $ref: '#/components/schemas/Amount'
           description: |
             Vested balance of the account in micro XEM. It indicates how much of the balance is already vested.
-            Each day, 10% of the unvested balance is added to the vested balance. Used for importance calculation only; it is not used when sending a transaction.
+            Each day, 10% of the unvested balance is added to the vested balance.
+            Used for importance calculation only; it is not used when sending a transaction.
             Only accounts with at least 10,000 XEM vested balance are eligible for importance score calculation and can activate harvesting.
         importance:
           $ref: '#/components/schemas/Importance'
@@ -2352,7 +2396,7 @@ components:
         - **ACTIVATING**: The account has activated delegated harvesting, but it is not yet active.
         - **ACTIVE**: The account has activated delegated harvesting and delegated harvesting is active.
         - **DEACTIVATING**: The account has deactivated delegated harvesting, but delegated harvesting is still active.
-        - **INACTIVE**: The account has inactive delegated harvesting, or it has deactivated delegated harvesting and 
+        - **INACTIVE**: The account has inactive delegated harvesting, or it has deactivated delegated harvesting and
           deactivation is operational.
       enum:
         - REMOTE
@@ -2429,7 +2473,7 @@ components:
       type: number
       format: double
       description: |
-        PageRank of the account in the NEM Proof of Importance (POI) model: a value between 0 and 1 that reflects the account's 
+        PageRank of the account in the NEM Proof of Importance (POI) model: a value between 0 and 1 that reflects the account's
         relative importance in the transfer graph (accounts and XEM transfers between them).
         It is one of the inputs to the final importance score.
       examples:
@@ -2516,14 +2560,14 @@ components:
             - type: string
             - type: 'null'
           description: |
-            The transaction signature. 
-            The transaction signature is validated using the supplied public key in the field signer. 
+            The transaction signature.
+            The transaction signature is validated using the supplied public key in the field signer.
             If the signature is not valid, an error is returned from validation.
         fee:
           $ref: '#/components/schemas/Amount'
           description: |
-            The fee (in micro XEM) for the transaction. The higher the fee, the higher is the priority of the transaction. 
-            Transactions with high priority get included in a block before transactions with lower priority. 
+            The fee (in micro XEM) for the transaction. The higher the fee, the higher is the priority of the transaction.
+            Transactions with high priority get included in a block before transactions with lower priority.
             If the sender does not have enough funds the validation will result in an error.
         type:
           type: integer
@@ -2545,8 +2589,10 @@ components:
         version:
           type: integer
           description: |
-            The transaction version. In the API this field is a decimal integer (e.g. `1744830466`). 
-            Internally it is a 32-bit value whose bits are often referred to in hex (e.g. `0x68000002`): the high 8 bits are the network identifier (`0x68` mainnet, `0x98` testnet), 
+            The transaction version. In the API this field is a decimal integer (e.g. `1744830466`).
+            Internally it is a 32-bit value whose bits are often referred to in hex
+            (e.g. `0x68000002`): the high 8 bits are the network identifier
+            (`0x68` mainnet, `0x98` testnet),
             and the low 24 bits are the entity version (`1` or `2`, depending on transaction type and fork height).
 
             Examples (hex and decimal):
@@ -2602,8 +2648,8 @@ components:
     TransferTransaction:
       description: |
         Transfer transactions contain data about transfers of XEM or mosaics to another account.
-        There are two versions of transfer transactions, version 1 and version 2. 
-        Version 1 transfer transactions are only capable of transferring XEM and a message 
+        There are two versions of transfer transactions, version 1 and version 2.
+        Version 1 transfer transactions are only capable of transferring XEM and a message
         while version 2 transfer transactions additionally can transfer a set of mosaics.
       allOf:
         - $ref: '#/components/schemas/Transaction'
@@ -2674,7 +2720,7 @@ components:
             remoteAccount:
               $ref: '#/components/schemas/PublicKey'
               description: |
-                The public key (256-bit encoded as a hexadecimal string - 64 characters) of the delegated (remote) account. 
+                The public key (256-bit encoded as a hexadecimal string - 64 characters) of the delegated (remote) account.
     MultisigCosignatoryModification:
       type: object
       description: |
@@ -2744,8 +2790,8 @@ components:
               $ref: '#/components/schemas/MultisigMinCosignatoriesModification'
     MultisigSignatureTransaction:
       description: |
-        Multisig signature transactions are part of the NEM's multisig account system. 
-        Multisig signature transactions are included in the corresponding multisig transaction and are the way a cosignatory 
+        Multisig signature transactions are part of the NEM's multisig account system.
+        Multisig signature transactions are included in the corresponding multisig transaction and are the way a cosignatory
         of a multisig account can sign a multisig transaction for that account.
       allOf:
         - $ref: '#/components/schemas/Transaction'
@@ -2762,7 +2808,8 @@ components:
             otherAccount:
               $ref: '#/components/schemas/Address'
               description: |
-                Address of the multisig account for which the transaction is being cosigned (40 characters, Base32-encoded, checksum-validated).
+                Address of the multisig account for which the transaction is being cosigned (40 characters, Base32-encoded,
+                checksum-validated).
     ProvisionNamespaceTransaction:
       description: |
         Used both to **register** (rent) a new namespace and to **renew** (extend) an existing root namespace for another year.
@@ -2778,14 +2825,16 @@ components:
             rentalFeeSink:
               $ref: '#/components/schemas/PublicKey'
               description: |
-                Public key (256-bit encoded as a hexadecimal string - 64 hex characters) of the **rental fee sink**: the network-designated account that receives the rental fee.
-                Must be the sink defined for this network (mainnet, testnet, etc.); otherwise validation fails with `FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`.
+                Public key (256-bit encoded as a hexadecimal string - 64 hex characters) of the
+                **rental fee sink**: the network-designated account that receives the rental fee.
+                Must be the sink defined for this network (mainnet, testnet, etc.); otherwise
+                validation fails with `FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`.
                 Use the value provided by the SDK or network docs for the network you are using.
             rentalFee:
               $ref: '#/components/schemas/Amount'
               description: |
                 The fee (in micro XEM) for renting the namespace.
-                Must be at least the network-defined minimum for the given namespace type (root vs. sub-namespace); 
+                Must be at least the network-defined minimum for the given namespace type (root vs. sub-namespace);
                 transactions with a lower value are rejected with `FAILURE_NAMESPACE_INVALID_RENTAL_FEE`.
                 The exact minimum is defined in the network configuration / fork schedule and can change over time,
                 so clients should use values provided by the SDK or network documentation rather than hardcoding them.
@@ -2843,7 +2892,7 @@ components:
           type: integer
           description: |
             Levy type:
-            - `1`: Absolute fee: The fee is specified as absolute quantity and thus does not depend on the quantity 
+            - `1`: Absolute fee: The fee is specified as absolute quantity and thus does not depend on the quantity
               that is transferred.
             - `2`: Percentage fee: The fee is specified as a percentage of the quantity transferred.
               The fee increases linearly with the transferred mosaic quantity.
@@ -2893,7 +2942,7 @@ components:
           $ref: '#/components/schemas/MosaicLevy'
     MosaicDefinitionCreationTransaction:
       description: |
-        Before a mosaic can be created or transferred, a corresponding definition of the mosaic has 
+        Before a mosaic can be created or transferred, a corresponding definition of the mosaic has
         to be created and published to the network. This is done via a mosaic definition creation transaction.
       allOf:
         - $ref: '#/components/schemas/Transaction'
@@ -2964,8 +3013,8 @@ components:
     MultisigTransaction:
       description: |
         Multisig transactions are the only way to make transactions from a multisig account to another account.
-        A multisig transaction carries another transaction inside (often referred to as "inner" transaction). 
-        The inner transaction can be for example a transfer, an importance transfer or an aggregate modification transaction. 
+        A multisig transaction carries another transaction inside (often referred to as "inner" transaction).
+        The inner transaction can be for example a transfer, an importance transfer or an aggregate modification transaction.
         A multisig transaction also has multisig signature transactions from the cosignatories of the multisig account inside.
       allOf:
         - $ref: '#/components/schemas/Transaction'
@@ -2977,7 +3026,7 @@ components:
             otherTrans:
               $ref: '#/components/schemas/NonMultisigTransaction'
               description: |
-                The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction 
+                The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction
                 or a multisig aggregate modification transaction. The inner transaction does not have a valid signature.
             signatures:
               type: array
@@ -3091,7 +3140,7 @@ components:
         beneficiary:
           $ref: '#/components/schemas/Address'
           description: |
-            Address (40 characters, Base32-encoded; first character indicates network: T testnet, N mainnet) 
+            Address (40 characters, Base32-encoded; first character indicates network: T testnet, N mainnet)
             of the account that receives the block fees (the harvester, or the delegator when harvesting is delegated).
         totalFee:
           $ref: '#/components/schemas/Amount'
@@ -3201,7 +3250,8 @@ components:
       type: object
       description: |
         Information about a single **audited request**: a request that was recorded by the node for inspection.
-        "Audit" means the request is tracked (who, which path, when, how long) for debug/trace purposes - not a security or compliance audit.
+        "Audit" means the request is tracked (who, which path, when, how long) for debug/trace purposes - not a security
+        or compliance audit.
       required:
         - id
         - host
@@ -3731,14 +3781,14 @@ components:
         active:
           type: array
           description: |
-            Nodes that have this status can be successfully communicated with. 
+            Nodes that have this status can be successfully communicated with.
             Whenever a node is selecting another node for communication, it will pick one from this list.
           items:
             $ref: '#/components/schemas/Node'
         busy:
           type: array
           description: |
-            A node is set to status 'busy' if a connection can be established but the node did not answer 
+            A node is set to status 'busy' if a connection can be established but the node did not answer
             a request within a certain time limit.
           items:
             $ref: '#/components/schemas/Node'
@@ -3804,7 +3854,7 @@ components:
     BootNodeRequest:
       type: object
       description: |
-        Object is used to transfer the relevant data for booting a local node to the NEM client. 
+        Object is used to transfer the relevant data for booting a local node to the NEM client.
         With the boot data the NEM client can create the local node object and connect to the network.
       required:
         - metaData
@@ -3926,7 +3976,9 @@ components:
       description: |
         Network timestamp in **milliseconds** since the NEM network epoch (29 March 2015, 00:06:25 UTC).
         Same epoch as the nemesis block; used for time synchronization request/response timestamps.
-        To convert to a real date: add this value to the Unix timestamp of the NEM epoch (e.g. 1427587585000 ms for 29 March 2015 00:06:25 UTC), then use standard date functions.
+        To convert to a real date: add this value to the Unix timestamp of the NEM epoch
+        (e.g. 1427587585000 ms for 29 March 2015 00:06:25 UTC), then use standard
+        date functions.
       examples:
         - 344290910584
     CommunicationTimestamps:
@@ -4036,7 +4088,7 @@ components:
     AccountPrivateKeyTransactionsPage:
       type: object
       description: |
-        Request object used to retrieve transaction data for an account with decoded messages.  
+        Request object used to retrieve transaction data for an account with decoded messages.
         This request requires the **private key** of the account and should only be used when the NEM client is running locally.
 
         Fields `hash`, `id`, and `pageSize` are optional and are used for pagination.
@@ -4055,14 +4107,15 @@ components:
           description: |
             256-bit SHA3 hash encoded as a hexadecimal string (64 characters).
             Optional pagination cursor: when supplied, the list returns transactions that appeared **before** this transaction.
-            Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention 
-            window (`nis.transactionHashRetentionTime`); after that time the hash is removed from the node's cache and the request will fail. 
-            Obtain this from `meta.hash` of a transaction in a previous response.
+            Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention
+            window (`nis.transactionHashRetentionTime`); after that time the hash is removed from the node's cache and
+            the request will fail. Obtain this from `meta.hash` of a transaction in a previous response.
         id:
           type: string
           description: |
-            Optional pagination cursor: node database identifier of the transaction. When supplied, the list returns transactions 
-            that appeared **before** this transaction. Works on all nodes. Obtain this from `meta.id` of a transaction in a previous response.
+            Optional pagination cursor: node database identifier of the transaction. When supplied, the list returns transactions
+            that appeared **before** this transaction. Works on all nodes. Obtain this from `meta.id` of a transaction
+            in a previous response.
           examples:
             - '100'
         pageSize:
@@ -4085,8 +4138,14 @@ components:
         signature:
           type: string
           description: |
-            Hex-encoded transaction signature. Fixed length: 64 bytes (128 hexadecimal characters). The signature is produced by signing the serialized transaction payload (the same bytes as `data` before hex encoding) with the signer's private key.
-            To obtain this value, use your SDK's signing method (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk), [Python](https://pypi.org/project/symbol-sdk-python/) - sign the transaction payload and encode the resulting 64-byte signature to hex). The signer must match the transaction's `signer` (public key) field.
+            Hex-encoded transaction signature. Fixed length: 64 bytes (128 hexadecimal characters).
+            The signature is produced by signing the serialized transaction payload
+            (the same bytes as `data` before hex encoding) with the signer's private key.
+            To obtain this value, use your SDK's signing method
+            (e.g. [JavaScript](https://www.npmjs.com/package/symbol-sdk),
+            [Python](https://pypi.org/project/symbol-sdk-python/) - sign the transaction payload
+            and encode the resulting 64-byte signature to hex).
+            The signer must match the transaction's `signer` (public key) field.
           pattern: ^[0-9a-fA-F]{128}$
           minLength: 128
           maxLength: 128
@@ -4107,71 +4166,117 @@ components:
                 - `1` (`SUCCESS`): Transaction announced successfully.
                 - `2` (`FAILURE_UNKNOWN`): Validation failed for an unknown reason.
                 - `3` (`FAILURE_PAST_DEADLINE`): Validation failed because the deadline passed.
-                - `4` (`FAILURE_FUTURE_DEADLINE`): Validation failed because the deadline is too far in the future. The deadline must be at most **24 hours** (1 day) after the transaction timestamp.
+                - `4` (`FAILURE_FUTURE_DEADLINE`): Validation failed because the deadline is too far in the future.
+                  The deadline must be at most **24 hours** (1 day) after the transaction timestamp.
                 - `5` (`FAILURE_INSUFFICIENT_BALANCE`): Validation failed because the account had an insufficient balance.
                 - `6` (`FAILURE_MESSAGE_TOO_LARGE`): Validation failed because the message is too large.
                 - `7` (`FAILURE_HASH_EXISTS`): Validation failed because the transaction hash is already known.
-                - `8` (`FAILURE_SIGNATURE_NOT_VERIFIABLE`): Validation failed because the verification of the signature failed. The most common cause is that the signature was not produced by the same account as in the signer field; it can also indicate a corrupted or malformed signature, or transaction data that was modified after signing.
+                - `8` (`FAILURE_SIGNATURE_NOT_VERIFIABLE`): Validation failed because the verification of the signature failed.
+                  The most common cause is that the signature was not produced by the same account as in the signer field;
+                  it can also indicate a corrupted or malformed signature, or transaction data that was modified after signing.
                 - `9` (`FAILURE_TIMESTAMP_TOO_FAR_IN_PAST`): Validation failed because the time stamp is too far in the past.
                 - `10` (`FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE`): Validation failed because the time stamp is too far in the future.
-                - `11` (`FAILURE_INELIGIBLE_BLOCK_SIGNER`): Validation failed because the block had an ineligible signer. This usually occurs when delegated harvesting is in the process of being activated or deactivated.
-                - `12` (`FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC`): Validation failed because the entity cannot be used because the nodes are out of sync. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.
-                - `13` (`FAILURE_CHAIN_SCORE_INFERIOR`): Validation failed because the incoming chain's score (from the peer) is inferior to the local node's chain score; the node keeps its current chain. This result is returned during **block chain synchronization** (when the node receives a chain from a peer), not when announcing a transaction.
+                - `11` (`FAILURE_INELIGIBLE_BLOCK_SIGNER`): Validation failed because the block had an ineligible signer.
+                  This usually occurs when delegated harvesting is in the process of being activated or deactivated.
+                - `12` (`FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC`): Validation failed because the entity cannot be used
+                  because the nodes are out of sync. This happens frequently when a node is not fully synchronized
+                  and receives a new block with much larger height than its own chain.
+                - `13` (`FAILURE_CHAIN_SCORE_INFERIOR`): Validation failed because the incoming chain's score
+                  (from the peer) is inferior to the local node's chain score; the node keeps its current chain.
+                  This result is returned during **block chain synchronization** (when the node receives
+                  a chain from a peer), not when announcing a transaction.
                 - `14` (`FAILURE_CHAIN_INVALID`): Validation failed because the chain could not be validated.
                 - `15` (`FAILURE_TOO_MANY_TRANSACTIONS`): Validation failed because there are too many transactions in a block.
                 - `16` (`FAILURE_SELF_SIGNED_TRANSACTION`): Validation failed because a block contained a self-signed transaction.
                 - `17` (`FAILURE_INSUFFICIENT_FEE`): Validation failed because a transaction has an insufficient fee.
-                - `18` (`FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK`): Validation failed because a transaction originated from the nemesis account after the nemesis block.
-                - `19` (`FAILURE_TRANSACTION_CACHE_TOO_FULL`): Transaction was rejected because the debtor is not allowed to put another transaction into the cache. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.
+                - `18` (`FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK`): Validation failed because
+                  a transaction originated from the nemesis account after the nemesis block.
+                - `19` (`FAILURE_TRANSACTION_CACHE_TOO_FULL`): Transaction was rejected because the debtor
+                  is not allowed to put another transaction into the cache. This happens when an account tries
+                  to send too many transactions in a short time. To improve the chance that the transaction
+                  gets accepted you can try to raise the transaction fee.
                 - `20` (`FAILURE_WRONG_NETWORK`): Entity was rejected because it has the wrong network specified.
-                - `21` (`FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT`): Block was rejected because it was harvested by a blocked account (e.g. a reserved NEM fund).
+                - `21` (`FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT`): Block was rejected because it was harvested
+                  by a blocked account (e.g. a reserved NEM fund).
                 - `22` (`FAILURE_ENTITY_INVALID_VERSION`): Validation failed because an entity had an invalid version.
-                - `41` (`FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK`): Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
-                - `42` (`FAILURE_TRANSACTION_BEFORE_SECOND_FORK`): Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic) are not allowed before the second fork height.
-                - `62` (`FAILURE_DESTINATION_ACCOUNT_IN_USE`): Validation failed because the delegated (harvesting) account is not eligible. The account must have balance zero (no XEM). It must also have no mosaics, own no namespaces, and must not be a multisig or cosignatory.
-                - `63` (`FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS`): Validation failed because previous importance transfer change is in progress
-                - `64` (`FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED`): Validation failed because importance transfer activation was attempted while already activated.
-                - `65` (`FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE`): Validation failed because importance transfer deactivation was attempted while already deactivated.
-                - `66` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE`): Validation failed because transaction is using delegated account in an improper way.
-                - `71` (`FAILURE_MULTISIG_NOT_A_COSIGNER`): Validation failed because signer is not a cosigner of given multisig account.
-                - `72` (`FAILURE_MULTISIG_INVALID_COSIGNERS`): Validation failed because the cosignatories attached to a multisig transaction were invalid.
-                - `73` (`FAILURE_MULTISIG_NO_MATCHING_MULTISIG`): Validation failed because a multisig signature was not associated with any known multisig transaction.
-                - `74` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG`): Validation failed because multisig account tried to make transaction that is not allowed. Multisig accounts are not allowed to initiate any transaction (only cosignatories are allowed to do so).
-                - `75` (`FAILURE_MULTISIG_ALREADY_A_COSIGNER`): Validation failed because signer is already a cosigner of given multisig account.
-                - `76` (`FAILURE_MULTISIG_MISMATCHED_SIGNATURE`): Validation failed because a multisig signature is attached to an incorrect multisig transaction.
-                - `77` (`FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES`): Validation failed because a multisig modification contained multiple deletes. It is only allowed to remove one cosignatory at a time.
-                - `78` (`FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS`): Validation failed because a multisig modification contained redundant cosignatory modifications. This can happen if a transaction tries to add the same cosignatory twice.
-                - `79` (`FAILURE_CONFLICTING_MULTISIG_MODIFICATION`): Validation failed because conflicting multisig modification is present. This can for instance happen if a transaction tries to add and then delete the same cosignatory.
-                - `80` (`FAILURE_TOO_MANY_MULTISIG_COSIGNERS`): Validation failed because a multisig modification would result in a multisig account having too many cosigners.
-                - `81` (`FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER`): Validation failed because a multisig modification would result in a multisig account being a cosigner.
-                - `82` (`FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE`): Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
+                - `41` (`FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK`): Validation failed because
+                  V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
+                - `42` (`FAILURE_TRANSACTION_BEFORE_SECOND_FORK`): Validation failed, because new transaction types
+                  (namespace, mosaic creation, mosaic supply, transfer mosaic) are not allowed before the second fork height.
+                - `62` (`FAILURE_DESTINATION_ACCOUNT_IN_USE`): Validation failed because the delegated (harvesting)
+                  account is not eligible. The account must have balance zero (no XEM). It must also have no mosaics,
+                  own no namespaces, and must not be a multisig or cosignatory.
+                - `63` (`FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS`): Validation failed because previous importance transfer
+                  change is in progress
+                - `64` (`FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED`): Validation failed because
+                  importance transfer activation was attempted while already activated.
+                - `65` (`FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE`): Validation failed because importance
+                  transfer deactivation was attempted while already deactivated.
+                - `66` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE`): Validation failed because transaction
+                  is using delegated account in an improper way.
+                - `71` (`FAILURE_MULTISIG_NOT_A_COSIGNER`): Validation failed because signer is not a cosigner
+                  of given multisig account.
+                - `72` (`FAILURE_MULTISIG_INVALID_COSIGNERS`): Validation failed because the cosignatories
+                  attached to a multisig transaction were invalid.
+                - `73` (`FAILURE_MULTISIG_NO_MATCHING_MULTISIG`): Validation failed because a multisig signature
+                  was not associated with any known multisig transaction.
+                - `74` (`FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG`): Validation failed because multisig
+                  account tried to make transaction that is not allowed. Multisig accounts are not allowed
+                  to initiate any transaction (only cosignatories are allowed to do so).
+                - `75` (`FAILURE_MULTISIG_ALREADY_A_COSIGNER`): Validation failed because signer is already a cosigner
+                  of given multisig account.
+                - `76` (`FAILURE_MULTISIG_MISMATCHED_SIGNATURE`): Validation failed because a multisig signature
+                  is attached to an incorrect multisig transaction.
+                - `77` (`FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES`): Validation failed because a multisig
+                  modification contained multiple deletes. It is only allowed to remove one cosignatory at a time.
+                - `78` (`FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS`): Validation failed because
+                  a multisig modification contained redundant cosignatory modifications. This can happen if
+                  a transaction tries to add the same cosignatory twice.
+                - `79` (`FAILURE_CONFLICTING_MULTISIG_MODIFICATION`): Validation failed because conflicting
+                  multisig modification is present. This can for instance happen if a transaction tries to add
+                  and then delete the same cosignatory.
+                - `80` (`FAILURE_TOO_MANY_MULTISIG_COSIGNERS`): Validation failed because a multisig modification
+                  would result in a multisig account having too many cosigners.
+                - `81` (`FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER`): Validation failed because a multisig
+                  modification would result in a multisig account being a cosigner.
+                - `82` (`FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE`): Validation failed because the minimum
+                  number of cosignatories is larger than the number of cosignatories.
                 - `101` (`FAILURE_MAX_CHAIN_SIZE_EXCEEDED`): Validation failed because received chain has too many blocks.
                 - `102` (`FAILURE_BLOCK_UNEXPECTED_HEIGHT`): Validation failed because a block was received with an unexpected height.
                 - `103` (`FAILURE_BLOCK_UNVERIFIABLE`): Validation failed because an unverifiable block was received.
                 - `104` (`FAILURE_BLOCK_NOT_HIT`): Validation failed because a block was received that is not a hit.
                 - `105` (`FAILURE_TRANSACTION_UNVERIFIABLE`): Validation failed because an unverifiable transaction was received.
-                - `106` (`FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN`): Validation failed because an incoming chain contained a transaction more than once.
+                - `106` (`FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN`): Validation failed because an incoming chain
+                  contained a transaction more than once.
                 - `121` (`FAILURE_NAMESPACE_UNKNOWN`): Validation failed because the namespace is unknown.
                 - `122` (`FAILURE_NAMESPACE_ALREADY_EXISTS`): Validation failed because the namespace already exists.
                 - `123` (`FAILURE_NAMESPACE_EXPIRED`): Validation failed because the namespace has expired.
-                - `124` (`FAILURE_NAMESPACE_OWNER_CONFLICT`): Validation failed because the transaction signer is not the owner of the namespace.
+                - `124` (`FAILURE_NAMESPACE_OWNER_CONFLICT`): Validation failed because the transaction signer is not the owner
+                  of the namespace.
                 - `125` (`FAILURE_NAMESPACE_INVALID_NAME`): Validation failed because the name for the namespace is invalid.
-                - `126` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`): Validation failed because the specified namespace rental fee sink is invalid.
+                - `126` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK`): Validation failed because the specified
+                  namespace rental fee sink is invalid.
                 - `127` (`FAILURE_NAMESPACE_INVALID_RENTAL_FEE`): Validation failed because the specified rental fee is invalid.
                 - `128` (`FAILURE_NAMESPACE_PROVISION_TOO_EARLY`): Validation failed because the provision was done too early.
-                - `129` (`FAILURE_NAMESPACE_NOT_CLAIMABLE`): Validation failed because the namespace contains a reserved part and is not claimable.
+                - `129` (`FAILURE_NAMESPACE_NOT_CLAIMABLE`): Validation failed because the namespace contains
+                  a reserved part and is not claimable.
                 - `141` (`FAILURE_MOSAIC_UNKNOWN`): Validation failed because the mosaic is unknown.
-                - `142` (`FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED`): Validation failed because the modification of the existing mosaic is not allowed.
-                - `143` (`FAILURE_MOSAIC_CREATOR_CONFLICT`): Validation failed because the transaction signer is not the creator of the mosaic.
+                - `142` (`FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED`): Validation failed because the modification
+                  of the existing mosaic is not allowed.
+                - `143` (`FAILURE_MOSAIC_CREATOR_CONFLICT`): Validation failed because the transaction signer is not the creator
+                  of the mosaic.
                 - `144` (`FAILURE_MOSAIC_SUPPLY_IMMUTABLE`): Validation failed because the mosaic supply is immutable.
-                - `145` (`FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED`): Validation failed because the maximum overall mosaic supply is exceeded.
+                - `145` (`FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED`): Validation failed because the maximum overall mosaic
+                  supply is exceeded.
                 - `146` (`FAILURE_MOSAIC_SUPPLY_NEGATIVE`): Validation failed because the resulting mosaic supply would be negative.
                 - `147` (`FAILURE_MOSAIC_NOT_TRANSFERABLE`): Validation failed because the mosaic is not transferable.
-                - `148` (`FAILURE_MOSAIC_DIVISIBILITY_VIOLATED`): Validation failed because the divisibility of the mosaic is violated.
+                - `148` (`FAILURE_MOSAIC_DIVISIBILITY_VIOLATED`): Validation failed because the divisibility of
+                  the mosaic is violated.
                 - `149` (`FAILURE_CONFLICTING_MOSAIC_CREATION`): Validation failed because conflicting mosaic creation is present.
                 - `150` (`FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK`): Validation failed because the mosaic creation fee sink is invalid.
                 - `151` (`FAILURE_MOSAIC_INVALID_CREATION_FEE`): Validation failed because the specified creation fee is invalid.
-                - `152` (`FAILURE_TOO_MANY_MOSAIC_TRANSFERS`): Validation failed because a transfer transaction had too many attached mosaic transfers.
+                - `152` (`FAILURE_TOO_MANY_MOSAIC_TRANSFERS`): Validation failed because a transfer transaction
+                  had too many attached mosaic transfers.
                 - `153` (`FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE`): Validation failed because the mosaic levy is not transferable.
                 - `154` (`FAILURE_MOSAIC_LEVY_UNKNOWN`): Validation failed because the mosaic levy is unknown.
             transactionHash:
@@ -4187,7 +4292,8 @@ components:
               type: object
               description: |
                 Hash of the inner transaction for multisig transactions. The value is always an object, never null.
-                When the transaction is multisig and the announcement was successful, the object has a `data` property with the inner transaction hash.
+                When the transaction is multisig and the announcement was successful, the object has a `data`
+                property with the inner transaction hash.
                 Otherwise (non-multisig or failure), the object is empty `{}`.
               properties:
                 data:
@@ -4283,8 +4389,9 @@ components:
   responses:
     Unauthorized:
       description: |
-        The request is unauthorized (HTTP 401). This can occur when a local-only endpoint is called from a remote address,
-        when a harvesting-related request from remote uses a non-delegated private key, or when the private key is not in the node's allowed harvester list.
+        The request is unauthorized (HTTP 401). This can occur when a local-only endpoint is called
+        from a remote address, when a harvesting-related request from remote uses a non-delegated
+        private key, or when the private key is not in the node's allowed harvester list.
         See the examples below for typical response bodies.
       content:
         application/json:
@@ -4308,7 +4415,8 @@ components:
                     description: |
                       Detailed error message describing the failure. Examples:
                       - `remote ... attempted to call local /node/boot`: Local API was called from a remote address.
-                      - `remote ... attempted to call local /account/unlock with non-remote address ...`: Start harvesting was called with a non-delegated key from a remote address.
+                      - `remote ... attempted to call local /account/unlock with non-remote address ...`:
+                        Start harvesting was called with a non-delegated key from a remote address.
           examples:
             localOnlyFromRemote:
               summary: Local-only endpoint called from remote
@@ -4430,12 +4538,15 @@ components:
                       - `address must be valid`: One or more addresses provided in the request are invalid.
                         All addresses are validated prior to processing.
                       - `JSON Object was expected`: A required parameter is missing or the request body is not valid JSON.
-                      - `height must be positive`: The supplied block height is zero or negative. Block height values must be greater than zero.
+                      - `height must be positive`: The supplied block height is zero or negative. Block height values must be
+                        greater than zero.
                       - `'11źż' is not a valid namespace id part`: The provided namespace identifier contains invalid characters
                         or does not conform to the required format.
                       - `FAILURE_UNKNOWN_ACCOUNT`: Harvesting could not be started for account because it is unknown.
-                      - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible for harvesting.
-                      - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked from harvesting.
+                      - `FAILURE_HARVESTING_INELIGIBLE`: Harvesting could not be started for account because it is ineligible
+                        for harvesting.
+                      - `FAILURE_HARVESTING_BLOCKED`: Harvesting could not be started for account because it is blocked
+                        from harvesting.
                       - `FAILURE_SERVER_LIMIT`: Harvesting could not be started for account because the server limit has been hit.
           examples:
             invalidAddress:
@@ -4634,9 +4745,12 @@ components:
         When supplied, the request returns transactions that appeared directly before this transaction,
         in the order defined by the request criteria.
 
-        Requires the transaction hash lookup (hash retention) feature and a hash that is still within the retention window (`nis.transactionHashRetentionTime`). 
-        Even when the feature is enabled, hashes older than this window are removed from the node's cache and will cause the request to fail. 
-        Obtain this from `meta.hash` of a transaction in a previous list response. For reliable pagination on any node, prefer using the `id` parameter instead.
+        Requires the transaction hash lookup (hash retention) feature and a hash that is still within
+        the retention window (`nis.transactionHashRetentionTime`).
+        Even when the feature is enabled, hashes older than this window are removed from the node's
+        cache and will cause the request to fail.
+        Obtain this from `meta.hash` of a transaction in a previous list response.
+        For reliable pagination on any node, prefer using the `id` parameter instead.
       schema:
         $ref: '#/components/schemas/Hash'
       examples:
