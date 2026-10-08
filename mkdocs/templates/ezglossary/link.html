@@ -1,0 +1,16 @@
+{% if entry.section == 'py' -%}
+	{# For Python reference docs we point to the header, because the actual
+	glossary term is hidden by the automatic-reference-term class #}
+	{%- set dest_anchor = entry.term -%}
+{%- elif entry.section == 'js' -%}
+	{%- set dest_anchor = entry.term.split('.')[-1].lower() -%}
+{%- else -%}
+	{%- set dest_anchor = entry.target -%}
+{%- endif -%}
+{%- if entry.section != '_' -%}<code>{%- endif -%}
+<a class="mkdocs-ezglossary-link"
+	id="{{ target }}"
+	title="{{ entry.definition }}"
+	name="{{entry.section}}:{{entry.term}}"
+	href="{{ root }}{{ entry.page.url }}#{{ dest_anchor }}">{{ text|safe }}</a>
+{%- if entry.section != '_' -%}</code>{%- endif -%}

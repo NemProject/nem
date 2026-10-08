@@ -1,0 +1,45 @@
+---
+extends:
+  - airbnb
+  - plugin:jsdoc/recommended-error
+  - ../linters/javascript/default.eslintrc
+globals:
+  WebSocket: readonly
+rules:
+  import/extensions:
+    - error
+    - ignorePackages
+  # Tutorials make heavy use of the console for output
+  no-console: off
+  max-len:
+    - error
+    - code: 88
+      ignoreTrailingComments: true
+  function-paren-newline:
+    - off
+  # This rule requires some pretty ugly constructs some times
+  prefer-destructuring:
+    - off
+  # Allow some simple for loops
+  no-restricted-syntax:
+    - error
+    - ForInStatement
+  # No cumbersome JSDocs in tutorial code
+  jsdoc/require-jsdoc:
+    - off
+  # Operators are the only logical place to break some long lines
+  operator-linebreak:
+    - error
+    - after
+  # Prefer old-style function declarations for clarity
+  func-style:
+  - error
+  - declaration
+  - allowArrowFunctions: true
+  # Polling loops do active waiting inside loops
+  no-await-in-loop:
+  - off
+  # The 'ethers' dependency is only used by one tutorial, we don't want to
+  # force it on every user. Specially because it's a heavy dependency.
+  import/no-extraneous-dependencies:
+  - off
