@@ -1,0 +1,118 @@
+<table style="width: 100%;"><tr><td>
+    <div class="side-info"><table>
+    <tr><td class="side-info-icon">&varr;</td><td>Size: 125+ bytes = 0x7d+ <i>(variable)</i></td></tr>
+    <tr><td class="side-info-icon"><i class="fab fa-github"></i></td><td><a href="https://github.com/symbol/symbol/blob/main/catbuffer/schemas/nem/namespace/namespace_registration.cats#L33">schema</a></td></tr>
+    </table></div>
+    <dl markdown><dt><code>ser:NonVerifiableNamespaceRegistrationTransactionV1</code></dt><dd>binary layout for a non-verifiable namespace registration transaction (V1, latest) </dd></dl>
+</td></tr></table>
+
+<div class="big-table6">
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">type</code></div>
+   <div><a href="#transactiontype" title="enumeration of transaction types">TransactionType</a></div>
+   <div class="description"><p>transaction type </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">version</code></div>
+   <div>byte[1]</div>
+   <div class="description"><p>entity version </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">entity_body_reserved_1</code></div>
+   <div>byte[2]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">0</code><br/><p>reserved padding between version and network type </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">network</code></div>
+   <div><a href="#networktype" title="enumeration of network types">NetworkType</a></div>
+   <div class="description"><p>entity network </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">timestamp</code></div>
+   <div><a href="#timestamp" title="">Timestamp</a></div>
+   <div class="description"><p>entity timestamp </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">signer_public_key_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">32</code><br/><p>entity signer public key size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">signer_public_key</code></div>
+   <div><a href="#publickey" title="">PublicKey</a></div>
+   <div class="description"><p>entity signer public key </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">fee</code></div>
+   <div><a href="#amount" title="">Amount</a></div>
+   <div class="description"><p>transaction fee </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">deadline</code></div>
+   <div><a href="#timestamp" title="">Timestamp</a></div>
+   <div class="description"><p>transaction deadline </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_VERSION</code></div>
+   <div>byte[1]</div>
+   <div class="description"><b>const</b> <code class="docutils literal">1</code><br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">TRANSACTION_TYPE</code></div>
+   <div><a href="#transactiontype" title="enumeration of transaction types">TransactionType</a></div>
+   <div class="description"><b>const</b> <code class="docutils literal">NAMESPACE_REGISTRATION</code> (<code class="docutils literal">0x2001</code>)<br/></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">rental_fee_sink_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><b>reserved</b> <code class="docutils literal">40</code><br/><p>mosaic rental fee sink public key size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">rental_fee_sink</code></div>
+   <div><a href="#address" title="">Address</a></div>
+   <div class="description"><p>mosaic rental fee sink public key </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">rental_fee</code></div>
+   <div><a href="#amount" title="">Amount</a></div>
+   <div class="description"><p>mosaic rental fee </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">name_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>new namespace name size </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">name</code></div>
+   <div>byte[name_size]</div>
+   <div class="description"><p>new namespace name </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">parent_name_size</code></div>
+   <div>byte[4]</div>
+   <div class="description"><p>size of the parent namespace name </p></div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <div><code class="docutils literal">parent_name</code></div>
+   <div>byte[parent_name_size]</div>
+   <div class="description"><p>parent namespace name </p><b>This field is only present if:</b><br/><code class="docutils literal">parent_name_size not equals 4294967295</code></div>
+</div>
