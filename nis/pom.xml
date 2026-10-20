@@ -30,8 +30,26 @@
         <!-- default so @{argLine} resolves when JaCoCo's prepare-agent is skipped -->
         <argLine></argLine>
         <jetty.version>9.4.58.v20250814</jetty.version>
-        <spring.version>4.3.30.RELEASE</spring.version>
+        <spring.version>5.3.39</spring.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- hibernate-core 5.6 declares byte-buddy 1.12.x, which cannot read Java 21 class files and would win over
+                 Mockito's newer version on the test classpath; keep both on the version mockito-core ${mockito.version}
+                 declares (check with: mvn -pl nis dependency:tree -Dincludes=net.bytebuddy) -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.17.5</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>1.17.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -182,13 +200,13 @@
         <!-- hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.3.11.Final</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.6.15.Final</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.0.Final</version>
+            <version>6.2.5.Final</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

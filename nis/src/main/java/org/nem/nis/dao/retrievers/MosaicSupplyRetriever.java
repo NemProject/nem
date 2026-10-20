@@ -85,6 +85,7 @@ public class MosaicSupplyRetriever {
 		return new DbMosaicDefinitionSupplyTuple(matchingMosaicDefinition, new Supply(supply), new BlockHeight(expirationHeight));
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbMosaicDefinitionCreationTransaction> queryCreationTransactions(final Session session, final MosaicId mosaicId,
 			final Long height) {
 		final Criteria creationTransactionsCriteria = session.createCriteria(DbMosaicDefinitionCreationTransaction.class, "transaction") // preserve-newline
@@ -100,6 +101,7 @@ public class MosaicSupplyRetriever {
 		return HibernateUtils.listAndCast(creationTransactionsCriteria);
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbMosaicSupplyChangeTransaction> querySupplyChangeTransactions(final Session session,
 			final Collection<Long> dbMosaicDefinitionIds, final Long startHeight, final Long endHeight) {
 		final Criteria supplyChangeTransactionCriteria = session.createCriteria(DbMosaicSupplyChangeTransaction.class, "transaction") // preserve-newline
@@ -113,6 +115,7 @@ public class MosaicSupplyRetriever {
 		return HibernateUtils.listAndCast(supplyChangeTransactionCriteria);
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static DbNamespace queryLastRootNamespace(final Session session, final String namespaceId, final Long maxHeight) {
 		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
 		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline
@@ -125,6 +128,7 @@ public class MosaicSupplyRetriever {
 		return namespaces.get(0);
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbNamespace> querySubsequentRootNamespaces(final Session session, final String namespaceId, final Long minHeight) {
 		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
 		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline

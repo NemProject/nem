@@ -3,6 +3,7 @@ package org.nem.nis.dao.retrievers;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
@@ -43,7 +44,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				+ "LEFT OUTER JOIN multisigsignermodifications msm on msm.id = mm.multisigsignermodificationid AND msm.senderproof IS NOT NULL "
 				+ "WHERE mm.multisigsignermodificationid < :maxId AND mm.cosignatoryid = :cosignatoryId AND msm.senderproof IS NOT NULL "
 				+ "ORDER BY mm.cosignatoryid ASC, mm.multisigsignermodificationid DESC limit :limit";
-		final Query query = session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = session.createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbMultisigAggregateModificationTransaction.class) // preserve-newline
 				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("cosignatoryId", cosignatoryId) // preserve-newline
@@ -56,7 +57,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 		final String queryString = "SELECT msm.* FROM multisigsignermodifications msm "
 				+ "WHERE msm.id < :maxId AND msm.senderid = :senderId AND msm.senderproof IS NOT NULL "
 				+ "ORDER BY msm.senderid ASC, msm.id DESC limit :limit";
-		final Query query = session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = session.createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbMultisigAggregateModificationTransaction.class) // preserve-newline
 				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("senderId", senderId) // preserve-newline

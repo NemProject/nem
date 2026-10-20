@@ -71,7 +71,7 @@ public class DaoUtilsTest {
 			final Address address = ACCOUNTS.get(i).getAddress();
 			final String statement = String.format("Insert into accounts (printableKey, publicKey) values('%s', '%s')", address.toString(),
 					address.getPublicKey().toString());
-			this.session.createSQLQuery(statement).executeUpdate();
+			this.session.createNativeQuery(statement).executeUpdate();
 		}
 	}
 }

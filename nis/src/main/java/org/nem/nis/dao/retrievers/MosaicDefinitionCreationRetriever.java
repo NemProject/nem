@@ -11,6 +11,7 @@ import org.nem.nis.dbmodel.*;
  * Class for for retrieving mosaic definition creation transactions.
  */
 public class MosaicDefinitionCreationRetriever implements TransactionRetriever {
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(final Session session, final long accountId, final long maxId,
 			final int limit, final ReadOnlyTransferDao.TransferType transferType) {
