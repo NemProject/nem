@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import java.util.List;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 
 /**
  * Helper class containing hibernate utility functions.
@@ -16,7 +17,7 @@ public class HibernateUtils {
 	 * @return The typed list.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listAndCast(final Query query) {
+	public static <T> List<T> listAndCast(final Query<?> query) {
 		return (List<T>) query.list();
 	}
 

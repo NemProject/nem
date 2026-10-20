@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
@@ -201,7 +202,7 @@ public class BlockDaoImpl implements BlockDao {
 		final String queryString = "((SELECT b.* FROM blocks b WHERE height<:height AND harvesterId=:accountId limit :limit) UNION "
 				+ "(SELECT b.* FROM blocks b WHERE height<:height AND harvestedInName=:accountId limit :limit)) "
 				+ "ORDER BY height DESC limit :limit";
-		final Query query = this.getCurrentSession().createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.getCurrentSession().createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbBlock.class) // preserve-newline
 				.setParameter("height", height) // preserve-newline
 				.setParameter("accountId", accountId) // preserve-newline
@@ -259,7 +260,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropMosaicDefinitionCreationTransactions(blockHeight);
 		this.dropTransfers(blockHeight, "DbMosaicSupplyChangeTransaction", "MosaicSupplyChanges", v -> {
 		});
-		final Query query = this.getCurrentSession().createQuery("delete from DbBlock a where a.height > :height") // preserve-newline
+		final Query<?> query = this.getCurrentSession().createQuery("delete from DbBlock a where a.height > :height") // preserve-newline
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 		this.sessionFactory.getCurrentSession().flush();
@@ -270,7 +271,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "Transfers", transactionsToDelete -> {
 			// TODO 20151124 J-B: consider refactoring into createDeleteQuery("DbMosaic", "transferTransaction.id", transactions)
 			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-			Query preQuery = this.getCurrentSession()
+			Query<?> preQuery = this.getCurrentSession()
 					.createQuery("delete from DbMosaic m where m.transferTransaction.id >= :min AND transferTransaction.id <= :max")
 					.setParameter("min", minMaxLong.min) // preserve-newline
 					.setParameter("max", minMaxLong.max);
@@ -281,7 +282,7 @@ public class BlockDaoImpl implements BlockDao {
 	private void dropMultisigTransactions(final BlockHeight blockHeight) {
 		this.dropTransfers(blockHeight, "DbMultisigTransaction", "MultisigTransactions", transactionsToDelete -> {
 			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-			Query preQuery = this.getCurrentSession().createQuery(
+			Query<?> preQuery = this.getCurrentSession().createQuery(
 					"delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id >= :min AND m.multisigTransaction.id <= :max")
 					.setParameter("min", minMaxLong.min) // preserve-newline
 					.setParameter("max", minMaxLong.max);
@@ -304,7 +305,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "DbMultisigAggregateModificationTransaction", "MultisigSignerModifications",
 				transactionsToDelete -> {
 					final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-					Query preQuery = this.getCurrentSession().createQuery(
+					Query<?> preQuery = this.getCurrentSession().createQuery(
 							"delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id >= :min AND m.multisigAggregateModificationTransaction.id <= :max")
 							.setParameter("min", minMaxLong.min) // preserve-newline
 							.setParameter("max", minMaxLong.max);
@@ -317,7 +318,7 @@ public class BlockDaoImpl implements BlockDao {
 				});
 
 		final MinMaxLong minMaxLong = getMinMax(minCosignatoriesModificationIds);
-		final Query deleteQuery = this.getCurrentSession()
+		final Query<?> deleteQuery = this.getCurrentSession()
 				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id >= :min AND t.id <= :max")
 				.setParameter("min", minMaxLong.min) // preserve-newline
 				.setParameter("max", minMaxLong.max);
@@ -328,7 +329,7 @@ public class BlockDaoImpl implements BlockDao {
 		final List<Long> namespaceIds = new ArrayList<>();
 		this.dropTransfers(blockHeight, "DbProvisionNamespaceTransaction", "NamespaceProvisions", transactionsToDelete -> {
 			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-			final Query preQuery = this.getCurrentSession()
+			final Query<?> preQuery = this.getCurrentSession()
 					.createQuery("select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id >= :min AND tx.id <= :max")
 					.setParameter("min", minMaxLong.min) // preserve-newline
 					.setParameter("max", minMaxLong.max);
@@ -336,7 +337,7 @@ public class BlockDaoImpl implements BlockDao {
 		});
 
 		final MinMaxLong minMaxLong = getMinMax(namespaceIds);
-		final Query deleteQuery = this.getCurrentSession().createQuery("delete from DbNamespace t where t.id >= :min AND t.id <= :max")
+		final Query<?> deleteQuery = this.getCurrentSession().createQuery("delete from DbNamespace t where t.id >= :min AND t.id <= :max")
 				.setParameter("min", minMaxLong.min) // preserve-newline
 				.setParameter("max", minMaxLong.max);
 		deleteQuery.executeUpdate();
@@ -348,7 +349,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "DbMosaicDefinitionCreationTransaction", "MosaicDefinitionCreationTransactions",
 				transactionsToDelete -> {
 					MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-					Query query = this.getCurrentSession().createQuery(
+					Query<?> query = this.getCurrentSession().createQuery(
 							"select tx.mosaicDefinition.id from DbMosaicDefinitionCreationTransaction tx where tx.id >= :min AND tx.id <= :max")
 							.setParameter("min", minMaxLong.min) // preserve-newline
 							.setParameter("max", minMaxLong.max);
@@ -362,7 +363,7 @@ public class BlockDaoImpl implements BlockDao {
 				});
 		mosaicIds.forEach(id -> this.mosaicIdCache.remove(new DbMosaicId(id)));
 		MinMaxLong minMaxLong = getMinMax(mosaicPropertyIds);
-		Query query = this.getCurrentSession().createQuery("delete from DbMosaicProperty mp where mp.id >= :min AND mp.id <= :max")
+		Query<?> query = this.getCurrentSession().createQuery("delete from DbMosaicProperty mp where mp.id >= :min AND mp.id <= :max")
 				.setParameter("min", minMaxLong.min) // preserve-newline
 				.setParameter("max", minMaxLong.max);
 		query.executeUpdate();
@@ -375,8 +376,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName,
 			final Consumer<List<Long>> preQuery) {
-		final Query getTransactionIdsQuery = this.getCurrentSession()
-				.createSQLQuery("select tx.id as txid from blocks b left outer join " + transfersName
+		final Query<?> getTransactionIdsQuery = this.getCurrentSession()
+				.createNativeQuery("select tx.id as txid from blocks b left outer join " + transfersName
 						+ " tx on b.id=tx.blockid where b.height > :height and tx.id is not null") // preserve-newline
 				.addScalar("txid", LongType.INSTANCE) // preserve-newline
 				.setParameter("height", blockHeight.getRaw());
@@ -386,7 +387,7 @@ public class BlockDaoImpl implements BlockDao {
 			preQuery.accept(transactionsToDelete);
 
 			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
-			final Query dropTxes = this.getCurrentSession()
+			final Query<?> dropTxes = this.getCurrentSession()
 					.createQuery("delete from " + tableName + " t where t.id >= :min AND t.id <= :max") // preserve-newline
 					.setParameter("min", minMaxLong.min) // preserve-newline
 					.setParameter("max", minMaxLong.max);
@@ -406,6 +407,7 @@ public class BlockDaoImpl implements BlockDao {
 		return new MinMaxLong(minMax[0], minMax[1]);
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
 		final Criteria criteria = this.getCurrentSession() // preserve-newline
 				.createCriteria(DbBlock.class).setMaxResults(limit) // preserve-newline

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.*;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
@@ -54,7 +55,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				+ " WHERE accountId=%d AND type=%d AND transactionId < %d " // preserve-newline
 				+ "ORDER BY accountId asc, type asc, transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
-		final Query preQuery = session.createSQLQuery(preQueryString) // preserve-newline
+		final Query<?> preQuery = session.createNativeQuery(preQueryString) // preserve-newline
 				.addScalar("transactionId", LongType.INSTANCE) // preserve-newline
 				.addScalar("height", LongType.INSTANCE) // preserve-newline
 				.setMaxResults(limit);
@@ -62,6 +63,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long) o[0], (Long) o[1])).collect(Collectors.toList());
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private List<DbMultisigTransaction> getMultisigTransactions(final Session session, final List<TransactionIdBlockHeightPair> pairs,
 			final String joinEntity) {
 		final Criteria criteria = session.createCriteria(DbMultisigTransaction.class) // preserve-newline
@@ -83,6 +85,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		return result;
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {
 		final HashMap<Long, DbBlock> blockMap = new HashMap<>();
 		final Criteria criteria = session.createCriteria(DbBlock.class) // preserve-newline

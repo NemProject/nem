@@ -25,7 +25,7 @@ import org.springframework.web.socket.sockjs.frame.AbstractSockJsMessageCodec;
 @Configuration
 @ComponentScan("org.nem.nis.websocket")
 @EnableWebSocketMessageBroker
-public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBrokerConfigurer {
+public class NisWebAppWebsocketInitializer implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(final MessageBrokerRegistry registry) {

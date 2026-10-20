@@ -4,6 +4,7 @@ import java.util.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.hibernate.*;
+import org.hibernate.query.NativeQuery;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -207,13 +208,13 @@ public class MosaicDefinitionDaoImplTest {
 		private final MosaicDefinitionRetriever retriever = Mockito.mock(MosaicDefinitionRetriever.class);
 		private final MosaicSupplyRetriever supplyRetriever = Mockito.mock(MosaicSupplyRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
-		private final SQLQuery sqlQuery = Mockito.mock(SQLQuery.class);
+		private final NativeQuery<Object> sqlQuery = Mockito.mock();
 		private final MosaicDefinitionDaoImpl mosaicDefinitionDao = new MosaicDefinitionDaoImpl(this.sessionFactory, this.retriever,
 				this.supplyRetriever);
 
 		private TestContext() {
 			Mockito.when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
-			Mockito.when(this.session.createSQLQuery(Mockito.anyString())).thenReturn(this.sqlQuery);
+			Mockito.when(this.session.createNativeQuery(Mockito.anyString())).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.addScalar(Mockito.any(), Mockito.any())).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.setParameter(Mockito.any(String.class), Mockito.anyString())).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(1L);

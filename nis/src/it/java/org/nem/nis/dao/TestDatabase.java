@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -130,7 +131,7 @@ public class TestDatabase {
 	private List<Account> readAccounts(final MockAccountDao mockAccountDao) {
 		LOGGER.warning("reading accounts");
 		final Session session = this.sessionFactory.openSession();
-		final Query query = session.createQuery("from DbAccount a");
+		final Query<?> query = session.createQuery("from DbAccount a");
 		final List<DbAccount> dbAccounts = HibernateUtils.listAndCast(query);
 		session.flush();
 		session.clear();
