@@ -155,7 +155,7 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 	}
 
 	private void log(final String message) {
-		LOGGER.fine(String.format("[%d] Timer %s: %s", Thread.currentThread().getId(), this.timerName, message));
+		LOGGER.fine(String.format("[%d] Timer %s: %s", Thread.currentThread().threadId(), this.timerName, message));
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 import org.nem.nis.ForkConfiguration;
 
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class NisConfigurationTest {
 	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList("nem.shortServerName", "nem.httpPort", "nem.httpsPort",
 			"nem.webContext", "nem.apiContext", "nem.homePath", "nem.maxThreads");

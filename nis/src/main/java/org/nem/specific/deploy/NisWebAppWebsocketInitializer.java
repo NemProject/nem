@@ -82,7 +82,7 @@ public class NisWebAppWebsocketInitializer implements WebSocketMessageBrokerConf
 
 	@Override
 	public void registerStompEndpoints(final StompEndpointRegistry registry) {
-		registry.addEndpoint("/messages").setAllowedOrigins("*").withSockJS().setMessageCodec(new AbstractSockJsMessageCodec() {
+		registry.addEndpoint("/messages").setAllowedOriginPatterns("*").withSockJS().setMessageCodec(new AbstractSockJsMessageCodec() {
 			@Override
 			public String[] decode(String s) {
 				return new String[]{

@@ -11,6 +11,7 @@ import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.connect.Communicator;
 
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class AuditedCommunicatorTest {
 
 	@Test
