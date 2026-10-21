@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 /**
  * Static class containing helper functions for meta data tests.
  */
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class MetaDataTestUtils {
 
 	/**

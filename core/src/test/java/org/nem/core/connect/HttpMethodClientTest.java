@@ -19,6 +19,7 @@ import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 
 @RunWith(Enclosed.class)
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 15000;

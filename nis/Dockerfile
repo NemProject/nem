@@ -1,9 +1,9 @@
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 # install dependencies (install tzdata first to prevent 'geographic area' prompt)
 RUN apt-get update \
   && apt-get install -y tzdata \
-  && apt-get install -y openjdk-11-jdk-headless git libssl-dev maven ca-certificates \
+  && apt-get install -y openjdk-21-jdk-headless git libssl-dev maven ca-certificates \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
@@ -14,25 +14,25 @@ COPY . /build/nem
 
 WORKDIR /build/nem
 
-# actually build (using java 11)
+# actually build (using java 21)
 RUN mvn clean package -DskipTests=true \
   && cd infra \
   && bash ./package.prepare.sh package
 
 # second stage of multistage build
-FROM ubuntu:22.04 AS runner
+FROM ubuntu:24.04 AS runner
 
 ENV MEMORY_MS=6G
-ENV MEMORY_MX=6G
+ENV MEMORY_MX=16G
 
 ARG UID=11001
 ARG UNAME=nem
 
 RUN useradd --uid $UID -ms /bin/bash $UNAME
 
-#install jre 11 for runtime
+#install jre 21 for runtime
 RUN apt-get update \
-  && apt-get install -y openjdk-11-jre-headless
+  && apt-get install -y openjdk-21-jre-headless
 
 VOLUME ["/usersettings"]
 

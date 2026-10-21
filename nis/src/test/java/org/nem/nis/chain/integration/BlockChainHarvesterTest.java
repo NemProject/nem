@@ -562,7 +562,7 @@ public class BlockChainHarvesterTest {
 		}
 
 		private void logWithThread(final String message) {
-			LOGGER.info(String.format("[%d] %s (state = %s)", Thread.currentThread().getId(), message, this.getStateToLog.get()));
+			LOGGER.info(String.format("[%d] %s (state = %s)", Thread.currentThread().threadId(), message, this.getStateToLog.get()));
 		}
 
 		private static void yieldSleep() {

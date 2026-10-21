@@ -10,6 +10,7 @@ import org.nem.core.utils.ExceptionUtils;
 /**
  * A helper class that connects to an NIS instance running on the local machine.
  */
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class LocalHostConnector {
 
 	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpMethodClient = new HttpMethodClient<>();
