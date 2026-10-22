@@ -17,7 +17,6 @@
         <mockito.version>5.24.0</mockito.version>
         <!-- default so @{argLine} resolves when JaCoCo's prepare-agent is skipped -->
         <argLine></argLine>
-        <spring.version>4.3.30.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -36,8 +35,8 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.86</version>
         </dependency>
 
         <!-- commons -->
@@ -64,6 +63,23 @@
             <version>4.1.5</version>
         </dependency>
 
+        <!-- httpasyncclient 4.1.5 (the last 4.x) declares httpclient 4.5.13 and httpcore 4.4.15; pin the last patch releases -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore-nio</artifactId>
+            <version>4.4.16</version>
+        </dependency>
+
         <!-- test related -->
         <dependency>
             <groupId>junit</groupId>
@@ -85,55 +101,10 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
-            <version>1.58</version>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.13.2</version>
             <scope>test</scope>
-
-            <!-- Include everything below here if you have dependency conflicts -->
-            <classifier>standalone</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.skyscreamer</groupId>
-                    <artifactId>jsonassert</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xmlunit</groupId>
-                    <artifactId>xmlunit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.jayway.jsonpath</groupId>
-                    <artifactId>json-path</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.jopt-simple</groupId>
-                    <artifactId>jopt-simple</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
@@ -165,12 +136,15 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.15.0</version>
                 <configuration>
-                    <release>11</release>
+                    <release>21</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <failOnWarning>true</failOnWarning>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
-                        <arg>${javac.lint}</arg>
+                        <!-- this-escape (new in JDK 21): the model layer's constructors call overridable methods by design
+                             (e.g. Transaction ctors call setFee/getVersion) and Mockito/test doubles subclass these types, so making
+                             them final is a separate design change (58 sites in 37 files). -->
+                        <arg>-Xlint:all,-this-escape</arg>
                     </compilerArgs>
                     <includes>
                         <include>org/nem/core/**/*.java</include>
@@ -273,7 +247,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.46.1</version>
+                <version>3.10.4</version>
                 <configuration>
                     <formats>
                         <format>
@@ -297,7 +271,7 @@
                         <endWithNewline/>
 
                         <eclipse>
-                          <version>4.13</version>
+                          <version>4.41</version>
                           <file>${project.basedir}/eclipse-formatter.xml</file>
                         </eclipse>
 
@@ -350,20 +324,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <!-- JDK 21 added the 'this-escape' lint. The model layer's constructors call overridable methods by design
-             (e.g. Transaction ctors call setFee/getVersion) and Mockito/test doubles subclass these types, so making
-             them final is a separate design change (58 sites in 37 files). Older javac rejects unknown lint keys
-             ("invalid flag"), hence the JDK-activated profile instead of a plain compiler arg. -->
-        <profile>
-            <id>jdk21-lint</id>
-            <activation>
-                <jdk>[21,)</jdk>
-            </activation>
-            <properties>
-                <javac.lint>-Xlint:all,-this-escape</javac.lint>
-            </properties>
-        </profile>
-    </profiles>
 </project>

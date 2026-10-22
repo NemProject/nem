@@ -8,7 +8,6 @@ import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import wiremock.org.apache.commons.lang.StringUtils;
 
 public class MosaicIdTest {
 
@@ -16,7 +15,7 @@ public class MosaicIdTest {
 
 	private static final String[] INVALID_NAME_STRINGS = {
 			"fo€", " extra_leading_spaces", "extra_trailing_spaces ", "extra  inside spaces1", "extra inside  spaces2", "inside\ttabs",
-			"'id", "-id", "_id", StringUtils.repeat("too long", 5)
+			"'id", "-id", "_id", "too long".repeat(5)
 	};
 
 	private static final String[] VALID_NAME_STRINGS = {
