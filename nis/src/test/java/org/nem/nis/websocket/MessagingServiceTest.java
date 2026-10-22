@@ -62,9 +62,9 @@ public class MessagingServiceTest {
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/recenttransactions"),
-					Mockito.any(SerializableList.class));
+					Mockito.nullable(SerializableList.class));
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1))
-					.convertAndSend(Mockito.eq("/recenttransactions/" + address.getEncoded()), Mockito.any(SerializableList.class));
+					.convertAndSend(Mockito.eq("/recenttransactions/" + address.getEncoded()), Mockito.nullable(SerializableList.class));
 		}
 
 		@Test

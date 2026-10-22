@@ -444,7 +444,7 @@ public class MathUtils {
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
-		a[0] &= 0xF8;
+		a[0] = (byte) (a[0] & 0xF8);
 		final Ed25519GroupElement pubKey = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(a)));
 
 		return new PublicKey(pubKey.encode().getRaw());
@@ -462,7 +462,7 @@ public class MathUtils {
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
-		a[0] &= 0xF8;
+		a[0] = (byte) (a[0] & 0xF8);
 		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(Hashes.sha3_512(Arrays.copyOfRange(hash, 32, 64), data));
 		final Ed25519EncodedFieldElement rReduced = reduceModGroupOrder(r);
 		final Ed25519GroupElement R = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(rReduced)));
