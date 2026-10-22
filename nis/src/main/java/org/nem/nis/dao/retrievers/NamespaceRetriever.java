@@ -2,7 +2,6 @@ package org.nem.nis.dao.retrievers;
 
 import java.util.*;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
 import org.hibernate.query.Query;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.HibernateUtils;
@@ -22,7 +21,6 @@ public class NamespaceRetriever {
 	 * @param limit The limit.
 	 * @return The namespaces.
 	 */
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	public Collection<DbNamespace> getNamespacesForAccount(final Session session, final long accountId, final NamespaceId parent,
 			final int limit) {
 		final HashMap<String, DbNamespace> rootMap = getCurrentRootNamespacesForAccount(session, accountId);
@@ -32,14 +30,17 @@ public class NamespaceRetriever {
 			return Collections.emptyList();
 		}
 
-		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
-				.add(Restrictions.eq("owner.id", accountId)) // preserve-newline
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		final String hql = "SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner WHERE n.owner.id = :accountId"
+				+ (null == parent ? "" : " AND n.fullName LIKE :prefix");
+		final Query<DbNamespace> query = session.createQuery(hql, DbNamespace.class).setParameter("accountId", accountId)
 				.setMaxResults(limit);
 		if (null != parent) {
-			criteria.add(Restrictions.like("fullName", parent.toString() + ".", MatchMode.START));
+			// same as the former Criteria MatchMode.START: '_' is not escaped (unchanged behaviour)
+			query.setParameter("prefix", parent.toString() + ".%");
 		}
 
-		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
+		final List<DbNamespace> dbNamespaces = query.list();
 		final HashMap<String, DbNamespace> map = new HashMap<>();
 		dbNamespaces.forEach(n -> {
 			// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
@@ -58,17 +59,16 @@ public class NamespaceRetriever {
 	 * @param id The namespace id.
 	 * @return The specified namespace or null.
 	 */
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	public DbNamespace getNamespace(final Session session, final NamespaceId id) {
 		final DbNamespace root = getCurrentRootNamespace(session, id);
 		if (null == root) {
 			return null;
 		}
 
-		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
-				.add(Restrictions.eq("fullName", id.toString()));
-
-		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		final List<DbNamespace> dbNamespaces = session
+				.createQuery("SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner WHERE n.fullName = :fullName", DbNamespace.class)
+				.setParameter("fullName", id.toString()).list();
 		if (dbNamespaces.isEmpty()) {
 			return null;
 		}
@@ -99,12 +99,12 @@ public class NamespaceRetriever {
 		return HibernateUtils.listAndCast(query);
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static HashMap<String, DbNamespace> getCurrentRootNamespacesForAccount(final Session session, final Long accountId) {
-		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
-				.add(Restrictions.eq("owner.id", accountId)) // preserve-newline
-				.add(Restrictions.eq("level", 0));
-		final List<DbNamespace> roots = HibernateUtils.listAndCast(criteria);
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		final List<DbNamespace> roots = session
+				.createQuery("SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner WHERE n.owner.id = :accountId AND n.level = 0",
+						DbNamespace.class)
+				.setParameter("accountId", accountId).list();
 		final HashMap<String, DbNamespace> map = new HashMap<>();
 		roots.forEach(n -> {
 			final DbNamespace current = map.get(n.getFullName());
@@ -116,13 +116,13 @@ public class NamespaceRetriever {
 		return map;
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static DbNamespace getCurrentRootNamespace(final Session session, final NamespaceId id) {
 		final String rootName = id.getRoot().toString();
-		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
-				.add(Restrictions.eq("fullName", rootName)) // preserve-newline
-				.addOrder(Order.desc("height"));
-		final List<DbNamespace> roots = HibernateUtils.listAndCast(criteria);
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		final List<DbNamespace> roots = session
+				.createQuery("SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner WHERE n.fullName = :fullName ORDER BY n.height DESC",
+						DbNamespace.class)
+				.setParameter("fullName", rootName).list();
 		return roots.isEmpty() ? null : roots.get(0);
 	}
 

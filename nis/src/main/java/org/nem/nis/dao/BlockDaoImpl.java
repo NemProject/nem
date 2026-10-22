@@ -5,7 +5,6 @@ import java.util.function.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
 import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 import org.nem.core.crypto.HashChain;
@@ -168,21 +167,21 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
-		final List<byte[]> blockList = this.prepareCriteriaGetFor("blockHash", height, limit);
+		final List<byte[]> blockList = this.getBlockPropertyFrom("blockHash", byte[].class, height, limit);
 		return HashChain.fromRawHashes(blockList);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
-		final List<Long> rawDifficulties = this.prepareCriteriaGetFor("difficulty", height, limit);
+		final List<Long> rawDifficulties = this.getBlockPropertyFrom("difficulty", Long.class, height, limit);
 		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
-		final List<Integer> rawTimeStamps = this.prepareCriteriaGetFor("timeStamp", height, limit);
+		final List<Integer> rawTimeStamps = this.getBlockPropertyFrom("timeStamp", Integer.class, height, limit);
 		return rawTimeStamps.stream().map(TimeInstant::new).collect(Collectors.toList());
 	}
 
@@ -407,14 +406,11 @@ public class BlockDaoImpl implements BlockDao {
 		return new MinMaxLong(minMax[0], minMax[1]);
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
-	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
-		final Criteria criteria = this.getCurrentSession() // preserve-newline
-				.createCriteria(DbBlock.class).setMaxResults(limit) // preserve-newline
-				.add(Restrictions.ge("height", height.getRaw())) // >=
-				.setProjection(Projections.property(name)) // preserve-newline
-				.addOrder(Order.asc("height"));
-		return HibernateUtils.listAndCast(criteria);
+	private <T> List<T> getBlockPropertyFrom(final String name, final Class<T> type, final BlockHeight height, final int limit) {
+		// name is one of the code constants passed by the callers above, never user input
+		return this.getCurrentSession()
+				.createQuery("SELECT b." + name + " FROM DbBlock b WHERE b.height >= :height ORDER BY b.height ASC", type)
+				.setParameter("height", height.getRaw()).setMaxResults(limit).list();
 	}
 
 	private void addToMosaicIdsCache(final DbBlock block) {
