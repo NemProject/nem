@@ -1,0 +1,136 @@
+INHERIT: ./mkdocs.base.yml
+
+site_name: NEMドキュメント WIP ⚠
+site_url: https://docs.nemtest.net/ja
+docs_dir: ../pages/ja
+site_dir: ../../docs/ja
+edit_uri: blob/new-docs/mkdocs/pages/ja
+plugins:
+  search:
+    lang: ja
+markdown_extensions:
+  toc:
+    permalink_title: 参照用にこのセクションへのアンカーリンク
+    title: このページに
+theme:
+  language: ja
+  palette:
+    # Palette toggle for automatic mode
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/brightness-auto
+        name: ライトモードに切り替える
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: ダークモードに切り替える
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: システム設定に切り替える
+extra:
+  nem:
+    code_full_intro: |
+      このチュートリアルの完全なコード一覧を以下に示します。
+      詳細な手順ごとの説明は次のセクションで行います。
+    tutorial_level: チュートリアルの難易度
+    tutorial_level_labels:
+      beginner: 初級
+      intermediate: 中級
+      advanced: 上級
+  consent:
+    title: クッキーの同意
+    description: >-
+      当社では、お客様の繰り返しのアクセスや好みを認識するため、
+      また、当社のドキュメントの有効性やユーザーが探しているものを見つけられるかどうかを測定するために Cookie を使用しています。
+      お客様の同意により、当社はドキュメントの改善に協力することになります。
+  social:
+    - icon: fontawesome/solid/house
+      link: https://docs.nemtest.net
+      name: ホームページ
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/SymbolSyndicate
+      name: X (旧Twitter)
+    - icon: fontawesome/brands/github
+      link: https://github.com/NemProject
+      name: リポジトリ
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/J38KwW5ZuG
+      name: Discordサーバー
+    - icon: fontawesome/solid/mountain
+      link: https://nemproject.github.io/nem-docs
+      name: 旧ドキュメントサイト
+nav:
+  - index.md
+  - ユーザーマニュアル:
+      - userbook/intro.md
+      - ノード運用:
+          - userbook/node/install.md
+          - userbook/node/supernode-program.md
+  - 開発者マニュアル:
+      - devbook/intro.md
+      - はじめに:
+          - devbook/start/setup.md
+          - devbook/start/hello-world.md
+      - チュートリアル:
+          - アカウント:
+              - devbook/accounts/create-from-private-key.md
+              - devbook/accounts/create-from-mnemonic.md
+              - devbook/accounts/testnet-faucet.md
+              - devbook/accounts/query-balance.md
+              - devbook/accounts/configure-multisig.md
+          - トランザクション:
+              - devbook/transactions/transfer-xem.md
+              - devbook/transactions/transfer-mosaics.md
+              - devbook/transactions/messages.md
+              - devbook/transactions/monitoring-status.md
+              - devbook/transactions/manual-transaction-creation.md
+              - devbook/transactions/sign-multisig.md
+          - モザイク:
+              - devbook/mosaics/create-mosaic.md
+              - devbook/mosaics/mosaic-levy.md
+              - devbook/mosaics/get-mosaic-info.md
+              - devbook/mosaics/change-mosaic-supply.md
+              - devbook/mosaics/modify-mosaic-definition.md
+          - ネームスペース:
+              - devbook/namespaces/register-root-namespace.md
+              - devbook/namespaces/register-subnamespace.md
+              - devbook/namespaces/extend-root-namespace.md
+              - devbook/namespaces/get-namespace-info.md
+          - ネットワーク通貨:
+              - devbook/network-currency/query-currency-supply.md
+              - devbook/network-currency/query-block-rewards.md
+          - チェーン状態:
+              - devbook/chain/chain-heights.md
+          - WebSocket:
+              - devbook/websockets/listen-new-blocks.md
+              - devbook/websockets/listen-transaction-flow.md
+              - devbook/websockets/listen-multisig-transaction-flow.md
+      - リファレンスガイド:
+          - Python SDK: devbook/reference/py/
+          - TypeScript SDK: devbook/reference/ts/
+          - Java SDK: devbook/reference/java/
+          - NEM REST API: devbook/reference/rest/nem.md
+          - シリアライズ: devbook/reference/serialization/index.md
+          - WebSocket: devbook/reference/websockets/index.md
+          - devbook/reference/whitepaper/index.md
+  - 教科書:
+      - textbook/intro.md
+      - textbook/cryptography.md
+      - textbook/accounts.md
+      - textbook/consensus.md
+      - textbook/transactions.md
+      - textbook/transfer_transactions.md
+      - textbook/mosaics.md
+      - textbook/namespaces.md
+      - textbook/blocks.md
+      - textbook/nodes.md
+      - textbook/harvesting.md
+      - textbook/cats.md
+      - textbook/glossary.md

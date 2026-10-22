@@ -1,0 +1,176 @@
+repo_url: https://github.com/NemProject/nem
+repo_name: nem
+plugins:
+  search: {}
+  meta-manager: {}  # Add recursive metadata to md files
+  ezglossary:  # Automatic glossary tooltips
+    templates: ../templates/ezglossary
+    use_default: true
+    inline_refs: none
+    markdown_links: true
+    tooltip: full
+    ignore_case: true
+    strict: true
+    plurals: en
+    sections:
+      - py
+      - js
+      - java
+      - ws
+      - req
+      - ser
+      - _
+  gen-files:  # Generate stub files for API reference docs and link.md files for literate-nav
+    scripts:
+      - ../scripts/gen_ref_pages_py.py
+      - ../scripts/gen_ref_pages_ts.py
+      - ../scripts/gen_ref_pages_java.py
+  mkdocstrings:  # Generate API reference docs for Python
+    default_handler: python
+    custom_templates: ../templates/mkdocstrings
+    handlers:
+      python:
+        paths: [../../_symbol/sdk/python]
+        options:
+          show_source: false
+          merge_init_into_class: false
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          show_root_toc_entry: false
+          show_object_full_path: false
+  literate-nav:  # Allow navigation to be specified in the md files created by gen-files
+    nav_file: links.md
+  git-revision-date-localized:  # git dates in page footers
+    enable_creation_date: true
+    exclude:
+      - devbook/reference/*
+  git-authors:  # git authors in page footers
+    sort_authors_by: contribution
+    exclude:
+      - devbook/reference/*
+  glightbox:
+    auto_caption: false
+    caption_position: left
+    background: none
+    shadow: false
+  macros:
+    include_dir: templates/macros
+  site-urls: {}
+hooks:
+  - ../scripts/hooks.py
+  - ../scripts/typedoc_plugin.py
+  - ../scripts/register_lexers.py
+markdown_extensions:
+  attr_list: {}
+  admonition: {}
+  pymdownx.caret: {}
+  pymdownx.mark: {}
+  pymdownx.tilde: {}
+  pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+    pygments_lang_class: true
+  pymdownx.inlinehilite: {}
+  pymdownx.snippets:
+    base_path: !relative $config_dir/../snippets
+    check_paths: true
+  pymdownx.superfences: {}
+  pymdownx.tabbed:
+    alternate_style: true
+  pymdownx.details: {}
+  def_list: {}
+  md_in_html: {}
+  toc:
+    permalink: ⚓︎
+    toc_depth: 3
+  mkdocs_graphviz: {}
+  pymdownx.arithmatex:
+    generic: true
+extra_javascript:
+  - assets/javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+theme:
+  name: material
+  custom_dir: ../overrides
+  favicon: assets/images/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/images/nem-logo.svg
+  features:
+    - content.tooltips  # Material tooltips instead of browser
+    # - navigation.instant  # Single-page application
+    # - navigation.prune  # Navigation only holds visible items
+    - navigation.tracking  # URL follows the current section in the page
+    - navigation.tabs  # Top navbar
+    - toc.follow  # Current section in TOC is always visible
+    - content.tabs.link  # Linked content tabs
+    - content.code.copy  # Copy code button in code blocks
+    - content.action.edit  # Edit on GitHub button
+    - content.action.view  # View on GitHub button
+    - search.suggest  # Suggest search terms
+    - search.highlight  # Highlight searched term
+    - search.share  # Add share button for deep-linking to search results
+extra:
+  homepage: https://docs.nemtest.net
+  alternate:
+    - name: English
+      link: /en/
+      lang: en
+    - name: 日本語
+      link: /ja/
+      lang: ja
+  nem:
+    branch: new-docs
+    java-sdk:
+      disabled: !ENV [NEM_DOCS_DISABLE_JAVA, false]
+      javadoc_build_dir: ../../_symbol/sdk/java/build/docs/javadoc/org/symbol/sdk  # Where the Java SDK writes the docs
+      output_dir: devbook/reference/java  # Generated markdown files
+      ignore-files:
+        - SymbolFacade
+        - SymbolFacade.SymbolAccount
+        - SymbolFacade.SymbolPublicAccount
+      ignore-folders:
+        - symbol
+        - impl
+      class-remaps:
+        NemTransactionFactory: TransactionFactory
+        generateKey: metadataGenerateKey
+        updateValue: metadataUpdateValue
+        getPublicKey: publicKey
+    py-sdk:  # Symbol SDK is shared with NEM; exclude the Symbol-only parts
+      ignore-files:
+        - __main__
+        - symbolchain
+        - symbol
+        - sc
+        - nc
+        - SymbolFacade
+        - facade
+        - external
+        - Ordered
+        - SharedKey
+      ignore-folders:
+        - symbol
+        - impl
+    ts-sdk:
+      output_dir: devbook/reference/ts
+      tsconfig: ../_symbol/sdk/javascript/tsconfig/check-bindings.json
+      options: config/typedoc.json
+      disabled: !ENV [NEM_DOCS_DISABLE_TS, false]
+    class-remaps: {}
+    method-remaps:
+      createTransactionFromTypedDescriptor: createTransactionFromDescriptor
+    global-namespaces:
+      - FeeCalculator
+copyright: >
+  Copyright &copy; 2026 The Symbol Syndicate
+extra_css:
+  - assets/stylesheets/extra.css
+  - https://unpkg.com/katex@0/dist/katex.min.css
+not_in_nav: |
+  /404.md
+  /devbook/reference/java/links.md

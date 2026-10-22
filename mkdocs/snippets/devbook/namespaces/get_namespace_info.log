@@ -1,0 +1,19 @@
+Using node http://libertalia.nemtest.net:7890
+Namespace name: company
+Fetching namespace information from /namespace?namespace=company
+Namespace information:
+  Name: company
+  Owner: TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP
+  Height: 625711
+
+Current chain height: 655420
+Lease expiration height: 1151311
+Blocks until expiration: 495891
+
+Fetching subnamespaces from /account/namespace/page?address=TBONKWCOWBZYZB2I5JD3LSDBQVBYHB757VN3SKPP&parent=company
+Subnamespaces of company: 1
+  company.division
+
+Fetching mosaic definitions from /namespace/mosaic/definition/page?namespace=company
+Mosaics defined under company: 1
+  company:token

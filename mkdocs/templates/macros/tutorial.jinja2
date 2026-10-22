@@ -1,0 +1,122 @@
+{% set ns = namespace(step_count=1) %}
+{% set ns.group_count = 99 %}
+{% set lang_name = {"py":"Python", "js":"JavaScript", "java":"Java"} %}
+{% set lang_icon = {"py":":simple-python:", "js":":simple-javascript:", "java":":fontawesome-brands-java:"} %}
+{% set lang_ext = {"py":"py", "js":"mjs", "java":"java"} %}
+
+{% macro to_pascal_case(name) -%}
+{%- set parts = name.split('_') -%}
+{{ parts | map('title') | join('') }}
+{%- endmacro %}
+
+{% macro java_filename(filename) -%}
+{%- set path_parts = filename.split('/') -%}
+{%- set basename = path_parts[-1] -%}
+{%- set dirname = path_parts[:-1] | join('/') -%}
+{{ dirname ~ '/' if dirname else '' }}{{ to_pascal_case(basename) }}
+{%- endmacro %}
+
+{% macro source_filename(filename, lang) -%}
+{%- if 'java' == lang -%}
+{{ java_filename(filename) }}
+{%- else -%}
+{{ filename }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro list_begin() -%}
+{% set ns.step_count = 1 %}
+<table markdown class="tutorial">
+{%- endmacro %}
+
+{% macro list_end() -%}
+</table>
+{%- endmacro %}
+
+{% macro step_begin(fname) -%}
+<tr markdown><td markdown>![]({{ fname }}){ data-description=".step-{{ ns.step_count }}" }<div markdown class="step-{{ ns.step_count }}"><span class="big-number">{{ ns.step_count }}. </span>
+{%- endmacro -%}
+
+{% macro step_end() -%}
+</div></td></tr>
+{% set ns.step_count = ns.step_count + 1 %}
+{%- endmacro %}
+
+{% macro code_full_tagged(filename, langs=none, show=true) -%}
+{%- set ns.filename = filename -%}
+
+{%- if langs is none -%}
+    {%- set langs = lang_name -%}
+{%- endif -%}
+
+{# Convert list to dictionary with empty values #}
+{%- if langs is sequence and langs is not mapping -%}
+    {%- set parsed = {} -%}
+    {%- for l in langs -%}
+        {%- set _ = parsed.update({ l: {} }) -%}
+    {%- endfor -%}
+    {%- set langs = parsed %}
+{%- endif -%}
+{%- set ns.langs = langs -%}
+
+{# Now iterate over the normalized dictionary #}
+{%- if show -%}
+{{ config.extra.nem.code_full_intro }}
+{%- for l, props in langs.items() -%}
+{%- set source = source_filename(filename, l) -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{ l }} linenums="1"
+    {% for line in config['extra']['nem']['tutorial_code'][source ~ '.' ~ lang_ext[l]]['full'].split('\n') %}
+    {{- line }}
+    {% endfor %}
+    ```
+
+    [Download source]({{ config.repo_url }}/raw/refs/heads/{{config.extra.nem.branch}}/mkdocs/snippets/{{source}}.{{lang_ext[l]}}){ .source-link }
+
+{% endfor %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro code_snippet_tagged(section) -%}
+{# Iterate over the langs of the full code #}
+{%- for l, props in ns.langs.items() -%}
+{%- set source = source_filename(ns.filename, l) -%}
+{%- set snippet = config['extra']['nem']['tutorial_code'][source ~ '.' ~ lang_ext[l]]['snippets'][section] -%}
+=== "{{lang_icon[l]}} {{lang_name[l]}}"
+
+    ```{{ l }} linenums="{{snippet['start_line']}}"
+    {% for line in snippet['code'].split('\n') %}
+    {{- line }}
+    {% endfor %}
+    ```
+
+{% endfor %}
+{%- endmacro %}
+
+{% macro to_camel_case(name) -%}
+{%- set parts = name.split('_') -%}
+{{ parts[0] }}{{ parts[1:] | map('title') | join('') }}
+{%- endmacro %}
+
+{% macro var(name) -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display_name = name if 'py' == l else to_camel_case(name) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display_name }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
+{%- endmacro %}
+
+{# Renders a language-specific literal (e.g. Python True -> JavaScript true) as a language-switching dylink. #}
+{% macro lit(value) -%}
+{%- set js_literals = {"True": "true", "False": "false", "None": "null"} -%}
+<span markdown class="dylink">
+{%- for l, props in ns.langs.items() -%}
+{%- set display = value if 'py' == l else js_literals.get(value, value) -%}
+<input type="radio" name="rGroup{{ns.group_count}}" id="{{lang_name[l]}}" /><label class="dylink-option" for="{{lang_name[l]}}" markdown>`{{ display }}`</label>
+{%- endfor -%}
+</span>
+{%- set ns.group_count = ns.group_count + 1 -%}
+{%- endmacro %}
