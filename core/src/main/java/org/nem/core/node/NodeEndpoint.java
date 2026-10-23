@@ -91,6 +91,7 @@ public class NodeEndpoint implements SerializableEntity {
 		}
 	}
 
+	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
 	private URL createUrl() {
 		try {
 			return new URL(this.protocol, this.host, this.port, "/");

@@ -95,7 +95,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 
 		// Setup AES cipher in CBC mode with PKCS7 padding.
 		final BlockCipherPadding padding = new PKCS7Padding();
-		final BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
+		final BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(AESEngine.newInstance()), padding);
 		cipher.reset();
 		cipher.init(forEncryption, params);
 		return cipher;

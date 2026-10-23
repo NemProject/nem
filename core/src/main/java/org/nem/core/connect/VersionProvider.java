@@ -45,6 +45,7 @@ public class VersionProvider {
 	 */
 	public NodeVersion getLatestVersion() {
 		try {
+			@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
 			final URL url = ExceptionUtils.propagate(() -> new URL(VERSION_PROVIDER_URL));
 			return this.httpClient.get(url, new HttpErrorResponseDeserializerUnionStrategy(null)).getFuture().thenApply(union -> {
 				final Deserializer deserializer = union.getDeserializer();

@@ -17,6 +17,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
 
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class DefaultAsyncNemConnectorTest {
 
 	// region getAsync

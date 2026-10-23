@@ -7,6 +7,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
 
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class NodeEndpointTest {
 
 	// region constructor

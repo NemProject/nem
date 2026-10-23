@@ -126,6 +126,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	// endregion
 
+	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
 	private static URL getUrl(final Node node, final NisPeerId id) {
 		return ExceptionUtils.propagate(() -> new URL(node.getEndpoint().getBaseUrl(), id.toString()));
 	}
