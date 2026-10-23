@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 import org.nem.core.model.TransactionTypes;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
@@ -160,8 +161,8 @@ public class BlockLoader {
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
-		final Query query = this.session
-				.createSQLQuery(
+		final Query<?> query = this.session
+				.createNativeQuery(
 						"SELECT b.* FROM BLOCKS b WHERE height >= :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
 				.setParameter("fromHeight", fromHeight.getRaw()) // preserve-newline
 				.setParameter("toHeight", toHeight.getRaw()) // preserve-newline
@@ -170,7 +171,7 @@ public class BlockLoader {
 	}
 
 	private List<DbBlock> getDbBlockById(final long blockId) {
-		final Query query = this.session.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE id = :blockId") // preserve-newline
+		final Query<?> query = this.session.createNativeQuery("SELECT b.* FROM BLOCKS b WHERE id = :blockId") // preserve-newline
 				.setParameter("blockId", blockId);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
@@ -182,7 +183,7 @@ public class BlockLoader {
 				+ "LEFT OUTER JOIN transferredMosaics tm ON tm.transferId = t.id "
 				+ "WHERE blockid > :minBlockId AND blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = HibernateUtils.listAndCast(query);
@@ -220,7 +221,7 @@ public class BlockLoader {
 		final String queryString = "SELECT t.* FROM importancetransfers t " // preserve-newline
 				+ "WHERE blockid > :minBlockId AND blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		return this.executeAndMapAll(query, DbImportanceTransferTransaction.class);
@@ -237,7 +238,7 @@ public class BlockLoader {
 				+ "LEFT OUTER JOIN minCosignatoriesModifications mmcm ON msm.minCosignatoriesModificationId = mmcm.id "
 				+ "WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY msm.blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = HibernateUtils.listAndCast(query);
@@ -293,7 +294,7 @@ public class BlockLoader {
 				+ "LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id "
 				+ "WHERE mt.blockid > :minBlockId and mt.blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY mt.blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString).setParameter("minBlockId", minBlockId) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString).setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = HibernateUtils.listAndCast(query);
 		return this.mapToDbMultisigTransactions(objects);
@@ -347,7 +348,7 @@ public class BlockLoader {
 				+ "LEFT OUTER JOIN namespaces n on np.namespaceId = n.id " // preserve-newline
 				+ "WHERE np.blockid > :minBlockId AND np.blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY np.blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		return this.executeAndMapAll(query, DbProvisionNamespaceTransaction.class);
@@ -360,7 +361,7 @@ public class BlockLoader {
 				+ "LEFT OUTER JOIN mosaicdefinitions m on t.mosaicDefinitionId = m.id "
 				+ "WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY t.blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		final List<DbMosaicDefinitionCreationTransaction> transactions = this.executeAndMapAll(query,
@@ -379,7 +380,7 @@ public class BlockLoader {
 		final String queryString = "SELECT mp.* FROM mosaicproperties mp " // preserve-newline
 				+ "WHERE mp.mosaicDefinitionId in (:ids) " // preserve-newline
 				+ "ORDER BY mp.mosaicDefinitionId ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameterList("ids", map.keySet());
 		final List<Object[]> arrays = HibernateUtils.listAndCast(query);
 		for (final Object[] array : arrays) {
@@ -398,13 +399,13 @@ public class BlockLoader {
 		final String queryString = "SELECT t.* FROM mosaicsupplychanges t " // preserve-newline
 				+ "WHERE blockid > :minBlockId AND blockid < :maxBlockId " // preserve-newline
 				+ "ORDER BY blockid ASC";
-		final Query query = this.session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(queryString) // preserve-newline
 				.setParameter("minBlockId", minBlockId) // preserve-newline
 				.setParameter("maxBlockId", maxBlockId);
 		return this.executeAndMapAll(query, DbMosaicSupplyChangeTransaction.class);
 	}
 
-	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
+	private <T> List<T> executeAndMapAll(final Query<?> query, final Class<T> targetClass) {
 		final List<Object[]> objects = HibernateUtils.listAndCast(query);
 		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
 	}
@@ -412,7 +413,7 @@ public class BlockLoader {
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
 		final String ids = accounts.stream().map(a -> a.getId().toString()).collect(Collectors.joining(","));
 		final String sql = String.format("SELECT a.* FROM accounts a WHERE a.id in (%s)", ids);
-		final Query query = this.session.createSQLQuery(sql) // preserve-newline
+		final Query<?> query = this.session.createNativeQuery(sql) // preserve-newline
 				.addEntity(DbAccount.class);
 		final List<DbAccount> realAccounts = HibernateUtils.listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();

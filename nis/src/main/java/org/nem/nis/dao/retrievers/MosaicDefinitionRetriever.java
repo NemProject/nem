@@ -2,6 +2,7 @@ package org.nem.nis.dao.retrievers;
 
 import java.util.Collection;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.utils.MustBe;
@@ -24,7 +25,7 @@ public class MosaicDefinitionRetriever {
 		MustBe.notNull(mosaicId, "mosaic id");
 		final String queryString = "SELECT m.* FROM mosaicDefinitions m "
 				+ "WHERE namespaceId = :namespaceId AND NAME = :name ORDER BY id DESC LIMIT 1";
-		final Query query = session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = session.createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbMosaicDefinition.class) // preserve-newline
 				.setParameter("namespaceId", mosaicId.getNamespaceId().toString()) // preserve-newline
 				.setParameter("name", mosaicId.getName());
@@ -92,7 +93,7 @@ public class MosaicDefinitionRetriever {
 		}
 
 		queryString += "ORDER BY id DESC LIMIT :limit";
-		Query query = session.createSQLQuery(queryString) // preserve-newline
+		Query<?> query = session.createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbMosaicDefinition.class) // preserve-newline
 				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("limit", limit);

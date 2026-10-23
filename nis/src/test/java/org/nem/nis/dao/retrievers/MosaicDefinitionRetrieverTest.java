@@ -220,7 +220,7 @@ public class MosaicDefinitionRetrieverTest {
 
 	private void addMosaicDefinitionToSession(final long creatorId, final String name, final String namespaceId, final String description) {
 		final String statement = createMosaicSQLStatement(creatorId, name, namespaceId, description);
-		this.session.createSQLQuery(statement).executeUpdate();
+		this.session.createNativeQuery(statement).executeUpdate();
 		this.setupPropertiesForMosaicDefinition(creatorId);
 	}
 
@@ -233,7 +233,7 @@ public class MosaicDefinitionRetrieverTest {
 		};
 		IntStream.range(0, 4).forEach(i -> {
 			final String statement = createMosaicPropertiesSQLStatement(mosaicId, names[i], values[i]);
-			this.session.createSQLQuery(statement).executeUpdate();
+			this.session.createNativeQuery(statement).executeUpdate();
 		});
 	}
 
@@ -253,7 +253,7 @@ public class MosaicDefinitionRetrieverTest {
 			final Address address = Utils.generateRandomAddressWithPublicKey();
 			final String statement = String.format("Insert into accounts (printableKey, publicKey) values('%s', '%s')", address.toString(),
 					address.getPublicKey().toString());
-			this.session.createSQLQuery(statement).executeUpdate();
+			this.session.createNativeQuery(statement).executeUpdate();
 		}
 	}
 }

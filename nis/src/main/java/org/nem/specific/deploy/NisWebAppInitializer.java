@@ -9,8 +9,8 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * Class supplying Spring MVC configuration.
@@ -57,7 +57,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 		super.addInterceptors(registry);
 	}
 
-	private HandlerInterceptorAdapter createAuditInterceptor() {
+	private HandlerInterceptor createAuditInterceptor() {
 		return new AuditInterceptor(Arrays.asList(this.nisConfiguration.getNonAuditedApiPaths()), this.host.getIncomingAudits());
 	}
 }
