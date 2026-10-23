@@ -22,7 +22,7 @@ public class Ed25519Utils {
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
-		a[0] &= 0xF8;
+		a[0] = (byte) (a[0] & 0xF8);
 		return new Ed25519EncodedFieldElement(a);
 	}
 }

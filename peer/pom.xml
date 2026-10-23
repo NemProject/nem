@@ -13,6 +13,10 @@
     <properties>
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javac.lint>-Xlint:all</javac.lint>
+        <mockito.version>5.24.0</mockito.version>
+        <!-- default so @{argLine} resolves when JaCoCo's prepare-agent is skipped -->
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -39,8 +43,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -72,7 +76,7 @@
                     <failOnWarning>true</failOnWarning>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
-                        <arg>-Xlint:all</arg>
+                        <arg>${javac.lint}</arg>
                     </compilerArgs>
                     <includes>
                         <include>org/nem/peer/**/*.java</include>
@@ -146,6 +150,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.6</version>
+                <configuration>
+                    <!-- Mockito 5's inline mock maker must be loaded as an agent on JDK 21+ (self-attach is deprecated).
+                         The jar is addressed in the local repository so the path also resolves when failsafe is
+                         invoked directly (mvn failsafe:integration-test), which runs no lifecycle phase. -->
+                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -154,6 +164,7 @@
                 <configuration>
                     <testSourceDirectory>src/it/java</testSourceDirectory>
                     <failIfNoTests>true</failIfNoTests>
+                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -245,4 +256,20 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- JDK 21 added the 'this-escape' lint. The model layer's constructors call overridable methods by design
+             (e.g. Transaction ctors call setFee/getVersion) and Mockito/test doubles subclass these types, so making
+             them final is a separate design change (58 sites in 37 files). Older javac rejects unknown lint keys
+             ("invalid flag"), hence the JDK-activated profile instead of a plain compiler arg. -->
+        <profile>
+            <id>jdk21-lint</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <javac.lint>-Xlint:all,-this-escape</javac.lint>
+            </properties>
+        </profile>
+    </profiles>
 </project>
