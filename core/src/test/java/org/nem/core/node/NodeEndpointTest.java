@@ -1,13 +1,12 @@
 package org.nem.core.node;
 
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
-@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class NodeEndpointTest {
 
 	// region constructor
@@ -18,7 +17,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint("ftp", "10.8.8.2", 12);
 
 		// Assert:
-		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
+		final URL expectedUrl = URI.create("ftp://10.8.8.2:12/").toURL();
 		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
@@ -28,7 +27,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = NodeEndpoint.fromHost("10.8.8.2");
 
 		// Assert:
-		final URL expectedUrl = new URL("http", "10.8.8.2", 7890, "/");
+		final URL expectedUrl = URI.create("http://10.8.8.2:7890/").toURL();
 		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
@@ -41,7 +40,7 @@ public class NodeEndpointTest {
 		final NodeEndpoint endpoint = new NodeEndpoint(Utils.roundtripSerializableEntity(originalEndpoint, null));
 
 		// Assert:
-		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
+		final URL expectedUrl = URI.create("ftp://10.8.8.2:12/").toURL();
 		MatcherAssert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
 	}
 
@@ -77,6 +76,29 @@ public class NodeEndpointTest {
 
 		// Assert:
 		MatcherAssert.assertThat(endpoint.getBaseUrl().getHost(), IsEqual.equalTo(expectedHostName));
+	}
+
+	// endregion
+
+	// region url
+
+	@Test
+	public void urlBracketsIpv6Addresses() {
+		// Act:
+		final NodeEndpoint endpoint = new NodeEndpoint("http", "::1", 7890);
+
+		// Assert:
+		MatcherAssert.assertThat(endpoint.getBaseUrl().toString(), IsEqual.equalTo("http://[::1]:7890/"));
+	}
+
+	@Test
+	public void cannotCreateEndpointWithProtocolContainingUrlDelimiters() {
+		// Assert: a url built around any of these would point at a different host or path
+		for (final String protocol : new String[]{
+				"http://other.example.com/x?", "http://user@", "http://127.0.0.1:7890/#", "http:"
+		}) {
+			ExceptionAssert.assertThrows(v -> new NodeEndpoint(protocol, "127.0.0.1", 7890), InvalidNodeEndpointException.class);
+		}
 	}
 
 	// endregion

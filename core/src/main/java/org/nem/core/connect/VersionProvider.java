@@ -1,6 +1,6 @@
 package org.nem.core.connect;
 
-import java.net.URL;
+import java.net.*;
 import java.util.logging.Logger;
 import org.nem.core.metadata.MetaDataFactory;
 import org.nem.core.node.NodeVersion;
@@ -45,8 +45,7 @@ public class VersionProvider {
 	 */
 	public NodeVersion getLatestVersion() {
 		try {
-			@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
-			final URL url = ExceptionUtils.propagate(() -> new URL(VERSION_PROVIDER_URL));
+			final URL url = ExceptionUtils.propagate(() -> URI.create(VERSION_PROVIDER_URL).toURL());
 			return this.httpClient.get(url, new HttpErrorResponseDeserializerUnionStrategy(null)).getFuture().thenApply(union -> {
 				final Deserializer deserializer = union.getDeserializer();
 				return NodeVersion.parse(deserializer.readString(VERSION_FLAVOR));
