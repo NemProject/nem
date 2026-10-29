@@ -12,7 +12,6 @@ public class H2ITCase {
 
 	@Ignore
 	@Test
-	@SuppressWarnings("deprecation")
 	public void h2MemoryTest() {
 		final H2Database db = new H2Database("test");
 		final int range = 1000;

@@ -1,6 +1,6 @@
 package org.nem.core.connect;
 
-import java.net.URL;
+import java.net.*;
 import java.util.concurrent.CompletableFuture;
 import net.minidev.json.JSONObject;
 import org.hamcrest.MatcherAssert;
@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import org.nem.core.node.NodeVersion;
 import org.nem.core.utils.ExceptionUtils;
 
-@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class VersionProviderTest {
 
 	@Test
@@ -100,7 +99,7 @@ public class VersionProviderTest {
 		}
 
 		public void assertDelegationToVersionProvider() {
-			final URL versionProviderUrl = ExceptionUtils.propagate(() -> new URL("http://bob.nem.ninja/version.json"));
+			final URL versionProviderUrl = ExceptionUtils.propagate(() -> URI.create("http://bob.nem.ninja/version.json").toURL());
 			Mockito.verify(this.client, Mockito.only()).get(Mockito.eq(versionProviderUrl), Mockito.any());
 		}
 	}
