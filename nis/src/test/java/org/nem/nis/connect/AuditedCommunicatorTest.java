@@ -11,13 +11,12 @@ import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.peer.connect.Communicator;
 
-@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class AuditedCommunicatorTest {
 
 	@Test
 	public void postDelegatesToInnerCommunicator() throws MalformedURLException {
 		// Arrange:
-		final URL url = new URL("http://localhost/my/path");
+		final URL url = URI.create("http://localhost/my/path").toURL();
 		final TestRunner context = new PostTestRunner();
 		Mockito.when(context.post(context.innerCommunicator, url, context.entity)).thenReturn(new CompletableFuture<>());
 
@@ -49,7 +48,7 @@ public class AuditedCommunicatorTest {
 	@Test
 	public void postVoidDelegatesToInnerCommunicator() throws MalformedURLException {
 		// Arrange:
-		final URL url = new URL("http://localhost/my/path");
+		final URL url = URI.create("http://localhost/my/path").toURL();
 		final TestRunner context = new PostVoidTestRunner();
 		Mockito.when(context.post(context.innerCommunicator, url, context.entity)).thenReturn(new CompletableFuture<>());
 
@@ -90,7 +89,7 @@ public class AuditedCommunicatorTest {
 
 		public void assertPostAddsToAuditCollection() throws MalformedURLException {
 			// Arrange:
-			final URL url = new URL("http://localhost/my/path");
+			final URL url = URI.create("http://localhost/my/path").toURL();
 			Mockito.when(this.post(this.innerCommunicator, url, this.entity)).thenReturn(new CompletableFuture<>());
 
 			// Act:
@@ -102,7 +101,7 @@ public class AuditedCommunicatorTest {
 
 		public void assertPostSuccessfulCompletionRemovesFromAuditCollection() throws MalformedURLException {
 			// Arrange:
-			final URL url = new URL("http://localhost/my/path");
+			final URL url = URI.create("http://localhost/my/path").toURL();
 			Mockito.when(this.post(this.innerCommunicator, url, this.entity))
 					.thenReturn(CompletableFuture.completedFuture(this.deserializer));
 
@@ -116,7 +115,7 @@ public class AuditedCommunicatorTest {
 
 		public void assertPostExceptionalCompletionRemovesFromAuditCollection() throws MalformedURLException {
 			// Arrange:
-			final URL url = new URL("http://localhost/my/path");
+			final URL url = URI.create("http://localhost/my/path").toURL();
 			final CompletableFuture<Deserializer> future = new CompletableFuture<>();
 			future.completeExceptionally(new RuntimeException());
 			Mockito.when(this.post(this.innerCommunicator, url, this.entity)).thenReturn(future);

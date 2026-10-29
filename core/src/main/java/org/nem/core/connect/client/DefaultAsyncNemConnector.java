@@ -83,8 +83,7 @@ public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiI
 				}));
 	}
 
-	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
-	private URL createNisUrl(final NodeEndpoint endpoint, final String nisPath) throws MalformedURLException {
-		return new URL(endpoint.getBaseUrl(), nisPath);
+	private URL createNisUrl(final NodeEndpoint endpoint, final String nisPath) throws MalformedURLException, URISyntaxException {
+		return endpoint.getBaseUrl().toURI().resolve(nisPath).toURL();
 	}
 }

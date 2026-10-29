@@ -91,11 +91,16 @@ public class NodeEndpoint implements SerializableEntity {
 		}
 	}
 
-	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
 	private URL createUrl() {
+		final String urlHost = this.host.contains(":") && !this.host.startsWith("[") ? "[" + this.host + "]" : this.host;
 		try {
-			return new URL(this.protocol, this.host, this.port, "/");
-		} catch (final MalformedURLException e) {
+			final URL url = new URI(this.protocol, urlHost + ":" + this.port, "/", null, null).toURL();
+			if (!url.getProtocol().equalsIgnoreCase(this.protocol)) {
+				throw new MalformedURLException(String.format("protocol '%s' is malformed", this.protocol));
+			}
+
+			return url;
+		} catch (final URISyntaxException | MalformedURLException | IllegalArgumentException e) {
 			throw new InvalidNodeEndpointException("url is malformed", e);
 		}
 	}

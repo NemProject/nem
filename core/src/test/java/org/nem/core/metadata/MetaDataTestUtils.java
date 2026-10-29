@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 /**
  * Static class containing helper functions for meta data tests.
  */
-@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class MetaDataTestUtils {
 
 	/**
@@ -34,6 +33,7 @@ public class MetaDataTestUtils {
 	 * @return The url.
 	 * @throws IOException If an I/O exception occurred.
 	 */
+	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20): its replacement URL.of rejects a custom handler for file:
 	public static URL createMockUrl(final String spec, final InputStream inputStream) throws IOException {
 		final URLStreamHandler urlStreamHandler = new URLStreamHandler() {
 			@Override

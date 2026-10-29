@@ -3,7 +3,7 @@ package org.nem.core.connect;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.*;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
-import java.net.URL;
+import java.net.*;
 import java.util.concurrent.CancellationException;
 import java.util.function.*;
 import org.apache.http.*;
@@ -20,7 +20,6 @@ import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 
 @RunWith(Enclosed.class)
-@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 15000;
@@ -224,12 +223,14 @@ public class HttpMethodClientTest {
 		}
 
 		@Test(expected = FatalPeerException.class)
-		public void sendThrowsFatalPeerExceptionOnUriError() {
+		@SuppressWarnings("deprecation") // only the java.net.URL ctor (deprecated in JDK 20) can build a url that URI cannot parse
+		public void sendThrowsFatalPeerExceptionOnUriError() throws MalformedURLException {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+			final URL url = new URL(MALFORMED_URI);
 
 			// Act:
-			this.strategy.send(client, this.stringToUrl(MALFORMED_URI), DEFAULT_STRATEGY).get();
+			this.strategy.send(client, url, DEFAULT_STRATEGY).get();
 		}
 
 		@Test(expected = FatalPeerException.class)
@@ -251,7 +252,7 @@ public class HttpMethodClientTest {
 		}
 
 		private URL stringToUrl(final String s) {
-			return ExceptionUtils.propagate(() -> new URL(s));
+			return ExceptionUtils.propagate(() -> URI.create(s).toURL());
 		}
 	}
 
