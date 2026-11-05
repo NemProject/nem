@@ -31,6 +31,6 @@
   "devDependencies": {
     "@redocly/cli": "^2.47.0",
     "markdown-link-check": "^3.14.2",
-    "openapi-to-postmanv2": "^6.0.1"
+    "openapi-to-postmanv2": "^6.4.2"
   }
 }
