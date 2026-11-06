@@ -2,7 +2,6 @@ package org.nem.nis.dao.retrievers;
 
 import java.util.*;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
@@ -85,58 +84,51 @@ public class MosaicSupplyRetriever {
 		return new DbMosaicDefinitionSupplyTuple(matchingMosaicDefinition, new Supply(supply), new BlockHeight(expirationHeight));
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbMosaicDefinitionCreationTransaction> queryCreationTransactions(final Session session, final MosaicId mosaicId,
 			final Long height) {
-		final Criteria creationTransactionsCriteria = session.createCriteria(DbMosaicDefinitionCreationTransaction.class, "transaction") // preserve-newline
-				.setFetchMode("sender", FetchMode.JOIN) // preserve-newline
-				.createAlias("transaction.block", "block") // preserve-newline
-				.createAlias("transaction.mosaicDefinition", "mosaicDefinition") // preserve-newline
-				.add(Restrictions.eq("mosaicDefinition.namespaceId", mosaicId.getNamespaceId().toString())) // preserve-newline
-				.add(Restrictions.eq("mosaicDefinition.name", mosaicId.getName())) // preserve-newline
-				.add(Restrictions.le("block.height", height)) // preserve-newline
-				.addOrder(Order.desc("block.height")) // preserve-newline
-				.addOrder(Order.desc("blkIndex")) // preserve-newline
-				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return HibernateUtils.listAndCast(creationTransactionsCriteria);
+		// JOIN FETCH everything the former Criteria query joined implicitly (the lazy block and every eager to-one); HQL loads each
+		// eager association left out here with a separate select per row (N+1)
+		final String hql = "SELECT t FROM DbMosaicDefinitionCreationTransaction t" // preserve-newline
+				+ " JOIN FETCH t.block b LEFT JOIN FETCH b.harvester LEFT JOIN FETCH b.lessor" // preserve-newline
+				+ " JOIN FETCH t.mosaicDefinition md LEFT JOIN FETCH md.creator LEFT JOIN FETCH md.feeRecipient" // preserve-newline
+				+ " LEFT JOIN FETCH t.sender LEFT JOIN FETCH t.creationFeeSink" // preserve-newline
+				+ " WHERE md.namespaceId = :namespaceId AND md.name = :name AND b.height <= :height" // preserve-newline
+				+ " ORDER BY b.height DESC, t.blkIndex DESC";
+		return session.createQuery(hql, DbMosaicDefinitionCreationTransaction.class)
+				.setParameter("namespaceId", mosaicId.getNamespaceId().toString()).setParameter("name", mosaicId.getName())
+				.setParameter("height", height).list();
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbMosaicSupplyChangeTransaction> querySupplyChangeTransactions(final Session session,
 			final Collection<Long> dbMosaicDefinitionIds, final Long startHeight, final Long endHeight) {
-		final Criteria supplyChangeTransactionCriteria = session.createCriteria(DbMosaicSupplyChangeTransaction.class, "transaction") // preserve-newline
-				.setFetchMode("sender", FetchMode.JOIN) // preserve-newline
-				.createAlias("transaction.block", "block") // preserve-newline
-				.add(Restrictions.in("dbMosaicId", dbMosaicDefinitionIds)) // preserve-newline
-				.add(Restrictions.ge("block.height", startHeight)) // preserve-newline
-				.add(Restrictions.le("block.height", endHeight)) // preserve-newline
-				.addOrder(Order.desc("block.height")) // preserve-newline
-				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return HibernateUtils.listAndCast(supplyChangeTransactionCriteria);
+		// JOIN FETCH everything the former Criteria query joined implicitly (the lazy block and every eager to-one); HQL loads each
+		// eager association left out here with a separate select per row (N+1)
+		// callers guarantee a non-empty id collection (getMosaicDefinitionWithSupply returns null first)
+		final String hql = "SELECT t FROM DbMosaicSupplyChangeTransaction t" // preserve-newline
+				+ " JOIN FETCH t.block b LEFT JOIN FETCH b.harvester LEFT JOIN FETCH b.lessor LEFT JOIN FETCH t.sender" // preserve-newline
+				+ " WHERE t.dbMosaicId IN (:ids) AND b.height >= :startHeight AND b.height <= :endHeight" // preserve-newline
+				+ " ORDER BY b.height DESC";
+		return session.createQuery(hql, DbMosaicSupplyChangeTransaction.class).setParameterList("ids", dbMosaicDefinitionIds)
+				.setParameter("startHeight", startHeight).setParameter("endHeight", endHeight).list();
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static DbNamespace queryLastRootNamespace(final Session session, final String namespaceId, final Long maxHeight) {
 		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
-		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline
-				.add(Restrictions.eq("fullName", rootNamespaceId.toString())) // preserve-newline
-				.add(Restrictions.lt("height", maxHeight)) // preserve-newline
-				.addOrder(Order.desc("height")) // preserve-newline
-				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY) // preserve-newline
-				.setMaxResults(1);
-		final List<DbNamespace> namespaces = HibernateUtils.listAndCast(namespaceCriteria);
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		final List<DbNamespace> namespaces = session
+				.createQuery("SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner"
+						+ " WHERE n.fullName = :fullName AND n.height < :maxHeight ORDER BY n.height DESC", DbNamespace.class)
+				.setParameter("fullName", rootNamespaceId.toString()).setParameter("maxHeight", maxHeight).setMaxResults(1).list();
 		return namespaces.get(0);
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static List<DbNamespace> querySubsequentRootNamespaces(final Session session, final String namespaceId, final Long minHeight) {
 		final NamespaceId rootNamespaceId = new NamespaceId(namespaceId).getRoot();
-		final Criteria namespaceCriteria = session.createCriteria(DbNamespace.class, "namespace") // preserve-newline
-				.add(Restrictions.eq("fullName", rootNamespaceId.toString())) // preserve-newline
-				.add(Restrictions.gt("height", minHeight)) // preserve-newline
-				.addOrder(Order.asc("height")) // preserve-newline
-				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY); // preserve-newline
-		return HibernateUtils.listAndCast(namespaceCriteria);
+		// n.owner is eager; without the JOIN FETCH, HQL would load it with a separate select per row (N+1)
+		return session
+				.createQuery("SELECT n FROM DbNamespace n LEFT JOIN FETCH n.owner"
+						+ " WHERE n.fullName = :fullName AND n.height > :minHeight ORDER BY n.height ASC", DbNamespace.class)
+				.setParameter("fullName", rootNamespaceId.toString()).setParameter("minHeight", minHeight).list();
 	}
 
 	private Long findExpirationHeight(final Session session, final String namespaceId, final Long height) {

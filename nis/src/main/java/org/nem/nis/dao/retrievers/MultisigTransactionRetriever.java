@@ -3,7 +3,7 @@ package org.nem.nis.dao.retrievers;
 import java.util.*;
 import java.util.stream.*;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.Query;
 import org.hibernate.type.LongType;
 import org.nem.nis.dao.*;
@@ -63,17 +63,21 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long) o[0], (Long) o[1])).collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private List<DbMultisigTransaction> getMultisigTransactions(final Session session, final List<TransactionIdBlockHeightPair> pairs,
 			final String joinEntity) {
-		final Criteria criteria = session.createCriteria(DbMultisigTransaction.class) // preserve-newline
-				.setFetchMode(joinEntity, FetchMode.JOIN) // preserve-newline
-				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList()))) // preserve-newline
-				.add(Restrictions.isNotNull(joinEntity)) // preserve-newline
-				.addOrder(Order.desc("id"));
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-
-		final List<DbMultisigTransaction> result = HibernateUtils.listAndCast(criteria);
+		// JOIN FETCH every eager association the former Criteria query joined implicitly (the sender, the wrapped transaction and its
+		// eager associations, see getInnerTransactionFetches); HQL loads each one left out here with a separate select per row (N+1)
+		// joinEntity is one of the TYPE_TO_FIELD_NAME_MAP code constants, never user input;
+		// the inner join also excludes multisig transactions wrapping a different transaction type
+		final List<Long> ids = pairs.stream().map(p -> p.transactionId).collect(Collectors.toList());
+		// DISTINCT (in memory only, not passed to SQL) collapses the duplicate root rows produced by fetching the eager
+		// multisigModifications collection; it keeps the first occurrence, so the id-descending order is preserved
+		final String hql = "SELECT DISTINCT m FROM DbMultisigTransaction m LEFT JOIN FETCH m.sender" // preserve-newline
+				+ " JOIN FETCH m." + joinEntity + " t LEFT JOIN FETCH t.sender" // preserve-newline
+				+ getInnerTransactionFetches(joinEntity) // preserve-newline
+				+ " WHERE m.id IN (:ids) ORDER BY m.id DESC";
+		final List<DbMultisigTransaction> result = session.createQuery(hql, DbMultisigTransaction.class).setParameterList("ids", ids)
+				.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false).list();
 		// we deliberately set multisigSignatureTransactions to lazy, to avoid
 		// duplicates inside other entities within current "joinEntity"
 		// (i.e. TransferTransaction holds mosaics, so each mosaic would get duplicated
@@ -85,13 +89,33 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		return result;
 	}
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
+	private static String getInnerTransactionFetches(final String joinEntity) {
+		// fetch the eager associations of the inner transaction type, so they are not loaded by a select per row
+		switch (joinEntity) {
+			case "transferTransaction":
+				return " LEFT JOIN FETCH t.recipient";
+			case "importanceTransferTransaction":
+				return " LEFT JOIN FETCH t.remote";
+			case "multisigAggregateModificationTransaction":
+				return " LEFT JOIN FETCH t.multisigMinCosignatoriesModification"
+						+ " LEFT JOIN FETCH t.multisigModifications mm LEFT JOIN FETCH mm.cosignatory";
+			case "provisionNamespaceTransaction":
+				return " LEFT JOIN FETCH t.rentalFeeSink LEFT JOIN FETCH t.namespace ns LEFT JOIN FETCH ns.owner";
+			case "mosaicDefinitionCreationTransaction":
+				return " LEFT JOIN FETCH t.creationFeeSink LEFT JOIN FETCH t.mosaicDefinition md"
+						+ " LEFT JOIN FETCH md.creator LEFT JOIN FETCH md.feeRecipient";
+			default :
+				return "";
+		}
+	}
+
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {
 		final HashMap<Long, DbBlock> blockMap = new HashMap<>();
-		final Criteria criteria = session.createCriteria(DbBlock.class) // preserve-newline
-				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList()))) // preserve-newline
-				.addOrder(Order.desc("height"));
-		final List<DbBlock> blocks = HibernateUtils.listAndCast(criteria);
+		// b.harvester and b.lessor are eager; without the JOIN FETCH, HQL would load each with a separate select per row (N+1)
+		final List<DbBlock> blocks = session
+				.createQuery("SELECT b FROM DbBlock b LEFT JOIN FETCH b.harvester LEFT JOIN FETCH b.lessor"
+						+ " WHERE b.height IN (:heights) ORDER BY b.height DESC", DbBlock.class)
+				.setParameterList("heights", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())).list();
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
 		return blockMap;
 	}

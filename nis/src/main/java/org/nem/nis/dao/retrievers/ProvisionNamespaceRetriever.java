@@ -3,7 +3,6 @@ package org.nem.nis.dao.retrievers;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
@@ -12,7 +11,6 @@ import org.nem.nis.dbmodel.*;
  */
 public class ProvisionNamespaceRetriever implements TransactionRetriever {
 
-	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(final Session session, final long accountId, final long maxId,
 			final int limit, final ReadOnlyTransferDao.TransferType transferType) {
@@ -21,19 +19,17 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 		}
 
 		final String senderOrRentalFeeSink = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "rentalFeeSink";
-		final Criteria criteria = session.createCriteria(DbProvisionNamespaceTransaction.class) // preserve-newline
-				.setFetchMode("block", FetchMode.JOIN) // preserve-newline
-				.setFetchMode("sender", FetchMode.JOIN) // preserve-newline
-				.setFetchMode("rentalFeeSink", FetchMode.JOIN) // preserve-newline
-				.setFetchMode("namespace", FetchMode.JOIN) // preserve-newline
-				.add(Restrictions.eq(senderOrRentalFeeSink + ".id", accountId)) // preserve-newline
-				.add(Restrictions.isNotNull("senderProof")) // preserve-newline
-				.add(Restrictions.lt("id", maxId)) // preserve-newline
-				.addOrder(Order.asc(senderOrRentalFeeSink)) // preserve-newline
-				.addOrder(Order.desc("id")) // preserve-newline
-				.setMaxResults(limit);
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbProvisionNamespaceTransaction> list = HibernateUtils.listAndCast(criteria);
+		// JOIN FETCH everything the former Criteria query joined implicitly (the lazy block and every eager to-one); HQL loads each
+		// eager association left out here with a separate select per row (N+1)
+		// senderOrRentalFeeSink is one of two code constants, never user input
+		final String hql = "SELECT t FROM DbProvisionNamespaceTransaction t" // preserve-newline
+				+ " LEFT JOIN FETCH t.block b LEFT JOIN FETCH b.harvester LEFT JOIN FETCH b.lessor" // preserve-newline
+				+ " LEFT JOIN FETCH t.sender LEFT JOIN FETCH t.rentalFeeSink" // preserve-newline
+				+ " LEFT JOIN FETCH t.namespace ns LEFT JOIN FETCH ns.owner" // preserve-newline
+				+ " WHERE t." + senderOrRentalFeeSink + ".id = :accountId AND t.senderProof IS NOT NULL AND t.id < :maxId" // preserve-newline
+				+ " ORDER BY t." + senderOrRentalFeeSink + ".id ASC, t.id DESC";
+		final List<DbProvisionNamespaceTransaction> list = session.createQuery(hql, DbProvisionNamespaceTransaction.class)
+				.setParameter("accountId", accountId).setParameter("maxId", maxId).setMaxResults(limit).list();
 		return list.stream().map(t -> new TransferBlockPair(t, t.getBlock())).collect(Collectors.toList());
 	}
 }

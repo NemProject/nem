@@ -7,10 +7,9 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
-import wiremock.org.apache.commons.lang.StringUtils;
 
 public class MosaicDescriptorTest {
-	private static final String MAX_LENGTH_DESCRIPTION = StringUtils.repeat("abcd", 128);
+	private static final String MAX_LENGTH_DESCRIPTION = "abcd".repeat(128);
 
 	// region ctor
 

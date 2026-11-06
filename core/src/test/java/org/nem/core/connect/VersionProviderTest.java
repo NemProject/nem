@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.nem.core.node.NodeVersion;
 import org.nem.core.utils.ExceptionUtils;
 
+@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20) used to build test URLs
 public class VersionProviderTest {
 
 	@Test
