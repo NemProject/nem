@@ -248,7 +248,7 @@
                     <!-- Mockito 5's inline mock maker must be loaded as an agent on JDK 21+ (self-attach is deprecated).
                          The jar is addressed in the local repository so the path also resolves when failsafe is
                          invoked directly (mvn failsafe:integration-test), which runs no lifecycle phase. -->
-                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+                    <argLine>@{argLine} -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar"</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -258,7 +258,7 @@
                 <configuration>
                     <testSourceDirectory>src/it/java</testSourceDirectory>
                     <failIfNoTests>true</failIfNoTests>
-                    <argLine>@{argLine} -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</argLine>
+                    <argLine>@{argLine} -javaagent:"${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar"</argLine>
                 </configuration>
                 <executions>
                     <execution>
