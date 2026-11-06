@@ -3,6 +3,7 @@ package org.nem.nis.dao.retrievers;
 import java.util.*;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.query.Query;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.HibernateUtils;
 import org.nem.nis.dbmodel.DbNamespace;
@@ -21,6 +22,7 @@ public class NamespaceRetriever {
 	 * @param limit The limit.
 	 * @return The namespaces.
 	 */
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	public Collection<DbNamespace> getNamespacesForAccount(final Session session, final long accountId, final NamespaceId parent,
 			final int limit) {
 		final HashMap<String, DbNamespace> rootMap = getCurrentRootNamespacesForAccount(session, accountId);
@@ -56,6 +58,7 @@ public class NamespaceRetriever {
 	 * @param id The namespace id.
 	 * @return The specified namespace or null.
 	 */
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	public DbNamespace getNamespace(final Session session, final NamespaceId id) {
 		final DbNamespace root = getCurrentRootNamespace(session, id);
 		if (null == root) {
@@ -89,13 +92,14 @@ public class NamespaceRetriever {
 				+ "AND id < :maxId " // preserve-newline
 				+ "ORDER BY id DESC " // preserve-newline
 				+ "LIMIT :limit";
-		final Query query = session.createSQLQuery(queryString) // preserve-newline
+		final Query<?> query = session.createNativeQuery(queryString) // preserve-newline
 				.addEntity(DbNamespace.class) // preserve-newline
 				.setParameter("maxId", maxId) // preserve-newline
 				.setParameter("limit", limit);
 		return HibernateUtils.listAndCast(query);
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static HashMap<String, DbNamespace> getCurrentRootNamespacesForAccount(final Session session, final Long accountId) {
 		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline
 				.add(Restrictions.eq("owner.id", accountId)) // preserve-newline
@@ -112,6 +116,7 @@ public class NamespaceRetriever {
 		return map;
 	}
 
+	@SuppressWarnings("deprecation") // Hibernate 5.6 legacy Criteria API (createCriteria) has no drop-in replacement
 	private static DbNamespace getCurrentRootNamespace(final Session session, final NamespaceId id) {
 		final String rootName = id.getRoot().toString();
 		final Criteria criteria = session.createCriteria(DbNamespace.class) // preserve-newline

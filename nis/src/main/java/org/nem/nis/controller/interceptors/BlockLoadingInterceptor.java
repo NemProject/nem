@@ -6,12 +6,12 @@ import javax.servlet.http.*;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * An interceptor that prevents access to most NIS functions while the block chain is loading.
  */
-public class BlockLoadingInterceptor extends HandlerInterceptorAdapter {
+public class BlockLoadingInterceptor implements HandlerInterceptor {
 	private static final Logger LOGGER = Logger.getLogger(BlockLoadingInterceptor.class.getName());
 
 	private final BlockChainLastBlockLayer lastBlockLayer;
