@@ -112,7 +112,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519EncodedGroupElement encoded = g.encode();
 			final byte[] bytes = MathUtils.toByteArray(MathUtils.toBigInteger(g.getY()));
 			if (MathUtils.toBigInteger(g.getX()).mod(new BigInteger("2")).equals(MathUtils.toBigInteger(Ed25519Field.ONE))) {
-				bytes[31] |= 0x80;
+				bytes[31] = (byte) (bytes[31] | 0x80);
 			}
 
 			// Assert:

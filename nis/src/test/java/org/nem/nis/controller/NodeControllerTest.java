@@ -430,7 +430,7 @@ public class NodeControllerTest {
 
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollectionOf(Node.class)))
+			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollection()))
 					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
 			Mockito.when(this.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(true);

@@ -210,7 +210,7 @@ public class AccountsHeightObserverTest {
 				createExecuteNotificationContext(12));
 
 		// Assert:
-		Mockito.verifyZeroInteractions(context.accountCache, context.accountStateCache);
+		Mockito.verifyNoInteractions(context.accountCache, context.accountStateCache);
 	}
 
 	// endregion

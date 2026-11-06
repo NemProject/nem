@@ -190,7 +190,7 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert: the notification context should use the current (not creation) information
 			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any(), Mockito.anyObject());
+			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
 			Mockito.verify(context.blockTransferObserver, Mockito.only()).notify(Mockito.any(), Mockito.any());
 			MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 			context.assertNotificationContext(CONFIRMED_BLOCK_HEIGHT + 10, CURRENT_TIME + 7);
@@ -242,7 +242,7 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
-			Mockito.verify(transaction, Mockito.never()).execute(Mockito.any(), Mockito.anyObject());
+			Mockito.verify(transaction, Mockito.never()).execute(Mockito.any(), Mockito.any());
 			Mockito.verify(context.blockTransferObserver, Mockito.never()).notify(Mockito.any(), Mockito.any());
 			MatcherAssert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}

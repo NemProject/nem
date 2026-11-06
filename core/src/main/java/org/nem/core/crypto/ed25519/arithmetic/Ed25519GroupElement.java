@@ -713,12 +713,12 @@ public class Ed25519GroupElement implements Serializable {
 		/* e[63] is between 0 and 7 */
 		int carry = 0;
 		for (i = 0; i < 63; i++) {
-			e[i] += carry;
+			e[i] = (byte) (e[i] + carry);
 			carry = e[i] + 8;
 			carry >>= 4;
-			e[i] -= carry << 4;
+			e[i] = (byte) (e[i] - (carry << 4));
 		}
-		e[63] += carry;
+		e[63] = (byte) (e[63] + carry);
 
 		return e;
 	}
@@ -826,10 +826,10 @@ public class Ed25519GroupElement implements Serializable {
 					// Accumulate bits if possible
 					if (r[i + b] != 0) {
 						if (r[i] + (r[i + b] << b) <= 15) {
-							r[i] += r[i + b] << b;
+							r[i] = (byte) (r[i] + (r[i + b] << b));
 							r[i + b] = 0;
 						} else if (r[i] - (r[i + b] << b) >= -15) {
-							r[i] -= r[i + b] << b;
+							r[i] = (byte) (r[i] - (r[i + b] << b));
 							for (int k = i + b; k < 256; ++k) {
 								if (r[k] == 0) {
 									r[k] = 1;
