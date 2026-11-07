@@ -188,9 +188,8 @@ public class CommonStarter {
 		}
 	}
 
-	@SuppressWarnings("deprecation") // java.net.URL ctor (deprecated in JDK 20); the URI-based replacement parses more strictly
 	private void start(final Server server, final CommonConfiguration configuration) throws Exception {
-		this.startServer(server, new URL(configuration.getShutdownUrl()));
+		this.startServer(server, URI.create(configuration.getShutdownUrl()).toURL());
 		this.servers.add(server);
 	}
 }
