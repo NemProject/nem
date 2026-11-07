@@ -30,8 +30,10 @@ public class MosaicDefinitionRetrieverTest {
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
-		this.createAccounts(3);
-		this.setupMosaicDefinitions();
+		DbTestUtils.runInTransaction(this.session, () -> {
+			this.createAccounts(3);
+			this.setupMosaicDefinitions();
+		});
 	}
 
 	@After

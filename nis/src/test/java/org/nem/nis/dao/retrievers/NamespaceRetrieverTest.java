@@ -33,8 +33,10 @@ public class NamespaceRetrieverTest {
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
-		this.createAccounts(5);
-		this.setupNamespaces();
+		DbTestUtils.runInTransaction(this.session, () -> {
+			this.createAccounts(5);
+			this.setupNamespaces();
+		});
 	}
 
 	@After

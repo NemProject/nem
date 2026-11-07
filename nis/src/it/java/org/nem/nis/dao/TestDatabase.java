@@ -133,7 +133,6 @@ public class TestDatabase {
 		final Session session = this.sessionFactory.openSession();
 		final Query<?> query = session.createQuery("from DbAccount a");
 		final List<DbAccount> dbAccounts = HibernateUtils.listAndCast(query);
-		session.flush();
 		session.clear();
 		session.close();
 		final List<Account> accounts = dbAccounts.stream().map(dbAccount -> {

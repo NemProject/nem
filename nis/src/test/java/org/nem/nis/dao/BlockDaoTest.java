@@ -416,7 +416,6 @@ public class BlockDaoTest {
 			final Session session = this.sessionFactory.openSession();
 			final Long count = (Long) session.createNativeQuery("SELECT COUNT(*) as count FROM " + tableName)
 					.addScalar("count", LongType.INSTANCE).uniqueResult();
-			session.flush();
 			session.clear();
 			session.close();
 			return count;

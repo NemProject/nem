@@ -32,7 +32,7 @@ public class DaoUtilsTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
-		this.createAccounts(NUM_ACCOUNTS);
+		DbTestUtils.runInTransaction(this.session, () -> this.createAccounts(NUM_ACCOUNTS));
 	}
 
 	@After

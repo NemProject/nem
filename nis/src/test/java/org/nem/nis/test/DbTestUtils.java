@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.*;
@@ -32,11 +33,33 @@ public class DbTestUtils {
 	}
 
 	/**
+	 * Runs an action that writes to the database in a transaction, which Hibernate 5+ requires for updates.
+	 *
+	 * @param session The session.
+	 * @param action The action.
+	 */
+	public static void runInTransaction(final Session session, final Runnable action) {
+		final Transaction transaction = session.beginTransaction();
+		try {
+			action.run();
+			transaction.commit();
+		} catch (final RuntimeException e) {
+			transaction.rollback();
+			throw e;
+		}
+	}
+
+	/**
 	 * Cleans up the database.
 	 *
 	 * @param session The session.
 	 */
 	public static void dbCleanup(final Session session) {
+		runInTransaction(session, () -> deleteAll(session));
+		session.clear();
+	}
+
+	private static void deleteAll(final Session session) {
 		session.createNativeQuery("delete from multisigsignatures").executeUpdate();
 		session.createNativeQuery("delete from multisigtransactions").executeUpdate();
 		session.createNativeQuery("delete from transferredmosaics").executeUpdate();
@@ -65,9 +88,6 @@ public class DbTestUtils {
 		session.createNativeQuery("ALTER TABLE transferredmosaics ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createNativeQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createNativeQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
-
-		session.flush();
-		session.clear();
 	}
 
 	/**
