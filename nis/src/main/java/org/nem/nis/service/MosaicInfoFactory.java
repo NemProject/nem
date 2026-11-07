@@ -41,7 +41,7 @@ public class MosaicInfoFactory {
 
 		// add owned mosaic definitions
 		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream().map(this::getMosaicDefinition)
-				.collect(Collectors.toSet());
+				.filter(Objects::nonNull).collect(Collectors.toSet());
 
 		// add 1st level levies too
 		final Set<MosaicDefinition> mosaicLevyDefinitions = mosaicDefinitions.stream().filter(def -> null != def.getMosaicLevy())

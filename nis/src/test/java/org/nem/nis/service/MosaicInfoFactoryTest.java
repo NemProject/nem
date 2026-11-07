@@ -1,7 +1,8 @@
 package org.nem.nis.service;
 
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.Test;
@@ -37,6 +38,20 @@ public class MosaicInfoFactoryTest {
 		final Mosaic barMosaic = mosaics.get(1);
 		MatcherAssert.assertThat(barMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("foo"), "bar")));
 		MatcherAssert.assertThat(barMosaic.getQuantity(), IsEqual.equalTo(new Quantity(1234)));
+	}
+
+	@Test
+	public void factoryFiltersMosaicDefinitionsThatAreNotFoundInNamespaceCache() {
+		// Arrange: account info contains mosaic ids foo.bar, baz.qux and nomosaic.crash
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Set<MosaicDefinition> mosaicDefinitions = context.factory.getMosaicDefinitions(context.address);
+
+		// Assert: two mosaic definitions were returned (nem.xem, foo.bar), mosaics baz.qux and nomosaic.crash were filtered
+		final Set<MosaicId> mosaicIds = mosaicDefinitions.stream().map(MosaicDefinition::getId).collect(Collectors.toSet());
+		MatcherAssert.assertThat(mosaicIds,
+				IsEqual.equalTo(new HashSet<>(Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, new MosaicId(new NamespaceId("foo"), "bar")))));
 	}
 
 	private static class TestContext {
